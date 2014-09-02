@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <!-- change title to match the h1 heading -->
+    <title id="bclPageTitle">Media API Sample: delete_video</title>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/foundation.min.css" />
+	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/normalize.css" />
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/styles/github.min.css" />
+    <link rel="stylesheet" type="text/css" href="/en/styles/anytime.5.0.0-1401232312.min.css" />
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2728311-29', 'auto');
+  ga('send', 'pageview');
+
+</script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/vendor/modernizr.js"></script>
+  </head>
+
+  <body>
+	<!-- header navbar -->
+	<div id="navWrapper" class="fixed"></div>
+	<!-- breadcrumbs -->
+	<nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+	<!-- search -->
+	<div id="searchModal" class="reveal-modal" data-reveal></div>
+	<!-- content -->
+    <div class="row">
+        <div class="large-2 columns show-for-large-up">
+            <div id="sidenav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+        <div id="top" class="section" title="Top">
+          <h1>Media API Sample: delete_video</h1>
+          <p>This example uses the <code>search_videos()</code> READ method, which allows you to perform complex searches for videos. You can search any standard or custom data field, and you can have multiple <code>all</code>, <code>any</code>, and <code>none</code> terms to include and exclude videos from the search results. All READ method samples are made using the <a href="//docs.brightcove.com/en/video-cloud/open-source/">JavaScript MAPI wrapper</a>.</p>
+            <p>You can then select a video from the drop-down menu and delete it. This sample uses the <code>delete_video()</code> WRITE method of the Media API to delete a video from an account.</p>
+            <p>There are hard-coded values below from a Brightcove Learning demo account that you can use to test with or you can substitute the read and write tokens for your own account.</p>
+          <p class="text-warning">Note: you should <strong style="color:red">never</strong> hard-code your tokens into a client-side application in the manner shown here for demonstration purposes only. Also be aware that even if you require the use to enter the token, it will be transmitted as plain text unless the form submits over an https connection.</p>
+          <p>View the source for this page to see the code.</p>
+        </div>
+        <div class="section" id="input">
+          <h2>Search Input</h2>
+          <p>Read token (to retrieve list of videos: <input name="yourReadToken" id="yourReadToken" type="text" size="100" value="ZY4Ls9Hq6LCBgleGDTaFRDLWWBC8uoXQun0xEEXtlDUHBDPZBCOzbw.."></p>
+          <p>API Location: <input id="yourAPILocation" value="//api.brightcove.com/services/post" /></p>
+          <p>Return videos that have <code>all</code> of these terms:<br /><input name="all" id="all" type="text" size="100" ></p>
+            <p>Return videos that have <code>any</code> of these terms:<br /><input name="any" id="any" type="text" size="100" ></p>
+            <p>Return videos that have <code>none</code> of these terms:<br /><input name="none" id="none" type="text" size="100" value="private"></p>
+            <p>Sort videos: 
+              <select id="sortByOrder">
+                <option value="ASC">Ascending</option>
+                <option value="DESC">Descending</option>
+              </select>
+            </p>  
+         
+            <p>Page size: <input name="pageSize" id="pageSize" type="text" size="10" value="5">
+            &nbsp; Page number:
+              <select id="pageNumber">
+                <option>0</option>
+              </select>
+            </p>
+            <p class="text-warning">Only the first page is available until you make a search; then the available pages are recalculated.</p>
+            <p>Total videos: <input name="totalVidoes" id="totalVideos" type="text" readonly="readonly" value="???"></p>
+            <p><span class="BCL-btn" onclick="BCL.doSearchVideos()">Search for Videos</span></p>
+          <br/>
+          <p class="text-warning">After you select the <strong>Search for Videos</strong> button, your video list will appear in the <strong>Video to delete</strong> drop-down menu below.</p>
+          </div>
+          
+        <div class="section" id="delete">
+          <h2>Delete a Video</h2>
+          <p class="text-warning">There is some delay (about 5-10 mins) from when you create a video and when it shows up in the video list below. This is because the results from the Media API are cached. You will also notice that there is a delay from when you delete a video and when it is removed from the the Media API search results.
+</p>
+          <p>Write Token: <input id="yourWriteToken" type="text" value="ZY4Ls9Hq6LCBgleGDTaFRDLWWBC8uoXQHkhGuDebKvjFPjHb3iT-4g.." /></p>
+          <p>Video to delete:
+            <select id="videoList">
+                <option>none</option>
+              </select>
+          </p>
+          <p>Delete even if assigned to playlists or players:
+            <select id="cascade">
+              <option value="true">yes</option>
+              <option value="false">no</option>
+            </select>
+          </p>
+          <p>Also delete shared copies:
+            <select id="deleteShares">
+              <option value="true">yes</option>
+              <option value="false">no</option>
+            </select>
+          </p>
+          <p class="text-warning">Deleting a video can <strong>not</strong> be undone!</p>
+          <br/>
+          <p><span class="BCL-btn" onclick="BCL.doDeleteVideo()">Delete Video</span></p>
+ 
+          </div>
+          <div class="section" id="request">
+            <h2>Media API Request</h2>
+          <form id="delete_video_sample" method="POST" enctype="multipart/form-data"  target="postFrame">
+            <fieldset>
+            <legend>JSON Request</legend>
+             <input type=hidden name="JSONView" id="JSONView" style="width:97%;padding:5px;border:1px #999 solid" />
+            </fieldset>
+          </form>
+          <p>Below is the request sent to the Media API service to retrieve videos:</p>
+          <pre><code id="jsonRequest1"></code></pre>
+          <p>Below is the request sent to the Media API service to delete the selected video:</p>
+          <pre><code id="jsonRequest2"></code></pre>
+        </div>
+        <div class="section" id="response">
+          <h2>Media API Response</h2>
+          <p class="text-warning">A successful response for deleting a video will look like this: <code>{"result": {}, "error": null, "id": null}</code></p>
+          <fieldset>
+          <legend>Response:</legend>
+            <p>Below is the response from the delete video request:</p>
+            <iframe id="postFrame" name="postFrame" style="width:100%;border:none"></iframe>
+          </fieldset>
+        </div>
+      </div>
+    </div>
+    <!-- bcl scripts -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.2/fastclick.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/foundation.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
+    
+    <script src="/en/scripts/docs-nav-data.min.js"></script>
+    <script src="/en/scripts/bcls-doc-site.js"></script>
+    <script src="/en/scripts/bc-mapi.js"></script>
+        <script src="/en/scripts/anytime.5.0.0-1401232312.min.js"></script>
+    <script>
+        $(document).foundation();
+    </script>
+    <script id="pageScript" type="text/javascript">
+      /******** Any scripts specific to page samples should go here *********/
+      BCL = {};
+			BCL.resetPageNumber = false;
+			BCL.videoSelector = document.getElementById("videoList");
+			BCL.sortBy = document.getElementById("sortBy");
+			BCL.sortByOrder = document.getElementById("sortByOrder");
+			BCL.pageNumber = document.getElementById("pageNumber");
+	  
+			BCL.doSearchVideos = function() {
+			// call the Media API to return all the video data for the specified account  
+				if (document.getElementById("yourReadToken") == "" || document.getElementById("yourWriteToken") == "" || document.getElementById("yourAPILocation").value == "") {
+					alert("Please enter a valid read token, write token and service URL");
+				}
+				BCMAPI.token = document.getElementById("yourReadToken").value;
+				BCMAPI.callback = "BCL.onSearchResponse";
+				BCL.params = {};
+				if (document.getElementById("all").value !== "") {
+					BCL.params.all = document.getElementById("all").value.split(",");
+				}
+				if (document.getElementById("any").value !== "") {
+					BCL.params.any = document.getElementById("any").value.split(",");
+				}
+				if (document.getElementById("none").value !== "") {
+					BCL.params.none = document.getElementById("none").value.split(",");
+				}
+				if (document.getElementById("pageSize").value !== "") {
+					BCL.params.page_size = document.getElementById("pageSize").value;
+				}
+				BCL.params.video_fields = "id,name";
+				BCL.params.media_delivery = "default";
+				BCL.params.sort_by = "DISPLAY_NAME:" + BCL.sortByOrder.options[BCL.sortByOrder.selectedIndex].value;
+				if ((BCL.resetPageNumber) || (!BCL.pageNumber.options[BCL.pageNumber.selectedIndex])) {
+					BCL.params.page_number = 0;
+					BCL.resetPageNumber = false;
+				} else {
+					BCL.params.page_number = BCL.pageNumber.options[BCL.pageNumber.selectedIndex].value;
+				}
+				BCL.params.get_item_count = true;
+				BCMAPI.search(BCL.params);
+			}
+			
+			// initial call to get video list for default values
+			BCL.doSearchVideos();
+	  
+	  	// check if any data was returned from the search
+      BCL.onSearchResponse = function(jsonData) {
+				console.log("onSearchResponse");
+				console.log(jsonData);
+				
+				if (jsonData.items) {
+					BCL.formatSearchData(jsonData);
+				}
+			}
+	  
+      BCL.formatSearchData = function(jsonData) {
+				var numberOfPages = Math.ceil(jsonData.total_count/jsonData.page_size);
+				// check if a page number was selected that no longer exists with current data
+				if (BCL.params.page_number > numberOfPages) {
+					// redo video data search and reset the selected page number to 0
+					BCL.resetPageNumber = true;
+					BCL.doSearchVideos();
+				}
+				// create the video list and format in HTML
+				var str = "";
+				for (var i in jsonData.items) {
+					// format the video drop-down menu items
+					str += "<option value='"+ jsonData.items[i].id +
+					"' >" + jsonData.items[i].name + "</option>";	
+				}
+				// inject the video list into the video drop-down menu
+				document.getElementById("videoList").innerHTML = str;
+				
+				BCL.formatPageDropdown(numberOfPages);
+				
+				// set the number of videos returned
+				document.getElementById("totalVideos").value = jsonData.total_count;
+				// output request 
+        document.getElementById("jsonRequest1").innerHTML = BCMAPI.request;
+      }
+			
+			BCL.formatPageDropdown = function (numberOfPages){
+				// remove any page option elements from previous requests
+				if(BCL.pageNumber.length > numberOfPages) {
+					for (var i = numberOfPages; i < BCL.pageNumber.length; i++) {	
+						BCL.pageNumber.remove(i);
+						i--;
+					}
+				}
+				// add page option elements for each page in returned data
+				for (var i = 0; i < numberOfPages; i++) {	
+					if (!BCL.pageNumber[i]) {
+						var option = document.createElement("option");
+						option.text = i;
+						BCL.pageNumber.add(option,null);
+					}
+				}
+			}
+			
+      BCL.doDeleteVideo = function() {
+        var form = document.getElementById("delete_video_sample");
+				if(!(BCL.videoSelector.options[BCL.videoSelector.selectedIndex])){
+					alert("Required: Selected Video");
+					document.getElementById("jsonRequest2").innerHTML = "";
+					document.getElementById("postFrame").src = "";
+					return;
+				}
+        BCL.buildJSONRequest();
+        form.action = document.getElementById("yourAPILocation").value;
+        form.submit();
+        BCL.videoSelector.remove(BCL.videoSelector.options[BCL.videoSelector.selectedIndex]);
+      }
+
+      BCL.buildJSONRequest = function() {
+        var cascade = document.getElementById("cascade");
+        var deleteShares = document.getElementById("deleteShares");
+        json = document.getElementById('JSONView');
+        //Construct the JSON request:
+        BCL.json = {};
+        BCL.json.method = "delete_video";
+        BCL.json.params = {};
+				BCL.json.params.token = document.getElementById("yourWriteToken").value;
+        BCL.json.params.video_id = BCL.videoSelector.options[BCL.videoSelector.selectedIndex].value;
+        BCL.json.params.cascade = cascade.options[cascade.selectedIndex].value;
+        BCL.json.params.delete_shares = deleteShares.options[deleteShares.selectedIndex].value;
+        json.value = JSON.stringify(BCL.json);
+				document.getElementById("jsonRequest2").innerHTML = JSON.stringify(BCL.json);
+      }
+			
+      // debugging tool - wraps console.log to avoid errors in IE 7 & 8
+      BCL.log = function(message) {
+        if (window["console"] && console["log"]) {
+          var d = new Date();
+          console.log(d + ": ");
+          console.log(message);
+        }
+      }
+    </script>
+
+	    <div class="footer text-center"><a href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+	</body>
+</html>

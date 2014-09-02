@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <!-- change title to match the h1 heading -->
+    <title id="bclPageTitle">Media API Sample: create_video</title>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/foundation.min.css" />
+	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/normalize.css" />
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/styles/github.min.css" />
+    <link rel="stylesheet" type="text/css" href="/en/styles/anytime.5.0.0-1401232312.min.css" />
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2728311-29', 'auto');
+  ga('send', 'pageview');
+
+</script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/vendor/modernizr.js"></script>
+  </head>
+
+  <body>
+	<!-- header navbar -->
+	<div id="navWrapper" class="fixed"></div>
+	<!-- breadcrumbs -->
+	<nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+	<!-- search -->
+	<div id="searchModal" class="reveal-modal" data-reveal></div>
+	<!-- content -->
+    <div class="row">
+        <div class="large-2 columns show-for-large-up">
+            <div id="sidenav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+        <div id="top" class="section">
+            <h1 id="bclPageHeading">Media API Sample: create_video</h1>
+            <p>This sample uses the Media API <code>create_video()</code> WRITE method to upload a video and associated metadata. The <a href="http://www.ama3.com/anytime/"><strong>Anytime</strong></a> jQuery plugin is used for date/time pickers.</p>
+            <p>There are hard-coded values below from a Brightcove Learning demo account that you can use to test with or you can substitute the read and write tokens for your own account.</p>
+            <p class="text-warning">Note: you should <strong style="color:red">never</strong> hard-code your tokens into a client-side application in the manner shown here for demonstration purposes only. Also be aware that even if you require the use to enter the token, it will be transmitted as plain text unless the form submits over an https connection.</p>
+            <p>View the source for this page to see the code.</p>
+          </div>
+          <div class="section" id="input">
+            <h2>Input form</h2>
+            <p>Write token: <input id="yourWriteToken" type="text" value="ZY4Ls9Hq6LCBgleGDTaFRDLWWBC8uoXQHkhGuDebKvjFPjHb3iT-4g.." /></p>
+            <p>API location: <input id="yourAPILocation" value="//api.brightcove.com/services/post" /></p>
+            <p>Video name: <input id="name" size="55" type="text"/></p>
+            <p>Short description: <input id="shortDescription" size="55" type="text"/></p>
+            <p>Tags (comma-separated, no spaces): <input id="tags" size="70" type="text"/></p>
+            <p>Start date: <input id="startDate" type="text" size="50">
+             &nbsp; Start time: <input id="startTime" type="text" size="50"></p>
+            <p>End date: <input id="endDate" type="text" size="50">
+             &nbsp; End time: <input id="endTime" type="text" size="50"></p>
+			<p>Encode to: <select id="encodeTo">
+                <option selected="selected">FLV</option>
+				<option>MP4</option>
+              </select>
+			</p>
+			<p>Create multiple renditions: <select id="multiRenditions">
+                <option selected="selected">False</option>
+				<option>True</option>
+              </select>
+			</p>
+            </div>
+            <div class="section" id="request">
+            <form id="create_video_sample" method="POST" enctype="multipart/form-data" target="postFrame">
+              <!--This is where the actual json request lives, it has to come before the file input -->
+              <input type="hidden" name="JSONRPC" />
+              <p><input type="file" name="filePath"/></p>
+              <!--<p><button id="submitButton" onclick="doFileUpload()">Upload</button></p>-->
+              <p><span class="BCL-btn" onclick="doFileUpload()">Create Video</span></p>
+              <!--display the json request -->
+              <h2>Media API Request</h2>
+              <fieldset>
+              <legend>JSON Request</legend>
+                <input type=hidden name="JSONView" id="JSONView" style="width:97%;padding:5px;border:1px #999 solid" />
+              </fieldset>
+            </form>
+            <pre><code id="jsonRequest1"></code></pre>
+          </div>
+          <div class="section" id="response">
+            <h2>Media API Response</h2>
+            <fieldset>
+            <legend>Response:</legend>
+              <iframe id="postFrame" name="postFrame" style="width:100%;border:none"></iframe>
+            </fieldset>
+          </div>
+      </div>
+    </div>
+    <!-- bcl scripts -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-migrate/1.2.1/jquery-migrate.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.2/fastclick.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/foundation.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
+    
+    <script src="/en/scripts/docs-nav-data.min.js"></script>
+    <script src="/en/scripts/bcls-doc-site.js"></script>
+    <script src="/en/scripts/bc-mapi.js"></script>
+        <script src="/en/scripts/anytime.5.0.0-1401232312.min.js"></script>
+    <script>
+        $(document).foundation();
+    </script>
+    <script id="pageScript" type="text/javascript">
+      /******** Any scripts specific to page samples should go here *********/
+      BCL = {};
+      BCL.name = document.getElementById('name');
+      BCL.shortDescription = document.getElementById('shortDescription');
+      BCL.tags = document.getElementById('tags');
+      BCL.startDate = document.getElementById("startDate");
+      BCL.startTime = document.getElementById("startTime");
+      BCL.endDate = document.getElementById("endDate");
+      BCL.endTime = document.getElementById("endTime");
+      BCL.thisDate = new Date();
+      BCL.timeZone = BCL.thisDate.getTimezoneOffset();
+      BCL.today = BCL.thisDate.toDateString();
+      BCL.yearFromNow = BCL.thisDate.getTime() + 31536000000;
+      BCL.nextYear = new Date(BCL.yearFromNow);
+      BCL.nextYearDate = BCL.nextYear.toDateString();
+      BCL.nextYearTime = BCL.nextYear.toTimeString();
+      BCL.now = BCL.thisDate.toTimeString();
+      BCL.startDate.value = BCL.today;
+      BCL.startTime.value = BCL.now;
+      BCL.endDate.value = BCL.nextYearDate;
+      BCL.endTime.value = BCL.nextYearTime;
+      AnyTime.picker( "startDate", { format: "%a %M %d %Y" } );
+      AnyTime.picker( "startTime", { format: "%H:%i:%s GMT%-", labelTitle: "Time", labelHour: "Hour", labelMinute: "Minute" } );
+      AnyTime.picker( "endDate", { format: "%a %M %d %Y" } );
+      AnyTime.picker( "endTime", { format: "%H:%i:%s GMT%-", labelTitle: "Time", labelHour: "Hour", labelMinute: "Minute" } );
+      BCL.encodeTo = document.getElementById("encodeTo");
+      BCL.multiRenditions = document.getElementById("multiRenditions");
+		
+      doFileUpload = function (){
+        form = document.getElementById("create_video_sample");
+				if(BCL.name.value == "" || BCL.shortDescription.value == "" || form.filePath.value == ""){
+          alert("Required: Name, Short Description and File");
+					document.getElementById("jsonRequest1").innerHTML = "";
+					document.getElementById("postFrame").src = "";
+          return;
+        }
+        buildJSONRequest(form);
+        form.action = document.getElementById("yourAPILocation").value;
+        form.submit();
+      }
+      buildJSONRequest = function(form){
+				var endDate = BCL.endDate + " " + BCL.endTime;
+				if (endDate !== " ") {
+					endDate = new Date(endDate).getTime();
+				} else {
+					endDate = null;
+				}
+				BCL.json = {};
+				BCL.json.params = {};
+				BCL.json.params.video = {};
+				json = form.JSONRPC
+				//Construct the JSON request:
+				BCL.json.method = "create_video";
+				BCL.json.params.video.name = BCL.name.value;
+				BCL.json.params.video.shortDescription = BCL.shortDescription.value;
+				BCL.json.params.video.startDate = new Date(BCL.startDate.value + " " + BCL.startTime.value).getTime();
+				BCL.json.params.video.endDate = endDate;
+				if (BCL.tags.value !== "") {
+					BCL.json.params.video.tags = BCL.tags.value.split(",");
+				}
+		  	    BCL.json.params.encode_to = BCL.encodeTo.options[BCL.encodeTo.selectedIndex].value;
+		  		BCL.json.params.create_multiple_renditions = BCL.multiRenditions.options[BCL.multiRenditions.selectedIndex].value;
+		  
+		  		BCL.json.params.token = document.getElementById('yourWriteToken').value;
+		  
+				json.value  = JSON.stringify(BCL.json);
+				document.getElementById('JSONView').value = json.value;
+				document.getElementById("jsonRequest1").innerHTML = JSON.stringify(BCL.json);
+      }
+			
+    </script>
+	    <div class="footer text-center"><a href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+	</body>
+</html>

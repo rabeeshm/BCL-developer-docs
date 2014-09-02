@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="robots" content="noindex" />
+  <meta name="robots" content="noindex" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <title id="bclPageTitle">IMA Plugin Guide</title>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/foundation.min.css" />
+	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/normalize.css" />
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/styles/github.min.css" />
+    <link rel="stylesheet" type="text/css" href="/en/styles/anytime.5.0.0-1401232312.min.css" />
+    <script type="text/javascript">
+        <!--//--><![CDATA[//><!--
+        var _gaq = _gaq || [];
+        _gaq.push(
+            ["_setAccount", "UA-2728311-23"], ["_setDomainName", ".brightcove.com"], ["_trackPageview"]);
+        (function () {
+            var ga = document.createElement("script");
+            ga.type = "text/javascript";
+            ga.async = true;
+            ga.src = ("https:" == document.location.protocol ? "https://ssl" : "http://www") + ".google-analytics.com/ga.js";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+         //--><!]]>
+    </script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/vendor/modernizr.js"></script>
+</head>
+
+<body>
+    <!-- header navbar -->
+    <div id="navWrapper" class="fixed"></div>
+    <!-- search -->
+    <div id="searchModal" class="reveal-modal" data-reveal></div>
+    <!-- content -->
+    <div class="row">
+        <div class="large-2 columns show-for-large-up">
+            <div id="sidenav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+            <div id="top" class="section">
+                <h1 id="bclPageHeading">IMA Plugin Guide</h1>
+                <p class="video-cloud-only BCL-aside">Note: the Brightcove player is currently in beta and requires some developer skills to implement. If you are interested in participating in the beta, please contact your account manager.</p>
+                <!-- content starts here -->
+                <p class="BCL-objective">This plugin integrates Video.js with <a href="https://developers.google.com/interactive-media-ads/docs/sdks/html5/v3/">Google&#39;s Interactive Media Ads (IMA) for HTML5 version 3</a>.</p> 
+                <p>For a quick introduction to using plugins take the <a href="../../player-management/guides/player-mgmt-quick-start.html">Quick Start to Player Management</a>. For a detailed look at plugin development and use check out the <a href="../../player-management/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a>.</p>
+            </div>
+            <div id="using" class="section">
+                <h2><a name="using"></a>Using the plugin</h2>
+                <div class="BCL-concept">
+                    <p>As shown in the Quick Start to Player Management, to implement a plugin the player configuration needs to know the location of the plugin code, a stylesheet if needed, and the plugin name and plugin configuration options. The location of the plugin code and stylesheet are as follows:</p>
+                    <ul>
+                        <li>http://players.brightcove.net/videojs-ima3/videojs.ima3.min.js</li>
+                        <li>http://players.brightcove.net/videojs-ima3/videojs.ima3.min.css</li>
+                    </ul>
+                    <p class="BCL-aside">The plugins are versioned, and the URL given will always contain the latest version. The versioned instances are also available, for instance <code>http://players.brightcove.net/videojs-ima3/1.2.0/videojs.ima3.min.js</code></p>
+                    <p>The name of the plugin is <code>ima3</code>, and an example set of options is:</p>
+                    <p><code data-gist-id="6edffc8c896381fb71e9" data-gist-hide-footer="true" data-gist-line="1-4"></code></p>
+                    <p>You can associate the plugin with a player, and all child instances of that player, using a curl statement. You can also use the <code>embed_in_page</code> code and associate the plugin with just one instance of a player. Examples of both follow.</p>
+                    <h3>Associate plugin with all instances of a player</h3>
+                    <p>An example of a complete curl statement to implement the IMA plugin with a player and all child players follows:</p>
+                    <p><code data-gist-id="6edffc8c896381fb71e9" data-gist-hide-footer="true" data-gist-line="8-26"></code></p>
+                    <h3>Associate plugin with one player instance</h3>
+                    <p>To associate the plugin with a single instance of a player, which you do using the <code>embed_in_page</code> code, you must perform the following (with line references to the code which follows the list):</p>
+                    <ul>
+                        <li>Give the <code>video</code> tag an <code>id</code> attribute, with some value, in this case <strong>video</strong>; line 40.</li>
+                        <li>Use a <code>link</code> tag to include the plugin's CSS in the <code>head</code> of the HTML page; line 38.</li>
+                        <li>Use a <code>script</code> tag to include the plugin's JavaScript in the <code>body</code> of the HTML page; line 48.</li>
+                        <li>Create a reference to the player; line 51.</li>
+                        <li>Initialize the plugin and pass in custom options; lines 54-57.</li>
+                    </ul>
+                    <p><code data-gist-id="6edffc8c896381fb71e9" data-gist-hide-footer="true" data-gist-line="37-58"></code></p>
+                    <p>The rest of this document details options and advanced user options for the plugin.</p>
+                </div>
+            </div>
+            <div id="options" class="section">
+                <h2><a name="options"></a>Options</h2>
+                <div class="BCL-concept">
+                    <p>The video.js IMA3 plugin is built on top of the <a href="https://github.com/brightcove/videojs-ads">video.js ad framework</a> and accepts any options
+                        that the ad framework provides. Take a look at the ad framework <a href="https://github.com/brightcove/videojs-ads/blob/master/README.md">README</a> for
+                        details on the current set of overrideable settings. In addition, the following IMA specific options are supported:</p>
+                    <h3>ima3SdkSettings</h3>
+                    <p>Type: <code>object</code> Default Value: undefined</p>
+                    <p>If provided, the properties of this object are used to set the page-level <a href="https://developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.ImaSdkSettings">Ima3SdkSettings</a> when
+                        the IMA SDK has finished loading. The properties of this object are expected to be the camel-cased equivalent of setter methods on the SDK
+                        settings object, minus the &#39;set&#39; prefix. For example, if you provided this object when initializing the plugin:</p>
+<pre><code class="js">{
+  &#39;numRedirects&#39;: 3,
+  &#39;ppid&#39;: &#39;publisher-id&#39;,
+}
+</code></pre>
+                    <p>Then the video.js IMA plugin would run code that looks something like this when IMA had loaded:</p>
+<pre><code class="js">window.google.ima.ImaSdkSettings.setNumRedirects(3);
+window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
+</code></pre>
+                    <h3>adTechOrder</h3>
+                    <p>Type: <code>array</code>
+                        Default Value: [&#39;html5&#39;, &#39;flash&#39;]</p>
+                    <p>The ad integration technologies to attempt to use, in order of descending precedence. videojs-ima3 will test each ad tech in order on initialization
+                        and use the first supported one for the lifetime of the player.</p>
+                    <h3>adControlBar</h3>
+                    <p>Type: <code>object</code>
+                        Default Value: identical to the player control bar options</p>
+                    <p>When using the Flash ad tech, a separate set of controls are created to manage interaction with the ad SWF. When those controls are created,
+                        these options will be used during their initialization. If no value is specified, the configuration settings for the regular control bar
+                        will be used.</p>
+
+                    <h3>adSwf</h3>
+                    <p>Type: <code>string</code>
+                        Default Value: <code>videojs.ima3.swf</code></p>
+                    <p>Development Value: <code>src/videojs.ima3.swf</code></p>
+                    <p>The path to the videojs IMA3 swf. This will be directly applied to the object element if the Flash ad tech is used.</p>
+                    <h3>clickTrackingElement</h3>
+                    <p>Type: <code>HTMLElement</code> Default Value: undefined</p>
+                    <p>If the HTML ad tech is being used in <a href="//developers.google.com/interactive-media-ads/docs/sdks/html5/v3/guides/custom_playback">custom ad playback</a> mode, this specifies an alternative HTML element to be used to track advertisement taps on devices that don't support input events over the video element. More details are available in the parameter documentation for the <a href="//developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.AdDisplayContainer">IMA AdDisplayContainer</a>. If you provide a click tracking element, it is your responsibility to show and hide it at the appropriate times on the appropriate platforms. In most cases, it's best to leave this setting undefined and allow the the plugin and IMA to manage ad interaction.</p>
+                </div>
+            </div>
+          <div id="html5settings" class="section">
+            <h2>HTML5 settings</h2>
+            <p>If the HTML5 ad tech is in use, a number of IMA settings are available on the plugin object at runtime. For instance, to determine the ad ID you you would use:</p>
+<pre><code>var adId = player.ima3.currentAd.getAdId();</code></pre>            
+            <p>Be careful interacting directly with these properties. Calling the wrong method can lead to unexpected results and failure of advertisements to play properly.</p>
+            <h3>adsManager</h3>
+            <p>Type: <code>google.ima.AdsManager</code></p>
+            <p>The object responsible for playing ads. See ima.AdsManager. The Ads Manager is not available until adsready has been fired by the plugin.</p>
+            <h3>currentAd</h3>
+            <p>Type: <code>google.ima.Ad</code></p>
+            <p>When an ad is playing, an object that encapsulates information about the current ad. See ima.Ad.</p>
+            <h3>adDisplayContainer</h3>
+            <p>Type: <code>google.ima.AdDisplayContainer</code></p>
+            <p>The object responsible for managing the display elements for ads. See ima.AdDisplayContainer. The Ads Display container may not be available until adsready has been fired by the plugin.</p>
+            <h3>adsLoader</h3>
+            <p>Type: <code>google.ima.AdsLoader</code></p>
+            <p>The object used to create ads requests. See ima.AdsLoader. The Ads Loader may not be available until adsready has been fired by the plugin.</p>
+            <h3>SWF Development Note</h3>
+            <p>The swf compiled into the src/ directory will not be saved. This file is used for development and creating the distribution copy only.</p>
+          </div>
+            <div id="events" class="section">
+                <h2><a name="events"></a>Events</h2>
+                <div class="BCL-concept">
+                    <p>The plugin emits some custom event types during loading, initialization, and playback. You can listen for IMA3 events just like you would any
+                        other event:</p>
+<pre><code class="js">player.on(&#39;ima3error&#39;, function(event) {
+  console.log(&#39;event&#39;, event);
+});
+</code></pre>
+                    <h3>ima3error</h3>
+                    <p>This event indicates there was an error loading the IMA3 SDK from Google. If it occurs, no ads will be displayed.</p>
+                    <h3>ima3-ad-error</h3>
+                    <p>An error has occurred in the IMA3 SDK. You should verify your ad configuration and settings to be sure your DoubleClick account is correctly
+                        configured. You can find common troubleshooting tasks at the
+<a href="https://support.google.com/dfp_premium/">DoubleClick support site</a> or
+                        talk to your DoubleClick account representative.</p>
+                </div>
+            </div>
+          <div id="playbackmodes" class="section">
+            <h2>Playback modes</h2>
+            <p>The IMA3 HTML5 SDK has two seperate modes of operation: standard and custom playback mode. In standard mode, IMA3 will create a video element inside of the AdDisplayContainer iframe to play linear ads. Custom playback mode shares the video element with the content player and is intended for mobile devices that do not support multiple simultaneous video elements well. The videojs-ima3 plugin chooses which HTML5 playback mode to use by querying the content player's techOrder property and determining if any of the other content techs are supported. If multiple techs are supported, sharing the content video element isn't safe because it would be disposed if the current tech is unloaded. In practice, this means desktop machines with Flash installed will operate in standard playback mode and mobile devices without Flash will use custom playback mode.</p>
+          </div>
+            <div id="HMTLModeFF" class="section">
+                <h2><a name="HMTLModeFF"></a>HTML Mode/Firefox</h2>
+                <div class="BCL-concept">
+                    <p>Unlike the rest of the major browsers, Firefox does not yet support MP4 video on OS X. If you plan on adopting an HTML-first ad policy on Firefox,
+                        you&#39;ll need to make sure your ad creatives are available in a format that is supported natively, like .webm or ogv.</p>
+                </div>
+            </div>
+            <div id="clickhandling" class="section">
+                <h2><a name="clickhandling"></a>Click handling</h2>
+                <div class="BCL-concept">
+                    <p>The IMA3 ad display is overlaid on top of the video player during playback. By default, that would prevent click or touch events from reaching
+                        the player. This is not normally desirable so the default CSS only allows pointer events to reach the IMA SDK when at least one of the following
+                        conditions is true:</p>
+                    <ul>
+                        <li>When the flash ad tech is active and an ad is playing</li>
+                        <li>When the user&#39;s browser does not support touch events, the HTML ad tech is active and an ad is playing</li>
+                        <li>When the the user&#39;s browser supports touch event, player controls are visible and an ad is playing</li>
+                    </ul>
+                    <table>
+                    <thead><tr>
+                    <th align="right"></th>
+                    <th align="center">0 0</th>
+                    <th align="center">0 1</th>
+                    <th align="center">1 0</th>
+                    <th align="center">1 1</th>
+                    </tr></thead>
+                    <tbody>
+                    <tr>
+                    <td align="right"><strong>0 0</strong></td>
+                    <td align="center">0</td>
+                    <td align="center">0</td>
+                    <td align="center">1</td>
+                    <td align="center">0</td>
+                    </tr>
+                    <tr>
+                    <td align="right"><strong>0 1</strong></td>
+                    <td align="center">1</td>
+                    <td align="center">0</td>
+                    <td align="center">1</td>
+                    <td align="center">0</td>
+                    </tr>
+                    <tr>
+                    <td align="right"><strong>1 0</strong></td>
+                    <td align="center">1</td>
+                    <td align="center">0</td>
+                    <td align="center">1</td>
+                    <td align="center">0</td>
+                    </tr>
+                    <tr>
+                    <td align="right"><strong>1 1</strong></td>
+                    <td align="center">1</td>
+                    <td align="center">0</td>
+                    <td align="center">1</td>
+                    <td align="center">0</td>
+                    </tr>
+                    </tbody>
+                    </table>
+                    <p>A <a href="http://en.wikipedia.org/wiki/Karnaugh_map">Karnaugh map</a> of all the conditions under which the ad container should receive pointer
+                        events. The first digit of the row indicates whether the player was expecting mouse input. That digit would be a &#39;1&#39; if a mouse is
+                        present, a &#39;0&#39; for touch. The second digit of each row indicates whether the user is active (or not). The first digit of each column
+                        specifies whether the Flash ad tech is used. A &#39;0&#39; indicates the HTML ad tech. The second column digit is &#39;1&#39; if content
+                        is playing, &#39;0&#39; if an ad is playing.</p>
+                </div>
+            </div>
+            <div id="issues" class="section">
+                <h2><a name="issues"></a>Known issues</h2>
+                <div class="BCL-concept">
+                    <h3>Supported environments</h3>
+                    <p>To check for supported combinations of platforms, advertising standards and video media, see Google's <a href="https://developers.google.com/interactive-media-ads/video_features_and_sdk_versions">Video Feature and SDK compatibility</a> document. That document and the <a href="https://developers.google.com/interactive-media-ads/docs/vastinspector_dual">Video Suite Inspector</a> will help you diagnose attempted IMA3 advertisement configurations that simply will not function.</p>
+                    <p class="BCL-aside">Note: To use the Video Suite Inspector you will need your VAST ad tag or VAST ad response. You can then paste it into the given text field and then click the <strong>Test Ad</strong> button.</p>
+                    <h3>Resizing the Player During Ad or Video Playback</h3>
+                    <p>If the player is resized during ad or video playback, ad content will not resize unless the player's dimensions function is called to resize the player. Resizing the player using other methods (style width and height, for example) will not resize the ad.</p>
+                    <h3>Exceptions Generated by Overlay Ads</h3>
+                    <p>On Chrome 30, an exception is thrown from the IMA bridge when &quot;fading out&quot; an overlay ad:</p>
+<pre><code>Uncaught NotFoundError: An attempt was made to reference a Node in a context where it does not exist. bridge3.1.33.html:46
+ae bridge3.1.33.html:46
+Pi.I bridge3.1.33.html:121
+(anonymous function) bridge3.1.33.html:93
+</code></pre>
+                    <p>This issue is evident in the <a href="https://developers.google.com/interactive-media-ads/docs/vastinspector_dual">IMA VAST inspector</a> as well.</p>
+                    <h3>Overlays and Fullscreen Transitions</h3>
+                    <p>video.js uses the <a href="http://www.w3.org/TR/fullscreen/">fullscreen API</a> where available. Different browsers implement the transition to
+                        fullscreen differently and that can produce discrepancies in appearance when transitioning into and out of fullscreen mode. In most implementations,
+                        the element that is being taken into fullscreen is geometrically scaled (i.e. zoomed) from its original to the target size. Most overlay
+                        advertisements are designed to be displayed at a fixed size, however, and so they may appear distorted until the animation completes.</p>
+                    <h3>Midrolls and live streams</h3>
+                    <p>Midrolls play immediately if they are configured for live streams.</p>
+                    <h3>Control bars</h3>
+                    <p>You will see that the advertisement and video that plays after advertisement completion can have different control bars. IMA creates a separate video element under most circumstances and exposes information about the ad playback state through non-standard methods. The control bar in the Brightcove Player is associated with different playback technology, and it is non-trivial to have the same control bar for both technologies.</p>
+                    <h3>Skippable ads on iPhones</h3>
+                    <p>Skippable ads are not supported by IMA3 on iPhones.</p>
+                </div>
+            </div>
+            <div class="section" id="BCLreferences">
+                <h2>Related Topics</h2>
+                <ul>
+                    <!-- <li><a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/bc-analytics-plugin.html">New Player Plugin: Analytics</a> -->
+                    </li>
+                    <li><a href="hls-plugin.html">New Player Plugin: HLS</a>
+                    </li>
+                    <li><a href="../../player-management/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a>
+                    </li>
+                    <li><a href="../../player-management/guides/player-mgmt-quick-start.html">Quick Start to Player Management</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- bcl scripts============================================================-->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/1.7/gist-embed.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.2/fastclick.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/foundation.min.js"></script>
+    
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
+    <script src="/en/scripts/docs-nav-data.min.js"></script>
+    <script src="/en/scripts/bcls-doc-site.js"></script>
+    <script>
+        $(document).foundation();
+    </script>
+    <script id="pageScript" type="text/javascript">
+        /******** Any scripts specific to page samples should go here *********/
+    </script>
+    </div>
+    <div class="footer text-center"><a href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+	</body>
+
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <!-- change title to match the h1 heading -->
+    <title id="bclPageTitle">Media API Sample: add_image</title>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/foundation.min.css" />
+	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/normalize.css" />
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/styles/github.min.css" />
+    <link rel="stylesheet" type="text/css" href="/en/styles/anytime.5.0.0-1401232312.min.css" />
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2728311-29', 'auto');
+  ga('send', 'pageview');
+
+</script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/vendor/modernizr.js"></script>
+  </head>
+
+  <body>
+  <!-- header navbar -->
+	<div id="navWrapper" class="fixed"></div>
+	<!-- breadcrumbs -->
+	<nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+  <!-- search -->
+  <div id="searchModal" class="reveal-modal" data-reveal></div>
+  <!-- content -->
+    <div class="row">
+        <div class="large-2 columns show-for-large-up">
+            <div id="sidenav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+        <div id="top" class="section">
+            <h1 id="bclPageHeading">Media API Sample: add_image</h1>
+            <p>This sample uses the <code>add_image()</code> Write method of the Media API to upload an image file (or provide a remote URL for it) and add it to a video as a new video still, thumbnail, or overlay.</p>
+            <p>There are hard-coded values from a Brightcove Learning demo account that you can use to test with, as long as you have a valid video file to upload, or you can substitute a write token for your own account.</p>
+            <p>View the source for this page to see the code.</p>
+            <p class="text-warning">Note: you should <strong style="color:red">never</strong> hard-code your tokens into a client-side application in the manner shown here for demonstration purposes only. Also be aware that even if you require the use to enter the token, it will be transmitted as plain text unless the form submits over an https connection.</p>
+          </div>
+          <div class="section" id="input">
+            <h2>Input form</h2>
+            <p>Read token: <input name="yourReadToken" id="yourReadToken" type="text" size="100" value="ZY4Ls9Hq6LCBgleGDTaFRDLWWBC8uoXQun0xEEXtlDUHBDPZBCOzbw.."></p>
+            <p>Write Token: <input id="yourWriteToken" type="text" value="ZY4Ls9Hq6LCBgleGDTaFRDLWWBC8uoXQHkhGuDebKvjFPjHb3iT-4g.." size="100" /></p>
+            <p>API Location: <input id="yourAPILocation" value="//api.brightcove.com/services/post" size="100" /></p>
+            <p>Video to add image to:
+              <select id="videoID"></select>
+            </p>
+            <p>Display Name for image: <input id="name" size="55" type="text" value="My new video still"/></p>
+            <p>Image type:
+              <select id="imageType">
+                <option>THUMBNAIL</option>
+                <option selected="selected">VIDEO_STILL</option>
+                <option>LOGO_OVERLAY</option>
+              </select>
+            </p>
+            <p>Remote URL (only if you are not uploading an image): <input id="remoteUrl" type="text" size="70" /></p>
+            <p>Resize it?
+              <select id="resize">
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            </p>
+            <p>File checksum (MD5): <input id="file_checksum" size="55" type="text" value=""/></p>
+            </div>
+            <div class="section" id="request">
+            <form id="create_video_sample" method="POST" enctype="multipart/form-data" target="postFrame">
+              <!--This is where the actual json request lives, it has to come before the file input -->
+              <input type="hidden" name="JSONRPC" />
+              <p><input type="file" name="filePath"/></p>
+              <p><button id="submitButton" onclick="BCL.doAddImage()">Add Image</button></p>
+              <!--display the json request -->
+              <h2>Media API Request</h2>
+              <fieldset>
+              <legend>JSON Request</legend>
+                <input name="JSONView" id="JSONView" style="width:97%;padding:5px;border:1px #999 solid" />
+              </fieldset>
+            </form>
+          </div>
+          <div class="section" id="response">
+            <h2>Media API Response</h2>
+            <fieldset>
+            <legend>Response:</legend>
+              <iframe id="postFrame" name="postFrame" style="width:100%;border:none"></iframe>
+            </fieldset>
+          </div>
+      </div>
+    </div>
+    <!-- bcl scripts -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.2/fastclick.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/foundation.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
+    
+    <script src="/en/scripts/docs-nav-data.min.js"></script>
+    <script src="/en/scripts/bcls-doc-site.js"></script>
+    <script src="/en/scripts/bc-mapi.js"></script>
+        <script src="/en/scripts/anytime.5.0.0-1401232312.min.js"></script>
+    <script>
+        $(document).foundation();
+    </script>
+    <script id="pageScript" type="text/javascript">
+      /******** Any scripts specific to page samples should go here *********/
+        BCL = {};
+        BCL.videoSelector = document.getElementById("videoID");
+        BCMAPI.token = document.getElementById("yourReadToken").value;
+        BCMAPI.callback = "BCL.onSearchResponse";
+        BCL.params = {};
+        BCL.params.video_fields = "id,name";
+        BCL.params.page_size = 5;
+        BCL.params.get_item_count = true;
+        BCMAPI.search(BCL.params);
+        BCL.onSearchResponse = function(jsonData) {
+          BCL.log(jsonData);
+          for (var i = 0; i < jsonData.items.length; i++) {
+            var option = document.createElement("option");
+            var video = jsonData.items[i];
+            BCL.log(video);
+            option.text = video.name;
+            option.value = video.id;
+            BCL.videoSelector.add(option,null);
+          }
+        }
+        BCL.doAddImage = function (){
+          form = document.getElementById("create_video_sample");
+          BCL.buildJSONRequest(form);
+          form.action = document.getElementById("yourAPILocation").value;
+          form.submit();
+        }
+
+        BCL.buildJSONRequest = function(form){
+          if(document.getElementById('name').value == "" || form.filePath.value == ""){
+            alert("Required: Display Name and File");
+            return;
+          }
+          else {
+            var imageType = document.getElementById("imageType");
+            var resize = document.getElementById("resize");
+            json = form.JSONRPC
+            //Construct the JSON request:
+            BCL.json = {};
+            BCL.json.method = "add_image";
+            BCL.json.params = {};
+            if (document.getElementById("file_checksum").value !== "") {
+              BCL.json.params.file_checksum = document.getElementById("file_checksum").value;
+            }
+            BCL.json.params.image = {};
+            BCL.json.params.image.type = imageType.options[imageType.selectedIndex].text;
+            BCL.json.params.image.resize = resize.options[resize.selectedIndex].value;
+            BCL.json.params.image.displayName = document.getElementById("name").value;
+            if (document.getElementById("remoteUrl").value !== "") {
+              BCL.json.params.image.remoteUrl = document.getElementById("remoteUrl").value;
+            }
+            BCL.json.params.token = document.getElementById('yourWriteToken').value;
+            BCL.json.params.video_id = BCL.videoSelector.options[BCL.videoSelector.selectedIndex].value;
+            json.value = JSON.stringify(BCL.json);
+            form.JSONView.value = json.value;
+          }
+        }
+        // debugging tool - wraps console.log to avoid errors in IE 7 & 8
+        BCL.log = function(message) {
+          if (window["console"] && console["log"]) {
+            var d = new Date();
+            console.log(d + ": ");
+            console.log(message);
+          }
+        }
+    </script>
+
+	    <div class="footer text-center"><a href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+	</body>
+</html>

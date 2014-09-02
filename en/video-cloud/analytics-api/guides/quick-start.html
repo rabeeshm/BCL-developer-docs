@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <title id="bclPageTitle">Brightcove Video Cloud Analytics API Quick Start</title>
+	<script type="text/javascript" src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/foundation.min.css" />
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/normalize.css" />
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/styles/github.min.css" />
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-2728311-29', 'auto');
+    ga('send', 'pageview');
+
+    </script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/vendor/modernizr.js"></script>
+  </head>
+
+<body>
+	<!-- header navbar -->
+	<div id="navWrapper" class="fixed"></div>
+	<!-- breadcrumbs -->
+	<nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+	<!-- search -->
+	<div id="searchModal" class="reveal-modal" data-reveal></div>
+	<!-- content -->
+    <div class="row">
+        <div class="large-2 columns show-for-large-up">
+            <div id="sidenav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+            <div id="top" class="section">
+                <h1>Analytics API Quick Start</h1>
+                <p>This topic provides a quick start tutorial for the Analytics API. It will guide you through steps to getting authetication credentials for the API and then making an API call using CURL.</p>
+                <p class="text-warning">Note: access to the Analytics API is currently limited and available only for Professional or Enterprise accounts. If you are interested in getting access to the Analytics API, please contact your Account Manager.</p>
+                <p class="text-warning" id="curlNote">Note: The steps in the document involve <code>curl</code> and other command-line tools that are native to Mac and Linux systems, but not part of the Windows operating system. If you are on Windows, you can get these tools by installing <a href="//cygwin.com">cygwin</a>. During the install you will be prompted for packages to install. Open the <strong>Net</strong> package, then check the <strong>curl</strong> option and then finish the installation. Once you have done this you will be able to follow the Quick Start to Player Management successfully as written using the cygwin command line. Tools are available to run curl at the normal Windows command line, but not detailed in this document.</p>
+            </div>
+            <!--break-->
+            <div id="steps" class="section">
+                <h2>Steps</h2>
+                <h3>Get client credentials</h3>
+                <p>Although you can get client credentials (a <code>client_id</code> and <code>client_secret</code>) directly from the Brightcove OAuth Service using <a href="/en/video-cloud/oauth-api/guides/get-client-credentials.html">CURL</a> or <a href="/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">Postman</a>, the easiest way is to use the <a href="http://docs.brightcove.com/en/video-cloud/analytics-api/guides/managing-api-credentials.html">OAuth Credentials UI</a>. We will use that method here.</p>
+                <ol>
+                    <li>Login to Video Cloud Studio.</li>
+                    <li>Click the gear icon <img alt="" src="http://img.brightcove.com/node14056-gear-icon.png" /> in the header.</li>
+                	<li>Click the Account Settings link:<br /><img src="assets/oauth-account-settings.png" alt="account settings link" width="346" height="181"></li>
+                    <li>Click the <strong>OAuth Credentials</strong> link:<br /><img src="assets/oauth-oauth-settings-link.png" alt="OAuth Credentials" width="353" height="342"></li>
+
+                	<li>The API Authentication page will open displaying your current client registrations.<br />
+                    <img alt="current client registrations" src="assets/oauth-start-screen.png" width="827" height="276"/><br />
+                    <p class="BCL-aside">Note: Only the client registrations for the account you are logged into will display.</p>
+                    </li>
+                    <li>Click <strong>Register New Application</strong>.</li>
+                    <li>Enter a <strong>Name</strong> and <strong>Short Description</strong> for the client registration.</li>
+                    <li>Select one or more of your  accounts for authorization. You can select multiple accounts and click <strong>&gt;</strong> to add them or click <strong>&gt;&gt;</strong> to add all accounts. Click <strong>&lt;</strong> to remove an account or <strong>&lt;&lt;</strong> to remove all accounts.</li>
+                    <li>Select the API(s) and permission(s) to enable for this registration.<br />
+                    <img alt="register new app" src="assets/oauth-registering-new-app.png" width="878" height="779"/></li>
+                    <li>Click <strong>Save</strong>.</li>
+                    <li>A <strong>Client ID</strong> and <strong>Client secret</strong> will be returned.<br />
+                    <img alt="OAuth" src="assets/oauth-client-secret.png" width="601" height="452"/><br/>
+                      <p class="BCL-aside">Note: Copy the client secret and store it in a secure location as the client secret <strong>will not</strong> be displayed again.</p>
+                    </li>
+                </ol>
+                <h3>Get an access token</h3>
+                <p>Now that we have client credentials, we're ready to get an access token. We will do this using CURL. Because we will need to do this repeatedly if we are going to make multiple calls to API over more than a five minute period, we will export the <code>client_id</code> and <code>client_secret</code> as system variables to make it easier to rerun the CURL request.</p>
+                <ol start="12">
+                    <li>
+                        At a command line, export the client id and secret you obtained in the previous steps as <code>CLIENT_ID</code> and <code>CLIENT_SECRET</code>:
+<pre><code>$ export CLIENT_ID=<em>{your client id}</em>
+$ export CLIENT_SECRET=<em>{your client secret}</em></code></pre>
+                    </li>
+                    <li>
+                        Send the following CURL request to the OAuth Service (note that we are using the client id and secret as a username/password pair):
+<pre><code>$ curl -s --data "grant_type=client_credentials" https://oauth.brightcove.com/v3/access_token --header "Content-Type: application/x-www-form-urlencoded" --user $CLIENT_ID:$CLIENT_SECRET</code></pre>
+                    </li>
+                    <li>
+                        You should see a JSON response that includes the <code>access_token</code>:
+<pre><code>{"access_token":"APA-eethQBfNsqKrK6jpR9zuqFc3GqCuJkBmJlV15MPCO9yv_4V1GD_dHnBf5SuMi_BPgDRDjsp0VnZlOb_RBlw55FnI7NSPkPxeNdvgmz2vhGjX08EB-9xsfkEgqNQmCbtIaZcrvFjfj5hvdac5PRw05CqxBX2tqmfyZ9yJnQiUdAyK-I6814LYDdLYhYggq38eWsUNLhwSep4Yjiw0wCbWJr3yci6dWuGDixsGHvp9IKYCRDbELDNuiVzfzq6pd3yux5ZvovuJJILrPiatQW2HOOOtIqCh629Sf-_c64QNSFgKGIy2Aeuv9F1qCYmgbTsz7WafRCiwmHosjPsIHTjKnud7zxKJCyTnoIDdK9Fvo4_qUwkWU17sBWz-D_9cgJsFGMP3BRl1-5begFnSZhfStJcjnwDG4RchJ4X377uuabEd-uP98qYqyKsBAH8FK7FJ1pGOFRV2","token_type":"Bearer","expires_in":300}</code></pre>
+                    </li>
+                    <li>Copy the value for the <code>access_token</code> (not including the quotation marks).</li>
+                    <li>
+                        Export the <code>access_token</code> as ACCESS_TOKEN:
+<pre><code>$ export ACCESS_TOKEN=<em>{your access token}</em></code></pre>
+                    </li>
+                    <li>Whenever the access token expires, you need to repeat steps 13-16 to get a new one.</li>
+                </ol>
+                <h3>Make the Analytics API call</h3>
+                <p>Now we are ready to make the API request.</p>
+                <ol start="18">
+                    <li>
+                        Run the following CURL command to make the API request, substituting your Video Cloud account id for <code><strong><em>{account_id}</em></strong></code>:
+<pre><code>curl -s \
+    "https://data.brightcove.com/analytics-api/videocloud/account/<strong>{account_id}</strong>/report/?dimensions=video,referrer_domain&amp;limit=2&amp;offset=0&amp;fields=all&amp;sort=engagement_score&amp;format=json" \
+-H "Authorization: Bearer $ACCESS_TOKEN"</code></pre>
+                    </li>
+                    <li>
+                        The response should look like this (the response here has been prettified for readability):
+<pre><code id="apiResponse">>{"account":"20318290001","item_count":2251,"items":[{"engagement_score":200,"play_rate":0.5,"referrer_domain":"plstudios.com","video":"1854105390001","video_duration":"218.0","video_impression":2,"video_name":"Adding Captions to Videos","video_percent_viewed":200,"video_seconds_viewed":436,"video_view":1},{"engagement_score":200,"play_rate":0.17,"referrer_domain":"ratchetlocal.com","video":"594316519001","video_duration":"28.0","video_impression":6,"video_name":"Sea_LionFish","video_percent_viewed":200,"video_seconds_viewed":56,"video_view":1}],"summary":{"engagement_score":55.09,"video_seconds_viewed":789819,"video_percent_viewed":362308.4,"video_impression":105084,"video_view":6577,"play_rate":0.06}}</code></pre>
+                    </li>
+                    <li>If you got an unauthorized request response instead, try repeating steps 13-16 to get a new access token, and make sure that account id that you used in the request matches one that got client credentials for in steps 1-12.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    <!-- bcl scripts -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.2/fastclick.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/foundation.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
+<script src="/en/scripts/docs-nav-data.min.js"></script>
+<script src="/en/scripts/bcls-doc-site.js"></script>
+<script>
+    $(document).foundation();
+</script>
+    <script id="pageScript" type="text/javascript">
+        /******** Any scripts specific to page samples should go here *********/
+        var jsonStr = JSON.parse('{"account":"20318290001","item_count":2251,"items":[{"engagement_score":200,"play_rate":0.5,"referrer_domain":"plstudios.com","video":"1854105390001","video_duration":"218.0","video_impression":2,"video_name":"Adding Captions to Videos","video_percent_viewed":200,"video_seconds_viewed":436,"video_view":1},{"engagement_score":200,"play_rate":0.17,"referrer_domain":"ratchetlocal.com","video":"594316519001","video_duration":"28.0","video_impression":6,"video_name":"Sea_LionFish","video_percent_viewed":200,"video_seconds_viewed":56,"video_view":1}],"summary":{"engagement_score":55.09,"video_seconds_viewed":789819,"video_percent_viewed":362308.4,"video_impression":105084,"video_view":6577,"play_rate":0.06}}'),
+            responseBlock = document.getElementById("apiResponse");
+            responseBlock.innerHTML = JSON.stringify(jsonStr, true, 2);
+            console.log(JSON.stringify(jsonStr, null, "  "));
+    </script>
+    <div class="footer text-center"><a href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+	</body>
+
+</html>

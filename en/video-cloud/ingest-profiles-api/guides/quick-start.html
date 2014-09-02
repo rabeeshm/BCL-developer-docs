@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <title id="bclPageTitle">Brightcove Video Cloud Ingest Profiles API Quick Start</title>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/foundation.min.css" />
+	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/normalize.css" />
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/styles/github.min.css" />
+    <style>
+      .codeLine {
+        font-family: "Source Code Pro", Menlo, Consolas, Monaco, "Lucida Console", monospace;
+        width: 80%;
+        height: 100px;
+      }
+    </style>
+  <script type="text/javascript">
+  <!--//--><![CDATA[//><!--
+    var _gaq = _gaq || [];
+    _gaq.push(
+        ["_setAccount", "UA-2728311-23"],
+        ["_setDomainName", ".brightcove.com"],
+        ["_trackPageview"]
+    );
+    (function() {var ga = document.createElement("script");ga.type = "text/javascript";ga.async = true;ga.src = ("https:" == document.location.protocol ? "https://ssl" : "http://www") + ".google-analytics.com/ga.js";var s = document.getElementsByTagName("script")[0];s.parentNode.insertBefore(ga, s);})();
+//--><!]]>
+	</script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/vendor/modernizr.js"></script>
+  </head>
+  <body>
+  <!-- header navbar -->
+	<div id="navWrapper" class="fixed"></div>
+	<!-- breadcrumbs -->
+	<nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+  <!-- search -->
+  <div id="searchModal" class="reveal-modal" data-reveal></div>
+  <!-- content -->
+    <div class="row">
+        <div class="large-2 columns show-for-large-up">
+            <div id="sidenav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+          <div id="top" class="section">
+              <h1 id="bclPageHeading">Get Started with the Ingest Profiles API</h1>
+            <p class="BCL-objective">This topic walks you through the required steps to create and manage ingest profiles for a Video Cloud account. Ingest profiles allow you to define the set of renditions to be created for a video or set of videos.</p>
+            <!--break-->
+            <h3>What you will need</h3>
+            <p>This document assumes you understand how to make HTTP requests to a RESTful API generally. It also assumes that you know how to run cURL commands. The <a href="/en/video-cloud/ingest-profiles-api/reference/versions/v1/index.html">Ingest Profiles API Reference</a> describes the available methods and events for each player component and provides examples for use. To create and test your sample solutions by stepping through the processes of preparing your player for Ingest Profiles API coding, you need the following:</p>
+            <ul>
+                <li>The <a href="/en/video-cloud/ingest-profiles-api/reference/index.html">Ingest Profiles API Reference</a></li>
+                <li>A text/code editor</li>
+                <li>If you are using Windows, you will need install cURL, at least for the authentication setup &mdash; you can find instructructions for installing cURL in many places on the web, such as <a href="http://thecustomizewindows.com/2012/07/installing-curl-in-windows-to-run-curl-commands-natively/">http://thecustomizewindows.com/2012/07/installing-curl-in-windows-to-run-curl-commands-natively/</a></li>
+                <li>Optional: an HTTP client for testing REST API calls will make the actual API calls easier. There are several such clients on the Mac App Store, such as <a href="//itunes.apple.com/us/app/paw-http-client/id584653203?mt=12">Paw</a> and <a href="//itunes.apple.com/us/app/rested-simple-http-requests/id421879749?mt=12">RESTed</a>, and there are similar clients available for Windows and Linux - otherwise all requests can be made via cURL, but the steps below will assume that you have a client app.</li>
+                <li>A <a href="//www.brightcove.com/en/online-video-platform">Video Cloud</a> account</li>
+            </ul>
+          </div>
+          <div class="section" id="baseURL">
+            <h2>Service URL</h2>
+            <p>The service URL for the API is:</p>
+<pre><code>https://ingestion.api.brightcove.com/v1/</code></pre>
+          </div>
+          <div id="authorization" class="section">
+            <h2>Set up authorization</h2>
+            <ol>
+              <li>Brightcove uses OAuth2 to authorize access to its APIs. At this point there is not an automated way to get the credentials you need to make calls against the Ingest Profiles API. For the current workaround, to contact <a href="mailto:training@brightcove.com">Documentation</a>.</li>
+                <li>For all API calls, you will pass the token returned here as a request Authorization header in this form:
+<pre id="authorizationHeader"><code>Authorization: Bearer {token}</code></pre>
+                  </li>
+            </ol>
+            <p>You are now ready to make calls to the ingest profiles API.</p>
+          </div>
+          <div class="section" id="manageProfiles">
+            <h2>Managing profiles</h2>
+            <p>The next few sections will walk you through the basic operations of creating and managing ingest profiles. A profile is a JSON object that looks like this (abridged version with just a couple of renditions and packages):</p>
+<pre><code>{
+   "account_id" : "ACCT_ID",
+   "archive_master" : true,
+   "name" : "Protected",
+   "description" : "This will produce 1 hds packaged file with renditions, 1 widevine packaged file with hds renditions and HLSe renditions.",
+   "renditions" : [
+      {
+         "audio_bitrate" : 48,
+         "reference_id" : "wv0",
+         "audio_codec" : "aac",
+         "format" : "mp4",
+         "h264_profile" : "baseline",
+         "height" : 180,
+         "keyframe_rate" : 0.333,
+         "fixed_keyframe_interval" : true,
+         "media_type" : "video",
+         "speed" : 3,
+         "video_bitrate" : 300,
+         "video_codec" : "h264",
+         "width" : 320
+      },
+      {
+         "audio_bitrate" : 48,
+         "reference_id" : "hls2",
+         "audio_codec" : "aac",
+         "format" : "ts",
+         "type" : "segmented",
+         "max_hls_protocol_version": 2,
+         "hls_optimized_ts": "true",
+         "package_format": "zip",
+         "decoder_bitrate_cap" : 960,
+         "decoder_buffer_size" : 2560,
+         "encryption_method" : "aes-128",
+         "encryption_key_rotation_period": 10,
+         "h264_profile" : "baseline",
+         "height" : 288,
+         "keyframe_rate" : 0.5,
+         "max_frame_rate" : 30,
+         "media_type" : "video",
+         "speed" : 3,
+         "video_bitrate" : 640,
+         "video_codec" : "h264",
+         "width" : 512
+      }
+  ],
+   "packages" : [ {
+    "package_type" : "widevine",
+    "renditions" : [ "wv0", "wv1","wv2", "wv3","wv4", "wv5","wv6", "wv7" ]
+   },
+   {
+    "package_type" : "hds-faxs",
+    "renditions" : [ "hds0" ]
+   }
+ ]
+}
+</code></pre>
+            <p>Note: the packages array is used to specify rendition bundles for DRM-protected packages. Each item has two properties, the <code>package_type</code>, which will be either "hds-faxs" or "widevine", and <code>renditions</code>, which is an array of <strong>reference IDs</strong> for the renditions that should be included in that package. If you are not using DRM, leave the packages array empty.</p>
+            <p>Now we will look at the profile operations.</p>
+          </div>
+          <div class="section" id="getList">
+            <h2>Get list of profiles</h2>
+            <p>Next, we will get a list of profiles for the account. Initially, there should be a single default profile for the account</p>
+            <h3>Request</h3>
+            <p>This will be a GET request, and the endpoint to get a list of profiles is:</p>
+<pre><code>/accounts/{accountId}/profiles</code></pre>
+            <ol start="3">
+              <li>Set the API request URL to https://ingestion.api.brightcove.com/v1/accounts/{accountId}/profiles &mdash; replacing <code>{accoundId}</code> with the ID for your account</li>
+              <li>Remember to include the <a href="#authorizationHeader">authorization header</a></li>
+              <li>Send the request and view the results.</li>
+            </ol>
+          </div>
+          <div class="section" id="createProfile">
+            <h2>Create a profile</h2>
+            <p>Next, we will add a new profile to the account.</p>
+            <h3>Request</h3>
+            <p>This will be a POST request, and the endpoint to create a profile is:</p>
+<pre><code>/accounts/{accountId}/profiles</code></pre>
+            <ol start="6">
+              <li>Set the API request URL to https://ingestion.api.brightcove.com/v1/accounts/{accountId}/profiles &mdash; replacing <code>{accoundId}</code> with the ID for your account</li>
+              <li>Remember to include the <a href="#authorizationHeader">authorization header</a></li>
+              <li>For the request body (data if you are using cURL), enter the following JSON, substituting your account id for <code>{account_id}</code>:
+<pre><code>{
+  "account_id": "{account_id}",
+  "archive_master": true,
+  "name": "Test Profile",
+  "reference_id": "test1",
+  "description": "This will produce 4 MP4 renditions and 4 HLS renditions.",
+  "renditions": [
+    {
+      "audio_bitrate": 48,
+      "reference_id": "mp0",
+      "audio_codec": "aac",
+      "format": "mp4",
+      "h264_profile": "baseline",
+      "height": 272,
+      "keyframe_rate": 0.333,
+      "fixed_keyframe_interval": true,
+      "media_type": "video",
+      "speed": 3,
+      "video_bitrate": 480,
+      "video_codec": "h264",
+      "width": 480
+    },
+    {
+      "audio_bitrate": 48,
+      "reference_id": "mp1",
+      "audio_codec": "aac",
+      "format": "mp4",
+      "h264_profile": "baseline",
+      "height": 360,
+      "keyframe_rate": 0.333,
+      "fixed_keyframe_interval": true,
+      "media_type": "video",
+      "speed": 3,
+      "video_bitrate": 896,
+      "video_codec": "h264",
+      "width": 640
+    },
+    {
+      "audio_bitrate": 48,
+      "reference_id": "mp2",
+      "audio_codec": "aac",
+      "format": "mp4",
+      "h264_profile": "high",
+      "height": 480,
+      "keyframe_rate": 0.333,
+      "fixed_keyframe_interval": true,
+      "media_type": "video",
+      "speed": 3,
+      "video_bitrate": 1280,
+      "video_codec": "h264",
+      "width": 848
+    },
+    {
+      "audio_bitrate": 48,
+      "reference_id": "mp3",
+      "audio_codec": "aac",
+      "format": "mp4",
+      "h264_profile": "high",
+      "height": 480,
+      "keyframe_rate": 0.333,
+      "fixed_keyframe_interval": true,
+      "media_type": "video",
+      "speed": 3,
+      "video_bitrate": 1536,
+      "video_codec": "h264",
+      "width": 848
+    },
+    {
+      "audio_bitrate": 48,
+      "reference_id": "hls0",
+      "audio_codec": "aac",
+      "format": "ts",
+      "type": "segmented",
+      "max_hls_protocol_version": 2,
+      "hls_optimized_ts": "true",
+      "package_format": "zip",
+      "decoder_bitrate_cap": 450,
+      "decoder_buffer_size": 1200,
+      "encryption_method": "aes-128",
+      "encryption_key_rotation_period": 10,
+      "h264_profile": "baseline",
+      "height": 180,
+      "keyframe_rate": 0.5,
+      "max_frame_rate": 30,
+      "media_type": "video",
+      "speed": 3,
+      "video_bitrate": 300,
+      "video_codec": "h264",
+      "width": 320
+    },
+    {
+      "audio_bitrate": 48,
+      "reference_id": "hls1",
+      "audio_codec": "aac",
+      "format": "ts",
+      "type": "segmented",
+      "max_hls_protocol_version": 2,
+      "hls_optimized_ts": "true",
+      "package_format": "zip",
+      "decoder_bitrate_cap": 960,
+      "decoder_buffer_size": 2560,
+      "encryption_method": "aes-128",
+      "encryption_key_rotation_period": 10,
+      "h264_profile": "baseline",
+      "height": 288,
+      "keyframe_rate": 0.5,
+      "max_frame_rate": 30,
+      "media_type": "video",
+      "speed": 3,
+      "video_bitrate": 640,
+      "video_codec": "h264",
+      "width": 512
+    },
+    {
+      "audio_bitrate": 48,
+      "reference_id": "hls2",
+      "audio_codec": "aac",
+      "format": "ts",
+      "type": "segmented",
+      "max_hls_protocol_version": 2,
+      "hls_optimized_ts": "true",
+      "package_format": "zip",
+      "decoder_bitrate_cap": 1344,
+      "decoder_buffer_size": 3584,
+      "encryption_method": "aes-128",
+      "encryption_key_rotation_period": 10,
+      "h264_profile": "baseline",
+      "height": 360,
+      "keyframe_rate": 0.5,
+      "max_frame_rate": 30,
+      "media_type": "video",
+      "speed": 3,
+      "video_bitrate": 896,
+      "video_codec": "h264",
+      "width": 640
+    },
+    {
+      "audio_bitrate": 48,
+      "reference_id": "hls3",
+      "audio_codec": "aac",
+      "format": "ts",
+      "type": "segmented",
+      "max_hls_protocol_version": 2,
+      "hls_optimized_ts": "true",
+      "package_format": "zip",
+      "decoder_bitrate_cap": 1920,
+      "decoder_buffer_size": 5120,
+      "encryption_method": "aes-128",
+      "encryption_key_rotation_period": 10,
+      "h264_profile": "high",
+      "height": 480,
+      "keyframe_rate": 0.5,
+      "max_frame_rate": 30,
+      "media_type": "video",
+      "speed": 3,
+      "video_bitrate": 1280,
+      "video_codec": "h264",
+      "width": 848
+    }
+  ],
+  "packages": [
+
+  ]
+}</code></pre>
+              </li>
+              <li>Send the request - you should get this profile back with IDs for the whole profile and renditions. Save the ID for the profile, as you will need it for later steps.</li>
+            </ol>
+          </div>
+          <div class="section" id="getProfileByID">
+            <h2>Get a profile by ID</h2>
+            <p>To return just a specific profile rather than listing all of them, we can get the profile by its ID.</p>
+            <h3>Request</h3>
+            <p>This will be a GET request, and the endpoint to get a profile by ID is:</p>
+<pre><code>/accounts/{accountId}/profiles/{profile-id}</code></pre>
+            <ol start="10">
+              <li>Set the API request URL to https://ingestion.api.brightcove.com/v1/accounts/{accountId}/profiles/{profile-id} &mdash; replacing <code>{accoundId}</code> with the ID for your account, and the <code>{profile_id}</code> with the ID you saved from the last section.</li>
+              <li>Remember to include the <a href="#authorizationHeader">authorization header</a></li>
+              <li>Submit the request to return the profile created in the last section &mdash; save the JSON, as you will need it in the next section.</li>
+            </ol>
+          </div>
+          <div class="section" id="updateProfile">
+            <h2>Update a profile</h2>
+            <p>Now we will update a profile to change some of the rendition settings.</p>
+            <h3>Request</h3>
+            <p>This will be a PUT request, and the endpoint to update a profile is:</p>
+<pre><code>/accounts/{accountId}/profiles/{profile-id}</code></pre>
+            <ol start="13">
+              <li>Set the API request URL to https://ingestion.api.brightcove.com/v1/accounts/{accountId}/profiles/{profile-id} &mdash; replacing <code>{accoundId}</code> with the ID for your account, and the <code>{profile_id}</code> with the ID you saved from the last section.</li>
+              <li>Remember to include the <a href="#authorizationHeader">authorization header</a></li>
+              <li>For the request body, use the JSON returned in the previous operation, changing the <code>video_bitrate</code> for the first rendition to 400.</li>
+              <li>Submit the request and verify that the update worked by checking the first rendition in the response JSON.</li>
+            </ol>
+          </div>
+          <div class="section" id="deleteProfile">
+            <h2>Delete a profile</h2>
+            <p>Now we will see how to delete a profile &mdash; <strong><em>note that this operation cannot be undone!</em></strong></p>
+            <h3>Request</h3>
+            <p>This will be a DELETE request, and the endpoint to delete a profile is:</p>
+<pre><code>/accounts/{accountId}/profiles/{profile-id}</code></pre>
+            <ol start="17">
+              <li>Set the API request URL to https://ingestion.api.brightcove.com/v1/accounts/{accountId}/profiles/{profile-id} &mdash; replacing <code>{accoundId}</code> with the ID for your account, and the <code>{profile_id}</code> for this test profile.</li>
+              <li>Remember to include the <a href="#authorizationHeader">authorization header</a></li>
+              <li>Go ahead and submit the request if you wish to delete the test profile, or skip this step if you want to keep it.</li>
+            </ol>
+          </div>
+          <div class="section" id="usingIngestProfiles">
+            <h2>Using ingest profiles</h2>
+            <h3>Media Module / Media API</h3>
+            <p>Custom ingest profiles are not currently used for uploads or retranscode jobs that are requested via the Media Module or Media API.</p>
+            <h3>Batch provisioning</h3>
+            <p>When you upload or re-transcode videos via batch provisioning, you can specify the ingest profile to be used in the <code>profile</code> attribute of the title tag &mdash; set the value of this attribute equal to the reference_id of the profile you want to use:</p>
+<pre><code>&lt;?xml version="1.0" encoding="utf-8" ?&gt;
+&lt;publisher-upload-manifest publisher-id="123456789" preparer="Robert" report-success="true"&gt;
+  &lt;notify email="bclftp@gmail.com" /&gt;
+  &lt;asset filename="Bird_Woodpecker.mp4"
+      refid="woodpecker_asset_refid"
+      type="VIDEO_FULL"
+      hash-code="ea87a8c52cf85d89b4b1c8403c9ef73"
+      encode-to="MP4"
+      encode-multiple="true"/&gt;
+  &lt;title name="Profile Test"
+         refid="test_title_refid_2013_10_07a"
+         active="TRUE"
+         video-full-refid="test_asset_refid_2013_10_07a"
+         profile="test1"&gt;
+    &lt;short-description&gt;short&lt;/short-description&gt;
+    &lt;long-description&gt;long description is long&lt;/long-description&gt;
+  &lt;/title&gt;
+&lt;/publisher-upload-manifest&gt;</code></pre>
+          </div>
+          <div class="section" id="conclusion">
+              <h2>Conclusion</h2>
+              <p>You now have  the basic tools for working with the Ingest Profiles API. See the <a href="/en/video-cloud/ingest-profiles-api/reference/versions/v1/#">API Reference</a> for more detail on the operations.</p>
+          </div>
+          <div class="section" id="relatedTopics">
+              <h2>Related Topics</h2>
+              <p>Additional detail on settings can be found in these Zencoder documents:</p>
+              <ul>
+                <li>package_format: Used to Zip thumbnails or segmented outputs for easy download &mdash;<br /><a href="https://app.zencoder.com/docs/api/encoding/general-output-settings/package-format?from_query=package_format">https://app.zencoder.com/docs/api/encoding/general-output-settings/package-format?from_query=package_format</a></li>
+                <li>encryption_key_rotation_period: Number of segments after which to rotate the encryption key in HLS &mdash;<br /><a href="https://app.zencoder.com/docs/api/encoding/encryption/encryption-key-rotation-period?from_query=encryption_key_rotation_period">https://app.zencoder.com/docs/api/encoding/encryption/encryption-key-rotation-period?from_query=encryption_key_rotation_period</a></li>
+                <li>decoder_bitrate_cap: Used with decoder_buffer_size to control bitrate fluctuations &mdash;<br /><a href="https://app.zencoder.com/docs/api/encoding/rate-control/decoder-bitrate-cap?from_query=decoder_bitrate_cap ">https://app.zencoder.com/docs/api/encoding/rate-control/decoder-bitrate-cap?from_query=decoder_bitrate_cap </a></li>
+                <li>size: width x height target of the rendition &mdash;<br /><a href="https://app.zencoder.com/docs/api/encoding/thumbnails/thumbnails-size?from_query=size">https://app.zencoder.com/docs/api/encoding/thumbnails/thumbnails-size?from_query=size</a></li>
+              </ul>
+          </div>
+        </div>
+      </div>
+      <!-- bcl scripts -->
+      <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.2/fastclick.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/foundation.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
+
+      <script src="/en/scripts/docs-nav-data.min.js"></script>
+      <script src="/en/scripts/bcls-doc-site.js"></script>
+    <script>
+        $(document).foundation();
+    </script>
+      <script id="pageScript" type="text/javascript">
+        /******** Any scripts specific to page samples should go here *********/
+      </script>
+    </body>
+</html>

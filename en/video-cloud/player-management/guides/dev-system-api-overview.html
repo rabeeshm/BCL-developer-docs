@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="robots" content="noindex" />
+  <meta name="robots" content="noindex" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="robots" content="noindex" />
+  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+  <!-- change title to match the h1 heading -->
+  <title>Delivery System API Overview</title>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/foundation.min.css" />
+	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/normalize.css" />
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/styles/github.min.css">
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2728311-29', 'auto');
+  ga('send', 'pageview');
+
+</script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/vendor/modernizr.js"></script>
+  </head>
+
+<body>
+  <!-- header navbar -->
+	<div id="navWrapper" class="fixed"></div>
+	<!-- breadcrumbs -->
+	<nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+  <!-- search -->
+  <div id="searchModal" class="reveal-modal" data-reveal></div>
+  <!-- content -->
+    <div class="row">
+        <div class="large-2 columns show-for-large-up">
+            <div id="sidenav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+      <div id="top" class="section">
+        <h1>Delivery System API Overview</h1>
+        <p class="video-cloud-only BCL-aside">Note: the Brightcove player is currently in beta and requires some developer skills to implement. If you are interested in participating in the beta, please contact your account manager.</p>
+        <p>The Delivery System APIs allow for the management and deployment of a group of files, called a repository. These files are managed through REST APIs and through git. These files are delivered, on every &quot;git push&quot;, to players.brightcove.net.</p>
+        <p>If you haven't gone through the <a href="player-mgmt-quick-start.html">Quick Start to Player Management</a>, it's highly suggested you start there. You'll get security set up, learn some of the basics of the system, and then be ready to dive in further here.</p>
+        <h2>Using the REST APIs: overview</h2>
+        <p>The delivery system APIs are centered around repositories, otherwise known as repos. You can manage repos through a group of REST APIs that allow you to add, get, and list your repos.</p>
+        <p>We use the command-line tool curl to help show usage of the REST APIs. You can't use the examples directly as written, however, as a number of placeholders are used. Substitute in the environment variable or value for the following: $ACCOUNT_ID, $REPO_NAME, $ACCESS_TOKEN, $EMAIL</p>
+        <p>The REST APIs return responses in JSON format containing the following information on success:</p>
+        <ul>
+          <li>name: The repo name. This is the same as the name found in the REST API URLs.</li>
+          <li>public_url: The base URL where the repo files can be seen.</li>
+        </ul>
+      </div>
+      <div class="section" id="authentication">
+        <h2>Authentication</h2>
+        <p>You can authorize yourself using either <a href="OAuth.html">OAuth access tokens</a> or through Basic Authentication using your Video Cloud username and password. The standard OAuth access tokens should be used for any programmatic usage of the APIs, but the Basic Authentication route is a lot easier for command-line usage and getting started.</p>
+        <p>We'll use Basic Authentication in the examples below. If you wanted to use access tokens instead, change:</p>
+<pre><code>--user $EMAIL
+</code></pre>
+        <p>to:</p>
+<pre><code>--header &quot;Authorization: Bearer $ACCESS_TOKEN&quot;
+</code></pre>
+      </div>
+      <div class="section" id="APIerrors">
+        <h2>API Error responses</h2>
+        <p>There are a number of possible error responses that can returned in JSON format when there's an issue with a REST API call:</p>
+        <ul>
+          <li>If you try to call an API which does not exist, including misspelling existing API calls, you will get a status code of 404 and a helpful message about what you may have done wrong.</li>
+          <li>If your call can not be authenticated or authorized, you will get a 403 status code. Try going over the OAuth guide again to ensure you have a valid access token.</li>
+          <li>If you try to use a method other than GET or PUT, the response will contain a 405 status code.</li>
+          <li>If there's a problem with processing your request, you'll get a 500 status code and a standard Brightcove error response.</li>
+        </ul>
+        <p>The standard Brightcove error response mentioned above is a JSON response containing error_code and message properties. The error code will be one of the following:</p>
+        <ul>
+          <li>INVALID_LOGIN_CREDENTIALS: the username and password given when using Basic Authentication were not valid</li>
+          <li>ACCESS_TOKEN_ERROR: the access token given was not valid</li>
+          <li>INVALID_API_CALL: the API call was not formatted properly</li>
+          <li>NOT_FOUND: the API call was not pointing to a known resource or was not formatted properly</li>
+          <li>CREATE_REPO_ERROR: an error occurred while creating a repo</li>
+          <li>GET_REPO_ERROR: an error occurred while getting a repo</li>
+          <li>GET_REPOS_ERROR: an error occurred while getting all repos</li>
+          <li>UNCAUGHT_ERROR: an uncaught error caused things to fail</li>
+          <li>UNKNOWN_ERROR: an error which doesn't have an associated error code has happened</li>
+        </ul>
+      </div>
+      <div class="section" id="limitations">
+        <h2>Limitations</h2>
+        <ul>
+          <li>Repositories are not meant for, or designed for, very large files. In other words, please don't store videos in them.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- bcl scripts -->
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.2/fastclick.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/foundation.min.js"></script>
+  
+  <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
+    <script src="/en/scripts/docs-nav-data.min.js"></script>
+    <script src="/en/scripts/bcls-doc-site.js"></script>
+    <script src="/en/scripts/bc-mapi.js"></script>
+    <script>
+        $(document).foundation();
+    </script>
+    <script type="text/javascript">
+    /******** Any scripts specific to page samples should go here *********/
+  </script>
+</body>
+
+</html>

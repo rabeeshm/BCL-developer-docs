@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+	<!-- change title to match the h1 heading -->
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/foundation.min.css" />
+	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/normalize.css" />
+	<script src="//use.edgefonts.net/source-code-pro.js"></script>
+	<link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css">
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/styles/github.min.css">
+	<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2728311-29', 'auto');
+  ga('send', 'pageview');
+
+</script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/vendor/modernizr.js"></script>
+</head>
+
+<body>
+	<!-- header navbar -->
+	<div id="navWrapper" class="fixed"></div>
+	<!-- breadcrumbs -->
+	<nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+	<!-- search -->
+	<div id="searchModal" class="reveal-modal" data-reveal></div>
+	<!-- content -->
+	<!-- content -->
+	<div class="row">
+		<div class="large-2 columns show-for-large-up">
+			<div id="sidenav"></div>
+		</div>
+		<div id="main" class="large-10 small-12 columns">
+			<div id="top" class="section">
+				<h1>The HLS Player for Android</h1>
+				<p>This document explains the architecture of the HLS Player and its relation to the <code>SeamlessVideoView</code> and <code>BrightcoveVideoView</code>. </p>
+			</div>
+			<div id="introduction" class="section">
+				<h2>Introduction</h2>
+				<p>The HLS player consists of a number of classes which extend classes from the Brightcove Player SDK for Android. First, there is the <code>SeamlessVideoView</code>, which extends the <code>BrightcoveVideoView</code> by replacing:</p>
+				<ul>
+				    <li>the <code>BrightcoveSurfaceView</code> with a <code>SeamlessSurfaceView</code></li>
+				    <li>the <code>DefaultSourceSelectionController</code> with a <code>SeamlessSourceSelectionController</code></li>
+				    <li>the <code>VideoDisplayComponent</code> with a <code>SeamlessVideoDisplayComponent</code></li>
+				</ul>
+				<p>The HLS player also adds seekToLive() to support live streams.</p>
+			</div>
+			<div id="SurfaceView" class="section">
+				<h2>Surface view</h2>
+				<p><code>SeamlessSurfaceView</code>, which extends <code>BrightcoveSurfaceView</code>, overrides <code>onSizeChanged()</code> to set the fixed size of the surface and overrides <code>invalidate()</code> and <code>requestLayout()</code> to prevent unnecessary measure and layout passes, which can cause flickering. Its <code>SurfaceHolder</code> also overrides <code>setFixedSize()</code> to prevent setting the surface to the same size as the video width and height. This allows the layout constraints to determine the width and height of the surface.</p>
+			</div>
+			<div class="section" id="SelectionController">
+                <h2>Selection controller</h2>
+                <p><code>SeamlessSourceSelectionController</code> overrides <code>getMinimumHLSVersion()</code>
+to allow HLS playback as far back as Gingerbread (Android 2.3.3).</p>
+            </div>
+            <div class="section" id="DisplayComponent">
+                <h2>Video display component</h2>
+                <p>The bulk of the HLS implementation is in <code>SeamlessVideoDisplayComponent</code>, which extends <code>VideoDisplayComponent</code>. This class uses a <code>voOSBasePlayer</code> instead of an Android <code>MediaPlayer</code> to render the video. It also contains a second <code>voOSBasePlayer</code> instance, which is used to pre-buffer subsequent videos in a playlist. Just like <code>VideoDisplayComponent</code>, a <code>ScheduledFuture</code> is used to emit <code>PROGRESS</code> events at a fixed interval of 500 milliseconds.</p>
+                <p>Some methods, like <code>getMediaPlayer()</code> become unsupported, as they are replaced by methods like <code>getSeamlessPlayer()</code>.</p>
+                <p>Other methods, like <code>getClosedCaptionsEnabled()</code>, <code>setClosedCaptionsEnabled()</code>, <code>redraw()</code>, <code>isLive()</code>, <code>setBufferMaxSize()</code>, provide additional functionality.</p>
+            </div>
+		</div>
+	</div>
+	<!-- bcl scripts -->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/1.7/gist-embed.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.2/fastclick.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/foundation.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
+	<script src="/en/scripts/log.js"></script>
+	<script src="/en/scripts/docs-nav-data.min.js"></script>
+	<script src="/en/scripts/bcls-doc-site.js"></script>
+	<script src="/en/scripts/bc-mapi.js"></script>
+	<script>
+		$(document).foundation();
+	</script>
+	<script type="text/javascript">
+		/******** Any scripts specific to page samples should go here *********/
+	</script>
+	<div class="footer text-center"><a href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+</body>
+
+</html>

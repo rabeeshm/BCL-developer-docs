@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="robots" content="noindex" />
+  <meta name="robots" content="noindex" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <title id="bclPageTitle">HLS Plugin Guide</title>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/foundation.min.css" />
+	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/normalize.css" />
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/styles/github.min.css" />
+    <link rel="stylesheet" type="text/css" href="/en/styles/anytime.5.0.0-1401232312.min.css" />
+    <script type="text/javascript">
+        <!--//--><![CDATA[//><!--
+        var _gaq = _gaq || [];
+        _gaq.push(
+            ["_setAccount", "UA-2728311-23"], ["_setDomainName", ".brightcove.com"], ["_trackPageview"]);
+        (function () {
+            var ga = document.createElement("script");
+            ga.type = "text/javascript";
+            ga.async = true;
+            ga.src = ("https:" == document.location.protocol ? "https://ssl" : "http://www") + ".google-analytics.com/ga.js";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+         //--><!]]>
+    </script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/vendor/modernizr.js"></script>
+</head>
+
+<body>
+    <!-- header navbar -->
+    <div id="navWrapper" class="fixed"></div>
+	<!-- breadcrumbs -->
+	<nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+    <!-- search -->
+    <div id="searchModal" class="reveal-modal" data-reveal></div>
+    <!-- content -->
+    <div class="row">
+        <div class="large-2 columns show-for-large-up">
+            <div id="sidenav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+            <div id="top" class="section">
+                <h1 id="bclPageHeading">HLS Plugin Guide</h1>
+                <p class="video-cloud-only BCL-aside">Note: the Brightcove player is currently in beta and requires some developer skills to implement. If you are interested in participating in the beta, please contact your account manager.</p>
+                <!-- content starts here -->
+                <p class="BCL-objective">A Brightcove player plugin that plays HLS video on platforms that don&#39;t support it but have Flash. The HLS plugin is automatically included in the player. With the plugin you can then use HLS (m3u8) video content in the player. For instance you could create a player using this configuration for the media section:</p>
+                <pre><code>"media":{
+    "sources": [{
+        "src": "http://example.com/video.m3u8",
+        "type": "application/x-mpegURL"
+    }]
+}</code></pre>
+                <p>The rest of this document deals with downloading and using the plugin on its own.</p>
+                <p class="BCL-aside">Cross-origin resource sharing (CORS) can be an issue when using HLS. For more information about using CORS see <a href="../../concepts/cors/cors.html">http://docs.brightcove.com/en/video-cloud/concepts/cors/cors.html</a>.</p>
+            </div>
+            <div id="gettingstarted" class="section">
+                <h2><a name="gettingstarted"></a>Getting started</h2>
+                <div class="BCL-concept">
+                    <p>Get the <a href="https://github.com/videojs/videojs-contrib-hls">plugin</a>. Note: you will need to clone the repository and then run grunt in the top-level folder to build the latest version of the plugin. If you are not familiar with grunt, see the <a href="http://gruntjs.com/getting-started">Getting Started</a> page. When you run grunt, a /dist/ folder will be created, which contains a full and minified version of the plugin.</p>
+                    <p>You can also download a <a href="//files.brightcove.com/hls-plugin.zip">compiled version of the plugin</a>, but be sure to check back often for updated versions.</p>
+                    <p class="text-warning">Note: When defining your HLS source be sure that you set the video type to <code>application/x-mpegURL</code></p>
+
+                    <p>On your web page:</p>
+<pre><code class="html">&lt;script src=&quot;video.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;videojs-hls.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+  var player = videojs(&#39;video&#39;);
+  player.hls(&#39;http://example.com/video.m3u8&#39;);
+  player.play();
+&lt;/script&gt;
+</code></pre>
+                </div>
+            </div>
+            <div id="documentation" class="section">
+                <h2><a name="documentation"></a>Documentation</h2>
+                <div class="BCL-concept">
+                    <p><a href="https://developer.apple.com/streaming/">HTTP Live Streaming</a> (HLS) has become a de-facto standard for streaming video on mobile devices
+                        thanks to its native support on iOS and Android. There are a number of reasons independent of platform to recommend the format, though:</p>
+                    <ul>
+                        <li>Supports (client-driven) adaptive bitrate selection</li>
+                        <li>Delivered over standard HTTP ports</li>
+                        <li>Simple, text-based manifest format</li>
+                        <li>No proprietary streaming servers required</li>
+                    </ul>
+                    <p>Unfortunately, all the major desktop browsers except for Safari are missing HLS support. That leaves web developers in the unfortunate position
+                        of having to maintain alternate renditions of the same video and potentially having to forego HTML-based video entirely to provide the best
+                        desktop viewing experience.</p>
+                    <p>This plugin attempts to address that situation by providing a polyfill for HLS on browsers that have Flash support. You can deploy a single HLS
+                        stream, code against the regular HTML5 video APIs, and create a fast, high-quality video experience across all the big web device categories.</p>
+                    <p>The videojs-hls plugin is still working towards a 1.0 release so it may not fit your requirements today. Specifically, there is <em>no</em>
+                        support for:</p>
+                    <ul>
+                        <li>Alternate audio and video tracks</li>
+                        <li>Subtitles</li>
+                        <li>Segment codecs <em>other than</em> H.264 with AAC audio</li>
+                        <li>Live streams</li>
+                        <li>Internet Explorer &lt; 10</li>
+                    </ul>
+                    <h3>Runtime Properties</h3>
+                    <h4>player.hls.master</h4>
+                    <p>Type: <code>object</code>
+                    </p>
+                    <p>An object representing the parsed master playlist. If a media playlist is loaded directly, a master playlist with only one entry will be created.</p>
+                    <h4>player.hls.media</h4>
+                    <p>Type: <code>object</code>
+                    </p>
+                    <p>An object representing the currently selected media playlist. This is the playlist that is being referred to when a additional video data needs
+                        to be downloaded.</p>
+                    <h4>player.hls.mediaIndex</h4>
+                    <p>Type: <code>number</code>
+                    </p>
+                    <p>The index of the next video segment to be downloaded from
+<code>player.hls.media</code>.</p>
+                    <h4>player.hls.selectPlaylist</h4>
+                    <p>Type: <code>function</code>
+                    </p>
+                    <p>A function that returns the media playlist object to use to download the next segment. It is invoked by the plugin immediately before a new segment
+                        is downloaded. You can override this function to provide your adaptive streaming logic. You must, however, be sure to return a valid media
+                        playlist object that is present in <code>player.hls.master</code>.</p>
+                    <h3>Events</h3>
+                    <h4>loadedmetadata</h4>
+                    <p>Fired after the first media playlist is downloaded for a stream.</p>
+                    <h4>loadedmanifest</h4>
+                    <p>Fired immediately after a new master or media playlist has been downloaded. By default, the plugin only downloads playlists as they are needed.</p>
+                </div>
+            </div>
+            <div id="hosting" class="section">
+                <h2><a name="hosting"></a>Hosting issues</h2>
+                <div class="BCL-concept">
+                    <p>Unlike a native HLS implementation, the HLS plugin has to comply with the browser&#39;s security policies. That means that all the files that
+                        make up the stream must be served from the same domain as the page hosting the video player or from a server that has appropriate <a href="https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS">CORS
+headers</a>
+                        configured. Easy <a href="http://enable-cors.org/server.html">instructions are
+available</a> for popular webservers and most CDNs should have no trouble turning CORS on for your account.</p>
+                </div>
+            </div>
+            <div class="section" id="BCLreferences">
+                <h2>Related Topics</h2>
+                <ul>
+                    <!-- <li><a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/bc-analytics-plugin.html">New Player Plugin: Analytics</a> -->
+                    </li>
+                    <li><a href="ima-plugin.html">New Player Plugin: IMA</a>
+                    </li>
+                    <li><a href="../../player-management/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a>
+                    </li>
+                    <li><a href="../../player-management/guides/player-mgmt-quick-start.html">Quick Start to Player Management</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- bcl scripts============================================================-->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/1.7/gist-embed.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.2/fastclick.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/foundation.min.js"></script>
+    
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
+    <script src="/en/scripts/docs-nav-data.min.js"></script>
+    <script src="/en/scripts/bcls-doc-site.js"></script>
+    <script>
+        $(document).foundation();
+    </script>
+    <script id="pageScript" type="text/javascript">
+        /******** Any scripts specific to page samples should go here *********/
+    </script>
+    </div>
+    <div class="footer text-center"><a href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+	</body>
+
+</html>
