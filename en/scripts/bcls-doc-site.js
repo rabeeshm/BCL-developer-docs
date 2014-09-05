@@ -144,7 +144,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             document.title = $pageTitle.html();
         }
     };
-    // force into https mode if not already there
+    // force into https mode if not already there -- currently not used
     forceSecure = function () {
         var pageURL = window.location.href,
             pageProtocol = window.location.protocol;
