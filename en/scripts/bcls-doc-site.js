@@ -1,8 +1,10 @@
 var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData, hljs) {
     "use strict";
     var $precode = $("pre code"),
+        // for handlebars
         template,
         result,
+        // navigation vars
         linkPath,
         product,
         productName,
@@ -119,7 +121,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
     };
     // test for existence
     exists = function (x) {
-        return (x !== undefined && x !== null && x !== "");
+        return (x !== undefined && x !== null && x !== "" && x !== NaN);
     };
     /*
     find index of an object in array of objects
@@ -189,6 +191,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             createInPageNavMenu();
         }
     };
+    // highlight the current page in the global navigation
     highlightCurrentItem = function () {
         // find current page in navigation menu
         $navMenuLeft.find("a").each(function () {
@@ -252,6 +255,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         }
         $breadCrumbWrapper.html(str);
     };
+    // create the global navigation
     createNavigation = function () {
         var data = bclsNavData[product],
             item,
@@ -329,6 +333,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             highlightBackgroundColor = lightenDarkenColor(productColors[product], -40);
             highlightCurrentItem();
         };
+        // create the index of section pages for the landing page
         createLandingPageSections = function () {
             var data = bclsNavData[product].sections[section],
                 $sections = $("#sections"),
@@ -381,6 +386,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                 $sections.children("div").filter(":last").addClass("end");
             }
         };
+        // create the index of pages for subsections on the subsection landing page
         createSubsectionLandingPageSections = function () {
             var dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName),
                 data = bclsNavData[product].sections[section].items[dataIndex],
@@ -418,6 +424,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             $top.append(str);
             // $top.children("div").filter(":last").addClass("end");
         };
+        // special case - landing page for solutions.brightcove.com -- create index of all solutions
         createSolutionsLandingPageSections = function () {
             var data = bclsNavData["video-cloud"].sections,
                 $sections = $("#sections"),
@@ -448,6 +455,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             $sections.html(str);
             $sections.children("div").filter(":last").addClass("end");
         };
+        // figure out what section we're in
         getSection = function () {
             var pathArray = path.split("/"),
                 server;
@@ -715,6 +723,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                 createNavigation();
             }
         };
+        // initialization: set the page title, set up the header shell, get references to the parts
         init = function () {
             // set the page title in case wrong
             setPageTitle();
@@ -728,9 +737,9 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             $siteTitle = $("#siteTitle");
             // get the section name
             getSection();
-            /***************************************************
-            syntax highlighting - dependent on highlight.pack.js
-            ***************************************************/
+            /*
+             * syntax highlighting - dependent on highlight.pack.js
+             */
             hljs.tabReplace = "  ";
             hljs.initHighlightingOnLoad();
         };
@@ -744,7 +753,6 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         };
         init();
         return {
-            "BCLhighlight": BCLhighlight,
-            "bclslog": bclslog
-        };
+            "BCLhighlight": BCLhighlight
+        }
 })($, window, console, document, Handlebars, bclsNavData, hljs);
