@@ -91,13 +91,12 @@
                     </ol>
                 </div>
                 <h3>API Ingest</h3>
-                <p>Brightcove’s Once API Ingest service is a RESTful API that accepts a POST with a <code>DownloadURL</code> for the video. When the video has been successfully generated, the <a href="#profiles">core profiles</a> required for delivery on the OnceVOD platform
-                    are generated, and a notification is sent to the URL you specify in the POST.</p>
+                <p>Brightcove’s Once API Ingest service is a RESTful API that accepts a POST with a <code>DownloadURL</code> for the video. When the video has been successfully generated, the <a href="#profiles">core profiles</a> required for delivery on the OnceVOD platform are generated, and a notification is sent to the URL you specify in the POST.</p>
                 <h4>Service URL</h4>
                 <p>The URL for the POST request is:</p>
 <pre><code>http://apiingest.unicornmedia.com/api/ingest</code></pre>
                 <div class="text-warning">
-                    <p><code>DomainName</code>, <code>CatalogGUID</code> and <code>ChannelGUID</code> values can be obtained from Client Services.</p>
+                    <p><code>DomainName</code>, <code>CatalogGUID</code> and <code>ChannelGUID</code> values can be obtained from Brightcove Media Solution Delivery</p>
                     <p>NOTE: <code>&lt;ForeignKey&gt;</code> is a required field. <code>&lt;StartDate&gt;</code> and <code>&lt;EndDate&gt;</code> must be in Unix time format (Epoch time in seconds).</p>
                 </div>
                 <h4>Simple XML</h4>
@@ -776,7 +775,50 @@
   "passThruMetadata" : "<em>{JSON string sent in with ingest}</em>",
   "status": "Completed"
 }</code></pre>
+                <h5>Example of an error notification</h5>
+<pre><code>{
+  "___version" : "1.0",
+  "errorCode" : "500",
+  "errorMessage" : "There was an error in the Unicorn Media System",
+  "jobId" : "<GUID>",
+  "passThruMetadata" : "clob",
+  "status" : "Error"
+}</code></pre>
                 <h5>Field explanation</h5>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Property</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>jobid</td>
+                            <td>internal Once platform job id</td>
+                        </tr>
+                        <tr>
+                            <td>onceurl</td>
+                            <td>url that can be used for playback utilizing a predetermined applicationguid</td>
+                        </tr>
+                        <tr>
+                            <td>passthrumetadata</td>
+                            <td>any metadata set for passthrough sent on the initial ingest request</td>
+                        </tr>
+                        <tr>
+                            <td>status</td>
+                            <td><code>Completed</code> or <code>Error</code></td>
+                        </tr>
+                        <tr>
+                            <td>errorCode</td>
+                            <td>Error code if the ingest did not succeed</td>
+                        </tr>
+                        <tr>
+                            <td>errorMessage</td>
+                            <td>Brief data around why a particular asset failed</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <div class="section" id="onceURLcreation">
                 <h2>Once URL Creation</h2>
@@ -1170,61 +1212,13 @@
                 <h3>Foreign key use</h3>
 				<p>The Brightcove Once platform allows for the use of foreign key values to be used instead of mediaitemguids within the URL construct to identify the video for playback. Most all values can be used, giving the opportunity for values already associated to content within customer systems to be kept congruent throughout.</p>
 				<h4>Example</h4>
-[example (search for fkey01 in the consolidated doc)]
+<pre><code>http://...63598604-cb88-44f8-bc47-d207af3b7b4a/
+    ?UMXBEACON=http%3A%5F%2Fbeaconserver.um.com%3Fkeyone=111</code></pre>
 
-For foreign keys that have characters such as colons, please see the <a href="#UMFKEY"><code>UMFKEY</code></a> query string parameter.
-                <h3>Virtual filename</h3>
-                <p>The VirtualFileName parameter value is an arbitrary file name; however the extension should accurately represent the requested file type to ensure that the file is compatible with the requesting device.</p>
-                <h5>URL Map:</h5>
-                <pre><code>/.../MediaItemGUID/VirtualFileName?AdParams</code></pre>
-                <h5>Example:</h5>
-                <pre><code>http://...63598604-cb88-44f8-bc47-d207af3b7b4a/content.m3u8? UMAID-10-0=c2364425-2267-4eaa-b800-ef544bdd3da3/...</code></pre>
-                <table id="t12">
-                    <caption>Table 12: Virtual File Name Variables</caption>
-                    <thead>
-                        <tr>
-                            <th>
-                                <p>Parameter</p>
-                            </th>
-                            <th>
-                                <p>Type</p>
-                            </th>
-                            <th>
-                                <p>Description</p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <p>VirtualFileName</p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <p>Arbitrary file name for the request, whereas content.[extension] is default. Value could be changed by customer to be video.[extension] or [videotitle].[extension] i.e. BigBuckBunny.once</p>
-                                <ul>
-                                    <li>Regardless of the file type, the system will return a media file</li>
-                                    <li>May help you identify the delivery format and play back properly</li>
-                                </ul>
-                                <p>Extensions Include:</p>
-                                <ul>
-                                    <li>"content.<strong>once</strong>"
-                                        <ul>
-                                            <li>The only acceptable RequestedFileType for ".once" is "auto"</li>
-                                        </ul>
-                                    </li>
-                                    <li>"content.<strong>mp4</strong>"</li>
-                                    <li>"content.<strong>m3u8</strong>"</li>
-                                </ul>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <p>For foreign keys that have characters such as colons, please see the <a href="#UMFKEY"><code>UMFKEY</code></a> query string parameter.</p>
                 <h3>Segmenting</h3>
                 <p>Segmented video clips must have a start time and end time defined. The parameters, <code>StartTime</code> and <code>EndTime</code>, are represented by positive integer values in seconds, i.e. "30" for 30 seconds. <code>StartTime</code>  <strong>must always</strong> precede <code>EndTime</code>. The clip will start playing and end playback at the points in the MediaItem indicated by these parameters.</p>
-                    <p><strong>For auto- device detection</strong>, <code>StartTime</code> and <code>EndTime</code> will be supplied immediately after <code>MediaItemGUID</code> (or <code>ForeignKey</code> if used).</p>
+                    <p><strong>For auto- device detection</strong>, <code>StartTime</code> and <code>EndTime</code> will be supplied immediately after <code>MediaItemGUID</code> (or  <code>ForeignKey</code> if used).</p>
                 <h4>URL Map:</h4>
 <pre><code>/.../MediaItemGUID/StartTime/EndTime/VirtualFileName?AdParams</code></pre>
                 <h4>Example:</h4>
@@ -1270,12 +1264,12 @@ For foreign keys that have characters such as colons, please see the <a href="#U
                         </tr>
                     </tbody>
                 </table>
-                <p>For <strong>Stitched</strong>, <code>StartTime</code> and <code>EndTime</code> should be supplied immediately after the required>MediaitemGUID.</p>
+                <p>For <strong>Stitched</strong>, <code>StartTime</code> and <code>EndTime</code> should be supplied immediately after the required MediaitemGUID.</p>
                 <h5>Stitched URL Map:</h5>
                 <p>.../DomainGUID/ApplicationGUID/ProfileGUID/MeidaItemGUID/<strong>StartTime/End Time</strong> </p>
                 <h5>Example:</h5>
 <pre><code>http://...4989f8db-9187-49ca-86ff-e2cd53429cd4/35217a08-d9db-469f-aec0-7c8806a0c60/
-    c264425-2267-4eaa-b800-ef54bddda3/15/30/63598604-cb88-44f8-bc47- d207af3b7b4a/...</code></pre>
+    c264425-2267-4eaa-b800-ef54bddda3/15/30/content.mp4</code></pre>
             </div>
             <div class="section" id="parameters">
                 <h2>Parameters</h2>
@@ -1286,7 +1280,7 @@ For foreign keys that have characters such as colons, please see the <a href="#U
                 <h5 id="UMADPARAM"><code>UMADPARAM</code> – Specify the Ads Served Back by Ad Provider</h5>
                 <p><code>UMADPARAM{Key}={Value}</code>
                 </p>
-                <p>Use this parameter to have your ad provider serve back ads according to your requirements. The parameter value will be passed along to the ad call.</p>
+                <p>Use this parameter to pass along page level and client side data to the Once platform to be appended to ad calls made to your ad provider, enabling this data to be used in their ad targeting/decisioning.</p>
                 <h6>Example Key/Value pairs:</h6>
                 <ul>
                     <li>cc=US</li>
@@ -1295,7 +1289,7 @@ For foreign keys that have characters such as colons, please see the <a href="#U
                 <h6>Customer Created URL:</h6>
 <pre><code>/.../once.unicornmedia.com/content.m3u8?UMADPARAMcc=US&amp;UMADPARAMstate= Arizona</code></pre>
                 <p>Brightcove consumes this OnceVOD URL, strips off the <code>UMADPARAM</code> key designator and serves the resulting key-value pair to the ad provider who in turn will serve only the ads that were requested by the certain value.</p>
-                <h6>URL Sent by UM to ad provider:</h6>
+                <h6>URL Sent by Brightcove Once to ad provider:</h6>
 <pre><code>http://.../adprovider.com/content.m3u8?cc=US&amp;state=Arizona</code></pre>
                 <p>The OnceVOD URL example above would make the ad call and return ads specific to the country and state values provided.</p>
                 <h5 id="UMPTPARAM"><code>UMPTPARAM</code> – Pass Values Through with No System Manipulation</h5>
@@ -1312,7 +1306,7 @@ For foreign keys that have characters such as colons, please see the <a href="#U
 <pre><code>http://.../VirtualFileName?&amp;
     UMPTPARAMCust_Params=Denver%Android_4_0%26 tile%Video&amp;UMPTPARAMVideo_param=26iu%3D%252F7646</code></pre>
                 <p>The above example depicts the parameter variables in a URL with ad targeting. Through appending a OnceVOD URL with the UMPTPARAM query string parameter, the encoded string value can be specified and passed through without manipulation.</p>
-                <p>Below is a sample of the call that Brightcove will be expected to make to ad providers in order to retrieve an Ad asset. The response to the Video Ad will be in in the form of a VAST XML.</p>
+                <p>Below is a sample of the call that Brightcove will be expected to make to ad providers in order to retrieve an Ad asset. The response to the Video Ad will be in in the form of a VAST XML or other supported response types of Brightcove Once.</p>
                 <h6>URL Sent by UM to ad provider:</h6>
 <pre><code>http://ad.provider.url/content.m3u8?
     Cust_Params=Denver%Android_4_0%26 tile%Video&amp;Video_param=26iu%3D%252F7646</code></pre>
@@ -1335,32 +1329,37 @@ For foreign keys that have characters such as colons, please see the <a href="#U
     Cust_Params=Denver%Android_4_0%26tile%Video%26Video_par am=26iu%3D%252F7646&amp;
     slau=midroll&amp;tpos=180;;ptgt=a&amp;slau=midroll&amp;tpos=360;;ptgt=a&amp;
     slau=midroll&amp;tpos=540</code></pre>
-                <h4>Dynamic Ad Params (DAP)</h4>
-                <p>DAP key/value pairs are functional throughout the system; preconfigured and mapped. OnceVOD will dynamically pull known client device information from the mapping in the runtime database and include that data as part of the tracking or targeting parameters expected by the Beaconing Server or Ad Server. See <a href="#serverSideBeaconing">Server Side Beaconing</a> and <a href="#UMADPARAM">UMADPARAM</a> for URL examples.</p>
-                <p>View the table in the <a href="#DAP">Quick Reference Tables</a> section for all available Ad Parameters and their use. See <a href="#serverSideBeaconing">Server Side Beaconing</a> and <a href="#UMADPARAM">UMADPARAM</a> for URL examples.</p>
-                <h5>Example Key/Value pairs:</h5>
+
+
+
+                <h4>Beacon params</h4>
+                <h5 id="UMBEPARAM"><code>UMBEPARAM</code></h5>
+                <p>Appends a OnceVOD URL where each variable value can be specified according to preferences and passed dynamically to the beacon call.</p>
+                <h6>Example Key/Value pairs:</h6>
                 <ul>
                     <li><code>Localadid={{adid}}:</code> ad id integer value will be obtained from the database and inserted</li>
                     <li><code>Uniqueid={{country}}:</code> the device country will be inserted</li>
                 </ul>
-                <h5>Beaconing URL Example:</h5>
+                <h6>Beaconing URL Example:</h6>
                 <pre><code>http://once.unicornmedia.com/Localadid=adValue&amp;uniqueid=$uniqueid</code></pre>
-                <h5>Parameter Examples:</h5>
+                <h6>Parameter Examples:</h6>
                 <ul>
                     <li><code>UMBEPARAMLocaladid=55</code>
                     </li>
                     <li><code>UMBEPARAMuniqueid=country</code>
                     </li>
                 </ul>
-                <h5>Fired Beaconing URL:</h5>
+                <h6>Fired Beaconing URL:</h6>
                 <pre><code>http://once.unicornmedia.com/Localadid=55&amp;uniqueid=$country</code></pre>
-                <h4>Independent Tracking</h4>
+                <h5 id="UMXBEACON"><code>UMXBEACON</code></h5>
+                <p>Decodes the encoded URL value set in the <code>umxbeacon</code> parameter and redirects to the next handler.</p>
+                <h6>Independent Tracking</h6>
                 <p><code>UMXBEACON={encodedURL}</code>
                 </p>
                 <p class="text-warning">NOTE: The URL in the beacon MUST be URL encoded and be the last UM parameter in the URL</p>
-                <h5>URL Map:</h5>
+                <h6>URL Map:</h6>
                 <p class="text-warning">/...}/[{mediaItemGUID}]?[UMXBEACON={encodedURL}]</p>
-                <h5>Example:</h5>
+                <h6>Example:</h6>
                 <pre><code>http://...63598604-cb88-44f8-bc47-d207af3b7b4a?UMXBEACON=http%3A%5F%2Fbeaconserver.um.com%3Fkeyone=111</code></pre>
                 <table id="t14">
                     <caption>Table 14: Independent Tracking</caption>
@@ -1396,11 +1395,6 @@ For foreign keys that have characters such as colons, please see the <a href="#U
                         </tr>
                     </tbody>
                 </table>
-                <h4>Beacon params</h4>
-                <h5 id="UMBEPARAM"><code>UMBEPARAM</code></h5>
-                <p>Appends a OnceVOD URL where each variable value can be specified according to preferences and passed dynamically to the beacon call.</p>
-                <h5 id="UMXBEACON"><code>UMXBEACON</code></h5>
-                <p>Decodes the encoded URL value set in the <code>umxbeacon</code> parameter and redirects to the next handler.</p>
                 <h4>Utility params</h4>
                 <h5 id="UMFKEY"><code>UMFKEY</code> – Foreign Key Takes Priority over Media Item GUID in Query String</h5>
                 <p><code>UMFKEY={URLEncodedForeignKey}</code>
@@ -1411,15 +1405,15 @@ For foreign keys that have characters such as colons, please see the <a href="#U
                     <li>ForeignKey=uma:video:movie.com:480337</li>
                 </ul>
                 <h6>Example Static MediaItemGUID</h6>
-                <pre><code>63598604-cb88-44f8-bc47-d207af3b7b4a</code></pre>
+                <pre><code>00000000-0000-0000-0000-000000000000</code></pre>
                 <h6>Customer Created URL:</h6>
 <pre><code>http://once.unicornmedia.com/od/auto/m3u8/
     4989f8db-9187-49ca-86ff-e2cd53429cd4/35217a08-d9db-469f-aec0-7c88406a0c60/
-    63598604-cb88-44f8-bc47-d207af3b7b4a/content.m3u8?
+    00000000-0000-0000-0000-000000000000/content.m3u8?
     cc=US&amp;state=Arizona&amp;UMFKEY=uma:video:movie.com:480337</code></pre>
                 <p class="text-warning">NOTE: The UMFKEY value must be URL encoded.</p>
                 <h5 id="temporarilyOverride">Temporarily Override the Standard Profile List (umoprofiles)</h5>
-                <p>When the query string is appended with umoprofiles={profileGUID}, the associated profile will be dynamically inserted in the m3u8 to temporarily override the standard profile list for adaptive playback of an asset.</p>
+                <p>When the query string is appended with umoprofiles={profileGUID}, the associated profile(s) will be dynamically inserted in the m3u8 to temporarily override the standard profile list for adaptive playback of an asset.</p>
                 <h6>URL Map:</h6>
                 <pre><code>/.../MediaItemGUID/VirtualFileName?umoprofiles=PROFILEGUID1,PROFILEGUID2,...,PROFILEGUIDX
                 </code></pre>
@@ -1452,7 +1446,7 @@ For foreign keys that have characters such as colons, please see the <a href="#U
                             </td>
                             <td>
                                 <ul>
-                                    <li>Overrides the standard profile list so that only the specified profile will be delivered in the m3u8</li>
+                                    <li>Overrides the standard profile list so that only the specified profile(s) will be delivered in the m3u8</li>
                                     <li>Multiple profiles are entered as a comma-separated list of profile GUIDs</li>
                                 </ul>
                             </td>
@@ -1644,9 +1638,9 @@ For foreign keys that have characters such as colons, please see the <a href="#U
                 	</tbody>
                 </table>
                 <h3>Dynamic ad params</h3>
-                <h4>Description</h4>
-                <h4>Common params</h4>
-                <h4>Full list of params</h4>
+                <p>DAP key/value pairs are functional throughout the system; preconfigured and mapped. OnceVOD will dynamically pull known client device information from the mapping in the runtime database and include that data as part of the tracking or targeting parameters expected by the Beaconing Server or Ad Server. See <a href="#serverSideBeaconing">Server Side Beaconing</a> and <a href="#UMADPARAM">UMADPARAM</a> for URL examples.</p>
+                <p>View the table in the <a href="#DAP">Quick Reference Tables</a> section for all available Ad Parameters and their use.</p>
+
                 <h5>Advertising</h5>
                 <table>
                     <thead>
@@ -2124,6 +2118,8 @@ For foreign keys that have characters such as colons, please see the <a href="#U
                     </tbody>
                 </table>
                 <h5 id="DAP">Dynamic ad params</h5>
+
+
                 <table>
                   <thead>
                       <tr>
