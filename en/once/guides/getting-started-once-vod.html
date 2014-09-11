@@ -57,7 +57,7 @@
                 <h3>Description</h3>
                 <p>Brightcove’s Once Ingest service receives and transcodes your video, making it ready for the Once VOD delivery system.</p>
                 <h3>Profiles and Renditions</h3>
-                <p>The following table shows the standard renditions created for videos. Both SD (4:3) and HD (16:9) renditions are created.</p>
+                <p>The following table shows the standard renditions created for videos.</p>
                 <table id="t1" class="wide-table">
     <caption>Table 1: OnceVOD profiles for your channel</caption>
     <thead>
@@ -99,7 +99,7 @@
                     <p><code>DomainName</code>, <code>CatalogGUID</code> and <code>ChannelGUID</code> values can be obtained from Brightcove Media Solution Delivery</p>
                     <p>NOTE: <code>&lt;ForeignKey&gt;</code> is a required field. <code>&lt;StartDate&gt;</code> and <code>&lt;EndDate&gt;</code> must be in Unix time format (Epoch time in seconds).</p>
                 </div>
-                <h4>Simple XML</h4>
+                <h4 id="simpleXML">Simple XML</h4>
 <pre><code>&lt;APIIngestRequest&gt;
     &lt;UserName&gt;required&lt;/UserName&gt;
     &lt;Password&gt;required&lt;/Password&gt;
@@ -117,7 +117,7 @@
     &lt;NotificationRequestMethod&gt;optional&lt;/NotificationRequestMethod&gt;
     &lt;Priority&gt;0&lt;/Priority&gt;
 &lt;/APIIngestRequest&gt;</code></pre>
-                <h4>Full XML</h4>
+                <h4 id="fullXML">Full XML</h4>
 <pre><code>&lt;APIIngestRequest&gt;
     &lt;UserName&gt;required&lt;/UserName&gt;
     &lt;Password&gt;required&lt;/Password&gt;
@@ -641,7 +641,7 @@
                 </table>
                 <h3>Notifications</h3>
                 <h4>Item notification</h4>
-                <p>Notifications can be sent via email or automated post-back to a URL of your choosing. Brightcove will send these responses in real time, allowing for your CMS or other publication platform to publish your content in the shortest possible time frame. The table below provides the minimum information necessary for Customer Service to set up your notifications.</p>
+                <p>By default, API Ingest will supply item notifications via the appropriate fields in the ingest xml to the specified location of your choosing. Examples of the url post-back are below. As an alternate method of utilizing Item Notifications through the API Ingest request, a single post-back url can be preconfigured in the Once system to be used instead.</p>
                 <div class="text-align-center">
                     <table id="t5">
                         <caption>Table 5: Item Notification Required Properties</caption>
@@ -1188,7 +1188,7 @@
                             </td>
                             <td>
                                 <ul>
-                                    <li><code>stitched</code>is the only acceptable value</li>
+                                    <li><code>stitched</code> is the only acceptable value</li>
                                     <li>For delivering to devices that don't support MP4 or HTTP Live Streaming</li>
                                 </ul>
                             </td>
@@ -1504,7 +1504,7 @@
                 </ul>
                 <h3>Dynamic ad params</h3>
                 <p>DAP key/value pairs are functional throughout the system; preconfigured and mapped. OnceVOD will dynamically pull known client device information from the mapping in the runtime database and include that data as part of the tracking or targeting parameters expected by the Beaconing Server or Ad Server. See <a href="#serverSideBeaconing">Server Side Beaconing</a> and <a href="#UMADPARAM">UMADPARAM</a> for URL examples.</p>
-                <p>View the table in the <a href="#DAP">Quick Reference Tables</a> section for all available Ad Parameters and their use.</p>
+                <p>View the table in the <a href="#DAPtable">Quick Reference Tables</a> section for all available Ad Parameters and their use.</p>
                 <h4>Full list of params</h4>
                 <h5>Advertising</h5>
                 <table>
@@ -1677,7 +1677,7 @@
                     	</tr>
                 	</tbody>
                 </table>
-                <h5 id="DAP">Dynamic ad params</h5>
+                <h5 id="DAPtable">Dynamic ad params</h5>
                 <table>
                   <thead>
                       <tr>
@@ -2720,20 +2720,24 @@
                 <h3>Beacon frequency</h3>
                 <h4>Event based</h4>
                 <ul>
-                <li>Start</li>
-                <li>First quartile</li>
-                <li>Midpoint</li>
-                <li>Third quartile</li>
-                <li>Complete</li>
+                    <li>Start</li>
+                    <li>First quartile</li>
+                    <li>Midpoint</li>
+                    <li>Third quartile</li>
+                    <li>Complete</li>
                 </ul>
                 <h4>Time based</h4>
-                <h5>Every n seconds</h5>
+                <ul>
+                    <li>Every n seconds</li>
+                </ul>
+
                 <h3>Value generation</h3>
                 <h4>Static</h4>
                 <p>Static values for beacons can be preconfigured and set in place in the Brightcove Once database to always be fired with the associated beacon server base URL.</p>
                 <h4>DAP</h4>
-                <p>The Once platform can automatically generate some contextual information based off of... (pull info from the DAP explanation for this.) Reference/link to the DAP section/table as a for more information thing.</p>
+                <p>The Once platform can automatically generate some contextual information based off of known client device information from the mapping in the runtime database and include that data as part of the tracking or targeting parameters expected by the Beaconing Server or Ad Server. See the <a href="#DAPtable">full list of dyamic ad parameters</a>.</p>
                 <h4>Page level</h4>
+                <p>For values that are not static or DAP generated, beacon key value pairs can be appended to the initial Once url request to be utilized as well. See the <a href="#serverSideBeaconing">Server Side Beaconing</a> section for more information.</p>
                 <h3>UMXBeacon</h3>
                 <h4>Description</h4>
                 <h4>Example</h4>
@@ -2804,11 +2808,18 @@
                 <p></p>
                 <h4>Playback limited to HLS</h4>
                 <h3>Publication rules</h3>
+                <p>Publication Rules are a set of <strong>optional</strong> business logic parameters that may be applied to the content you upload into the Brightcove Once platform to restrict playback in a number of ways.</p>
                 <h4>Source</h4>
-                <h5>API Ingest</h5>
                 <h5>Inherited from catalog</h5>
-                <h4>Types of limits</h4>
+                <p>By default, media items created will inherit the publication rule that is assigned to the catalog that the asset is created in. This rule can be edited to utilize any of the limits included in the Type of Limits section to automatically be applied but by default this publication rule is a rolling 10 year window with no other restrictions.</p>
+                <h5>API Ingest</h5>
+                <p>If you have a need to more granularly adjust publication rules on a per asset basis rather than utilizing the standard inheritance of publication rules, you can specify this rule via the Brightcove Once API at time of ingest.</p>
+
+<p>These types of publication rules will overwrite the inherited rule that an asset would receive by default.</p>
+
+<p>Please see the <a href="#fullXML">extended Ingest xml example</a> for more information on how to include publication rules into your ingest request.</p>
                 <h5>Start date / end date</h5>
+                <p>Playback is only allowed within the start and end dates.</p>
                 <h5>Geo restrictions</h5>
                 <p>Once supports geo-restriction at the country level both by inclusion and exclusion.</p>
                 <h6>Allow country or countries</h6>
@@ -2816,6 +2827,9 @@
                 <h6>Deny country or countries</h6>
                 <p>When you disallow viewing in one or more countries, viewing is automatically allowed in all other countries.</p>
                 <h5>Referring host</h5>
+                <p>Playback is allowed only if the referring host matches the specified value.</p>
+                <h5>Multiple publication rules</h5>
+                <p>Multiple rules can be used if a particular behavior is desired. For example, using two publication rules, you could limit playback to a particular country for a set amount of time before offering the video globally. This would look like: Publication rule 1 would allow video playback for a particular specified date range to a particular single country only. Publication rule 2 would start at the end time of rule 1 with a 10 year time limit and no country restriction.</p>
             </div>
         </div>
     </div>
