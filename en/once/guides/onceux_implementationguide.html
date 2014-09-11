@@ -40,7 +40,6 @@
         <div id="main" class="large-10 small-12 columns">
             <div id="top" class="section">
                 <h1>Brightcove OnceUX Implementation Guide</h1>
-                <p>Last Revision Date: March 2013</p>
             </div>
             <div class="section" id="overview">
                 <h2>Overview</h2>
@@ -52,27 +51,21 @@
                 <h3>Information Gathering</h3>
                 <p>Several pieces of information are needed to take advantage of the OnceUX URL construct. Resulting Once URL(s) within responses will follow OnceVOD convention for <code>{deliveryType}</code> and <code>{RequestedFileType}</code> based on the OnceUX request syntax decisions you make as listed below. (<em>See OnceVOD Implementation Guide for more information</em>)</p>
                 <ul>
-                    <li><strong>Delivery Type:</strong> Decide if your media will be 'stitched' for progressive download, 'adaptive' for HTTP streaming or 'od' (on demand) to be used with Auto Links</li>
-                    <li><strong>Requested File Type:</strong> Choose from 'mp4', '3gp', 'm3u8' or 'auto' which determines delivery method according to client capabilities</li>
+                    <li><strong>Delivery Type:</strong> Decide if your media will be <code>stitched</code> for progressive download, <code>adaptive</code> for HTTP streaming or <code>od</code> (on demand) to be used with Auto Links</li>
+                    <li><strong>Requested File Type:</strong> Choose from <code>mp4</code>, <code>3gp</code>, <code>m3u8</code> or <code>auto</code>, which determines delivery method according to client capabilities</li>
                     <li><strong>DomainGUID</strong>, <strong>ApplicationGUID</strong>, <strong>MediaItemGUID</strong>: Each are obtained by contacting <a href="mailto:oncesupport@brightcove.com">oncesupport@brightcove.com</a>
                     </li>
                     <li><strong>Query String Parameters:</strong> Use the following pages to determine your parameters</li>
                 </ul>
-                <p class="text-info">Some of the query string parameters will be passed through and appended to the resulting
-                    <br/>Once URL while others will be used by OnceUX when making calls to ad servers.</p>
-                <h3>VAST Ad Proxy Method</h3>
-                <p>This method behaves as an ad server proxy. Using the OnceUX URL construct that is pre-defined to elicit a VAST response, you would create a URL that utilizes pre-configured ad logic organized to make a request to a third party ad server. The response is normalized to a VAST 3.0 or SmartXML document. VAST XML contains a location called <code>&lt;mediafile&gt;</code> where the URL for the actual media file is held. The system parses the VAST 3.0 document for a <code>foriegnkey</code> or <code>mediaitemGUID</code> within <code>&lt;mediafile&gt;</code> to determine if it has already been ingested into the Brightcove File System. If the URL exists, it is replaced with a Brightcove Once URL that is the Ad Asset and the response is returned to the requesting client. However, if the file is not currently in the Brightcove File System, ingest and processing is initiated via Ad Cache (see the <em>Brightcove Once Technical User Guide </em>for more information on Ad Caching). An empty VAST 3.0 response is returned until the ad video is ready for delivery via Ad Cache.</p>
-                <p>Therefore, if the application is a flash player, iPhone app, Android app, etc., you have a searchable VAST response to utilize however you wish. In addition, you have a Brightcove Once URL that utilizes OnceVOD Automatic Device Detection technology for the ad asset.</p>
-                <p>This method also supports using HTTP cookies to handle tracking session for ad frequency capping.</p>
+                <p class="text-info">Some of the query string parameters will be passed through and appended to the resulting Once URL while others will be used by OnceUX when making calls to ad servers.</p>
                 <h3>VMAP Ad Aggregation Method</h3>
-                <p>With this method, OnceUX retrieves a multiple ad playlist from values that are derived by summarizing or <em>aggregating </em>the ad viewing data based on your application (player, iPhone, etc.) from appropriate ad servers. This OnceUX URL template is pre-defined to elicit a VMAP 1.0 response providing control over ad inventory insertion where you don't control the player application.</p>
+                <p>With this method, OnceUX retrieves a multiple ad playlist from values that are derived by summarizing or <em>aggregating</em> the ad viewing data based on your application (player, iPhone, etc.) from appropriate ad servers. This OnceUX URL template is pre-defined to elicit a VMAP 1.0 response providing control over ad inventory insertion where you don't control the player application.</p>
                     <p>You will create a Once URL that sends a request to Brightcove servers for content. The data returned is a list of all the ads for that content viewing session normalized into VAST 3.0 and then embedded into a VMAP 1.0 XML object. This VMAP object contains a Brightcove Once XML object, which includes Brightcove Once data and a URL. See the <a href="#vmapResponse">sample response</a> example.</p>
                 <p><strong>NOTE:</strong> Be aware that the VAST 3.0 object for each creative in the VMAP object will be missing a download link because the URL provided in the Once XML object will incorporate the ad resources at the correct locations causing the video ad creative content URL to be unnecessary.</p>
                 <p>The greatest difference between these two methods is that, in addition to the Once URL, the Ad Aggregation method also provides metadata and a VMAP object containing the ad load for the entire asset. This gives you greater client side flexibility with advertising while still using Brightcove Once platform. For instance, you can decide to manage tracking client side or through Brightcove Services, include banners and click-throughs not supported by Brightcove, etc.</p>
                     <p>Brightcove OnceUX utilizes a proprietary URL syntax based on OnceVOD technology. You configure it through a programmatic URL generation method customized for your specific application.</p>
             <div class="section" id="urlSegmentVariables">
                 <h2>Segment variables</h2>
-                <p>The <strong>Ad Proxy</strong> method sends an ad call using pre-configured ad logic, normalized and returned to the client with a Once URL for delivery.</p>
                 <p>The <strong>VMAP method</strong> implements the Ad Server Aggregator behavior, in which content is requested and a fully-formed response is given with a OnceUX URL, metadata and a VMAP object containing the ad load for the entire asset.</p>
                 <p>The URL segment variables described below are consistent between both methods with the only difference being the RequestedFileType parameter in the query string.</p>
                 <p class="text-info">Optional variables within the following URL syntax examples are represented with brackets ( <code>[ ]</code> ).</p>
