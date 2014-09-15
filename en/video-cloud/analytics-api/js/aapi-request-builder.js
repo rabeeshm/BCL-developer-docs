@@ -163,7 +163,7 @@ var BCLS = (function ($, window, AnyTime) {
         // build the request
         authorization = "Bearer " + removeSpaces($token.val());
         requestURL = $serviceURL.val();
-        requestURL += "/account/" + removeSpaces($accountID.val()) + "/";
+        requestURL += "/accounts/" + removeSpaces($accountID.val()) + "/";
         // is it a report?
         if ($requestType.val() === "report") {
             // make sure dimensions is defined

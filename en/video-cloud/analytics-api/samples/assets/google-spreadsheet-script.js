@@ -5,7 +5,7 @@ var brightcove_account = '20318290001', //'1417400168''20318290001';
     today_unix = today.getTime(),
     one_week_ago = new Date(today_unix - 1000 * 60 * 60 * 24 * 7).getTime(),
     // Video report for the last week
-    url = "https://data.brightcove.com/analytics-api/videocloud/account/" + brightcove_account + "/report?dimensions=video&limit=all&from=" + one_week_ago + "&to=" + today_unix,
+    url = "https://data.brightcove.com/analytics-api/videocloud/accounts/" + brightcove_account + "/report?dimensions=video&limit=all&from=" + one_week_ago + "&to=" + today_unix,
     options = {
         "headers": {
             "Authorization": "Bearer " + auth_token

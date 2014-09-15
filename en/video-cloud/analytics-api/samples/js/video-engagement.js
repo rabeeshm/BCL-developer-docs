@@ -221,7 +221,7 @@ var BCLS = (function ($, window, AnyTime) {
         // build the request
         authorization = "Bearer " + removeSpaces($token.val());
         requestURL = $serviceURL.val();
-        requestURL += "/account/" + removeSpaces($accountID.val()) + "/?";
+        requestURL += "/accounts/" + removeSpaces($accountID.val()) + "/?";
         // check for time filters
         startDate = $startDate.val() + " " + $startTime.val();
         if (startDate !== " ") {
