@@ -55,7 +55,12 @@
             <div class="section" id="ingest">
                 <h2>Ingest</h2>
                 <h3>Description</h3>
-                <p>Brightcove’s Once Ingest service receives and transcodes your video, making it ready for the Once VOD delivery system.</p>
+                <p>Brightcove’s Once Ingest service receives and transcodes your video, making it ready for the Once VOD delivery system. Three ingest methods are supported:</p>
+                <ul>
+                    <li><a href="#apiIngest">API ingest</a></li>
+                    <li><a href="#snsIngest">SNS ingest</a></li>
+                    <li><a href="#s3Ingest">S3 ingest</a></li>
+                </ul>
                 <h3>Profiles and Renditions</h3>
                 <p>The following table shows the standard renditions created for videos.</p>
                 <table id="t1" class="wide-table">
@@ -90,7 +95,7 @@
                             href="#temporarilyAdd">Temporarily <strong>A</strong>dd Profiles to the Standard Profile List (um<strong>a</strong>)profile</a>.</li>
                     </ol>
                 </div>
-                <h3>API Ingest</h3>
+                <h3 id="apiIngest">API ingest</h3>
                 <p>Brightcove’s Once API Ingest service is a RESTful API that accepts a POST with a <code>DownloadURL</code> for the video. When the video has been successfully generated, the <a href="#profiles">core profiles</a> required for delivery on the OnceVOD platform are generated, and a notification is sent to the URL you specify in the POST.</p>
                 <h4>Service URL</h4>
                 <p>The URL for the POST request is:</p>
@@ -101,8 +106,8 @@
                 </div>
                 <h4 id="simpleXML">Simple XML</h4>
                 <p>
-                    <span style="background-color:#BD000F;">&nbsp;&nbsp;&nbsp;&nbsp;</span> Required node <br/>
-                    <span style="background-color:#23AF54;">&nbsp;&nbsp;&nbsp;&nbsp;</span> Optional node
+                    <span style="background-color:#BD000F;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <span class="once-red">Required node</span> <br/>
+                    <span style="background-color:#23AF54;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <span class="once-green">Optional node</span>
                 </p>
 <pre><span class="once-red">&lt;APIIngestRequest&gt;</span>
     <span class="once-red">&lt;UserName&gt;required&lt;/UserName&gt;</span>
@@ -123,8 +128,8 @@
 <span class="once-red">&lt;/APIIngestRequest&gt;</span></pre>
                 <h4 id="fullXML">Full XML</h4>
                 <p>
-                    <span style="background-color:#BD000F;">&nbsp;&nbsp;&nbsp;&nbsp;</span> Required node <br/>
-                    <span style="background-color:#23AF54;">&nbsp;&nbsp;&nbsp;&nbsp;</span> Optional node
+                    <span style="background-color:#BD000F;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <span class="once-red">Required node</span> <br/>
+                    <span style="background-color:#23AF54;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <span class="once-green">Optional node</span>
                 </p>
 <pre><span class="once-red">&lt;APIIngestRequest&gt;</span>
     <span class="once-red">&lt;UserName&gt;required&lt;/UserName&gt;</span>
@@ -143,48 +148,48 @@
                 &lt;key2&gt;optional&lt;/key2&gt;
             &lt;/ExtendedMetadata&gt;</span>
             <span class="once-green">&lt;Captions&gt;</span><sup><a href="#ingestN1">[1]</a></sup>
-                &lt;Caption&gt;
+                <span class="once-red">&lt;Caption&gt;</span>
                     <span class="once-green">&lt;CatalogGUID&gt;optional&lt;/CatalogGUID&gt;</span>
-                    &lt;ForeignKey&gt;required&lt;/ForeignKey&gt;
-                    &lt;IngestItemType&gt;{Caption}&lt;/IngestItemType&gt;
-                    &lt;IngestInfo&gt;
-                        &lt;DownloadURL&gt;required&lt;/DownloadURL&gt;
-                    &lt;/IngestInfo&gt;
-                    &lt;Language&gt;required&lt;/Language&gt;
-                    &lt;CaptionAssociateType&gt;{Default}&lt;/CaptionAssociateType&gt;
+                    <span class="once-red">&lt;ForeignKey&gt;required&lt;/ForeignKey&gt;</span>
+                    <span class="once-red">&lt;IngestItemType&gt;{Caption}&lt;/IngestItemType&gt;</span>
+                    <span class="once-red">&lt;IngestInfo&gt;
+                            &lt;DownloadURL&gt;required&lt;/DownloadURL&gt;
+                        &lt;/IngestInfo&gt;</span>
+                    <span class="once-red">&lt;Language&gt;required&lt;/Language&gt;</span>
+                    <span class="once-green">&lt;CaptionAssociateType&gt;{Default}&lt;/CaptionAssociateType&gt;</span>
                 <span class="once-green">&lt;/Caption&gt;</span>
-            &lt;/Captions&gt;
-            &lt;PublicationRules&gt;<sup><a href="#ingestN1">[1]</a></sup>
+            <span class="once-green">&lt;/Captions&gt;</span>
+            <span class="once-green">&lt;PublicationRules&gt;<sup><a href="#ingestN1">[1]</a></sup>
                 &lt;PublicationRule&gt;
-                    &lt;ChannelGUID&gt;required&lt;/ChannelGUID&gt;
-                    &lt;StartDate&gt;required&lt;/StartDate&gt;
-                    &lt;EndDate&gt;required&lt;/EndDate&gt;
-                    &lt;ClientFilters&gt;
-                        &lt;ClientFilter&gt;
-                            &lt;VariableName&gt;{IPAddress|UserAgent|ReferringHost}&lt;/VariableName&gt;
-                            &lt;Value&gt;required&lt;/Value&gt;
-                            &lt;FilterType&gt;{EQUALS|NOT_EQUALS|IN|NOT_IN|CONTAINS|NOT_CONTAINS|STARTSWITH|NOT_STARTSWITH|ENDSWITH|NOT_ENDSWITH}&lt;/FilterType&gt;
-                               &lt;IsDenied&gt;true|false&lt;/IsDenied&gt;
-                        &lt;/ClientFilter&gt;
-                    &lt;/ClientFilters&gt;
-                    &lt;Countries&gt;
-                        &lt;Country&gt;
-                            &lt;CountryCode&gt;required&lt;/CountryCode&gt;
-                            &lt;IsDenied&gt;true|false&lt;/IsDenied&gt;
-                        &lt;/Country&gt;
-                    &lt;/Countries&gt;
+                    <span class="once-red">&lt;ChannelGUID&gt;required&lt;/ChannelGUID&gt;
+                        &lt;StartDate&gt;required&lt;/StartDate&gt;
+                        &lt;EndDate&gt;required&lt;/EndDate&gt;</span>
+                    <span class="once-red">&lt;ClientFilters&gt;
+                            &lt;ClientFilter&gt;
+                                &lt;VariableName&gt;{IPAddress|UserAgent|ReferringHost}&lt;/VariableName&gt;
+                                &lt;Value&gt;required&lt;/Value&gt;
+                                &lt;FilterType&gt;{EQUALS|NOT_EQUALS|IN|NOT_IN|CONTAINS|NOT_CONTAINS|STARTSWITH|NOT_STARTSWITH|ENDSWITH|NOT_ENDSWITH}&lt;/FilterType&gt;
+                                   &lt;IsDenied&gt;true|false&lt;/IsDenied&gt;
+                            &lt;/ClientFilter&gt;
+                        &lt;/ClientFilters&gt;</span>
+                    <span class="once-red">&lt;Countries&gt;
+                            &lt;Country&gt;
+                                &lt;CountryCode&gt;required&lt;/CountryCode&gt;
+                                &lt;IsDenied&gt;true|false&lt;/IsDenied&gt;
+                            &lt;/Country&gt;
+                        &lt;/Countries&gt;</span>
                 &lt;/PublicationRule&gt;
-            &lt;/PublicationRules&gt;
-            &lt;CuePoints&gt;<sup><a href="#ingestN1">[1]</a></sup>
-                &lt;CuePoint&gt;
-                    &lt;CuePointType&gt;CuePoint&lt;/CuePointType&gt;
-                    &lt;SecondsIn&gt;required&lt;/SecondsIn&gt;
-                &lt;/CuePoint&gt;
-            &lt;/CuePoints&gt;
-    &lt;/AVItem&gt;
-    &lt;NotificationURL&gt;optional&lt;/NotificationURL&gt;
-    &lt;NotificationRequestMethod&gt;optional&lt;/NotificationRequestMethod&gt;
-    &lt;Priority&gt;0&lt;/Priority&gt;
+            &lt;/PublicationRules&gt;</span>
+            <span class="once-green">&lt;CuePoints&gt;<sup><a href="#ingestN1">[1]</a></sup>
+                    <span class="once-red">&lt;CuePoint&gt;
+                            &lt;CuePointType&gt;CuePoint&lt;/CuePointType&gt;
+                            &lt;SecondsIn&gt;required&lt;/SecondsIn&gt;
+                        &lt;/CuePoint&gt;</span>
+                &lt;/CuePoints&gt;</span>
+    <span class="once-red">&lt;/AVItem&gt;</span>
+    <span class="once-green">&lt;NotificationURL&gt;optional&lt;/NotificationURL&gt;
+        &lt;NotificationRequestMethod&gt;optional&lt;/NotificationRequestMethod&gt;
+        &lt;Priority&gt;0&lt;/Priority&gt;</span>
 <span class="once-red">&lt;/APIIngestRequest&gt;</span></pre>
                 <h5 class="bcl-notes">Notes</h5>
                 <p id="ingestN1"><sup class="once-red"><strong>[1]</strong></sup> The required nodes in captions, publication rules, and cue points are only required if those specific options are being utilized in the request. All caption sub-fields are necessary for each caption in the array.</p>
@@ -238,7 +243,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <p><a href="#t2"><code>AVItem</code></a>
+                            <p><a href="#aviItem"><code>AVItem</code></a>
                             </p>
                         </td>
                         <td>
@@ -285,7 +290,7 @@
                         </td>
                     </tr>
                 </table>
-                <h4>AVItem node details</h4>
+                <h4 id="aviItem">AVItem node details</h4>
                 <table id="t3">
                     <caption>Table 3: A description of each node available in <strong>AVItem</strong></caption>
                     <thead>
@@ -319,7 +324,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <p><a href="#t3"><code>IngestItemType</code></a></p>
+                            <p><a href="#ingestTypeNode"><code>IngestItemType</code></a></p>
                         </td>
                         <td>
                             <p>No</p>
@@ -330,7 +335,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <p><a href="#t4"><code>IngestInfo</code></a></p>
+                            <p><a href="#ingestInfoNode"><code>IngestInfo</code></a></p>
                         </td>
                         <td>
                             <p>Yes</p>
@@ -375,7 +380,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <p><a href="#t5"><code>Captions</code></a></p>
+                            <p><a href="#captionsNode"><code>Captions</code></a></p>
                         </td>
                         <td>
                             <p>No</p>
@@ -386,7 +391,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <p><a href="#t6"><code>PublicationRules</code></a></p>
+                            <p><a href="#publicationRulesNode"><code>PublicationRules</code></a></p>
                         </td>
                         <td>
                             <p>No</p>
@@ -549,7 +554,7 @@
                         </tr>
                     </table>
                 </div>
-                <h3>SNS Ingest</h3>
+                <h3 id="snsIngest">SNS Ingest</h3>
                 <p>SNS Content Ingest is the service that allows for the automated ingest of assets and metadata from an Amazon SNS Topic into the Once platform. The SNS Ingest API waits for SNS Messages from all topics that it is subscribed to. Content is passed to the API by posting a Notification message to a topic that SNS Ingest API is subscribed to.</p>
                 <p>For the Once SNS Ingest API to receive messages published to your topic, you should first send a Create Subscription Message to the API's receiving endpoint from the AWS Management Console. The API’s HTTP receiving endpoint is the following:</p>
 <pre>http://snsingest.unicornmedia.com/api/sns</pre>
@@ -814,6 +819,7 @@
                         </tr>
                     </tbody>
                 </table>
+                <h3 id="s3Ingest">S3 ingest</h3>
             </div>
             <div class="section" id="onceURLcreation">
                 <h2>Once URL Creation</h2>
@@ -1402,46 +1408,14 @@
     cc=US&amp;state=Arizona&amp;UMFKEY=uma:video:movie.com:480337</pre>
                 <p class="text-warning">NOTE: The UMFKEY value must be URL encoded.</p>
                 <h5 id="temporarilyOverride">Temporarily Override the Standard Profile List (<code>umoprofiles</code>)</h5>
-                <p>When the query string is appended with <code>umoprofiles={profileGUID}</code>, the associated profile(s) will be dynamically inserted in the m3u8 to temporarily override the standard profile list for adaptive playback of an asset.</p>
+                <p>When the <code>UMOPROFILES={profileGUID}</code> query string is appended to a Once URL, the associated profile(s) will be dynamically inserted in the returned m3u8 to temporarily override the standard profile list for adaptive playback of an asset. The value can be a single <code>profileGUID</code> or can contain a list of multiple comma-separated profileGUIDs.</p>
                 <h6>URL Map:</h6>
                 <pre>/.../MediaItemGUID/VirtualFileName?umoprofiles=PROFILEGUID1,PROFILEGUID2,...,PROFILEGUIDX
                 </pre>
                 <h6>Example:</h6>
 <pre>http://...63598604-cb88-44f8-bc47-d207af3b7b4a/content.m3u8?
     umoprofiles=c2364425-2267-4eaa-b800-ef544bdd3da3,27e71340-af9c-468d-96c3-ebac95dd884d,...</pre>
-                <table id="t15">
-                    <caption>Table 15: Temporarily Override the Standard Profile List</caption>
-                    <thead>
-                        <tr>
-                            <th>
-                                <p>Parameter</p>
-                            </th>
-                            <th>
-                                <p>Type</p>
-                            </th>
-                            <th>
-                                <p>Description</p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <p><code>umoprofiles</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <ul>
-                                    <li>Overrides the standard profile list so that only the specified profile(s) will be delivered in the m3u8</li>
-                                    <li>Multiple profiles are entered as a comma-separated list of profile GUIDs</li>
-                                </ul>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+
                 <h5 id="temporarilyAdd">Temporarily Add Profiles to the Standard Profile List (umaprofiles)</h5>
                 <p>When the query string is appended with umaprofiles={profileGUID}, the specified profile will be temporarily added to the standard profile list for adaptive playback of an asset.</p>
                 <h6>URL Map:</h6>
