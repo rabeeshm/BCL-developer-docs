@@ -337,7 +337,7 @@
                             <p>No</p>
                         </td>
                         <td>
-                            <p>The Title assigned to the AV Item. Default is the Foreign Key.</p>
+                            <p>The Title assigned to the AV Item. The Foreign Key will be used if no title is provided.</p>
                         </td>
                     </tr>
                     <tr>
@@ -456,7 +456,7 @@
                             <p>No</p>
                         </td>
                         <td>
-                            <p>The Title assigned to the AV Item. Default is the Foreign Key.</p>
+                            <p>The Title assigned to the AV Item. The Foreign Key will be used if no title is provided.</p>
                         </td>
                     </tr>
                     <tr>
@@ -817,11 +817,11 @@
                     </table>
                 </div>
                 <h5>URL Notification Template:</h5>
-<pre>[notificationURL]?Provider=Brightcove+Media&amp;Catalog=[CatalogName]&amp;Filename=[MediaItemTitle]
+<pre>[notificationURL]?Unicorn+Media&amp;Catalog=[CatalogName]&amp;Filename=[MediaItemTitle]
     &amp;MediaItemGUID=[MediaItemGUID]&amp;MediaItemForeignKey=[MediaItemForeignKey]
     &amp;Duration=[Duration]&amp;StartTime=[StartTime]</pre>
                 <h5>URL Notification Example:</h5>
-                <pre>http://tempuri.org/notify?Provider=Brightcove+Media&amp;Catalog=Catalog+Name&amp;FilenameMedia+Item+Title&amp;MediaItemGUID=a43680-29fc-468c-75b&amp;MediaItemForeignKey=876dc-4676-8426ecf6&amp;Duration=30&amp;StartTime=8%2F22%2F2012+1%3A08%3A59+PM</pre>
+                <pre>http://tempuri.org/notify?Provider=Unicorn+Media&amp;Catalog=Catalog+Name&amp;FilenameMedia+Item+Title&amp;MediaItemGUID=a43680-29fc-468c-75b&amp;MediaItemForeignKey=876dc-4676-8426ecf6&amp;Duration=30&amp;StartTime=8%2F22%2F2012+1%3A08%3A59+PM</pre>
                 <h4 id="itemNotification">Field explanation</h4>
                 <div class="text-align-center">
                     <table>
@@ -1206,7 +1206,7 @@
                 				<p>String</p>
                 			</td>
                 			<td colspan="2">
-                				<code>now</code> is the only variable currently available
+                				<code>now</code> is the only value currently available
                             </td>
                 		</tr>
                 		<tr>
@@ -1384,57 +1384,6 @@
                         </tr>
                     </tbody>
                 </table>
-                <h4>Auto delivery</h4>
-                <p>The File Delivery/File Type combination for auto delivery is <code>od/auto</code>, where <code>od</code> stands for "on demand". Using <code>od/auto </code>will allow the Brightcove system to determine the appropriate delivery type, file type and applicable profile(s) to include within the OnceVOD response.</p>
-                <h5>URL Map:</h5>
-                <pre>Host/Service/DeliveryType/RequestedFileType/DomainGUID/ApplicationGUID/...</pre>
-                <h5>Example:</h5>
-<pre>http://.../od/auto/4989f8db-9187-49ca-86ff-e2cd53429cd4/
-    35217a08-d9db-469f-aec0-7c88406a0c60/63598604-cb88-44f8-bc47-d207af3b7b4a/...</pre>
-                <table>
-                    <caption>TAuto Delivery</caption>
-                    <thead>
-                        <tr>
-                            <th>
-                                <p>Parameter</p>
-                            </th>
-                            <th>
-                                <p>Type</p>
-                            </th>
-                            <th>
-                                <p>Description</p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <p><code>DeliveryType</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <ul>
-                                    <li><code>od</code> is the only acceptable value</li>
-                                    <li>Delivery will be determined by the client hitting the URL</li>
-                                    <li>Utilizes the Once auto-detection syntax</li>
-                                </ul>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><code>RequestedFileType</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td><code>auto</code> indicates that the delivery method is determined according to client capabilities; representing different file types, profiles, etc.</td>
-                        </tr>
-                    </tbody>
-                </table>
                 <h4>Adaptive delivery</h4>
                 <h5>HLS Delivery</h5>
                 <p>The combination for HLS delivery is <code>adaptive/m3u8</code>, where <code>.m3u8</code> is a proprietary file format that stores multimedia playlists specifically for HLS. Additionally, if you wish to tailor the profiles returned on a request, you can force video to play through certain profiles by using additional query string parameters – <code><a href="#temporarilyOverride">umoprofiles</a></code> and <code><a href="#temporarilyOverride">umaprofiles</a></code>.</p>
@@ -1541,20 +1490,28 @@
                     </tbody>
                 </table>
                 <h3>Foreign key use</h3>
-				<p>The Brightcove Once platform allows for the use of foreign key values to be used instead of system generated MediaItemGUIDs within the URL construct to identify the video for playback. Foreignkey values must be unique to each video item and cannot be used multiple times in the same Domain.</p>
-				<h4>Example</h4>
-<pre>http://...63598604-cb88-44f8-bc47-d207af3b7b4a/
-    ?UMXBEACON=http%3A%5F%2Fbeaconserver.um.com%3Fkeyone=111</pre>
+				<p>The Brightcove Once platform allows for the use of foreign key values to be used instead of system generated MediaItemGUIDs within the URL construct to identify the video for playback. This allows for the flexibility of using existing unique ID values associated to customer videos to be reused. <code>Foreignkey</code> values must be unique to each video item and cannot be used multiple times in the same Domain.</p>
+				<h4>Example MediaItemGUID</h4>
+<pre>63598604-cb88-44f8-bc47-d207af3b7b4a</pre>
+
+<h4>Example Url using MediaItemGUID</h4>
+<pre>http://once.unicornmedia.com/.../63598604-cb88-44f8-bc47-d207af3b7b4a/content.once</pre>
+
+<h4>Example Foreign Key</h4>
+<pre>video-co-ca-2113</pre>
+
+<h4>Example URL using Foreign Key</h4>
+<pre>http://once.unicornmedia.com/.../video-co-ca-2113/content.once</pre>
 
                 <p>For foreign keys that have characters such as colons, please see the <a href="#UMFKEY"><code>UMFKEY</code></a> query string parameter.</p>
                 <h3>Segmenting</h3>
                 <p>Segmenting single video items is a feature that allows for the playback of a specified subset portion of a video at run time. In order to achieve this, the Once URL must have a start time and end time defined. The parameters, <code>StartTime</code> and <code>EndTime</code>, are represented by positive integer values in seconds, i.e. "30" for 30 seconds. <code>StartTime</code>  <strong>must always</strong> precede <code>EndTime</code>. The clip will start playing and end playback at the points in the MediaItem indicated by these parameters.</p>
                     <p><strong>For auto- device detection</strong>, <code>StartTime</code> and <code>EndTime</code> will be supplied immediately after <code>MediaItemGUID</code> (or  <code>ForeignKey</code> if used).</p>
                 <h4>URL Map:</h4>
-<pre>/.../MediaItemGUID/StartTime/EndTime/VirtualFileName?AdParams</pre>
+<pre>/.../MediaItemGUID/StartTime/EndTime/VirtualFileName?...</pre>
                 <h4>Example:</h4>
 <pre>http://...63598604-cb88-44f8-bc47-d207af3b7b4a/15/30/
-    content.m3u8? UMAID-10-0=c2364425-2267-4eaa-b800-ef544bdd3da3/...</pre>
+    content.m3u8?...</pre>
                 <table>
                     <caption>Time Segmented Video Clips</caption>
                     <thead>
@@ -1618,7 +1575,7 @@
                     <li>state=Arizona</li>
                 </ul>
                 <h6>Customer Created URL:</h6>
-<pre>/.../once.unicornmedia.com/content.m3u8?UMADPARAMcc=US&amp;UMADPARAMstate= Arizona</pre>
+<pre>http://once.unicornmedia.com/.../content.m3u8?UMADPARAMcc=US&UMADPARAMstate=Arizona</pre>
                 <p>Brightcove consumes this OnceVOD url, removes the <code>UMADPARAM</code> key designator, and serves the resulting key-value pair to the ad provider who in turn can utilize that data to respond with the appropriate ad creative based on their decisioning and logic.</p>
                 <h6>URL Sent by Brightcove Once to ad provider:</h6>
 <pre>http://.../adprovider.com/content.m3u8?cc=US&amp;state=Arizona</pre>
@@ -1634,9 +1591,9 @@
                     <li>Video_param=26iu%3D%252F7646</li>
                 </ul>
                 <h6>Customer Created URL:</h6>
-<pre>http://.../content.once?&amp;
+<pre>http://once.unicornmedia.com/.../content.once?&amp;
     UMPTPARAMCust_Params=Denver%Android_4_0%26 tile%Video&amp;UMPTPARAMVideo_param=26iu%3D%252F7646</pre>
-                <p>The above example depicts the parameter variables in a URL with ad targeting. Through appending a OnceVOD URL with the UMPTPARAM query string parameter, the encoded string value can be specified and passed through without manipulation.</p>
+
                 <p>Below is a sample of the call that Brightcove will be expected to make to ad providers in order to retrieve an Ad asset. The response to the Video Ad will be in in the form of a VAST XML or other supported response types of Brightcove Once.</p>
                 <h6>URL Sent by UM to ad provider:</h6>
 <pre>http://ad.provider.url/content.m3u8?
@@ -1683,49 +1640,16 @@
                 <h6>Fired Beaconing URL:</h6>
                 <pre>http://tracking.exampleurl?Localadid=55&amp;uniqueid=$country</pre>
                 <h5 id="UMXBEACON"><code>UMXBEACON</code></h5>
-                <p>Decodes the encoded URL value set in the <code>umxbeacon</code> parameter and redirects to the next handler.</p>
+                <p><code>UMXBEACON</code> enables the specification of a standalone url to be called to at play start that can be used independently or in addition to pre-configured beacons. This URL used must be URL encoded and must be the last parameter in the URL.</p>
                 <h6>Independent Tracking</h6>
                 <p><code>UMXBEACON={encodedURL}</code>
                 </p>
-                <p class="text-warning">NOTE: The URL in the beacon MUST be URL encoded and be the last UM parameter in the URL</p>
+
                 <h6>URL Map:</h6>
-                <p class="text-warning">/...}/[{mediaItemGUID}]?[UMXBEACON={encodedURL}]</p>
+<pre>http://once.unicornmedia.com/.../content.once?[UMXBEACON={encodedURL}]</pre>
                 <h6>Example:</h6>
                 <pre>http://...63598604-cb88-44f8-bc47-d207af3b7b4a?UMXBEACON=http%3A%5F%2Fbeaconserver.um.com%3Fkeyone=111</pre>
-                <table>
-                    <caption>Independent Tracking</caption>
-                    <thead>
-                        <tr>
-                            <th>
-                                <p>Parameter</p>
-                            </th>
-                            <th>
-                                <p>Type</p>
-                            </th>
-                            <th>
-                                <p>Description</p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <p><code>UMXBEACON</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <ul>
-                                    <li>Set up a beacon to track plays independent of UM analytics</li>
-                                    <li>Decodes encoded URL value set in UMXBEACON and redirects to next handler</li>
-                                    <li>Fires off the URL when the UM play metric is recorded</li>
-                                </ul>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+
                 <h4>Utility params</h4>
                 <h5 id="UMFKEY"><code>UMFKEY</code> – Foreign Key Takes Priority over Media Item GUID in Query String</h5>
                 <p><code>UMFKEY={URLEncodedForeignKey}</code>
@@ -1759,7 +1683,7 @@
                 <h6>Example:</h6>
 <pre>http://...63598604-cb88-44f8-bc47-d207af3b7b4a/
     content.m3u8? umaprofiles=c2364425-2267-4eaa-b800-ef544bdd3da3,27e71340-af9c-468d-96c3- ebac95dd884d,...</pre>
-                
+
                 <h5 id="forcemute"><code>forcemute</code></h5>
                 <p>Set <code>forcemute=true</code> to strip the audio steam of all audio responses.</p>
                 <h5 id="timedtextextension"><code>timedtextextension</code></h5>

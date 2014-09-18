@@ -563,6 +563,36 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                     createSubsectionLandingPageSections();
                                 }
                                 break;
+                            case "creating-players":
+                                subsectionName = "Create Players";
+                                if (pathArray[4] === "index.html") {
+                                    createSubsectionLandingPageSections();
+                                }
+                                break;
+                            case "general-info":
+                                subsectionName = "General Info";
+                                if (pathArray[4] === "index.html") {
+                                    createSubsectionLandingPageSections();
+                                }
+                                break;
+                            case "getting-started":
+                                subsectionName = "Get Started";
+                                if (pathArray[4] === "index.html") {
+                                    createSubsectionLandingPageSections();
+                                }
+                                break;
+                            case "managing-accounts":
+                                subsectionName = "Manage Accounts";
+                                if (pathArray[4] === "index.html") {
+                                    createSubsectionLandingPageSections();
+                                }
+                                break;
+                            case "publishing-players":
+                                subsectionName = "Publish Players";
+                                if (pathArray[4] === "index.html") {
+                                    createSubsectionLandingPageSections();
+                                }
+                                break;
                             default:
                                 // trouble
                                 bclslog("unknown subsection: ", subsection);
@@ -754,5 +784,5 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         init();
         return {
             "BCLhighlight": BCLhighlight
-        }
+        };
 })($, window, console, document, Handlebars, bclsNavData, hljs);
