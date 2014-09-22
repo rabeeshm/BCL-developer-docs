@@ -1383,7 +1383,7 @@
                 <p>For foreign keys that have characters such as colons, please see the <a href="#UMFKEY"><code>UMFKEY</code></a> query string parameter.</p>
                 <h3>Segmenting</h3>
                 <p>Segmenting single video items is a feature that allows for the playback of a specified subset portion of a video at run time. In order to achieve this, the Once URL must have a start time and end time defined. The parameters, <code>StartTime</code> and <code>EndTime</code>, are represented by positive integer values in seconds, i.e. "30" for 30 seconds. <code>StartTime</code>  <strong>must always</strong> precede <code>EndTime</code>. The clip will start playing and end playback at the points in the <code>MediaItem</code> indicated by these parameters.</p>
-                    <p><strong>For auto- device detection</strong>, <code>StartTime</code> and <code>EndTime</code> will be supplied immediately after <code>MediaItemGUID</code> (or <code>ForeignKey</code> if used).</p>
+                    <p><strong>For auto-device detection</strong>, <code>StartTime</code> and <code>EndTime</code> will be supplied immediately after <code>MediaItemGUID</code> (or <code>ForeignKey</code> if used).</p>
                 <h4>URL Map:</h4>
 <pre>/.../MediaItemGUID/StartTime/EndTime/VirtualFileName?</pre>
                 <h4>Example:</h4>
@@ -2488,6 +2488,30 @@
                     <li>Information as to what events should be reported against.</li>
                 </ul>
             </div>
+            <div class="section" id="cdn">
+                <h2>CDN</h2>
+                <p>Brightcove Once utilizes existing customer CDN relationships to provide the delivery of content to end users. All requests will be brokered by the Once platform, with the Dynamic Permutation Later acting as origin, and your CDN ultimately delivering the content. This section outlines support and the steps your Brightcove representative will go through with you to configure the Once service along with your CDN provider.</p>
+                <h3>Supported providers</h3>
+                <ul>
+                    <li>Akamai</li>
+                    <li>CloudFront</li>
+                    <li>Limelight</li>
+                    <li>Level3</li>
+                </ul>
+                <h4>Details</h4>
+                <ul>
+                    <li>Brightcove will generate and provide a host name for you to use. (Example: <code>customername.dpl.unicornmedia.com</code>)</li>
+                    <li>Your CDN provider will need to set up an <em>HTTP Large Object</em> configuration utilizing the provided hostname as the Origin.</li>
+                    <li>Your CDN will need to enable or verify that the following settings are enabled.
+                        <ul>
+                            <li>Cache on Query String or Unique-Cache</li>
+                            <li>If there is a tiered caching option available, this should be enabled as well.</li>
+                            <li>"Keep alive" should be on</li>
+                            <li>Cache control should be set to honor Origin headers</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
             <div class="section" id="captions">
                 <h2>Captions</h2>
                 <h3>Input</h3>
@@ -2532,11 +2556,6 @@
             </div>
             <div class="section" id="contentRestriction">
                 <h2>Content Restriction</h2>
-                <p></p>
-                <h3>AES-128</h3>
-                <h4>Description</h4>
-                <p></p>
-                <h4>Playback limited to HLS</h4>
                 <h3>Publication rules</h3>
                 <p>Publication Rules are a set of <strong>optional</strong> business logic parameters that may be applied to the content you upload into the Brightcove Once platform to restrict playback in a number of ways.</p>
                 <h4>Source</h4>
@@ -2551,7 +2570,7 @@
                 <h5>Start date / end date</h5>
                 <p>Playback is only allowed within the start and end dates.</p>
                 <h5>Geo restrictions</h5>
-                <p>Once supports geo-restriction at the country level both by inclusion and exclusion.</p>
+                <p>Once supports geo-restriction at the country level both by inclusion and exclusion. Countries are specified by ISO 3166-1 country codes.</p>
                 <ul>
                     <li>Allow country or countries: when you allow one or more countries, viewing in all other countries is automatically disallowed.</li>
                     <li>Deny country or countries: when you disallow viewing in one or more countries, viewing is automatically allowed in all other countries.</li>
@@ -2560,6 +2579,8 @@
                 <p>Playback is allowed only if the referring host matches the specified value.</p>
                 <h5>Multiple publication rules</h5>
                 <p>Multiple rules can be used if a particular behavior is desired. For example, using two publication rules, you could limit playback to a particular country for a set amount of time before offering the video globally. This would look like: Publication rule 1 would allow video playback for a particular specified date range to a particular single country only. Publication rule 2 would start at the end time of rule 1 with a 10 year time limit and no country restriction.</p>
+                <h3>AES-128</h3>
+                <p>Playback limited to HLS</p>
             </div>
         </div>
     </div>
