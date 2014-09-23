@@ -60,7 +60,6 @@
                     <li><a href="#apiIngest">API ingest</a></li>
                     <li><a href="#snsIngest">SNS ingest</a></li>
                 </ul>
-                <p>Ingesting files via S3 is also supported by the API Ingest system as a source location for video files. If your files are publicly available, no further action is necessary. If your files require authentication, please see the SNS section around adding the Once platform to your bucket's security.</p>
                 <h3>Profiles and Renditions</h3>
                 <p>The following table shows the standard renditions created for videos.</p>
                 <table>
@@ -90,16 +89,18 @@
 </table>
                 <div class="text-warning">Notes:
                     <ol>
-                        <li id="n1">The Once.HD 4500 1080p profile is not included in the default profile list for HLS. If you need to use it for HLS, it is only available via the <code>umoprofiles</code> and <code>umaprofiles</code> query string parameters. See <a href="#temporarilyOverride">Temporarily <strong>O</strong>verride the Standard Profile List (um<strong>o</strong>profile)</a> and
+                        <li id="n1">The Once.HD 4500 1080p profile is not included in the default profile list for HLS. If having this profile returned in adaptive playback is desired, it can be included by utilizing the <code>umoprofiles</code> and <code>umaprofiles</code> query string parameters. See <a href="#temporarilyOverride">Temporarily <strong>O</strong>verride the Standard Profile List (um<strong>o</strong>profile)</a> and
                             <a
                             href="#temporarilyAdd">Temporarily <strong>A</strong>dd Profiles to the Standard Profile List (um<strong>a</strong>)profile</a>.</li>
                     </ol>
                 </div>
                 <h3 id="apiIngest">API ingest</h3>
-                <p>Brightcove’s Once API Ingest service is a RESTful API that accepts a POST with a <code>DownloadURL</code> for your video. When the video has been successfully generated, the <a href="#profiles">core profiles</a> required for delivery on the OnceVOD platform are generated, and a notification is sent to the URL you specify in the POST. DownloadURLs must be progressive formats and publicly addressable URLs unless the video is hosted on S3 where authentication is necessary. Please see the <a href="#s3">SNS S3 bucket permission section</a> for authorizing the Once platform to access protected URLs.</p>
+                <p>Brightcove’s Once API Ingest service is a RESTful API that accepts a POST with a <code>DownloadURL</code> for your video. When the video has been successfully generated, the <a href="#profiles">core profiles</a> required for delivery on the OnceVOD platform are generated, and a notification is sent to the URL you specify in the POST. Videos linked to for DownloadURLs must be progressive formats and publicly addressable URLs. Ingesting files via S3 is also supported by the API Ingest system as a source location. If your files are publicly available, no further action is necessary. If your files require authentication, please see the <a href="#s3">S3 bucket permission section</a> for authorizing the Once platform to access protected URLs.</p>
                 <h4>Service URL</h4>
                 <p>The URL for the POST request is:</p>
-<pre>http://apiingest.unicornmedia.com/api/ingest</pre>
+<pre>
+http://apiingest.unicornmedia.com/api/ingest
+</pre>
                 <div class="text-warning">
                     <p><code>DomainName</code>, <code>CatalogGUID</code> and <code>ChannelGUID</code> values can be obtained from your Brightcove representative.</p>
                     <p>NOTE: <code>&lt;ForeignKey&gt;</code> is a required field. <code>&lt;StartDate&gt;</code> and <code>&lt;EndDate&gt;</code> must be in Unix time format (Epoch time in seconds).</p>
@@ -148,9 +149,9 @@
             <span class="once-red">&lt;Caption&gt;</span>
                 <span class="once-red">&lt;ForeignKey&gt;{unique foreign key}&lt;/ForeignKey&gt;</span>
                 <span class="once-red">&lt;IngestInfo&gt;
-                        &lt;DownloadURL&gt;{url where captions file resides}&lt;/DownloadURL&gt;<sup><a href="#ingestN2">[2]</a></sup>
+                        &lt;DownloadURL&gt;{url where captions file resides}&lt;/DownloadURL&gt;
                     &lt;/IngestInfo&gt;</span>
-                <span class="once-red">&lt;Language&gt;{ISO 639-1 language code}&lt;/Language&gt;</span>
+                <span class="once-red">&lt;Language&gt;{<a href="avItemIngestInfoNode">ISO 639-1</a> language code}&lt;/Language&gt;</span>
             <span class="once-green">&lt;/Caption&gt;</span>
         <span class="once-green">&lt;/Captions&gt;</span>
         <span class="once-green">&lt;PublicationRules&gt;<sup><a href="#ingestN1">[1]</a></sup>
@@ -186,7 +187,7 @@
 <span class="once-red">&lt;/APIIngestRequest&gt;</span></pre>
                 <h5 class="bcl-notes">Notes</h5>
                 <p id="ingestN1"><sup class="once-red"><strong>[1]</strong></sup> The required nodes in captions, publication rules, and cue points are only required if those specific options are being utilized in the request. All caption sub-fields are necessary for each caption in the array.</p>
-                <p id="ingestN2"><sup class="once-red"><strong>[2]</strong></sup> If you omit the download URL, the ingest will still succeed, but the captions will be missing - if you think you included captions with your video, but don't see them, check to be sure you included a valed downloadURL for the captions file.</p>
+
                 <h4>Field explanation</h4>
                 <p>The following tables detail each node of the POST:</p>
                 <table>
@@ -194,7 +195,7 @@
                     </caption>
                     <thead>
                         <tr>
-                            <th>Name</th>
+                            <th>Node</th>
                             <th>Required</th>
                             <th>Description</th>
                         </tr>
@@ -278,7 +279,7 @@
                     <caption>A description of each node available in <strong>AVItem</strong></caption>
                     <thead>
                         <tr>
-                            <th>Name</th>
+                            <th>Node</th>
                             <th>Required</th>
                             <th>Description</th>
                         </tr>
@@ -313,7 +314,7 @@
                             <p>Yes</p>
                         </td>
                         <td>
-                            <p>The dictionary containing information relevant to how this AV Item will be ingested or versioned. Required.</p>
+                            <p>The dictionary containing information relevant to how this AV Item will be ingested or versioned.</p>
                         </td>
                     </tr>
                     <tr>
@@ -378,7 +379,7 @@
                     </caption>
                     <thead>
                         <tr>
-                            <th>Name</th>
+                            <th>Node</th>
                             <th>Description</th>
                         </tr>
                     </thead>
@@ -392,32 +393,13 @@
                         </td>
                     </tr>
                 </table>
-
-                <h4 id="avItemIngestInfoNode">IngestInfo</h4>
-                <table>
-                    <caption>A description of each node available in <strong>IngestInfo</strong></caption>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tr>
-                        <td>
-                            <p><code>DownloadURL</code></p>
-                        </td>
-                        <td>
-                            <p>A URL to download the content from.</p>
-                        </td>
-                    </tr>
-                </table>
                 <h4 id="captionNode">Caption node details</h4>
 
                 <table>
                     <caption>A description of each node available in <strong>Caption</strong></caption>
                     <thead>
                         <tr>
-                            <th>Name</th>
+                            <th>Node</th>
                             <th>Required</th>
                             <th>Description</th>
                         </tr>
@@ -444,13 +426,18 @@
                             <p>Contains the required child node <code>DownloadURL</code>, which provides the download URL for the captions file</p>
                         </td>
                     </tr>
+                    <tr>
+                        <li>Language</li>
+                        <li>Yes</li>
+                        <li><a href="avItemIngestInfoNode">ISO 639-1</a> language code</li>
+                    </tr>
                 </table>
                 <h4 id="publicationRuleNode">PublicationRule node details</h4>
                 <table>
                     <caption>A description of each node available in <strong>PublicationRule</strong></caption>
                     <thead>
                         <tr>
-                            <th>Name</th>
+                            <th>Node</th>
                             <th>Required</th>
                             <th>Description</th>
                         </tr>
@@ -517,7 +504,7 @@
                     <caption>A description of each node available in <strong>ClientFilter</strong></caption>
                     <thead>
                         <tr>
-                            <th>Name</th>
+                            <th>Node</th>
                             <th>Required</th>
                             <th>Description</th>
                         </tr>
@@ -572,7 +559,7 @@
                     <caption>A description of each node available in <strong>Country</strong></caption>
                     <thead>
                         <tr>
-                            <th>Name</th>
+                            <th>Node</th>
                             <th>Required</th>
                             <th>Description</th>
                         </tr>
@@ -605,7 +592,7 @@
                     <caption>A description of each node available in <strong>CuePoint</strong></caption>
                     <thead>
                         <tr>
-                            <th>Name</th>
+                            <th>Node</th>
                             <th>Required</th>
                             <th>Description</th>
                         </tr>
@@ -629,14 +616,14 @@
                             <p>Yes</p>
                         </td>
                         <td>
-                            <p>The number of seconds into the AV Item this Cue Point will fire. Must be non-negative.</p>
+                            <p>The number of whole seconds into the AV Item this Cue Point will fire. Must be non-negative.</p>
                         </td>
                     </tr>
                 </table>
 
                 <h3>Notifications</h3>
                 <h4>Item notification</h4>
-                <p>By default, API Ingest will supply item notifications via the appropriate fields in the ingest xml to the specified location of your choosing. Examples of the url post-back are below. As an alternate method of utilizing Item Notifications through the API Ingest request, a single post-back url can be preconfigured in the Once system to be used instead - contact your Brightcove representative if you would like this preconfiguration.</p>
+                <p>By default, API Ingest will supply item notifications via the appropriate fields in the ingest XML to the specified location of your choosing. Examples of the url post-back are below. As an alternate method of utilizing Item Notifications through the API Ingest request, a single post-back url can be preconfigured in the Once system to be used instead - contact your Brightcove representative if you would like this preconfiguration.</p>
                 <div class="text-align-center">
                     <table>
                         <caption>Item Notification Required Properties</caption>
@@ -683,11 +670,13 @@
                     </table>
                 </div>
                 <h5>URL Notification Template:</h5>
-<pre>[notificationURL]?Unicorn+Media&amp;Catalog=[CatalogName]&amp;Filename=[MediaItemTitle]
-    &amp;MediaItemGUID=[MediaItemGUID]&amp;MediaItemForeignKey=[MediaItemForeignKey]
-    &amp;Duration=[Duration]&amp;StartTime=[StartTime]</pre>
+<pre>
+[notificationURL]?Unicorn+Media&amp;Catalog=[CatalogName]&amp;Filename=[MediaItemTitle]&amp;MediaItemGUID=[MediaItemGUID]&amp;MediaItemForeignKey=[MediaItemForeignKey]&amp;Duration=[Duration]&amp;StartTime=[StartTime]
+</pre>
                 <h5>URL Notification Example:</h5>
-                <pre>http://tempuri.org/notify?Provider=Unicorn+Media&amp;Catalog=Catalog+Name&amp;FilenameMedia+Item+Title&amp;MediaItemGUID=a43680-29fc-468c-75b&amp;MediaItemForeignKey=876dc-4676-8426ecf6&amp;Duration=30&amp;StartTime=8%2F22%2F2012+1%3A08%3A59+PM</pre>
+<pre>
+http://tempuri.org/notify?Provider=Unicorn+Media&amp;Catalog=Catalog+Name&amp;FilenameMedia+Item+Title&amp;MediaItemGUID=a43680-29fc-468c-75b&amp;MediaItemForeignKey=876dc-4676-8426ecf6&amp;Duration=30&amp;StartTime=8%2F22%2F2012+1%3A08%3A59+PM
+</pre>
                 <h4 id="itemNotification">Field explanation</h4>
                 <div class="text-align-center">
                     <table>
@@ -703,7 +692,7 @@
                                 <p><code>NotificationURL</code></p>
                             </td>
                             <td>
-                                <p>The default notification URL to use</p>
+                                <p>The host name the notification will be sent to.</p>
                             </td>
                         </tr>
                         <tr>
@@ -711,7 +700,7 @@
                                 <p><code>Catalog</code></p>
                             </td>
                             <td>
-                                <p>The name assigned to the Catalog</p>
+                                <p>The name assigned to the Catalog where the content was ingested.</p>
                             </td>
                         </tr>
                         <tr>
@@ -759,10 +748,14 @@
                 <h3 id="snsIngest">SNS Ingest</h3>
                 <p>SNS Content Ingest is the service that allows for the automated ingest of assets and metadata from an Amazon SNS Topic into the Once platform. The SNS Ingest API waits for SNS Messages from all topics that it is subscribed to. Content is passed to the API by posting a Notification message to a topic that SNS Ingest API is subscribed to.</p>
                 <p>For the Once SNS Ingest API to receive messages published to your topic, you should first send a Create Subscription Message to the API's receiving endpoint from the AWS Management Console. The API’s HTTP receiving endpoint is the following:</p>
-<pre>http://snsingest.unicornmedia.com/api/sns</pre>
+<pre>
+http://snsingest.unicornmedia.com/api/sns
+</pre>
                 <p>The SNS Ingest API will automatically accept the subscription confirmation, and it is now ready to ingest content sent via a Notification SNS message.</p>
                 <p id="s3">The SNS Ingest API is capable of ingesting content via HTTP links and Amazon S3 Buckets. To allow the Ingest API permission to receive messages from your Amazon S3 bucket(s), you will need the Once IAM ARN:  "arn:aws:iam::453163911362:root".    This permission policy is configured within your AWS account under Permissions for the S3 Bucket.  Note that if your S3 content is set to be publicly available, configuring this permission policy is not necessary. If you are not using Amazon S3 Buckets to send your content, the following section can be ignored.</p>
-                <img src="images/AWS-console1.png" alt="AWS-console1" title="AWS-console1" width="941" height="505" />
+                <p>
+                    <img src="images/snscap01arrow.png" alt="AWS-console1" title="AWS-console1" width="964" height="426" />
+                </p>
                 <p>Sample message to allow permissions to an S3 bucket</p>
 <pre>{
     "Version": "2008-10-17",
@@ -780,7 +773,9 @@
     ]
 }
 </pre>
-                <img src="images/AWS-bucket-policy-editor.png" alt="AWS-bucket-policy-editor" title="AWS-bucket-policy-editor" width="979" height="660" />
+                <p>
+                    <img src="images/snscap02.png" alt="AWS-bucket-policy-editor" title="AWS-bucket-policy-editor" width="615" height="455" />
+                </p>
                 <p>Once a topic is established and the Once AWS has been subscribed to it, any Notification message published to the topic will be ingested to the Once system for transcoding and processing. Messages may be manually published through the AWS Management Console, or by using the Amazon Web Services SDK. The content and its metadata should be published to your topic via a JSON string following the format below. The SNS Ingest API will then pick it up and processing of the content will begin.</p>
                 <h4>Ingest Example</h4>
 <pre>{
@@ -796,17 +791,18 @@
      "cuePoints" : [
         {
             "type":"<em>CuePoint</em>",
-            "secondsIn":<em>{value}</em>
+            "secondsIn":<em>{value in whole seconds}</em>
         },
         {
             "type":"<em>CuePoint</em>",
-            "secondsIn":<em>{value}</em>
+            "secondsIn":<em>{value in whole seconds}</em>
         },
         ...
     ],
     "extendedMetadata" : {
         "{Key1}" : "<em>{Value1}</em>",
-        "{Key2}" : "<em>{Value2}</em>"
+        "{Key2}" : "<em>{Value2}</em>",
+        ... (additional key/value pairs)
     },
   "publicationRules" : [
     {
@@ -836,7 +832,7 @@
         "file" : "<em>url for captions file</em>",
         "assetId" : "<em>assetId</em>",
         "publicationDate" : "<em>publication date in UTC format</em>",
-        "language" : "<em>{ISO 639-1 language code}</em>",
+        "language" : "<em>{<a href="avItemIngestInfoNode">ISO 639-1</a> language code}</em>",
         "captionAssociationType" : "<em>Default</em>"
     },
     ... <em>additional caption files</em>
@@ -926,7 +922,7 @@
                 				<p>Yes</p>
                 			</td>
                 			<td>
-                				<p>Customer identifier for the transcode job, needs to be passed as extended metadata to allow for it to be included in the item notification</p>
+                				<p>Customer identifier for the transcode job.</p>
                 			</td>
                 		</tr>
                 		<tr>
@@ -967,8 +963,10 @@
 
                 <h4>SNS notification</h4>
                 <p>SNS notification is similar to item notification in functions. Once can pass SNS notifications back to your topic, informing you of published items or any errors that may have occurred.  These notifications can be for profile complete notification or error notification. The SNS Topic for either notification must be a topic that the Once AWS account has permission to publish to. To enable the SNS Ingest API to publish notifications to your topic(s), you will first need to grant permission to the Once IAM ARN:    <code>arn:aws:iam::453163911362:root</code>. This is done within the AWS Management Console.</p>
-                <img src="images/AWS-bucket-policy.png" alt="AWS-bucket-policy" title="AWS-bucket-policy" width="900" height="408" />
-                <p>If you would like to receive Once URLs in the item notifications, an application GUID must be set up for use, which is saved within your domain configuration.</p>
+                <p>
+                    <img src="images/AWS-bucket-policy.png" alt="AWS-bucket-policy" title="AWS-bucket-policy" width="900" height="408" />
+                </p>
+                <p>If you would like to receive Once URLs in the item notifications, an ApplicationGUID must be set up for use, which is saved within your domain configuration.</p>
                 <h5>Example:</h5>
 <pre>{
   "___version" : "1.0",
@@ -1001,7 +999,7 @@
                         </tr>
                         <tr>
                             <td>onceurl</td>
-                            <td>URL that can be used for playback utilizing a predetermined applicationguid</td>
+                            <td>URL that can be used for playback utilizing a predetermined ApplicationGUID</td>
                         </tr>
                         <tr>
                             <td>passthrumetadata</td>
@@ -1028,11 +1026,13 @@
                 <h3>URL Syntax</h3>
                 <p>The OnceVOD URL is constructed by using a programmatic URL syntax. This section will cover the URL structures and the available parameters.</p>
                 <p>Base URL Map:</p>
-<pre>Host/Service/DeliveryType/RequestedFileType/DomainGUID/ApplicationGUID/MediaItemGUID/VirtualFileName</pre>
+<pre>
+Host/Service/DeliveryType/RequestedFileType/DomainGUID/ApplicationGUID/MediaItemGUID/VirtualFileName
+</pre>
                 <h3>Example</h3>
-<pre>http://once.unicornmedia.com/now/od/auto/
-    28c23297-a1ab-4eb5-a697-7d6942db4efb/d202862f-bb88-41c0-921e-27baf5ade003/
-    cb4ca200-f10d-451e-9487-410052062a5d/content.once</pre>
+<pre>
+http://once.unicornmedia.com/now/od/auto/28c23297-a1ab-4eb5-a697-7d6942db4efb/d202862f-bb88-41c0-921e-27baf5ade003/cb4ca200-f10d-451e-9487-410052062a5d/content.once
+</pre>
                 <h3>URL Variables</h3>
                 <table>
                 	<caption>URL Variables</caption>
@@ -1087,11 +1087,7 @@
                 				</p>
                 			</td>
                 			<td>
-                				<ul>
-                					<li><code>auto</code> File type ONLY</li>
-                					<li>Delivery is determined by the client requesting the URL</li>
-                					<li>Must be used with Auto Links</li>
-                				</ul>
+                				<p>Used to determine video delivery behavior. Please see <a href="#outputFormats">Output Formats</a> for more information.</p>
                 			</td>
                 		</tr>
                 		<tr>
@@ -1125,11 +1121,7 @@
                 				<p>String</p>
                 			</td>
                 			<td colspan="2">
-                				<p>Possible values include <code>mp4</code>, <code>m3u8</code> and <code>auto</code>.</p>
-                				<ul>
-                					<li><code>auto</code> means that the delivery method will be determined depending on</li>
-                					<li>the capabilities of the client, i.e., different file types, profiles, etc.</li>
-                				</ul>
+                				Used to determine video delivery behavior. Please see <a href="#outputFormats">Output Formats</a> for more information.
                 			</td>
                 		</tr>
                 		<tr>
@@ -1153,7 +1145,7 @@
                 				<p>String</p>
                 			</td>
                 			<td colspan="2">
-                				<p>The Player GUID for the application in which to record metrics and enforce business rules obtained through support at <a href="mailto:oncesupport@brightcove.com">oncesupport@brightcove.com</a>.</p>
+                				<p>The Player GUID for the application in which to record metrics and enforce business rules obtained through your Brightcove representative.</p>
                 			</td>
                 		</tr>
                 		<tr>
@@ -1185,210 +1177,113 @@
                     				<li>Regardless of the file type, the system will return a media file</li>
                     				<li>May help you identify the delivery format and play back properly</li>
                     			</ul>
-                    			<p>Extensions Include:</p>
-                    			<ul>
-                    				<li>"content.<strong>once</strong>"
-                    					<ul>
-                    						<li>The only acceptable Delivery Type for ".once" is "auto"</li>
-                    					</ul>
-                    				</li>
-                    				<li>"content.<strong>mp4</strong>"</li>
-                    				<li>"content.<strong>m3u8</strong>"</li>
-                    			</ul>
+                    			<p>Extensions are determined by the output format used in your request. Please see <a href="#outputFormats">Output Formats</a> for more information.</p>
                     		</td>
                     	</tr>
                 	</tbody>
                 </table>
-                <h3>Output formats</h3>
-                <p>File Delivery/File Type combinations are <code>od/auto</code>, <code>adaptive/m3u8</code>, <code>stitched/mp4</code>, <code>and ctadaptive/m3u8</code>.</p>
-                <h4>URL Map:</h4>    <pre>Host/Service/<strong>DeliveryType/RequestedFileType</strong>/DomainGUID/ApplicationGUID/...</pre>
-                <h4>Stitched URL Map:</h4>
-                <pre>.../<strong>DeliveryType/RequestedFileType</strong>/DomainGUID/ApplicationGUID/<strong>ProfileGUID</strong>/</pre>
+                <h3 id="outputFormats">Output formats</h3>
+                <p>Utilizing various combinations of delivery type, file type, and extension in your Once URLs, the response can be modified to suit various environments as needed. This behavior can either be handled completely by Once's automatic decision logic, or can be be narrowed to respond with only adaptive or progressive formats. The URL variables outlined in each section are the only supported options for each delivery method.</p>
+                <h4>Auto</h4>
+                <p>To utilize the Once platform's innate device detection to determine proper delivery and file type for the requesting client device, use the combination for Auto delivery. This device detection will determine a number of different playback variables depending on the requesting device including optimal file format, video quality, and for HLS, segment length. The Once platform's Auto detection will prioritize adaptive delivery to a device if supported, otherwise the device will receive an appropriate progressive response.</p>
                 <table>
-                    <caption>OnceVOD URL Content Type Syntax</caption>
                     <thead>
                         <tr>
-                            <th>
-                                <p>DeliveryType/FileType</p>
-                            </th>
-                            <th>
-                                <p>Function</p>
-                            </th>
+                            <th>DeliveryType</th>
+                            <th>FileType</th>
+                            <th>Extension</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>
-                                <p><code>od/auto</code></p>
-                            </td>
-                            <td>
-                                <p>Uses Device Detection to determine proper delivery and file type for the requesting client device</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><code>adaptive/m3u8</code></p>
-                            </td>
-                            <td>Forces HLS delivery type and uses Device Detection to determine proper HLS profiles for the requesting client device</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><code>ctadpative/m3u8</code>
-                                </p>
-                            </td>
-                            <td>Forces Android-specific HLS delivery type and uses Device Detection to determine proper HLS profiles for requesting device</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><code>stitched/mp4</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>Forces progressive download delivery type and MP4 file type</p>
-                            </td>
+                            <td><code>od</code></td>
+                            <td><code>auto</code></td>
+                            <td><code>once</code></td>
                         </tr>
                     </tbody>
                 </table>
-                <h4>Adaptive delivery</h4>
-                <h5>HLS Delivery</h5>
-                <p>The combination for HLS delivery is <code>adaptive/m3u8</code>, where <code>.m3u8</code> is a proprietary file format that stores multimedia playlists specifically for HLS. Additionally, if you wish to tailor the profiles returned on a request, you can force video to play through certain profiles by using additional query string parameters – <code><a href="#temporarilyOverride">umoprofiles</a></code> and <code><a href="#temporarilyOverride">umaprofiles</a></code>.</p>
-                <h6>URL Map:</h6>
-                <pre>Host/Service/DeliveryType/RequestedFileType/DomainGUID/ApplicationGUID/...</pre>
-                <h6>Example:</h6>
-<pre>http://.../adaptive/m3u8/4989f8db-9187-49ca-86ff-e2cd5342cd4/
-    35217a08- d9db-469f-aec0-7c88406a0c60/63598604-cb88-44f8-bc47-d207af3b7b4a/...</pre>
+                <h5>URL map</h5>
+<pre>Host/Service/<strong>DeliveryType</strong>/<strong>RequestedFileType</strong>/DomainGUID/ApplicationGUID/MediaItemGUID/VirtualFileName.<strong>Extension</strong></pre>
+                <h5>Example</h5>
+<pre>http://.../<strong>od</strong>/<strong>auto</strong>/4989f8db-9187-49ca-86ff-e2cd5342cd4/35217a08-d9db-469f-aec0-7c88406a0c60/63598604-cb88-44f8-bc47-d207af3b7b4a/content.<strong>once</strong></pre>
+                <h4>Adaptive</h4>
+                <p>The Once platform utilizes the HTTP Live Streaming (HLS) protocol for adaptive, multi-bitrate playback to devices that support this method. Requesting an adaptive response will force an HLS response and keep the Once platform's logic in place for determining remaining device specific parameters including the range of profiles to be returned and segment length. If you wish to tailor the profiles returned on a request, you can denote those specific profiles by using the additional query string parameters – <code>umoprofiles</code> or <code>umaprofiles</code>.</p>
                 <table>
-                    <caption>HLS Delivery</caption>
                     <thead>
                         <tr>
-                            <td>
-                                <p>Parameter</p>
-                            </td>
-                            <td>
-                                <p>Type</p>
-                            </td>
-                            <td>
-                                <p>Description</p>
-                            </td>
+                            <th>DeliveryType</th>
+                            <th>FileType</th>
+                            <th>Extension</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>
-                                <p><code>DeliveryType</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <p> <code>adaptive</code> is the only acceptable value</p>
-                                <p>Content is delivered via HTTP Live Streaming on devices that support HLS</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><code>RequestedFileType</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <p><code>m3u8</code></p>
-                            </td>
+                            <td><code>adaptive</code></td>
+                            <td><code>m3u8</code></td>
+                            <td><code>m3u8</code></td>
                         </tr>
                     </tbody>
                 </table>
-                <h4>Progressive download</h4>
-                <h5>MP4 delivery</h5>
-                <p>The File Delivery/File Type combination for MP4 delivery is <code>stitched/mp4</code>.</p>
-                <h6>Stitched URL Map:</h6>
-<pre>.../DeliveryType/RequestedFileType/DomainGUID/ApplicationGUID/ProfileGUID/MediaitemGUID/content.mp4</pre>
-                <h6>Example:</h6>
-<pre>http://.../stitched/mp4/4989f8db-9187-49ca-86ff-e2cd53429cd4/
-    35217a08- d9db-469f-aec0-7c88406a0c60/c2364425-2267-4eaa-b800-ef544bdd3da3/
-    63598604- cb88-44f8-bc47-d207af3b7b4a/file.mp4</pre>
+                <h5>URL map</h5>
+<pre>Host/Service/<strong>DeliveryType</strong>/<strong>RequestedFileType</strong>/DomainGUID/ApplicationGUID/MediaItemGUID/VirtualFileName.<strong>Extension</strong></pre>
+                <h5>Example</h5>
+<pre>http://.../<strong>adaptive</strong>/<strong>m3u8</strong>/4989f8db-9187-49ca-86ff-e2cd5342cd4/35217a08- d9db-469f-aec0-7c88406a0c60/63598604-cb88-44f8-bc47-d207af3b7b4a/content.<strong>m3u8</strong></pre>
+                <h4>Progressive</h4>
+                <p>If the desired or required video output is a progressive download in an mp4 format, the stitched combination should be used. When requesting a progressive playback experience, a <code>ProfileGUID</code> of the requested quality must be included in the URL for successful playback. The placement of the ProfileGUID in the Once URL is immediately following the <code>ApplicationGUID</code>, as shown in the example below.</p>
                 <table>
-                    <caption>MP4 Delivery</caption>
                     <thead>
                         <tr>
-                            <th>
-                                <p>Parameter</p>
-                            </th>
-                            <th>
-                                <p>Type</p>
-                            </th>
-                            <th>
-                                <p>Description</p>
-                            </th>
+                            <th>DeliveryType</th>
+                            <th>FileType</th>
+                            <th>Extension</th>
                         </tr>
                     </thead>
                     <tbody>
-                       <tr>
-                           <td>
-                               <p><code>ProfileGUID</code></p>
-                           </td>
-                           <td>
-                               <p>String</p>
-                           </td>
-                           <td>
-                               <p>The <code>ProfileGUID</code> for the video</p>
-                           </td>
-                       </tr>
                         <tr>
-                            <td>
-                                <p><code>DeliveryType</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <ul>
-                                    <li><code>stitched</code> is the only acceptable value</li>
-                                    <li>For delivering to devices that
-                                        do not support MP4 via streaming or HTTP Live Streaming</li>
-                                </ul>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><code>RequestedFileType</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <p><code>mp4</code> is a multimedia container format standard</p>
-                            </td>
+                            <td><code>stitched</code></td>
+                            <td><code>mp4</code></td>
+                            <td><code>mp4</code></td>
                         </tr>
                     </tbody>
                 </table>
+                <h5>URL map</h5>
+<pre>Host/Service/<strong>DeliveryType</strong>/<strong>RequestedFileType</strong>/DomainGUID/ApplicationGUID/<strong>ProfileGUID</strong>/MediaItemGUID/VirtualFileName.<strong>Extension</strong></pre>
+                <h5>Example</h5>
+<pre>http://.../<strong>stitched</strong>/<strong>mp4</strong>/4989f8db-9187-49ca-86ff-e2cd5342cd4/35217a08- d9db-469f-aec0-7c88406a0c60/<strong>3a41c6e4-93a3-4108-8995-64ffca7b9106</strong>/63598604-cb88-44f8-bc47-d207af3b7b4a/content.<strong>mp4</strong></pre>
                 <h3>Foreign key use</h3>
 				<p>The Brightcove Once platform allows for the use of foreign key values to be used instead of system generated MediaItemGUIDs within the URL construct to identify the video for playback. This allows for the flexibility of using existing unique ID values associated to customer videos to be reused. <code>Foreignkey</code> values must be unique to each video item and cannot be used multiple times in the same Domain.</p>
 				<h4>Example MediaItemGUID</h4>
-<pre>63598604-cb88-44f8-bc47-d207af3b7b4a</pre>
+<pre>
+63598604-cb88-44f8-bc47-d207af3b7b4a
+</pre>
 
 <h4>Example Url using MediaItemGUID</h4>
-<pre>http://once.unicornmedia.com/.../63598604-cb88-44f8-bc47-d207af3b7b4a/content.once</pre>
+<pre>
+http://once.unicornmedia.com/.../63598604-cb88-44f8-bc47-d207af3b7b4a/content.once
+</pre>
 
 <h4>Example Foreign Key</h4>
-<pre>video-co-ca-2113</pre>
+<pre>
+video-co-ca-2113
+</pre>
 
 <h4>Example URL using Foreign Key</h4>
-<pre>http://once.unicornmedia.com/.../video-co-ca-2113/content.once</pre>
+<pre>
+http://once.unicornmedia.com/.../video-co-ca-2113/content.once
+</pre>
 
                 <p>For foreign keys that have characters such as colons, please see the <a href="#UMFKEY"><code>UMFKEY</code></a> query string parameter.</p>
                 <h3>Segmenting</h3>
                 <p>Segmenting single video items is a feature that allows for the playback of a specified subset portion of a video at run time. In order to achieve this, the Once URL must have a start time and end time defined. The parameters, <code>StartTime</code> and <code>EndTime</code>, are represented by positive integer values in seconds, i.e. "30" for 30 seconds. <code>StartTime</code>  <strong>must always</strong> precede <code>EndTime</code>. The clip will start playing and end playback at the points in the <code>MediaItem</code> indicated by these parameters.</p>
                     <p><strong>For auto-device detection</strong>, <code>StartTime</code> and <code>EndTime</code> will be supplied immediately after <code>MediaItemGUID</code> (or <code>ForeignKey</code> if used).</p>
                 <h4>URL Map:</h4>
-<pre>/.../MediaItemGUID/StartTime/EndTime/VirtualFileName?</pre>
+<pre>
+/.../MediaItemGUID/StartTime/EndTime/VirtualFileName?
+</pre>
                 <h4>Example:</h4>
-<pre>http://...63598604-cb88-44f8-bc47-d207af3b7b4a/15/30/
-    content.m3u8?</pre>
+<pre>
+http://...63598604-cb88-44f8-bc47-d207af3b7b4a/15/30/content.m3u8?
+</pre>
                 <table>
                     <caption>Time Segmented Video Clips</caption>
                     <thead>
@@ -1447,7 +1342,9 @@
                     <li>state=Arizona</li>
                 </ul>
                 <h6>Customer Created URL:</h6>
-<pre>http://once.unicornmedia.com/.../content.m3u8?UMADPARAMcc=US&amp;UMADPARAMstate=Arizona</pre>
+<pre>
+http://once.unicornmedia.com/.../content.m3u8?UMADPARAMcc=US&amp;UMADPARAMstate=Arizona
+</pre>
                 <p>Brightcove consumes this OnceVOD url, removes the <code>UMADPARAM</code> key designator, and serves the resulting key-value pair to the ad provider who in turn can utilize that data to respond with the appropriate ad creative based on their decisioning and logic.</p>
                 <h6>URL Sent by Brightcove Once to ad provider:</h6>
 <pre>http://ad.provider.url?cc=US&state=Arizona"</pre>
@@ -1463,34 +1360,33 @@
                     <li>Video_param=26iu%3D%252F7646</li>
                 </ul>
                 <h6>Customer Created URL:</h6>
-<pre>http://once.unicornmedia.com/.../content.once?&amp;
-    UMPTPARAMCust_Params=Denver%Android_4_0%26 tile%Video&amp;UMPTPARAMVideo_param=26iu%3D%252F7646</pre>
+<pre>
+http://once.unicornmedia.com/.../content.once?&amp;UMPTPARAMCust_Params=Denver%Android_4_0%26 tile%Video&amp;UMPTPARAMVideo_param=26iu%3D%252F7646
+</pre>
 
                 <p>Below is a sample of the call that Brightcove will be expected to make to ad providers in order to retrieve an Ad asset. The response to the Video Ad will be in in the form of a VAST XML or other supported response types of Brightcove Once.</p>
                 <h6>URL Sent by UM to ad provider:</h6>
-<pre>http://ad.provider.url?Cust_Params=Denver%Android_4_0%26tile%Video&Video_param=26iu%3D%252F7646</pre>
+<pre>
+http://ad.provider.url?Cust_Params=Denver%Android_4_0%26tile%Video&Video_param=26iu%3D%252F7646
+</pre>
                 <h5 id="UMLITERAL"><code>UMLITERAL</code> – Pass Set Number of Characters Right of '&amp;' as One String Value</h5>
                 <p><code>UMLITERAL{Key},{Integer}&amp;{Value}</code>
                 </p>
                 <p>This is used to collectively set a defined number of characters right of a specified '&amp;' query string delimiter as one value for inclusion in the Ad Provider URL. UMLITERAL can be utilized to include ad targeting data that may otherwise be unsafe to include in a URL such as semi-colons. The example below assumes you are passing an 81-character string through as one value.</p>
                 <h6>Example of String:</h6>
-<pre>slau=midroll&amp;tpos=180;;ptgt=a&amp;slau=midroll&amp;tpos=360;&amp;
-    ptgt=a&amp;slau=midrol l&amp;tpos=540</pre>
+<pre>
+slau=midroll&amp;tpos=180;;ptgt=a&amp;slau=midroll&amp;tpos=360;&amp;ptgt=a&amp;slau=midrol l&amp;tpos=540
+</pre>
                 <h6>Number of Characters in String:</h6>
                 <p>81</p>
                 <h6>Customer Created URL:</h6>
-<pre>http://once.unicornmedia.com.../VirtualFileName?
-    UMPTPARAMCust_Params=Denver%Andr oid_4_0%26tile%Video&amp;%26Video_param=26iu%3D%252F7646&amp;
-    UMLITERALKey1,81&amp;slau=midroll&amp;tpos=180;;ptgt=a&amp;slau=midroll&amp;
-    tpos=360;;ptgt=a&amp;slau=midroll&amp;tpos=540</pre>
+<pre>
+http://once.unicornmedia.com.../VirtualFileName?UMPTPARAMCust_Params=Denver%Andr oid_4_0%26tile%Video&amp;%26Video_param=26iu%3D%252F7646&amp;UMLITERALKey1,81&amp;slau=midroll&amp;tpos=180;;ptgt=a&amp;slau=midroll&amp;tpos=360;;ptgt=a&amp;slau=midroll&amp;tpos=540
+</pre>
                 <h6>Corresponding Ad Provider URL:</h6>
-<pre>http://ad.provider.url?
-    Cust_Params=Denver%Android_4_0%26tile%Video%26Video_par am=26iu%3D%252F7646&amp;
-    slau=midroll&amp;tpos=180;;ptgt=a&amp;slau=midroll&amp;tpos=360;;ptgt=a&amp;
-    slau=midroll&amp;tpos=540</pre>
-
-
-
+<pre>
+http://ad.provider.url?Cust_Params=Denver%Android_4_0%26tile%Video%26Video_par am=26iu%3D%252F7646&amp;slau=midroll&amp;tpos=180;;ptgt=a&amp;slau=midroll&amp;tpos=360;;ptgt=a&amp;slau=midroll&amp;tpos=540
+</pre>
                 <h4 id="serverSideBeaconing">Beacon params</h4>
                 <h5 id="UMBEPARAM"><code>UMBEPARAM</code></h5>
                 <p>Similar to the use of UMADPARAM, the UMBEPARAM parameter can be utilized to pass along page level and client side data to the Once platform to instead be appended to beacon urls made to an external analytics provider, enabling this data to be used in the tracking of a number of playback events. For more information please see the <a href="#beacons">Beaconing section</a>.</p>
@@ -1500,7 +1396,9 @@
                     <li><code>Uniqueid=country</code></li>
                 </ul>
                 <h6>Customer Created URL:</h6>
-                <pre>http://once.unicornmedia.com/Localadid=adValue&amp;uniqueid=$uniqueid</pre>
+<pre>
+http://once.unicornmedia.com/Localadid=adValue&amp;uniqueid=$uniqueid
+</pre>
                 <h6>Parameter Examples:</h6>
                 <ul>
                     <li><code>UMBEPARAMLocaladid=55</code>
@@ -1509,7 +1407,9 @@
                     </li>
                 </ul>
                 <h6>Fired Beaconing URL:</h6>
-                <pre>http://tracking.exampleurl?Localadid=55&amp;uniqueid=$country</pre>
+<pre>
+http://tracking.exampleurl?Localadid=55&amp;uniqueid=$country
+</pre>
                 <h5 id="UMXBEACON"><code>UMXBEACON</code></h5>
                 <p><code>UMXBEACON</code> enables the specification of a standalone url to be called to at play start that can be used independently or in addition to pre-configured beacons. This URL used must be URL encoded and must be the last parameter in the URL.</p>
                 <h6>Independent Tracking</h6>
@@ -1517,9 +1417,13 @@
                 </p>
 
                 <h6>URL Map:</h6>
-<pre>http://once.unicornmedia.com/.../content.once?[UMXBEACON={encodedURL}]</pre>
+<pre>
+http://once.unicornmedia.com/.../content.once?[UMXBEACON={encodedURL}]
+</pre>
                 <h6>Example:</h6>
-                <pre>http://...63598604-cb88-44f8-bc47-d207af3b7b4a?UMXBEACON=http%3A%5F%2Fbeaconserver.um.com%3Fkeyone=111</pre>
+<pre>
+http://...63598604-cb88-44f8-bc47-d207af3b7b4a?UMXBEACON=http%3A%5F%2Fbeaconserver.um.com%3Fkeyone=111
+</pre>
 
                 <h4>Utility params</h4>
                 <h5 id="UMFKEY"><code>UMFKEY</code> – Foreign Key Takes Priority over Media Item GUID in Query String</h5>
@@ -1531,32 +1435,36 @@
                     <li>ForeignKey=uma:video:movie.com:480337</li>
                 </ul>
                 <h6>Example Static MediaItemGUID</h6>
-                <pre>00000000-0000-0000-0000-000000000000</pre>
+<pre>00000000-0000-0000-0000-000000000000</pre>
                 <h6>Customer Created URL:</h6>
-<pre>http://once.unicornmedia.com/od/auto/m3u8/
-    4989f8db-9187-49ca-86ff-e2cd53429cd4/35217a08-d9db-469f-aec0-7c88406a0c60/
-    00000000-0000-0000-0000-000000000000/content.m3u8?
-    cc=US&amp;state=Arizona&amp;UMFKEY=uma:video:movie.com:480337</pre>
+<pre>
+http://once.unicornmedia.com/od/auto/m3u8/4989f8db-9187-49ca-86ff-e2cd53429cd4/35217a08-d9db-469f-aec0-7c88406a0c60/00000000-0000-0000-0000-000000000000/content.m3u8?UMFKEY=uma:video:movie.com:480337
+</pre>
                 <p class="text-warning">NOTE: The UMFKEY value must be URL encoded.</p>
                 <h5 id="temporarilyOverride">Temporarily Override the Standard Profile List (<code>umoprofiles</code>)</h5>
                 <p>When the <code>UMOPROFILES={profileGUID}</code> query string is appended to a Once URL, the associated profile(s) will be dynamically inserted in the returned m3u8 to temporarily override the standard profile list for adaptive playback of an asset. The value can be a single <code>profileGUID</code> or can contain a list of multiple comma-separated profileGUIDs. The order in which profiles are appended to the url does not affect the way we return them. The <em>hinted</em> or top bitrate returned is tied into the device detection rule as a value of, <code>optimalProfileGuid</code>.</p>
                 <h6>URL Map:</h6>
-                <pre>/.../MediaItemGUID/VirtualFileName?umoprofiles=PROFILEGUID1,PROFILEGUID2,...,PROFILEGUIDX
-                </pre>
+<pre>
+/.../MediaItemGUID/VirtualFileName?umoprofiles=PROFILEGUID1,PROFILEGUID2,...,PROFILEGUIDX
+</pre>
                 <h6>Example:</h6>
-<pre>http://...63598604-cb88-44f8-bc47-d207af3b7b4a/content.m3u8?
-    umoprofiles=c2364425-2267-4eaa-b800-ef544bdd3da3,27e71340-af9c-468d-96c3-ebac95dd884d,...</pre>
+<pre>
+http://...63598604-cb88-44f8-bc47-d207af3b7b4a/content.m3u8?umoprofiles=c2364425-2267-4eaa-b800-ef544bdd3da3,27e71340-af9c-468d-96c3-ebac95dd884d,...
+</pre>
 
                 <h5 id="temporarilyAdd">Temporarily Add Profiles to the Standard Profile List (umaprofiles)</h5>
                 <p>When the query string is appended with umaprofiles={profileGUID}, the specified profile will be temporarily added to the standard profile list for adaptive playback of an asset.</p>
                 <h6>URL Map:</h6>
-<pre>/.../MediaItemGUID/VirtualFileName?umaprofiles=PROFILEGUID1,PROFILEGUID2,...,PROFILEGUIDX</pre>
+<pre>
+/.../MediaItemGUID/VirtualFileName?umaprofiles=PROFILEGUID1,PROFILEGUID2,...,PROFILEGUIDX
+</pre>
                 <h6>Example:</h6>
-<pre>http://...63598604-cb88-44f8-bc47-d207af3b7b4a/
-    content.m3u8? umaprofiles=c2364425-2267-4eaa-b800-ef544bdd3da3,27e71340-af9c-468d-96c3- ebac95dd884d,...</pre>
+<pre>
+http://...63598604-cb88-44f8-bc47-d207af3b7b4a/content.m3u8? umaprofiles=c2364425-2267-4eaa-b800-ef544bdd3da3,27e71340-af9c-468d-96c3- ebac95dd884d,...
+</pre>
 
                 <h5 id="forcemute"><code>forcemute</code></h5>
-                <p>Set <code>forcemute=true</code> to strip the audio steam of all audio responses.</p>
+                <p>Set <code>forcemute=true</code> to remove all audio streams from the video being returned.</p>
                 <h5 id="timedtextextension"><code>timedtextextension</code></h5>
                 <p>Use <code>timedtextextension={extension}</code> to modify the output caption type for timedtext adaptive/M3U8 and <a href="onceux_implementationguide.html">OnceUX</a> responses. Once provides the sidecar in manifest for players/apps/environments that may not be able to use the Apple method of webvtt by default. Additionally, utilizing this sidecar in manifest allows for different caption types to be returned. If captions are enabled for a device rule and present on an item Once will generate the in-manifest webVTT.</p>
                 <p>The available extensions are:</p>
@@ -1567,7 +1475,7 @@
                     <li><code>dfxp</code></li>
                 </ul>
                 <h3>Dynamic ad params</h3>
-                <p>DAP key/value pairs are functional throughout the system; preconfigured and mapped. OnceVOD will dynamically pull known client device information from the mapping in the runtime database and include that data as part of the tracking or targeting parameters expected by the Beaconing Server or Ad Server. See <a href="#serverSideBeaconing">Server Side Beaconing</a> and <a href="#UMADPARAM">UMADPARAM</a> for URL examples.</p>
+                <p>DAP key/value pairs are functional throughout the system; preconfigured and mapped. The Once platform will dynamically pull known client device information from the mapping in the runtime database and include that data as part of the tracking or targeting parameters expected by the Beaconing Server or Ad Server, respectively. See <a href="#serverSideBeaconing">Server Side Beaconing</a> and <a href="#UMADPARAM">UMADPARAM</a> for URL examples.</p>
                 <p>View the table in the <a href="#DAPtable">Quick Reference Tables</a> section for all available Ad Parameters and their use.</p>
                 <h4>Full list of params</h4>
                 <h5>Advertising</h5>
@@ -1904,7 +1812,7 @@
                     <tr>
                       <td colspan="4">
                         <ul>
-                          <li>A unit random number</li>
+                          <li>A unique random number</li>
                         </ul>
                       </td>
                     </tr>
@@ -2221,7 +2129,7 @@
                     <tr>
                       <td colspan="4">
                         <ul>
-                          <li>(DFP) Random # correlator specific to DFP. used to implement competitive exclusions, including in cookieless environments. (unique per page view)</li>
+                          <li>(For DFP) Random # correlator specific to DFP. used to implement competitive exclusions, including in cookieless environments. (unique per page view)</li>
                         </ul>
                       </td>
                     </tr>
@@ -2242,7 +2150,7 @@
                     <tr>
                       <td colspan="4">
                         <ul>
-                          <li>(DFP) Represents a pod within a video. Pass &amp;pod=1 for first pod, &amp;pod=2 for second pod, and so on.</li>
+                          <li>(For DFP) Represents a pod within a video. Pass &amp;pod=1 for first pod, &amp;pod=2 for second pod, and so on.</li>
                         </ul>
                       </td>
                     </tr>
@@ -2263,7 +2171,7 @@
                     <tr>
                       <td colspan="4">
                         <ul>
-                          <li>(DFP) Position within a pod. Pass &amp;ppos=1 for the first position, &amp;ppos=2 for the second position, and so on.</li>
+                          <li>(For DFP) Position within a pod. Pass &amp;ppos=1 for the first position, &amp;ppos=2 for the second position, and so on.</li>
                         </ul>
                       </td>
                     </tr>
@@ -2284,7 +2192,7 @@
                     <tr>
                       <td colspan="4">
                         <ul>
-                          <li>(DFP) Whether ad request is being sent from pre-roll,mid-roll or post-roll.</li>
+                          <li>(For DFP) Whether ad request is being sent from pre-roll,mid-roll or post-roll.</li>
                         </ul>
                       </td>
                     </tr>
@@ -2305,7 +2213,7 @@
                     <tr>
                       <td colspan="4">
                         <ul>
-                          <li>(DFP) Integer generated for each video stream that reflects unique streams (so each piece of content); the number needs to be the same within a stream and unique within a pageview.</li>
+                          <li>(For DFP) Integer generated for each video stream that reflects unique streams (so each piece of content); the number needs to be the same within a stream and unique within a pageview.</li>
                         </ul>
                       </td>
                     </tr>
@@ -2326,7 +2234,7 @@
                     <tr>
                       <td colspan="4">
                         <ul>
-                          <li>To carry the IP value into each standard and optimized pod call.</li>
+                          <li>(For DFP) To carry the IP value into each standard and optimized pod call.</li>
                         </ul>
                       </td>
                     </tr>
@@ -2347,7 +2255,7 @@
                     <tr>
                       <td colspan="4">
                         <ul>
-                          <li>Required for all initial and subsequent ad tags for the UM-to-XFP session.</li>
+                          <li>(For DFP) Required for all initial and subsequent ad tags for the UM-to-XFP session.</li>
                         </ul>
                       </td>
                     </tr>
@@ -2357,23 +2265,23 @@
             <div class="section" id="advertising">
                 <h2>Advertising</h2>
                 <h3>Description</h3>
-                <p>OnceVOD serves up and distributes ads through ad campaigns associated with your Application GUID to dynamically request the payload from your Ad Server(s). Advertising calls are made server-side on behalf of the client to the ad server configured within your Brightcove account. Our platform supports VAST XML, SmartXML and nearly any VAST-like XML format. Contact Brightcove Client Services and provide your VAST ad tag or FreeWheel tag URL for integration.</p>
-                <p>If an applicationguid configured to make ad calls is used in a request for video, OnceVOD will send a request to the Ad Server to retrieve the Ad payload. The Ad Server returns XML with data that is used to ingest and cache the ad unit within your Brightcove account. When the same ad unit is encountered for subsequent consumers, the system will utilize the cached ad video along with the unique impression and tracking events for that request.</p>
+                <p>OnceVOD serves up and distributes ads through ad campaigns associated with your ApplicationGUID to dynamically request the payload from your Ad Server(s). Advertising calls are made server-side on behalf of the client to the ad server configured within your Brightcove account. Our platform supports VAST XML, SmartXML and nearly any VAST-like XML format. Contact Brightcove Client Services and provide your VAST ad tag or FreeWheel tag URL for integration.</p>
+                <p>If an ApplicationGUID configured to make ad calls is used in a request for video, OnceVOD will send a request to the Ad Server to retrieve the Ad payload. The Ad Server returns XML with data that is used to ingest and cache the ad unit within your Brightcove account. When the same ad unit is encountered for subsequent consumers, the system will utilize the cached ad video along with the unique impression and tracking events for that request.</p>
                 <h3>URL Templates</h3>
-                <h4>VAST Ad Proxy Method</h4>
-<pre>onceux.unicorn.com/now/ads/proxy/{deliveryType}/{RequestedFileType}/{do mainGUID}/{applicationGUID}/[{mediaItemGUID}/][?param1=value[&amp;param2=value]]</pre>
                 <h4>VMAP Ad Aggregator Method</h4>
-<pre>onceux.unicorn.com/now/ads/vmap/{deliveryType}/{RequestedFileType}/{dom ainGUID}/{applicationGUID}/[{mediaItemGUID}/][?param1=value[&amp;param2=value]]</pre>
-
-
-                <p>The OnceVOD AdCache component recognizes if an ad being served to your customer is present within your account. If the ad is not in our system, OnceVOD automatically ingests and caches it. Ad responses that return a particular creative currently being ingested will be served with that slot unmonetized. Once the creative is complete the Once platform will then begin inserting that advertisement.</p>
+<pre>
+once.unicorn.com/now/ads/vmap/{deliveryType}/{RequestedFileType}/{dom ainGUID}/{ApplicationGUID}/[{mediaItemGUID}/][?param1=value[&amp;param2=value]]
+</pre>
                 <h3>Types supported</h3>
                 <ul>
+                    <li>DFP</li>
                     <li>VAST</li>
                     <li>VAST-Wrapper</li>
-                    <li>DFP
+                    <li>Ad Pods
                         <ul>
+                            <li>Freewheel</li>
                             <li>VAST</li>
+                            <li>VAST-Wrapper</li>
                             <li>FreeWheel SmartXML</li>
                         </ul>
                     </li>
@@ -2388,17 +2296,6 @@
 
                 <h4 id="adCache">Ad Cache</h4>
                 <p>The OnceVOD AdCache component recognizes if an ad being served to your customer is present within your account. If the ad is not in our system, OnceVOD automatically ingests and caches it. Ad responses that return a particular creative currently being ingested will be served with that slot unmonetized. Once the creative is complete the Once platform will then begin inserting that advertisement.</p>
-                <h5>Types supported</h5>
-                <ul>
-                    <li>VAST</li>
-                    <li>VAST-Wrapper</li>
-                    <li>DFP
-                        <ul>
-                            <li>VAST</li>
-                            <li>FreeWheel SmartXML</li>
-                        </ul>
-                    </li>
-                </ul>
                 <h4 id="waterfall">Waterfall</h4>
                 <h3>Ad Unit Waterfall Method</h3>
                 <p>Brightcove Once supports ad creative waterfall behavior for both VAST XML and SmartXML. Once makes an ad request to the first node in sequence and, if an ad unit is returned, the ad is rendered with appropriate tracking. If an ad unit is not returned, Once will try the next node in sequence and continue until all nodes have been tried.</p>
@@ -2416,50 +2313,56 @@
                         </tr>
                         <tr>
                             <th>Event Type</th>
-                            <th>Single Video/MMI Segment</th>
+                            <th>Single Video or MMI Segment</th>
                             <th>MMI Playlist</th>
                             <th>Ad</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Yes</td>
+                            <td>Play</td>
                             <td>Yes</td>
                             <td>Yes</td>
                             <td>No</td>
                         </tr>
                         <tr>
-                            <td>Yes</td>
-                            <td>Yes</td>
-                            <td>Yes</td>
-                            <td>Yes</td>
-                        </tr>
-                        <tr>
-                            <td>Yes</td>
+                            <td>Start</td>
                             <td>Yes</td>
                             <td>Yes</td>
                             <td>Yes</td>
                         </tr>
                         <tr>
-                            <td>Yes</td>
-                            <td>Yes</td>
-                            <td>Yes</td>
-                            <td>Yes</td>
-                        </tr>
-                        <tr>
-                            <td>Yes</td>
+                            <td>First Quartile</td>
                             <td>Yes</td>
                             <td>Yes</td>
                             <td>Yes</td>
                         </tr>
                         <tr>
-                            <td>Yes</td>
+                            <td>Midpoint</td>
                             <td>Yes</td>
                             <td>Yes</td>
                             <td>Yes</td>
                         </tr>
                         <tr>
+                            <td>Third Quartile</td>
                             <td>Yes</td>
+                            <td>Yes</td>
+                            <td>Yes</td>
+                        </tr>
+                        <tr>
+                            <td>Complete</td>
+                            <td>Yes</td>
+                            <td>Yes</td>
+                            <td>Yes</td>
+                        </tr>
+                        <tr>
+                            <td>Quartiles</td>
+                            <td>Yes</td>
+                            <td>Yes</td>
+                            <td>Yes</td>
+                        </tr>
+                        <tr>
+                            <td>Interval</td>
                             <td>Yes</td>
                             <td>Yes</td>
                             <td>No</td>
@@ -2490,7 +2393,7 @@
             </div>
             <div class="section" id="cdn">
                 <h2>CDN</h2>
-                <p>Brightcove Once utilizes existing customer CDN relationships to provide the delivery of content to end users. All requests will be brokered by the Once platform, with the Dynamic Permutation Later acting as origin, and your CDN ultimately delivering the content. This section outlines support and the steps your Brightcove representative will go through with you to configure the Once service along with your CDN provider.</p>
+                <p>Brightcove Once utilizes existing customer CDN relationships to provide the delivery of content to end users. All requests will be brokered by the Once platform, with Once acting as origin, and your CDN delivering the content. This section outlines support and the steps your Brightcove representative will go through with you to configure the Once service along with your CDN provider.</p>
                 <h3>Supported providers</h3>
                 <ul>
                     <li>Akamai</li>
@@ -2502,7 +2405,7 @@
                 <ul>
                     <li>Brightcove will generate and provide a host name for you to use. (Example: <code>customername.dpl.unicornmedia.com</code>)</li>
                     <li>Your CDN provider will need to set up an <em>HTTP Large Object</em> configuration utilizing the provided hostname as the Origin.</li>
-                    <li>Your CDN will need to enable or verify that the following settings are enabled.
+                    <li>Your CDN will need to enable or verify that the following settings are enabled:
                         <ul>
                             <li>Cache on Query String or Unique-Cache</li>
                             <li>If there is a tiered caching option available, this should be enabled as well.</li>
@@ -2515,7 +2418,7 @@
             <div class="section" id="captions">
                 <h2>Captions</h2>
                 <h3>Input</h3>
-                <p>Below are input types supported by Once.</p>
+                <p>Below are input types supported by Once:</p>
                 <ul>
                     <li>Embedded
                         <ul>
@@ -2560,13 +2463,13 @@
                 <p>Publication Rules are a set of <strong>optional</strong> business logic parameters that may be applied to the content you upload into the Brightcove Once platform to restrict playback in a number of ways.</p>
                 <h4>Source</h4>
                 <h5>Inherited from catalog</h5>
-                <p>By default, media items created will inherit the publication rule that is assigned to the catalog that the asset is created in. This rule can be edited to utilize any of the limits included in the Type of Limits section to automatically be applied but by default this publication rule is a rolling 10 year window with no other restrictions.</p>
+                <p>By default, media items created will inherit the publication rule that is assigned to the catalog that the asset is created in. This rule can be edited to utilize any of the limits included in the Type of Limits section to automatically be applied. By default this publication rule is a rolling 10 year window with no other restrictions.</p>
                 <h5>API Ingest</h5>
                 <p>If you have a need to more granularly adjust publication rules on a per asset basis rather than utilizing the standard inheritance of publication rules, you can specify this rule via the Brightcove Once API at time of ingest.</p>
 
 <p>These types of publication rules will overwrite the inherited rule that an asset would receive by default.</p>
 
-<p>Please see the <a href="#fullXML">extended Ingest xml example</a> for more information on how to include publication rules into your ingest request.</p>
+<p>Please see the <a href="#fullXML">extended Ingest XML example</a> for more information on how to include publication rules into your ingest request.</p>
                 <h5>Start date / end date</h5>
                 <p>Playback is only allowed within the start and end dates.</p>
                 <h5>Geo restrictions</h5>
@@ -2578,9 +2481,13 @@
                 <h5>Referring host</h5>
                 <p>Playback is allowed only if the referring host matches the specified value.</p>
                 <h5>Multiple publication rules</h5>
-                <p>Multiple rules can be used if a particular behavior is desired. For example, using two publication rules, you could limit playback to a particular country for a set amount of time before offering the video globally. This would look like: Publication rule 1 would allow video playback for a particular specified date range to a particular single country only. Publication rule 2 would start at the end time of rule 1 with a 10 year time limit and no country restriction.</p>
+                <p>Multiple rules can be used if a particular behavior is desired. For example, using two publication rules, you could limit playback to a particular country for a set amount of time before offering the video globally. In practice, creating this implementation would go as follows: Publication rule 1 would allow video playback for a particular specified date range to a particular single country only. Publication rule 2 would start at the end time of rule 1 with a 10 year time limit and no country restriction.</p>
                 <h3>AES-128</h3>
-                <p>Playback limited to HLS</p>
+                <p>AES-128 is the Advanced Encryption Standard, which utilizes 128 bit keys for additional protection of HLS content. The Once platform will handle key generation and authorization with the device. When a request for encrypted content is made, authorization information is passed to the requesting device within the HLS manifest as the attribute EXT-X-KEY and must be successfully validated in order for playback to begin.</p>
+                <p>For customers that require additional content protection from unauthorized playback, the Once platform supports the utilization of AES-128 encryption via HLS. Configuration of AES within a domain may be done across the entire domain or may be configured to provide multi-mode delivery. Security can be specified on a catalog by catalog and ApplicationGUID by ApplicationGUID basis. Videos ingested into a <em>secure</em> catalog will inherit the assigned security settings whereas videos ingested into an <em>unsecured</em> catalog will not.</p>
+                <p>For example, a domain may contain a catalog for secure content such as feature films, episodic, or other premium types as well as a catalog for unsecured content such as clips or trailers. Additionally, that domain would have ApplicationGUIDs for secure content and unsecured content. Secure or unsecured content would only be accessible via the appropriate secure and unsecured ApplicationGUIDs, respectively.</p>
+                <p>Your Brightcove representative can assist in the configuration of AES-128 for your domain.</p>
+                <p class="warning">Note: Advertisements are not encrypted to optimize playback performance while ensuring content remains secure and to enable unsecured content to be monetized with the same advertisement creative.</p>
             </div>
         </div>
     </div>
