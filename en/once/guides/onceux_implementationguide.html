@@ -53,30 +53,18 @@
                 <h2>Syntax</h2>
                 <p>The OnceUX is a pre-configurable web method, based on Brightcove OnceVOD technology that allows you to make a content request and receive a single normalized response, including all ad information, in a defined XML Schema; along with your video content and in-stream video ads.</p>
                 <h3>Information Gathering</h3>
-                <p>Several pieces of information are needed to take advantage of the OnceUX URL construct. Resulting Once URL(s) within responses will follow OnceVOD convention for <code>{deliveryType}</code> and <code>{RequestedFileType}</code> based on the OnceUX request syntax decisions you make as listed below. (<em>See OnceVOD Implementation Guide for more information</em>)</p>
-                <ul>
-                    <li><strong>Delivery Type:</strong> Decide if your media will be <code>stitched</code> for progressive download, <code>adaptive</code> for HTTP streaming or <code>od</code> (on demand) to be used with Auto Links</li>
-                    <li><strong>Requested File Type:</strong> Choose from <code>mp4</code>, <code>3gp</code>, <code>m3u8</code> or <code>auto</code>, which determines delivery method according to client capabilities</li>
-                    <li><strong>DomainGUID</strong>, <strong>ApplicationGUID</strong>, <strong>MediaItemGUID</strong>: Each are obtained by contacting <a href="mailto:oncesupport@brightcove.com">oncesupport@brightcove.com</a>
-                    </li>
-                    <li><strong>Query String Parameters:</strong> Use the following pages to determine your parameters</li>
-                </ul>
-                <p class="text-info">Some of the query string parameters will be passed through and appended to the resulting Once URL while others will be used by OnceUX when making calls to ad servers.</p>
+                <p>Several pieces of information are needed to take advantage of the OnceUX URL construct. Resulting Once URL(s) within responses will follow OnceVOD convention for <code>{deliveryType}</code> and <code>{RequestedFileType}</code> based on the OnceUX request syntax decisions you make as listed below. (<em>See <a href="./getting-started-once-vod.html">Getting Started with OnceVOD</a> for more information</em>)</p>
                 <h3>VMAP Ad Aggregation Method</h3>
                 <p>With this method, OnceUX retrieves a multiple ad playlist from values that are derived by summarizing or <em>aggregating</em> the ad viewing data based on your application (player, iPhone, etc.) from appropriate ad servers. This OnceUX URL template is pre-defined to elicit a VMAP 1.0 response providing control over ad inventory insertion where you don't control the player application.</p>
-                    <p>You will create a Once URL that sends a request to Brightcove servers for content. The data returned is a list of all the ads for that content viewing session normalized into VAST 3.0 and then embedded into a VMAP 1.0 XML object. This VMAP object contains a Brightcove Once XML object, which includes Brightcove Once data and a URL. See the <a href="#vmapResponse">sample response</a> example.</p>
+                    <p>You will create a OnceUX URL that sends a request to Brightcove servers for content. The data returned is a list of all the ads for that content viewing session normalized into VAST 3.0 and then embedded into a VMAP 1.0 XML object. This VMAP object contains a Brightcove Once XML object, which includes Brightcove Once data and a URL. See the <a href="#vmapResponse">sample response</a> example.</p>
                 <p><strong>NOTE:</strong> Be aware that the VAST 3.0 object for each creative in the VMAP object will be missing a download link because the URL provided in the Once XML object will incorporate the ad resources at the correct locations causing the video ad creative content URL to be unnecessary.</p>
                 <p>The greatest difference between these two methods is that, in addition to the Once URL, the Ad Aggregation method also provides metadata and a VMAP object containing the ad load for the entire asset. This gives you greater client side flexibility with advertising while still using Brightcove Once platform. For instance, you can decide to manage tracking client side or through Brightcove Services, include banners and click-throughs not supported by Brightcove, etc.</p>
                     <p>Brightcove OnceUX utilizes a proprietary URL syntax based on OnceVOD technology. You configure it through a programmatic URL generation method customized for your specific application.</p>
             <div class="section" id="urlSegmentVariables">
                 <h2>Segment variables</h2>
                 <p>The <strong>VMAP method</strong> implements the Ad Server Aggregator behavior, in which content is requested and a fully-formed response is given with a OnceUX URL, metadata and a VMAP object containing the ad load for the entire asset.</p>
-                <p>The URL segment variables described below are consistent between both methods with the only difference being the RequestedFileType parameter in the query string.</p>
-                <p class="text-info">Optional variables within the following URL syntax examples are represented with brackets ( <code>[ ]</code> ).</p>
                 <h3>Location and Service Variables</h3>
                 <p>These segments must be as shown here for the ad service to perform properly.</p>
-                <h5>Ad Proxy URL Map:  Host/Service/ads/proxy/{deliveryType}/{RequestedFileType}/{domainGUID}/…</h5>
-<pre><code>Example: http://onceux.brightcove.com/now/ads/proxy/od/auto/4989f8db-187-49ca-86ff-e2cd53429cd4/...</code></pre>
                 <h5>VMAP URL Map:  Host/Service/ads/vmap/{deliveryType}/{RequestedFileType}/{domainGUID}/…</h5>
 <pre><code>Example: http://onceux.brightcove.com/now/ads/vmap/od/auto/4989f8db-9187-49ca-86ff-e2cd53429cd4/...</code></pre>
                 <table>
@@ -103,7 +91,7 @@
                                 <p>String</p>
                             </td>
                             <td>
-                                <p>"onceux.brightcove.com"</p>
+                                <p><code>onceux.brightcove.com</code> or a CNAME pointing to that address</p>
                             </td>
                         </tr>
                         <tr>
@@ -114,12 +102,7 @@
                             <td>
                                 <p>String</p>
                             </td>
-                            <td>
-                                <p> <strong>"now" </strong>specifies that we will use our dynamic permutation layer (DPL) to service your request</p>
-                                <ul>
-                                    <li>This is the only variable currently available</li>
-                                </ul>
-                            </td>
+                            <td><code>now</code> is the only variable currently available</td>
                         </tr>
                         <tr>
                             <td>
@@ -133,18 +116,7 @@
                                 <p>The only value available</p>
                             </td>
                         </tr>
-                        <tr>
-                            <td>
-                                <p><code>proxy</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <p>The OnceUX will perform as an ad proxy</p>
-                            </td>
-                        </tr>
+
                         <tr>
                             <td>
                                 <p><code>vmap</code>
@@ -160,273 +132,17 @@
                     </tbody>
                 </table>
                 <h3>Serving Content Variables</h3>
-                <p>There are four acceptable <code>DeliveryType/RequestedFileType</code> combinations for the OnceUX service; od<em>/auto</em>, <em>adaptive/m3u8, stitched/3gp </em>and <em>stitched/mp4</em>. Brightcove Once automatically delivers one or multiple bit rate profiles based on device detection; however, you can force video to play through certain profiles by temporarily overriding the standard profile list.</p>
-                <p class="text-warning">NOTE: MP4 and 3GP file types will hit all impressions/tracking event URLs at once so if you are tracking hit data, it's detailed by asset rather than by ad. However, m3u8 file types have playlist associated so each URL is hit as it is viewed providing tracking granularity.</p>
-                <h4>Auto Delivery</h4>
-                <p>The DeliveryType/RequestedFileType combination for auto delivery is <em>od/auto</em>, where 'od' stands for 'on demand'. Using <em>od/auto </em>will allow the system to determine the appropriate profiles to include within the .m3u8 playlist using Brightcove device detection technology.</p>
-                <h5><strong>URL Map:</strong> …/ads/{proxy or vmap}/{deliveryType}/{RequestedFileType}/{domainGUID}/…</h5>
-                <h5>Proxy Example: </h5>
-<pre><code>http://.../proxy/od/auto/4989f8db-9187-49ca-86ff-e2cd53429cd4/...</code></pre>
-                <h5>VMAP Example:</h5>
-<pre><code>http://.../vmap/od/auto/4989f8db-9187-49ca-86ff-e2cd53429cd4/...</code></pre>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>
-                                <p>Parameter</p>
-                            </th>
-                            <th>
-                                <p>Type</p>
-                            </th>
-                            <th>
-                                <p>Description</p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <p><code>deliveryType</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <ul>
-                                    <li><code>od</code> is the only acceptable value</li>
-                                    <li>Delivery will be determined by the client hitting the URL</li>
-                                    <li>Utilizes the Once auto-detection syntax</li>
-                                </ul>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><code>RequestedFileType</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <p><code>auto</code> indicates that the delivery method is determined according to client capabilities; representing different file types, profiles, etc.</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <h4>HLS Delivery</h4>
-                <p>The DeliveryType/RequestedFileType combination for HLS delivery is <em>adaptive/m3u8</em>, where .m3u8 is a proprietary file format that stores multimedia playlists specifically for HLS. Brightcove Once automatically delivers one or multiple bit rate profiles based on device detection.</p>
-                <h5>Ad Proxy URL Map: …/ad/{proxy or vmap}/{deliveryType}/{RequestedFileType}/{domainGUID}/…</h5>
-                <h5>Proxy Example:</h5>
-<pre><code>http://.../proxy/adaptive/m3u8/4989f8db-9187-49ca-86ff-e2ccd4...</code></pre>
-                <h5>VMAP Example:</h5>
-<pre><code>http://.../vmap/adaptive/m3u8/4989f8db-9187-49ca-86ff-e2ccd4...</code></pre>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>
-                                <p>Parameter</p>
-                            </th>
-                            <th>
-                                <p>Type</p>
-                            </th>
-                            <th>
-                                <p>Description</p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <p><code>DeliveryType</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <ul>
-                                    <li><code>adaptive</code> is the only acceptable value</li>
-                                    <li>Content is delivered via HTTP Live Streaming</li>
-                                    <li>Used for devices that support HLS</li>
-                                </ul>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><code>RequestedFileType</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <p><code>m3u8</code> is a UTF-8 Encoded Audio Playlist file</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <h4>MP4 Delivery</h4>
-                <p>The MP4 file type is primarily associated with &#39;MPEG-4'. The DeliveryType/RequestedFileType combination for MP4 delivery is <em>stitched/mp4</em>.</p>
-                <h5>URL Map: …/{deliveryType}/{RequestedFileType}/{domainGUID}/{ApplicationGUID}/{ProfileGUID}/…</h5>
-                <h5>Example:</h5>
-                <p class="code_area">http://.../stitched/mp4/4989f8db-9187-49ca-86ff-e2cd53429cd4/35217a08- d9db-469f-aec0-7c88406a0c60/c2364425-2267-4eaa-b800-ef544bdd3da3/...</p>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>
-                                <p>Parameter</p>
-                            </th>
-                            <th>
-                                <p>Type</p>
-                            </th>
-                            <th>
-                                <p>Description</p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <p><code>DeliveryType</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <ul>
-                                    <li><code>stitched</code> is the only acceptable value</li>
-                                    <li>Used to deliver to devices that do not support HTTP Live Streaming</li>
-                                </ul>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><code>RequestedFileType</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <p><code>mp4</code> is a multimedia container format standard</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <!-- <h4>3GP Delivery</h4>
-                <p>The 3GP file type is an audio and video format designed for transmitting files between devices that do not support MP4 or HLS playback. The DeliveryType/RequestedFileType combination for 3GP delivery is <em>stitched/3gp.</em>
-                </p>
-                <h5>URL Map: …/{deliveryType}/{RequestedFileType}/{domainGUID}/{ApplicationGUID}/{ProfileGUID}/…</h5>
-                <h5>Example:</h5>
-<pre><code>http://.../stitched/3gp/4989f8db-9187-49ca-86ff-e2cd53429cd4/35217a08- d9db-469f-aec0-7c88406a0c60/c2364425-2267-4eaa-b800-ef544bdd3da3/...</code></pre>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>
-                                <p>Parameter</p>
-                            </th>
-                            <th>
-                                <p>Type</p>
-                            </th>
-                            <th>
-                                <p>Description</p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <p><code>DeliveryType</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <ul>
-                                    <li><code>stitched</code> is the only acceptable value</li>
-                                    <li>Used to deliver to devices that do not support MP4 or HTTP Live Streaming</li>
-                                </ul>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><code>RequestedFileType</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <p><code>3gp<//p> is a multimedia container format standard for 3G devices</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table> -->
-                <h3>GUID Variables</h3>
-                <p>These GUIDs are obtained through Brightcove Customer Support at oncesupport@brightcove.com.</p>
-                <h5><strong>URL Map: </strong>/…/<strong>{domainGUID}/{ApplicationGUID}/[{MediaItemGUID}</strong>/][?param1=value[&amp;param2=value]]</h5>
-                <h5><strong>URL Map: </strong>/…/<strong>{domainGUID}/{ApplicationGUID}/[{ForeignKey}</strong>/][?param1=value[&amp;param2=value]]</h5>
-                <h5>Example:</h5>
-<pre><code>http://.../4989f8db-9187-49ca-86ff-e2cd53429cd4/35217a08-d9db-469f- aec0-7c88406a0c60/63598604-cb88-44f8-bc47-d207af3b7b4a?UMPRO=rtsp&amp;output=0</code></pre>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>
-                                <p>Parameter</p>
-                            </th>
-                            <th>
-                                <p>Type</p>
-                            </th>
-                            <th>
-                                <p>Description</p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <p><code>DomainGUID</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <p>The GUID of the customer domain in the Brightcove system.</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><code>ApplicationGUID</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <p>The Player GUID for the application in which to record metrics and enforce business rules</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><code>MediaItemGUID</code>
-                                </p>
-                                <p>or</p>
-                                <p><code>ForeignKey</code>
-                                </p>
-                            </td>
-                            <td>
-                                <p>String</p>
-                            </td>
-                            <td>
-                                <p>The Media Item GUID or Foreign Key for the base asset being requested (the Media Item GUID and Foreign Key parameters are interchangeable).</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <p>The syntax for OnceUX requests differs from general OnceVOD requests in two ways:</p>
+                <dl>
+                    <dt>Host</dt>
+                    <dd>For OnceUX requests, the <code>host</code> will be <code>onceux.unicornmedia.com</code> or a CNAME pointing to that host.</dd>
+                    <dt>/ad/vmap/</dt>
+                    <dd>These will preceed the <code>deliveryType</code> in the request URL</dd>
+                </dl>
+                <h4>URL Map</h4>
+<pre>http://host/ads/vmap/{deliveryType}/{RequestedFileType}/{domainGUID}/...</pre>
+                <h4>Example</h4>
+<pre>http://onceux.unicornmedia.com/ads/vmap/od/auto/4989f8db-9187-49ca-86ff-e2cd53429cd4/...</pre>
                 <h3>Dynamic Ad Parameters (DAP)</h3>
                 <p>DAP key/value pairs are preconfigured and mapped within the system. OnceUX will dynamically pull known client device information from the mapping in the runtime database and include that data as part of the tracking or targeting parameters expected by the Beaconing Server or Ad Server.</p>
                 <p>View the table in the <a href="#quickReference">Quick Reference Tables</a> section for all available Ad Parameters and their use. See
