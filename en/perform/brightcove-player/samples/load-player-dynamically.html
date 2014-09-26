@@ -7,13 +7,14 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
   <!-- change title to match the h1 heading -->
-  <title>Brightcove Player Sample: Play Video from iframe Parent</title>
+  <title>Brightcove Player Sample: Loading the Player Dynamically</title>
   <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/foundation.min.css" />
 	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/normalize.css" />
   <script src="//use.edgefonts.net/source-code-pro.js"></script>
   <link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
   <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css">
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/styles/github.min.css">
+  
   <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -25,7 +26,15 @@
 
 </script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/vendor/modernizr.js"></script>
-  </head>
+  
+  <!-- Page styles -->
+	<style id="pageStyles">
+    #video_1 {
+      width: 640px;
+      height: 360px;
+    }
+	</style>
+</head>
 
 <body>
     <!-- header navbar -->
@@ -41,14 +50,14 @@
         </div>
         <div id="main" class="large-10 small-12 columns">
       <div id="top" class="section">
-        <h1>Brightcove Player Sample: Play Video from iframe Parent</h1>
+        <h1>Brightcove Player Sample: Loading the Player Dynamically</h1>
         <p class="video-cloud-only BCL-aside">Note: the Brightcove player is currently in beta and requires some developer skills to implement. If you are interested in participating in the beta, please contact your account manager.</p>
-        <p>This topic shows you how to use a button on the parent page of an iframe player to play the video in the iframe player.</p>
+        <p>This topic describes how to load the Brightcove player dynamically, that is, on a user event and NOT in the startup HTML. In the working example here you can click the <strong>Add Player</strong> button to dynamically load the player and play a video.</p>
       </div>
-          
-      <div id="developmentsequence" class="section">
-        <h2 id="expanderHead"><span id="expanderSign">+</span>Development sequence</h2>
-        <div id="expanderContent" style="display:none">
+			
+		  <div id="developmentsequence" class="section">
+			  <h2 id="expanderHead"><span id="expanderSign">+</span>Development sequence</h2>
+        <div id="expanderContent" style="display:none">	
           <p>Here is the recommended development sequence:</p>
           <ol>
             <li>Use the embed_in_page player implementation to test the functionality of your player, plugin and CSS (if CSS is needed)</li>
@@ -76,59 +85,76 @@
           <p>Even if your final implementation does not use the iframe code, you can still use the embed_in_page code with a plugin for your JS and a separate file for your CSS. This encapsulates your logic so that you can easily use it in multiple players.</p>
         </div><!-- id="expanderContent" -->
 			</div>
-        
+			
       <div id="selectimplementation" class="section">
 				<h2>Select implementation</h2>
-				<p>In this case the point of the example is to interact with the iframe player, so an iframe player will be used.</p>
+				<p>In this sample, you will generate the embed_in_page code dynamically, given your account id and player id. Since the <code>videojs</code> object does not exist until the player script is added to the page and run, you will not be able to move the CSS and JS into a plugin. Without a plugin, the iframe implementation can not be used.</p>
 			</div>
           
       <div id="resources" class="section">
-        <h2><a name="resources"></a>API resources used</h2>
-        <h3>Brightcove Player API</h3>
-        <ul><li><code>play()</code> method</li></ul>
-        <h3>Player Management API</h3>
+        <h2>API resources used</h2>
+		  <p>The following sections detail resources used from various APIs.</p>
+        <h3>Player management API</h3>
         <ul><li>HTTP <code>POST</code> method with the endpoint <code>https://players.api.brightcove.com/v1/accounts/$ACCOUNT_ID/players</code> to create the player and its proper configuration</li></ul>
       </div>
+			
       <div id="player" class="section">
-        <h2><a name="player"></a>The player</h2>
-        <p>Click this button, which is part of the iframe's parent page, to see it initiate playback of the video in the iframe player.</p>
-          <p><button onclick="playVideo()" class="BCL-btn">Play Video</button></p>
-
-          <iframe src='//players.brightcove.net/3441935391001/ced36921-fd10-4944-bd78-1582084edd85_default/index.html' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
-      </div>
+        <h2>The player</h2>
+        <p>Select the <strong>Add Player</strong> button to dynamically load the player with its associated video.</p>
+        
+        <div class="player-block">
+            <div id="placeHolder" style="background-color:#64AAB2;width:640px;height:360px;text-align: center;">
+                <button onclick="addPlayer()">Add Player</button>
+            </div>
+        </div>
+		  
+      </div><!-- class="section" -->
+			
       <div id="code" class="section">
-        <h2><a name="code"></a>How it works</h2>
+        <h2>How it works</h2>
+		  <p>The following sections explain the player, JavaScript and CSS code used in the example.</p>
         <h3>The player code</h3>
-        <p>The player code is simply the iframe implementation displayed when the player is published. Also added to this code is an HTML button.</p>
-        <p><code data-gist-id="10292169" data-gist-hide-footer="true" data-gist-line="30-32"></code></p>
-        <p>This player was created using the following curl statement. The following configuration options are used:</p>
+        <p>The player code is simply the embed_in_page implementation displayed when the player is published.</p>
+        <p class="BCL-aside">Note: This code does not initially reside in the HTML page, but is generated dynamically when the user selects the <strong>Add Player</strong> button.</p>
+        <p><code data-gist-id="bca97cb5b55b2918911f" data-gist-hide-footer="true" data-gist-line="72-77"></code></p>
+        <p>This player was created using the curl statement statement below with the following configuration options:</p>
         <ul>
-            <li>The video to play is added in <code>sources</code>.</li>
-            <li>The location of the plugin's JavaScript code is added in <code>scripts</code>.</li>
-            <li>The location of the plugin's CSS is added in <code>stylesheets</code>.</li>
-            <li>The name of the plugin, defined in the plugin's Javascript, is added in <code>plugins</code>.</li>
+            <li>Lines 61-62: Define the video and its type in the <code>sources</code> array.</li>
         </ul>
-        <p><code data-gist-id="10292169" data-gist-hide-footer="true" data-gist-line="1-25"></code></p>
+        <p><code data-gist-id="bca97cb5b55b2918911f" data-gist-hide-footer="true" data-gist-line="51-68" data-gist-highlight-line="61-62"></code></p>
         <p></p>
-        <h3><a name="playerCode"></a>The JavaScript code</h3>
-        <p>The <strong>iframe player's parent</strong> page uses JavaScript's <code>postMessage()</code> method to send a message to the iframe. This is done by:</p>
+		 
+		<h3><a name="HTMLCode"></a>The HTML code</h3>
+        <p>Add the following HTML to your page code:</p>
+		  <ul>
+			  <li>Lines 19,21: Define the container where the player will by dynamically added.</li>
+			  <li>Line 20: Defines the button that when selected adds the player to the page.</li>
+		  </ul> 
+		<p><code data-gist-id="bca97cb5b55b2918911f" data-gist-hide-footer="true" data-gist-line="18-22"></code></p>
+		  
+        <h3><a name="JSCode"></a>The JavaScript code</h3>
+		  
+        <p>Define the video array, and load each successive video from the array when a video finishes playing.</p>
         <ol>
-            <li>Use the <code>document.querySelector</code> method to retrieve the iframe element.</li>
-            <li>Retrieve the Window object generated by an iframe using the iframe's <code>contentWindow</code> property.</li>
-            <li>On button click, <code>postMessage</code> is used to send a message to the iframe's Window object. The first argument is the data passed as part of the event. (In this case it is simply a string, but can be an object.) The second argument specifies the origin of the iframe. You can use the <code>*</code> wildcard to have the event sent to any content in the iframe, no matter where it came from,  but this is considered a poor security practice. Using <code>http://players.brightcove.net</code> as the argument means the event will only be sent to the iframe if the content originated from that URL.</li>
+          <li>Lines 26-31: Define the variables for the script. The <code>accountID</code> and <code>accountID</code> fields are used to dynamically create the player code.</li>
+          <li>Lines 33-43: Dynamically add the player code to your HTML page. The <code>video</code> tag is injected into the HTML code. The <code>script</code> tag is added to the page and executed using the <code>createElement()</code> and <code>appendChild()</code> methods.</li>
         </ol>
-        <p><code data-gist-id="10292169" data-gist-hide-footer="true" data-gist-line="38-43"></code></p>
-        <p>The <strong>plugin</strong> uses JavaScript to listen for the event, and when handled, play the video. This is done by:</p>
-        <ol>
-            <li>Listen for the event using <code>addEventListener()</code>. The <code>postMessage()</code> method dispatches an event of type <code>message</code> (the first argument). The defined event handler is <code>playVideo</code> (the second argument).</li>
-            <li>In the <code>playVideo()</code> event handler, an <code>if</code> statement is used to check the value of the data passed by  <code>postMessage()</code>, this case the string <code>playVideo</code>. This is not required in this simple example as no other events are sent to the iframe, but is considered a  good practice.</li>
-            <li>The player's <code>play()</code> method is called.</li>
-        </ol>
-        <p><code data-gist-id="10292169" data-gist-hide-footer="true" data-gist-line="48-56"></code></p>
-        <h3><a name="playerCode"></a>The stylesheet</h3>
-        <p>The stylesheet used by the player does one simple task, prevents the default play button from appearing over the video. Since a play button is created as part of the parent page, the default play button on the video is not needed, although it would not have changed any behaviors.</p>
-        <p><code data-gist-id="10292169" data-gist-hide-footer="true" data-gist-line="61-63"></code></p>
+		<p><code data-gist-id="bca97cb5b55b2918911f" data-gist-hide-footer="true" data-gist-line="25-44"></code></p>
+        
+		  <h3><a name="CSSCode"></a>The stylesheet</h3>
+        <p>This example uses CSS styles for the Brightcove player.</p>
+		  <ul>
+			  <li>Lines 10-13: Set the dimensions of the player.</li>
+		  </ul>
+        <p><code data-gist-id="bca97cb5b55b2918911f" data-gist-hide-footer="true" data-gist-line="9-14"></code></p>
+	  </div>
+          
+      <div id="useiframe" class="section">
+        <h2>Use iframe</h2>
+        <p>It is a best practice to use the iframe player implementation. If it is possible for this example, replace the embed_in_page implementation with the iframe implementation.</p>
+				<p>Since this example uses JavaScript code that manipulates elements on the page, an iframe implementation will not work.</p>
       </div>
+			
       <div class="section" id="BCLreferences">
         <h2>Related Topics</h2>
         <ul>
@@ -152,17 +178,30 @@
   <script src="/en/scripts/bcls-doc-site.js"></script>
   <script src="/en/scripts/bc-mapi.js"></script>
   <script src="/en/scripts/expander.js"></script>
-    <script>
-        $(document).foundation();
-    </script>
+  <script>
+      $(document).foundation();
+  </script>
   <script type="text/javascript">
     /******** Any scripts specific to page samples should go here *********/
-    var iframeTag = document.querySelector("iframe"),
-        win = iframeTag.contentWindow;
+    
+		var myPlayer,
+        playerHTML,
+        playerData = { 
+            "accountID" : "1752604059001",
+            "playerID" : "0a69b53e-92cf-40b5-b17e-3ff6b09a3f1b"
+        };
+    
+    function addPlayer (){
+        // dynamically build the player video element
+        playerHTML = "<video id=\"video_1\" data-account=\"" + playerData.accountID + "\" data-player=\"" + playerData.playerID + "\" data-embed=\"default\" class=\"video-js\" controls></video>";
+        // inject the player code into the DOM
+        document.getElementById("placeHolder").innerHTML = playerHTML;
 
-    function playVideo(){
-        win.postMessage("playVideo","http://players.brightcove.net");
-    }
+        // add and execute the player script tag
+        var s = document.createElement("script");
+        s.src = "//players.brightcove.net/" + playerData.accountID + "/" + playerData.playerID + "_default/index.js";
+        document.body.appendChild(s); 
+    } 
 
   </script>
     <div class="footer text-center"><a href="mailto:docs@brightcove.com">Questions or comments?</a></div>
