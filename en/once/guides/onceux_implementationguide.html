@@ -43,7 +43,7 @@
             </div>
             <div class="section" id="overview">
                 <h2>Overview</h2>
-                <p>This guide provides the necessary information to implement the Brightcove OnceUX ad service within your workflow to obtain a OnceVOD URL along with metadata to describe the ad load, including timing, beacons, and captions.. OnceUX is an add-on for OnceVOD, and this document assumes that you are already familiar with the contents of <a href="getting-started-once-vod.html">Getting Started with OnceVOD</a>.</p>
+                <p>This guide provides the necessary information to implement the Brightcove OnceUX ad service within your workflow to obtain a Once URL along with metadata to describe the ad load, including timing, beacons, and captions.. OnceUX is an add-on for OnceVOD, and this document assumes that you are already familiar with the contents of <a href="getting-started-once-vod.html">Getting Started with OnceVOD</a>.</p>
             </div>
             <div class="section" id="dependencies">
                 <h2>Dependencies</h2>
@@ -57,8 +57,8 @@
                 <h3>VMAP Ad Aggregation Method</h3>
                 <p>With this method, OnceUX retrieves a multiple ad playlist from values that are derived by summarizing or <em>aggregating</em> the ad viewing data based on your application (player, iPhone, etc.) from appropriate ad servers. This OnceUX URL template is pre-defined to elicit a VMAP 1.0 response providing control over ad inventory insertion where you don't control the player application.</p>
                     <p>You will create a OnceUX URL that sends a request to Brightcove servers for content. The data returned is a list of all the ads for that content viewing session normalized into VAST 3.0 and then embedded into a VMAP 1.0 XML object. This VMAP object contains a Brightcove Once XML object, which includes Brightcove Once data and a URL. See the <a href="#vmapResponse">sample response</a> example.</p>
-                <p><strong>NOTE:</strong> Be aware that the VAST 3.0 object for each creative in the VMAP object will be missing a download link because the URL provided in the Once XML object will incorporate the ad resources at the correct locations causing the video ad creative content URL to be unnecessary.</p>
-                <p>The greatest difference between these two methods is that, in addition to the Once URL, the Ad Aggregation method also provides metadata and a VMAP object containing the ad load for the entire asset. This gives you greater client side flexibility with advertising while still using Brightcove Once platform. For instance, you can decide to manage tracking client side or through Brightcove Services, include banners and click-throughs not supported by Brightcove, etc.</p>
+                <p><strong>NOTE:</strong> The VAST 3.0 object for each creative in the VMAP object excludes the download link as the URL provided in the Once XML object incorporates the ad resources at the correct locations.</p>
+                <p>The greatest difference between these two methods is that, in addition to the Once URL, the Ad Aggregation method also provides metadata and a VMAP object containing the ad load for the entire asset. This gives you greater client side flexibility with advertising while still using Brightcove Once platform. Using OnceUX gives you the ability to handle ad features normally unsupported by Once like banners, click-throughs, and VPAID.</p>
                     <p>Brightcove OnceUX utilizes a proprietary URL syntax based on OnceVOD technology. You configure it through a programmatic URL generation method customized for your specific application.</p>
             <div class="section" id="urlSegmentVariables">
                 <h2>Segment variables</h2>
@@ -159,33 +159,7 @@
                 </ul>
                 <p>By default, Brightcove fires linear ad video impression and tracking events to the ad server on behalf of the client/application. If the parameter is explicitly set, UM does not fire the impression or tracking event.</p>
 
-                <h4>Override <code>MediaItemGUID</code> with Foreign Key</h4>
-                <p><code>UMFKEY={URLEncodedForeignKey}</code>
-                </p>
-                <p>You are able to make requests utilizing the Foreign Key as a query string parameter rather than in the URL path. This function allows for the inclusion of characters that would otherwise be disallowed in the URL path, including unsafe characters.</p>
-                <p>Brightcove Client Support will provide a pseudo or 'static' Media Item GUID as a placeholder to fill its OnceUX URL path position. Then, if the <code>UMFKEY={URLEncodedForeignKey}</code> key-value pair is in the request query string, the Media Item GUID will be ignored.</p>
-                <h5>Example Key/Value pairs:</h5>
-                <p><code>ForeignKey= uma:video:movie.com:480337</code>
-                </p>
-                <h5>Example Static MediaItemGUID</h5>
-                <p><code>63598604-cb88-44f8-bc47-d207af3b7b4a</code>
-                </p>
-                <h5>Customer Created URL:</h5>
-<pre><code>http://onceux.brightcove.com/od/auto/m3u8/4989f8db-9187-49ca-86ff-e2cd53429c d4/35217a08-d9db-469f-aec0-7c88406a0c60/63598604-cb88-44f8-bc47-d207af3b7b4a/content.m3u8?cc=US&amp;state=Arizona&amp;UMFKEY=uma:video:movie.com:480337</code></pre>
-                <p class="text-warning">NOTE: The UMFKEY value must be URL encoded.</p>
-                <h4>Append Custom Parameters</h4>
-                <p><code>UMPTPARAM{Key}={Value}</code>
-                </p>
-                <p>This is used to pass key-value pairs into the ad server call when the value should not be URL decoded by the service. In contrast to <code>UMADPARAM</code>, this parameter lets you pass a string directly through the system without manipulation by Brightcove. For example, you have the ability to pass a string value of comma delimited key-value pairs that require URL Encoding.</p>
-                <h5>Example Key-Value pairs:</h5>
-                <p><code>Cust_params=Denver%Android_4_0%2tile%Video&amp;<strong>Video_param=26iu%3D%252F7646</strong></code>
-                </p>
-                <h5>URL Created by Customer:</h5>
-<pre><code>http://.../?UMPTPARAMCust_Params=Denver%Android_4_0%2tile%Video&amp;UMP TPARAMVideo_param=26iu%3D%252F7646</code></pre>
-                <p>The above example depicts the parameter variables in a URL with ad targeting. Through appending an OnceUX URL with the <code>UMPTPARAM</code> query string parameter, the encoded string value can be specified and passed through to the ad server without manipulation.</p>
-                <p>Below is a sample of the call that Brightcove will be expected to make to ad providers in order to retrieve an Ad asset. The response to the Video Ad will be in in the form of a VAST XML.</p>
-                <h5>URL Sent by UM to ad provider:</h5>
-<pre><code>http://adserver.adprovider.com?Cust_Params=Denver%Android_4_0%2tile%V ideo&amp;Video_param=26iu%3D%252F7646</code></pre>
+
                 <h4>Output</h4>
                 <p><code>output={integer}</code>
                 </p>
