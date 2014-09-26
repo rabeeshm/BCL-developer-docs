@@ -254,9 +254,9 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             if (section === "video-cloud") {
                 str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + section + "/index.html\">" + subsectionName + "</a></li>"
             } else if (section === "index") {
-                str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + subsection + "/index.html\">" + subsectionName + "</a></li>"
+                str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + subsection.toLowerCase() + "/index.html\">" + subsectionName + "</a></li>"
             } else {
-                str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + section + "/" + subsection + "/index.html\">" + subsectionName + "</a></li>"
+                str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + section.toLowerCase() + "/" + subsection.toLowerCase() + "/index.html\">" + subsectionName + "</a></li>"
             }
         }
         if (exists(sectionName)) {
@@ -631,11 +631,11 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     if (pathArray[3] === "index.html") {
                         // we're on the subsection landing page
                         subsection = "Guides";
-                        createLandingPageSections();
+                        // createLandingPageSections();
                     }
                 }
                 $navMenuRight.html(menuRightBase + onceSupportNav);
-                createNavigation();
+                // createNavigation();
                 break;
             case "perform": // in perform
                 product = "perform";
