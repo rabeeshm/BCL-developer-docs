@@ -531,6 +531,8 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
                     } else if (section === "player-management") {
                         section = "player-management-api";
+                    } else if (section === "pbi-api") {
+                        section = "pbi-api";
                     } else {
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
                     }
