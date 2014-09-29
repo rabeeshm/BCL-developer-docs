@@ -529,6 +529,8 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                         subsection = null;
                         section = "smart-player-api";
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
+                    } else if (section === "player-management") {
+                        section = "player-management-api";
                     } else {
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
                     }
