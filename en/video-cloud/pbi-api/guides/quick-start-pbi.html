@@ -45,11 +45,11 @@
           <p>In this quick start you will perform the following tasks:</p>
           <ul>
           	<li>Create a Node.js application to act as your OAuth security proxy. This proxy will use your access token to make calls to the needed APIs.</li>
-            <li>Created a video ID using the CMS API</li>
-            <li>Created a ingest request using the ID returned from the CMS API and a POST method call to the PBI API. </li>
-            <li>Verified the ingest request functioned correctly.</li>
+            <li>Create a video using the Content Management System (CMS) API and use the returned ID in the Pull-Based Ingest (PBI) API call.</li>
+            <li>Create an ingest request using the ID returned from the CMS API and an HTTP <code>POST</code> method using the PBI API. </li>
+            <li>Verify the ingest request functioned correctly.</li>
           </ul>
-          <p class="BCL-aside">For details on the API used in this document you can view the <a href="//docs.brightcove.com/en/video-cloud/pbi-api/guides/overview-pbi.html">Pull-Based Ingest API Overview</a> document and the <a href="//docs.playermanagementapi.apiary.io">Pull-Based Ingest API</a> reference.</p>
+          <p class="BCL-aside">For details on the API used in this document you can view the <a href="//docs.brightcove.com/en/video-cloud/pbi-api/guides/overview-pbi.html">Pull-Based Ingest API Overview</a> document and the <a href="//docs.brightcove.com/en/video-cloud/pbi-api/reference/versions/v1/index.html">Pull-Based Ingest API</a> reference.</p>
           <p class="text-warning">Note: The steps in the document involve curl and other command-line tools that are native to Mac and Linux systems, but not part of the Windows operating system. If you are on Windows, you can get these tools by installing <a href="//cygwin.com">cygwin</a>. During the install you will be prompted for packages to install. Open the <strong>Net</strong> package, then check the <strong>curl</strong> option and then finish the installation. Once you have done this you will be able to follow the Quick Start to Pull-Based Ingest successfully as written using the cygwin command line. Tools are available to run curl at the normal Windows command line, but not detailed in this document.</p>
 			</div>
       <div id="oauthproxy" class="section">
@@ -62,18 +62,30 @@
       </div>
 			<div id="obtaincredentials" class="section">
 				<h2>Obtain credentials</h2>
-				<p>To use the PBI API you will need proper credentials. You will use the credentials in this quick start in a form when submitting requests to APIs. To obtain proper credentials use your choice of these two options (Be sure to read the paragraph following the bullets to be sure you ask for the proper operations):</p>
+				<p>To use the PBI API you will need proper credentials. You will use the credentials in a form when submitting requests to APIs.</p> 
+				<ol start="3">
+					<li>To obtain proper credentials use your choice of these two options (Be sure to read the paragraph following the bullets to ensure you ask for the proper operations):</li>
+				</ol>
 				<ul>
 				    <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html">OAuth: Get Client Credentials Using CURL</a></li>
 				    <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">OAuth: Get Client Credentials Using Postman</a></li>
 				</ul>
-				<p>Whichever option you choose, you will need to ask for the correct permissions. In this quick start you will need both <strong>video</strong> and <strong>ingest-profile</strong> operations. The following can be used with curl or Postman to get the proper permissions:</p>
+				<p>Whichever option you choose, you will need to ask for the correct operation permissions. In this quick start you will need both <strong>video</strong> and <strong>ingest-profile</strong> operations. The following can be used with curl or Postman to get the proper permissions:</p>
 				<p><code data-gist-id="ff79f6ddb8cfce63b153" data-gist-hide-footer="true" data-gist-line="1-6"></code></p>
 			</div>
 			<div id="obtainvideoid" class="section">
 				<h2>Obtain video id</h2>
-				<p>Before you can create an ingest request you must create a place holder video information, which contains the master copy of the video, metadata, possible renditions and other information. To do this you will use the Content Management System (CMS) API. Of course, you will need correct permissions to the the API. By requesting the operations in the previous section, you do have the required permissions.</p>
-				<p>You will now use the proxy in conjunction with the <strong>tester.html</strong> page to retrieve create a video information placeholder and retrieve the ID for the video. Browse to <strong>tester.html</strong> and complete the form as follows:</p>
+				<p>Before you can create an ingest request you must first create a video object. This video object will eventually contain the master copy of the video, metadata, possible renditions and other information. To do this you will use the Content Management System (CMS) API. Of course, you will need correct permissions to use the API. By requesting the operations in the previous section, you do have the required permissions.</p>
+				<ol start="4">
+					<li>You will now use the proxy in conjunction with the <strong>tester.html</strong> page to create a video object and retrieve the ID for the video. Browse to <strong>tester.html</strong> and complete the form as follows:</li>
+				</ol>
+				<div class="BCL-aside">
+					<p>Note: When filling out the form:</p>
+					<ul>
+					    <li>Be sure the <strong>body contains no spaces or carriage returns</strong></li>
+					    <li>Realize the name you supply will be the video name you see in Video Cloud Studio</li>
+					</ul>
+				</div>
 				<table>
 					<tr>
 						<th>Form Field</th>
@@ -93,19 +105,28 @@
 					</tr>
 					<tr>
 						<td>Call body</td>
-						<td>{"name":"**YOUR_VIDEO_NAME**"}</td>
+						<td><strong>{"name":"**YOUR_VIDEO_NAME**"}</strong></td>
 					</tr>
 					<tr>
 						<td>Full request URL for the API call</td>
-						<td><strong>https://edge.api.brightcove.com/cms/v1/accounts/**YOUR_ACCOUNT_ID**/videos</strong></td>
-					</tr>
+						<td><strong>https://cms.api.brightcove.com/v1beta1/accounts/**YOUR_ACCOUNT_ID**/videos</strong></td>
+					</tr>         
 				</table>
 				<p>After you click the <strong>Submit</strong> button, the text area following the button will be populated with a JSON object, as shown in the following screenshot. Copy the ID returned and proceed to the next section.</p>
-				<p><img src="/en/video-cloud/pbi-api/guides/assets/quick-start-pbi-pbi-form.png"></p>
+				<p><img src="/en/video-cloud/pbi-api/guides/assets/quick-start-pbi-cms-form.png"></p>
 			</div>
-			<div id="change-to-section-name" class="section">
+			<div id="createingestrequest" class="section">
 				<h2>Create ingest request</h2>
-				<p>Again you will use the proxy in conjunction with the <strong>tester.html</strong> page. This time you will use the ID just returned to create the ingest request. Browse to <strong>tester.html</strong> and complete the form as follows:</p>
+				<ol start="5">
+					<li>Create the actual ingest request by using again the OAuth proxy in conjunction with the <strong>tester.html</strong> page. This time you will use the ID just returned to create the ingest request. Browse to <strong>tester.html</strong> and complete the form as follows:</li>
+				</ol>
+				<div class="BCL-aside">
+					<p>Note: When filling out the form:</p>
+						<ul>
+						    <li>Be sure the <strong>body contains no spaces or carriage returns</strong></li>
+						    <li>The profile varies based upon the renditions you wish created. See the <a href="//docs.brightcove.com/en/video-cloud/pbi-api/guides/standard-profiles.html">Standard Ingest Profiles</a> document for details.</li>
+						</ul>
+				</div>
 				<table>
 					<tr>
 						<th>Form Field</th>
@@ -135,9 +156,14 @@
 				<p>After you click the <strong>Submit</strong> button, the text area following the button will be populated with a JSON object, as shown in the following screenshot. The ID returned uniquely identifies your ingest request.</p>
 				<p><img src="/en/video-cloud/pbi-api/guides/assets/quick-start-pbi-pbi-form.png"></p>
 			</div>
-			<div id="change-to-section-name" class="section">
+			<div id="seerequestresults" class="section">
 				<h2>See request results</h2>
-				<p></p>
+				<ol start="6">
+					<li>See the results of the ingest request by going to Video Cloud Studio, choose the Media module, then double-click the video you just created. Select the <strong>Video Files</strong> tab, and in the <strong>Renditions List</strong> you will see the renditions that correspond to the profile you selected.</li>
+				</ol>
+				<p><img src="/en/video-cloud/pbi-api/guides/assets/studio-showing-renditions.png"></p>
+				<p class="BCL-aside">Note: It is possible not all renditions will be created as your master may not be of high enough quality to produce all intended renditions.</p>
+				<p>Congratulations, in this quick start you have completed the steps necessary to create an ingest request and have seen the renditions of your master video have been created.</p>
 			</div>
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
