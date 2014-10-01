@@ -63,7 +63,7 @@
 
                 <h3>URL Templates</h3>
                 <p>Brightcove OnceUX utilizes a proprietary URL syntax based on OnceVOD technology, allowing for URL creation to be very similar in function to standard Once URLs. The only differences in URL creation for OnceUX are an updated host name and the inclusion of two additional variables before the typical Once DeliveryType and RequestedFileType variables, covered below. For additional explanation URL creation, please see <a href="//docs.brightcove.com/en/once/guides/getting-started-once.html#onceURLcreation">Getting Started with Once: Once URL Creation</a>.</p>
-                <h3>Serving Content Variables</h3>
+                <h3 id="servingContentVariables">Serving Content Variables</h3>
                 <table>
                     <thead>
                         <tr>
@@ -87,7 +87,7 @@
             </div>
             <div class="section" id="vmapAdAggregation">
                 <h2>VMAP Ad Aggregation Method</h2>
-                <p>The serving content variables for OnceUX utilize the service's Ad Aggregation method. This method retrieves a multiple ad playlist from values that are derived by summarizing or <em>aggregating</em> the ad viewing data based on your applicationguid and ad server(s) configured. When receiving the OnceUX response, this method provides metadata and a VMAP object containing the ad load for the entire asset's viewing session that has been normalized into VAST 3.0 and then embedded into a VMAP 1.0 XML object. This VMAP response gives you the ability to handle ad features relating to user experience and additional creative types like banners, hiding player controls, click-throughs, and VPAID advertisements. This VMAP object also contains a Brightcove Once XML object, which includes Brightcove Once data and an ad inserted Once URL to be used for playback. See the <a href="#fullVMAPexample">VMAP sample response example</a> for more information.</p>
+                <p>The <a href="#servingContentVariables">serving content variables</a> for OnceUX utilize the service's Ad Aggregation method. This method retrieves an ad playlist from values that are derived by summarizing or <em>aggregating</em> the ad viewing data based on your applicationguid and ad server(s) configured. When receiving the OnceUX response, this method provides metadata and a VMAP object containing the ad load for the entire asset's viewing session that has been normalized into VAST 3.0 and then embedded into a VMAP 1.0 XML object. This VMAP response gives you the ability to handle client-side ad features relating to user experience (ad creative or ad pod countdowns, hiding player controls), beaconing, and additional creative types (banners, click-throughs, and VPAID advertisements). This VMAP object also contains a Brightcove Once XML object, which includes Brightcove Once data and an ad inserted Once URL to be used for playback. See the <a href="#fullVMAPexample">VMAP sample response example</a> for more information.</p>
             </div>
             <div class="section" id="DAP">
                 <h2>Dynamic Ad Parameters (DAP)</h2>
@@ -130,7 +130,7 @@
 
             <div class="section" id="examples">
                 <h2>VMAP Examples &amp; Fields</h2>
-                <p>This section covers the notable fields in VMAP responses from OnceUX. These examples are broken out into:</p>
+                <p>This section covers the notable fields in VMAP responses in regard to OnceUX. These examples are broken out into:</p>
                 <ul>
                     <li><a href="#onceXMLobjectExample">The Brightcove Once XML object</a>
                     </li>
@@ -153,17 +153,100 @@ http://api206-phx.unicornmedia.com/tt/ab1dbc9b-9d90-4edb-b4ab-769e0049209b/0e627
             ]]&gt;
         &lt;/uo:timedTextURL&gt;
 &lt;/vmap:Extensions&gt;</code></pre>
-                <h4>Field Explanation</h4>
+                <h4>Extensions Node Explanation</h4>
                 <table>
                     <thead>
                         <tr>
-                            <th>Extensions</th>
                             <th>Node</th>
-                            <th>Details</th>
+                            <th>Description</th>
                         </tr>
                     </thead>
                     <tbody>
-
+                        <tr>
+                            <td>uo:unicornOnce</td>
+                            <td>Contains information on the video content.</td>
+                        </tr>
+                        <tr>
+                            <td>uo:contentImpressions</td>
+                            <td>Populated for ad requests that require a content start beacon.</td>
+                        </tr>
+                        <tr>
+                            <td>uo:requestParameters</td>
+                            <td>Break out of ad targeting key values sent in the ad request by Once.</td>
+                        </tr>
+                        <tr>
+                            <td>uo:timeTextURL</td>
+                            <td>Information around the timedtext caption file.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h4>uo:unicornOnce Node Explanation</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Node</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ttl</td>
+                            <td>Time to live value in seconds for the ads inserted into this particular request. If the request is made outside of this time, no ads will be inserted. Best practices recommendation is to request the top level OnceUX URL if a user waits past the ttl to begin playback.</td>
+                        </tr>
+                        <tr>
+                            <td>contenturi</td>
+                            <td>Once URL video response to be played back to the end user. Contains dynamically inserted advertisements in the requested/determined format following standard Once behavior.</td>
+                        </tr>
+                        <tr>
+                            <td>contentlength</td>
+                            <td>The duration in seconds of the non-monetized base asset.</td>
+                        </tr>
+                        <tr>
+                            <td>payloadlength</td>
+                            <td>The duration in seconds of the monetized base asset. <strong>NOTE:</strong> VPAID Duration is not included in this value.</td>
+                        </tr>
+                        <tr>
+                            <td>contextid</td>
+                            <td>Unique value for the particular returned content and ad payload.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h4>uo:contentImpressions Node Explanation</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Node</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>url</td>
+                            <td>URL to be fired by player at content start if server side tracking has been disabled via umtp=0. <strong>NOTE:</strong> SmartXML is currently the only ad response where this is supported.</td>
+                        </tr>
+                        <tr>
+                            <td>time</td>
+                            <td>Time in seconds when the contentImpression URL is to be fired.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h4>uo:requestParameters Node Explanation</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Node</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>key</td>
+                            <td>Key of key value pair in call to ad provider</td>
+                        </tr>
+                        <tr>
+                            <td>value</td>
+                            <td>Value of key value pair in call to ad provider</td>
+                        </tr>
                     </tbody>
                 </table>
                 <h3 id="adbreakObjectSample">Sample AdBreak Object</h3>
