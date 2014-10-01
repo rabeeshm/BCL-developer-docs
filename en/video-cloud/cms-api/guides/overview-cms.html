@@ -96,69 +96,488 @@
 			    		</tr>
 			    		<tr>
 			    			<td><a href="#sourcesEndpoint">/videos/{video_id}/sources</a></td>
-			    			<td>Player-specific metadata for this video's sources (renditions)</td>
+			    			<td>Metadata for this video's sources (renditions)</td>
 			    		</tr>
 			    		<tr>
 			    			<td><a href="#imagesEndpoint">/videos/{video_id}/images</a></td>
-			    			<td></td>
+			    			<td>Metadata for all of this video's images: poster, thumbnail, logo overlay</td>
 			    		</tr>
 			    		<tr>
 			    			<td><a href="#videoRefidEndpoint">/videos/ref:{video_reference_id}</a></td>
-			    			<td></td>
+			    			<td>Metadata and asset information about the video with the given reference ID</td>
 			    		</tr>
 			    		<tr>
 			    			<td><a href="videoRefidSourcesEndpoint">/videos/ref:{video_reference_id}/sources</a></td>
-			    			<td></td>
+			    			<td>Metadata for this video's sources (renditions)</td>
 			    		</tr>
 			    		<tr>
 			    			<td><a href="#videoRefidImagesEndpoint">/videos/ref:{video_reference_id}/images</a></td>
-			    			<td></td>
+			    			<td>Metadata for all of this this video's images: poster, thumbnail, logo overlay</td>
+			    		</tr>
+			    	</tbody>
+			    </table>
+			</div>
+			<div class="section" id="parameters">
+			    <p>Note that all parameters are <strong>optional</strong>.</p>
+			    <h2>Query parameters</h2>
+			    <table>
+			    	<thead>
+			    		<tr>
+			    			<th>Parameter</th>
+			    			<th>Description</th>
+			    		</tr>
+			    	</thead>
+			    	<tbody>
+			    		<tr>
+			    			<td><code>q</code></td>
+			    			<td>Query string for searches - see <a href="#search">Search syntax</a> for details</td>
+			    		</tr>
+			    		<tr>
+			    			<td><code>limit</code></td>
+			    			<td>Number of videos to return - must be an integer between 1 and 100. <strong>Default: 20</strong></td>
+			    		</tr>
+			    		<tr>
+			    			<td><code>offset</code></td>
+			    			<td>Number of videos to skip (for paging results). Must be a positive integer. <strong>Default: 0</strong></td>
+			    		</tr>
+			    		<tr>
+			    			<td><code>sort</code></td>
+			    			<td>A string that specifies the field to sort by. Start with <code>-</code> to sort descending. If a value for <code>q</code> is provided, then the default sort is by "score" (relevance of the search results to the original query). If no value for <code>q</code> is provided, then the default sort is by <code>updated_at</code> descending.</td>
 			    		</tr>
 			    	</tbody>
 			    </table>
 			</div>
 			<div class="section" id="search">
 			    <h2>Search Syntax</h2>
-			    <p></p>
+			    <p>Search terms are specified using the <code>q</code> parameter.
+				<pre><code>q={search terms}</code></pre>
+			    <p>The query string you provide should be a url encoded list of terms separated by a space (+ after encoding).</p>
+			    <h3>Basic search</h3>
 			</div>
 			<div class="section" id="paging">
 			    <h2>Paging</h2>
-			    <p></p>
+			    <p>If provide no qualifiers on the search term:</p>
+			    <pre><code>q=foo</code></pre>
+			    <p>This will execute a text search against the following fields: <code>name</code>, <code>description</code>, <code>long_description</code>, <code>keywords</code>, <code>reference_id</code>, and all custom fields.</p>
+			    <h3>Limit search to a specific property</h3>
+			    <p>You can search against values for a specific field:</p>
+			    <pre><code>q=name:foo</code></pre>
+			    <p>This will search for videos with the term "foo" in the <code>name</code> field of the video. The supported fields are:</p>
+			    <table>
+					<thead>
+						<tr>
+							<th>Field</th>
+							<th>Legal values</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>name</td>
+							<td>strings or quoted strings</td>
+						</tr>
+						<tr>
+							<td>text</td>
+							<td>strings or quoted strings (name, description, long_description)</td>
+						</tr>
+						<tr>
+							<td>keywords</td>
+							<td>strings or quoted strings</td>
+						</tr>
+						<tr>
+							<td>reference_id</td>
+							<td>string or quoted string</td>
+						</tr>
+						<tr>
+							<td>state</td>
+							<td>ACTIVE, INACTIVE, DELETED, PENDING</td>
+						</tr>
+						<tr>
+							<td>updated_at</td>
+							<td>date range</td>
+						</tr>
+						<tr>
+							<td>created_at</td>
+							<td>date range</td>
+						</tr>
+						<tr>
+							<td>published_at</td>
+							<td>date range</td>
+						</tr>
+						<tr>
+							<td>complete</td>
+							<td>true or false</td>
+						</tr>
+					</tbody>
+				</table>
+				<p>The fields that take a string result in a text search against that field.</p>
+				<h3>Required and excluded terms</h3>
+				<p>You can mark a term as required (returned videos MUST match) or prohibited (returned videos must NOT match). This is controlled with a <code>+</code> or <code>-</code> sign immediately preceding the term.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>example</th>
+							<th>urlencoded</th>
+							<th>meaning</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>+foo</td>
+							<td>%2Bfoo</td>
+							<td>videos must include the term 'foo' in the name, description, or long_description</td>
+						</tr>
+						<tr>
+							<td>-foo</td>
+							<td>%2D</td>
+							<td>videos must NOT include the term 'foo' in the name, description, or long_description</td>
+						</tr>
+						<tr>
+							<td>+name:foo</td>
+							<td>%2Bfoo</td>
+							<td>videos must include the term 'foo' in the name</td>
+						</tr>
+						<tr>
+							<td>-name:foo</td>
+							<td>%2D</td>
+							<td>videos must NOT include the term 'foo' in the name</td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>Quoted search terms</h3>
+				<p>By default, a search term could match similar words. If you want to do an exact match, or match multiple words, just wrap the term in quotes:</p>
+<pre><code>"foo"
+"foo bar"</code></pre>
+				<p>This also works when searching against a specific field:</p>
+<pre><code>name:"foo"
+name:"foo bar"</code></pre>
+				<h3>Custom fields</h3>
+				<p>You may search on your custom fields similarly. Custom fields are treated as strings:</p>
+<pre><code>my_field:foo
+my_field:"foo"
+</code></pre>
+				<h3>Date ranges</h3>
+				<p>If the field you are searching on is a date, then you can specify a range of dates to search for:</p>
+<pre><code>updated_at:2012-08-01T00:00:00Z..2012-10-08T00:00:00Z
+</code></pre>
+				<p>This will search for all videos with an <code>updated_at</code> value between Aug 1, 2012 and October 8, 2012.</p>
+				<h4>Supported date formats</h4>
+				<table>
+					<thead>
+						<tr>
+							<th>format</th>
+							<th>meaning</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>2012-08-01T00:00:00Z</td>
+							<td>This represents a time in UTC.</td>
+						</tr>
+						<tr>
+							<td>2012-08-01</td>
+							<td>This represents a midnight on a day in UTC. The example is equivalent to 2012-08-01T00:00:00Z</td>
+						</tr>
+						<tr>
+							<td>-1d</td>
+							<td>The current time minus 1 day. (see <a href="#relativeDates">below</a>)</td>
+						</tr>
+						<tr>
+							<td>+1d</td>
+							<td>The current time plus 1 day. (see <a href="#relativeDates">below</a>)</td>
+						</tr>
+					</tbody>
+				</table>
+				<h5 id="relativeDates">Relative dates</h5>
+				<p>For relative dates we support a direction (+ or -) followed by a number, followed by a duration. Legal durations are: minutes, hours, days</p>
+				<h6>Examples</h6>
+				<ul>
+					<li>-1day</li>
+					<li>-2days</li>
+					<li>+4hours</li>
+					<li>-60minutes</li>
+					<li>-1d</li>
+					<li>-2d</li>
+					<li>+4h</li>
+					<li>-60m</li>
+				</ul>
+				<h5>Open ended ranges</h5>
+				<p>If you want to match all dates until a given time, or match all dates since a given time, leave off one end of the range. For example:</p>
+				<h6>Search for all videos modified in the last 2 days</h6>
+				<pre><code>q=updated_at:-2days..</code></pre>
+				<h6>Search for all videos modified before August 11, 2013:</h6>
+				<pre><code>q=updated_at:..2013-08-11T00:00:00Z</code></pre>
+				<h3>Combining search criteria</h3>
+				<p>You can combine criteria for complex searches:</p>
+<pre><code>q=%2Bname:gossip+%2Bupdated_at:2010-08-01T00:00:00Z..2010-10-08T00:00:00Z&sort=updated_at</code></pre>
 			</div>
 			<div class="section" id="videosEndpoint">
 			    <h2>/videos endpoint</h2>
 			    <h3>Example<h3>
 <pre><code>https://cms.api.brightcove.com/v1beta1/accounts/20318290001/videos</code></pre>
+				<h3>Response</h3>
+<pre><code>[ {
+  "id" : "3790053031001",
+  "account_id" : "20318290001",
+  "complete" : true,
+  "created_at" : "2014-09-17T15:56:59.564Z",
+  "cue_points" : [ ],
+  "custom_fields" : {
+    "topic" : "Gallery - Customizing a Site",
+    "inproduct" : "Gallery"
+  },
+  "description" : "Leanr how to create a lead form to capture viewer information.",
+  "duration" : 189400,
+  "geo" : null,
+  "long_description" : null,
+  "name" : "Creating a Lead Form for a Gallery Site",
+  "reference_id" : null,
+  "schedule" : null,
+  "sharing" : null,
+  "state" : "ACTIVE",
+  "tags" : [ "drupal" ],
+  "updated_at" : "2014-09-17T17:11:15.346Z"
+}, {
+  "id" : "2900459533001",
+  "account_id" : "20318290001",
+  "complete" : true,
+  "created_at" : "2013-12-06T16:27:12.266Z",
+  "cue_points" : [ ],
+  "custom_fields" : {
+    "topic" : "VC - Developing with VC"
+  }, ...
+ ]</code></pre>
 			</div>
 			<div class="section" id="videoEndpoint">
 			    <h2>/videos/{video_id} endpoint</h2>
 			    <h3>Example<h3>
 <pre><code>https://cms.api.brightcove.com/v1beta1/accounts/20318290001/videos/610747847001</code></pre>
+				<h3>Response</h3>
+<pre><code>{
+  "id" : "610747847001",
+  "account_id" : "20318290001",
+  "complete" : true,
+  "created_at" : "2010-09-17T21:35:49.385Z",
+  "cue_points" : [ ],
+  "custom_fields" : {
+    "inproduct" : "Video Cloud",
+    "topic" : "VC - General Information"
+  },
+  "description" : "Learn about Brightcove's Smart players that will allow your videos to be viewed on desktop and mobile devices",
+  "duration" : 136627,
+  "geo" : null,
+  "long_description" : null,
+  "name" : "HTML5 Smart Players",
+  "reference_id" : "610747847001",
+  "schedule" : null,
+  "sharing" : {
+    "by_external_acct" : true,
+    "by_id" : "301925175",
+    "source_id" : "407591857001",
+    "to_external_acct" : false,
+    "by_reference" : false
+  },
+  "state" : "INACTIVE",
+  "tags" : [ "basics", "studio", "3play_processed", "players", "drupal", "express paid" ],
+  "updated_at" : "2013-12-12T14:44:26.517Z"
+}</code></pre>
 			</div>
 			<div class="section" id="sourcesEndpoint">
 			    <h2>/videos/{video_id}/sources endpoint</h2>
 			    <h3>Example<h3>
 <pre><code>https://cms.api.brightcove.com/v1beta1/accounts/20318290001/videos/2900459533001/sources</code></pre>
+				<h3>Response</h3>
+
+<pre><code>[ {
+  "id" : "2900506580001",
+  "app_name" : "rtmp://cp150446.edgefcs.net/ondemand",
+  "stream_name" : "mp4:20318290001/20318290001_2900506580001_video-player-module-demo.mp4?__nn__=1497926354001&slist=20318290001/&auth=daEbUb_a_a.b_a2bQd0cpcrdXa9a2c7bXdl-buleeG-bWG-qmAAuptx_yEyo_CEAA_GvB&aifp=bcosuds",
+  "codec" : "H264",
+  "container" : "MP4",
+  "encoding_rate" : 1063687,
+  "duration" : 700639,
+  "height" : 720,
+  "width" : 1280,
+  "size" : 90933140,
+  "uploaded_at" : "2013-12-06T16:38:13.683Z"
+}, {
+  "id" : "2900506580001",
+  "src" : "http://uds.ak.o.brightcove.com/20318290001/20318290001_2900506580001_video-player-module-demo.mp4",
+  "codec" : "H264",
+  "container" : "MP4",
+  "encoding_rate" : 1063687,
+  "duration" : 700639,
+  "height" : 720,
+  "width" : 1280,
+  "size" : 90933140,
+  "uploaded_at" : "2013-12-06T16:38:13.683Z"
+}, {
+  "id" : "2900507785001",
+  "app_name" : "rtmp://cp150446.edgefcs.net/ondemand",
+  "stream_name" : "mp4:20318290001/20318290001_2900507785001_video-player-module-demo.mp4?__nn__=1497926354001&slist=20318290001/&auth=daEbUb_a_a.b_a2bQd0cpcrdXa9a2c7bXdl-buleeG-bWG-qmAAuptx_yEyo_CEAA_GvB&aifp=bcosuds",
+  "codec" : "H264",
+  "container" : "MP4",
+  "encoding_rate" : 676687,
+  "duration" : 700639,
+  "height" : 720,
+  "width" : 1280,
+  "size" : 59849740,
+  "uploaded_at" : "2013-12-06T16:37:35.397Z"
+}, {
+  "id" : "2900507785001",
+  "src" : "http://uds.ak.o.brightcove.com/20318290001/20318290001_2900507785001_video-player-module-demo.mp4",
+  "codec" : "H264",
+  "container" : "MP4",
+  "encoding_rate" : 676687,
+  "duration" : 700639,
+  "height" : 720,
+  "width" : 1280,
+  "size" : 59849740,
+  "uploaded_at" : "2013-12-06T16:37:35.397Z"
+}, {
+  "src" : "http://c.brightcove.com/services/mobile/streaming/index/master.m3u8?videoId=2900459533001&pubId=20318290001",
+  "container" : "M2TS",
+  "codec" : "H264"
+} ]</code></pre>
 			</div>
 			<div class="section" id="imagesEndpoint">
 			    <h2>/videos/{video_id}/images endpoint</h2>
 			    <h3>Example<h3>
 <pre><code>https://cms.api.brightcove.com/v1beta1/accounts/20318290001/videos/2900459533001/images</code></pre>
+				<h3>Response</h3>
+<pre><code>{
+  "thumbnail" : {
+    "id" : "2900507794001",
+    "src" : "http://brightcove04.o.brightcove.com/20318290001/20318290001_2900507794001_th-52a1fae0e4b00f8cb61e1f72-1592194025001.jpg?pubId=20318290001"
+  },
+  "poster" : {
+    "id" : "2900507792001",
+    "src" : "http://brightcove04.o.brightcove.com/20318290001/20318290001_2900507792001_vs-52a1fae0e4b00f8cb61e1f72-1592194025001.jpg?pubId=20318290001"
+  }
+}</code></pre>
 			</div>
 			<div class="section" id="videoRefidEndpoint">
 			    <h2>/videos/ref:{video_reference_id} endpoint</h2>
 			    <h3>Example<h3>
 <pre><code>https://cms.api.brightcove.com/v1beta1/accounts/20318290001/videos/ref:VOD%20Analytics%206</code></pre>
+				<h3>Response</h3>
+<pre><code></code></pre>
 			</div>
 			<div class="section" id="videoRefidSourcesEndpoint">
 			    <h2>/videos/ref:{video_reference_id}/sources endpoint</h2>
 			    <h3>Example<h3>
 <pre><code>https://cms.api.brightcove.com/v1beta1/accounts/20318290001/videos/ref:VOD%20Analytics%206/sources</code></pre>
+				<h3>Response</h3>
+<pre><code></code></pre>
 			</div>
 			<div class="section" id="videoRefidImagesEndpoint">
 			    <h2>/videos/ref:{video_reference_id}/sources endpoint</h2>
 			    <h3>Example<h3>
 <pre><code>https://cms.api.brightcove.com/v1beta1/accounts/20318290001/videos/ref:VOD%20Analytics%206/images</code></pre>
+				<h3>Response</h3>
+<pre><code></code></pre>
+			</div>
+			<div id="settingvalues" class="section">
+				<h2>Setting values</h2>
+				<p>When you use <code>POST</code> to create a video you can set some property fields during the <code>POST</code> operation. Not all fields can be set during the <code>POST</code> though, for example <code>cue_points</code> and <code>sharing</code>. The following
+					table lists those fields for which you can provide values when the video is created.</p>
+				<table>
+					<tr>
+						<th>Field</th>
+						<th>Type</th>
+						<th>Required</th>
+						<th>Comments</th>
+					</tr>
+					<tr>
+						<td>account_id</td>
+						<td>String</td>
+						<td>no</td>
+						<td>Must match account ID in the URL</td>
+					</tr>
+					<tr>
+						<td>name</td>
+						<td>String</td>
+						<td>yes</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td>reference_id</td>
+						<td>String</td>
+						<td>no</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td>description</td>
+						<td>String</td>
+						<td>no</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td>long_description</td>
+						<td>String</td>
+						<td>no</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td>state</td>
+						<td>String</td>
+						<td>no</td>
+						<td>Defaults to "ACTIVE" if not set explicitly</td>
+					</tr>
+					<tr>
+						<td>keywords</td>
+						<td>Array of Strings</td>
+						<td>no</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td>custom_fields</td>
+						<td>Map of field-value pairs</td>
+						<td>no</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td>geo</td>
+						<td>Map of geo properties</td>
+						<td>no</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td>&nbsp;&nbsp;&nbsp;geo.countries</td>
+						<td>Array of country code Strings</td>
+						<td>no</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td>&nbsp;&nbsp;&nbsp;geo.exclude_countries</td>
+						<td>Boolean</td>
+						<td>no</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td>&nbsp;&nbsp;&nbsp;geo.restricted</td>
+						<td>Boolean</td>
+						<td>no</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td>schedule</td>
+						<td>Map of scheduling properties</td>
+						<td>no</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td>&nbsp;&nbsp;&nbsp;schedule.ends_at</td>
+						<td>String in ISO-8601 date format</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td>&nbsp;&nbsp;&nbsp;schedule.starts_at</td>
+						<td>String in ISO-8601 date format</td>
+						<td>&nbsp;</td>
+						<td></td>
+					</tr>
+				</table>
 			</div>
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
