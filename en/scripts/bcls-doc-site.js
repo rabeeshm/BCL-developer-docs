@@ -364,6 +364,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             itemTemplate = Handlebars.compile(landingPageBlockTemplate),
             blockEndTemplate = landingPageBlockTemplateEnd,
             str = "";
+
         if (exists(sections)) {
             data = data.items;
             max = data.length;
