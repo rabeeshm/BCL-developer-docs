@@ -532,9 +532,9 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
                     } else if (section === "player-management") {
                         section = "player-management-api";
-                    } else if (section === "pbi-api") {
-                        section = "pbi-api";
-                        sectionName = "Pull-Based Ingest API";
+                    } else if (section === "di-api") {
+                        section = "di-api";
+                        sectionName = "Dynamic Ingest API";
                     } else if (section === "cms-api") {
                         section = "cms-api";
                         sectionName = "CMS API";
