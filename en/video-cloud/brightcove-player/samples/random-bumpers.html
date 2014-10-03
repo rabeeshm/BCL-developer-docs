@@ -26,7 +26,15 @@
 
 </script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/vendor/modernizr.js"></script>
-  </head>
+  
+  <!-- Page styles -->
+	<style id="pageStyles">
+    #video_1 {
+      width: 640px;
+      height: 360px;
+    }
+	</style>
+</head>
 
 <body>
     <!-- header navbar -->
@@ -90,13 +98,10 @@
         <ul>
           <li><code>src()</code></li>
           <li><code>play()</code></li>
-          <li><code>duration()</code></li>
-          <li><code>currentTime()</code></li>
         </ul>
         <h3>Brightcove player API events</h3>
         <ul>
           <li><code>ended</code></li>
-          <li><code>timeupdate</code></li>
         </ul>
         <h3>Player management API</h3>
         <ul><li>HTTP <code>POST</code> method with the endpoint <code>https://players.api.brightcove.com/v1/accounts/$ACCOUNT_ID/players</code> to create the player and its proper configuration</li></ul>
@@ -104,23 +109,20 @@
 			
       <div id="player" class="section">
         <h2>The player</h2>
-        <p>Start playing the video below. When the video finishes playing, the next video in the array is loaded and begins to play. The video name and the calculated time remaining are displayed.</p>
+        <p>In this sample, randomly selected bumpers are played before each video from a playlist defined as an internal array.</p>
         
         <div class="player-block">
             <video id="video_1"
                 data-account="1752604059001"
-                data-player="9e4a8265-12c0-4065-896f-bb872506518a"
+                data-player="48acc04c-b71e-41d7-b8df-9f17d451cdc6"
                 data-embed="default"
                 class="video-js" controls></video>
 
-            <br/>
-            <p id="videoName"></p>
-            <p id="timeRemaining"></p>
         </div>
 
-        <script src="//players.brightcove.net/1752604059001/9e4a8265-12c0-4065-896f-bb872506518a_default/index.js"></script>
+        <script src="//players.brightcove.net/1752604059001/48acc04c-b71e-41d7-b8df-9f17d451cdc6_default/index.js"></script>
 		  
-      </div><!-- class="section" -->
+      </div><!-- id="player" -->
 			
       <div id="code" class="section">
         <h2>How it works</h2>
@@ -135,14 +137,14 @@
         <p><code data-gist-id="d53ac026726646763b07" data-gist-hide-footer="true" data-gist-line="142-159" data-gist-highlight-line="152-153"></code></p>
         <p></p>
 		 
-		<h3><a name="HTMLCode"></a>The HTML code</h3>
-        <p>Add the following HTML to your page code:</p>
-		  <ul>
-			  <li>Lines 31-32: Define the display area for the video name and calculated time remaining. </li>
-			  <li>Line 37: Links to a script which extracts the hours, minutes and seconds from seconds. </li>
-		  </ul> 
-		<p class="BCL-aside">Note: Line 35: Make sure to move the player <code>&lt;script&gt;</code> tag below the page HTML code. The Brightcove player script must be placed after your page code. It is common practice to put your scripts just before the closing <code>&lt;/body&gt;</code> tag.</p>
-		<p><code data-gist-id="d53ac026726646763b07" data-gist-hide-footer="true" data-gist-line="24-37"></code></p>
+        <h3><a name="HTMLCode"></a>The HTML code</h3>
+            <p>Add the following HTML to your page code:</p>
+          <ul>
+            <li>Lines 31-32: Define the display area for the video name and calculated time remaining. </li>
+            <li>Line 37: Links to a script which extracts the hours, minutes and seconds from seconds. </li>
+          </ul> 
+        <p class="BCL-aside">Note: Line 35: Make sure to move the player <code>&lt;script&gt;</code> tag below the page HTML code. The Brightcove player script must be placed after your page code. It is common practice to put your scripts just before the closing <code>&lt;/body&gt;</code> tag.</p>
+        <p><code data-gist-id="d53ac026726646763b07" data-gist-hide-footer="true" data-gist-line="24-37"></code></p>
 		  
         <h3><a name="JSCode"></a>The JavaScript code</h3>
 		  
@@ -249,6 +251,98 @@
   </script>
   <script type="text/javascript">
     /******** Any scripts specific to page samples should go here *********/
+      var myPlayer,
+      bumperDataLength,
+      playlistDataLength,
+      currentVideoIndex = 0,
+      currentBumperIndex = 0,
+      bumperRandomNumber,
+      playBumper = true,
+      playlistData = [
+        {
+        "name":"Bird Chickadee", 
+        "sources":[
+          {
+          "type":"video/mp4",
+          "src":"http://solutions.brightcove.com/bcls/assets/videos/Bird_Titmouse.mp4"
+          }
+        ]},
+        {
+        "name":"Sea Clownfish", 
+        "sources":[
+          {
+          "type":"video/mp4",
+          "src":"http://solutions.brightcove.com/bcls/assets/videos/Sea_ClownFish.mp4"
+          }
+        ]},
+        {
+        "name":"Sea Lionfish", 
+        "sources":[
+          {
+          "type":"video/mp4",
+          "src":"http://solutions.brightcove.com/bcls/assets/videos/Sea_LionFish.mp4"
+          }
+        ]},
+        {
+        "name":"Sea Seahorse", 
+        "sources":[
+          {
+          "type":"video/mp4",
+          "src":"http://solutions.brightcove.com/bcls/assets/videos/Sea_SeaHorse.mp4"
+          }
+        ]}
+      ],
+      bumperData = [
+        {
+        "name":"bumper1",
+        "sources":[
+          {
+          "type":"video/mp4",
+          "src":"http://solutions.brightcove.com/bcls/assets/videos/bumper1.mp4"
+          }
+        ]},
+        {
+        "name":"bumper2", 
+        "sources":[
+          {
+          "type":"video/mp4",
+          "src":"http://solutions.brightcove.com/bcls/assets/videos/bumper2.mp4"
+          }
+        ]}
+      ];
+     
+    videojs("video_1").ready(function(){
+      myPlayer = this;
+      // listen for the "ended" event and play the next video or bumper
+      myPlayer.on("ended", function () {
+          playVideo();
+      });
+      playlistDataLength = playlistData.length;
+      bumperDataLength = bumperData.length;
+      // load the first bumper video
+      playVideo();
+    }); 
+    
+    function playVideo () {
+      if (currentVideoIndex < playlistDataLength) {
+        // alternate between playing a bumper video and a regular video
+        if (playBumper){
+            playBumper = false;
+            // randomly select the bumper video to play
+            bumperRandomNumber = Math.floor(Math.random()*bumperDataLength);
+            // load the bumper video
+            myPlayer.src(bumperData[bumperRandomNumber].sources);
+        } else {
+            playBumper = true;
+            // load the next video
+            myPlayer.src(playlistData[currentVideoIndex].sources);
+            // increment the current video index
+            currentVideoIndex++;
+        }
+        // play the video
+        myPlayer.play();  
+      }
+    };
 
   </script>
     <div class="footer text-center"><a href="mailto:docs@brightcove.com">Questions or comments?</a></div>
