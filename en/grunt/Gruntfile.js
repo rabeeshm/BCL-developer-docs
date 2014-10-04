@@ -21,7 +21,7 @@ module.exports = function (grunt) {
                         'source/ingest-profiles-api.json',
                         'source/di-api.json',
                         'source/cms-api.json',
-                        'source/groups.json',
+                        'source/forums.json',
                         'source/oauth-api.json',
                         'source/player-management.json',
                         'source/media.json'

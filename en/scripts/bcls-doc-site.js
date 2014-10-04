@@ -515,13 +515,16 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     /**
                      * special cases
                      */
-                    if (section === "open-source" || section === "concepts") {
+                    if (section === "open-source" || section === "concepts" || section === "forums") {
                         switch (section) {
                         case "open-source":
                             sectionName = "Open-Source";
                             break;
                         case "concepts":
                             sectionName = "Concepts";
+                            break;
+                        case "forums":
+                            sectionName = "Forums";
                             break;
                         }
                         subsection = null;
@@ -666,6 +669,10 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                         sectionName = "Concepts";
                         subsection = null;
                         section = "perform";
+                    } else if (section === "forums") {
+                        sectionName = "Forums";
+                        subsection = null;
+                        section = "perform";
                     } else {
                         sectionName = bclsNavData["perform"].sections[section].name;
                     }
@@ -722,7 +729,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             default:
                 section = "index";
                 sectionName = null;
-                product = index;
+                product = "index";
                 productName = "";
                 $navMenuRight.html(menuRightBase + vcSupportNav);
             }
