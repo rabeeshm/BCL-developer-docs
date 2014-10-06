@@ -7,7 +7,7 @@ var BCLSformatJSON = ( function () {
   var formattedData;
   return {
     formatJSON : function(data) {
-      formattedData = JSON.stringify(data,null, "    ")
+      formattedData = JSON.stringify(data,null, "    ");
       return formattedData;
     }
   }
