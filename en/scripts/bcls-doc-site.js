@@ -370,9 +370,12 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             max = data.length;
             for (i = 0; i < max; i++) {
                 item = data[i];
-                if (i === 4) {}
-                // str += "<br style=\"clear:all;\">"
-                str += blockTemplateStart(item);
+                bclslog("landing page item", item);
+                if (exists(item.items)) {
+                    str += blockTemplateStart(item);
+                }
+
+
                 if (exists(item.items)) {
                     kMax = item.items.length;
                     for (k = 0; k < kMax; k++) {
