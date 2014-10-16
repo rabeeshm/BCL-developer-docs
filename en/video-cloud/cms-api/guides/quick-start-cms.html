@@ -44,30 +44,20 @@
 				<!-- Place document intro sentence(s) here -->
           <p>In this quick start you will perform the following tasks:</p>
           <ul>
-          	<li>Create a Node.js application to act as your OAuth security proxy. This proxy will use your access token to make calls to the needed APIs.</li>
           	<li>Obtain credentials to use the Content Management System (CMS) API.</li>
           	<li>Retrieve all videos from your account. Returned information is in the form of JSON objects.</li>
-          	<li>Retrieve information for a specified video.</li>
-          	<li>Retrieve rendition information for a specified video.</li>
-          	<li>Retrieve image information for a specified video.</li>
             <li>Create a video and view it in Video Cloud Studio.</li>
+            <li>Retrieve information for a specified video.</li>
+            <li>Retrieve rendition information for a specified video.</li>
+            <li>Retrieve image information for a specified video.</li>
           	<li>Search videos in your account by keywords (tags) and by created date.</li>
           </ul>
           <p class="BCL-aside">For details on the API used in this document you can view the <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/overview-cms.html">Content Management System API Overview</a> document and the <a href="//docs.brightcove.com/en/video-cloud/cms-api/reference/versions/v1/index.html">Content Management System API</a> reference.</p>
-          <p class="text-warning">Note: The steps in the document involve curl and other command-line tools that are native to Mac and Linux systems, but not part of the Windows operating system. If you are on Windows, you can get these tools by installing <a href="//cygwin.com">cygwin</a>. During the install you will be prompted for packages to install. Open the <strong>Net</strong> package, then check the <strong>curl</strong> option and then finish the installation. Once you have done this you will be able to follow the Quick Start to the Content Management System successfully as written using the cygwin command line. Tools are available to run curl at the normal Windows command line, but not detailed in this document.</p>
 			</div>
-      <div id="oauthproxy" class="section">
-        <h2>Create proxy</h2>
-        <p>Security on the CMS API uses OAuth2. This requires some work to access the API. </p>
-        <ol>
-        <li>In this quick start it is recommended you set up a Node.js application to act as a proxy. The <a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/quick-start.html">OAuth Quick Start</a> guides you through the steps to create a basic proxy in Node.js that gets an access token for a Brightcove API, makes the API call, and then returns the response data.</li>
-        <li>You will also need a local web server running to serve up a testing page, <strong>tester.html</strong>, which works with the proxy. Note that simply browsing the page as a file will NOT work as the page utilizes an iframe, which requires an HTTP server.</li>
-        </ol>
-      </div>
 			<div id="obtaincredentials" class="section">
 				<h2>Obtain credentials</h2>
 				<p>To use the CMS API you will need proper credentials. Later in this quick start, you will use the credentials in a form when submitting requests to APIs.</p> 
-				<ol start="3">
+				<ol>
 					<li>To obtain proper credentials use your choice of these two options (Be sure to read the paragraph following the bullets to ensure you ask for the proper operations):</li>
 				</ol>
 				<ul>
@@ -77,170 +67,306 @@
 				<p>Whichever option you choose, you will need to ask for the correct operation permissions. In this quick start you will need both <strong>video</strong> and <strong>ingest-profile</strong> operations. The following can be used with curl or Postman to get the proper permissions:</p>
 				<p><code data-gist-id="7661acb7095f0c8b0e34" data-gist-hide-footer="true" data-gist-line="1"></code></p>
 			</div>
+      <div id="assignvalues" class="section">
+        <h2>Assign values</h2>
+        <p>Values you just retrieved in the previous section will be used in calls to the CMS API. These values will be entered and assigned in the following form.</p>
+        <ol start="2">
+          <li>Enter the corresponding values for each of the following. If you do not have a video ID some of the later tasks in this quick start will not function. This step <strong>MUST</strong> be completed for any of the other API calls to function correctly.</li>
+        </ol>
+        <div class="form-wrapper">
+          <fieldset>
+            <legend>Assign values for reuse</legend>
+            <p>Submits to local JavaScript and assigns values to variables</p>
+            <p>
+              Client id:
+              <input name="client_id" id="cms_client_id" type="text" value="5fbee876-9ac3-419f-b1b9-5878282964b9">
+            </p>
+            <p>
+              Client secret:
+              <input name="client_secret" id="cms_client_secret" type="text" value="KLwqa9yx5npgu9enFHglI9GFff39StO0Id1ytaZBWXg2pQ_7DiH-XUjg3_svKNBSkB0KN21sYrvfKnALcBLOLA">
+            </p>
+            <p>
+              Account ID:
+              <input name="account_id" id="cms_account_id" type="text" value="1507807800001">
+            </p>
+            <p>
+              Video ID (if available):
+              <input name="video_id" id="cms_video_id" type="text" value="2114345471001">
+            </p>
+            <p>
+              <input id="initialValues_Submit" type="submit" value="Assign Values">
+            </p>
+            <p><span id="assignConfirm"></span></p>
+          </fieldset>
+        </div>
+      </div>
       <div id="retrieveallvideos" class="section">
         <h2>Retrieve all videos</h2>
-        <p>One of the basic tasks you will want to perform is retrieve all videos in an account. This is done using an HTTP <code>GET</code> method.</p>
-				<ol start="4">
-					<li>You will now use the proxy in conjunction with the <strong>tester.html</strong> page to retrieve information on all the videos in your account, returned as a JSON objects. Browse to <strong>tester.html</strong> and complete the form as follows:</li>
+        <p>One of the basic tasks you will want to perform is retrieve all videos in an account. This is done using an HTTP <code>GET</code> method. The endpoint used is <code>https://cms.api.brightcove.com/v1beta1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos</code></p>
+        <p class="BCL-aside">Note: Before completing this task you must perform steps 1 and 2 above to retrieve and assign account and credential information.</p>
+				<ol start="3">
+					<li>You will now use the proxy in conjunction with the following form to retrieve information on all the videos in your account, returned as a JSON objects. Be aware that the response data can be lengthy if you have numerous videos in your account.</li>
 				</ol>
-				<table>
-					<tr>
-						<th>Form Field</th>
-						<th>Value</th>
-					</tr>
-					<tr>
-						<td>Client id</td>
-						<td>Returned in your client credentials</td>
-					</tr>
-					<tr>
-						<td>Client secret</td>
-						<td>Returned in your client credentials</td>
-					</tr>
-					<tr>
-						<td>Call type</td>
-						<td><strong>GET</strong></td>
-					</tr>
-					<tr>
-						<td>Call body</td>
-						<td><strong></strong></td>
-					</tr>
-					<tr>
-						<td>Full request URL for the API call</td>
-						<td><strong>https://cms.api.brightcove.com/v1beta1/accounts/**YOUR_ACCOUNT_ID**/videos</strong></td>
-					</tr>         
-				</table>
-				<p>After you click the <strong>Submit</strong> button, the text area following the button will be populated with JSON objects containing information on all videos in your account, as shown in the following screenshot.</p>
-				<p><img src="/en/video-cloud/cms-api/guides/assets/quick-start-all-videos.png"></p>
+        <div class="form-wrapper">
+          <fieldset>
+            <legend>Caller for the CMS API - Get All Videos</legend>
+            <p>Submits to http://solutions.brightcove.com:<strong>8006</strong>
+            </p>
+            <p>
+              Call type:
+              <select name="requestType" id="cms_requestType1">
+                <option selected="selected">GET</option>
+                <option>POST</option>
+                <option>PUT</option>
+                <option>PATCH</option>
+                <option>DELETE</option>
+              </select>
+            </p>
+            <p>
+              Call body (optional - include if you need to submit data with the request):
+              <br />
+              <textarea name="requestBody" id="cms_requestBody1"></textarea>
+            </p>
+            <p>
+              Full request URL for the API call:
+              <br />
+              <textarea name="url" id="cms_url1" class="cms_url">https://cms.api.brightcove.com/v1beta1/accounts/YOUR_ACCOUNT_ID/videos</textarea>
+            </p>
+            <p>
+              <input id="cms_retrieveall_Submit" type="submit" value="Submit">
+            </p>
+    				<p>After you click the <strong>Submit</strong> button, the following text area will be populated with JSON objects containing information on all videos in your account.</p>
+            <pre><code id="cms_response1"></code></pre>
+          </fieldset>
+        </div>
+      </div>
+      <div id="createvideo" class="section">
+        <h2>Create video</h2>
+        <p>You create videos using an HTTP <code>POST</code> method. The endpoint used is <code>https://cms.api.brightcove.com/v1beta1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos</code>. This video object will eventually contain the master copy of the video, metadata, possible renditions and other information. In the call body you supply a simple JSON object specifying the <code>name</code> of the video to be created. To see the fields for which you can provide values during the <code>POST</code>, browse to the CMS API Overview document's <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/overview-cms.html#settingvalues">Setting values</a> section.</p>
+        <p class="BCL-aside">Note: Before completing this task you must perform steps 1 and 2 above to retrieve and assign account and credential information.</p>
+        <ol start="4">
+          <li>You will now use the proxy in conjunction with the following form to create a video. Be sure to alter the body so the <code>name</code> reflects the name of your choice for your video.</li>
+        </ol>
+        <div class="form-wrapper">
+          <fieldset>
+            <legend>Caller for the CMS API - Create a Video</legend>
+            <p>Submits to http://solutions.brightcove.com:<strong>8006</strong>
+            </p>
+            <p>
+              Call type:
+              <select name="requestType" id="cms_requestType2">
+                <option>GET</option>
+                <option selected="selected">POST</option>
+                <option>PUT</option>
+                <option>PATCH</option>
+                <option>DELETE</option>
+              </select>
+            </p>
+            <p>
+              Call body:
+              <br />
+              <textarea name="requestBody" id="cms_requestBody2">{"name":"My test Video"}</textarea>
+            </p>
+            <p>
+              Full request URL for the API call:
+              <br />
+              <textarea name="url" id="cms_url2" class="cms_url">https://cms.api.brightcove.com/v1beta1/accounts/YOUR_ACCOUNT_ID/videos</textarea>
+            </p>
+            <p>
+              <input id="cms_create_Submit" type="submit" value="Submit">
+            </p>
+            <p>After you click the <strong>Submit</strong> button, the following text area will be populated with the JSON object representing your newly created video.</p>
+            <pre><code id="cms_response2"></code></pre>
+          </fieldset>
+        </div>
+        <p>You can confirm the video was created by browsing to Video Cloud Studio, open the Media Module, and a video with the name supplied will be present.</p>
       </div>
       <div id="usingreferenceids" class="section">
         <h2>Using reference IDs</h2>
         <p>In the samples that follow the video ID is used in the endpoint URL. You can also use the video's reference ID if you wish. If you use the reference ID you must prepend that identifier with <strong>ref:</strong>. For example, the first URL uses the video ID, whereas the second uses the reference ID.</p>
-				<p><img src="/en/video-cloud/cms-api/guides/assets/quick-start-ref-ids.png"></p>
+        <p><img src="/en/video-cloud/cms-api/guides/assets/quick-start-ref-ids.png"></p>
       </div>
       <div id="retrieveonevideos" class="section">
         <h2>Retrieve one video</h2>
-        <p>You will retrieve a specific video from your account. This is done using an HTTP <code>GET</code> method and append a video ID to the end of the <strong>videos</strong> endpoint.</p>
+        <p>You will retrieve a specific video from your account. This is done using an HTTP <code>GET</code> method. The endpoint used is <code>https://cms.api.brightcove.com/v1beta1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos/<em>VIDEO_ID</em>.</code></p>
+        <p class="BCL-aside">Note: Before completing this task you must perform steps 1 and 2 above to retrieve and assign account and credential information.</p>
 				<ol start="5">
-					<li>You will now use the proxy in conjunction with the <strong>tester.html</strong> page to retrieve information on a specified video in your account, returned as a JSON object. Browse to <strong>tester.html</strong> and complete the form as follows:</li>
+					<li>You will now use the proxy in conjunction with the following form to retrieve information on a specified video in your account. The response data will be a JSON object.</li>
 				</ol>
-				<table>
-					<tr>
-						<th>Form Field</th>
-						<th>Value</th>
-					</tr>
-					<tr>
-						<td>Client id</td>
-						<td>Returned in your client credentials</td>
-					</tr>
-					<tr>
-						<td>Client secret</td>
-						<td>Returned in your client credentials</td>
-					</tr>
-					<tr>
-						<td>Call type</td>
-						<td><strong>GET</strong></td>
-					</tr>
-					<tr>
-						<td>Call body</td>
-						<td><strong></strong></td>
-					</tr>
-					<tr>
-						<td>Full request URL for the API call</td>
-						<td><strong>https://cms.api.brightcove.com/v1beta1/accounts/**YOUR_ACCOUNT_ID**/videos/**VIDEO_ID**</strong></td>
-					</tr>         
-				</table>
-				<p>After you click the <strong>Submit</strong> button, the text area following the button will be populated with a JSON object with information on the single video requested, as shown in the following screenshot.</p>
-				<p><img src="/en/video-cloud/cms-api/guides/assets/quick-start-one-video.png"></p>
-				<p class="BCL-aside">Note: Now that you have seen the how the form and proxy interact, the remaining examples will  only list the form elements that change, with the results following.</p>
+        <div class="form-wrapper">
+          <fieldset>
+            <legend>Caller for the CMS API - Retrieve Single Video Info</legend>
+            <p>Submits to http://solutions.brightcove.com:<strong>8006</strong>
+            </p>
+            <p>
+              Call type:
+              <select name="requestType" id="cms_requestType3">
+                <option selected="selected">GET</option>
+                <option>POST</option>
+                <option>PUT</option>
+                <option>PATCH</option>
+                <option>DELETE</option>
+              </select>
+            </p>
+            <p>
+              Call body (optional - include if you need to submit data with the request):
+              <br />
+              <textarea name="requestBody" id="cms_requestBody3"></textarea>
+            </p>
+            <p>
+              Full request URL for the API call:
+              <br />
+              <textarea name="url" id="cms_url3" class="cms_url_videoID">https://cms.api.brightcove.com/v1beta1/accounts/YOUR_ACCOUNT_ID/videos/VIDEO_ID</textarea>
+            </p>
+            <p>
+              <input id="cms_retrieveone_Submit" type="submit" value="Submit">
+            </p>
+    				<p>After you click the <strong>Submit</strong> button, the following text area will be populated with a JSON object containing information on the single video requested.</p>
+            <pre><code id="cms_response3"></code></pre>
+          </fieldset>
+        </div>
       </div>
       <div id="retrieverenditioninfo" class="section">
         <h2>Retrieve rendition info</h2>
+        <p>At some point a video object will have renditions created for it. You can see the available renditions using an HTTP <code>GET</code> method. The endpoint used is <code>https://cms.api.brightcove.com/v1beta1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos/<em>VIDEO_ID</em>/<span class="bcl-highlight">sources</span>.</code></p>
+        <p class="BCL-aside">Note: Before completing this task you must perform steps 1 and 2 above to retrieve and assign account and credential information.</p>
         <ol start="6">
-          <li>You will now retrieve rendition information for a specific video. You will again use the HTTP <code>GET</code> method, with a video ID and the <code>sources</code> endpoint added.</li>
+          <li>You will now retrieve rendition information for a specific video. You will again use the HTTP <code>GET</code> method, with a video ID.</li>
+          <li>At the end of the current request URL you MUST append <code>/sources</code> to get rendition information.</li>
         </ol>
-        <table>
-          <tr>
-            <th>Form Field</th>
-            <th>Value</th>
-          </tr>
-          <tr>
-            <td>Call type</td>
-            <td><strong>GET</strong></td>
-          </tr>
-          <tr>
-            <td>Call body</td>
-            <td><strong></strong></td>
-          </tr>
-          <tr>
-            <td>Full request URL for the API call</td>
-            <td><strong>https://cms.api.brightcove.com/v1beta1/accounts/**YOUR_ACCOUNT_ID**/videos/**VIDEO_ID**<span class="bcl-highlight">/sources</span></strong></td>
-          </tr>         
-        </table>
-        <p>The results from the call follow. If you have universal delivery service (UDS) enabled, you will see each rendition is represented by a pair of JSON objects. The first one for streaming and the second for download. You need to look carefully at JSON object's properties, for instance <code>encoding_rate</code>, to see that different renditions are being reported.</p>
-        <p><code data-gist-id="7661acb7095f0c8b0e34" data-gist-hide-footer="true" data-gist-line="5-51"></code></p>
+        <div class="form-wrapper">
+          <fieldset>
+            <legend>Caller for the CMS API - Retrieve Rendition Info</legend>
+            <p>Submits to http://solutions.brightcove.com:<strong>8006</strong>
+            </p>
+            <p>
+              Call type:
+              <select name="requestType" id="cms_requestType4">
+                <option selected="selected">GET</option>
+                <option>POST</option>
+                <option>PUT</option>
+                <option>PATCH</option>
+                <option>DELETE</option>
+              </select>
+            </p>
+            <p>
+              Call body (optional - include if you need to submit data with the request):
+              <br />
+              <textarea name="requestBody" id="cms_requestBody4"></textarea>
+            </p>
+            <p>
+              Full request URL for the API call:
+              <br />
+              <textarea name="url" id="cms_url4" class="cms_url_videoID">https://cms.api.brightcove.com/v1beta1/accounts/YOUR_ACCOUNT_ID/videos/VIDEO_ID/sources</textarea>
+            </p>
+            <p>
+              <input id="cms_retrieverenditions_Submit" type="submit" value="Submit">
+            </p>
+            <p>After you click the <strong>Submit</strong> button, the following text area will be populated with renditions for the specified video. If you have universal delivery service (UDS) enabled, you will see each rendition is represented by a pair of JSON objects. The first one for streaming and the second for download. You need to look carefully at JSON object's properties, for instance <code>encoding_rate</code>, to see that different renditions are being reported.</p>
+            <pre><code id="cms_response4"></code></pre>
+          </fieldset>
+        </div>
       </div>
       <div id="retrieveimageinfo" class="section">
         <h2>Retrieve image info</h2>
-        <ol start="7">
-          <li>You will now retrieve image information for a specific video. You will again use the HTTP <code>GET</code> method, with a video ID and the <code>images</code> endpoint added.</li>
+        <p>There can be a number of images associated with a video, for instance thumbnail. poster and overlay. You can retrieve information about these images using an HTTP <code>GET</code> method. The endpoint used is <code>https://cms.api.brightcove.com/v1beta1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos/<em>VIDEO_ID</em>/<span class="bcl-highlight">images</span>.</code></p>
+        <p class="BCL-aside">Note: Before completing this task you must perform steps 1 and 2 above to retrieve and assign account and credential information.</p>
+        <ol start="6">
+          <li>You will now retrieve images information for a specific video. You will again use the HTTP <code>GET</code> method, with a video ID.</li>
+          <li>At the end of the current request URL you MUST append <code>/images</code> to get image information.</li>
         </ol>
-        <table>
-          <tr>
-            <th>Form Field</th>
-            <th>Value</th>
-          </tr>
-          <tr>
-            <td>Call type</td>
-            <td><strong>GET</strong></td>
-          </tr>
-          <tr>
-            <td>Call body</td>
-            <td><strong></strong></td>
-          </tr>
-          <tr>
-            <td>Full request URL for the API call</td>
-            <td><strong>https://cms.api.brightcove.com/v1beta1/accounts/**YOUR_ACCOUNT_ID**/videos/**VIDEO_ID**<span class="bcl-highlight">/images</span></strong></td>
-          </tr>         
-        </table>
-        <p>The results from the call follow.</p>
-        <p><code data-gist-id="7661acb7095f0c8b0e34" data-gist-hide-footer="true" data-gist-line="149-169"></code></p>
+        <div class="form-wrapper">
+          <fieldset>
+            <legend>Caller for the CMS API - Retrieve Image Info</legend>
+            <p>Submits to http://solutions.brightcove.com:<strong>8006</strong>
+            </p>
+            <p>
+              Call type:
+              <select name="requestType" id="cms_requestType5">
+                <option selected="selected">GET</option>
+                <option>POST</option>
+                <option>PUT</option>
+                <option>PATCH</option>
+                <option>DELETE</option>
+              </select>
+            </p>
+            <p>
+              Call body (optional - include if you need to submit data with the request):
+              <br />
+              <textarea name="requestBody" id="cms_requestBody5"></textarea>
+            </p>
+            <p>
+              Full request URL for the API call:
+              <br />
+              <textarea name="url" id="cms_url5" class="cms_url_videoID">https://cms.api.brightcove.com/v1beta1/accounts/YOUR_ACCOUNT_ID/videos/VIDEO_ID/images</textarea>
+            </p>
+            <p>
+              <input id="cms_retrieveimages_Submit" type="submit" value="Submit">
+            </p>
+            <p>After you click the <strong>Submit</strong> button, the following text area will be populated with information on the specified video's associated images.</p>
+            <pre><code id="cms_response5"></code></pre>
+          </fieldset>
+        </div>
       </div>
-			<div id="createvideo" class="section">
-				<h2>Create video</h2>
-				<ol start="8">
-					<li>Create a video using the HTTP <code>POST</code> method. This video object will eventually contain the master copy of the video, metadata, possible renditions and other information. For the first time you will supply information information for the call body. In this case, it will be a simple JSON object specifying the <code>name</code> of the video to be created. To see the fields for which you can provide values during the <code>POST</code>, browse to the CMS API Overview document's <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/overview-cms.html#settingvalues">Setting values</a> section.</li>
-				</ol>
-				<div class="BCL-aside">
-					<p>Note: When filling out the form:</p>
-					<ul>
-					    <li>Be sure the <strong>body contains no spaces or carriage returns</strong></li>
-					    <li>Realize the name you supply will be the video name you see in Video Cloud Studio</li>
-					</ul>
-				</div>
-				<table>
-					<tr>
-						<th>Form Field</th>
-						<th>Value</th>
-					</tr>
-					<tr>
-						<td>Call type</td>
-						<td><strong>POST</strong></td>
-					</tr>
-					<tr>
-						<td>Call body</td>
-						<td><strong>{"name":"**YOUR_VIDEO_NAME**"}</strong></td>
-					</tr>
-					<tr>
-						<td>Full request URL for the API call</td>
-						<td><strong>https://cms.api.brightcove.com/v1beta1/accounts/**YOUR_ACCOUNT_ID**/videos</strong></td>
-					</tr>         
-				</table>
-        <p>The results from the call follow.</p>
-        <p><code data-gist-id="7661acb7095f0c8b0e34" data-gist-hide-footer="true" data-gist-line="174-192"></code></p>
-        <p>You can confirm the video was created by browsing to Video Cloud Studio, open the Media Module, and a video with the name supplied will be present.</p>
-			</div>
       <div id="searchbykeywords" class="section">
         <h2>Search by keywords</h2>
+        <p class="BCL-aside">The CMS API has a rich searching implementation which you can leverage. Not only does the implementation provide many ways to search, but you can also manipulate the display of results by sorting, limiting result set size, etc. A few examples will be shown in this quick start. For complete documentation see the CMS API Overview document's <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/overview-cms.html#search">Search</a> section.</p>
+        <p>You will now search your videos for a certain keyword. These keywords can be set via API, or in Video Cloud Studio where they are referred to as <strong>tags</strong>. Searches use an HTTP <code>GET</code> method. The endpoint used is <code>https://cms.api.brightcove.com/v1beta1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos</code>. You add a query string to control the search.</p>
+        <p class="BCL-aside">Note: Before completing this task you must perform steps 1 and 2 above to retrieve and assign account and credential information.</p>
+        <ol start="8">
+          <li>You will now search for videos with a keyword of <strong>wildlife</strong>. To do this, add a query string to the endpoint, then a <code>q:</code>, and finally the syntax to look for the specific keyword, in this case <strong>keywords:wildlife</strong>.</li>
+          <li>Check to be sure your URL is in the form:
+            <p><code>https://cms.api.brightcove.com/.../videos/<strong>?q=keywords:wildlife</strong></code></p>
+          </li>
+        </ol>
+        <div class="form-wrapper">
+          <fieldset>
+            <legend>Caller for the CMS API - Search by Tag</legend>
+            <p>Submits to http://solutions.brightcove.com:<strong>8006</strong>
+            </p>
+            <p>
+              Call type:
+              <select name="requestType" id="cms_requestType6">
+                <option selected="selected">GET</option>
+                <option>POST</option>
+                <option>PUT</option>
+                <option>PATCH</option>
+                <option>DELETE</option>
+              </select>
+            </p>
+            <p>
+              Call body (optional - include if you need to submit data with the request):
+              <br />
+              <textarea name="requestBody" id="cms_requestBody6"></textarea>
+            </p>
+            <p>
+              Full request URL for the API call:
+              <br />
+              <textarea name="url" id="cms_url6" class="cms_url">https://cms.api.brightcove.com/v1beta1/accounts/YOUR_ACCOUNT_ID/videos/</textarea>
+            </p>
+            <p>
+              <input id="cms_searchbytags_Submit" type="submit" value="Submit">
+            </p>
+            <p>After you click the <strong>Submit</strong> button, the following text area will be populated videos with which the keyword <strong>wildlife</strong> is associated.</p>
+            <pre><code id="cms_response6"></code></pre>
+          </fieldset>
+        </div>
+        <p>You can also do exclusion on a value. For instance, to eliminate all videos that contain the keyword <strong>wildlife</strong> you place a minus sign (-) just after the <strong>q=</strong>, as shown here:</p>
+        <p><code data-gist-id="7661acb7095f0c8b0e34" data-gist-hide-footer="true" data-gist-line="257"></code></p>
+      </div>
+
+
+
+
+
+      
+
+
+
+
+
+      <div id="searchbykeywords2" class="section">
+        <h2>Search by keywords2</h2>
         <p class="BCL-aside">Note: The CMS API has a rich searching implementation which you can leverage. Not only does the implementation provide many ways to search, but you can also manipulate the display of results by sorting, limiting result set size, etc. A few examples will be shown in this quick start. For complete documentation see the CMS API Overview document's <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/overview-cms.html#search">Search</a> section.</p>
         <ol start="9">
           <li>You will now search your videos for a certain keyword. These keywords can be set via API, or in Video Cloud Studio where they are referred to as <strong>tags</strong>. In this case, videos with a keyword of <strong>wildlife</strong> will be retrieved. To do this, add a query string to the endpoint, then a <code>q:</code>, and finally the syntax to look for the specific keyword.</li>
@@ -319,6 +445,137 @@
 	</script>
 	<script type="text/javascript">
 		/******** Any scripts specific to page samples should go here *********/
+    var BCLS = (function ($) {
+      var // CMS API stuff
+      $cms_client_id = $("#cms_client_id"),
+        $cms_client_secret = $("#cms_client_secret"),
+        $cms_submit = $("#cms_Submit"),
+        $cms_account_id = $("#cms_account_id"),
+        $cms_response = $("#cms_response"),
+        $cms_video_id = $("#cms_video_id"),
+        cmsURL = "http://solutions.brightcove.com:8006",
+        // functions
+        bclslog,
+        submitRequest,
+        cleanString,
+        setCMSOptions;
+      // IE safe logger
+      bclslog = function (context, message) {
+        if (console) {
+          console.log(context, message);
+        }
+      }
+      // function to remove spaces and line breaks
+      cleanString = function (str) {
+        // remove line breaks
+        str = str.replace(/\s/g, "");
+        // remove spaces
+        // here we have to be careful - spaces fine within strings
+        // but not outside them
+        if (str != "") {
+          str = JSON.stringify(JSON.parse(str));
+        };
+        return str;
+        bclslog("str cleaned", str);
+      };
+      // set options for the CMS API request
+      setCMSOptionsRetrieveAll = function () {
+        var options = {};
+        options.client_id = $cms_client_id.val();
+        options.client_secret = $cms_client_secret.val();
+        $cms_requestBody1 = $("#cms_requestBody1");
+        options.requestBody = cleanString($cms_requestBody1.val());
+        options.requestType = $("#cms_requestType1").val();
+        options.url = $("#cms_url1").val();
+        // now submit the request
+        submitRequest(options, cmsURL, $("#cms_response1"));
+      };
+      setCMSOptionsCreate = function () {
+        var options = {};
+        options.client_id = $cms_client_id.val();
+        options.client_secret = $cms_client_secret.val();
+        $cms_requestBody2 = $("#cms_requestBody2");
+        options.requestBody = cleanString($cms_requestBody2.val());
+        options.requestType = $("#cms_requestType2").val();
+        options.url = $("#cms_url2").val();
+        // now submit the request
+        submitRequest(options, cmsURL, $("#cms_response2"));
+      };
+      setCMSOptionsRetrieveOne = function () {
+        var options = {};
+        options.client_id = $cms_client_id.val();
+        options.client_secret = $cms_client_secret.val();
+        $cms_requestBody3 = $("#cms_requestBody3");
+        options.requestBody = cleanString($cms_requestBody3.val());
+        options.requestType = $("#cms_requestType3").val();
+        options.url = $("#cms_url3").val();
+        // now submit the request
+        submitRequest(options, cmsURL, $("#cms_response3"));
+      };
+      setCMSOptionsRetrieveRenditions = function () {
+        var options = {};
+        options.client_id = $cms_client_id.val();
+        options.client_secret = $cms_client_secret.val();
+        $cms_requestBody4 = $("#cms_requestBody4");
+        options.requestBody = cleanString($cms_requestBody4.val());
+        options.requestType = $("#cms_requestType4").val();
+        options.url = $("#cms_url4").val();
+        // now submit the request
+        submitRequest(options, cmsURL, $("#cms_response4"));
+      };
+      setCMSOptionsRetrieveImages = function () {
+        var options = {};
+        options.client_id = $cms_client_id.val();
+        options.client_secret = $cms_client_secret.val();
+        $cms_requestBody5 = $("#cms_requestBody5");
+        options.requestBody = cleanString($cms_requestBody5.val());
+        options.requestType = $("#cms_requestType5").val();
+        options.url = $("#cms_url5").val();
+        // now submit the request
+        submitRequest(options, cmsURL, $("#cms_response5"));
+      };
+      setCMSOptionsSearchByTags = function () {
+        var options = {};
+        options.client_id = $cms_client_id.val();
+        options.client_secret = $cms_client_secret.val();
+        $cms_requestBody6 = $("#cms_requestBody6");
+        options.requestBody = cleanString($cms_requestBody6.val());
+        options.requestType = $("#cms_requestType6").val();
+        options.url = $("#cms_url6").val();
+        // now submit the request
+        submitRequest(options, cmsURL, $("#cms_response6"));
+      };
+      // function to submit Request
+      submitRequest = function (options, proxyURL, responseLocation) {
+        var parsedData = {};
+        $.ajax({
+          url: proxyURL,
+          type: "POST",
+          data: options,
+          success: function (data) {
+            bclslog(data);
+            parsedData = JSON.parse(data);
+            responseLocation.html(data);
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            responseLocation.html("The called failed; here's what the server sent back: " + errorThrown);
+          }
+        });
+      };
+      setInitialValues = function () {
+        var elem = document.getElementById("assignConfirm");
+        elem.innerHTML = "    Values Assigned!";
+        $(".cms_url").html("https://cms.api.brightcove.com/v1beta1/accounts/" + $cms_account_id.val() + "/videos");
+        $(".cms_url_videoID").html("https://cms.api.brightcove.com/v1beta1/accounts/" + $cms_account_id.val() + "/videos/" + $cms_video_id.val());
+      };
+      $("#initialValues_Submit").on("click", setInitialValues);
+      $("#cms_retrieveall_Submit").on("click", setCMSOptionsRetrieveAll);
+      $("#cms_create_Submit").on("click", setCMSOptionsCreate);
+      $("#cms_retrieveone_Submit").on("click", setCMSOptionsRetrieveOne);
+      $("#cms_retrieverenditions_Submit").on("click", setCMSOptionsRetrieveRenditions);
+      $("#cms_retrieveimages_Submit").on("click", setCMSOptionsRetrieveImages);
+      $("#cms_searchbytags_Submit").on("click", setCMSOptionsSearchByTags);
+    })($);
 	</script>
 	<div class="footer text-center"><a href="mailto:docs@brightcove.com">Questions or comments?</a></div>
 </body>
