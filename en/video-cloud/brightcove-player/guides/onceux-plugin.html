@@ -56,7 +56,7 @@ img<!DOCTYPE html>
 				
       <div id="player" class="section">
         <h2>The player</h2>
-        <p>This example enforces the playback of an advertisement before the main subject video.</p>
+        <p>This example enforces the playback of an advertisement before the main subject video. An overlay is displayed with an ad count-down timer.</p>
 
         <div class="player-block">
             <iframe src='//players.brightcove.net/1752604059001/b2ce0968-2eb1-445c-af0d-4d54e6b73bbb_default/index.html' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
@@ -66,13 +66,138 @@ img<!DOCTYPE html>
         
 			</div>
 				
-		<div id="getstarted" class="section">
-          <h2>Get started</h2>
-		  <p>It is best practice to update your player using the Brightcove player API. We use <code>curl</code> statements in the following sections to update the error messages plugin for your player. This will update all instances of your player. If you choose to update this plugin from a page of code, it will only affect that instance of your player.</p>
-				<p>To update the plugin from your page code, first get a reference to the Brightcove player. In this example, in the JavaScript we are creating a variable named <code>myPlayer</code> and assigning it a reference to the player.</p>
-			<p class="BCL-aside">Note: you do not need to do this if you are updating your Brightcove player using <code>curl</code> statements.</p>
-				<p><code data-gist-id="89b496092aee326f7216" data-gist-hide-footer="true" data-gist-line="55-66" data-gist-highlight-line="55,66"></code></p>
-        </div>
+      <div id="getstarted" class="section">
+            <h2>Get started</h2>
+        <p>Here is the <code>curl</code> statement to create a Brightcove player with the OnceUX plugin.</p>
+        <p>The properties are defined as follows:</p>
+				<ul>
+          <li><code>scripts</code>: This property includes the script for the plugin.</li>
+          <li><code>stylesheets</code>: This property includes the styles for the plugin.</li>
+          <li><code>poster</code>: This property defines the poster image for the player.</li>
+          <li><code>plugins</code>: This property contains an array of properties and values. For this plugin, you only need to supply the <code>name</code> property with the value of <code>onceux</code>.</li>
+          <li><code>options</code>: This property is used to pass data to the plugin.</li>
+          <li><code>metadataUri</code>:  This property specifies the URI to call to get the Once VMAP data.</li>
+				</ul>	
+        <p><code data-gist-id="ef63cba9fedd4f7ed5c5" data-gist-hide-footer="true" data-gist-line="3-31"></code></p>
+        <p>The values for the <code>options</code> property are defined in the next section.</p>
+      </div>
+      
+      <div id="options" class="section">
+            <h2>Options</h2>
+        <p>When you add the OnceUX plugin to your player, as shown in the <code>curl</code> statement above, you must pass an <code>options</code> object to the plugin to initialize it. This object must contain a <code>metadataUri</code> string or a VMAP object, along with any of the other optional properties:</p>
+        <ul>
+          <li><code>metadataUri</code></li>
+          <ul>
+            <li>Required</li>
+            <li>Type: String</li>
+            <li>Default: undefined</li>
+            <li>Description: The URI to call for the VMAP data.</li>
+            <li>Example: "http://onceux.unicornmedia.com/now/ads/vmap/od/auto/1234"</li>
+          </ul>
+          <li><code>vmap</code></li>
+          <ul>
+            <li>Optional</li>
+            <li>Type: Object</li>
+            <li>Default: none</li>
+            <li>Description: If supplied, the plugin will use this VMAP object instead of calling the metadata URL to get the VMAP data.</li>
+            <li>Example: see this <a href="//solutions.brightcove.com/bcls/brightcove-player/onceux-plugin/vmap-example.json">VMAP object</a></li>
+          </ul>
+          <li><code>hideOverlay</code></li>
+          <ul>
+            <li>Optional</li>
+            <li>Type: Boolean</li>
+            <li>Default: false</li>
+            <li>Description: If true, the countdown timer and the <strong>Learn More</strong> click through overlays will not be shown while ads are playing.</li>
+            <li>Example: true (hides default overlays)</li>
+          </ul>
+          <li><code>timeout</code></li>
+          <ul>
+            <li>Optional</li>
+            <li>Type: Number</li>
+            <li>Default: 45000</li>
+            <li>Description: The time in milliseconds to wait for the Once URI to respond.</li>
+            <li>Example: 10000 (wait 10 seconds)</li>
+        </ul>
+      </div>
+        
+      <div id="properties" class="section">
+        <h2>Properties</h2>
+        <p>You can view the values of runtime properties on the <code>onceux</code> object. Not all properties are currently parsed from the VMAP. See the <a href="//solutions.brightcove.com/bcls/brightcove-player/onceux-plugin/properties-example.json">properties example</a> for the current objects that are returned.</p>
+        <p>The following runtime properties are available:</p>
+        <ul>
+          <li><code>player.onceux.timeline</code></li>
+          <ul>
+            <li>Type: Object</li>
+            <li>Description: An object providing the essential parsed "absolute" timeline information from the VMAP.</li>
+            <li>Example: </li>
+            <p><code data-gist-id="ef63cba9fedd4f7ed5c5" data-gist-hide-footer="true" data-gist-line="34-42"></code></p>
+          </ul>
+          <li><code>player.onceux.timeline.contenturi</code></li>
+          <ul>
+            <li>Type: String</li>
+            <li>Description: The content URI parsed from the VMAP.</li>  
+          </ul>
+          <li><code>player.onceux.timeline.absoluteDuration</code></li>
+          <ul>
+            <li>Type: Number</li>
+            <li>Description: The total duration of the content including all Linear advertisements.</li>  
+          </ul>
+          <li><code>player.onceux.timeline.contentDuration</code></li>
+          <ul>
+            <li>Type: Number</li>
+            <li>Description: The duration of the content excluding all Linear advertisements.</li>  
+          </ul>
+          <li><code>player.onceux.timeline.adRolls</code></li>
+          <ul>
+            <li>Type: Array</li>
+            <li>Description: An Array of JSON objects representing the unmodified VAST 'AdBreak' info parsed from the Once VMAP XML file.</li>
+            <li>Properties included in the <code>adRolls</code> array:</li>
+            <ul>
+              <li><code>adRoll.absoluteBeginTime</code></li>
+              <ul>
+                <li>Indicates the absolute time at which the adRoll will begin.</li>
+              </ul>
+              <li><code>adRoll.absoluteEndTime</code></li>
+              <ul>
+                <li>Indicates the absolute time at which the adRoll will end.</li>
+              </ul>
+              <li><code>adRoll.index</code></li>
+              <ul>
+                <li>Indicates the position of the adRoll with respect to the other adRollsIndicates the absolute time at which the adRoll will end.</li>
+              </ul>
+              <li><code>adRoll.playCount</code></li>
+              <ul>
+                <li>Indicates the number of times the adRoll has completed. Value 0 means that it has not been played.</li>
+              </ul>
+              <li><code>linearAd.absoluteBeginTime</code></li>
+              <ul>
+                <li>Indicates the absolute time at which the linear ad will begin.</li>
+              </ul>
+              <li><code>linearAd.absoluteEndTime</code></li>
+              <ul>
+                <li>Indicates the absolute time at which the linear ad will end.</li>
+              </ul>
+              <li><code>linearAd.index</code></li>
+              <ul>
+                <li>Indicates the position of the linear ad within the adRoll.</li>
+              </ul>
+              <li><code>linearAd.playCount</code></li>
+              <ul>
+                <li>Indicates the number of times the linear ad has been played. Value 0 means that it has not been played.</li>
+              </ul>
+              <li><code>linearAd.skipOffset</code></li>
+              <ul>
+                <li>Indicates the time after which the linear ad can be skipped. Value 0 means that the linear ad is not skippable.</li>
+              </ul>
+              <li><code>linearAd.companionAd</code></li>
+              <ul>
+                <li>An object representing the unmodified VAST companionAd info.</li>
+              </ul>
+            </ul>
+            
+          </ul>
+          
+      </div>
 			
       <div id="standarderrors" class="section">
         <h2>Standard errors</h2>
