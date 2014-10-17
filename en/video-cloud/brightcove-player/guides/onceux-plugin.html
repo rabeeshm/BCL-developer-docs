@@ -53,6 +53,15 @@ img<!DOCTYPE html>
 				<!-- Place document intro sentence(s) here -->
 				<p>Using the OnceUX plugin with your Brightcove player, you can playback any Brightcove Once video.</p>
         <p>By default, the plugin enforces that all advertisements are watched and displays an ad count-down timer while they play. You can easily customize this plugin to use your own overlays and allow users to skip advertisements.</p> 
+        <div class="text-warning" style="padding-left:1em;padding-right:1em;">
+          <h4>Other plugins used</h4>
+          <p>Note: This example uses two other open source video.js plugins:</p>
+          <ul>
+            <li><a href="https://github.com/videojs/videojs-contrib-ads">videojs-contrib-ads</a> : Allows you to listen for <code>adstart</code> and <code>adend</code> events. You can listen for these events to know when an <code>adRoll</code> starts and ends respectively. Be aware, however, that these events can fire in rapid succession when scrubbing. They should always accurately reflect the <code>currentTime</code> of the playhead and states of the player.</li>
+            <li><a href="https://github.com/brightcove/videojs-overlay">videojs-overlay</a> : For details, refer to the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/overlay-plugin.html">Display Overlay Plugin</a> document.</li>
+          </ul>
+        </div>
+      </div>
 				
       <div id="player" class="section">
         <h2>The player</h2>
@@ -62,28 +71,26 @@ img<!DOCTYPE html>
             <iframe src='//players.brightcove.net/1752604059001/b2ce0968-2eb1-445c-af0d-4d54e6b73bbb_default/index.html' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
 
         </div>
-      </div><!-- id="player" -->  
-        
-			</div>
+      </div><!-- id="player" --> 
 				
       <div id="getstarted" class="section">
             <h2>Get started</h2>
         <p>Here is the <code>curl</code> statement to create a Brightcove player with the OnceUX plugin.</p>
         <p>The properties are defined as follows:</p>
 				<ul>
-          <li><code>scripts</code>: This property includes the script for the plugin.</li>
-          <li><code>stylesheets</code>: This property includes the styles for the plugin.</li>
-          <li><code>poster</code>: This property defines the poster image for the player.</li>
-          <li><code>plugins</code>: This property contains an array of properties and values. For this plugin, you only need to supply the <code>name</code> property with the value of <code>onceux</code>.</li>
-          <li><code>options</code>: This property is used to pass data to the plugin.</li>
-          <li><code>metadataUri</code>:  This property specifies the URI to call to get the Once VMAP data.</li>
+          <li><p><code>scripts</code>: This property includes the script for the plugin.</p></li>
+          <li><p><code>stylesheets</code>: This property includes the styles for the plugin.</p></li>
+          <li><p><code>poster</code>: This property defines the poster image for the player.</p></li>
+          <li><p><code>plugins</code>: This property contains an array of properties and values. For this plugin, you only need to supply the <code>name</code> property with the value of <code>onceux</code>.</p></li>
+          <li><p><code>options</code>: This property is used to pass data to the plugin.</p></li>
+          <li><p><code>metadataUri</code>:  This property specifies the URI to call to get the Once VMAP data.</p></li>
 				</ul>	
         <p><code data-gist-id="ef63cba9fedd4f7ed5c5" data-gist-hide-footer="true" data-gist-line="3-31"></code></p>
         <p>The values for the <code>options</code> property are defined in the next section.</p>
       </div>
       
-      <div id="options" class="section">
-            <h2>Options</h2>
+      <div id="initializeoptions" class="section">
+            <h2>Initialize options</h2>
         <p>When you add the OnceUX plugin to your player, as shown in the <code>curl</code> statement above, you must pass an <code>options</code> object to the plugin to initialize it. This object must contain a <code>metadataUri</code> string or a VMAP object, along with any of the other optional properties:</p>
         <ul>
           <li><code>metadataUri</code></li>
@@ -117,6 +124,50 @@ img<!DOCTYPE html>
             <li>Default: 45000</li>
             <li>Description: The time in milliseconds to wait for the Once URI to respond.</li>
             <li>Example: 10000 (wait 10 seconds)</li>
+        </ul>
+      </div>
+       
+      <div id="methods" class="section">
+        <h2>Methods</h2>
+        <p>The OnceUX plugin has the following methods:</p>
+        <ul>
+          <li><code>player.onceux.seekAds(timeInSeconds)</code></li>
+          <ul>
+            <li>A function that takes a time (in seconds) to seek to without the default seek handling behavior enforcing that ads are not skipped.</li>
+            <li>Parameters: A Number for the absolute time in seconds to seek to.</li>
+            <li>Returns: None</li>
+          </ul>
+          <li><code>player.onceux.timeline.pathAtAbsoluteTime(timeInSeconds)</code></li>
+          <ul>
+            <li>A function which takes a Number and provides a "path" into the timeline at any given point between <code>0</code> and the <code>absoluteDuration</code> of the stream.</li>
+            <li>Parameters: A Number for the absolute time in seconds to provide a "path" for.</li>
+            <li>Returns: A JSON object for the <code>path</code> representing the timeline. For details, see the <a href="#pathproperties">path object properties</a>.</li>
+          </ul>
+        </ul>		
+      </div>
+      
+      <div id="events" class="section">
+        <h2>Events</h2>
+        <p>The OnceUX plugin events are triggered when the <code>timeupdate</code> event occurs. Both the <code>linearAd</code> and <code>adRoll</code> objects are passed in these events.</p>
+        <p>Here is an example of an event object returned:</p>
+        <p><code data-gist-id="ef63cba9fedd4f7ed5c5" data-gist-hide-footer="true" data-gist-line="46-49"></code></p>
+        <p>Here are the available events:</p>
+        <ul>
+          <li><p><code>onceux-linearad-start</code> : The linear ad starts playing.</p></li>
+          <li><p><code>onceux-linearad-impression</code> : The linear ad impression URL has been pinged.</p></li>
+          <li><p><code>onceux-linearad-firstQuartile</code> : The linear ad playhead crosses first quartile.</p></li>
+          <li><p><code>onceux-linearad-midpoint</code> : The linear ad playhead crosses midpoint.</p></li>
+          <li><p><code>onceux-linearad-thirdQuartile</code> : The linear ad playhead crosses third quartile.</p></li>
+          <li><p><code>onceux-linearad-complete</code> : The linear ad completes playing. The <code>playCount</code> property of linear ad is incremented.</p></li>
+          <li><p><code>onceux-adroll-start</code> : The ad roll starts playing.</p></li>
+          <li><p><code>onceux-adroll-complete</code> : The ad roll completes playing. The <code>playCount</code> property of the ad roll is incremented.</p></li>
+          <li><p><code>onceux-ads-complete</code> : All the ads have been played.</p></li>
+          <li><p><code>onceux-linearad-skipped</code> : The linear ad is skipped by the user. Ads can be skipped only when multiple ad rolls are seeked over or by invoking the <code>seekAds()</code> function.</p></li>
+          <li><p><code>onceux-linearad-mute</code> : The linear ad is muted by the user.</p></li>
+          <li><p><code>onceux-linearad-unmute</code> : The linear ad is unmuted by the user.</p></li>
+          <li><p><code>onceux-linearad-pause</code> : The linear ad is paused by the user.</p></li>
+          <li><p><code>onceux-linearad-resume</code> : The linear ad is resumed by the user.</p></li>
+          <li><p><code>onceux-companionad-creativeView</code> : The companion ad creative view event fired.</p></li>
         </ul>
       </div>
         
@@ -158,200 +209,71 @@ img<!DOCTYPE html>
         <h3>Add roll properties</h3>
           <p>Here are the properties included in the <code>adRoll</code> object:</p>
           <ul>
-            <li><code>adRoll.absoluteBeginTime</code></li>
-            <ul>
-              <li>Indicates the absolute time at which the adRoll will begin.</li>
-            </ul>
-            <li><code>adRoll.absoluteEndTime</code></li>
-            <ul>
-              <li>Indicates the absolute time at which the adRoll will end.</li>
-            </ul>
-            <li><code>adRoll.index</code></li>
-            <ul>
-              <li>Indicates the position of the adRoll with respect to the other adRollsIndicates the absolute time at which the adRoll will end.</li>
-            </ul>
-            <li><code>adRoll.playCount</code></li>
-            <ul>
-              <li>Indicates the number of times the adRoll has completed. Value 0 means that it has not been played.</li>
-            </ul>
+            <li><p><code>adRoll.absoluteBeginTime</code> : Indicates the absolute time at which the adRoll will begin.</p></li>
+            <li><p><code>adRoll.absoluteEndTime</code> : Indicates the absolute time at which the adRoll will end.</p></li>
+            <li><p><code>adRoll.index</code> : Indicates the position of the adRoll with respect to the other adRollsIndicates the absolute time at which the adRoll will end.</p></li>
+            <li><p><code>adRoll.playCount</code> : Indicates the number of times the adRoll has completed. Value 0 means that it has not been played.</p></li>
           </ul>
           
-          <h3>Linear ad properties</h3>
-            <p>Here are the properties included in the <code>linearAd</code> object:</p>
-            <ul>
-              <li><code>linearAd.absoluteBeginTime</code></li>
-              <ul>
-                <li>Indicates the absolute time at which the linear ad will begin.</li>
-              </ul>
-              <li><code>linearAd.absoluteEndTime</code></li>
-              <ul>
-                <li>Indicates the absolute time at which the linear ad will end.</li>
-              </ul>
-              <li><code>linearAd.index</code></li>
-              <ul>
-                <li>Indicates the position of the linear ad within the adRoll.</li>
-              </ul>
-              <li><code>linearAd.playCount</code></li>
-              <ul>
-                <li>Indicates the number of times the linear ad has been played. Value 0 means that it has not been played.</li>
-              </ul>
-              <li><code>linearAd.skipOffset</code></li>
-              <ul>
-                <li>Indicates the time after which the linear ad can be skipped. Value 0 means that the linear ad is not skippable.</li>
-              </ul>
-              <li><code>linearAd.companionAd</code></li>
-              <ul>
-                <li>An object representing the unmodified VAST companionAd info.</li>
-              </ul>
-            </ul>
-          
+        <h3>Linear ad properties</h3>
+          <p>Here are the properties included in the <code>linearAd</code> object:</p>
+          <ul>
+            <li><p><code>linearAd.absoluteBeginTime</code> : Indicates the absolute time at which the linear ad will begin.</p></li>
+            <li><p><code>linearAd.absoluteEndTime</code> : Indicates the absolute time at which the linear ad will end.</p></li>
+            <li><p><code>linearAd.index</code> : Indicates the position of the linear ad within the adRoll.</p></li>
+            <li><p><code>linearAd.playCount</code> : Indicates the number of times the linear ad has been played. Value 0 means that it has not been played.</p></li>
+            <li><p><code>linearAd.skipOffset</code> : Indicates the time after which the linear ad can be skipped. Value 0 means that the linear ad is not skippable.</p></li>
+            <li><p><code>linearAd.companionAd</code> : An object representing the unmodified VAST companionAd info.</p></li>
+          </ul> 
+        
+        <h3 id="pathproperties">Path properties</h3>
+          <p>Here are the properties included in the <code>path</code> object:</p>
+          <ul>
+            <li><p><code>path.absoluteTime</code> : This is the time in the stream relative to the absolute total time. This will always match what is passed into the function and provided just for convenience.</p></li>
+            <li><p><code>path.contentTime</code> : This is the time in the stream relative to the currently playing linear advertisement or content.</p></li>
+            <li><p><code>path.adRoll</code> : This value is null if no ad should be playing at the passed absolute time or if an ad should be playing, a JSON Object with the linear advertisement absolute begin/end time info from the timeline.</p></li>
+            <li><p><code>path.linearAd</code> : This value is null if no ad should be playing at the passed absolute time or if an ad should be playing, a JSON Object with the linear advertisement <code>AdBreak</code> info from the timeline.</p></li>
+          </ul>
+          <p>Here is an example of a <code>path</code> object without an ad.</p>
+          <p><code data-gist-id="ef63cba9fedd4f7ed5c5" data-gist-hide-footer="true" data-gist-line="54-59"></code></p>   
+          <p>Here is an example of a <code>path</code> object with an ad.</p>
+          <p><code data-gist-id="ef63cba9fedd4f7ed5c5" data-gist-hide-footer="true" data-gist-line="64-169"></code></p> 
       </div>
 			
-      <div id="events" class="section">
-        <h2>Events</h2>
-        <p>The OnceUX plugin events are triggered when the <code>timeupdate</code> event occurs. Both the <code>linearAd</code> and <code>adRoll</code> objects are passed in these events.</p>
-        <p>Here is an example of an event object returned:</p>
-        <p><code data-gist-id="ef63cba9fedd4f7ed5c5" data-gist-hide-footer="true" data-gist-line="46-49"></code></p>
-        <p>Here are the available events:</p>
+      <div id="seekhandline" class="section">
+        <h2>Seek handling</h2>
+        <p>By default, the plugin enforces a "must-watch" ad policy. All advertisements must be watched in their entirety and <code>adRolls</code> cannot be skipped over or into part way. The only exception is when a seek is performed over multiple <code>adRolls</code>, where the plugin enforces that only the last <code>adRoll</code> that was seeked over is watched.</p>
+        <p>Here are some examples:</p>
         <ul>
-          <li><code>onceux-linearad-start</code></li>
-          <ul>
-            <li>The linear ad starts playing.</li>
-          </ul>
-          <li><code>onceux-linearad-impression</code></li>
-          <ul>
-            <li>The linear ad impression URL has been pinged.</li>
-          </ul>
-          <li><code>onceux-linearad-firstQuartile</code></li>
-          <ul>
-            <li>The linear ad playhead crosses first quartile.</li>
-          </ul>
-          <li><code>onceux-linearad-midpoint</code></li>
-          <ul>
-            <li>The linear ad playhead crosses midpoint.</li>
-          </ul>
-          <li><code>onceux-linearad-thirdQuartile</code></li>
-          <ul>
-            <li>The linear ad playhead crosses third quartile.</li>
-          </ul>
-          <li><code>onceux-linearad-complete</code></li>
-          <ul>
-            <li>The linear ad completes playing. The <code>playCount</code> property of linear ad is incremented.</li>
-          </ul>
-          <li><code>onceux-adroll-start</code></li>
-          <ul>
-            <li>The ad roll starts playing.</li>
-          </ul>
-          <li><code>onceux-adroll-complete</code></li>
-          <ul>
-            <li>The ad roll completes playing. The <code>playCount</code> property of the ad roll is incremented.</li>
-          </ul>
-          <li><code>onceux-ads-complete</code></li>
-          <ul>
-            <li>All the ads have been played.</li>
-          </ul>
-          <li><code>onceux-linearad-skipped</code></li>
-          <ul>
-            <li>The linear ad is skipped by the user. Ads can be skipped only when multiple ad rolls are seeked over or by invoking the <code>seekAds()</code> function.</li>
-          </ul>
-          <li><code>onceux-linearad-mute</code></li>
-          <ul>
-            <li>The linear ad is muted by the user.</li>
-          </ul>
-          <li><code>onceux-linearad-unmute</code></li>
-          <ul>
-            <li>The linear ad is unmuted by the user.</li>
-          </ul>
-          <li><code>onceux-linearad-pause</code></li>
-          <ul>
-            <li>The linear ad is paused by the user.</li>
-          </ul>
-          <li><code>onceux-linearad-resume</code></li>
-          <ul>
-            <li>The linear ad is resumed by the user.</li>
-          </ul>
-          <li><code>onceux-companionad-creativeView</code></li>
-          <ul>
-            <li>The companion ad creative view event fired.</li>
-          </ul>
+          <li><p>Seek out of an ad : returns the user to where they seeked from</p></li>
+          <li><p>Seek into an ad break : returns the user to the start of the <code>adRoll</code> containing the <code>adBreak</code></p></li>
+          <li><p>Seek over an ad : returns the user to the start of the <code>adRoll</code> seeked over</p></li>
+          <li><p>Seek over multiple ad rolls : returns the user to the start of the last <code>adRoll</code> seeked over</p></li>
+          <li><p>Seek backwards : no default handling</p></li>
           
         </ul>
-			
       </div>
         
-      <div id="methods" class="section">
-        <h2>Methods</h2>
-        <p>The OnceUX plugin has the following methods:</p>
-        <ul>
-          <li><code>player.onceux.seekAds(timeInSeconds)</code></li>
-          <ul>
-            <li>A function that takes a time (in seconds) to seek to without the default seek handling behavior enforcing that ads are not skipped.</li>
-          </ul>
-          
-        </ul>
-			
-      </div>
-			
-	  <div id="overridetext" class="section">
-        <h2>Override text</h2>
-        <p>There are three parts of the error message that you can change:</p>
-		<ul>
-			<li><code>headline</code> : This is the message text at the top.</li>
-			<li><code>type</code> : This is the <strong>Error Code:</strong> text.</li>
-			<li><code>message</code> : This is the <strong>Technical details:</strong> text.</li>
-		</ul>
-		<p><img src="/en/video-cloud/brightcove-player/assets/error-message-plugin2.png"></p>
-		<p>Once your player is created, use the HTTP <code>PATCH</code> method to update it as follows:</p>
-				<p>In the <code>data</code> property from the curl statement shown below you see an example of how to override the message text for the standard error with an error code value of <code>4</code>. The properties are defined as follows:</p>
-				<ul>
-				    <li><code>plugins</code>: This property contains an array of properties and values. For this plugin, you only need to supply the <code>name</code> property with the value of <code>errors</code>.</li>
-				    <li><code>options</code>: This property is used to pass data to the plugin.</li>
-				    <li><code>errors</code>:  This property defines the error code that you want to update. Here we are overriding the message text for the <code>headline</code>, <code>type</code>, and <code>message</code>.<p class="BCL-aside">Note: the error code can be any string value, such as overriding the text for the <code>unknown</code> message.</p></li>
-				</ul>	
-		<p><code data-gist-id="89b496092aee326f7216" data-gist-hide-footer="true" data-gist-line="1-19"></code></p>  
-		<p>If you include the errors script in your code, you can override message text as follows:</p>
-		<p><code data-gist-id="89b496092aee326f7216" data-gist-hide-footer="true" data-gist-line="68-77"></code></p>  
-      </div>
-			
-	  <div id="customerrors" class="section">
-        <h2>Custom errors</h2>
-        <p>You can also define your own custom error messages:</p>
-		    <ul>
-				<li>Custom error code values can be alphanumeric. We recommend using a negative integer or a text value to keep from colliding with the standard code values.</li>
-				<li>Custom error messages can be named anything you want. We recommend that they begin with <code>PLAYER_ERR</code> versus the standardized <code>MEDIA_ERR</code> to avoid confusion.</li>
-			</ul>
-		<p>Two custom error messages have been added as a reference:</p>
-			<ul>
-				<li>Error code: '-1'</li>
-				<ul>
-					<li>Message: PLAYER_ERR_NO_SRC</li>
-					<li>Description: No video has been loaded</li>
-				</ul>
-				<li>Error code: '-2'</li>
-				<ul>
-					<li>Message: PLAYER_ERR_TIMEOUT</li>
-					<li>Description: Could not download the video</li>
-				</ul>
-			</ul>
-		  
-		<h3>Adding custom errors</h3>
-          <p>Refer to the <a href="#overridetext">Override text</a> section for details about the message parts. When adding a custom error message, use the <code>options</code> property to pass data to the plugin. This example creates a new custom message with an error code value of <code>-3</code> and includes text based on an age gate test.</p>
-				
-		  <p><code data-gist-id="89b496092aee326f7216" data-gist-hide-footer="true" data-gist-line="22-40"></code></p>  
-		  <p>If you include the errors script in your code, you can add custom messages as follows:</p>
-		  <p><code data-gist-id="89b496092aee326f7216" data-gist-hide-footer="true" data-gist-line="111-120"></code></p>
-		  <h3>Displaying custom errors</h3>
-          <p>When you define custom errors, you need to let video.js know when you want to display it. To do this, create your own code to determine when the message should be displayed. Then use the <code>error()</code> function to display the message as follows:</p>
-				
-		  <p><code data-gist-id="89b496092aee326f7216" data-gist-hide-footer="true" data-gist-line="122-129"></code></p> 
-		  <p>Here we set the <code>age_appropriate</code> variable to <code>false</code>, but you would add your own code to determine when to display your custom error messages.</p>
-		  <p class="BCL-aside">Note: any code to throw custom errors must wait for the video to load. Use the <code>loadstart</code> event to determine this. If you try to display your message without waiting, then your message will dissappear after the video loads.</p>
-      </div>	
-			
-	  <div id="knownissues" class="section">
-        <h2>Known issues</h2>
-		<p>On iPhones, the tap events for error messages do not bubble up to the parent video element. This means that you can not close an error message once it appears. This behavior should not pose a problem since the video does not play anyway.</p>
-      </div>
+      <div id="glossary" class="section">
+      <h2>Glossary</h2>
+      <p>This plugin distinguishes the concepts of <strong>absolute</strong> and <strong>content</strong> time within a OnceUX stream. Traditional video players only have a concept of <strong>content</strong> time; times between start and end of the URI it is currently playing. Because a OnceUX stream is essentially a number of <strong>content</strong> streams stiched together we've introduced the concept of <strong>absolute</strong> time which takes into account the complete stitched stream including the video advertisements.</p>
+      <p>When you see the prefix <strong>absolute</strong> on a property or method, the times expected/returned are relative to the entire stitched stream. When you see the prefix <strong>content</strong>, the times expected/returned are relative only to a particular piece of content that was stitched into the stream (the main content or single linear advertisement).</p>
+      
+      <ul>
+        <li><p><code>timeline</code> : A JSON representation of the information in the Once VMAP XML. The timeline describes the stream and is referenced during playback constantly to ensure the UI is adapting to the currently playing content.</p></li>
+        <li><p><code>path</code> : A snapshot of the timeline at any given second with information that is relavant only to that point in time within the stream.</p></li>
+        <li><p><code>absoluteDuration</code> : The total duration of the stream including the linear ads.</p></li>
+        <li><p><code>contentDuration</code> : The total duration of the stream excluding the linear ads.</p></li>
+        <li><p><code>absoluteTime</code> : The time within the stream relative to absolute time.</p></li>
+        <li><p><code>contentTime</code> : The time within the stream relative to the stitched content segement.</p></li>
+        <li><p><code>absoluteStartTime</code> : The start time for stitched content in absolute time.</p></li>
+        <li><p><code>absoluteEndTime</code> : The end time for stitched content in absolute time.</p></li>
+        <li><p><code>adRoll</code> : A collection of one or more linear ads and non-linear ads.</p></li>
+        <li><p><code>linearAd </code> : An <code>adBreak</code> which replaces the main video content. For example, video ads.</p></li>
+        <li><p><code>companionAd</code> : An <code>adBreak</code> accompanying the linear ad or nonlinear ad which will be displayed outside the player screen. For example, ad banners.</p></li>
+        <li><p><code>nonLinerAd</code> : An <code>adBreak</code> which will not replace the main video content. For example, overlay ads. These are not yet supported.</p></li>
+      </ul>
+    </div>
 			
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
