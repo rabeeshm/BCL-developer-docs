@@ -44,35 +44,106 @@
 				<!-- Place document intro sentence(s) here -->
           <p>In this quick start you will perform the following tasks:</p>
           <ul>
-          	<li>Create a Node.js application to act as your OAuth security proxy. This proxy will use your access token to make calls to the needed APIs.</li>
-            <li>Create a video using the Content Management System (CMS) API and use the returned ID in the Dynamic Ingest (DI) API call.</li>
+            <li>Create a video object using the Content Management System (CMS) API and use the returned ID in the Dynamic Ingest (DI) API call.</li>
             <li>Create an ingest request using the ID returned from the CMS API and an HTTP <code>POST</code> method using the DI API. </li>
             <li>Verify the ingest request functioned correctly.</li>
           </ul>
           <p class="BCL-aside">For details on the API used in this document you can view the <a href="//docs.brightcove.com/en/video-cloud/di-api/guides/overview-di.html">Dynamic Ingest API Overview</a> document and the <a href="//docs.brightcove.com/en/video-cloud/di-api/reference/versions/v1/index.html">Dynamic Ingest API</a> reference.</p>
-          <p class="text-warning">Note: The steps in the document involve curl and other command-line tools that are native to Mac and Linux systems, but not part of the Windows operating system. If you are on Windows, you can get these tools by installing <a href="//cygwin.com">cygwin</a>. During the install you will be prompted for packages to install. Open the <strong>Net</strong> package, then check the <strong>curl</strong> option and then finish the installation. Once you have done this you will be able to follow the Quick Start to Dynamic Ingest successfully as written using the cygwin command line. Tools are available to run curl at the normal Windows command line, but not detailed in this document.</p>
 			</div>
-      <div id="oauthproxy" class="section">
-        <h2>Create proxy</h2>
-        <p>Security on the DI API uses OAuth2. This requires some work to access the API. </p>
-        <ol>
-        <li>In this quick start it is recommended you set up a Node.js application to act as a proxy. The <a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/quick-start.html">OAuth Quick Start</a> guides you through the steps to create a basic proxy in Node.js that gets an access token for a Brightcove API, makes the API call, and then returns the response data.</li>
-        <li>You will also need a local web server running to serve up a testing page, <strong>tester.html</strong>, which works with the proxy. Note that simply browsing the page as a file will NOT work as the page utilizes an iframe, which requires an HTTP server.</li>
-        </ol>
+			<div id="oauthproxy" class="section">
+        <h2>OAuth proxy</h2>
+        <p>The Dynamic Ingest (DI) API's security is implemented using OAuth2. To permit you to get started using the DI API as quickly as possible, the API calls in this quick start will use a security proxy running at <a href="http://solutions.brightcove.com:8004">http://solutions.brightcove.com:8004</a>. If you browse to that URL, you will be redirected to an informational page on the proxy. Be aware that the proxy will only accept requests originating from <strong>localhost</strong> and <strong>*.brightcove.com</strong> domains.</p>
       </div>
 			<div id="obtaincredentials" class="section">
 				<h2>Obtain credentials</h2>
-				<p>To use the DI API you will need proper credentials. Later in this quick start, you will use the credentials in a form when submitting requests to APIs.</p> 
-				<ol start="3">
-					<li>To obtain proper credentials use your choice of these two options (Be sure to read the paragraph following the bullets to ensure you ask for the proper operations):</li>
+				<p>To use the DI API you will need proper credentials. Later in this quick start, you will use the credentials in a form when submitting requests to the API.</p> 
+				<ol>
+					<li>To obtain proper credentials use your choice of the <strong>Get Client Credentials</strong> docs listed below. Whichever option you choose, you will need to ask for the correct operation permissions. In this quick start you will need <strong>video</strong> operations. The following can be used with curl or Postman to get the proper permissions:</li>
 				</ol>
-				<ul>
-				    <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html">OAuth: Get Client Credentials Using CURL</a></li>
-				    <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">OAuth: Get Client Credentials Using Postman</a></li>
-				</ul>
-				<p>Whichever option you choose, you will need to ask for the correct operation permissions. In this quick start you will need both <strong>video</strong> and <strong>ingest-profile</strong> operations. The following can be used with curl or Postman to get the proper permissions:</p>
 				<p><code data-gist-id="ff79f6ddb8cfce63b153" data-gist-hide-footer="true" data-gist-line="1-6"></code></p>
+        <ul>
+            <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html">OAuth: Get Client Credentials Using CURL</a></li>
+            <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">OAuth: Get Client Credentials Using Postman</a></li>
+        </ul>
 			</div>
+			<div id="assignvalues" class="section">
+        <h2>Assign values</h2>
+        <p>Values you just retrieved in the previous section will be used in calls to the Content Management System and Dynamic Ingest APIs. These values will be entered and assigned in the following form.</p>
+        <ol start="2">
+          <li>Enter the corresponding values for each of the following. This step <strong>MUST</strong> be completed for any of the API calls to function correctly.</li>
+        </ol>
+        <div class="form-wrapper">
+          <fieldset>
+            <legend>Assign values for reuse</legend>
+            <p>Submits to local JavaScript and assigns values to variables</p>
+            <p>
+              Client id:
+              <input name="client_id" id="cms_client_id" type="text" value="5fbee876-9ac3-419f-b1b9-5878282964b9">
+            </p>
+            <p>
+              Client secret:
+              <input name="client_secret" id="cms_client_secret" type="text" value="KLwqa9yx5npgu9enFHglI9GFff39StO0Id1ytaZBWXg2pQ_7DiH-XUjg3_svKNBSkB0KN21sYrvfKnALcBLOLA">
+            </p>
+            <p>
+              Account ID:
+              <input name="account_id" id="cms_account_id" type="text" value="1507807800001">
+            </p>
+            <p>
+              <input id="initialValues_Submit" type="submit" value="Assign Values">
+            </p>
+            <p><span id="assignConfirm"></span></p>
+          </fieldset>
+        </div>
+      </div>
+
+
+<div id="createvideo" class="section">
+        <h2>Create video</h2>
+        <p>The fundamental call information for creating a video is:</p>
+        <ul>
+            <li>HTTP method: <code>POST</code></li>
+            <li>Endpoint: <code>https://cms.api.brightcove.com/v1beta1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos</code></li>
+        </ul>
+        <p>The video object created will eventually contain the master copy of the video, metadata, possible renditions and other information. In the call body you supply a simple JSON object specifying the <code>name</code> of the video to be created. To see the fields for which you can provide values during the <code>POST</code>, browse to the CMS API Overview document's <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/overview-cms.html#settingvalues">Setting values</a> section.</p>
+        <p class="BCL-aside">Note: Before completing this task you must perform steps 1 and 2 above to retrieve and assign account and credential information.</p>
+        <ol start="4">
+          <li>You will now use the proxy in conjunction with the following form to create a video. Be sure to alter the body so the <code>name</code> property reflects your choice for the video name.</li>
+        </ol>
+        <div class="form-wrapper">
+          <fieldset>
+            <legend>Caller for the CMS API - Create a Video</legend>
+            <p>Submits to http://solutions.brightcove.com:<strong>8006</strong>
+            </p>
+            <p>
+              Call type:
+              <select name="requestType" id="cms_requestType2">
+                <option>GET</option>
+                <option selected="selected">POST</option>
+                <option>PUT</option>
+                <option>PATCH</option>
+                <option>DELETE</option>
+              </select>
+            </p>
+            <p>
+              Call body:
+              <br />
+              <textarea name="requestBody" id="cms_requestBody2">{"name":"My test Video"}</textarea>
+            </p>
+            <p>
+              Full request URL for the API call:
+              <br />
+              <textarea name="url" id="cms_url2" class="cms_url">https://cms.api.brightcove.com/v1beta1/accounts/YOUR_ACCOUNT_ID/videos</textarea>
+            </p>
+            <p>
+              <input id="cms_create_Submit" type="submit" value="Submit">
+            </p>
+            <p>After you click the <strong>Submit</strong> button, the following text area will be populated with the JSON object representing your newly created video.</p>
+            <pre><code id="cms_response2"></code></pre>
+          </fieldset>
+        </div>
+        <p>You can confirm the video was created by browsing to Video Cloud Studio, open the Media Module, and a video with the name supplied will be present.</p>
+      </div>
+
 			<div id="obtainvideoid" class="section">
 				<h2>Obtain video id</h2>
 				<p>Before you can create an ingest request you must first create a video object. This video object will eventually contain the master copy of the video, metadata, possible renditions and other information. To do this, you will use the Content Management System (CMS) API, permissions for which were granted in the previous section.</p>
@@ -191,7 +262,91 @@
 	</script>
 	<script type="text/javascript">
 		/******** Any scripts specific to page samples should go here *********/
+    var BCLS = (function ($) {
+      var // CMS API stuff
+      $cms_client_id = $("#cms_client_id"),
+        $cms_client_secret = $("#cms_client_secret"),
+        $cms_submit = $("#cms_Submit"),
+        $cms_account_id = $("#cms_account_id"),
+        $cms_response = $("#cms_response"),
+        $cms_video_id = $("#cms_video_id"),
+        cmsURL = "http://solutions.brightcove.com:8006",
+        // functions
+        bclslog,
+        submitRequest,
+        cleanString,
+        setCMSOptions;
+      // IE safe logger
+      bclslog = function (context, message) {
+        if (console) {
+          console.log(context, message);
+        }
+      }
+      // function to remove spaces and line breaks
+      cleanString = function (str) {
+        // remove line breaks
+        str = str.replace(/\s/g, "");
+        // remove spaces
+        // here we have to be careful - spaces fine within strings
+        // but not outside them
+        if (str != "") {
+          str = JSON.stringify(JSON.parse(str));
+        };
+        return str;
+        bclslog("str cleaned", str);
+      };
+      // set options for the CMS API request
+      setCMSOptionsRetrieveAll = function () {
+        var options = {};
+        options.client_id = $cms_client_id.val();
+        options.client_secret = $cms_client_secret.val();
+        $cms_requestBody1 = $("#cms_requestBody1");
+        options.requestBody = cleanString($cms_requestBody1.val());
+        options.requestType = $("#cms_requestType1").val();
+        options.url = $("#cms_url1").val();
+        // now submit the request
+        submitRequest(options, cmsURL, $("#cms_response1"));
+      };
+      setCMSOptionsCreate = function () {
+        var options = {};
+        options.client_id = $cms_client_id.val();
+        options.client_secret = $cms_client_secret.val();
+        $cms_requestBody2 = $("#cms_requestBody2");
+        options.requestBody = cleanString($cms_requestBody2.val());
+        options.requestType = $("#cms_requestType2").val();
+        options.url = $("#cms_url2").val();
+        // now submit the request
+        submitRequest(options, cmsURL, $("#cms_response2"));
+      };
+      // function to submit Request
+      submitRequest = function (options, proxyURL, responseLocation) {
+        var parsedData = {};
+        $.ajax({
+          url: proxyURL,
+          type: "POST",
+          data: options,
+          success: function (data) {
+            bclslog(data);
+            parsedData = JSON.parse(data);
+            responseLocation.html(data);
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            responseLocation.html("The called failed; here's what the server sent back: " + errorThrown);
+          }
+        });
+      };
+      setInitialValues = function () {
+        var elem = document.getElementById("assignConfirm");
+        elem.innerHTML = "    Values Assigned!";
+        $(".cms_url").html("https://cms.api.brightcove.com/v1beta1/accounts/" + $cms_account_id.val() + "/videos");
+        $(".cms_url_videoID").html("https://cms.api.brightcove.com/v1beta1/accounts/" + $cms_account_id.val() + "/videos/" + $cms_video_id.val());
+      };
+      $("#initialValues_Submit").on("click", setInitialValues);
+      $("#cms_retrieveall_Submit").on("click", setCMSOptionsRetrieveAll);
+      $("#cms_create_Submit").on("click", setCMSOptionsCreate);
+    })($);
 	</script>
+
 	<div class="footer text-center"><a href="mailto:docs@brightcove.com">Questions or comments?</a></div>
 </body>
 
