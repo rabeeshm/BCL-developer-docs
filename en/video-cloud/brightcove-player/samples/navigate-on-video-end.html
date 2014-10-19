@@ -27,13 +27,6 @@
 </script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/vendor/modernizr.js"></script>
   
-  <!-- Page styles -->
-    <style id="pageStyles">
-        .player-block iframe {
-            width: 640px;
-            height: 360px;
-        }
-    </style>
 </head>
 
 <body>
@@ -94,7 +87,8 @@
 			
       <div id="selectimplementation" class="section">
 				<h2>Select implementation</h2>
-				<p>In this sample, you will test with the embed_in_page code and then move the CSS and JavaScript into separate files to test locally. Then, you will move the JavaScript code to a plugin and run this sample as an iframe implementation. </p>
+				<p>In this example, you will test with the embed_in_page code and then move the CSS styles into a separate file to test locally. Then, you will use the Embed API to append the custom overlay styles to a child player based on the properties of the parent.</p>
+        <p>An iframe implementation will not work in this case since the new URL page would be contained within the dimensions of the iframe player.</p>
 			</div>
           
       <div id="resources" class="section">
@@ -116,10 +110,14 @@
         <h2>The player</h2>
         <p>This example displays an overlay when the video finishes playing. When the user selects the link contained in the overlay, the page navigates to the new URL.</p>
         
-        <div class="player-block">
-            <iframe src='//players.brightcove.net/1752604059001/9a26895b-e3bc-4c00-96a5-918c90d63ee3_default/index.html' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
-
-        </div>
+        <video
+            data-account="1752604059001"
+            data-player="2c1b81aa-9b4b-4ec1-8d9a-d6c17e1dacec"
+            data-embed="681b4115-1648-4543-b3fd-09febf510b85"
+            class="video-js" controls
+            autoplay ></video>
+        
+        <script src="//players.brightcove.net/1752604059001/2c1b81aa-9b4b-4ec1-8d9a-d6c17e1dacec_681b4115-1648-4543-b3fd-09febf510b85/index.min.js"></script>
 		  
       </div><!-- id="player" -->
 			
@@ -167,28 +165,27 @@
       </ol> 
 		  
 		<h3>Deploy the CSS</h3>
-      <p>Use the HTTP <code>PATCH</code> method to add the plugin and styles to your player.</p>
+      <p>You do not want to use the HTTP <code>PATCH</code> method to update your player with the Overlay plugin, since it will replace the <code>scripts</code> and <code>plugins</code> data. Instead, you want to create a child player based on the parent player with the Overlay plugin. When you create the child player, you can append an additional CSS stylesheet while maintaining the properties of the parent.</p>
+      <p>For details about player inheritance behavior to overwrite, prepend or append additional values see the  <a href="//docs.brightcove.com/en/video-cloud/player-management/guides/embeds.html#arrayfields"><strong>Array fields</strong></a> section of the <strong>Embed APIs Guide</strong>.</p>
       <ol>
-        <li>Use the following curl statement to associate the lightbox plugin with your player. As described in the <a href="http://docs.brightcove.com/en/video-cloud/players/guides/playertour.html">Player Tour</a>, the environment variables <code>ACCOUNT_ID</code>, <code>EMAIL</code> and <code>PLAYER_ID</code> must be defined.</li>
+        <li>Use the following HTTP <code>POST</code> method to append the custom stylesheet to a child player using the Embed API.</li>
       </ol>
-      <p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="206-220" ></code></p>
-				<p class="BCL-aside">Note: If you have an existing plugin already associated with a particular player and you perform another PATCH operation, it will replace the <code>scripts</code> and <code>plugins</code> data. If you wish to add, and not replace, the curl statement will need to reflect cumulative data, that is, multiple <code>scripts</code> and <code>plugin</code> name objects. Alternatively, for properties that are datatyped as arrays, which both <code>scripts</code> and <code>plugins</code> are, you can use inheritance behavior to be overwrite, prepend or append additional values. For details on this functionality, see the <a href="//docs.brightcove.com/en/video-cloud/player-management/guides/embeds.html#arrayfields"><strong>Array fields</strong></a> section of the <strong>Embed APIs Guide</strong>.</p>
+      <p><code data-gist-id="e8204faac81d86ead80d" data-gist-hide-footer="true" data-gist-line="118-129" ></code></p>
+				
       <ol start="2">
-        <li>Use the HTTP <code>POST</code> method to publish your player again.</li>
         <li>From the response, copy the <code>embed_in_page</code> code and place it in a newly created HTML page. Your page should look similar to this:</li>
       </ol> 
-      <p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="320-341" ></code></p>
+      <p><code data-gist-id="e8204faac81d86ead80d" data-gist-hide-footer="true" data-gist-line="133-153" ></code></p>
       <ol start="4">
-        <li>Browse the HTML page and you should see the player with the plugin functioning correctly.</li>
+        <li>Browse the HTML page and you should see the player with the custom overlay functioning correctly.</li>
       </ol> 
       </div>
           
       <div id="useiframe" class="section">
         <h2>Use iframe</h2>
-        <p>It is a best practice to use the iframe player implementation. If it is possible for this example, replace the embed_in_page implementation with the iframe implementation.</p>
-				<p>Here is the complete code:</p>
-        <p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="178-202" ></code></p>
-        <p>Browse the HTML page and you should see the player with the plugin functioning correctly.</p>
+        <p>It is a best practice to use the iframe player implementation if possible.</p>
+        <p>In this example, the iframe implementation will not work, since we want the entire page to navigate to the new URL. With the iframe implementaion, the contents of the new URL page would be contained within the dimensions of the iframe player.</p>
+        
       </div>
 			
       <div class="section" id="BCLreferences">
