@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="robots" content="noindex" />
+  <meta name="robots" content="noindex" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+  <!-- change title to match the h1 heading -->
+  <title>Brightcove Player Sample: Age Gate</title>
+  <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/foundation.min.css" />
+	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/normalize.css" />
+  <script src="//use.edgefonts.net/source-code-pro.js"></script>
+  <link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/styles/github.min.css">
+   
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2728311-29', 'auto');
+  ga('send', 'pageview');
+
+</script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/vendor/modernizr.js"></script>
+  
+<!-- Page styles -->
+<style>
+  .player-block iframe {
+    width: 640px;
+    height: 360px;
+  }
+</style>  
+</head>
+
+<body>
+    <!-- header navbar -->
+	<div id="navWrapper" class="fixed"></div>
+	<!-- breadcrumbs -->
+	<nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+  <!-- search -->
+  <div id="searchModal" class="reveal-modal" data-reveal></div>
+  <!-- content -->
+    <div class="row">
+        <div class="large-2 columns show-for-large-up">
+            <div id="sidenav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+      <div id="top" class="section">
+        <h1>Brightcove Player Sample: Age Gate</h1>
+        <p>This topic shows you how to use a Brightcove player with a simple age gate overlay. The user must certify their age by clicking on the overlay text before the video will play.</p>
+        <div class="text-warning" style="padding-left:1em;padding-right:1em;">
+          <h4>Plugins used</h4>
+          <p>Note: This example uses open source video.js plugins:</p>
+          <ul>
+            <li><a href="https://github.com/brightcove/videojs-overlay">videojs-overlay</a> : For details, refer to the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/overlay-plugin.html">Display Overlay Plugin</a> document.</li>
+          </ul>
+        </div>
+      </div>
+			
+		  <div id="developmentsequence" class="section">
+        <h2 id="expanderHead"><span id="expanderSign">+</span>Development sequence</h2>
+        <div id="expanderContent" style="display:none">
+          <p>Here is the recommended development sequence:</p>
+          <ol>
+            <li>Use the embed_in_page player implementation to test the functionality of your player, plugin and CSS (if CSS is needed)</li>
+            <li>Put the plugin's JavaScript and CSS into separate files for local testing</li>
+            <li>Deploy the plugin code and CSS to your server once you have worked out any errors</li>
+            <li>Use the HTTP <code>PATCH</code> method to add the plugin and styles to your player</li>
+            <li>Replace the embed_in_page player implementation if you determine that the iframe implementation is a better fit (detailed in next section)</li>
+          </ol>
+          <p>For details about these steps, review the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a> guide.</p>
+          <h3>iframe or embed_in_page</h3> 
+          <p>When developing enhancements for the Brightcove player you will need to decide if the code is a best fit for the iframe or embed_in_page implementation. The best practice recommendation is to build a plugin for use with an iframe implementation. The
+            advantages of using the iframe player are:</p>
+          <ul>
+            <li>No collisions with existing JavaScript and/or CSS</li>
+            <li>Automatically responsive</li>
+            <li>The iframe eases use in social media apps (or whenever the video will need to "travel" into other apps)</li>
+          </ul>
+          <p>Although integrating the embed_in_page player can be more complex, there are times when you will plan your code around that implementation. To generalize, this approach is best when the containing page needs to communicate to the player. Specifically,
+            here are some examples:</p>
+          <ul>
+            <li>Code in the containing page needs to listen for and act on player events</li>
+            <li>The player uses styles from the containing page</li>
+            <li>The iframe will cause app logic to fail, like a redirect from the containing page</li>
+          </ul>
+          <p>Even if your final implementation does not use the iframe code, you can still use the embed_in_page code with a plugin for your JavaScript and a separate file for your CSS. This encapsulates your logic so that you can easily use it in multiple players.</p>
+        </div><!-- id="expanderContent" -->
+			</div>
+			
+      <div id="selectimplementation" class="section">
+				<h2>Select implementation</h2>
+				<p>In this example, you will test with the embed_in_page code and then move the styles and scripts into separate files to test locally. Then, you will use the Embed API to append the age gate styles, script and plugin to a child player based on the properties of the parent. With this player, you can run this example as an iframe implementation.</p>
+			</div>
+          
+      <div id="resources" class="section">
+        <h2>API resources used</h2>
+		  <p>The following sections detail resources used from various APIs.</p>
+        <h3>Brightcove player API methods</h3>
+        <ul>
+          <li><code>removeClass()</code></li>
+          <li><code>play()</code></li>
+        </ul>
+        <h3>Brightcove player API events</h3>
+        <ul>
+          <li><code>loadedalldata</code></li>
+        </ul>
+        <h3>Player management API</h3>
+        <ul><li>HTTP <code>POST</code> method with the endpoint <code>https://players.api.brightcove.com/v1/accounts/$ACCOUNT_ID/players</code> to create the player and its proper configuration</li></ul>
+      </div>
+			
+      <div id="player" class="section">
+        <h2>The player</h2>
+        <p>This example displays an overlay and hides the player controls and play button. When the user confirms their age by clicking on the overlay text, the controls are displayed and the video plays.</p>
+        
+        <div class="player-block">
+          <iframe src='//players.brightcove.net/1752604059001/15dea403-8c57-4efd-ad9f-7c085eaade98_a93bab6c-e189-491b-93fa-44d8613438d6/index.html' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
+        </div>
+		  
+      </div><!-- id="player" -->
+			
+      <div id="code" class="section">
+        <h2>How it works</h2>
+		    <p>The following sections explain the player, JavaScript and CSS code used in the example.</p>
+        <h3>Create the player</h3>
+        <p>This player was created using the following curl statement. Notice that it includes an Overlay plugin for the player with some age verification text.</p>
+        <ul>
+          <li>Lines 9-18: Define the video sources. Notice this player has both an MP4 and an HLS video type. </li>
+          <li>Lines 20-25: Include the styles and scripts for the Overlay plugin.</li>
+          <li>Lines 26-36: Add the Overlay plugin to the player.</li>
+          <li>Line 31: Defines the age verification text.</li>
+          <li>Line 32: Tells the overlay to display when the player has initial duration and dimension information.</li>
+          <li>Line 33: Tells the overlay to hide when the video playback starts.</li>
+        </ul>
+        <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="1-39"></code></p>
+        
+        <h3>The player code</h3>
+        <p>The player code is simply the embed_in_page implementation displayed when the player is published.</p>
+        <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="85-91"></code></p>
+        
+        <h3><a name="HTMLCode"></a>The HTML code</h3>
+        <p>No extra HTML code is needed for this example, until you get to the iframe implementation.</p>
+		  
+        <h3><a name="JSCode"></a>The JavaScript code</h3>
+        <p>Add the following JavaScript to your page code.</p>
+        <p>Here you will use the player's <code>addClass()</code> and <code>removeClass()</code> methods to hide and then show the player controls. We'll look at the details of the <code>video-agelist</code> class in the next section.</p>
+        <ul>
+          <li>Line 99: Gets a reference to the player when it is ready.</li>
+          <li>Line 100: Adds the class which hides the player controls and the big play button.</li>
+          <li>Line 102: Listens for when the player has initial duration and dimension information.</li>
+          <li>Line 103: Gets a reference to the age verification text in the overlay.</li>
+          <li>Line 104: Listens for when the user clicks the age verification text.</li>
+          <li>Line 105: Removes the class which hides the player controls and the big play button.</li>
+          <li>Line 106: Starts video playback.</li>
+        </ul>
+        <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="94-110"></code></p>
+        
+        <h3><a name="stylesheet"></a>The stylesheet</h3>
+        <p>This example uses CSS styles for the Brightcove player and the Overlay plugin.</p>
+        <ul>
+          <li>Lines 53-65: Override the default styles for the Overlay plugin.</li>
+          <li>Lines 67-70: Hide the player controls and the big play button.</li>
+          <li>Lines 72-74: Set the cursor for the age verification text in the overlay.</li>
+          <li>Lines 76-79: Set the dimensions of the player.</li>
+        </ul>
+        <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="51-80"></code></p>
+        <h4>Hiding player controls</h4>
+        <p>Let's take a closer look at how we used CSS to hide the big play button and the control bar. For an introduction about changing the appearance of the Brightcove player, see the <a href="/en/video-cloud/brightcove-player/guides/customize-appearance.html">Customize Player Appearance</a> guide.</p>
+        <p>First, let's change the style to hide the player's big play button.</p>
+        <ol>
+          <li>In the Chrome browser, open the <strong>Developer Tools</strong>.</li>
+          <li>Right click on the player and select <strong>Inspect Element</strong>.</li>
+          <li>In the <strong>Elements</strong> section of the <strong>Developer Tools</strong>, select the HTML associated with the big play button.</li>
+          <li>In the <strong>Styles</strong> section, you can see that the original <code>display</code> property with a value of <code>block</code> is set on the <code>div</code> element.</li>
+          <p><img src="/en/video-cloud/brightcove-player/samples/assets/age-gate-hide-button.png" alt="hide big play button" title="hide big play button"></p>
+          <li>When overriding CSS values, more specific styles win over less specific ones. Since elements have the lowest specificity value, we can override the display property by simply specifying the <code>vjs-big-play-button</code> class.</li>
+          <li>Look at our CSS for the big play button below. In this example, we are saying select all elements with a class name of <code>vjs-big-play-button</code> which are decendents of the element with class name of <code>video-agelist</code>. Remember that in the JavaScript code, we added the <code>video-agelist</code> class to the player.</li>
+          <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="67-70" data-gist-highlight-line="68,69"></code></p>
+        </ol>
+        
+        <p>Next, let's change the style to hide the player's control bar.</p>
+        <ol>
+          <li>In the <strong>Elements</strong> section of the <strong>Developer Tools</strong>, select the HTML associated with the player control bar.</li>
+          <li>In the <strong>Styles</strong> section, you can see that the original <code>display</code> property with a value of <code>flex</code> is set with three class attributes in the selector.</li>
+          <p><img src="/en/video-cloud/brightcove-player/samples/assets/age-gate-hide-controls.png" alt="hide control bar" title="hide control bar"></p>
+          <li>To override the style for the control bar, we need at least three class attributes in our selector, including the <code>vjs-control-bar</code> class.</li>
+          <li>Look at our CSS for the control bar below. In this example, we are saying select all elements with a class name of <code>vjs-control-bar</code> which are decendents of the element with both a class name of <code>video-agelist</code> and a class name of <code>video-js</code>.</li>
+          <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="67-70" data-gist-highlight-line="67,69"></code></p>
+          <p>For more information about calculating specificity value, see the <a href="//css-tricks.com/specifics-on-css-specificity/">Specifics on CSS Specificity</a> page.</p>
+
+        </ol>
+        
+	  </div>
+		  
+    <div id="plugin" class="section">
+		  <h2>Use a plugin</h2>
+		  <p>It is a best practice to use a plugin so that you can easily add this functionality to multiple players. </p>
+		  
+      <h3>Create the JavaScript file</h3>
+        <p>Move the plugin's JavaScript code into a file and place it in an Internet accessible URL.</p>
+        <ul>
+          <li>Create a new file for your plugin JavaScript code. In this case, name it <code>age-gate.js</code>.</li>
+          <li>Cut and paste the JavaScript code from your main HTML file into this new file.</li>
+          <li>Lines 122,135: Wrap your JavaScript code using the <code>videojs.plugin()</code> function. The first argument, <code>ageGate</code>, is the plugin name.</li>
+          <li>Line 123: Gets a reference to your player.</li>
+          <li>The rest is your JavaScript code which was reviewed in a previous section.</li>
+        </ul>
+        <p class="BCL-aside">Note: Line 135: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</p>
+        <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="119-135"></code></p>
+        <ol start="6">
+          <li>In the HTML file, add the following code just below the existing <code>&lt;script&gt;</code> tags. This code includes the JavaScript file and then calls the method defined in that JavaScript.</li>
+        </ol>
+        <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="160-161" ></code></p>
+        <ol start="7">
+          <li>Browse the HTML page. You should see that the age gate overlay still works, except now your JavaScript code has been removed from the HTML page.</li>
+        </ol> 
+      
+      <h3>Create the CSS file</h3>
+        <p>If you are using CSS, move styles into a file and place it in an Internet accessible URL.</p>
+        <ol>
+            <li>Create a new file for your CSS styles. In this case, name it <code>age-gate.css</code>.</li>
+            <li>In the <code>&lt;head&gt;</code> section of your HTML file, add the following link to include your newly created CSS file.</li>
+          </ol>
+        <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="146" ></code></p>
+        <ol start="3">
+            <li>Browse the HTML page. You should see that the navigate on end link still works, except now your styles has been removed from the HTML page.</li>
+        </ol> 
+		  
+      <h3>Deploy plugin and CSS</h3>
+      <p>You do not want to use the HTTP <code>PATCH</code> method to update your player with the Age Gate plugin, since it will replace the <code>stylesheets</code>, <code>scripts</code> and <code>plugins</code> data. This will remove the Overlay plugin. Instead, you want to create a child player based on the parent player with the Overlay plugin.</p>
+      <p>When you create the child player, you can append additional styles, scripts and plugins while maintaining the properties of the parent. For details about child player inheritance behavior to overwrite, prepend or append additional values see the  <a href="//docs.brightcove.com/en/video-cloud/player-management/guides/embeds.html#arrayfields"><strong>Array fields</strong></a> section of the <strong>Embed APIs Guide</strong>.</p>
+      <ol>
+        <li>Use the following HTTP <code>POST</code> method to append the custom age gate style, script and plugin to a child player using the Embed API.</li>
+      </ol>
+        <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="172-193" ></code></p>
+
+        <ol start="2">
+          <li>From the response, copy the <code>embed_in_page</code> code and place it in a newly created HTML page. Your page should look similar to this:</li>
+        </ol> 
+        <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="198-219" ></code></p>
+        <ol start="4">
+          <li>Browse the HTML page and you should see the player with the custom age gate overlay functioning correctly.</li>
+        </ol> 
+        </div>
+
+        <div id="useiframe" class="section">
+          <h2>Use iframe</h2>
+          <p>It is a best practice to use the iframe player implementation. If it is possible for this example, replace the embed_in_page implementation with the iframe implementation.</p>
+				<p>Here is the complete code:</p>
+        <p class="BCL-aside">Note: Here we added a <code>div</code> container around the <code>iframe</code> element to make it easier to reference the player code.</p>
+        <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="224-248" ></code></p>
+        <p>Browse the HTML page and you should see the player with the plugin functioning correctly.</p>
+
+      </div>
+			
+      <div class="section" id="BCLreferences">
+        <h2>Related Topics</h2>
+        <ul>
+          <li><a href="../../player-management/guides/player-configuration.html">Player Configuration Guide</a></li>
+          <li><a href="../../brightcove-player/guides/plugin-guide.html">Plugin Guide</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- bcl scripts -->
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/1.7/gist-embed.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.2/fastclick.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/foundation.min.js"></script>
+  
+  <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
+  <script src="/en/scripts/log.js"></script>
+  <script src="/en/scripts/docs-nav-data.min.js"></script>
+  <script src="/en/scripts/bcls-doc-site.js"></script>
+  <script src="/en/scripts/bc-mapi.js"></script>
+  <script src="/en/scripts/expander.js"></script>
+  <script>
+      $(document).foundation();
+  </script>
+  <script type="text/javascript">
+    /******** Any scripts specific to page samples should go here *********/
+  </script>
+    <div class="footer text-center"><a href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+	</body>
+
+</html>
