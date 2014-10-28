@@ -44,69 +44,77 @@
         </div>
         <div id="intro" class="section">
           <h2><a name="intro"></a>Analytics integration</h2>
-            <p>If you use the Brightcove player and Catalog included in the SDK to retrieve and play videos, analytics data will be automatically collected and will appear in your Video Cloud Analytics. If you do not use the Brightcove player and catalog, you can still send analytics data to your Video Cloud Analytics using the <a href="//docs.brightcove.com/en/video-cloud/analytics-api/guides/data-collection-api-overview.html">Data Collection API</a>.
+            <p>If you use the Brightcove player and Catalog included in the SDK to retrieve and play videos, analytics data will be automatically collected and will appear in the Video Cloud Analytics module. If you do not use the Brightcove player and catalog, you can still send analytics data to Video Cloud Analytics using the <a href="//docs.brightcove.com/en/video-cloud/analytics-api/guides/data-collection-api-overview.html">Data Collection API</a>.
 </p>
 						
         </div>
         <div id="customizeProperties" class="section">
           <h2><a name="customizeProperties"></a>Customize properties</h2>
-            <p>From your iOS app, you can customize values sent to Brightcove Analytics for your account id, source URI and destination URI:</p>
+            <p>From your iOS app, you can customize values sent to Brightcove Analytics for destination URI, source URI and account id in your ViewController implementation file. This is typically done after the call to create the PlaybackController:</p>
             <pre><code>
 id&lt;BCOVPlaybackController&gt; controller = 
     [[BCOVPlayerSDKManager sharedManager] createPlaybackController];
 		
-controller.analytics.account = &lt;insert-valid-accountId&gt;;
-controller.analytics.destination = &lt;insert-example-of-valid-uri&gt;;
-controller.analytics.source = &lt;insert-example-of-valid-uri&gt;;
+controller.analytics.destination = &lt;insert your preferred Destination value here&gt;;
+controller.analytics.source = &lt;insert your preferred Source value here&gt;;
+controller.analytics.account = &lt;insert your Account ID here&gt;;
     </code></pre>
         </div>
 					
 				<div class="BCL-subsection">
-			  	<h3>account</h3>
-					<p>Use the <code>account</code> property to set the Account ID value in Brightcove Analytics. When data is sent to analytics, the value of this property will be used instead of the video's <code>accountId</code> value. The video's <code>accountId</code> value remains unchanged from when they were retrieved from the server.</p>
+			  	<h3>Destination</h3>
+					<p>Use the <code>destination</code> property to set the value of the location that originates the event. This field can be any string value, but it is most useful to use a URI with valid structure:</p>
+					<pre><code>
+&lt;scheme name&gt; : &lt;hierarchical part&gt; 
+    			</code></pre>
+<!--					<p>For more details about the URI structure, see the <a href="//en.wikipedia.org/wiki/URI_scheme#Generic_syntax">URI Scheme</a> Wikipedia page.</p>-->
+					<p>The default value the destination property is <code>bcsdk://</code> followed by the app's bundle identifier as listed in the app's <strong>info.plist</strong> file.</p>
+					<p>Example:</p>
+					<pre><code>
+controller.analytics.destination = 
+    @“bcsdk://com.brightcove.sampleAppMainScreen.Destination”;
+    			</code></pre>
+          <p>In the Video Cloud Analytics module, you can view a report of videos using this destination value:
+          <ol>
+            <li>In the Analytics module, mouse over <strong>Performance</strong> in the left-side menu.</li>
+            <li>Select <strong>Display Domain</strong> from the context menu that appears.</li>
+            <p><img src="/en/video-cloud/brightcove-player-sdk-for-ios/guides/analytics/assets/display-domains.png" alt="Display Domains Report" title="Display Domains Report"></p>
+            <li>Select your destination override listed to view details in the Display Domains report.</li>
+          </ol>
+          </p>
+				</div>
+					
+				<div class="BCL-subsection">
+			  	<h3>Source</h3>
+					<p>Use the <code>source</code> property to set the URI that sent the end-user to the destination URI. As with the destination value, the value of the source field can be any string value, but it is most useful to use a URI with valid structure:</p>
+					<pre><code>
+&lt;scheme name&gt; : &lt;hierarchical part&gt;
+    			</code></pre>
+					<p>The default value of the source property is nil. When the value is nil, the source property is not sent to the Analytics server.</p>
+					<p>Example:</p>
+					<pre><code>
+controller.analytics.source = @“bcsdk://com.brightcove.sampleAppMainScreen.Source”;
+    			</code></pre>
+          <p>In the Video Cloud Analytics module, you can view a report of videos using this source value:
+          <ol>
+            <li>In the Analytics module, mouse over <strong>Performance</strong> in the left-side menu.</li>
+            <li>Select <strong>Source of Traffic</strong> from the context menu that appears.</li>
+            <p><img src="/en/video-cloud/brightcove-player-sdk-for-ios/guides/analytics/assets/traffic-source.png" alt="Sources of Traffic" title="Sources of Traffic"></p>
+            <li>In the Traffic Sources report, there will be a link named <strong>Referrals</strong>. Clicking this link will display a report that includes your source override.</li>
+          </ol>
+          </p>
+      <p class="BCL-aside">Note: For more details about URI structures for use in the destination and source fields, see the <a href="//en.wikipedia.org/wiki/URI_scheme">URI Scheme</a> Wikipedia page.</p>
+				</div>
+          
+        <div class="BCL-subsection">
+			  	<h3>Account</h3>
+          <p>Use the <code>account</code> property to set the Account ID value in Brightcove Analytics. This property will be useful only in cases where there is no <code>accountId</code> value in the video’s metadata (for example, if your app uses a mix of Video Cloud videos, which contain the <code>accountId</code> property, and non-Video Cloud videos, which will not contain the <code>accountId</code> property).</p>
 				<pre><code>
-controller.analytics.account = &lt;insert-valid-accountId&gt;;
+controller.analytics.account = @“123456789”;
     </code></pre>
+          <p>When you set the account property, the value of this property will be used for any of your videos which do not already have an <code>accountId</code> property. These videos will be reported in the Brightcove Analytics module as <strong>Other/Third Party</strong>. This is because Brightcove Analytics does not currently support detailed reporting for videos that are not retrieved through the Brightcove Catalog service.</p> 
+          <p>For Video Cloud videos, setting this account override has no effect on reporting, since the video's <code>accountId</code> metadata value remains unchanged. That value can not be overridden by setting this account value.</p>
 				</div>
-					
-				<div class="BCL-subsection">
-			  	<h3>destination</h3>
-					<p>Use the <code>destination</code> property to set the URI that originates the event. The value of this field must be a URI with valid structure:</p>
-					<pre><code>
-&lt;scheme name&gt; : &lt;hierarchical part&gt; [ ? &lt;query&gt; ] [ # &lt;fragment&gt; ]
-    			</code></pre>
-					<p>For more details about the URI structure, see the <a href="//en.wikipedia.org/wiki/URI_scheme#Generic_syntax">URI Scheme</a> Wikipedia page.</p>
-					<p>The value of the <code>destination</code> property:</p>
-					<ul>
-					<li>The default value is <code>bcsdk:/</code> followed by the app's bundle identifier as listed in the app's <strong>info.plist</strong> file.</li>
-					<li>A URI without a hierarchical part (e.g. just a scheme) is invalid.</li>
-					<li>A URI without a scheme name is invalid.</li>
-					</ul>
-					<p>Example:</p>
-					<pre><code>
-controller.analytics.destination = &lt;insert-example-of-valid-uri&gt;;
-    			</code></pre>
-				</div>
-					
-				<div class="BCL-subsection">
-			  	<h3>source</h3>
-					<p>Use the <code>source</code> property to set the URI that sent the end-user to the destination URI. The value of this field must be a URI with valid structure:</p>
-					<pre><code>
-&lt;scheme name&gt; : &lt;hierarchical part&gt; [ ? &lt;query&gt; ] [ # &lt;fragment&gt; ]
-    			</code></pre>
-					<p>For more details about the URI structure, see the <a href="//en.wikipedia.org/wiki/URI_scheme#Generic_syntax">URI Scheme</a> Wikipedia page.</p>
-					<p>The value of the <code>source</code> property:</p>
-					<ul>
-					<li>The default value is nil. When the value is nil, the <code>source</code> property is not sent to the Analytics server.</li>
-					<li>A URI without a hierarchical part (e.g. just a scheme) is invalid.</li>
-					<li>A URI without a scheme name is invalid.</li>
-					</ul>
-					<p>Example:</p>
-					<pre><code>
-controller.analytics.source = &lt;insert-example-of-valid-uri&gt;;
-    			</code></pre>
-				</div>
-					
 					
 				
         <div class="BCL-references">
