@@ -112,7 +112,6 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                     <h3>adSwf</h3>
                     <p>Type: <code>string</code>
                         Default Value: <code>videojs.ima3.swf</code></p>
-                    <p>Development Value: <code>src/videojs.ima3.swf</code></p>
                     <p>The path to the videojs IMA3 swf. This will be directly applied to the object element if the Flash ad tech is used.</p>
                     <h3>clickTrackingElement</h3>
                     <p>Type: <code>HTMLElement</code> Default Value: undefined</p>
@@ -121,7 +120,11 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                     <h3>timeout</h3>
                     <p>Type: <code>number</code> Default Value: <code>5000</code></p>
                     <p>The maximum amount of time to wait, in milliseconds, for an ad implementation to initialize before playback. If the viewer has requested playback and the ad implementation does not dispatch the <code>adsready</code> event before this timeout expires the content video will begin playback. It's still possible for an ad implementation to play ads after this waiting period has finished, but video playback will already be in progress.</p>
-                    <p>Once the ad plugin starts waiting for the adsready event, one of these things will happen:</p>
+                    <p>This option is part of the ad framework is configured as follows:</p>
+<pre><code>player.ads({
+  timeout: 5000
+});</code></pre>
+                    <p>Once the ad plugin starts waiting for the <code>adsready</code> event, one of these things will happen:</p>
                     <ul>
                         <li>Integration ready within the timeout: This is the best case, preroll(s) will play without the user seeing any content video first.</li>
                         <li>Integration ready, but after timeout has expired: Preroll(s) still play, but the user will see a bit of content video.</li>
@@ -131,13 +134,28 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                     <p>If the ad implementation takes a long time to initialize and this timeout is too short, then the content video will begin playing before the first preroll opportunity. This has the jarring effect that the viewer would see a little content before the preroll cuts in.</p>
                     <p>In internal Brightcove testing it was found that five seconds seemed to be long enough to accommodate slow initialization in most cases, but still short enough that failures to initialize didn't look like failures of the player or content video.</p>
 
-                    <h3></h3>
-                    <p>Type: <code></code> Default Value: <code></code></p>
-                    <p></p>
+                    <h3>prerollTimeout</h3>
+                    <p>Type: <code>number</code> Default Value: <code>100</code></p>
+                    <p>The maximum amount of time to wait for an ad implementation to initiate a preroll, in milliseconds. If <code>readyforpreroll</code> has been fired and the ad implementation does not call <code>startLinearAdMode()</code> before <code>prerollTimeout</code> expires, the content video will begin playback. The <code>prerollTimeout</code> option is cumulative with the standard timeout parameter.</p>
+                    <p>This option is part of the ad framework is configured as follows:</p>
+<pre><code>player.ads({
+  prerollTimeout: 100
+});</code></pre>
+                    <p>Once the ad dispatches the <code>readyforpreroll</code> event one of these things will happen:</p>
+                    <ul>
+                        <li><code>startLinearAdMode()</code> is called within the timeout: Preroll(s) will play without the user seeing any content video first.</li>
+                        <li><code>startLinearAdMode()</code> is never called: Content video plays without preroll(s).</li>
+                        <li><code>startLinearAdMode()</code> is called, but after the prerollTimeout expired: Bad user experience; content video plays a bit, then preroll(s) cut in.</li>
+                    </ul>
+                    <p>The <code>prerollTimout</code> should be as short as possible so that the viewer does not have to wait unnecessarily if no preroll is scheduled for a video. Make this longer if your ad integration needs a long time to decide whether it has preroll inventory to play or not. Ideally, your ad integration should already know if it wants to play a preroll before the <code>readyforpreroll</code> event.</p>
 
                     <h3></h3>
                     <p>Type: <code></code> Default Value: <code></code></p>
                     <p></p>
+                    <p>This option is part of the ad framework is configured as follows:</p>
+<pre><code>player.ads({
+  timeout: 3000
+});</code></pre>
 
                 </div>
             </div>
