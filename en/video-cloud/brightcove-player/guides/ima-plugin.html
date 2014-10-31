@@ -67,9 +67,9 @@
                     <h3>Associate plugin with one player instance</h3>
                     <p>To associate the plugin with a single instance of a player, which you do using the <code>embed_in_page</code> code, you must perform the following (with line references to the code which follows the list):</p>
                     <ul>
-                        <li>Give the <code>video</code> tag an <code>id</code> attribute, with some value, in this case <strong>video</strong>; line 40.</li>
                         <li>Use a <code>link</code> tag to include the plugin's CSS in the <code>head</code> of the HTML page; line 38.</li>
-                        <li>Use a <code>script</code> tag to include the plugin's JavaScript in the <code>body</code> of the HTML page; line 48.</li>
+                        <li>Give the <code>video</code> tag an <code>id</code> attribute, with some value, in this case <strong>video</strong>; line 40.</li>
+                        <li>Use a <code>script</code> tag to include the plugin's JavaScript in the <code>body</code> of the HTML page; line 49.</li>
                         <li>Create a reference to the player; line 51.</li>
                         <li>Initialize the plugin and pass in custom options; lines 54-57.</li>
                     </ul>
@@ -117,6 +117,28 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                     <h3>clickTrackingElement</h3>
                     <p>Type: <code>HTMLElement</code> Default Value: undefined</p>
                     <p>If the HTML ad tech is being used in <a href="//developers.google.com/interactive-media-ads/docs/sdks/html5/v3/guides/custom_playback">custom ad playback</a> mode, this specifies an alternative HTML element to be used to track advertisement taps on devices that don't support input events over the video element. More details are available in the parameter documentation for the <a href="//developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.AdDisplayContainer">IMA AdDisplayContainer</a>. If you provide a click tracking element, it is your responsibility to show and hide it at the appropriate times on the appropriate platforms. In most cases, it's best to leave this setting undefined and allow the the plugin and IMA to manage ad interaction.</p>
+
+                    <h3>timeout</h3>
+                    <p>Type: <code>number</code> Default Value: <code>5000</code></p>
+                    <p>The maximum amount of time to wait, in milliseconds, for an ad implementation to initialize before playback. If the viewer has requested playback and the ad implementation does not dispatch the <code>adsready</code> event before this timeout expires the content video will begin playback. It's still possible for an ad implementation to play ads after this waiting period has finished, but video playback will already be in progress.</p>
+                    <p>Once the ad plugin starts waiting for the adsready event, one of these things will happen:</p>
+                    <ul>
+                        <li>Integration ready within the timeout: This is the best case, preroll(s) will play without the user seeing any content video first.</li>
+                        <li>Integration ready, but after timeout has expired: Preroll(s) still play, but the user will see a bit of content video.</li>
+                        <li>Integration never becomes ready: Content video starts playing after timeout.</li>
+                    </ul>
+                    <p>This timeout is necessary to ensure a good viewer experience in cases where the ad implementation suffers an unexpected or irreparable error and never fires an <code>adsready</code> event. Without this timeout, the ads plugin would wait forever, and neither the content video nor ads would ever play.</p>
+                    <p>If the ad implementation takes a long time to initialize and this timeout is too short, then the content video will begin playing before the first preroll opportunity. This has the jarring effect that the viewer would see a little content before the preroll cuts in.</p>
+                    <p>In internal Brightcove testing it was found that five seconds seemed to be long enough to accommodate slow initialization in most cases, but still short enough that failures to initialize didn't look like failures of the player or content video.</p>
+
+                    <h3></h3>
+                    <p>Type: <code></code> Default Value: <code></code></p>
+                    <p></p>
+
+                    <h3></h3>
+                    <p>Type: <code></code> Default Value: <code></code></p>
+                    <p></p>
+
                 </div>
             </div>
           <div id="html5settings" class="section">
@@ -177,45 +199,6 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                         <li>When the user&#39;s browser does not support touch events, the HTML ad tech is active and an ad is playing</li>
                         <li>When the the user&#39;s browser supports touch event, player controls are visible and an ad is playing</li>
                     </ul>
-                    <table>
-                    <thead><tr>
-                    <th align="right"></th>
-                    <th align="center">0 0</th>
-                    <th align="center">0 1</th>
-                    <th align="center">1 0</th>
-                    <th align="center">1 1</th>
-                    </tr></thead>
-                    <tbody>
-                    <tr>
-                    <td align="right"><strong>0 0</strong></td>
-                    <td align="center">0</td>
-                    <td align="center">0</td>
-                    <td align="center">1</td>
-                    <td align="center">0</td>
-                    </tr>
-                    <tr>
-                    <td align="right"><strong>0 1</strong></td>
-                    <td align="center">1</td>
-                    <td align="center">0</td>
-                    <td align="center">1</td>
-                    <td align="center">0</td>
-                    </tr>
-                    <tr>
-                    <td align="right"><strong>1 0</strong></td>
-                    <td align="center">1</td>
-                    <td align="center">0</td>
-                    <td align="center">1</td>
-                    <td align="center">0</td>
-                    </tr>
-                    <tr>
-                    <td align="right"><strong>1 1</strong></td>
-                    <td align="center">1</td>
-                    <td align="center">0</td>
-                    <td align="center">1</td>
-                    <td align="center">0</td>
-                    </tr>
-                    </tbody>
-                    </table>
                 </div>
             </div>
             <div id="issues" class="section">
