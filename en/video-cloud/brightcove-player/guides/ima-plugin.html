@@ -80,9 +80,9 @@
             <div id="options" class="section">
                 <h2><a name="options"></a>Options</h2>
                 <div class="BCL-concept">
-                    <p>The video.js IMA3 plugin is built on top of the <a href="https://github.com/brightcove/videojs-ads">video.js ad framework</a> and accepts any options
+                    <p>The video.js IMA3 plugin is built on top of the <a href="https://github.com/brightcove/videojs-ads">video.js ads framework</a> and accepts any options
                         that the ad framework provides. Take a look at the ad framework <a href="https://github.com/brightcove/videojs-ads/blob/master/README.md">README</a> for
-                        details on the current set of overrideable settings. In addition, the following IMA specific options are supported:</p>
+                        details on the current set of overrideable settings. Both the IMA plugin specific options and ad framework options are documented here.</p>
                     <h3>ima3SdkSettings</h3>
                     <p>Type: <code>object</code> Default Value: undefined</p>
                     <p>If provided, the properties of this object are used to set the page-level <a href="https://developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.ImaSdkSettings">Ima3SdkSettings</a> when
@@ -149,12 +149,12 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                     </ul>
                     <p>The <code>prerollTimout</code> should be as short as possible so that the viewer does not have to wait unnecessarily if no preroll is scheduled for a video. Make this longer if your ad integration needs a long time to decide whether it has preroll inventory to play or not. Ideally, your ad integration should already know if it wants to play a preroll before the <code>readyforpreroll</code> event.</p>
 
-                    <h3></h3>
-                    <p>Type: <code></code> Default Value: <code></code></p>
-                    <p></p>
+                    <h3>debug</h3>
+                    <p>Type: <code>boolean</code> Default Value: <code>false</code></p>
+                    <p>If debug is set to true, the ads framework will output additional information about its current state during playback. This can be handy for diagnosing issues or unexpected behavior in an ad integration.</p>
                     <p>This option is part of the ad framework is configured as follows:</p>
 <pre><code>player.ads({
-  timeout: 3000
+  debug: true
 });</code></pre>
 
                 </div>
@@ -180,8 +180,7 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
             <div id="events" class="section">
                 <h2><a name="events"></a>Events</h2>
                 <div class="BCL-concept">
-                    <p>The plugin emits some custom event types during loading, initialization, and playback. You can listen for IMA3 events just like you would any
-                        other event:</p>
+                    <p>The plugin emits some custom event types during loading, initialization, and playback. You can listen for IMA3 and ad framework events just like you would any other event:</p>
 <pre><code class="js">player.on(&#39;ima3error&#39;, function(event) {
   console.log(&#39;event&#39;, event);
 });
@@ -189,10 +188,16 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                     <h3>ima3error</h3>
                     <p>This event indicates there was an error loading the IMA3 SDK from Google. If it occurs, no ads will be displayed.</p>
                     <h3>ima3-ad-error</h3>
-                    <p>An error has occurred in the IMA3 SDK. You should verify your ad configuration and settings to be sure your DoubleClick account is correctly
-                        configured. You can find common troubleshooting tasks at the
-<a href="https://support.google.com/dfp_premium/">DoubleClick support site</a> or
-                        talk to your DoubleClick account representative.</p>
+                    <p>An error has occurred in the IMA3 SDK. You should verify your ad configuration and settings to be sure your DoubleClick account is correctly configured. You can find common troubleshooting tasks at the <a href="https://support.google.com/dfp_premium/">DoubleClick support site</a> or talk to your DoubleClick account representative.</p>
+                    <h3>adstart</h3>
+                    <p>This event indicates the player has entered linear ad playback mode. This event is fired directly as a consequence of calling code. This event only indicates that an ad break has begun. The start and end of individual ads must be signaled through some other mechanism.</p>
+                    
+                    <h3>adend</h3>
+                    <p>This event indicates the player has returned from linear ad playback mode. This event is fired directly as a consequence of calling <code>startLinearAdMode()</code>. Note that multiple ads may have played back between the <code>adstart</code> and <code>adend</code> events.</p>
+                    
+                    <h3>adtimeout</h3>
+                    <p>This event indicates a timeout managed by the plugin has expired and regular video content has begun to play. Ad integrations have a fixed amount of time to inform the plugin of their intent during playback. If the ad integration is blocked by network conditions or an error, this event will be dispatched and regular playback resumes rather than stalling the player indefinitely.</p>
+
                 </div>
             </div>
           <div id="playbackmodes" class="section">
