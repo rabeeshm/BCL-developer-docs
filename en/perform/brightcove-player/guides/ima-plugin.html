@@ -7,8 +7,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
     <title id="bclPageTitle">IMA Plugin Guide</title>
-    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/foundation.min.css" />
-	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/css/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/css/foundation.min.css" />
+	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/css/normalize.css" />
     <script src="//use.edgefonts.net/source-code-pro.js"></script>
     <link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css" />
@@ -29,7 +29,7 @@
         })();
          //--><!]]>
     </script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/vendor/modernizr.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/js/vendor/modernizr.js"></script>
 </head>
 
 <body>
@@ -67,9 +67,9 @@
                     <h3>Associate plugin with one player instance</h3>
                     <p>To associate the plugin with a single instance of a player, which you do using the <code>embed_in_page</code> code, you must perform the following (with line references to the code which follows the list):</p>
                     <ul>
-                        <li>Give the <code>video</code> tag an <code>id</code> attribute, with some value, in this case <strong>video</strong>; line 40.</li>
                         <li>Use a <code>link</code> tag to include the plugin's CSS in the <code>head</code> of the HTML page; line 38.</li>
-                        <li>Use a <code>script</code> tag to include the plugin's JavaScript in the <code>body</code> of the HTML page; line 48.</li>
+                        <li>Give the <code>video</code> tag an <code>id</code> attribute, with some value, in this case <strong>video</strong>; line 40.</li>
+                        <li>Use a <code>script</code> tag to include the plugin's JavaScript in the <code>body</code> of the HTML page; line 49.</li>
                         <li>Create a reference to the player; line 51.</li>
                         <li>Initialize the plugin and pass in custom options; lines 54-57.</li>
                     </ul>
@@ -80,9 +80,9 @@
             <div id="options" class="section">
                 <h2><a name="options"></a>Options</h2>
                 <div class="BCL-concept">
-                    <p>The video.js IMA3 plugin is built on top of the <a href="https://github.com/brightcove/videojs-ads">video.js ad framework</a> and accepts any options
+                    <p>The video.js IMA3 plugin is built on top of the <a href="https://github.com/brightcove/videojs-ads">video.js ads framework</a> and accepts any options
                         that the ad framework provides. Take a look at the ad framework <a href="https://github.com/brightcove/videojs-ads/blob/master/README.md">README</a> for
-                        details on the current set of overrideable settings. In addition, the following IMA specific options are supported:</p>
+                        details on the current set of overrideable settings. Both the IMA plugin specific options and ad framework options are documented here.</p>
                     <h3>ima3SdkSettings</h3>
                     <p>Type: <code>object</code> Default Value: undefined</p>
                     <p>If provided, the properties of this object are used to set the page-level <a href="https://developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.ImaSdkSettings">Ima3SdkSettings</a> when
@@ -112,11 +112,51 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                     <h3>adSwf</h3>
                     <p>Type: <code>string</code>
                         Default Value: <code>videojs.ima3.swf</code></p>
-                    <p>Development Value: <code>src/videojs.ima3.swf</code></p>
                     <p>The path to the videojs IMA3 swf. This will be directly applied to the object element if the Flash ad tech is used.</p>
                     <h3>clickTrackingElement</h3>
                     <p>Type: <code>HTMLElement</code> Default Value: undefined</p>
                     <p>If the HTML ad tech is being used in <a href="//developers.google.com/interactive-media-ads/docs/sdks/html5/v3/guides/custom_playback">custom ad playback</a> mode, this specifies an alternative HTML element to be used to track advertisement taps on devices that don't support input events over the video element. More details are available in the parameter documentation for the <a href="//developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.AdDisplayContainer">IMA AdDisplayContainer</a>. If you provide a click tracking element, it is your responsibility to show and hide it at the appropriate times on the appropriate platforms. In most cases, it's best to leave this setting undefined and allow the the plugin and IMA to manage ad interaction.</p>
+
+                    <h3>timeout</h3>
+                    <p>Type: <code>number</code> Default Value: <code>5000</code></p>
+                    <p>The maximum amount of time to wait, in milliseconds, for an ad implementation to initialize before playback. If the viewer has requested playback and the ad implementation does not dispatch the <code>adsready</code> event before this timeout expires the content video will begin playback. It's still possible for an ad implementation to play ads after this waiting period has finished, but video playback will already be in progress.</p>
+                    <p>This option is part of the ad framework is configured as follows:</p>
+<pre><code>player.ads({
+  timeout: 5000
+});</code></pre>
+                    <p>Once the ad plugin starts waiting for the <code>adsready</code> event, one of these things will happen:</p>
+                    <ul>
+                        <li>Integration ready within the timeout: This is the best case, preroll(s) will play without the user seeing any content video first.</li>
+                        <li>Integration ready, but after timeout has expired: Preroll(s) still play, but the user will see a bit of content video.</li>
+                        <li>Integration never becomes ready: Content video starts playing after timeout.</li>
+                    </ul>
+                    <p>This timeout is necessary to ensure a good viewer experience in cases where the ad implementation suffers an unexpected or irreparable error and never fires an <code>adsready</code> event. Without this timeout, the ads plugin would wait forever, and neither the content video nor ads would ever play.</p>
+                    <p>If the ad implementation takes a long time to initialize and this timeout is too short, then the content video will begin playing before the first preroll opportunity. This has the jarring effect that the viewer would see a little content before the preroll cuts in.</p>
+                    <p>In internal Brightcove testing it was found that five seconds seemed to be long enough to accommodate slow initialization in most cases, but still short enough that failures to initialize didn't look like failures of the player or content video.</p>
+
+                    <h3>prerollTimeout</h3>
+                    <p>Type: <code>number</code> Default Value: <code>100</code></p>
+                    <p>The maximum amount of time to wait for an ad implementation to initiate a preroll, in milliseconds. If <code>readyforpreroll</code> has been fired and the ad implementation does not call <code>startLinearAdMode()</code> before <code>prerollTimeout</code> expires, the content video will begin playback. The <code>prerollTimeout</code> option is cumulative with the standard timeout parameter.</p>
+                    <p>This option is part of the ad framework is configured as follows:</p>
+<pre><code>player.ads({
+  prerollTimeout: 100
+});</code></pre>
+                    <p>Once the ad dispatches the <code>readyforpreroll</code> event one of these things will happen:</p>
+                    <ul>
+                        <li><code>startLinearAdMode()</code> is called within the timeout: Preroll(s) will play without the user seeing any content video first.</li>
+                        <li><code>startLinearAdMode()</code> is never called: Content video plays without preroll(s).</li>
+                        <li><code>startLinearAdMode()</code> is called, but after the prerollTimeout expired: Bad user experience; content video plays a bit, then preroll(s) cut in.</li>
+                    </ul>
+                    <p>The <code>prerollTimout</code> should be as short as possible so that the viewer does not have to wait unnecessarily if no preroll is scheduled for a video. Make this longer if your ad integration needs a long time to decide whether it has preroll inventory to play or not. Ideally, your ad integration should already know if it wants to play a preroll before the <code>readyforpreroll</code> event.</p>
+
+                    <h3>debug</h3>
+                    <p>Type: <code>boolean</code> Default Value: <code>false</code></p>
+                    <p>If debug is set to true, the ads framework will output additional information about its current state during playback. This can be handy for diagnosing issues or unexpected behavior in an ad integration.</p>
+                    <p>This option is part of the ad framework is configured as follows:</p>
+<pre><code>player.ads({
+  debug: true
+});</code></pre>
+
                 </div>
             </div>
           <div id="html5settings" class="section">
@@ -140,8 +180,7 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
             <div id="events" class="section">
                 <h2><a name="events"></a>Events</h2>
                 <div class="BCL-concept">
-                    <p>The plugin emits some custom event types during loading, initialization, and playback. You can listen for IMA3 events just like you would any
-                        other event:</p>
+                    <p>The plugin emits some custom event types during loading, initialization, and playback. You can listen for IMA3 and ad framework events just like you would any other event:</p>
 <pre><code class="js">player.on(&#39;ima3error&#39;, function(event) {
   console.log(&#39;event&#39;, event);
 });
@@ -149,10 +188,16 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                     <h3>ima3error</h3>
                     <p>This event indicates there was an error loading the IMA3 SDK from Google. If it occurs, no ads will be displayed.</p>
                     <h3>ima3-ad-error</h3>
-                    <p>An error has occurred in the IMA3 SDK. You should verify your ad configuration and settings to be sure your DoubleClick account is correctly
-                        configured. You can find common troubleshooting tasks at the
-<a href="https://support.google.com/dfp_premium/">DoubleClick support site</a> or
-                        talk to your DoubleClick account representative.</p>
+                    <p>An error has occurred in the IMA3 SDK. You should verify your ad configuration and settings to be sure your DoubleClick account is correctly configured. You can find common troubleshooting tasks at the <a href="https://support.google.com/dfp_premium/">DoubleClick support site</a> or talk to your DoubleClick account representative.</p>
+                    <h3>adstart</h3>
+                    <p>This event indicates the player has entered linear ad playback mode. This event is fired directly as a consequence of calling code. This event only indicates that an ad break has begun. The start and end of individual ads must be signaled through some other mechanism.</p>
+                    
+                    <h3>adend</h3>
+                    <p>This event indicates the player has returned from linear ad playback mode. This event is fired directly as a consequence of calling <code>startLinearAdMode()</code>. Note that multiple ads may have played back between the <code>adstart</code> and <code>adend</code> events.</p>
+                    
+                    <h3>adtimeout</h3>
+                    <p>This event indicates a timeout managed by the plugin has expired and regular video content has begun to play. Ad integrations have a fixed amount of time to inform the plugin of their intent during playback. If the ad integration is blocked by network conditions or an error, this event will be dispatched and regular playback resumes rather than stalling the player indefinitely.</p>
+
                 </div>
             </div>
           <div id="playbackmodes" class="section">
@@ -177,45 +222,6 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                         <li>When the user&#39;s browser does not support touch events, the HTML ad tech is active and an ad is playing</li>
                         <li>When the the user&#39;s browser supports touch event, player controls are visible and an ad is playing</li>
                     </ul>
-                    <table>
-                    <thead><tr>
-                    <th align="right"></th>
-                    <th align="center">0 0</th>
-                    <th align="center">0 1</th>
-                    <th align="center">1 0</th>
-                    <th align="center">1 1</th>
-                    </tr></thead>
-                    <tbody>
-                    <tr>
-                    <td align="right"><strong>0 0</strong></td>
-                    <td align="center">0</td>
-                    <td align="center">0</td>
-                    <td align="center">1</td>
-                    <td align="center">0</td>
-                    </tr>
-                    <tr>
-                    <td align="right"><strong>0 1</strong></td>
-                    <td align="center">1</td>
-                    <td align="center">0</td>
-                    <td align="center">1</td>
-                    <td align="center">0</td>
-                    </tr>
-                    <tr>
-                    <td align="right"><strong>1 0</strong></td>
-                    <td align="center">1</td>
-                    <td align="center">0</td>
-                    <td align="center">1</td>
-                    <td align="center">0</td>
-                    </tr>
-                    <tr>
-                    <td align="right"><strong>1 1</strong></td>
-                    <td align="center">1</td>
-                    <td align="center">0</td>
-                    <td align="center">1</td>
-                    <td align="center">0</td>
-                    </tr>
-                    </tbody>
-                    </table>
                 </div>
             </div>
             <div id="issues" class="section">
@@ -267,9 +273,9 @@ Pi.I bridge3.1.33.html:121
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/1.7/gist-embed.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.2/fastclick.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.3/js/foundation.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/js/foundation.min.js"></script>
 
-    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
     <script src="/en/scripts/docs-nav-data.min.js"></script>
     <script src="/en/scripts/bcls-doc-site.js"></script>

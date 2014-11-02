@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <!-- change title to match the h1 heading -->
+    <title>Job Status API Overview</title>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/css/foundation.min.css" />
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/css/normalize.css" />
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/styles/github.min.css">
+    <script>
+        (function(i, s, o, g, r, a, m) {
+        	i['GoogleAnalyticsObject'] = r;
+        	i[r] = i[r] || function() {
+        		(i[r].q = i[r].q || []).push(arguments)
+        	}, i[r].l = 1 * new Date();
+        	a = s.createElement(o),
+        	m = s.getElementsByTagName(o)[0];
+        	a.async = 1;
+        	a.src = g;
+        	m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-2728311-29', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/js/vendor/modernizr.js"></script>
+</head>
+
+<body>
+    <!-- header navbar -->
+    <div id="navWrapper" class="fixed"></div>
+    <!-- breadcrumbs -->
+    <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+    <!-- search -->
+    <div id="searchModal" class="reveal-modal" data-reveal></div>
+    <!-- content -->
+    <!-- content -->
+    <div class="row">
+        <div class="large-2 columns show-for-large-up">
+            <div id="sidenav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+            <div id="top" class="section">
+                <h1>Job Status API Overview</h1>
+                <p>The Job Status API allows you to query the Once system and get back information about the status of a job in JSON format. The status request is defined by query string parameters, and you can obtain the status for any step of a job. The status returned will be:</p>
+                <ul>
+                    <li>PENDING</li>
+                    <li>PROCESSING</li>
+                    <li>ERROR</li>
+                    <li>COMPLETE</li>
+                </ul>
+            </div>
+            <div class="section" id="baseURL">
+                <h2>Base URL</h2>
+                <p>The base URL for the Job Status API is:</p>
+                <pre>https://statusapi.unicornmedia.com</pre>
+            </div>
+            <div class="section" id="authentication">
+                <h2>Authentication</h2>
+                <p>Login Credentials are passed via an apikey constructed by base64 encoding the login credentials.</p>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>Header</td>
+                            <td>Value</td>
+                        </tr>
+                        <tr>
+                            <td>X-BC-ONCE-API-KEY</td>
+                            <td>Apikey is made up of the login credentials seperated by a colon and base64 encoded.</p>
+                                <p>Plain text format: user@email.com:password:domain
+                                </p>
+                                <p>Base64 Encoded: dXNlckBlbWFpbC5jb206cGFzc3dvcmQ6ZG9tYWluTmFtZQ==</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="BCL-aside">Note: if you use CURL to make the call, CURL will automatically Base64-encode the <code>user:password:domain</code> string.</p>
+                <p>The encoded string is passed as a basic authorization header:</p>
+                <code>Authorization: Basic {Base64-encoded-string}</code>
+            </div>
+                <h3>Query by MediaItemGuid</h3>
+                <p>Allow the user to query a specific domain by the mediaitemguid. The mediaitemguid should be anything from:</p>
+                <ul>
+                	<li>Caption</li>
+                	<li>Thumbnail</li>
+                	<li>Mediaitem</li>
+                	<li>MMI</li>
+                </ul>
+                <h3>Query by ForeignKey</h3>
+                <p>Allows the user to query a specific domain by the foreignkey. If duplicate foreign keys are returned both should be returned in the status. These foreignkeys should be everything from:</p>
+                <ul>
+                	<li>Caption</li>
+                	<li>Thumbnail</li>
+                	<li>Mediaitem</li>
+                	<li>MMI</li>
+                </ul>
+                <h3>Query by CatalogGuid</h3>
+                <p>Allows the user to query a specific domain by a catalog guid to return a collection of summarized outputs of media items created in order of newest to oldest. The user can define an item count and a page number to return media item results that is less than the default item count as defined in the application config (Currently set to 50 as the max number of items).</p>
+                <h3>Query by Domain</h3>
+                <p>Allows the user to query all items within a domain to return a collection of summarized outputs of media items created in order of newest to  default item count as defined in the application config (Currently set to 50 as the max number of items).</p>
+                <h3>Example Output Media Item Data:</h3>
+                <ul>
+                    <li>Foreignkey</li>
+                    <li>Title</li>
+                    <li>CatalogGuid</li>
+                    <li>CreateDate</li>
+                    <li>UpdateDate</li>
+                    <li>Source URL</li>
+                    <li>Source FPS</li>
+                    <li>Status (overall)
+                        <ul>
+                        	<ul>
+                        		<li>PENDING</li>
+                        		<ul>
+                        			<li>No jobs have been created to start work</li>
+                        		</ul>
+                        		<li>PROCESSING</li>
+                        	</ul>
+                        	<ul>
+                        		<ul>
+                        			<li>1 or more jobs have begun processing</li>
+                        		</ul>
+                        		<li>ERROR</li>
+                        	</ul>
+                        	<ul>
+                        		<ul>
+                        			<li>A job has failed</li>
+                        		</ul>
+                        	</ul>
+                        	<ul>
+                        		<li>COMPLETE</li>
+                        		<li>Content is ready to deliver</li>
+                        	</ul>
+                        </ul>
+                    </li>
+                    <li>jobDetails:
+                        <li>Asset Ingest
+                            <ul>
+                            	<ul>
+                            		<li>startTime</li>
+                            		<li>completeTime</li>
+                            		<li>Status</li>
+                            	</ul>
+                            </ul>
+                            <p>AvFileDownload</p>
+                            <ul>
+                            	<ul>
+                            		<li>startTime</li>
+                            		<li>completeTime</li>
+                            		<li>Status:</li>
+                            	</ul>
+                            </ul>
+                        </li>
+                        <li>Collection Caption Creation
+                            <ul>
+                            	<ul>
+                            		<li>Per Caption</li>
+                            		<ul>
+                            			<li>Language</li>
+                            			<li>Start Time</li>
+                            			<li>CompleteTime</li>
+                            			<li>Source Url</li>
+                            			<li>Status</li>
+                            		</ul>
+                            	</ul>
+                            </ul>
+                        </li>
+                        <li>Transcoding/External Transcoding
+                            <ul>
+                            	<ul>
+                            		<li>Per Profile:</li>
+                            		<ul>
+                            			<li>profile name / guid</li>
+                            			<li>startTime</li>
+                            			<li>completeTime</li>
+                            			<li>Status</li>
+                            		</ul>
+                            	</ul>
+                            </ul>
+                        </li>
+                        <li>Collection  File Replication
+                            <ul>
+                            	<ul>
+                            		<li>Per profile</li>
+                            		<ul>
+                            			<li>Profile name /guid</li>
+                            			<li>startTime</li>
+                            			<li>completeTime</li>
+                            			<li>Status</li>
+                            		</ul>
+                            	</ul>
+                            </ul>
+                        </li>
+                        <li>ItemNotification
+                            <ul>
+                            	<ul>
+                            		<li>startTime</li>
+                            		<li>completeTime</li>
+                            		<li>Notification URL</li>
+                            		<li>Status</li>
+                            	</ul>
+                            </ul>
+                        </li>
+                    </li>
+                </ul>
+                <h3>Example Output Meta Media Item Data:</h3>
+                <ul>
+                    <li>Foreignkey</li>
+                    <li>Title</li>
+                    <li>Catalog</li>
+                    <li>CreateDate</li>
+                    <li>UpdateDate</li>
+                    <li>Status:
+                        <ul>
+                        	<ul>
+                        		<li>PENDING</li>
+                        		<ul>
+                        			<li>Request sitting in a queue OR</li>
+                        			<li>1 or more segments are in a PENDING state</li>
+                        		</ul>
+                        		<li>PROCESSING</li>
+                        	</ul>
+                        	<ul>
+                        		<ul>
+                        			<li>1 or more segments are in a PROCESSING state</li>
+                        		</ul>
+                        		<li>ERROR</li>
+                        	</ul>
+                        	<ul>
+                        		<ul>
+                        			<li>If any segments error out the MMI should error as well</li>
+                        			<li>If framerates do not match with all segments we should return an error state</li>
+                        		</ul>
+                        	</ul>
+                        	<ul>
+                        		<li>COMPLETE</li>
+                        		<li>MMI is ready to deliver</li>
+                        	</ul>
+                        </ul>
+                    </li>
+                        <li>Notification
+                            <ul>
+                            	<ul>
+                            		<li>Metadata:</li>
+                            		<ul>
+                            			<li>startTime</li>
+                            			<li>completeTime</li>
+                            			<li>Notification URL</li>
+                            		</ul>
+                            		<li>Status</li>
+                            	</ul>
+                            	<ul>
+                            		<ul>
+                            			<li>ERROR</li>
+                            			<li>COMPLETE</li>
+                            		</ul>
+                            	</ul>
+                            </ul>
+                        </li>
+                        <li>The overall status of each segment
+                            <ul>
+                            	<ul>
+                            		<li>Metadata</li>
+                            		<ul>
+                            			<li>FPS</li>
+                            			<li>startTime</li>
+                            			<li>completeTime</li>
+                            		</ul>
+                            		<li>Status</li>
+                            	</ul>
+                            	<ul>
+                            		<ul>
+                            			<li>PENDING</li>
+                            			<li>PROCESSING</li>
+                            			<li>ERROR</li>
+                            			<li>COMPLETE</li>
+                            		</ul>
+                            	</ul>
+                            </ul>
+                    	</li>
+                    </ul>
+                <h3>Example Output Captions Media Item Data:</h3>
+                <p>Language Code</p>
+                <p>Metadata</p>
+                <p>Foreignkey</p>
+                <p>Title</p>
+                <p>Source URL</p>
+                <p>CreateDate</p>
+                <p>UpdateDate</p>
+                <p>Status</p>
+                <ul>
+                	<ul>
+                		<li>PENDING</li>
+                		<li>PROCESSING</li>
+                		<li>ERROR</li>
+                		<li>COMPLETE</li>
+                	</ul>
+                </ul>
+                <h3>Example Output Image Media Item Data:</h3>
+                <p>Foreignkey</p>
+                <p>Source URL</p>
+                <p>CreateDate</p>
+                <p>UpdateDate</p>
+                <p>Status</p>
+                <ul>
+                	<ul>
+                		<li>PENDING</li>
+                		<li>PROCESSING</li>
+                		<li>ERROR</li>
+                		<li>COMPLETE</li>
+                	</ul>
+                </ul>
+
+                <h3>Rate Limiting</h3>
+                <p>The API will check the couchbase server for the number of request made versus the amount made within a time window defined in the application config. If the limit is exceeded the api will return no content with a status code of 429 (too many request)
+                	along with the limit, request remaining, and the time when the limit will reset in the response header. If content is returned the request made value associated with the domain guid will be incremented.</p>
+                <p>Values returned in the response header.</p>
+                <table>
+                	<tbody>
+                		<tr>
+                			<td>Header</td>
+                			<td>Value</td>
+                		</tr>
+                		<tr>
+                			<td>X-Rate-Remaining</td>
+                			<td>The number of requests left for the time window defined in the application config</td>
+                		</tr>
+                		<tr>
+                			<td>X-Retry-After </td>
+                			<td>The remaining window before the rate limit resets in seconds</td>
+                		</tr>
+                	</tbody>
+                </table>
+                <h3>
+                REST API</h3>
+                <table>
+                	<tbody>
+                		<tr>
+                			<td>Argument</td>
+                			<td>Type</td>
+                			<td>Description</td>
+                		</tr>
+                		<tr>
+                			<td>mediaItemGUID</td>
+                			<td>string</td>
+                			<td>Unique Identifier for a media item with in the Once system</td>
+                		</tr>
+                		<tr>
+                			<td>catalogGUID</td>
+                			<td>string</td>
+                			<td>Unique Identifier for a catalog with in the Once system</td>
+                		</tr>
+                		<tr>
+                			<td>foreignKey</td>
+                			<td>string</td>
+                			<td>Unique Identifier for a media item that was provided by the customer.</td>
+                		</tr>
+                		<tr>
+                			<td>itemCount</td>
+                			<td>int</td>
+                			<td>Number of items that are returned in the request. (Max limit defined in app.config)</td>
+                		</tr>
+                		<tr>
+                			<td>pageNumber</td>
+                			<td>int</td>
+                			<td>page number of the items defined by item count. If item count is 10 and page number is 3, the result will be items 30 to 39 of media items by create date newest to oldest.</td>
+                		</tr>
+                	</tbody>
+                </table>
+                <h3>RESTful syntax:</h3>
+                <table>
+                	<tbody>
+                		<tr>
+                			<td>Verb</td>
+                			<td>Syntax</td>
+                			<td>Description</td>
+                		</tr>
+                		<tr>
+                			<td>GET</td>
+                			<td>api/Status/Job?mediaItemGUID={mediaItemGUID}</td>
+                			<td>Returns the Job details of a specified media item.</td>
+                		</tr>
+                		<tr>
+                			<td>GET</td>
+                			<td>api/Status/Job?catalogGUID={catalogGUID}&amp;foreignKey={foreignKey}</td>
+                			<td>Returns the Job details of a specified media item.</td>
+                		</tr>
+                		<tr>
+                			<td>GET</td>
+                			<td>api/Status/Job?itemCount={itemCount}&amp;pageNumber={pageNumber}</td>
+                			<td>Returns a list of summarized job details for the domain specified in the login credentials.</td>
+                		</tr>
+                		<tr>
+                			<td>GET</td>
+                			<td>api/Status/Job?catalogGUID={catalogGUID}&amp;itemCount={itemCount}&amp;pageNumber={pageNumber}</td>
+                			<td>Returns a list of summarized job details for a given catalog.</td>
+                		</tr>
+                	</tbody>
+                </table>
+                <h3>Deployment</h3>
+                <p>Web API</p>
+                <table>
+                	<tbody>
+                		<tr>
+                			<td>Enviroment</td>
+                			<td>IP Address</td>
+                			<td>Host Name</td>
+                			<td>Machine name</td>
+                		</tr>
+                		<tr>
+                			<td>Production</td>
+                			<td>199.30.108.189</td>
+                			<td>statusapi.unicornmedia.com</td>
+                			<td>SN-Job-Status01</td>
+                		</tr>
+                		<tr>
+                			<td>Production</td>
+                			<td>192.33.167.252</td>
+                			<td>statusapi.unicornmedia.com</td>
+                			<td>SN-Job-Status02</td>
+                		</tr>
+                	</tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- bcl scripts -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.2/fastclick.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/js/foundation.min.js"></script>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
+    <script src="/en/scripts/log.js"></script>
+    <script src="/en/scripts/docs-nav-data.min.js"></script>
+    <script src="/en/scripts/bcls-doc-site.js"></script>
+    <script src="/en/scripts/bc-mapi.js"></script>
+    <script>
+        $(document).foundation();
+    </script>
+</body>
+
+</html>
