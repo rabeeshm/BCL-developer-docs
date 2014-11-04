@@ -46,83 +46,13 @@
 			    <p class="BCL-aside">Note: for some APIs, client credentials can also be obtained using OAuth Credentials UI. See the following document for instructions on using the OAuth UI.
 			        <ul>
 			            <li class="perform-only"><a href="//support.brightcove.com/en/perform/docs/managing-api-credentials">Managing API Authentication Credentials</a></li>
-			            <li class="video-cloud-only"><a href="//docs.brightcove.com/en/video-cloud/player-ui/managing-accounts/managing-api-credentials.html">Managing API Authentication Credentials</a>/li>
+			            <li class="video-cloud-only"><a href="//docs.brightcove.com/en/video-cloud/player-ui/managing-accounts/managing-api-credentials.html">Managing API Authentication Credentials</a></li>
 			        </ul>
 			    </p>
 			</div>
-			<div id="baseURL" class="section">
-				<h2>Base URL</h2>
-				<p>The base URL for the OAuth API is:</p>
-<pre><code>https://oauth.brightcove.com/v3</code></pre>
-			</div>
-			<div class="section" id="client-credential-flow">
-                <h2>Client credential flow</h2>
-                <p>In the client credential flow, your app will make a request for an access token, passing your client id and client secret to the OAuth service with the request. Currently, this is the only flow supported for Brightcove customers.</p>
-                <p class="text-warning">Note: the client id and client secret can be used to fully access the requested service. No other authentication is required. Therefore the client id and secret should <strong>never</strong> be exposed in a web page or other client. Requests for access tokens must be made securely from a server-side app.</p>
-                <p>Exactly how the client credential flow will work will depend on the scenario.</p>
-                <h3>Organizational app</h3>
-                <p>In this scenario, you have an app that needs to interact with one or more Brightcove APIs, only for the account or accounts that belong to your organization. The app is not tied to any specific user. In this case the workflow looks like this:</p>
-                <figure><figcaption>Client credential workflow for organization app</figcaption><img src="../assets/client-credentials-workflow.png" alt="client-credentials-workflow" width="487" height="415"></figure>
-                <p>To implement this scenario, you would do the following:</p>
-                <ol>
-                    <li>Using the OAuth UI or the OAuth Service, get a client id and secret for your app - the UI allows you to get a client id and secret for single account or multiple ones. This is a one-time operation.</li>
-                    <li>
-                        <p>Add logic to your server-side app to make requests to the OAuth API for access tokens. Implementation will depend on the language of your app (and you are encouraged to use an existing <a href="#libraries">OAuth2 library</a> for your language if possible), but the call you will make will be a POST request to:</p>
-<pre><code>https://oauth.brightcove.com/v3/access_token</code></pre>
-                        <p>The <code>client_id</code> and <code>client_secret</code> are passed as the <code>username:password</code> in a basic Authorization header:</p>
-<pre><code>Authorization: Basic {client_id}:{client_secret}</code></pre>
-                        <p>The entire <code>{client_id}:{client_secret}</code> string must be Base64 encoded (in Node.js, for example, you can use the <code>Buffer.toString("base64")</code> method). CURL does the BASE64 encoding automatically, so you can just pass the credentials as <code>user {client_id}:{client_secret}</code>. You also need to include a <code>Content-Type: application/x-www-form-urlencoded</code> header.</p>
-						<p>The request body will contain the key/value pair <code>grant_type=client_credentials</code>.</p>
-                        <p>Below is a very basic Node.js app that will get an <code>access_token</code> given a valid <code>client_id</code> and <code>client_secret</code>.</p>
-                        <script src="https://gist.github.com/7b71704aef0c968fd38d.js"></script>
-                    </li>
-                    <li><p>The response body will look like the following:</p>
-<textarea class="code-area">{
-	"access_token": "ACikM-7Mu04V5s7YBlKgTiPu4ZO3AsTBlWt-73l5kXRN4IeRuIVlJHZkq_lFQdZBYfzT9B_nHNgcmNFdalxSiNdqOBaaV7wQCCnRCua_efHNCg9d_yLbezcjxr3AGcBKy9a8_t-uTMTA46T24LKMOBGBNJFkyATSZI4JuxU71VIyGF9hDisbKHmKC5G5HdQ0nJgyCD1w1zkKrB1CpFb5iiBuA_XOzehF-Xf5DBYnSkDhzzByuFwTv9dU9d7W6V2OuiKiTzCzY3st01qJTk6-an6GcAOD4N5pdN8prvvMDQhz_HunJIamvVGqBz7o3Ltw8CFFJMXKQdeOF8LX31BDnOvMBEz-xvuWErurvrA0r6x5eZH8SuZqeri4ryZAsaitHiJjz9gp533o",
-	"token_type": "Bearer",
-	"expires_in": 300
-}</textarea>
-                    <p>You will need to capture the <code>access_token</code>. Unless your calls will be intermittant, in which case you will request a new <code>access_token</code> for every API call, you will also want to capture the <code>expires_in</code> value so that you can use it for later requests to check whether your token is still valid - if not you will need to request a new one. The <code>expires_in</code> value is in seconds.</p></li>
-                    <li><p>Once you have the <code>access_token</code>, you can call the Brightcove API, including the token in the <code>Authorization</code> header in the form:</p>
-<pre><code>Authorization: Bearer {access_token} // the token</code></pre>
-					</li>
-                </ol>
-            </div>
-            <div class="section" id="appForGeneralUsers">
-                <h2>General Authorization</h2>
-                <p>This scenario applies mainly to Brightcove partners who will be creating apps that may be used by Brightcove users in various organizations. The workflow for this scenario looks like the following:</p>
-                <figure><figcaption>Client credential workflow for multi-organization app</figcaption><img src="../assets/authorization-workflow.png" alt="authorization-workflow" width="484" height="411"></figure>
-				<p>The only difference in implementing this scenario rather than the first one is that the user must get a client id and secret for your app from the OAuth UI and provide these to you via a form. You will then pass these to your app to submit with the request for an <code>access_token</code>. Aside from that, everything will be the same.</p>
-            </div>
-            <div class="section" id="getCredentials">
-                <h2>Get Client Credentials</h2>
-                <p>The easiest way to get client credetials (the <code>client_id</code> and <code>client_secret</code>) is to use the <a class="video-cloud-only" href="/en/video-cloud/player-ui/managing-accounts/managing-api-credentials.html">OAuth UI</a> <a class="perform-only" href="http://support.brightcove.com/en/perform/docs/managing-api-credentials">OAuth UI</a>. If you prefer to get them directly from the OAuth Service, however, you can do so by making a POST request to <code>https://oauth.brightcove.com/v3/client_credentials</code>, passing the following headers:</p>
-                <ul>
-                    <li>Content-Type: application/json</li>
-            		<li>Authorization: BC_TOKEN <em>your BC_TOKEN</em></li>
-                </ul>
-                <p>You also need to send a JSON object as the payload:</p>
-<pre><code>{
-"type": "credential",
-"maximum_scope": [
-{
-	"identity": {
-		<span class="video-cloud-only">"type": "video-cloud-account",</span>
-		<span class="perform-only">"type": "perform-account",</span>
-		"account-id": <em>your account id</em>
-	},
-	"operations": [
-	"video-cloud/player/all"
-	]
-}
-],
-"name": "AnalyticsClient",
-"description": "My analytics app"
-}</code></pre>
-            </div>
             <div class="section" id="operations">
                 <h2>Operations</h2>
-                <p>The only thing that will vary here is the <code>operations</code> value, which will depend on which API you want access to, and whether you want access to read, write, or both operations. The currently supported operations options are shown in the following table:</p>
+                <p>The currently supported operations options are shown in the following table:</p>
                 <table>
                     <thead>
                         <tr>
@@ -133,13 +63,30 @@
                     <tbody>
                         <tr class="video-cloud-only">
                             <td>Analytics API</td>
-                            <td>video-cloud/analytics/read</td>
+                            <td><code>video-cloud/analytics/read</code></td>
                         </tr>
                         <tr>
                             <td>Player Management API</td>
                             <td>
-                                <span class="video-cloud-only">video-cloud/player/all</span>
-                                <span class="perform-only">perform/player/all</span>
+                                <code class="video-cloud-only">video-cloud/player/all</code><br />
+                                <code class="perform-only">perform/player/all</code>
+                            </td>
+                        </tr>
+                        <tr class="video-cloud-only">
+                            <td>Dynamic Ingest API</td>
+                            <td>
+                                <code>video-cloud/video/all</code><br />
+                                <code>video-cloud/ingest-profiles/profile/read</code><br />
+                                <code>video-cloud/ingest-profiles/account/read</code>
+                            </td>
+                        </tr>
+                        <tr class="video-cloud-only">
+                            <td>CMS API</td>
+                            <td>
+                                <code>video-cloud/video/read</code><br />
+                                <code>video-cloud/video/create</code><br />
+                                <code>video-cloud/video/update</code><br />
+                                <code>video-cloud/video/all</code>
                             </td>
                         </tr>
                     </tbody>
