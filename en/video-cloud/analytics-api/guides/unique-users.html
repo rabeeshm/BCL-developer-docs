@@ -139,22 +139,15 @@
                 <p>The uniques estimate happens in the batch processing system, which means this daily_unique_viewers value is not available in real time. The value of daily_unique_viewers will not be available for 3-5 days after the day being measured has passed. If you call the API and get a NULL response that means that the data is not available yet.</p>
                 <p class="BCL-aside">Note: json returns NULL and CSV returns "". CSV does not have a method for displaying a null value.</p>
             </div>
-            <div class="section" id="implementation">
-                <h2>Implementation details</h2>
-            </div>
+            <div class="section" id="identifyUsers">
                 <h2>Identifying Users</h2>
-                <p>A unique user might have a login name that is unique on a website, an email address, or a unique <code>guid</code> in a browser cookie. The method for determining a unique user id is complex, and site-dependant.</p>
-                <p>For this reason, we allow you to determine how unique users are tracked. The analytics data collection API has been updated to accept a <code>user</code> parameter:
-                    <ul>
-                        <li>If the player/client application wants to track the unique viewer, it should send a unique Id for the user as the value of the <code>user</code> parameter to the collector.</li>
-                        <li>If the user parameter is not provided or the value is blank, we use the fallback method of using the <code>(Source IP address + the User-Agent String)</code> as the unique identifier.</li>
-                        <li>The value of the user parameter is never stored in the logs or database. Only a hash (using SHA-256) is stored.</li>
-                        <li>No cookies are set by the collector.</li>
-                    </ul>
-                <p>Today no Brightcove players are updated to accept a "user" parameter to send to analytics. This means that today all values for daily_unique_viewers are based on the fallback mechanism.</p>
-                <h2>Estimating the number</h2>
-                <p>The second component of the implementation is to estimate the number of unique identity values seen at the account level. Storing each unique user in a database and then doing a sort and unique on it is not feasible. We have too many users. Instead we use an estimate.</p>
-                <p>That means if you know the exact number of viewers and compare that to our number, you will see a small discrepancy. This error rate increases as the number of unique viewers increase. The paper documenting the method we use says the average error rate is 0.05%. The method we use is called <a href="http://static.googleusercontent.com/external_content/untrusted_dlcp/research.google.com/en/us/pubs/archive/40671.pdf">HyperLogLogPlus</a>.</p>
+                <p>Video Cloud Analytics uses a string composed of the <code>Source IP address + the User-Agent String</code> as the unique identifier for users.</p>
+            </div>
+            <div class="section" id="estimatingUsers">
+                <h2>sectionTitle</h2>
+                <p>Total unique users</p>
+                <p>Because storing unique identifiers for all users is not feasible, we use an algoritm to estimate the total users for an account.</p>
+                <p>That means if you know the exact number of viewers and compare that to our number, you will see a small discrepancy. This error rate increases as the number of unique viewers increase.</p>
             </div>
         </div>
     </div>
