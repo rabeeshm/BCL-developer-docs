@@ -157,7 +157,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             document.title = $pageTitle.html();
         }
     };
-    // force into https mode if not already there -- currently not used
+    // force into https mode if not already there
     forceSecure = function () {
         var pageURL = window.location.href,
             pageProtocol = window.location.protocol;
@@ -842,6 +842,8 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
     };
     // initialization: set the page title, set up the header shell, get references to the parts
     init = function () {
+        // force secure page load
+        forceSecure();
         // set the page title in case wrong
         setPageTitle();
         // set up the header

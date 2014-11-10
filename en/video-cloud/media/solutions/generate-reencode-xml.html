@@ -215,7 +215,7 @@
 	</div>
 	<!-- bcl scripts -->
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-	
+
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.2/fastclick.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/js/foundation.min.js"></script>
@@ -399,17 +399,22 @@
     				notifyEmail = notifyEmail.replace(/^\s+|\s+$/g, '');
 */
     				totalCount = jsonData["total_count"];
-    				if (callbackURLString !== "") {
-    					callbackURLString = "    &lt;callback entity-url=\""+callbackURL+"\"/&gt;\n";
-    				}
-    				if (notifyEmail !== "") {
-    					notifyEmail = returnEmailAddress(notifyEmail);
-    				}
-    				loopCount = Math.ceil(totalCount / 100);
-    				callsRemaining = loopCount;
-    				submitBtn.innerHTML = "Processing... <span id=\"callCounter\">" + callsRemaining + "</span> API calls remaining";
-    				callCounter = document.getElementById("callCounter");
-    				makeAPIcall();
+                    if (totalCount > -1) {
+                        if (callbackURLString !== "") {
+                            callbackURLString = "    &lt;callback entity-url=\""+callbackURL+"\"/&gt;\n";
+                        }
+                        if (notifyEmail !== "") {
+                            notifyEmail = returnEmailAddress(notifyEmail);
+                        }
+                        loopCount = Math.ceil(totalCount / 100);
+                        callsRemaining = loopCount;
+                        submitBtn.innerHTML = "Processing... <span id=\"callCounter\">" + callsRemaining + "</span> API calls remaining";
+                        callCounter = document.getElementById("callCounter");
+                        makeAPIcall();
+                    } else {
+                        errorLog.innerHTML += "<br>No matching videos found....";
+                    }
+
     			}
     		};
     		response = function (jsonData) {
@@ -448,7 +453,8 @@
                     if (retries < 5) {
                             t = window.setTimeout(function () {
                                 makeAPICall();
-                            },30000 )
+                            },30000 );
+                            retries++;
                     } else {
                         errorLog.innerHTML += "Something went wrong...writing the data we got below. " + "The error code was: " + jsonData.error.code + "and the message was: " + jsonData.error.message;
                         writeData();
