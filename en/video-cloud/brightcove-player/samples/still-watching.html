@@ -121,15 +121,16 @@
 			
       <div id="player" class="section">
         <h2>The player</h2>
-        <p>This example displays an overlay when the video finishes playing. When the user selects the link contained in the overlay, the page navigates to the new URL.</p>
+        <p>This example displays an overlay after a specified amount of time. If the viewer clicks on the overlay, the video continues playing. If they do not, it will stop after a set amount of time. For demo purposes this time is set in seconds instead of minutes and you can adjust these values below the player. </p>
         
         <video id="video_1"
             data-account="1752604059001"
-            data-player="5ef93cb1-19b7-4592-8452-37fa2afae271"
+            data-player="52dc6cea-8bb6-4f19-b600-368a99fdaf57"
             data-embed="default"
             class="video-js" controls></video>
         
         <br/>
+        <p>The following settings and message box are for demo purposes only so that you can adjust the values:</p>
         <p>Show "Are you still there?" message after <input id="timeCheckOption" value="5" size="5" style="width:20px;text-align:center;" /> seconds or <input id="videoCheckOption" value="2" size="5" style="width:20px;text-align:center;" /> videos. If the message is not clicked, pause the video after <input id="timeOutOption" value="5" size="5" style="width:20px;text-align:center;" /> seconds.</p>
 
         <fieldset>
@@ -139,7 +140,7 @@
             <p>Current position: <span id="currentPosition"></span> seconds</p>
         </fieldset>
 
-          <script src="//players.brightcove.net/1752604059001/5ef93cb1-19b7-4592-8452-37fa2afae271_default/index.min.js"></script>
+          <script src="//players.brightcove.net/1752604059001/52dc6cea-8bb6-4f19-b600-368a99fdaf57_default/index.min.js"></script>
 
         <script type="text/javascript" src="http://solutions.brightcove.com/bcls/brightcove-player/still-watching/still-watching.js"></script>
         <script>videojs('video_1').stillWatching();</script>
@@ -151,66 +152,92 @@
 		    <p>The following sections explain the player, JavaScript and CSS code used in the example.</p>
         
         <h3>Create the player</h3>
-        <p>This player was created using the following curl statement. Notice that we included the Overlay plugin for the player. In the overlay, we created a clickable link to the Brightcove homepage.</p>
+        <p>This player was created using the following curl statement. Notice that we included the Overlay plugin with a message. The overlay will be added to the DOM when the player loads, so that we have access to its elements. Then, we can easily display and hide the overlay as needed.</p>
         <ul>
-          <li>Lines 54-59: Define the video and its type.</li>
-          <li>Lines 61-66: Include the styles and scripts for the Overlay plugin.</li>
-          <li>Lines 67-77: Add the Overlay plugin to the player.</li>
-          <li>Line 72: Defines the URL link and text.</li>
-          <li>Line 73: Tells the overlay to display when the video ends.</li>
-          <li>Line 74: Tells the overlay to hide when the video starts playback.</li>
+          <li>Lines 12-13: Define the source video and its type.</li>
+          <li>Lines 17-22: Include the styles and scripts for the Overlay plugin.</li>
+          <li>Lines 23-33: Add the Overlay plugin to the player.</li>
+          <li>Line 28: Defines the overlay message.</li>
+          <li>Line 29: Tells the overlay to display when the player loads.</li>
         </ul>
-        <p><code data-gist-id="e8204faac81d86ead80d" data-gist-hide-footer="true" data-gist-line="46-80"></code></p>
+        <p><code data-gist-id="0276d6624dba45a43c66" data-gist-hide-footer="true" data-gist-line="2-36"></code></p>
         
         <h3>The player code</h3>
         <p>The player code is simply the embed_in_page implementation displayed when the player is published.</p>
-        <p><code data-gist-id="e8204faac81d86ead80d" data-gist-hide-footer="true" data-gist-line="34-40"></code></p>
+        <p><code data-gist-id="0276d6624dba45a43c66" data-gist-hide-footer="true" data-gist-line="74-78,93"></code></p>
+        
+        <h3>The HTML code</h3>
+        <p>The following HTML code has been added to this example for demo purposes only. You will not add this code for your production players.</p>
+        <p><code data-gist-id="0276d6624dba45a43c66" data-gist-hide-footer="true" data-gist-line="74-93" data-gist-highlight-line="80-91"></code></p>
         
 		    <h3><a name="stylesheet"></a>The stylesheet</h3>
         <p>This example uses CSS styles for the Brightcove player and the Overlay plugin.</p>
         <ul>
-          <li>Lines 11-23: Override the default styles for the Overlay plugin.</li>
-          <li>Lines 25-28: Set the dimensions of the player.</li>
+          <li>Lines 51-53: Hide the Overlay.</li>
+          <li>Lines 55-63: Override the default styles for the Overlay plugin.</li>
+          <li>Lines 65-68: Set the dimensions of the player.</li>
         </ul>
-        <p><code data-gist-id="e8204faac81d86ead80d" data-gist-hide-footer="true" data-gist-line="9-29"></code></p>
+        <p><code data-gist-id="0276d6624dba45a43c66" data-gist-hide-footer="true" data-gist-line="49-69"></code></p>
 	  </div>
 		  
     <div id="plugin" class="section">
 		  <h2>Use a plugin</h2>
-		  <p>It is a best practice to use a plugin so that you can easily add this functionality to multiple players. Since this example does not require any JavaScript code, we do not need to create a plugin. We will, however, put the styles into an external file and include it in our player.</p>
+		  <p>It is a best practice to use a plugin so that you can easily add this functionality to multiple players. </p>
 		  
-		  <h3>Create the CSS file</h3>
+		  <h3>Create the JavaScript file</h3>
+        <p>Move the plugin's JavaScript code into a file and place it in an Internet accessible URL.</p>
+        <ul>
+          <li>Create a new file for your plugin JavaScript code. In this case, name it <code>still-watching.js</code>.</li>
+          <li>Cut and paste the JavaScript code from your main HTML file into this new file.</li>
+          <li>Lines 287,466: Wrap your JavaScript code using the <code>videojs.plugin()</code> function. The first argument, <code>stillWatching</code>, is the plugin name.</li>
+          <li>Line 288: Gets a reference to your player.</li>
+          <li>The rest is your JavaScript code which was reviewed in a previous section.</li>
+        </ul>
+        <p class="BCL-aside">Note: Line 466: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</p>
+        <p><code data-gist-id="0276d6624dba45a43c66" data-gist-hide-footer="true" data-gist-line="284-466"></code></p>
+        <ol start="6">
+          <li>In the HTML file, add the following code just below the existing <code>&lt;script&gt;</code> tags. This code includes the JavaScript file and then calls the method defined in that JavaScript.</li>
+        </ol>
+        <p><code data-gist-id="0276d6624dba45a43c66" data-gist-hide-footer="true" data-gist-line="503-504" ></code></p>
+        <ol start="7">
+          <li>Browse the HTML page. You should see that the still watching overlay still works, except now your JavaScript code has been removed from the HTML page.</li>
+        </ol> 
+      
+      <h3>Create the CSS file</h3>
       <p>If you are using CSS, move styles into a file and place it in an Internet accessible URL.</p>
       <ol>
-          <li>Create a new file for your CSS styles. In this case, name it <code>navigate-on-end.css</code>.</li>
+          <li>Create a new file for your CSS styles. In this case, name it <code>still-watching.css</code>.</li>
           <li>In the <code>&lt;head&gt;</code> section of your HTML file, add the following link to include your newly created CSS file.</li>
         </ol>
-      <p><code data-gist-id="e8204faac81d86ead80d" data-gist-hide-footer="true" data-gist-line="90" ></code></p>
+      <p><code data-gist-id="0276d6624dba45a43c66" data-gist-hide-footer="true" data-gist-line="478" ></code></p>
       <ol start="3">
-          <li>Browse the HTML page. You should see that the navigate on end link still works, except now your styles has been removed from the HTML page.</li>
+          <li>Browse the HTML page. You should see that the still watching overlay still works, except now your styles has been removed from the HTML page.</li>
       </ol> 
 		  
-		  <h3>Deploy the CSS</h3>
-      <p>You do not want to use the HTTP <code>PATCH</code> method to update your player with the Overlay plugin, since it will replace the <code>scripts</code> and <code>plugins</code> data. Instead, you want to create a child player based on the parent player with the Overlay plugin. When you create the child player, you can append an additional CSS stylesheet while maintaining the properties of the parent.</p>
-      <p>For details about player inheritance behavior to overwrite, prepend or append additional values see the  <a href="//docs.brightcove.com/en/video-cloud/player-management/guides/embeds.html#arrayfields"><strong>Array fields</strong></a> section of the <strong>Embed APIs Guide</strong>.</p>
+		  <h3>Deploy plugin and CSS</h3>
+      <p>You do not want to use the HTTP <code>PATCH</code> method to update your player with the Age Gate plugin, since it will replace the <code>stylesheets</code>, <code>scripts</code> and <code>plugins</code> data, which will remove the Overlay plugin. Instead, you want to create a child player based on the parent player with the Overlay plugin.</p>
+      <p>When you create the child player, you can append additional styles, scripts and plugins while maintaining the properties of the parent. For details about child player inheritance behavior to overwrite, prepend or append additional values see the  <a href="//docs.brightcove.com/en/video-cloud/player-management/guides/embeds.html#arrayfields"><strong>Array fields</strong></a> section of the <strong>Embed APIs Guide</strong>.</p>
       <ol>
-        <li>Use the following HTTP <code>POST</code> method to append the custom stylesheet to a child player using the Embed API.</li>
+        <li>Use the following HTTP <code>POST</code> method to append the custom still watching style, script and plugin to a child player using the Embed API.</li>
       </ol>
-      <p><code data-gist-id="e8204faac81d86ead80d" data-gist-hide-footer="true" data-gist-line="117-128" ></code></p>
-				
-      <ol start="2">
-        <li>From the response, copy the <code>embed_in_page</code> code and place it in a newly created HTML page. Your page should look similar to this:</li>
-      </ol> 
-      <p><code data-gist-id="e8204faac81d86ead80d" data-gist-hide-footer="true" data-gist-line="132-151" ></code></p>
-      <ol start="4">
-        <li>Browse the HTML page and you should see the player with the custom overlay functioning correctly.</li>
-      </ol> 
-      </div>
-          
-      <div id="useiframe" class="section">
-        <h2>Use iframe</h2>
-        <p>It is a best practice to use the iframe player implementation if possible.</p>
-        <p>In this example, the iframe implementation will not work, since we want the entire page to navigate to the new URL. With the iframe implementaion, the contents of the new URL page would be contained within the dimensions of the iframe player.</p>
+        <p><code data-gist-id="0276d6624dba45a43c66" data-gist-hide-footer="true" data-gist-line="515-536" ></code></p>
+
+        <ol start="2">
+          <li>From the response, copy the <code>embed_in_page</code> code and place it in a newly created HTML page. Your page should look similar to this:</li>
+        </ol> 
+        <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="198-219" ></code></p>
+        <ol start="4">
+          <li>Browse the HTML page and you should see the player with the custom still watching overlay functioning correctly.</li>
+        </ol> 
+        </div>
+
+        <div id="useiframe" class="section">
+          <h2>Use iframe</h2>
+          <p>It is a best practice to use the iframe player implementation. If it is possible for this example, replace the embed_in_page implementation with the iframe implementation.</p>
+				<p>Here is the complete code:</p>
+        <p class="BCL-aside">Note: Here we added a <code>div</code> container around the <code>iframe</code> element to make it easier to reference the player code.</p>
+        <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="224-248" ></code></p>
+        <p>Browse the HTML page and you should see the player with the plugin functioning correctly.</p>
         
       </div>
 			
