@@ -562,6 +562,12 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     // check to see if we're on a subsection landing page
                     if (exists(subsection)) {
                         switch (subsection) {
+                        case "general":
+                            subsectionName = "General Info";
+                            if (pathArray[4] === "index.html") {
+                                createSubsectionLandingPageSections();
+                            }
+                            break;
                         case "players-module":
                             subsectionName = "Players Module";
                             // check to see if on landing page
@@ -574,9 +580,6 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 switch (subsubsection) {
                                     case "creating-players":
                                     subsubsectionName = "Create Players";
-                                    break;
-                                    case "general-info":
-                                    subsubsectionName = "General Info";
                                     break;
                                     case "getting-started":
                                     subsubsectionName = "Get Started";
