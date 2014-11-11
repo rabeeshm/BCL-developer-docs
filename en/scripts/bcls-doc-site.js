@@ -606,7 +606,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 createSubsectionLandingPageSections();
                             } else {
                                 // we're in a subsubsection
-                                subsubsection = pathArray[5];
+                                subsubsection = pathArray[4];
                                 switch (subsubsection) {
                                     case "getting-started":
                                     subsubsectionName = "Get Started";
@@ -627,7 +627,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 createSubsectionLandingPageSections();
                             } else {
                                 // we're in a subsubsection
-                                subsubsection = pathArray[5];
+                                subsubsection = pathArray[4];
                                 switch (subsubsection) {
                                     case "getting-started":
                                     subsubsectionName = "Get Started";
