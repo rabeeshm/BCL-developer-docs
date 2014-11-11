@@ -846,7 +846,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
     // initialization: set the page title, set up the header shell, get references to the parts
     init = function () {
         // force secure page load
-        forceSecure();
+        // forceSecure();
         // set the page title in case wrong
         setPageTitle();
         // set up the header
