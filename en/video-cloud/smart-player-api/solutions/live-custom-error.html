@@ -125,9 +125,9 @@
             <h2><a name="logic"></a>How it is done</h2>
             <p>This example uses the Smart Player API to direct error handling when there is no content available. In the error handler function, we get a reference to the player's <code>div</code> element and remove all of its child elements from the page. Then we add an <code>img</code> element with the custom error message. In this way, we have replaced the player with a custom image.</p>
             <h3>Modifications to the player publishing code</h3>
-            <p>After you copy the player publishing code to your page, you will add a few parameters.</p>
+            <p>From Video Cloud, copy the player publishing code to your page.</p>
             <ol>
-              <li>When the player is loaded, get a reference to the player and the API modules. </li>
+              <li>Add the following parameters to name the templete error, template ready and template load handler  functions:</li>
             </ol>
             <code data-gist-id="366a353db98e58876c68" data-gist-line="36-41" data-gist-hide-footer="true"></code>
             <h3>The Smart Player API part</h3>
@@ -140,47 +140,40 @@
               <li>When the player is ready, get a reference to the <code>VIDEO_PLAYER</code> module. Notice there is an <code>addEventListener</code> call that you can leave commented out for now. This is an alternate way to listen for media errors.</li>
             </ol>
             <p><code data-gist-id="366a353db98e58876c68" data-gist-line="104-110" data-gist-hide-footer="true"></code></p>
-
+            <ol start="4">
+              <li>In the template error handler function, write the error info to the log and call the <code>displayStandbyMsg()</code> function.</li>
+            </ol>
+            <p><code data-gist-id="366a353db98e58876c68" data-gist-line="82-87" data-gist-hide-footer="true"></code></p>
+            <ol start="5">
+              <li>Remove the player elements and display a custom image.</li>
+              <ul>
+                <li>Lines 72-75: Get a reference to the <code>div</code> container around the player and remove all of the child elements.</li>
+                <li>Lines 76-78: Create an <code>img</code> element with the <code>src</code> property pointing to the custom image. This element is then added to now empty <code>div</code> container.</li>
+              </ul>
+            </ol>
+            <p><code data-gist-id="366a353db98e58876c68" data-gist-line="70-79" data-gist-hide-footer="true"></code></p>
             
-            <p>Call the <code>getPlaylistByID()</code> method to get the videos and associated data for each playlist. Because the call to this method is asynchronous, this method calls itself until it has looped through all of the id's in the playlist array. When done, build the tabbed navigation with the retrieved data.</p>
-            <code data-gist-id="8e0bade4b0c85a260b1b" data-gist-line="176-194" data-gist-hide-footer="true"></code>
-			  
-			<p>For the video loaded in the player, use the <code>getCurrentVideo()</code> method to get the associated metadata and display this information.</p>
-            <code data-gist-id="8e0bade4b0c85a260b1b" data-gist-line="219-259" data-gist-hide-footer="true"></code>
-			  
-			<p>When a video is selected, call the <code>canPlayWithoutInteraction()</code> method to see if the video can play without user interaction. If so, call the <code>loadVideoByID()</code> method to load and start playing the video. Otherwise, call the <code>cueVideoByID()</code> method to load the video without playing it. Then, get the metadata for this loaded video.</p>
-            <code data-gist-id="8e0bade4b0c85a260b1b" data-gist-line="261-270" data-gist-hide-footer="true"></code>
+            <h3>Alternate solution</h3>
+            <p>Instead of using the template error handler, you can also listen for a media error.</p>
+            <ol>
+              <li>Comment out the templete error handler that you added to the player code in the previous section.</li>
+            </ol>
+            <p><code data-gist-id="f48ae56755bb20675ac7" data-gist-line="36-41" data-gist-hide-footer="true" data-gist-highlight-line="36"></code></p>
+            <ol start="2">
+              <li>When the player is ready, add an event listener for the <code>mediaError</code> event.</li>
+            </ol>
+            <p><code data-gist-id="f48ae56755bb20675ac7" data-gist-line="104-110" data-gist-hide-footer="true" data-gist-highlight-line="109"></code></p>
+            <ol start="3">
+              <li>In the media error handler function, write the error info to the log and call the <code>displayStandbyMsg()</code> function.</li>
+            </ol>
+            <p><code data-gist-id="f48ae56755bb20675ac7" data-gist-line="90-95" data-gist-hide-footer="true"></code></p>
 			
-			<h3>The rest</h3>
-            <p>This sample uses the jQuery UI Tabs component to display the playlists. To implement this, do the following:</p>
-			<ol>
-			  <li>In the <code>&lt;head&gt;</code> section of your HTML document, link to the jQuery UI stylesheet.</li>
-			</ol>
-            <code data-gist-id="8e0bade4b0c85a260b1b" data-gist-line="7" data-gist-hide-footer="true"></code>
-			<ol start="2">
-			  <li>In the <code>&lt;body&gt;</code> section of your HTML document, define the tabbed navigation.</li>
-			</ol>
-            <code data-gist-id="8e0bade4b0c85a260b1b" data-gist-line="108-121" data-gist-hide-footer="true"></code>
-			<ol start="3">
-			  <li>Include the jQuery UI scripts for the Tabs component and initialize it.</li>
-			</ol>
-            <code data-gist-id="8e0bade4b0c85a260b1b" data-gist-line="123-131" data-gist-hide-footer="true"></code>
-			<ol start="4">
-			  <li>For each playlist, create a tab section in the navigation. For each video in the playlist, create a link with the video thumbnail and short description.</li>
-			</ol>
-            <code data-gist-id="8e0bade4b0c85a260b1b" data-gist-line="196-217" data-gist-hide-footer="true"></code>
-
-          
           <div id="code" class="section">
             <h2><a name=""></a>The code</h2>
-            <p>See the full code sample <a href="https://gist.github.com/bcls/8e0bade4b0c85a260b1b">here</a>.</p>
-            <p>View the sample running in the browser <a href="//solutions.brightcove.com/bcls/smart-player-api/tabbed-playlist/custom-player.html">here</a>.</p>
-
-            <h3>CSS used for this sample:</h3>
-            <code data-gist-id="8e0bade4b0c85a260b1b" data-gist-line="9-60" data-gist-hide-footer="true"></code>
+            <p>Browse or download the <a href="https://gist.github.com/bcls/366a353db98e58876c68">full code sample</a>.</p>
 
             <h3>JavaScript used for this sample:</h3>
-            <code data-gist-id="8e0bade4b0c85a260b1b" data-gist-line="123-271" data-gist-hide-footer="true"></code>
+            <code data-gist-id="366a353db98e58876c68" data-gist-line="56-112" data-gist-hide-footer="true"></code>
           </div><!-- div id="code" --> 
 
         </div>
