@@ -17,6 +17,7 @@ module.exports = function (grunt) {
                         'source/analytics-api.json',
                         'source/batch-provisioning.json',
                         'source/studio.json',
+                        'source/studio-prerelease.json',
                         'source/brightcove-player.json',
                         'source/ingest-profiles-api.json',
                         'source/di-api.json',
