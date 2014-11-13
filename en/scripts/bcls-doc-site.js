@@ -560,7 +560,6 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     if (pathArray[3] === "index.html") {
                         // we're on the section landing page
                         subsection = null;
-                        createLandingPageSections(bclsNavData[product].sections[section]);
                     } else {
                         subsection = pathArray[3];
                     }
