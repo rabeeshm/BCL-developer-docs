@@ -551,7 +551,6 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     } else if (section === "studio-prerelease") {
                         sectionName = "Studio (pre-release)";
                         if (pathArray[3] === "index.html") {
-                            createLandingPageSections(bclsNavData["video-cloud"]["studio-prerelease"]);
                         }
                     } else {
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
