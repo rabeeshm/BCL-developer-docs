@@ -45,38 +45,40 @@
             </div>
             <div class="section" id="setPolicy">
                 <h2>Setting the S3 Policy</h2>
-                <p>To set up your policy to allow Dynamic Ingest to access your videos, go to the <a href="http://aws.amazon.com/console/">AWS Console</a>. Select your bucket on the left side of the screen, then click "properties". On the last row click "Add bucket policy". Below is our recommended policy:</p>
+                <p>To set up your policy to allow Dynamic Ingest to access your videos, go to the <a href="http://aws.amazon.com/console/">AWS Console</a>. Select your bucket on the left side of the screen, then click "properties". On the last row click <strong>Add bucket policy</strong>. Below is our recommended policy:</p>
 <pre><code>{
-  "Version": "2014-11-12",
-  "Id": "VideoCloudBucketPolicy",
-  "Statement": [
-    {
-      "Sid": "Stmt1295042087538",
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "arn:aws:iam::395540211253:root"
-      },
-      "Action": [
-        "s3:GetObjectAcl",
-        "s3:GetObject",
-        "s3:ListMultipartUploadParts"
-      ],
-      "Resource": "arn:aws:s3:::MY-BUCKET/*"
-    },
-    {
-      "Sid": "Stmt1295042087538",
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "arn:aws:iam::395540211253:root"
-      },
-      "Action": [
-        "s3:ListBucketMultipartUploads",
-        "s3:GetBucketLocation"
-      ],
-      "Resource": "arn:aws:s3:::MY-BUCKET"
-    }
-  ]
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AddPerm",
+            "Effect": "Allow",
+            "Principal": {
+                    "AWS": "arn:aws:iam::395540211253:root"
+            },
+            "Action": [
+                    "s3:GetObject"
+            ],
+            "Resource": [
+                    "arn:aws:s3:::<strong><em>BUCKETNAME</em></strong>/*"
+            ]
+        }
+    ]
 }</code></pre>
+            <p>There is only <strong>one change you will have to make</strong> to this bucket policy before it's ready to go:</p>
+            <ol>
+                <li>Replace <strong><em>BUCKETNAME</em></strong> with the name of your bucket. Leave the <code>/*</code> at the end of the <code>resource</code> line, as that will apply the policy to every file within the bucket.</li>
+                <li>Optionally, replace the Action array with the actions you want to allow. Valid actions that Video Cloud may need are:
+                  <h4>Object Permissions - first action array in the example above</h4>
+                  <ul>
+                    <li>s3:GetObject - allow Video Cloud to download files from the bucket</li>
+                  </ul>
+                  <h4>Bucket Permissions - second action array in the example above</h4>
+                  <ul>
+                    <li>s3:GetBucketLocation - allow Video Cloud to get the location of the bucket (US, EU, Asia, etc.)</li>
+                    <li>s3:ListBucketMultipartUploads - allow Video Cloud to view any multipart uploads currently happening on the bucket</li>
+                  </ul>
+                <p>Video Cloud does not need any write permissions.</p>
             </div>
             <div class="section" id="BCLreferences">
                 <h2>Related Topics</h2>

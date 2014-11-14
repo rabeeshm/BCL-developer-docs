@@ -559,6 +559,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     if (pathArray[3] === "index.html") {
                         // we're on the section landing page
                         subsection = null;
+                        createLandingPageSections(bclsNavData[product].sections[section]);
                     } else {
                         subsection = pathArray[3];
                     }
@@ -596,7 +597,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 }
                                 // subsubsectionName = bclsNavData.studio.items[subsection].items[subsubsection].name;
                                 // bclslog("subsubsectionName", subsubsectionName);
-                                if (pathArray[6] === "index.html") {
+                                if (pathArray[5] === "index.html") {
                                     // on subsubsection landing page
                                     createSubsectionLandingPageSections();
                                 }
@@ -617,7 +618,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 }
                                 // subsubsectionName = bclsNavData.studio.items[subsection].items[subsubsection].name;
                                 // bclslog("subsubsectionName", subsubsectionName);
-                                if (pathArray[6] === "index.html") {
+                                if (pathArray[5] === "index.html") {
                                     // on subsubsection landing page
                                     createSubsectionLandingPageSections();
                                 }
@@ -638,7 +639,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 }
                                 // subsubsectionName = bclsNavData.studio.items[subsection].items[subsubsection].name;
                                 // bclslog("subsubsectionName", subsubsectionName);
-                                if (pathArray[6] === "index.html") {
+                                if (pathArray[5] === "index.html") {
                                     // on subsubsection landing page
                                     createSubsectionLandingPageSections();
                                 }
