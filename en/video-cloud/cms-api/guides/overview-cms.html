@@ -61,11 +61,12 @@
 			</div>
 			<div id="operations" class="section">
 				<h2>Operations</h2>
-				<p>When you use the PBI API you will perform different operations, such as reading an ingest profile and writing ingest information to your account. The following is a complete list of ingest profile operations:</p>
+				<p>When you request client credentials, you will need to specify the type of account access or operations that you want. The following is a list of the currently supported operations for the CMS API:</p>
 				<ul>
-				    <li>video-cloud/video/profile/read</li>
-				    <li>video-cloud/video/account/create</li>
-				    <li>video-cloud/video/account/update</li>
+				    <li>video-cloud/video/read</li>
+				    <li>video-cloud/video/create</li>
+				    <li>video-cloud/video/update</li>
+          <li>video-cloud/video/all</li>
 				</ul>
 			</div>
 			<div class="section" id="methods">
@@ -154,9 +155,6 @@
 				<pre><code>q={search terms}</code></pre>
 			    <p>The query string you provide should be a url encoded list of terms separated by a space (+ after encoding).</p>
 			    <h3>Basic search</h3>
-			</div>
-			<div class="section" id="paging">
-			    <h2>Paging</h2>
 			    <p>If provide no qualifiers on the search term:</p>
 			    <pre><code>q=foo</code></pre>
 			    <p>This will execute a text search against the following fields: <code>name</code>, <code>description</code>, <code>long_description</code>, <code>tags</code>, <code>reference_id</code>, and all custom fields.</p>
@@ -319,6 +317,7 @@ my_field:"foo"
 				<p>You can combine criteria for complex searches:</p>
 <pre><code>q=%2Bname:gossip+%2Bupdated_at:2010-08-01T00:00:00Z..2010-10-08T00:00:00Z&sort=updated_at</code></pre>
 			</div>
+    
 			<div class="section" id="getSamples">
 			    <h2>GET samples</h2>
 			    <div id="videosEndpoint">
@@ -592,6 +591,47 @@ my_field:"foo"
 				</tr>
 			</table>
 		</div>
+        
+    <div class="section" id="paging">
+      <h2>Paging</h2>
+      <p>With the CMS API, you can implement paging. This allows you to handle large result sets in smaller groups, which improves performance.</p>
+      <p>A maximum of 100 records will be returned from a single request to the CMS API.</p>
+      <p>For page handling, follow these steps:</p>
+      <ul>
+        <li>Get a count of the total number of records in the result set.</li>
+        <li>Calculate the number of pages for your result set.</li>
+        <li>Loop through and call the CMS API for each page of data.</li>
+      </ul>
+      
+      <h3>Getting the record count</h3>
+      <p>Use the <code>counts</code> resource to return a total count of records in your result set.</p>
+      <p>You can get a total count of videos in your account:</p>
+      <pre><code>https://cms.api.brightcove.com/v1beta1/accounts/921483702001/counts/videos</code></pre>
+      <p>Results:</p>
+      <pre><code>{
+  "count" : 74
+}</code></pre>
+      <p>You can limit the count by using the optional <code>q=</code> parameter. Here we get the number of videos which have a tag value of <strong>wildlife</strong>.</p>
+      <pre><code>https://cms.api.brightcove.com/v1beta1/accounts/921483702001/counts/videos?q=tags:wildlife</code></pre>
+      <p>Results:</p>
+      <pre><code>{
+  "count" : 6
+}</code></pre>
+      
+      <h3>Calculating number of pages</h3>
+      <p>To calculate the number of pages, take the total number of records in your result set and divide it by the number of records per page (page size).</p>
+      <p>JavaScript example:</p>
+      <pre><code>var numberOfPages = Math.ceil(jsonData.count/pageSize);</code></pre>
+      
+      <h3>Retrieving pages</h3>
+      <p>Loop through the number of pages that you calculated in the previous step and call the CMS API with the <code>limit</code> and <code>offset</code> parameters to retrieve successive subsets of data.</p>
+      <p>This example returns 10 videos starting with the 21st video in your result set.</p>
+      <pre><code>https://cms.api.brightcove.com/v1beta1/accounts/921483702001/videos?limit=10&offset=20</code></pre>
+      <p>You can also include the optional <code>q=</code> parameter. This request returns 2 videos starting with the 5th video from the result set of videos which have a tag value of <strong>wildlife</strong>.</p>
+      <pre><code>https://cms.api.brightcove.com/v1beta1/accounts/921483702001/videos?q=tags:wildlife&limit=2&offset=4</code></pre>
+      
+    </div>
+        
 		<div class="section" id="BCLreferences">
 			<h2>Related Topics</h2>
 			<ul>
