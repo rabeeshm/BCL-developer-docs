@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <!-- change title to match the h1 heading -->
+    <title>OAuth Quick Start</title>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/css/foundation.min.css" />
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/css/normalize.css" />
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/styles/github.min.css">
+    <script>
+        (function(i, s, o, g, r, a, m) {
+        	i['GoogleAnalyticsObject'] = r;
+        	i[r] = i[r] || function() {
+        		(i[r].q = i[r].q || []).push(arguments)
+        	}, i[r].l = 1 * new Date();
+        	a = s.createElement(o),
+        	m = s.getElementsByTagName(o)[0];
+        	a.async = 1;
+        	a.src = g;
+        	m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-2728311-29', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/js/vendor/modernizr.js"></script>
+</head>
+
+<body>
+    <!-- header navbar -->
+    <div id="navWrapper" class="fixed"></div>
+    <!-- breadcrumbs -->
+    <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+    <!-- search -->
+    <div id="searchModal" class="reveal-modal" data-reveal></div>
+    <!-- content -->
+    <div class="row">
+        <div class="large-2 columns show-for-large-up">
+            <div id="sidenav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+            <div id="top" class="section">
+                <h1>OAuth Quick Start</h1>
+                <p>This tutorial guides you through the steps to create a basic proxy in Node.js that gets an <code>access_token</code> for a Brightcove API, makes the API call, and returns the response data and headers (or error if something goes wrong). If you haven't yet looked at the <a href="oauth-api-overview.html">OAuth Overview</a>, it would be a good idea to look at it before proceeding.</p>
+                <div class="BCL-aside">
+                    <p>Note: If you are not interested in the logic used to build the proxy and simply wish to use the proxy as a tool to perform calls to APIs, you do not have to follow the steps in this document. Simply perform the following tasks and you can get started using the APIs more quickly:</p>
+                    <ul>
+                        <li>Be sure you have completed the <a href="#requirements">requirements</a> as detailed later in this document.</li>
+                        <li>Download the <a href="https://github.com/BrightcoveLearning/bcls-proxy.js/blob/master/tester.html">tester.html</a> file and be sure you can browse it from a local web server and you use <strong>localhost</strong> in the address to the page.</li>
+                        <li>Copy the <a href="#fullCode">full code</a> for the proxy into a file named <strong>bcls-proxy.js</strong>.</li>
+                        <li>Run <strong>bcls-proxy.js</strong> using Nodemon (installed in the requirements).</li>
+                    </ul>
+                    <p>The proxy is meant as a way for you to explore the basics of the APIs. It is not meant to be an enterprise ready, deployable app.</p>
+                </div>
+                <p>The proxy requires a <code>client_id</code> and <code>client_secret</code>, which can be obtained from the Brightcove OAuth UI:</p>
+                <ul>
+                    <li class="perform-only"><a href="https://studio.brightcove.com/products/perform/admin/oauthsettings">https://studio.brightcove.com/products/perform/admin/oauthsettings</a>
+                    </li>
+                    <li class="video-cloud-only"><a href="https://sadmin.brightcove.com/oauth_module/v1/">https://sadmin.brightcove.com/oauth_module/v1/</a>
+                    </li>
+                </ul>
+                <p>Generally, to keep the proxy as simple and flexible as possible, you will require clients to submit the following as a POST request:</p>
+                <ul>
+                    <li><code>client_id</code>
+                    </li>
+                    <li><code>client_secret</code>
+                    </li>
+                    <li><code>url</code> (full url for the API request)</li>
+                    <li><code>requestType</code> (GET | POST | PUT | PATCH | DELETE)</li>
+                    <li><code>requestBody</code> (body for the API request [if any])</li>
+                </ul>
+            </div>
+            <div id="requirements" class="section">
+                <h2>Requirements</h2>
+                <ul>
+                    <li>Install <a href="//nodejs.org">node.js</a>.</li>
+                    <li>
+                        After installing node.js it is a good idea to install <a href="http://nodemon.io/">nodemon</a> also. This is not required, but makes development easier by automatically reloading your node app when you make changes to the code.
+                    </li>
+                    <li>The tutorial will tell you what you need to with regard to node.js, but minimal competency with node.js is needed. You can find a good beginner's guide to node.js <a href="//code.tutsplus.com/tutorials/nodejs-for-beginners--net-26314">here</a>.</li>
+                    <li>For testing, you will need a local web server such as <a href="//www.mamp.info/en/">MAMP</a> or <a href="https://www.apachefriends.org/index.html">XAMPP</a> installed and running.</li>
+                    <li>An editor for writing JavaScript.</li>
+                    <li>Competent skills in JavaScript.</li>
+                </ul>
+            </div>
+            <div id="assets" class="section">
+                <h2>Assets</h2>
+                <p>There is a slightly enhanced version of the proxy you are going to build here on <a href="https://github.com/BrightcoveLearning/bcls-proxy.js">Github</a>. The project also includes a <code>tester.html</code> file. Grab this file and copy it somewhere under the document root for your local web server. You can also see the tester live (using our version of the proxy) <a href="//solutions.brightcove.com/bcls/bcls-proxy/tester.html">here</a>.</p>
+            </div>
+            <div class="section" id="overview">
+                <h2>Overview</h2>
+                <p>Here's the basic logic for the proxy:</p>
+                <img src="assets/proxylogic.png" width="500" height="300" alt="Proxy Logic" />
+            </div>
+            <div class="section" id="steps">
+                <h2>Steps</h2>
+                <h3>Setup</h3>
+                <p>First you will modify the <code>tester.html</code> file to point to the local proxy you are going to create.</p>
+                <ol>
+                    <li>Make sure you have done the installation steps listed in <a href="#requirements">Requirements</a>, have your local web server running and can browse to http://localhost/...path.../tester.html</li>
+                </ol>
+                <h3>Create a package and install dependencies</h3>
+                <p>Next you will create a JSON package for the app, which simplifies installing dependencies. The package provides information about the app, including the name, description, version, and other node modules that it requires. The <code>private</code> flag determines whether the package is discoverable for npm installations - here you will keep it private.</p>
+                <ol start="2">
+                    <li>In your editor, create a new file and save it as <code>package.json</code> in the folder where you are creating the proxy app.</li>
+                    <li>
+                        Insert the following JSON code in the empty file:
+                        <pre><code>{
+    "name": "bcls-proxy",
+    "description": "proxy for for Brightcove API calls",
+    "version": "0.0.1",
+    "private": "true",
+    "dependencies": {
+        "request": "2.x.x"
+    }
+}</code></pre>
+                        <p>Note: By specifying the version as <strong>2.x.x</strong>, you are saying "get the latest minor version / patch of request 2." That is slightly risky, as a new minor version might introduce a breaking change (patches should not do that). The request module is quite mature, however, and you will not be using any advanced functionality of it, so you will take that risk. If you wanted to be safer, you could instead specify <strong>2.39.x</strong> or even <strong>2.39.0</strong>. See <a href="http://blog.nodejitsu.com/package-dependencies-done-right/">Package.json dependencies done right</a> for more on specifying dependency versions.</p>
+                    </li>
+                    <li>Save the file</li>
+                    <li>To install the dependencies, run the following at a command line in the folder where <code>package.json</code> is:
+                        <pre><code>$ npm install</code></pre>
+                        <p>If you are on a Mac or Linux system, you will probably need to enter <code>sudo npm install</code> to get permission to write the files.</p>
+                    </li>
+                    <li>Upon successful installation of the dependencies you will see something similar to the following in response to the npm command:</li>
+                    <pre><code>request@2.39.0 node_modules/request
+├── json-stringify-safe@5.0.0
+├── aws-sign2@0.5.0
+├── forever-agent@0.5.2
+├── qs@0.6.6
+├── oauth-sign@0.3.0
+├── stringstream@0.0.4
+├── tunnel-agent@0.4.0
+├── node-uuid@1.4.1
+├── mime-types@1.0.1
+├── tough-cookie@0.12.1 (punycode@1.3.0)
+├── hawk@1.1.1 (cryptiles@0.2.2, sntp@0.2.4, boom@0.4.2, hoek@0.9.1)
+├── http-signature@0.10.0 (assert-plus@0.1.2, asn1@0.1.11, ctype@0.5.2)
+└── form-data@0.1.4 (mime@1.2.11, async@0.9.0, combined-stream@0.0.5)</code></pre>
+                </ol>
+                <h3>Start building the proxy</h3>
+                <p>The first step to building the proxy itself is to define the overall structure and some variables. You will start by defining the overall proxy as a module to keep the variable scope contained.</p>
+                <ol start="6">
+                    <li>Create a new file in your folder called <code>bcls-proxy.js</code></li>
+                    <li>Define your code as a self-executing module, with <code>use strict</code> to keep the code clean:</li>
+                    <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="20-21,174"></code></p>
+                    <li>Next, after the <code>use strict</code> statement, define variables for the dependencies and functions.</li>
+                    <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="22-27"></code></p>
+                    <li> Now you will create placeholders for the functions, and fill in the logic later. After the variable declarations, add the following: </li>
+                    <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="31,62,66,90,94,116"></code></p>
+                    <li>Save the file.</li>
+                </ol>
+                <h3>Set up a server</h3>
+                <p>Now you will use the <code>http.createServer()</code> method to create an HTTP server to listen for and respond to requests on port 8003. You will also include an anonymous function to handle incoming requests.</p>
+                <ol start="11">
+                    <li>After the function placeholders, add the following:</li>
+                    <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="120,172"></code></p>
+                    <li>At the beginning of the anonymous listener function, add a single variable that you will use to capture the request body:</li>
+                    <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="121"></code></p>
+                    <li>Add a console log just before then end of the code to verify the server starts correctly:</li>
+                    <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="173"></code></p>
+                    <li>Confirm that your code appears as follows:</li>
+                    <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="193-215"></code></p>
+                    <li>Save the file.</li>
+                    <li>Start the proxy app using node.js. If you have <code>nodemon</code> installed, use the following command in the folder where <code>bcls-proxy.js</code> is located:
+                        <pre><code>nodemon bcls-proxy.js</code></pre>
+                        <p>The nodemon utility will automatically restart <code>bcls-proxy.js</code> anytime you save a change to the file. If you do not have nodemon installed, then enter the following command:</p>
+                        <pre><code>node bcls-proxy.js</code></pre>
+                        <p>Without nodemon, each time you save changes to the proxy app you will need to stop it by pressing <code>CTRL-c</code> and restart the app by entering <code>node bcls-proxy.js</code> again.</p>
+                    </li>
+                    <li>No matter how you started the server, check to be sure no errors are showing in the terminal and you see the logged message.</li>
+                </ol>
+                <h3>Finish the server part of the app</h3>
+                <p>Now you will finish the server part.</p>
+                <ol start="18">
+                    <li>After the assignment of the empty string to the <code>body</code> variable, put in a check on the <code>origin</code> header to accept requests only from <code>localhost</code> (and add comments to remind yourself to modify this if you decide to deploy the proxy in production):
+                    </li>
+                    <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="123-129"></code>
+                    </p>
+                    <li>After the <code>if</code> block, set a listener for <code>data</code> events to add the data chunks to the <code>body</code> string:
+                    </li>
+                    <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="130-132"></code>
+                    </p>
+                    <li>After the listener for <code>data</code> events, add a listener for the request <code>end</code> event. This listener will do the rest of work (once you add the logic for the functions):</li>
+                    <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="133-170"></code></p>
+                    <li>Save the file.</li>
+                </ol>
+                <p>A couple things to note here:</p>
+                <ul>
+                    <li>For each of the three external function calls, you pass an anonymous function as a callback. This allows us to know that the function has completed before you proceed. This is crucial to the logic of the proxy because of the asynchronous nature of node.js processes.</li>
+                    <li>In case of failure in any of the functions, you will return an error instead of data. You have logic to handle that in the previous code block.</li>
+                </ul>
+                <h3>Add logic for the getFormValues() function</h3>
+                <p>Now you will fill in the login for <code>getFormValues()</code> function, which processes the incoming request data, parses it into an object for easier handling, and checks for required values.</p>
+                <ol start="20">
+                    <li>Locate the <code>getFormValues()</code> function and note the parameters you are passing from the server:</li>
+                    <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="31"></code></p>
+                    <li>In the body of the function, add the following code to first split the body string into an array of key/value pairs, and then split each of those to populate the properties of an <code>options</code> object:</li>
+                    <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="32-61"></code></p>
+                    <li>Save the file.</li>
+                </ol>
+                <p>Things to note here:</p>
+                <ul>
+                    <li>You set default values for the options properties first - this provides the default GET for <code>requestType</code> and makes it easy to check for errors after you repopulate the values from the submitted data</li>
+                    <li>You define an error to pass when you call the callback if the checks fail, and otherwise pass null for error, along with the options object</li>
+                    <li>
+                        You have to decode the URL, to reverse the encoding that happens automatically in the form submission by the client
+                    </li>
+                </ul>
+                <h3>Add logic for the getAccessToken() function</h3>
+                <p>Now you will add the logic for the <code>getAccessToken()</code> function, which calls the Brightcove OAuth service to get an access token for the API call.</p>
+                <ol start="23">
+                    <li>Locate the <code>getAccessToken()</code> function and note the parameters you are passing from the server:</li>
+                    <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="66"></code>
+                    </p>
+                    <li>In the body of the function, add the following code to make the call to the OAuth service and return the <code>access_token</code> (or error) to the server:
+                    </li>
+                    <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="67-89"></code>
+                    </p>
+                    <li>Save the file.</li>
+                </ol>
+                <p>Things to note here:</p>
+                <ul>
+                    <li>The OAuth service requires the <code>client_id:client_secret</code> string to be Base64 encoded and passed as a basic auth header</li>
+                    <li>The body must include the key/value pair <code>grant_type=client_credentials</code> and must be <code>application/x-www-form-urlencoded</code>
+                    </li>
+                </ul>
+                <h3>Add logic for the sendRequest() function</h3>
+                <p>Finally, you will fill in the logic for the <code>sendRequest()</code> function, which makes the actual API request and returns the response headers and body to the server to be sent back to the client.</p>
+                <ol start="26">
+                    <li>Locate the <code>sendRequest()</code> function and note the parameters you are passing from the server:</li>
+                    <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="94"></code>
+                    </p>
+                    <li>Now add the logic to the function to make the API call and return the headers and body of the response via the callback:
+                    </li>
+                    <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="95-115"></code>
+                    </p>
+                    <li>Save the file. The proxy should now be ready for a full test using <code>tester.html</code>.</li>
+                </ol>
+                <h3>Testing</h3>
+                <ol start="29">
+                    <li>Browse the file <code>tester.html</code>.</li>
+                    <li>Click the <strong>Submit</strong> button.</li>
+                    <li>You should see data returned similar to the following (although not formatted as nicely):</li>
+                    <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="222-267"></code>
+                    </p>
+                </ol>
+            </div>
+            <div class="section" id="fullCode">
+                <h2>Full code</h2>
+                <p>The full code for this sample is below:</p>
+                <p><code data-gist-id="91f64a6252f9fc7bafd0" data-gist-hide-footer="true" data-gist-line="1-174"></code>
+                </p>
+            </div>
+            <div class="section" id="limitations">
+                <h2>Limitations</h2>
+                <p>There are a few limitations in this sample that you should think about if you are going to create a version for production use:</p>
+                <ul>
+                    <li>The proxy fetches a new token for every request it receives. The token does not time out immediately, however - you will get back the timeout in seconds from the OAuth service when you make the call to get the access token (currently the token expires after 300 seconds, but that value may change in the future). It would be easy to keep track of the timeout and not make another call to the OAuth services unless you need to. The reason you did not implement that logic here is that it could get you into trouble if your proxy accepts requests for calls to different API (as written, this one will). In that case, you could easily have a situation where you have an unexpired token - but not for the current API call. If you proxy will only be used for a single Brightcove API, however, it would make sense to avoid getting a token when you already have a valid one.</li>
+                    <li>No handling for concurrent calls is built in here, so under high volumes of requests, this proxy would be unreliable. There are various ways to handle concurrency - one approach would be to create multiple HTTP servers listening on different ports, so that you could divide calls between them.</li>
+                    <li>If you examine tester.html, you will see that the return of the data to client page is something of an illusion - the response is actually being sent to an iframe via the <code>target</code> attribute of the form. That is fine if you only need to display the data, but not if you need to process it in some way - in that case you would either need to build your client on the server side and have it get the data and process it before serving the web page, or implement your proxy in such a way that the client can access it via a socket or AJAX.</li>
+                </ul>
+            </div>
+            <div class="section" id="enhancedCode">
+                <h2>Enhanced version</h2>
+                <p>Below is code for an enhanced version of this proxy that adds timeout checking and multiple servers for different APIs to provide better handling for concurrency.</p>
+                <script src="https://gist.github.com/c9254c89313f4246d80f.js"></script>
+            </div>
+            <div class="section" id="BCLreferences">
+                <h2>Related Topics</h2>
+                <ul>
+                    <li><a href="oauth-api-overview.html">OAuth Overview</a>
+                    </li>
+                    <li><a href="../reference/versions/v3/">OAuth API Reference</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- bcl scripts -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/1.7/gist-embed.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.0/fastclick.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/js/foundation.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
+    <script src="/en/scripts/log.js"></script>
+    <script src="/en/scripts/docs-nav-data.min.js"></script>
+    <script src="/en/scripts/bcls-doc-site.js"></script>
+    <script src="/en/scripts/bc-mapi.js"></script>
+    <script>
+        $(document).foundation();
+    </script>
+    <script type="text/javascript">
+        /******** Any scripts specific to page samples should go here *********/
+    </script>
+    <div class="footer text-center"><a href="mailto:docs@brightcove.com">Questions or comments?</a>
+    </div>
+</body>
+
+</html>
