@@ -150,7 +150,7 @@
 			    </table>
 			</div>
 			<div class="section" id="search">
-			    <h2>Search Syntax</h2>
+			    <h2>Search syntax</h2>
 			    <p>Search terms are specified using the <code>q</code> parameter.
 				<pre><code>q={search terms}</code></pre>
 			    <p>The query string you provide should be a url encoded list of terms separated by a space (+ after encoding).</p>
@@ -592,6 +592,189 @@ my_field:"foo"
 			</table>
 		</div>
         
+    <div class="section" id="updatevideo">
+      <h2>Update video</h2>
+      <p>HTTP <code>PATCH</code> requests will update media data for a video object in the account.</p>
+      
+      <h3>Check the data type</h3>
+      <p>When updating fields, check the data type:</p>
+      <ul>
+        <li><p>For non-array fields, like <code>description</code>, <code>name</code> and <code>reference_id</code>, you can update each field without affecting the others.</p></li>
+        <p>Example: If you have a <code>description</code> and <code>long_description</code> defined, you can update one without affecting the other.</p>
+        <li><p>For map fields, like <code>geo</code>, <code>schedule</code>, <code>link</code>, you can update each sub-field without affecting the other.</p></li>
+        <p>Example: If you have a <code>link.url</code> and <code>link.text</code> defined, you can update one without affecting the other.</p>
+        <li><p>For array fields, like <code>cue_points</code> and <code>tags</code>, you have to include all the items in the array, and not just the one you are updating.</p></li>
+        <p>Example: With <code>cue_points</code>, you you have to include all cue points and not just the one you are updating.</p>
+      </ul> 
+      
+      <h3>Fields for update</h3>
+      <p>The following media fields can be updated using the <code>PATCH</code> method:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Comments</th>
+				  </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>complete</td>
+            <td>Boolean</td>
+            <td>no</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>cue_points</td>
+            <td>Array of Maps</td>
+            <td>no</td>
+            <td>You must patch the entire array to update.</td>
+          </tr>
+          <tr>
+            <td>cue_points.0.name</td>
+            <td>String</td>
+            <td>yes</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>cue_points.0.type</td>
+            <td>String</td>
+            <td>yes</td>
+            <td>must be one of valid enum values</td>
+          </tr>
+          <tr>
+            <td>cue_points.0.time</td>
+            <td>Float</td>
+            <td>yes</td>
+            <td>time in seconds</td>
+          </tr>
+          <tr>
+            <td>cue_points.0.metadata</td>
+            <td>String</td>
+            <td>no</td>
+            <td>code point only</td>
+          </tr>
+          <tr>
+            <td>cue_points.0.force_stop</td>
+            <td>Boolean</td>
+            <td>no</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>custom_fields</td>
+            <td>Map of field-value pairs</td>
+            <td>no</td>
+            <td>patch to null to unset</td>
+          </tr>
+          <tr>
+            <td>description</td>
+            <td>String</td>
+            <td>no</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>economics</td>
+            <td>String</td>
+            <td>no</td>
+            <td>must be one of valid enum values</td>
+          </tr>
+          <tr>
+            <td>geo</td>
+            <td>Map of property-value pairs</td>
+            <td>no</td>
+            <td>to unset, you can either patch 'geo: null' or 'geo{}'</td>
+          </tr>
+          <tr>
+            <td>geo.countries</td>
+            <td>Array of country code Strings</td>
+            <td>no</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>geo.exclude_countries</td>
+            <td>Boolean</td>
+            <td>no</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>geo.restricted</td>
+            <td>Boolean</td>
+            <td>no</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>link</td>
+            <td>Map of property-value pairs</td>
+            <td>no</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>link.url</td>
+            <td>String</td>
+            <td>no</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>link.text</td>
+            <td>String</td>
+            <td>no</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>long_description</td>
+            <td>String</td>
+            <td>no</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>name</td>
+            <td>String</td>
+            <td>no</td>
+            <td>cannot be empty or null</td>
+          </tr>
+          <tr>
+            <td>reference_id</td>
+            <td>String</td>
+            <td>no</td>
+            <td>must be unique in the account</td>
+          </tr>
+          <tr>
+            <td>schedule</td>
+            <td>Map of property-value pairs</td>
+            <td>no</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>schedule.ends_at</td>
+            <td>String in ISO-8601 date format</td>
+            <td>no</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>schedule.starts_at</td>
+            <td>String in ISO-8601 date format</td>
+            <td>no</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>state</td>
+            <td>String</td>
+            <td>no</td>
+            <td>must be one of valid enum values</td>
+          </tr>
+          <tr>
+            <td>tags</td>
+            <td>Array of tags (Strings)</td>
+            <td>no</td>
+            <td>Strings cannot be empty or contain commas</td>
+          </tr>
+          
+        </tbody>
+      </table>
+      
+    </div>
+        
     <div class="section" id="paging">
       <h2>Paging</h2>
       <p>With the CMS API, you can implement paging. This allows you to handle large result sets in smaller groups, which improves performance.</p>
@@ -633,7 +816,7 @@ my_field:"foo"
     </div>
         
 		<div class="section" id="BCLreferences">
-			<h2>Related Topics</h2>
+			<h2>Related topics</h2>
 			<ul>
 				<li><a href="//docs.brightcove.com/en/video-cloud/di-api/guides/overview-di.html">Pull-Based Ingest API Overview</a></li>
 				<li><a href="//docs.brightcove.com/en/video-cloud/di-api/guides/quick-start-di.html">Quick Start to Pull-Based Ingest</a></li>
