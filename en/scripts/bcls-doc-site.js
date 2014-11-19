@@ -430,9 +430,8 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         bclslog("subsectionName: ", subsectionName);
         bclslog("dataIndex: ", dataIndex);
         bclslog("subsection data", data);
-        max = data.items.length;
         // check for submenus
-        if (exists(data.items[0].items)) {
+        if (exists(data) && exists(data.items[0].items)) {
             max = data.items.length;
             for (i = 0; i < max; i++) {
                 item = data.items[i];
