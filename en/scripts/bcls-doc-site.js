@@ -248,10 +248,10 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             }
         }
         if (exists(sectionName)) {
-            if (section === "video-cloud" || section === "perform") {
+            if (section === "video-cloud" || section === "perform" || section === "player-management") {
                 str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + sectionName.toLowerCase() + "/index.html\"><strong>" + sectionName + "</strong></a></li>";
             } else {
-                str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + section + "/index.html\"><strong>" + sectionName + "</strong></a></li>";
+                str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + section + "/index.html\"><strong>" + section + "</strong></a></li>";
             }
         }
         if (exists(subsection)) {
@@ -546,7 +546,8 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                         section = "smart-player-api";
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
                     } else if (section === "player-management") {
-                        section = "player-management-api";
+                        section = "player-management";
+                        sectionName = "player-management";
                     } else if (section === "studio-prerelease") {
                         sectionName = "Studio (pre-release)";
                         if (pathArray[3] === "index.html") {
