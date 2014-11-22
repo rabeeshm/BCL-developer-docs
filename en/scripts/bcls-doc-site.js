@@ -190,10 +190,30 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         $divsection.each(function (index) {
             if (index > 0) {
                 $this = $(this);
-                navObj = {};
-                navObj.link = $this.attr("id");
-                navObj.text = $this.find("h2:first").text();
-                navLabel.push(navObj);
+                switch (product) {
+                    case "video-cloud":
+                        if (!$this.hasClass("perform-only")) {
+                            navObj = {};
+                            navObj.link = $this.attr("id");
+                            navObj.text = $this.find("h2:first").text();
+                            navLabel.push(navObj);
+                        }
+                        break;
+                    case "perform":
+                        if (!$this.hasClass("perform-only")) {
+                            navObj = {};
+                            navObj.link = $this.attr("id");
+                            navObj.text = $this.find("h2:first").text();
+                            navLabel.push(navObj);
+                        }
+                        break;
+                    default:
+                    navObj = {};
+                    navObj.link = $this.attr("id");
+                    navObj.text = $this.find("h2:first").text();
+                    navLabel.push(navObj);
+                    break;
+                }
             }
         });
         // only create the nav widget if there is more than one item
@@ -265,7 +285,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         }
         if (exists(subsubsection)) {
             // only in video cloud but allow for other subsections having subsubsections
-            if (section === "studio") {
+            if (section === "studio" || section === "mobile-sdks") {
                 str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + section.toLowerCase() + "/" + subsection.toLowerCase() + "/" + subsubsection.toLowerCase() + "/index.html\">" + subsubsectionName + "</a></li>";
             }
         }
@@ -814,6 +834,42 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     // check to see if we're on a subsection landing page
                     if (exists(subsection)) {
                         switch (subsection) {
+                        case "brightcove-player-sdk-for-ios":
+                            subsectionName = "Brightcove Player SDK for iOS";
+                            if (pathArray[4] === "index.html") {
+                                createSubsectionLandingPageSections();
+                            } else {
+                                // we're in a subsubsection
+                                subsubsection = pathArray[4];
+                                // set subsubsection name
+                                switch (subsubsection) {
+                                    case "guides":
+                                    subsubsectionName = "Guides";
+                                    break;
+                                    case "samples":
+                                    subsubsectionName = "Code Samples";
+                                    break;
+                                }
+                            }
+                            break;
+                        case "brightcove-player-sdk-for-android":
+                            subsectionName = "Brightcove Player SDK for Android";
+                            if (pathArray[4] === "index.html") {
+                                createSubsectionLandingPageSections();
+                            } else {
+                                // we're in a subsubsection
+                                subsubsection = pathArray[4];
+                                // set subsubsection name
+                                switch (subsubsection) {
+                                    case "guides":
+                                    subsubsectionName = "Guides";
+                                    break;
+                                    case "samples":
+                                    subsubsectionName = "Code Samples";
+                                    break;
+                                }
+                            }
+                            break;
                         case "references":
                             subsectionName = "API References";
                             if (pathArray[4] === "index.html") {
