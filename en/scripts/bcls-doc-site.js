@@ -421,7 +421,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             templateMiddle = Handlebars.compile("{{#items}}<li><a href=\"{{url}}\">{{name}}</a></li>{{/items}}"),
             templateEnd = "</ul></div>",
             str = "";
-
+        bclslog("bclsNavData[product].sections[section].items", bclsNavData[product].sections[section].items);
         // data = data.items;
         bclslog("product: ", product);
         bclslog("section: ", section);
@@ -560,12 +560,49 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                         // we're on the section landing page
                         subsection = null;
                         createLandingPageSections(bclsNavData[product].sections[section]);
+                        bclslog("bclsNavData[product].sections[section]", bclsNavData[product].sections[section]);
                     } else {
                         subsection = pathArray[3];
                     }
                     // check to see if we're on a subsection landing page
                     if (exists(subsection)) {
                         switch (subsection) {
+                        case "brightcove-player-sdk-for-ios":
+                            subsectionName = "Brightcove Player SDK for iOS";
+                            if (pathArray[4] === "index.html") {
+                                createSubsectionLandingPageSections();
+                            } else {
+                                // we're in a subsubsection
+                                subsubsection = pathArray[4];
+                                // set subsubsection name
+                                switch (subsubsection) {
+                                    case "guides":
+                                    subsubsectionName = "Guides";
+                                    break;
+                                    case "samples":
+                                    subsubsectionName = "Code Samples";
+                                    break;
+                                }
+                            }
+                            break;
+                        case "brightcove-player-sdk-for-android":
+                            subsectionName = "Brightcove Player SDK for Android";
+                            if (pathArray[4] === "index.html") {
+                                createSubsectionLandingPageSections();
+                            } else {
+                                // we're in a subsubsection
+                                subsubsection = pathArray[4];
+                                // set subsubsection name
+                                switch (subsubsection) {
+                                    case "guides":
+                                    subsubsectionName = "Guides";
+                                    break;
+                                    case "samples":
+                                    subsubsectionName = "Code Samples";
+                                    break;
+                                }
+                            }
+                            break;
                         case "general":
                             subsectionName = "General Info";
                             if (pathArray[4] === "index.html") {

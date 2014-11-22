@@ -12,9 +12,9 @@ module.exports = function (grunt) {
                 files: {
                     'working/docs-nav-data-from-minjson.json': ['source/smart-player-api.json',
                         'source/video-cloud.json',
-                        'source/mobile-sdks.json',
                         'source/analytics-api.json',
                         'source/batch-provisioning.json',
+                        'source/mobile-sdks.json',
                         'source/studio.json',
                         'source/studio-prerelease.json',
                         'source/brightcove-player.json',
