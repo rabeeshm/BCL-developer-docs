@@ -29,6 +29,7 @@ module.exports = function (grunt) {
                     'working/temp-perform.json': ['source/perform.json',
                         'source/brightcove-player-perform.json',
                         'source/player-management-perform.json',
+                        'source/mobile-sdks-perform.json',
                         'source/oauth-api-perform.json'
                     ]
                 },

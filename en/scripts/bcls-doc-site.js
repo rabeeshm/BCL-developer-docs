@@ -821,7 +821,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                         subsection = null;
                         section = "perform";
                     } else {
-                        sectionName = bclsNavData["perform"].sections[section].name;
+                        sectionName = bclsNavData[product].sections[section].name;
                     }
                     // check to see if we're on the section landing page
                     if (pathArray[3] === "index.html") {
