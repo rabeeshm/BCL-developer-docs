@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+	<!-- change title to match the h1 heading -->
+	<title>Batch update Using CMS API</title>
+	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/css/foundation.min.css" />
+	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/css/normalize.css" />
+	<script src="//use.edgefonts.net/source-code-pro.js"></script>
+	<link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" type="text/css" href="//docs.brightcove.com/en/styles/bcls-doc-site.css">
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/styles/github.min.css">
+	<style>
+	input, select {
+		max-width: 60%;
+		font-size: .8rem;
+	}
+	fieldset {
+		border: 1px #366 solid;
+		border-radius: 5px;
+	}
+	textarea {
+		width: 90%;
+		height: 4rem;
+		font-size: .8rem;
+	}textarea#videoData {
+		width: 90%;
+		background-color: #f5f5f5;
+		height: 24rem;
+		font-size: .8rem;
+	}
+	</style>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/js/vendor/modernizr.js"></script>
+</head>
+
+<body>
+	<!-- header navbar -->
+	<div id="navWrapper" class="fixed"></div>
+	<!-- breadcrumbs -->
+	<nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+	<!-- search -->
+	<div id="searchModal" class="reveal-modal" data-reveal></div>
+	<!-- content -->
+	<div class="row">
+		<div class="large-2 columns show-for-large-up">
+			<div id="sidenav"></div>
+		</div>
+		<div id="main" class="large-10 small-12 columns">
+			<div id="top" class="section">
+
+	<h1>Batch update Using CMS API</h1>
+    <fieldset>
+        <legend>Inputs</legend>
+        <p>
+			Account ID:
+			<input size="60" id="account_id" type="text" value="57838016001">
+		</p>
+        <p>
+			Client ID:
+			<input size="60" id="client_id" type="text" value="f05869d2-f201-47d1-9606-aaafa66fea6e">
+		</p>
+        <p>
+			Client Secret:
+			<input size="120" id="client_secret" type="text" value="2F4CvF8DER1j3fmQr3TjKSmD6jMfvigM3HwCVkdhykvYOOUamFYeu9U8fRpks-EH7PCJcthc8IsEPT3bAnAqNQ">
+		</p>
+		<p>
+			Video metadata for update:
+			<textarea id="videoData">[
+     {
+          "name": "Betty Boop Full Movie",
+          "id": "96851865001",
+          "description": "",
+          "reference_id": "f4631c7c-a724-4226-920f-29de042e35c8"
+     },
+     {
+          "name": "Water-Liquid-Flow",
+          "id": "1194921693001",
+          "description": "Water flowing",
+          "reference_id": "f7d11d8b-d87a-499a-a64b-6ec14f243eb6"
+     },
+     {
+          "name": "Wildlife_Zebra",
+          "id": "734484324001",
+          "description": "The striped mammal",
+          "reference_id": "f4f8adef-2df8-49bf-84cd-95d31b20a7a2"
+     }
+]</textarea>
+		</p>
+		<p><button id="setRequest">Submit Request</button></p>
+    </fieldset>
+    <fieldset>
+    	<legend>Outputs</legend>
+		<p>
+			API request:
+			<textarea id="apiRequest"></textarea>
+		</p>
+        <pre><code id="response"></code></pre>
+    </fieldset>
+		</div>
+	</div>
+	<!-- bcl scripts -->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/1.7/gist-embed.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.2/fastclick.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/js/foundation.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
+	<script src="//docs.brightcove.com/en/scripts/docs-nav-data.min.js"></script>
+	<script src="//docs.brightcove.com/en/scripts/bcls-doc-site.js"></script>
+
+	<script>
+		$(document).foundation();
+	</script>
+	<script id="pageScript">
+	var BCLS = ( function (window, document) {
+		var account_id_field = document.getElementById("account_id"),
+			account_id,
+			client_id_field = document.getElementById("client_id"),
+			client_id = null,
+			client_secret_field = document.getElementById("client_secret"),
+			client_secret = null,
+			setRequest_btn = document.getElementById("setRequest"),
+			apiRequest = null,
+            apiRequest_field = document.getElementById("apiRequest"),
+			submit_button = document.getElementById("submit"),
+			response = document.getElementById("response"),
+			totalVideos = 0,
+			offset = 0,
+			callNumber = 0,
+			requestBody,
+			videoData_display = document.getElementById("videoData"),
+			videoData,
+			t1,
+			currentVideo,
+			// functions
+			isDefined,
+			cleanString,
+			cleanUpData,
+			submitRequest,
+			setRequest,
+			logResponse,
+			init;
+		// is defined
+		isDefined = function(x){
+			if(x !== "" && x !== null && x !== undefined){
+				return true;
+			} else{
+				return false;
+			}
+		};
+		// function to remove spaces from string
+		cleanString = function (str) {
+			// remove spaces
+			str = str.replace(/\s/g, "");
+			return str;
+		};
+		// clean up data before submitting
+		cleanUpData = function () {
+			var i, iMax, item;
+			iMax = videoData.length;
+			for (i = 0; i < iMax; i++) {
+				item = videoData[i];
+				// truncate over-long descriptions
+				if (item.description.length > 120) {
+					item.description = item.description.substr(0, 250) + "...";
+				}
+				// use name for missing descriptions
+				if (item.description === "") {
+					item.description = item.name;
+				}
+			}
+			// console.log("videoData Cleaned", videoData);
+		}
+		// function to set up request
+		setRequest = function () {
+
+			currentVideo = videoData[callNumber];
+			if (isDefined(currentVideo)) {
+				apiRequest = "https://cms.api.brightcove.com/v1beta1/accounts/" + account_id + "/videos/" + currentVideo.id;
+				requestBody = '{"description":"' + currentVideo.description + '","reference_id":"' + currentVideo.reference_id + '"}';
+				// display the request URL
+				apiRequest_field.innerHTML = apiRequest;
+				submitRequest();
+			}
+
+		}
+		// function to set the request
+		logResponse = function (data) {
+			response.innerHTML += data + ",<br />"
+		}
+		// function to make API request
+		submitRequest = function () {
+		    var httpRequest = new XMLHttpRequest(),
+				proxyURL = "http://solutions.brightcove.com:8005/",
+				requestData,
+				getResponse = function () {
+					try {
+					    if (httpRequest.readyState === 4) {
+					      if (httpRequest.status === 200) {
+					        logResponse(httpRequest.responseText);
+					        if (callNumber < totalVideos) {
+					        	callNumber++;
+					        	setRequest();
+					        }
+					      } else {
+					        alert("There was a problem with the request. Request returned " + httpRequest.status);
+					      }
+					    }
+					  }
+					  catch(e) {
+					    alert('Caught Exception: ' + e);
+					  }
+				};
+			if (account_id === null || client_id === null || client_secret === null) {
+				alert("You must provide an account id, client id, and client secret");
+				return false;
+			}
+			// get latest request URL in case use edited it
+			apiRequest = cleanString(apiRequest_field.value);
+			// set up request data
+			requestData = "client_id=" + client_id + "&client_secret=" + client_secret + "&url=" + encodeURIComponent(apiRequest) + "&requestBody=" + encodeURIComponent(requestBody) + "&requestType=PATCH";
+			// set response handler
+			httpRequest.onreadystatechange = getResponse;
+			// open the request
+			httpRequest.open("POST", proxyURL);
+			// set headers
+			httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+			// open and send request
+			httpRequest.send(requestData);
+		};
+		// init function to set up event listeners
+		init = function () {
+			// event listeners
+			setRequest_btn.addEventListener("click", function () {
+				// trim any leading/trailing spaces from the input strings
+				account_id = cleanString(account_id_field.value);
+				client_id = cleanString(client_id_field.value);
+				client_secret = cleanString(client_secret_field.value);
+				// get and clean up video data
+				videoData = JSON.parse(videoData_display.value);
+				totalVideos = videoData.length;
+				cleanUpData();
+				// set up the request
+				setRequest();
+			});
+		}
+		// initialize - set up data
+		init();
+
+	})(window, document);
+	</script>
+</body>
+
+</html>

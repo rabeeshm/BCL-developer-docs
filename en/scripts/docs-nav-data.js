@@ -318,6 +318,9 @@ var bclsNavData = {
 						url: "//docs.brightcove.com/en/video-cloud/analytics-api/guides/managing-api-credentials.html",
 						name: "Managing API Credentials"
 					}, {
+						url: "//docs.brightcove.com/en/video-cloud/analytics-api/guides/unique-users.html",
+						name: "Unique Users"
+					}, {
 						url: "//docs.brightcove.com/en/video-cloud/analytics-api/guides/day.html",
 						name: "Dimension: day"
 					}, {
@@ -508,110 +511,113 @@ var bclsNavData = {
 				name: "Batch Provisioning"
 			},
 			"mobile-sdks": {
-				name: "Mobile SDKs",
 				items: [{
-					"brightcove-player-sdk-for-android": {
-						name: "Brightcove Player SDK for Android",
+					name: "Brightcove Player SDK for Android",
+					items: [{
+						url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/reference/versions/4.2.8/index.html",
+						name: "SDK Reference"
+					}, {
+						url: "//repo.brightcove.com/releases",
+						name: "Maven Repo"
+					}, {
 						items: [{
-							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/reference/versions/4.2.8/index.html",
-							name: "SDK Reference"
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/view-layout.html",
+							name: "Add View/Manage Layout"
 						}, {
-							url: "//repo.brightcove.com/releases",
-							name: "Maven Repo"
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/studio-android-sdk-quick-start.html",
+							name: "Brightcove Player SDK for Android Quick Start - Android Studio"
 						}, {
-							items: [{
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/view-layout.html",
-								name: "Add View/Manage Layout"
-							}, {
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/android-sdk-quick-start.html",
-								name: "Brightcove Player SDK for Android Quick Start - ADT"
-							}, {
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/studio-android-sdk-quick-start.html",
-								name: "Brightcove Player SDK for Android Quick Start - Android Studio"
-							}, {
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/error-msg-reference.html",
-								name: "Error Message Guide"
-							}, {
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/hls-limitations.html",
-								name: "HLS Limitations"
-							}, {
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/hls-player-for-android-sdk.html",
-								name: "HLS Player for Android Overview"
-							}, {
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/android-sdk-quick-start.html#getready",
-								name: "Installation/Setup"
-							}, {
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/plugin-guide/plugin-guide.html",
-								name: "Plugin Guide"
-							}, {
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/orientation-change/orientation-change.html",
-								name: "Orientation Change"
-							}, {
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/analytics/analytics.html",
-								name: "Using Brightcove Analytics"
-							}, {
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/hls-best-practices.html",
-								name: "Using the HLS Player"
-							}],
-							name: "Guides",
-							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/index.html"
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/android-sdk-quick-start.html",
+							name: "Brightcove Player SDK for Android Quick Start - ADT (deprecated)"
 						}, {
-							items: [{
-								url: "//github.com/BrightcoveOS/android-player-samples",
-								name: "Basic Android Player Samples"
-							}],
-							name: "Code Samples"
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/error-msg-reference.html",
+							name: "Error Message Guide"
 						}, {
-							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/forum/sdk.html",
-							name: "Developer Forum"
-						}]
-					},
-					"brightcove-player-sdk-for-ios": {
-						name: "Brightcove Player SDK for iOS",
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/hls-limitations.html",
+							name: "HLS Limitations"
+						}, {
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/hls-player-for-android-sdk.html",
+							name: "HLS Player for Android Overview"
+						}, {
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/android-sdk-quick-start.html#getready",
+							name: "Installation/Setup"
+						}, {
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/plugin-guide/plugin-guide.html",
+							name: "Plugin Guide"
+						}, {
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/orientation-change/orientation-change.html",
+							name: "Orientation Change"
+						}, {
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/analytics/analytics.html",
+							name: "Using Brightcove Analytics"
+						}, {
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/analytics/data-collection-api-overview.html",
+							name: "Data Collection API Overview"
+						}, {
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/hls-best-practices.html",
+							name: "Using the HLS Player"
+						}],
+						name: "Guides",
+						url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/index.html"
+					}, {
 						items: [{
-							items: [{
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/reference/versions/4.2.1/index.html",
-								name: "Brightcove Player SDK for iOS"
-							}, {
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/plugins/ima/reference/versions/1.1.1/",
-								name: "IMA Plugin"
-							}, {
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/plugins/freewheel/reference/versions/1.0.3/",
-								name: "FreeWheel Plugin"
-							}, {
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/plugins/widevine/reference/versions/1.0.10/",
-								name: "Widevine Plugin (1.0.10)"
-							}, {
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/plugins/widevine/reference/versions/1.2.0/",
-								name: "Widevine Plugin (1.2.0)"
-							}],
-							name: "References",
-							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/references.html"
+							url: "//github.com/BrightcoveOS/android-player-samples",
+							name: "Basic Android Player Samples"
+						}],
+						name: "Code Samples"
+					}, {
+						url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/forum/sdk.html",
+						name: "Developer Forum"
+					}]
+				}, {
+					name: "Brightcove Player SDK for iOS",
+					items: [{
+						items: [{
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/reference/versions/4.2.1/index.html",
+							name: "Brightcove Player SDK for iOS"
 						}, {
-							items: [{
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/guides/quick-start.html#installation",
-								name: "Installation/Setup"
-							}, {
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/guides/quick-start.html",
-								name: "Quick Start: Simple Video App"
-							}, {
-								url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/guides/analytics/analytics.html",
-								name: "Using Brightcove Analytics"
-							}],
-							name: "Guides",
-							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/guides.html"
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/plugins/ima/reference/versions/1.1.1/",
+							name: "IMA Plugin"
 						}, {
-							items: [{
-								url: "https://github.com/BrightcoveOS/ios-player-samples",
-								name: "Basic iOS Player Samples"
-							}],
-							name: "Code Samples"
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/plugins/freewheel/reference/versions/1.0.3/",
+							name: "FreeWheel Plugin"
 						}, {
-							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/forum/sdk.html",
-							name: "Developer Forum"
-						}]
-					}
-				}]
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/plugins/widevine/reference/versions/1.0.10/",
+							name: "Widevine Plugin (1.0.10)"
+						}, {
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/plugins/widevine/reference/versions/1.2.0/",
+							name: "Widevine Plugin (1.2.0)"
+						}],
+						name: "References",
+						url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/references.html"
+					}, {
+						items: [{
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/guides/quick-start.html#installation",
+							name: "Installation/Setup"
+						}, {
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/guides/quick-start.html",
+							name: "Quick Start: Simple Video App"
+						}, {
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/guides/analytics/analytics.html",
+							name: "Using Brightcove Analytics"
+						}, {
+							url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/guides/analytics/data-collection-api-overview.html",
+							name: "Data Collection API Overview"
+						}],
+						name: "Guides",
+						url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/guides.html"
+					}, {
+						items: [{
+							url: "https://github.com/BrightcoveOS/ios-player-samples",
+							name: "Basic iOS Player Samples"
+						}],
+						name: "Code Samples"
+					}, {
+						url: "//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/forum/sdk.html",
+						name: "Developer Forum"
+					}]
+				}],
+				name: "Mobile SDKs"
 			},
 			studio: {
 				items: [{
@@ -743,6 +749,9 @@ var bclsNavData = {
 					}, {
 						url: "//docs.brightcove.com/en/video-cloud/brightcove-player/reference/known-issues.html",
 						name: "Compatibility and Known Issues"
+					}, {
+						url: "//docs.brightcove.com/en/video-cloud/brightcove-player/reference/player-catalog.html",
+						name: "Player Catalog"
 					}],
 					name: "API Reference",
 					url: "//docs.brightcove.com/en/video-cloud/brightcove-player/references/index.html"
@@ -1609,6 +1618,115 @@ var bclsNavData = {
 					name: "Developer Forum"
 				}],
 				name: "Player Management"
+			},
+			"mobile-sdks": {
+				items: [{
+					name: "Brightcove Player SDK for Android",
+					items: [{
+						url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-android/reference/versions/4.2.8/index.html",
+						name: "SDK Reference"
+					}, {
+						url: "//repo.brightcove.com/releases",
+						name: "Maven Repo"
+					}, {
+						items: [{
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-android/guides/view-layout.html",
+							name: "Add View/Manage Layout"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-android/guides/studio-android-sdk-quick-start.html",
+							name: "Brightcove Player SDK for Android Quick Start - Android Studio"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-android/guides/android-sdk-quick-start.html",
+							name: "Brightcove Player SDK for Android Quick Start - ADT (deprecated)"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-android/guides/error-msg-reference.html",
+							name: "Error Message Guide"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-android/guides/hls-limitations.html",
+							name: "HLS Limitations"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-android/guides/hls-player-for-android-sdk.html",
+							name: "HLS Player for Android Overview"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-android/guides/android-sdk-quick-start.html#getready",
+							name: "Installation/Setup"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-android/guides/plugin-guide/plugin-guide.html",
+							name: "Plugin Guide"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-android/guides/orientation-change/orientation-change.html",
+							name: "Orientation Change"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-android/guides/analytics/analytics.html",
+							name: "Using Brightcove Analytics"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-android/guides/analytics/data-collection-api-overview.html",
+							name: "Data Collection API Overview"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-android/guides/hls-best-practices.html",
+							name: "Using the HLS Player"
+						}],
+						name: "Guides",
+						url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-android/guides/index.html"
+					}, {
+						items: [{
+							url: "//github.com/BrightcoveOS/android-player-samples",
+							name: "Basic Android Player Samples"
+						}],
+						name: "Code Samples"
+					}, {
+						url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-android/forum/sdk.html",
+						name: "Developer Forum"
+					}]
+				}, {
+					name: "Brightcove Player SDK for iOS",
+					items: [{
+						items: [{
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-ios/reference/versions/4.2.1/index.html",
+							name: "Brightcove Player SDK for iOS"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-ios/plugins/ima/reference/versions/1.1.1/",
+							name: "IMA Plugin"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-ios/plugins/freewheel/reference/versions/1.0.3/",
+							name: "FreeWheel Plugin"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-ios/plugins/widevine/reference/versions/1.0.10/",
+							name: "Widevine Plugin (1.0.10)"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-ios/plugins/widevine/reference/versions/1.2.0/",
+							name: "Widevine Plugin (1.2.0)"
+						}],
+						name: "References",
+						url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-ios/references.html"
+					}, {
+						items: [{
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-ios/guides/quick-start.html#installation",
+							name: "Installation/Setup"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-ios/guides/quick-start.html",
+							name: "Quick Start: Simple Video App"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-ios/guides/analytics/analytics.html",
+							name: "Using Brightcove Analytics"
+						}, {
+							url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-ios/guides/analytics/data-collection-api-overview.html",
+							name: "Data Collection API Overview"
+						}],
+						name: "Guides",
+						url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-ios/guides.html"
+					}, {
+						items: [{
+							url: "https://github.com/BrightcoveOS/ios-player-samples",
+							name: "Basic iOS Player Samples"
+						}],
+						name: "Code Samples"
+					}, {
+						url: "//docs.brightcove.com/en/perform/mobile-sdks/brightcove-player-sdk-for-ios/forum/sdk.html",
+						name: "Developer Forum"
+					}]
+				}],
+				name: "Mobile SDKs"
 			},
 			"oauth-api": {
 				items: [{
