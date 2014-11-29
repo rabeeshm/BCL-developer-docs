@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -48,8 +48,8 @@
 				<h1>Batch Dynamic Ingest</h1>
 			    <p>This is a sample of batch ingest using the Dynamic Ingest API. To get access tokens and make the API calls, it uses proxies built by Brightcove Learning services. The proxies run at:</p>
 			    <ul>
-			    	<li>solutions.brightcove.com:8006 (for the CMS API)</li>
-			    	<li>solutions.brightcove.com:8004 (for the DI API)</li>
+			    	<li><a href="//solutions.brightcove.com/bcls/bcls-proxy/cmsapi-proxy.html">solutions.brightcove.com:8006</a> (for the CMS API)</li>
+			    	<li><a href="//solutions.brightcove.com/bcls/bcls-proxy/diapi-proxy.html">solutions.brightcove.com:8004</a> (for the DI API)</li>
 			    </ul>
 			    <p>You may also use these proxies for testing from <strong>localhost</strong>, but not for production - the proxies will only accept requests from Brightcove domains or localhost. See <a href="//docs.brightcove.com/en/video-cloud/oauth-api/getting-started/quick-start.html">Oauth Quick Start</a> for a guide to building a simple proxy of your own.</p>
 			</div>
@@ -131,14 +131,21 @@
 				                <p>
 				                    <input id="di_Submit" type="submit" value="Start Ingest">
 				                </p>
-				            <pre><code id="response"></code></pre>
+				            
 				        </fieldset>
 				    </div>
 			</div>
 			<div class="section" id="logger">
-			    <h2>Log</h2>
-			    <div id="log"></div>
+			    <h2>Results Log</h2>
+			    <pre><code id="response"></code></pre>
 			</div>
+			<div class="section" id="pageCode">
+                <h2>Code for this app</h2>
+                <h3>The HTML code for this sample:</h3>
+                <p><script src="https://gist.github.com/7a738b40d08f50a7834f.js"></script></p>
+                <h3>The JavaScript code for this sample:</h3>
+                <p><script src="https://gist.github.com/940966ae2f64c052f2ba.js"></script></p>
+            </div>
 		</div>
 	</div>
 	<!-- bcl scripts -->
@@ -174,14 +181,12 @@
 			response = document.getElementById("response"),
 			videoData = [],
 			totalVideos,
-			logger = document.getElementById("log").innerHTML,
 			videoNumber = 0,
 			t1,
 			t2,
 			totalIngested = 0,
-			defaults = {account_id: 57838016001,client_id: "bad9c3eb-e413-49ff-87af-85be256ddb16",client_secret: "osWK2m0byFgzuTGbx5_8ifZ6WlL28XTimf1lACjT5TOblyF4iBSBKq3979rNGitTtqzJFB-kPsetufQGNQfZkA"},
+			defaults = {account_id: 57838016001,client_id: "37cd3c5d-6f18-4702-bfb6-4fbc1cd095f1",client_secret: "gLSQANqe6A2PzJce_6xA4bTNu844up5-CSrC-jxNfur4EaOgWKRcqq_GTxKjhMpPSflMdNEhFdBmNe0qsTIZSQ"},
 			// functions
-			bclslog,
 			isDefined,
 			cleanString,
 			logResponse,
@@ -190,10 +195,6 @@
 			setCMSOptions,
 			setDIOptions;
 
-		// IE safe logger
-		bclslog = function (context, message) {
-			logger += context + ": " + message + "<br>";
-		};
 		// is defined
 		isDefined = function(x){
 			if(x !== "" && x !== null && x !== undefined){
@@ -219,7 +220,7 @@
 			options.requestBody = '{"name":"' + videoData[videoNumber].name + '","description":"' + videoData[videoNumber].description + '","reference_id":"' + videoData[videoNumber].reference_id + '"}';
 			options.requestType = "POST"
 			options.url = cms_url_display.value;
-			console.log(options);
+			console.log("cmsoptions"  ,options);
 			// now submit the request
 			submitRequest(options, cmsURL, "cms");
 		};
@@ -231,6 +232,7 @@
 			options.requestBody = '{"master":{"url":"' + videoData[videoNumber].url +'"},"profile":"balanced-high-definition"}';
 			options.requestType = "POST"
 			options.url = di_url_display.value;
+			console.log("dioptions", options)
 			// now submit the request
 			submitRequest(options, diURL, "di");
 		};
@@ -258,7 +260,7 @@
 									t1 = setTimeout(setCMSOptions, 1000);
 								} else {
 									parsedData = JSON.parse(responseData);
-									di_url_display.value = "https://ingest.api.brightcove.com/v1/accounts/accountId/videos/" + parsedData.id + "/ingest-requests";
+									di_url_display.value = "https://ingest.api.brightcove.com/v1/accounts/" + account_id + "/videos/" + parsedData.id + "/ingest-requests";
 									setDIOptions();
 								}
 								break;
