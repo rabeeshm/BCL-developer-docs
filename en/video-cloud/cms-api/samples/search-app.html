@@ -51,17 +51,17 @@
 		</div>
 		<div id="main" class="large-10 small-12 columns">
 			<div id="top" class="section">
-            	<h1>Batch update Using CMS API</h1>
-                <p>This is a sample of batch ingest using the Dynamic Ingest API. To get access tokens and make the API calls, it uses a proxybuilt by Brightcove Learning services. The proxy run at:</p>
+            	<h1>Search Videos via the CMS API</h1>
+                <p>This is a sample search application using the CMS API. To get access tokens and make the API calls, it uses a proxy built by Brightcove Learning services. The proxy run at:</p>
 			    <ul>
 			    	<li><a href="//solutions.brightcove.com/bcls/bcls-proxy/cmsapi-proxy.html">solutions.brightcove.com:8006</a> (for the CMS API)</li>
 			    </ul>
+			    <p>You may also use this proxy for testing from <strong>localhost</strong>, but not for production - the proxy will only accept requests from Brightcove domains or localhost. See <a href="//docs.brightcove.com/en/video-cloud/oauth-api/getting-started/quick-start.html">Oauth Quick Start</a> for a guide to building a simple proxy of your own.</p>
 			    <h3>Other dependencies</h3>
 			    <ul>
 			    	<li><a href="//knockoutjs.com/index.html">Knockout.js</a> (2-way data-binding)</li>
 			    	<li><a href="//github.com/bevacqua/rome">Rome.js</a> (date picker)</li>
 			    </ul>
-			    <p>You may also use this proxy for testing from <strong>localhost</strong>, but not for production - the proxy will only accept requests from Brightcove domains or localhost. See <a href="//docs.brightcove.com/en/video-cloud/oauth-api/getting-started/quick-start.html">Oauth Quick Start</a> for a guide to building a simple proxy of your own.</p>
 			    </div>
                 <div class="section" id="getCredentials">
                     <h2>Get credentials</h2>
@@ -97,14 +97,15 @@
 						</p>
 						<p>
 							API URL:
-							<input
+							<input size="120" id="apiURL" type="text" data-bind="value: apiURL">
 						</p>
 				    </fieldset>
 					<fieldset id="searchInputs">
 						<legend>Search Inputs</legend>
-
+						<p>Require exact match? <select></select></p>
+						<p><span class="BCL-btn" id="setRequest">Submit Request</span></p>
 					</fieldset>
-						<p><button id="setRequest">Submit Request</button></p>
+
 				</div>
 				<div class="section" id="outputLog">
 				    <h2>Results</h2>
@@ -135,7 +136,7 @@
 	<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
 	<!-- knockout -->
-	<script src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.2.0/knockout-min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.2.0/knockout-debug.js"></script>
 	<!-- date picker -->
 	<script src="//docs.brightcove.com/en/scripts/rome/rome.min.js"></script>
 	<script src="//docs.brightcove.com/en/scripts/docs-nav-data.min.js"></script>
@@ -147,12 +148,19 @@
 	<script id="pageScript">
 
 	function cmsSearchModel () {
-		this.client_id: ko.observable(""),
-		this.client_secret: ko.observable(""),
-		this.account_id: ko.observable(""),
-	    this.proxyURL = ko.observable("//solutions.brightcove.com:8006"),
-	    this.apiURL = ko.observable("https://cms.api.brightcove.com/v1beta1/accounts/"),
+		var self = this;
+		self.client_id = ko.observable("");
+		self.client_secret = ko.observable("");
+		self.account_id = ko.observable("");
+	    self.proxyURL = ko.observable("//solutions.brightcove.com:8006");
+	    self.apiURL = ko.computed(function () {
+	    	var url = "https://cms.api.brightcove.com/v1beta1/accounts/" + self.account_id();
+	    	return url;
+	    });
+	    self.exactMatch = ["no", "yes"]
 	}
+
+	ko.applyBindings(new cmsSearchModel());
 	</script>
 </body>
 
