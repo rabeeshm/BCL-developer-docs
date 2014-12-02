@@ -200,7 +200,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                         }
                         break;
                     case "perform":
-                        if (!$this.hasClass("perform-only")) {
+                        if (!$this.hasClass("video-cloud-only")) {
                             navObj = {};
                             navObj.link = $this.attr("id");
                             navObj.text = $this.find("h2:first").text();
