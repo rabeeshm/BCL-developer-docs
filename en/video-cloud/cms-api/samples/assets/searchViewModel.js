@@ -1,7 +1,7 @@
-searchViewModel = function () {
-    self.proxyURL = "//solutions.brightcove.com:8006",
-    self.client_id = ,
-    self.client_secret = ,
-    self.baseURL = "https://cms.api.brightcove.com/v1beta1/accounts/",
-    self.url = ,
+function cmsSearchModel () {
+	this.client_id: ko.observable(""),
+	this.client_secret: ko.observable(""),
+	this.account_id: ko.observable(""),
+    this.proxyURL = ko.observable("//solutions.brightcove.com:8006"),
+    this.baseURL = ko.observable("https://cms.api.brightcove.com/v1beta1/accounts/"),
 }
