@@ -27,7 +27,8 @@
 		width: 90%;
 		height: 4rem;
 		font-size: .8rem;
-	}textarea#videoData {
+	}
+	textarea#videoData {
 		width: 90%;
 		background-color: #f5f5f5;
 		height: 24rem;
@@ -103,7 +104,13 @@
 					<fieldset id="searchInputs">
 						<legend>Search Inputs</legend>
 						<p><input type="checkbox" id="exactMatch" data-bind="checked: exactMatch"> Require exact match</p>
-						<p><input type="checkbox" id="excludeTerms"> Return videos that do <strong>not</strong> have these terms</p>
+						<p><input type="checkbox" id="excludeTerms" data-bind="checked: excludeTerms"> Return videos that do <strong>not</strong> have these terms</p>
+						<p><input type="checkbox" id="searchComplete" data-bind="checked: searchComplete"> Return videos that have been completely processed <strong>only</strong></p>
+						<p>Return videos only in this state: <select id="searchState" data-bind=""></select></p>
+						<p>Limit search to this field: <select id="searchField" data-bind=""></select></p>
+						<p>Limit search to this custom field: <input type="text" id="customField" data-bind="value: customField"></p>
+						<p>Limit </p>
+
 						<p><span class="BCL-btn" id="setRequest">Submit Request</span></p>
 					</fieldset>
 
@@ -151,7 +158,7 @@
 		function cmsSearchModel () {
 			var self = this;
 			// non-editable data
-		    self.searchFieldType = [
+		    self.searchField = [
 		    	{name: "none", value: ""},
 		    	{name: "name", value: "name"},
 		    	{name: "text", value: "text"},
@@ -159,8 +166,16 @@
 		    	{name: "Reference ID", value: "reference_id"},
 		    	{name: "Custom Fields", value: "custom_fields"}
 	    	];
-		    self.searchStates = ["ACTIVE", "INACTIVE", "DELETED", "PENDING"];
-		    self.dateRangeType = ["updated_at", "created_at", "schedule.starts_at", "schedule.ends_at", "published_at"];
+		    self.searchState = [
+		    	{name: "any", value: ""}
+		    	{name: "ACTIVE", value: "ACTIVE"},
+		    	{name: "INACTIVE", value: "INACTIVE"},
+		    	{name: "DELETED", value: "DELETED"},
+		    	{name: "PENDING", value: "PENDING"}
+	    	];
+		    self.dateRangeType = [
+		    	"updated_at", "created_at", "schedule.starts_at", "schedule.ends_at", "published_at"
+	    	];
 		    self.proxyURL = ko.observable("//solutions.brightcove.com:8006");
 
 		    // editable data
@@ -170,6 +185,7 @@
 		    self.exactMatch = ko.observable(false);
 		    self.excludeTerms = ko.observable(false);
 		    self.searchComplete = ko.observable(true);
+		    self.customField = ko.observable("");
 
 			// computed data
 		    self.apiURL = ko.computed(function () {
