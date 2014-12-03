@@ -15,9 +15,19 @@
 	<!-- date picker -->
 	<link rel="stylesheet" type="text/css" href="//docs.brightcove.com/en/scripts/rome/rome.min.css">
 	<style>
-	input, select {
-		max-width: 60%;
-		font-size: .8rem;
+	input {
+		max-width: 50%;
+		/*font-size: .8rem;*/
+	}
+	select {
+		max-width: 30%;
+		font-size: .9rem;
+	}
+	input.date, select.date {
+		max-width: 90%;
+	}
+	fieldset table {
+		min-width: 100%;
 	}
 	fieldset {
 		border: 1px #366 solid;
@@ -26,13 +36,13 @@
 	textarea {
 		width: 90%;
 		height: 4rem;
-		font-size: .8rem;
+		background-color: #f5f5f5;
 	}
 	textarea#videoData {
 		width: 90%;
 		background-color: #f5f5f5;
 		height: 24rem;
-		font-size: .8rem;
+		font-size: .9rem;
 	}
 	</style>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.4.7/js/vendor/modernizr.js"></script>
@@ -82,46 +92,59 @@
 				        <legend>Inputs</legend>
 				        <p>
 							Account ID:
-							<input size="60" id="account_id" type="text" value="" data-bind="value: account_id">
+							<input id="account_id" type="text" value="" data-bind="value: account_id">
 						</p>
 				        <p>
 							Client ID:
-							<input size="60" id="client_id" type="text" value="" data-bind="value: client_id">
+							<input id="client_id" type="text" value="" data-bind="value: client_id">
 						</p>
 				        <p>
 							Client Secret:
-							<input size="120" id="client_secret" type="text" value="" data-bind="value: client_secret">
+							<input id="client_secret" type="text" value="" data-bind="value: client_secret">
 						</p>
 						<p>
 							Proxy URL:
-							<input size="120" id="proxyURL" type="text" data-bind="value: proxyURL">
+							<input id="proxyURL" type="text" data-bind="value: proxyURL">
 						</p>
-						<p>
-							API URL:
-							<input size="120" id="apiURL" type="text" data-bind="value: apiURL">
-						</p>
+
 				    </fieldset>
-					<fieldset id="searchInputs">
+				</div>
+				<div class="section" id="searchInputs">
+				    <h2>Search Inputs</h2>
+				    <fieldset id="searchInputs">
 						<legend>Search Inputs</legend>
 						<p><input type="checkbox" id="exactMatch" data-bind="checked: exactMatch"> Require exact match</p>
-						<p><input type="checkbox" id="excludeTerms" data-bind="checked: excludeTerms"> Return videos that do <strong>not</strong> have these terms</p>
-						<p><input type="checkbox" id="searchComplete" data-bind="checked: searchComplete"> Return videos that have been completely processed <strong>only</strong></p>
-						<p>Return videos only in this state: <select id="searchState" data-bind=""></select></p>
-						<p>Limit search to this field: <select id="searchField" data-bind=""></select></p>
+						<p><input type="checkbox" id="excludeTerms" data-bind="checked: excludeTerms"> Only return videos that do <strong>not</strong> have the search terms</p>
+						<p><input type="checkbox" id="searchComplete" data-bind="checked: searchComplete"> <strong>Only</strong> return videos that have been completely processed</p>
+						<p>Return videos only in this state: <select id="searchState" data-bind="options: searchState, value: selectedSearchState, optionsCaption: 'Any'"></select></p>
+						<p>Limit search to this field: <select id="searchField" data-bind="options: searchField, alue: selectedSearchField, optionsCaption: 'Any'"></select></p>
 						<p>Limit search to this custom field: <input type="text" id="customField" data-bind="value: customField"></p>
-						<p>Limit </p>
-
+						<p>Search terms: <input id="searchTerms" type="text" data-bind="value: searchTerms"></p>
+						<table>
+							<caption>Limit search by dates:</caption>
+							<tr>
+								<td>Date type</td>
+								<td>From date</td>
+								<td>To date</td>
+							</tr>
+							<tr>
+								<td><select class="date" id="dateRangeType" data-bind="options: dateRangeType, value: selectedDateRangeType, optionsCaption: 'Do not limit by date'"></select></td>
+								<td><span data-bind="visible: 'dateRangeType'"><input id="fromDate" class="date" data-bind="value: fromDate"></span></td>
+								<td><input id="toDate" class="date" data-bind="value: toDate"></td>
+							</tr>
+						</table>
 						<p><span class="BCL-btn" id="setRequest">Submit Request</span></p>
 					</fieldset>
-
 				</div>
+
+
 				<div class="section" id="outputLog">
 				    <h2>Results</h2>
 				    <fieldset>
 				    	<legend>Outputs</legend>
 						<p>
 							API request:
-							<textarea id="apiRequest"></textarea>
+							<textarea id="apiURL" data-bind="value: apiURL"></textarea>
 						</p>
 				        <pre><code id="response"></code></pre>
 				    </fieldset>
@@ -154,28 +177,17 @@
 		$(document).foundation();
 	</script>
 	<script id="pageScript">
+		// date pickers
+		rome(fromDate);
+		rome(toDate);
+
 		// knockout view model
 		function cmsSearchModel () {
 			var self = this;
 			// non-editable data
-		    self.searchField = [
-		    	{name: "none", value: ""},
-		    	{name: "name", value: "name"},
-		    	{name: "text", value: "text"},
-		    	{name: "tags", value: "tags"},
-		    	{name: "Reference ID", value: "reference_id"},
-		    	{name: "Custom Fields", value: "custom_fields"}
-	    	];
-		    self.searchState = [
-		    	{name: "any", value: ""}
-		    	{name: "ACTIVE", value: "ACTIVE"},
-		    	{name: "INACTIVE", value: "INACTIVE"},
-		    	{name: "DELETED", value: "DELETED"},
-		    	{name: "PENDING", value: "PENDING"}
-	    	];
-		    self.dateRangeType = [
-		    	"updated_at", "created_at", "schedule.starts_at", "schedule.ends_at", "published_at"
-	    	];
+		    self.searchField = ["name", "text", "tags", "reference_id", "custom_fields"];
+		    self.searchState = ["ACTIVE", "INACTIVE", "DELETED","PENDING"];
+		    self.dateRangeType = ["updated_at", "created_at", "published_at", "schedule.starts_at", "schedule.ends_at"];
 		    self.proxyURL = ko.observable("//solutions.brightcove.com:8006");
 
 		    // editable data
@@ -184,13 +196,26 @@
 			self.account_id = ko.observable("");
 		    self.exactMatch = ko.observable(false);
 		    self.excludeTerms = ko.observable(false);
+		    self.selectedSearchState = ko.observable();
+		    self.selectedSeachField = ko.observable();
+		    self.selectedDateRangeType = ko.observable();
 		    self.searchComplete = ko.observable(true);
 		    self.customField = ko.observable("");
+		    self.searchTerms = ko.observable("");
+		    self.fromDate = ko.observable("");
+		    self.toDate = ko.observable("");
 
 			// computed data
 		    self.apiURL = ko.computed(function () {
 		    	var url = "https://cms.api.brightcove.com/v1beta1/accounts/" + self.account_id();
 		    	return url;
+		    });
+		    self.dateTypeSelected = ko.computed(function () {
+		    	if (self.dateRangeType === undefined) {
+		    		return false;
+		    	} else {
+		    		return true;
+		    	}
 		    });
 
 		    // operations
