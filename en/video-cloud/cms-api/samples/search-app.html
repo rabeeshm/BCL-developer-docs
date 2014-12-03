@@ -102,7 +102,8 @@
 				    </fieldset>
 					<fieldset id="searchInputs">
 						<legend>Search Inputs</legend>
-						<p>Require exact match? <input type="checkbox" id="exactMatch" data-bind="checked: exactMatch"></p>
+						<p><input type="checkbox" id="exactMatch" data-bind="checked: exactMatch"> Require exact match</p>
+						<p><input type="checkbox" id="excludeTerms"> Return videos that do <strong>not</strong> have these terms</p>
 						<p><span class="BCL-btn" id="setRequest">Submit Request</span></p>
 					</fieldset>
 
@@ -149,20 +150,34 @@
 		// knockout view model
 		function cmsSearchModel () {
 			var self = this;
+			// non-editable data
+		    self.searchFieldType = [
+		    	{name: "none", value: ""},
+		    	{name: "name", value: "name"},
+		    	{name: "text", value: "text"},
+		    	{name: "tags", value: "tags"},
+		    	{name: "Reference ID", value: "reference_id"},
+		    	{name: "Custom Fields", value: "custom_fields"}
+	    	];
+		    self.searchStates = ["ACTIVE", "INACTIVE", "DELETED", "PENDING"];
+		    self.dateRangeType = ["updated_at", "created_at", "schedule.starts_at", "schedule.ends_at", "published_at"];
+		    self.proxyURL = ko.observable("//solutions.brightcove.com:8006");
+
+		    // editable data
 			self.client_id = ko.observable("");
 			self.client_secret = ko.observable("");
 			self.account_id = ko.observable("");
-		    self.proxyURL = ko.observable("//solutions.brightcove.com:8006");
+		    self.exactMatch = ko.observable(false);
+		    self.excludeTerms = ko.observable(false);
+		    self.searchComplete = ko.observable(true);
+
+			// computed data
 		    self.apiURL = ko.computed(function () {
 		    	var url = "https://cms.api.brightcove.com/v1beta1/accounts/" + self.account_id();
 		    	return url;
 		    });
-		    self.exactMatch = ko.observable(false);
-		    self.excludeTerms = ko.observable(false);
-		    self.searchFieldType = ["name", "text", "tags", "reference_id", "custom_fields"];
-		    self.searchStates = ["ACTIVE", "INACTIVE", "DELETED", "PENDING"];
-		    self.searchComplete = ko.observable(true);
-		    self.dateRangeType = ["updated_at", "created_at", "schedule.starts_at", "schedule.ends_at", "published_at"];
+
+		    // operations
 		}
 		// apply knockout bindings
 		ko.applyBindings(new cmsSearchModel());
