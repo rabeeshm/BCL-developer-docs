@@ -117,7 +117,7 @@
 						<p><input type="checkbox" id="excludeTerms" data-bind="checked: excludeTerms"> Only return videos that do <strong>not</strong> have the search terms</p>
 						<p><input type="checkbox" id="searchComplete" data-bind="checked: searchComplete"> <strong>Only</strong> return videos that have been completely processed</p>
 						<p>Return videos only in this state: <select id="searchState" data-bind="options: searchState, value: selectedSearchState, optionsCaption: 'Any'"></select></p>
-						<p>Limit search to this field: <select id="searchField" data-bind="options: searchField, alue: selectedSearchField, optionsCaption: 'Any'"></select></p>
+						<p>Limit search to this field: <select id="searchField" data-bind="options: searchField, value: selectedSearchField, optionsCaption: 'Any'"></select></p>
 						<p>Limit search to this custom field: <input type="text" id="customField" data-bind="value: customField"></p>
 						<p>Search terms: <input id="searchTerms" type="text" data-bind="value: searchTerms"></p>
 						<table>
@@ -129,11 +129,11 @@
 							</tr>
 							<tr>
 								<td><select class="date" id="dateRangeType" data-bind="options: dateRangeType, value: selectedDateRangeType, optionsCaption: 'Do not limit by date'"></select></td>
-								<td><span data-bind="visible: 'dateRangeType'"><input id="fromDate" class="date" data-bind="value: fromDate"></span></td>
-								<td><input id="toDate" class="date" data-bind="value: toDate"></td>
+								<td><input id="fromDate" class="date" data-bind="value: fromDate, enable: dateTypeSelected"></td>
+								<td><input id="toDate" class="date" data-bind="value: toDate, enable: dateTypeSelected"></td>
 							</tr>
 						</table>
-						<p><span class="BCL-btn" id="setRequest">Submit Request</span></p>
+						<p><button class="BCL-btn" id="submitRequest" data-bind="click: submitRequest, enable: haveSearchTermsOrDateRange">Submit Request</button></p>
 					</fieldset>
 				</div>
 
@@ -177,13 +177,16 @@
 		$(document).foundation();
 	</script>
 	<script id="pageScript">
+
+
 		// date pickers
 		rome(fromDate);
 		rome(toDate);
 
 		// knockout view model
 		function cmsSearchModel () {
-			var self = this;
+			var self = this,
+				APIresponse = document.getElementById("response");
 			// non-editable data
 		    self.searchField = ["name", "text", "tags", "reference_id", "custom_fields"];
 		    self.searchState = ["ACTIVE", "INACTIVE", "DELETED","PENDING"];
@@ -207,11 +210,62 @@
 
 			// computed data
 		    self.apiURL = ko.computed(function () {
-		    	var url = "https://cms.api.brightcove.com/v1beta1/accounts/" + self.account_id();
+		    	var url = "https://cms.api.brightcove.com/v1beta1/accounts/" + self.account_id() + self.searchString();
 		    	return url;
 		    });
+		    self.searchString = ko.computed(function () {
+		    	var str = "?q=";
+		    	if (self.haveSearchField) {
+		    		if (self.)
+		    		str += selectedSeachField() + ":"
+		    	}
+
+		    });
+		    self.haveSearchState = ko.computed(function () {
+		    	if (self.selectedSearchState() === undefined) {
+		    		return false;
+		    	} else {
+		    		return true;
+		    	}
+		    });
+		    self.haveSearchField = ko.computed(function () {
+		    	if (self.selectedSeachField() === undefined) {
+		    		return false;
+		    	} else {
+		    		return true;
+		    	}
+		    });
 		    self.dateTypeSelected = ko.computed(function () {
-		    	if (self.dateRangeType === undefined) {
+		    	if (self.selectedDateRangeType() === undefined) {
+		    		return false;
+		    	} else {
+		    		return true;
+		    	}
+		    });
+		    self.haveSearchTerms = ko.computed(function () {
+		    	if (self.searchTerms() === "") {
+		    		return false;
+		    	} else {
+		    		return true;
+		    	}
+		    });
+		    self.haveSearchTermsOrDateRange = ko.computed(function () {
+		    	if (!self.searchTerms() && !self.selectedDateRangeType()) {
+		    		return false;
+		    	} else {
+		    		return true;
+		    	}
+		    });
+		    self.haveFromDate = ko.computed(function (){
+		    	if (self.fromDate() === "") {
+		    		return false;
+		    	} else {
+		    		return true;
+		    	}
+		    });
+
+		    self.haveToDate = ko.computed(function (){
+		    	if (self.toDate() === "") {
 		    		return false;
 		    	} else {
 		    		return true;
@@ -219,6 +273,48 @@
 		    });
 
 		    // operations
+		    this.submitRequest = function () {
+		    	console.log("submitting request");
+		    	var httpRequest = new XMLHttpRequest(),
+					proxyURL = "http://solutions.brightcove.com:8005/",
+					requestData,
+					// handler for response from the proxy
+					getResponse = function () {
+						try {
+						    if (httpRequest.readyState === 4) {
+						      if (httpRequest.status === 200) {
+						        logResponse(httpRequest.responseText);
+						      } else {
+						        alert("There was a problem with the request. Request returned " + httpRequest.status);
+						      }
+						    }
+						  }
+						  catch(e) {
+						    alert('Caught Exception: ' + e);
+						  }
+					},
+					// function to set the request
+					logResponse = function (data) {
+						response.innerHTML += data + ",<br />"
+					};
+		    	// check for required account info
+		    	if (self.account_id === "" || self.client_id === "" || self.client_secret === "") {
+		    		alert("You must proide an account id, client id, and client secret"):
+		    		return;
+		    	}
+				// get latest request URL in case use edited it
+				apiRequest = cleanString(apiRequest_field.value);
+				// set up request data
+				requestData = "client_id=" + client_id + "&client_secret=" + client_secret + "&url=" + encodeURIComponent(apiRequest) + "&requestBody=" + encodeURIComponent(requestBody) + "&requestType=PATCH";
+				// set response handler
+				httpRequest.onreadystatechange = getResponse;
+				// open the request
+				httpRequest.open("POST", proxyURL);
+				// set headers
+				httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+				// open and send request
+				httpRequest.send(requestData);
+		    }
 		}
 		// apply knockout bindings
 		ko.applyBindings(new cmsSearchModel());
