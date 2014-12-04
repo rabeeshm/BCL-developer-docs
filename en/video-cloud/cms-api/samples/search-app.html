@@ -129,8 +129,8 @@
 							</tr>
 							<tr>
 								<td><select class="date" id="dateRangeType" data-bind="options: dateRangeType, value: selectedDateRangeType, optionsCaption: 'Do not limit by date'"></select></td>
-								<td><input id="fromDate" class="date" data-bind="value: fromDate, enable: dateTypeSelected"></td>
-								<td><input id="toDate" class="date" data-bind="value: toDate, enable: dateTypeSelected"></td>
+								<td><input id="fromDate" class="date" data-bind="value: fromDate, enable: haveDateType"></td>
+								<td><input id="toDate" class="date" data-bind="value: toDate, enable: haveDateType"></td>
 							</tr>
 						</table>
 						<p><button class="BCL-btn" id="submitRequest" data-bind="click: submitRequest, enable: haveSearchTermsOrDateRange">Submit Request</button></p>
@@ -194,13 +194,13 @@
 		    self.proxyURL = ko.observable("//solutions.brightcove.com:8006");
 
 		    // editable data
-			self.client_id = ko.observable("");
-			self.client_secret = ko.observable("");
-			self.account_id = ko.observable("");
+			self.client_id = ko.observable("f05869d2-f201-47d1-9606-aaafa66fea6e");
+			self.client_secret = ko.observable("2F4CvF8DER1j3fmQr3TjKSmD6jMfvigM3HwCVkdhykvYOOUamFYeu9U8fRpks-EH7PCJcthc8IsEPT3bAnAqNQ");
+			self.account_id = ko.observable("57838016001");
 		    self.exactMatch = ko.observable(false);
 		    self.excludeTerms = ko.observable(false);
 		    self.selectedSearchState = ko.observable();
-		    self.selectedSeachField = ko.observable();
+		    self.selectedSearchField = ko.observable();
 		    self.selectedDateRangeType = ko.observable();
 		    self.searchComplete = ko.observable(true);
 		    self.customField = ko.observable("");
@@ -209,18 +209,6 @@
 		    self.toDate = ko.observable("");
 
 			// computed data
-		    self.apiURL = ko.computed(function () {
-		    	var url = "https://cms.api.brightcove.com/v1beta1/accounts/" + self.account_id() + self.searchString();
-		    	return url;
-		    });
-		    self.searchString = ko.computed(function () {
-		    	var str = "?q=";
-		    	if (self.haveSearchField) {
-		    		if (self.)
-		    		str += selectedSeachField() + ":"
-		    	}
-
-		    });
 		    self.haveSearchState = ko.computed(function () {
 		    	if (self.selectedSearchState() === undefined) {
 		    		return false;
@@ -229,13 +217,13 @@
 		    	}
 		    });
 		    self.haveSearchField = ko.computed(function () {
-		    	if (self.selectedSeachField() === undefined) {
+		    	if (self.selectedSearchField() === undefined) {
 		    		return false;
 		    	} else {
 		    		return true;
 		    	}
 		    });
-		    self.dateTypeSelected = ko.computed(function () {
+		    self.haveDateType = ko.computed(function () {
 		    	if (self.selectedDateRangeType() === undefined) {
 		    		return false;
 		    	} else {
@@ -271,6 +259,39 @@
 		    		return true;
 		    	}
 		    });
+		    self.apiURL = ko.computed(function () {
+		    	var str,
+		    		url = "https://cms.api.brightcove.com/v1beta1/accounts/" + self.account_id();
+		    		console.log("haveSearchField", self.haveSearchField());
+		    		console.log("haveSearchTerms", self.haveSearchTerms());
+		    		console.log("searchTerms", self.searchTerms);
+		    	if (self.haveSearchField) {
+		    		if (self.haveSearchTerms()) {
+		    			var termsArray = self.searchTerms().split(" "), i, iMax, item, termStr;
+		    			console.log("termsArray", termsArray);
+		    			imax = termsArray.length;
+		    			for (i = 0; i < iMax; i++) {
+		    				item = termsArray[i];
+		    				if (self.exactMatch()) {
+			    				item = '"' + item + '"';
+			    			}
+		    				item = self.selectedSeachField() + ":" + item;
+		    				if (self.excludeTerms) {
+		    					item = "-" + item;
+		    				}
+		    			}
+		    			console.log("termsArray", termsArray);
+		    			termsStr = termsArray.join(" ");
+
+		    			str += termStr;
+		    		}
+		    	}
+		    	if (self.haveDateType) {
+
+		    	}
+		    	url += str;
+		    	return url;
+		    });
 
 		    // operations
 		    this.submitRequest = function () {
@@ -299,7 +320,7 @@
 					};
 		    	// check for required account info
 		    	if (self.account_id === "" || self.client_id === "" || self.client_secret === "") {
-		    		alert("You must proide an account id, client id, and client secret"):
+		    		alert("You must proide an account id, client id, and client secret");
 		    		return;
 		    	}
 				// get latest request URL in case use edited it
