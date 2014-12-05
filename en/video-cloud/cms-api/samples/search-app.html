@@ -116,10 +116,16 @@
 						<p><input type="checkbox" id="exactMatch" data-bind="checked: exactMatch"> Require exact match</p>
 						<p><input type="checkbox" id="excludeTerms" data-bind="checked: excludeTerms"> Only return videos that do <strong>not</strong> have the search terms</p>
 						<p><input type="checkbox" id="searchComplete" data-bind="checked: searchComplete"> <strong>Only</strong> return videos that have been completely processed</p>
-						<p>Return videos only in this state: <select id="searchState" data-bind="options: searchState, value: selectedSearchState, optionsCaption: 'Any'"></select></p>
 						<p>Limit search to this field: <select id="searchField" data-bind="options: searchField, value: selectedSearchField, optionsCaption: 'Any'"></select></p>
 						<p>Limit search to this custom field: <input type="text" id="customField" data-bind="value: customField"></p>
-						<p>Search terms: <input id="searchTerms" type="text" data-bind="value: searchTerms"></p>
+						<p>
+							<div data-bind="visible: !haveSearchState()">
+								Search terms: <input id="searchTerms" type="text" data-bind="value: searchTerms">
+							</div>
+							<div data-bind="visible: haveSearchState">
+								State: <select id="searchStates" data-bind="options: searchState, value: selectedSearchState"></select>
+							</div>
+						</p>
 						<table>
 							<caption>Limit search by dates:</caption>
 							<tr>
@@ -188,7 +194,7 @@
 			var self = this,
 				APIresponse = document.getElementById("response");
 			// non-editable data
-		    self.searchField = ["name", "text", "tags", "reference_id", "custom_fields"];
+		    self.searchField = ["name", "text", "tags", "reference_id", "custom_fields", "state"];
 		    self.searchState = ["ACTIVE", "INACTIVE", "DELETED","PENDING"];
 		    self.dateRangeType = ["updated_at", "created_at", "published_at", "schedule.starts_at", "schedule.ends_at"];
 		    self.proxyURL = ko.observable("//solutions.brightcove.com:8006");
@@ -210,10 +216,10 @@
 
 			// computed data
 		    self.haveSearchState = ko.computed(function () {
-		    	if (self.selectedSearchState() === undefined) {
-		    		return false;
-		    	} else {
+		    	if (self.selectedSearchField() === "state") {
 		    		return true;
+		    	} else {
+		    		return false;
 		    	}
 		    });
 		    self.haveSearchField = ko.computed(function () {
@@ -231,21 +237,21 @@
 		    	}
 		    });
 		    self.haveSearchTerms = ko.computed(function () {
-		    	if (self.searchTerms() === "") {
+		    	if (self.searchTerms() === undefined) {
 		    		return false;
 		    	} else {
 		    		return true;
 		    	}
 		    });
 		    self.haveSearchTermsOrDateRange = ko.computed(function () {
-		    	if (!self.searchTerms() && !self.selectedDateRangeType()) {
+		    	if (!self.haveSearchTerms() && !self.haveDateType()) {
 		    		return false;
 		    	} else {
 		    		return true;
 		    	}
 		    });
 		    self.haveFromDate = ko.computed(function (){
-		    	if (self.fromDate() === "") {
+		    	if (self.fromDate() === undefined) {
 		    		return false;
 		    	} else {
 		    		return true;
@@ -253,37 +259,49 @@
 		    });
 
 		    self.haveToDate = ko.computed(function (){
-		    	if (self.toDate() === "") {
+		    	if (self.toDate() === undefined) {
 		    		return false;
 		    	} else {
 		    		return true;
 		    	}
 		    });
 		    self.apiURL = ko.computed(function () {
-		    	var str,
-		    		url = "https://cms.api.brightcove.com/v1beta1/accounts/" + self.account_id();
+		    	var str = "?q=",
+		    		url = "https://cms.api.brightcove.com/v1beta1/accounts/" + self.account_id() + "/videos";
 		    		console.log("haveSearchField", self.haveSearchField());
 		    		console.log("haveSearchTerms", self.haveSearchTerms());
-		    		console.log("searchTerms", self.searchTerms);
-		    	if (self.haveSearchField) {
-		    		if (self.haveSearchTerms()) {
-		    			var termsArray = self.searchTerms().split(" "), i, iMax, item, termStr;
-		    			console.log("termsArray", termsArray);
-		    			imax = termsArray.length;
+		    		console.log("searchTerms", self.searchTerms());
+		    	if (self.haveSearchTerms()) {
+		    		var termsArray = self.searchTerms().split(" "), i, iMax, item, termsStr;
+	    			console.log("termsArray", termsArray);
+	    			imax = termsArray.length;
+	    			if (self.exactMatch()) {
+	    				for (i = 0; i < iMax; i++) {
+	    					termsArray[i] = '"' + termsArray[i] + '"';
+	    				}
+
+	    			}
+		    		if (self.haveSearchField()) {
 		    			for (i = 0; i < iMax; i++) {
 		    				item = termsArray[i];
-		    				if (self.exactMatch()) {
-			    				item = '"' + item + '"';
-			    			}
 		    				item = self.selectedSeachField() + ":" + item;
 		    				if (self.excludeTerms) {
 		    					item = "-" + item;
 		    				}
 		    			}
-		    			console.log("termsArray", termsArray);
 		    			termsStr = termsArray.join(" ");
-
-		    			str += termStr;
+		    			console.log("termsStr" , termsStr);
+		    			str += termsStr;
+		    		} else {
+		    			if (self.excludeTerms) {
+	    					for (i = 0; i < iMax; i++) {
+	    						termsArray[i] = "-" + termsArray[i];
+	    					}
+	    				}
+	    				console.log("termsArray", termsArray);
+		    			termsStr = termsArray.join(" ");
+		    			console.log("termsStr" , termsStr);
+		    			str += termsStr;
 		    		}
 		    	}
 		    	if (self.haveDateType) {
