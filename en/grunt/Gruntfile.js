@@ -27,10 +27,10 @@ module.exports = function (grunt) {
                         'source/media.json'
                     ],
                     'working/temp-perform.json': ['source/perform.json',
-                        'source/brightcove-player-perform.json',
-                        'source/player-management-perform.json',
-                        'source/mobile-sdks-perform.json',
-                        'source/oauth-api-perform.json'
+                        'source/brightcove-player.json',
+                        'source/player-management.json',
+                        'source/mobile-sdks.json',
+                        'source/oauth-api.json'
                     ]
                 },
             },
@@ -54,6 +54,10 @@ module.exports = function (grunt) {
                 src: ['working/temp-perform.json'],
                 dest: 'working/temp-perform-replace.json',
                 replacements: [{
+                    from: '\/video-cloud\/',
+                    to: '\/perform\/'
+                },
+                {
                     from: '\[{"perform',
                     to: '\{"perform'
                 }, {
@@ -96,10 +100,22 @@ module.exports = function (grunt) {
                 src: 'working/docs-nav-data.min.js',
                 dest: '../scripts/docs-nav-data.min.js'
             }
-        }
+        },
+        sync: {
+          main: {
+            files: [
+              {expand: true, cwd: '../video-cloud/brightcove-player/', src: ['**'], dest: '../perform/brightcove-player'},
+              {expand: true, cwd: '../video-cloud/player-management/', src: ['**'], dest: '../perform/player-management'},
+              {expand: true, cwd: '../video-cloud/mobile-sdks/', src: ['**'], dest: '../perform/mobile-sdks'},
+              {expand: true, cwd: '../video-cloud/oauth-api/', src: ['**'], dest: '../perform/oauth-api'},
+              {expand: true, cwd: '../video-cloud/concepts/', src: ['**'], dest: '../perform/concepts'}
+            ],
+          },
+        }        
     });
 
     // These plugins provide necessary tasks.
+    grunt.loadNpmTasks('grunt-sync');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-minjson');
     grunt.loadNpmTasks('grunt-text-replace');
@@ -108,5 +124,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
 
     // Default task.
-    grunt.registerTask('default', ['minjson', 'replace:onVC', 'replace:onPerform', 'concat:buildjson', 'jsonlint', 'concat:buildvar', 'uglify']);
+    grunt.registerTask('default', ['minjson', 'replace:onVC', 'replace:onPerform', 'concat:buildjson', 'jsonlint', 'concat:buildvar', 'uglify', 'sync']);
 }
