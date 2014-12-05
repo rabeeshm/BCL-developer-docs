@@ -280,8 +280,29 @@ video2.properties = otherDictionary; // causes compiler error
 
                 <p>There is one caveat to using a view strategy: you must not access the playback controller&#39;s <code>view</code> property from within the view strategy block. Since the block is being called <em>because</em> the playback controller&#39;s <code>view</code> property was accessed for the first time, accessing the <code>view</code> property again <em>within</em> the view strategy block could cause a rip in the fabric of space and time, and your program will crash.</p>
             </div>
+          
+            <div class="section" id="resizingplayer">
+                <h2 id="toc_9">Resizing AVPlayerLayer</h2>
+              <p>One reason to assume control over the resizing animation of the <code>AVPlayerLayer</code> would be to implement a "full screen" button.</p>
+              <p>If you want to do this, Brightcove recommends that you create your own <code>UIView</code> and capture the <code>AVPlayerLayer</code> that is created for each <code>BCOVPlaybackSession</code> and not use <code>BCOVPlaybackController.view</code> at all.</p>
+              <p>The SDK adds the <code>AVPlayerLayer</code> to the <code>BCOVPlaybackController.view</code> every time a new playback session is sent to the playback controller. This is done for each video since each video's session has a unique <code>playerLayer</code> oject.</p>
+              <p>Each time the <code>AVPlayerLayer</code> is added to the <code>BCOVPlaybackController.view</code>, the SDK disables its animation by setting the bounds and position entries in the <code>AVPlayerLayer.actions</code> dictionary to <code>NSNull</code>. If you try to mutate the actions dictionary directly, you will have to update it every time it advances to a new playback session.</p>
+              <p>Here is an example of what you might do:</p>
+              <ol>
+                <li>If you are using the code from the Basic Player Sample, in the <code>viewDidLoad</code> method, comment any references to the <code>playbackController.view</code>.</li>
+                <pre><code>// self.playbackController.view.frame = self.videoContainer.bounds;
+// self.playbackController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+// [self.videoContainer addSubview:self.playbackController.view];
+</code></pre>
+                <li>Then, in the <code>didAdvanceToPlaybackSession</code> method, add the <code>AVPlayerLayer</code> to the layer of your view.</li>
+                
+                
+              </ol>
+              <p>If you really need to use <code>BCOVPlaybackController.view</code>, you can remove the bounds and position entries from the <code>AVPlayerLayer.actions</code> dictionary, but you’ll have to assume responsibility for setting up the <code>CALayer</code> animations to look good in your code.</p>
+            </div>
+          
             <div class="section" id="faq">
-                <h2 id="toc_9">FAQ</h2>
+                <h2 id="toc_10">FAQ</h2>
 
                 <p><strong>My content won&#39;t load. Is there an easy way to test whether the URL points to a valid video?</strong></p>
 
