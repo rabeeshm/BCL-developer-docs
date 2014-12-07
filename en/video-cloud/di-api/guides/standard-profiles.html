@@ -12,6 +12,11 @@
 	<link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css">
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+    <style type="text/css">
+        h2 {
+            font-size: 1.5rem;
+        }
+    </style>
 	<script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -58,7 +63,6 @@
 	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
 	<script src="/en/scripts/log.js"></script>
 	<script src="/en/scripts/docs-nav-data.min.js"></script>
-	<script src="/en/scripts/bcls-doc-site.js"></script>
 	<script src="/en/scripts/bc-mapi.js"></script>
 	<script>
 		$(document).foundation();
@@ -67,13 +71,100 @@
 	<script src="./assets/BCLSprofilesArray.js"></script>
     <script type="text/javascript">
 		var BCLS = ( function (window, document, Handlebars, bclsProfiles) {
-            var  mainSection = document.getElementById("main")
-            console.log("bclsProfiles", bclsProfiles);
-            return {
+            var  mainSection = document.getElementById("main"),
+            data = bclsProfiles,
+            profileListTemplate = "{{#BCLSprofilesArray}}<tr><td><a href=\"#{{name}}\">{{name}}</a></td><td class=\"bcl-center\">{{numRenditions}}</td></tr>{{/BCLSprofilesArray}}",
+            // functions
+            buildSummaryTable,
+            buildDetailTables;
+            buildSummaryTable = function () {
+                var newSectionNode = document.createElement("div"),
+                    sectionHeadingNode = document.createElement("h2"),
+                    profileTableNode = document.createElement("table"),
+                    profiletheadNode = document.createElement("thead"),
+                    profiletbodyNode = document.createElement("tbody"),
+                    sectionHeadingElem,
+                    profileTableElem,
+                    profiletheadElem,
+                    profiletbodyElem,
+                    template,
+                    i, iMax;
+                iMax = data.BCLSprofilesArray.length;
+                for (i = 0; i < iMax; i++) {
+                    data.BCLSprofilesArray[i].numRenditions = data.BCLSprofilesArray[i].renditions.length;
+                }
+                newSectionNode.setAttribute("id", "summaryTableSection");
+                newSectionNode.setAttribute("class", "section");
+                sectionHeadingNode.setAttribute("id", "summaryTableHeading");
+                profileTableNode.setAttribute("id", "profileSummaryTable");
+
+                profiletheadNode.setAttribute("id", "profileSummaryTableThead");
+                profiletbodyNode.setAttribute("id", "profileSummaryTableTbody");
+                newSectionNode.appendChild(sectionHeadingNode);
+                newSectionNode.appendChild(profileTableNode);
+                profileTableNode.appendChild(profiletheadNode)
+                profileTableNode.appendChild(profiletbodyNode)
+                mainSection.appendChild(newSectionNode);
+                sectionHeadingElem = document.getElementById("summaryTableHeading");
+                profiletheadElem = document.getElementById("profileSummaryTableThead");
+                profiletbodyElem = document.getElementById("profileSummaryTableTbody");
+                sectionHeadingElem.innerHTML = "Standard Profiles List";
+                profiletheadElem.innerHTML = "<tr><th>Profile Name</th><th>Number of Renditions</th></tr>";
+                template = Handlebars.compile(profileListTemplate);
+                profiletbodyElem.innerHTML = template(data);
+            }
+            buildDetailTables = function () {
+                var newSectionNode,
+                    sectionHeadingNode,
+                    profileTableNode,
+                    profiletheadNode,
+                    profiletbodyNode,
+                    sectionHeadingElem,
+                    profileTableElem,
+                    profiletheadElem,
+                    profiletbodyElem,
+                    trTemplate = "{{#renditions}}<tr><td>{{media_type}}</td><td>{{format}}</td><td>{{audio_codec}}</td><td>{{audio_bitrate}}</td><td>{{video_codec}}</td><td>{{video_bitrate}}</td><td>{{width}}</td><td>{{height}}</td><td>{{h264_profile}}</td></tr>{{/renditions}}",
+                    template,
+                    i, j, jMax,
+                    iMax = data.BCLSprofilesArray.length,
+                    headings;
+                for (i = 0; i < iMax; i++) {
+                    newSectionNode = document.createElement("div");
+                    sectionHeadingNode = document.createElement("h2");
+                    profileTableNode = document.createElement("table");
+                    profiletheadNode = document.createElement("thead");
+                    profiletbodyNode = document.createElement("tbody");
+                    newSectionNode.setAttribute("id", data.BCLSprofilesArray[i].name);
+                    newSectionNode.setAttribute("class", "section");
+                    sectionHeadingNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_summaryTableHeading");
+                    profileTableNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_profileSummaryTable");
+
+                    profiletheadNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_profileSummaryTableThead");
+                    profiletbodyNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_profileSummaryTableTbody");
+                    newSectionNode.appendChild(sectionHeadingNode);
+                    newSectionNode.appendChild(profileTableNode);
+                    profileTableNode.appendChild(profiletheadNode)
+                    profileTableNode.appendChild(profiletbodyNode)
+                    mainSection.appendChild(newSectionNode);
+                    sectionHeadingElem = document.getElementById(data.BCLSprofilesArray[i].name + "_summaryTableHeading");
+                    profiletheadElem = document.getElementById(data.BCLSprofilesArray[i].name + "_profileSummaryTableThead");
+                    profiletbodyElem = document.getElementById(data.BCLSprofilesArray[i].name + "_profileSummaryTableTbody");
+                    sectionHeadingElem.innerHTML = data.BCLSprofilesArray[i].name;
+                    profiletheadElem.innerHTML = "<tr><th>media_type</th><th>format</th><th>audio_codec</th><th>audio_bitrate</th><th>video_codec</th><th>video_bitrate</th><th>width</th><th>height</th><th>h264_profile</th></tr>";
+                    jMax = data.BCLSprofilesArray[i].renditions.length;
+                    renditionData = data.BCLSprofilesArray[i]
+                    template = Handlebars.compile(trTemplate);
+                    profiletbodyElem.innerHTML = template(renditionData);
+                }
 
             }
+            buildSummaryTable();
+            buildDetailTables();
+            BCLSmain.createInPageNav();
             })(window, document, Handlebars, bclsProfiles);
 	</script>
+    <script src="/en/scripts/bcls-doc-site.js"></script>
+
 </body>
 
 </html>

@@ -972,6 +972,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
     };
     init();
     return {
-        "BCLhighlight": BCLhighlight
+        "BCLhighlight": BCLhighlight,
+        "createInPageNav": createInPageNav
     };
 })($, window, console, document, Handlebars, bclsNavData, hljs);
