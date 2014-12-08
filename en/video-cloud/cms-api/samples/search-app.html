@@ -71,7 +71,7 @@
 			    <h3>Other dependencies</h3>
 			    <ul>
 			    	<li><a href="//knockoutjs.com/index.html">Knockout.js</a> (2-way data-binding)</li>
-			    	<li><a href="//github.com/bevacqua/rome">Rome.js</a> (date picker)</li>
+			    	<li><a href="//github.com/bevacqua/rome">rome.js</a> (date picker)</li>
 			    </ul>
 			    </div>
                 <div class="section" id="getCredentials">
@@ -111,21 +111,19 @@
 				</div>
 				<div class="section" id="searchInputs">
 				    <h2>Search Inputs</h2>
-				    <fieldset id="searchInputs">
+				    <fieldset id="searchInputs" data-bind="enable: haveAccountInputs">
 						<legend>Search Inputs</legend>
-						<p><input type="checkbox" id="exactMatch" data-bind="checked: exactMatch"> Require exact match</p>
+						<p><input type="checkbox" id="exactMatch" data-bind="checked: exactMatch"> Require exact match on search terms</p>
 						<p><input type="checkbox" id="excludeTerms" data-bind="checked: excludeTerms"> Only return videos that do <strong>not</strong> have the search terms</p>
 						<p><input type="checkbox" id="searchComplete" data-bind="checked: searchComplete"> <strong>Only</strong> return videos that have been completely processed</p>
-						<p>Limit search to this field: <select id="searchField" data-bind="options: searchField, value: selectedSearchField, optionsCaption: 'Any'"></select></p>
-						<p>Limit search to this custom field: <input type="text" id="customField" data-bind="value: customField"></p>
-						<p>
+						<p>Limit search to this field: <select id="searchField" data-bind="disable: haveCustomField(), options: searchField, value: selectedSearchField, optionsCaption: 'Any'"></select></p>
+						<p>Limit search to this custom field: <input type="text" id="customField" data-bind="value: customField, disable: haveSearchField"></p>
 							<div data-bind="visible: !haveSearchState()">
 								Search terms: <input id="searchTerms" type="text" data-bind="value: searchTerms">
 							</div>
 							<div data-bind="visible: haveSearchState">
 								State: <select id="searchStates" data-bind="options: searchState, value: selectedSearchState"></select>
 							</div>
-						</p>
 						<table>
 							<caption>Limit search by dates:</caption>
 							<tr>
@@ -135,11 +133,11 @@
 							</tr>
 							<tr>
 								<td><select class="date" id="dateRangeType" data-bind="options: dateRangeType, value: selectedDateRangeType, optionsCaption: 'Do not limit by date'"></select></td>
-								<td><input id="fromDate" class="date" data-bind="value: fromDate, enable: haveDateType"></td>
-								<td><input id="toDate" class="date" data-bind="value: toDate, enable: haveDateType"></td>
+								<td><input id="fromDate" class="date" data-bind="enable: haveDateType"></td>
+								<td><input id="toDate" class="date" data-bind="enable: haveDateType"></td>
 							</tr>
 						</table>
-						<p><button class="BCL-btn" id="submitRequest" data-bind="click: submitRequest, enable: haveSearchTermsOrDateRange">Submit Request</button></p>
+						<p><button class="BCL-btn" id="submitRequest" data-bind="click: setupURL, enable: haveSearchTermsOrDateRange">Submit Request</button></p>
 					</fieldset>
 				</div>
 
@@ -150,7 +148,7 @@
 				    	<legend>Outputs</legend>
 						<p>
 							API request:
-							<textarea id="apiURL" data-bind="value: apiURL"></textarea>
+							<textarea id="apiURL"></textarea>
 						</p>
 				        <pre><code id="response"></code></pre>
 				    </fieldset>
@@ -194,6 +192,7 @@
 			var self = this,
 				APIresponse = document.getElementById("response");
 			// non-editable data
+		    self.apiURL = document.getElementById("apiURL");
 		    self.searchField = ["name", "text", "tags", "reference_id", "custom_fields", "state"];
 		    self.searchState = ["ACTIVE", "INACTIVE", "DELETED","PENDING"];
 		    self.dateRangeType = ["updated_at", "created_at", "published_at", "schedule.starts_at", "schedule.ends_at"];
@@ -213,8 +212,14 @@
 		    self.searchTerms = ko.observable("");
 		    self.fromDate = ko.observable("");
 		    self.toDate = ko.observable("");
-
 			// computed data
+		    self.haveAccountInputs = ko.computed(function () {
+		    	if (self.account_id() === "" || self.client_id() === "" || self.client_secret() === "") {
+		    		return false;
+		    	} else {
+		    		return true;
+		    	}
+		    });
 		    self.haveSearchState = ko.computed(function () {
 		    	if (self.selectedSearchField() === "state") {
 		    		return true;
@@ -229,6 +234,13 @@
 		    		return true;
 		    	}
 		    });
+		    self.haveCustomField = ko.computed(function () {
+		    	if (self.customField() === "") {
+		    		return false;
+		    	} else {
+		    		return true;
+		    	}
+		    });
 		    self.haveDateType = ko.computed(function () {
 		    	if (self.selectedDateRangeType() === undefined) {
 		    		return false;
@@ -237,45 +249,39 @@
 		    	}
 		    });
 		    self.haveSearchTerms = ko.computed(function () {
-		    	if (self.searchTerms() === undefined) {
+		    	console.log("searchTerms", self.searchTerms());
+		    	if (self.searchTerms() === "") {
 		    		return false;
 		    	} else {
 		    		return true;
 		    	}
 		    });
 		    self.haveSearchTermsOrDateRange = ko.computed(function () {
-		    	if (!self.haveSearchTerms() && !self.haveDateType()) {
-		    		return false;
-		    	} else {
+		    	if (self.haveSearchTerms() || self.haveDateType()) {
 		    		return true;
-		    	}
-		    });
-		    self.haveFromDate = ko.computed(function (){
-		    	if (self.fromDate() === undefined) {
-		    		return false;
 		    	} else {
-		    		return true;
+		    		return false;
 		    	}
 		    });
 
-		    self.haveToDate = ko.computed(function (){
-		    	if (self.toDate() === undefined) {
-		    		return false;
-		    	} else {
-		    		return true;
-		    	}
-		    });
-		    self.apiURL = ko.computed(function () {
+		    // operations
+		    self.setupURL = (function () {
+			    console.log("haveCustomField", self.haveCustomField());
 		    	var str = "?q=",
-		    		url = "https://cms.api.brightcove.com/v1beta1/accounts/" + self.account_id() + "/videos";
+		    		url = "https://cms.api.brightcove.com/v1beta1/accounts/" + self.account_id() + "/videos",
+		    		fromDate = rome(fromDate).getValue().toISOString(),
+		    		toDate = rome(toDate).getValue().toISOString();
 		    		console.log("haveSearchField", self.haveSearchField());
 		    		console.log("haveSearchTerms", self.haveSearchTerms());
 		    		console.log("searchTerms", self.searchTerms());
+		    		console.log("customField", self.customField());
+		    		console.log("fromDate", fromDate);
+		    		console.log("toDate", toDate);
 		    	if (self.haveSearchField()) {
 		    		if (self.haveSearchState()) {
 		    			str += self.selectedSearchField() + ":" + self.selectedSearchState();
 		    		} else if (self.haveSearchTerms()) {
-		    			var termsArray = self.searchTerms().split(" "), i, iMax, item, termsStr;
+		    			var termsArray = self.searchTerms().split(" "), i, iMax, item;
 		    			console.log("termsArray", termsArray);
 		    			imax = termsArray.length;
 		    			if (self.exactMatch()) {
@@ -292,47 +298,69 @@
 		    			}
 		    			str += termsArray.join(" ");
 		    		}
+		    	} else if (self.haveCustomField()) {
+		    		if (self.haveSearchTerms()) {
+		    			var termsArray = self.searchTerms().split(" "), i, iMax, item;
+		    			console.log("termsArray", termsArray);
+			    		console.log("customField", self.customField());
+		    			iMax = termsArray.length;
+		    			if (self.exactMatch()) {
+		    				for (i = 0; i < iMax; i++) {
+		    					termsArray[i] = '\"' + termsArray[i] + '\"';
+		    				}
+		    			}
+						console.log("adding custom field");
+						for (i = 0; i < iMax; i++) {
+		    				termsArray[i] = self.customField() + ":" + termsArray[i];
+		    				console.log("i in customField", "i");
+		    				if (self.excludeTerms) {
+		    					item = "-" + item;
+		    				}
+		    			}
+		    			str += termsArray.join(" ");
+		    		}
 		    	} else if (self.haveSearchTerms()) {
-
+		    		// don't have field type
 		    		if (self.exactMatch()) {
 		    			if (self.excludeTerms()) {
-		    				str += '-"' + self.searchTerms + '"';
+		    				str += '-"' + self.searchTerms() + '"';
 		    			} else {
-		    				str += '"' + self.searchTerms + '"';
+		    				str += '"' + self.searchTerms() + '"';
 		    			}
 		    		} else if (self.excludeTerms()) {
-
-		    		}
-		    	}
-		    	if () {
-
-		    		if (self.haveSearchField()) {
-
-
-		    		} else {
-		    			if (self.excludeTerms) {
-	    					for (i = 0; i < iMax; i++) {
-	    						termsArray[i] = "-" + termsArray[i];
-	    					}
+		    			for (i = 0; i < iMax; i++) {
+	    					termsArray[i] = '-' + termsArray[i];
+	    					str += termsArray.join(" ");
 	    				}
-	    				console.log("termsArray", termsArray);
-		    			termsStr = termsArray.join(" ");
-		    			console.log("termsStr" , termsStr);
-		    			str += termsStr;
+		    		} else {
+		    			str += self.searchTerms();
 		    		}
 		    	}
-		    	if (self.haveDateType) {
-
-		    	}
+		    	// if (self.haveDateType()) {
+		    	// 	// add a plus if there are also search terms
+		    	// 	if (self.haveSearchTerms) {
+		    	// 		str += "+";
+		    	// 	}
+		    	// 	if (self.haveFromDate()) {
+		    	// 		str =+ self.selectedDateRangeType() + ":";
+		    	// 		fromDate = rome(fromDate).getValue();
+		    	// 		console.log(fromDate);
+		    	// 		fromDate = fromDate.toISOString();
+		    	// 		str += fromDate;
+		    	// 	}
+		    	// 	str += "..";
+		    	// 	if (self.haveToDate()) {
+		    	// 		toDate = rome(toDate).getValue();
+		    	// 		toDate = toDate.toISOString();
+		    	// 		str += toDate;
+		    	// 	}
+		    	// }
 		    	url += str;
-		    	return url;
+		    	self.apiURL.innerHTML = url;
 		    });
-
-		    // operations
-		    this.submitRequest = function () {
+		    self.submitRequest = function () {
 		    	console.log("submitting request");
 		    	var httpRequest = new XMLHttpRequest(),
-					proxyURL = "http://solutions.brightcove.com:8005/",
 					requestData,
 					// handler for response from the proxy
 					getResponse = function () {
@@ -354,18 +382,16 @@
 						response.innerHTML += data + ",<br />"
 					};
 		    	// check for required account info
-		    	if (self.account_id === "" || self.client_id === "" || self.client_secret === "") {
-		    		alert("You must proide an account id, client id, and client secret");
+		    	if (!self.haveAccountInputs) {
+		    		alert("You must provide an account id, client id, and client secret");
 		    		return;
 		    	}
-				// get latest request URL in case use edited it
-				apiRequest = cleanString(apiRequest_field.value);
 				// set up request data
-				requestData = "client_id=" + client_id + "&client_secret=" + client_secret + "&url=" + encodeURIComponent(apiRequest) + "&requestBody=" + encodeURIComponent(requestBody) + "&requestType=PATCH";
+				requestData = "client_id=" + self.client_id() + "&client_secret=" + self.client_secret() + "&url=" + encodeURIComponent(self.apiURL.value) + "&requestType=GET";
 				// set response handler
 				httpRequest.onreadystatechange = getResponse;
 				// open the request
-				httpRequest.open("POST", proxyURL);
+				httpRequest.open("POST", self.proxyURL());
 				// set headers
 				httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 				// open and send request
