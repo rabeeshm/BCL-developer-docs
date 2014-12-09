@@ -44,8 +44,10 @@ img<!DOCTYPE html>
 				<h1>Google Analytics Plugin</h1>
 				<!-- Place document intro sentence(s) here -->
 				<p>The Google Analytics plugin sends player and video event data to your Google Analytics account. This allows you to see some of your player/video data along with any other analytic metrics you are collecting all in one place.</p> 
-        <p><img src="assets/google-analytics-plugin/event-category.png" alt="event-category" title="event-category"></p>
         <p class="BCL-aside">The Google Analytics plugin only works with a Brightcove player that is created with a Video Cloud account. It will not work with players created with a Perform account.</p>
+        <p><img src="assets/google-analytics-plugin/event-category.png" alt="event-category" title="event-category"></p>
+        <p>If you use the embed_in_page implementation, this plugin supports both the Google Analytics <code>ga.js</code> library and the newer <code>analytics.js</code> library. The plugin detects which library you are using.</p>
+        <p>If you use the iframe implementation or the direct player URL, and a <code>tracker</code> code is provided, the <code>analytics.js</code> library is loaded.</p>
 			</div>
 				
       <div id="getstarted" class="section">
@@ -61,40 +63,52 @@ img<!DOCTYPE html>
         <h2>Implement plugin</h2>
         <p>To add the Google Analytics plugin to the embed-in-page code, follow these steps:</p>
         <ol>
-          <li>Before the <code>video</code> element in the player code, add tracking code to load Google Analytics. You can get this tracking code from your Google Analytics <strong>Admin</strong> page.</li>
+          <p><li>Before the <code>video</code> element in the player code, add tracking code to load Google Analytics. You can get this tracking code from your Google Analytics <strong>Admin</strong> page.</li></p>
+          <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="17-25"></code></p>
+          <p><li>Download the <a href="https://github.com/mister-ben/videojs-ga-videocloud">Google Analytics Plugin for Video Cloud</a>, and place the plugin JavaScript file (found in the <strong>dist</strong> folder) in an Internet accessible URL.</li></p>
+          <p><li>After your player code, add a <code>script</code> tag pointing to the plugin JavaScript file that you placed in the previous step.</li></p>
+          <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="38"></code></p>
+          <p><li>Add custom script to get a reference to the player and call the plugin.</li></p>
+          <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="40-48"></code></p>
+        <p>Notice in this code that we are writing the player's <code>mediinfo</code> object to the console. This is for informational purposes only. The Google Analytics plugin uses the <code>id</code> property found in this object.</p>
         </ol>
-        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="17-25"></code></p>
+        <p>Your embed-in-page code should look something like this:</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="1-52"></code></p>
+      </div>
+      
+      <div id="options" class="section">
+        <h2>Options</h2>
+        <p>You can provide options to the plugin to override default values.</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="57-62"></code></p>
+        <p>This plugin supports the following options:</p>
+        <h3>tracker</h3>
+        <p>If set, this tracker code will be used for the iframe implementation and the direct player URL. This is not used for the embed-in-page implementation.</p>
+        <p>Default: Not set</p>
+        <p>Example:</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="66-68"></code></p>
+        <h3>eventNames</h3>
+        <p>You can override or localize the names for the player events.</p>
+        <p>Default:</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="72-87"></code></p>
+        <p>Example:</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="89-93"></code></p>
+        <h3>eventCategory</h3>
+        <p>This is the category sent to Google Analytics. For details about using categories, see the <a href="https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide">Google Analytics Event Tracking</a> guide.</p>
+        <p>Default: <code>'Brightcove Player'</code></p>
+        <p>Example:</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="98-100"></code></p>
+        <h3>eventLabel</h3>
+        <p>This is the label sent to Google Analytics. For details about using labels, see the <a href="https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide">Google Analytics Event Tracking</a> guide.</p>
+        <p>Default: <code>VIDEO_ID</code> or <code>VIDEO_NAME</code>. If either of these values is not available, then the plugin will use the base name of the video path. If the path is <code>http://s3.amazonaws.com/tiger.mp4</code>, then the label would be <code>tiger</code>.</p>
+        <p>Example:</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="105-107"></code></p>
+        
       </div>
 			
       <div id="standarderrors" class="section">
         <h2>Standard errors</h2>
         <p>This plugin has a set of default error messages for the standard HTML5 video errors based on the runtime error code value:</p>
-			<ul>
-				<li>Error code: 1</li>
-				<ul>
-					<li>Message: MEDIA_ERR_ABORTED</li>
-					<li>Description: The video download was cancelled</li>
-				</ul>
-				<li>Error code: 2</li>
-				<ul>
-					<li>Message: MEDIA_ERR_NETWORK</li>
-					<li>Description: The video connection was lost, please confirm you're connected to the internet</li>
-				</ul>
-				<li>Error code: 3</li>
-				<ul>
-					<li>Message: MEDIA_ERR_DECODE</li>
-					<li>Description: The video is bad or in a format that can't be played on your browser</li>
-				</ul>
-				<li>Error code: 4</li>
-				<ul>
-					<li>Message: MEDIA_ERR_SRC_NOT_SUPPORTED</li>
-					<li>Description: This video is either unavailable or not supported in this browser</li>
-				</ul>
-				<li>Error code: 5</li>
-				<ul>
-					<li>Message: MEDIA_ERR_ENCRYPTED</li>
-					<li>Description: The video you're trying to watch is encrypted and we don't know how to decrypt it</li>
-				</ul>
+			
 			</ul>
 		    <p>If an error does not have an associated error code, a generic message is displayed:</p>
 			<ul>
