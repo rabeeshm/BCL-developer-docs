@@ -48,30 +48,32 @@
 				    <li>In-page embed</li>
 				    <li>iframe</li>
 				</ul>
-				<p>Each of these implementations can take two approaches. In the first approach the video is statically bound to the player by including it in the player configuration itself. This approach is similar to creating a static web page. The advantage is to reduce the number of calls the player must make to display a poster image or start playing the video, thus increasing performance. This can be done in Studio or using the API directly. A use case of this approach is a product page built with a player that contains a video detailing the single product. </p>
-				<p>A second approach is to create the player with no built-in video metadata. This player can play many different videos; the video ID is passed to the player at runtime, via a URL parameter, video tag attribute or JavaScript APIs. This is technically similar to a template web page that can be used for many different instances of content. A use case for this approach is a generic video player that is assigned different videos depending on which article or video the user is accessing.</p>
+				<p>Each of these implementations can take two approaches. The most common approach is to use a dynamic player. This player can play many different videos. With a dynamic player the video ID is passed to the player at runtime, via a URL parameter, video tag attribute or JavaScript APIs. This is technically similar to a template web page that can be used for many different instances of content. A use case for this approach is a generic video player that is assigned different videos depending on which article or video the user is accessing.</p>
+				<p>A more specialized approach is to statically bind the video to the player by including it in the player configuration itself. This approach is similar to creating a static web page. The advantage is to reduce the number of calls the player must make to display a poster image or start playing the video, thus increasing performance. This can be done in Studio or using the API directly. A use case of this approach is a product page built with a player that contains a video detailing the single product.</p>
 				<p class="BCL-aside">Note: Although it is possible to change the video statically bound to a player, it is not a good practice. If you do this, <em><strong>it is possible you will see the poster for the statically bound video  briefly appear in the player before the video dynamically added is displayed</strong></em>. For this reason is it a best practice to create a player that does not have a video initially associated with it for use in a situation where the video will be dynamically changed.</p>
 			</div>
-			<div id="url" class="section">
-				<h2>URL</h2>
-				<p>The URL implementation can be copied from Studio or the returned results from using the API directly. You can simply paste the URL into a browser and you will see the video full screen. In this case, a video source has been has been statically bound to the player.</p>
-				<p><code data-gist-id="493453b61bc3f061a603" data-gist-hide-footer="true" data-gist-line="1"></code></p>
-			</div>
 			<div id="urldynamicvideo" class="section">
-				<h2>URL dynamic video</h2>
+				<h2>Set video ID via URL</h2>
 				<p>It is possible to use the URL implementation and dynamically change the video that is played. To do this you use a query string at the end of the URL in the form <code>?videoId=<em>YOUR_VIDEO_ID</em></code> as shown in the following example.</p>
 				<p><code data-gist-id="493453b61bc3f061a603" data-gist-hide-footer="true" data-gist-line="4"></code></p>
 			</div>
-			<div id="inpageembed" class="section">
-				<h2>In-page embed</h2>
+			<div  id="refids" class="section">
+        <h2>Using reference IDs</h2>
+        <p>In the proceeding example the video ID is used to identify the video. You can also use the video's reference ID if you wish. If you use the reference ID you must prepend that identifier with <strong>ref:</strong>. For example, the first URL uses the video ID, whereas the second uses the reference ID.</p>
+				<p><code data-gist-id="493453b61bc3f061a603" data-gist-hide-footer="true" data-gist-line="4-5"></code></p>
+				<p>In all examples in this document where a video ID is used a reference ID can also be used following the indicated notation.</p>
+      </div>
+			<div  id="tag" class="section">
+				<h2>Set video ID via tag attribute</h2>
 				<p>The In-page embed code contains the <code>&lt;video></code> tag. The Video Cloud ID for the video statically bound to the player is associated with the <code>data-video-id</code> HTML 5 <strong>data</strong> attribute.</p>
 				<p><code data-gist-id="493453b61bc3f061a603" data-gist-hide-footer="true" data-gist-line="14-21" data-gist-highlight-line="18"></code></p>
+				<p class-"BCL-aside">Note: When the player JavaScript executes, it reads the video ID from the <code>data-video-id</code> attribute. However, it only does so at startup. Changing the value with, for example, JavaScript's <code>setAttribute()</code> method, does not cause the player to load the video. To change the video after the player has loaded, you should use the JavaScript method described below.</p>
 			</div>
-			<div id="inpageembeddynamic" class="section">
-				<h2>In-page embed dynamic video</h2>
-				<p>In this case, the player is created with no video bound to it. You then use JavaScript and the player catalog's <code>getVideo()</code> and <code>load()</code> methods to dynamically retrieve and play the desired video.</p>
+			<div id="setvideousingjavascript" class="section">
+				<h2>Set video using JavaScript</h2>
+				<p>In many cases, you want user interactions to control which video is played. To accomplish this, you can use the use JavaScript and the player catalog's <code>getVideo()</code> and <code>load()</code> methods to dynamically retrieve and play the desired video.</p>
 				<ul>
-				    <li>Lines 26-33: In-page embed code with no statically bound video.</li>
+				    <li>Lines 26-33: In-page embed code with no value for the <code>data-video-id</code> attribute.</li>
 				    <li>Lines 36,42: Use the <code>ready()</code> method to be sure player is ready to act upon.</li>
 				    <li>Line 37: Associate the player, referred to as <code>this</code> in the function, with a variable.</li>
 				    <li>Line 38,41: Use the catalog's <code>getVideo()</code> method using the Video Cloud ID and a callback function as parameters.</li>
@@ -79,11 +81,6 @@
 				</ul>
 				<p><code data-gist-id="493453b61bc3f061a603" data-gist-hide-footer="true" data-gist-line="26-43"></code></p>
 				<p>You can add a value to the HTML5 <code>data-video-id=""</code> data attribute to dynamically change the video, but this must be performed server-side with a tool like PHP/Ruby/Node.js. This will not work at the client as the player has already been loaded, and changing the value with, for example, JavaScript's <code>setAttribute()</code>, does not cause the player to load the video.</p>
-			</div>
-			<div id="iframe" class="section">
-				<h2>iframe</h2>
-				<p>The iframe implementation can be copied from Studio or the returned results from using the API directly. You can place the iframe tag in an HTML page and browse it to see the video. In this case, a video source has been has been statically bound to the player, although it is not something you can see from the iframe tag.</p>
-				<p><code data-gist-id="493453b61bc3f061a603" data-gist-hide-footer="true" data-gist-line="8-12"></code></p>
 			</div>
 			<div id="iframedynamic" class="section">
 				<h2>iframe dynamic video</h2>
@@ -121,3 +118,16 @@
 </body>
 
 </html>
+
+
+			<div id="url" class="section">
+				<h2>URL</h2>
+				<p>The URL implementation can be copied from Studio or the returned results from using the API directly. You can simply paste the URL into a browser and you will see the video full screen. In this case, a video source has been has been statically bound to the player.</p>
+				<p><code data-gist-id="493453b61bc3f061a603" data-gist-hide-footer="true" data-gist-line="1"></code></p>
+			</div>
+			<div id="inpageembed" class="section">
+			<div id="iframe" class="section">
+				<h2>iframe</h2>
+				<p>The iframe implementation can be copied from Studio or the returned results from using the API directly. You can place the iframe tag in an HTML page and browse it to see the video. In this case, a video source has been has been statically bound to the player, although it is not something you can see from the iframe tag.</p>
+				<p><code data-gist-id="493453b61bc3f061a603" data-gist-hide-footer="true" data-gist-line="8-12"></code></p>
+			</div>
