@@ -70,58 +70,81 @@
         var BCLS = ( function (window, document, Handlebars, bclsProfiles) {
             var  mainSection = document.getElementById("main"),
             data = bclsProfiles,
-            profileListTemplate = "{{#BCLSprofilesArray}}<tr><td><a href=\"#{{name}}\">{{name}}</a></td><td class=\"bcl-center\">{{numRenditions}}</td></tr>{{/BCLSprofilesArray}}",
+            profileListTemplate = "{{#BCLSprofilesArray}}<tr><td><a href=\"#{{name}}\">{{name}}</a></td><td class=\"bcl-center\">{{numRenditions}}</td><td>{{description}}</td></tr>{{/BCLSprofilesArray}}",
             // functions
             buildSummaryTable,
             buildDetailTables;
             buildSummaryTable = function () {
                 var newSectionNode = document.createElement("div"),
                     sectionHeadingNode = document.createElement("h2"),
+                    sectionIntroNode = document.createElement("p"),
                     profileTableNode = document.createElement("table"),
                     profiletheadNode = document.createElement("thead"),
                     profiletbodyNode = document.createElement("tbody"),
                     sectionHeadingElem,
+                    sectionIntroElem,
                     profileTableElem,
                     profiletheadElem,
                     profiletbodyElem,
                     template,
                     profileDescriptions = [
                         {"name": "Express Standard", "description": "The default for the old Studio - does not include HLS renditions"},
-                        {"name": "Live - HD", "description": ""}
-                        {"name": "Live - Premium HD", "description": ""}
-                        {"name": "Live - Standard", "description": ""}
-                        {"name": "audio-only", "description": ""}
-                        {"name": "balanced-high-definition", "description": ""}
-                        {"name": "balanced-nextgen-player", "description": ""}
-                        {"name": "balanced-standard-definition": ""}
-                        {"name": "high-bandwidth-devices", "description": ""}
-                        {"name": "low-bandwidth-devices", "description": ""}
-                        {"name": "mp4-only", "description": ""}
-                        {"name": "screencast", "description": ""}
-                        {"name": "single-rendition", "description": ""}
+                        {"name": "Live - HD", "description": "All up with HD"},
+                        {"name": "Live - Premium HD", "description": "Larger set without HD"},
+                        {"name": "Live - Standard", "description": "Small set that is cost effective"},
+                        {"name": "audio-only", "description": "Audio tracks to cover all devices"},
+                        {"name": "balanced-high-definition", "description": "A large set providing high quality renditions for all device types"},
+                        {"name": "balanced-nextgen-player", "description": "Mostly HLS renditions for the Brightcove Player"},
+                        {"name": "balanced-standard-definition", "description": "A set for general use, average quality"},
+                        {"name": "high-bandwidth-devices", "description": "For devices on good wi-fi connections"},
+                        {"name": "low-bandwidth-devices", "description": "For devices on non-wi-fi connections"},
+                        {"name": "mp4-only", "description": "A good range of MP4 renditions, no HLS"},
+                        {"name": "screencast", "description": "Limited renditions, larger frame size with lower bitrates"},
+                        {"name": "single-rendition", "description": "A single good quality MP4"}
                     ],
-                    i, iMax;
+                    i, iMax, j, jMax, k, kMax, item;
                 iMax = data.BCLSprofilesArray.length;
+                // massage data
                 for (i = 0; i < iMax; i++) {
-                    data.BCLSprofilesArray[i].numRenditions = data.BCLSprofilesArray[i].renditions.length;
+                    item = data.BCLSprofilesArray[i];
+                    console.log("item", item);
+                    jMax = item.renditions.length;
+                    item.numRenditions = jMax;
+                    kMax = profileDescriptions.length;
+                    for (k = 0; k < kMax; k++) {
+                        if (item.name === profileDescriptions[k].name) {
+                            item.description = profileDescriptions[k].description;
+                        }
+                    }
+
+                    for (j = 0; j < jMax; j++) {
+                        if (item.renditions[j].format === "ts") {
+                            item.renditions[j].format = "HLS";
+                        }
+                    }
+
                 }
                 newSectionNode.setAttribute("id", "summaryTableSection");
                 newSectionNode.setAttribute("class", "section");
                 sectionHeadingNode.setAttribute("id", "summaryTableHeading");
+                sectionIntroNode.setAttribute("id", "summarySectionIntro");
                 profileTableNode.setAttribute("id", "profileSummaryTable");
 
                 profiletheadNode.setAttribute("id", "profileSummaryTableThead");
                 profiletbodyNode.setAttribute("id", "profileSummaryTableTbody");
                 newSectionNode.appendChild(sectionHeadingNode);
+                newSectionNode.appendChild(sectionIntroNode);
                 newSectionNode.appendChild(profileTableNode);
                 profileTableNode.appendChild(profiletheadNode)
                 profileTableNode.appendChild(profiletbodyNode)
                 mainSection.appendChild(newSectionNode);
                 sectionHeadingElem = document.getElementById("summaryTableHeading");
+                sectionIntroElem = document.getElementById("summarySectionIntro");
                 profiletheadElem = document.getElementById("profileSummaryTableThead");
                 profiletbodyElem = document.getElementById("profileSummaryTableTbody");
                 sectionHeadingElem.innerHTML = "Standard Profiles List";
-                profiletheadElem.innerHTML = "<tr><th>Profile Name</th><th>Number of Renditions</th></tr>";
+                sectionIntroElem.innerHTML = "Click on a profile name to see details of the renditions it includes. Note that the actual renditions created will depend on the quality of the source video.";
+                profiletheadElem.innerHTML = "<tr><th>Profile Name</th><th>Number of Renditions</th><th>Description</th></tr>";
                 template = Handlebars.compile(profileListTemplate);
                 profiletbodyElem.innerHTML = template(data);
             }
