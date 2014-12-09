@@ -156,9 +156,9 @@
     			<div class="section" id="sampleCode">
 				    <h2>Code for the sample</h2>
 				    <h3>HTML code:</h3>
-				    <p></p>
+				    <p><script src="https://gist.github.com/134bc2a5d4b38d7731e4.js"></script></p>
 				    <h3>JavaScript code:</h3>
-				    <p></p>
+				    <p><script src="https://gist.github.com/3da31598634c2701f770.js"></script></p>
 				</div>
 		</div>
 	</div>
@@ -181,17 +181,14 @@
 		$(document).foundation();
 	</script>
 	<script id="pageScript">
-
-
-		// date pickers
-		rome(fromDate);
-		rome(toDate);
-
 		// knockout view model
 		function cmsSearchModel () {
 			var self = this,
 				APIresponse = document.getElementById("response");
 			// non-editable data
+			// date pickers
+			rome(fromDate);
+			rome(toDate);
 		    self.apiURL = document.getElementById("apiURL");
 		    self.searchField = ["name", "text", "tags", "reference_id", "custom_fields", "state"];
 		    self.searchState = ["ACTIVE", "INACTIVE", "DELETED","PENDING"];
@@ -210,8 +207,6 @@
 		    self.searchComplete = ko.observable(true);
 		    self.customField = ko.observable("");
 		    self.searchTerms = ko.observable("");
-		    self.fromDate = ko.observable("");
-		    self.toDate = ko.observable("");
 			// computed data
 		    self.haveAccountInputs = ko.computed(function () {
 		    	if (self.account_id() === "" || self.client_id() === "" || self.client_secret() === "") {
@@ -269,14 +264,14 @@
 			    console.log("haveCustomField", self.haveCustomField());
 		    	var str = "?q=",
 		    		url = "https://cms.api.brightcove.com/v1beta1/accounts/" + self.account_id() + "/videos",
-		    		fromDate = rome(fromDate).getValue().toISOString(),
-		    		toDate = rome(toDate).getValue().toISOString();
+		    		fromDateValue = rome(fromDate).getDate(),
+		    		toDateValue = rome(toDate).getDate();
 		    		console.log("haveSearchField", self.haveSearchField());
 		    		console.log("haveSearchTerms", self.haveSearchTerms());
 		    		console.log("searchTerms", self.searchTerms());
 		    		console.log("customField", self.customField());
-		    		console.log("fromDate", fromDate);
-		    		console.log("toDate", toDate);
+		    		console.log("fromDate", fromDateValue);
+		    		console.log("toDate", toDateValue);
 		    	if (self.haveSearchField()) {
 		    		if (self.haveSearchState()) {
 		    			str += self.selectedSearchField() + ":" + self.selectedSearchState();
@@ -297,6 +292,7 @@
 		    				}
 		    			}
 		    			str += termsArray.join(" ");
+		    			console.log("str for searchField", str);
 		    		}
 		    	} else if (self.haveCustomField()) {
 		    		if (self.haveSearchTerms()) {
@@ -318,45 +314,47 @@
 		    				}
 		    			}
 		    			str += termsArray.join(" ");
+		    			console.log("str for customField", str);
 		    		}
 		    	} else if (self.haveSearchTerms()) {
 		    		// don't have field type
 		    		if (self.exactMatch()) {
 		    			if (self.excludeTerms()) {
 		    				str += '-"' + self.searchTerms() + '"';
+		    			console.log("str for exact match searchField", str);
 		    			} else {
 		    				str += '"' + self.searchTerms() + '"';
+		    			console.log("str for no exact match searchField", str);
 		    			}
 		    		} else if (self.excludeTerms()) {
 		    			for (i = 0; i < iMax; i++) {
 	    					termsArray[i] = '-' + termsArray[i];
 	    					str += termsArray.join(" ");
+		    			console.log("str for exclude searchField", str);
 	    				}
 		    		} else {
 		    			str += self.searchTerms();
+		    			console.log("just searchTerms", str);
 		    		}
 		    	}
-		    	// if (self.haveDateType()) {
-		    	// 	// add a plus if there are also search terms
-		    	// 	if (self.haveSearchTerms) {
-		    	// 		str += "+";
-		    	// 	}
-		    	// 	if (self.haveFromDate()) {
-		    	// 		str =+ self.selectedDateRangeType() + ":";
-		    	// 		fromDate = rome(fromDate).getValue();
-		    	// 		console.log(fromDate);
-		    	// 		fromDate = fromDate.toISOString();
-		    	// 		str += fromDate;
-		    	// 	}
-		    	// 	str += "..";
-		    	// 	if (self.haveToDate()) {
-		    	// 		toDate = rome(toDate).getValue();
-		    	// 		toDate = toDate.toISOString();
-		    	// 		str += toDate;
-		    	// 	}
-		    	// }
+		    	if (self.haveDateType()) {
+		    		// add a plus if there are also search terms
+		    		if (self.haveSearchTerms) {
+		    			str += "+";
+		    			console.log("+ str", str);
+		    		}
+		    		if (fromDateValue !== null) {
+		    			str += self.selectedDateRangeType() + ":";
+		    			str += fromDateValue.toISOString();
+		    		}
+		    		str += "..";
+		    		if (toDateValue !== null) {
+		    			str += toDateValue.toISOString();
+		    		}
+		    	}
 		    	url += str;
 		    	self.apiURL.innerHTML = url;
+		    	self.submitRequest();
 		    });
 		    self.submitRequest = function () {
 		    	console.log("submitting request");
