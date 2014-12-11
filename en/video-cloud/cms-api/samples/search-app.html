@@ -137,6 +137,10 @@
 								<td><input id="toDate" class="date" data-bind="enable: haveDateType"></td>
 							</tr>
 						</table>
+						<p>
+							Number of items to return:
+							<select id="limit" data-bind="options: limit, value: selectedLimit"></select>
+						</p>
 						<p><button class="BCL-btn" id="submitRequest" data-bind="click: setupURL, enable: haveSearchTermsOrDateRange">Submit Request</button></p>
 					</fieldset>
 				</div>
@@ -192,6 +196,7 @@
 		    self.apiURL = document.getElementById("apiURL");
 		    self.searchField = ["name", "text", "tags", "reference_id", "custom_fields", "state"];
 		    self.searchState = ["ACTIVE", "INACTIVE", "DELETED","PENDING"];
+		    self.limit = [10, 25, 50, 100];
 		    self.dateRangeType = ["updated_at", "created_at", "published_at", "schedule.starts_at", "schedule.ends_at"];
 		    self.proxyURL = ko.observable("//solutions.brightcove.com:8006");
 
@@ -207,6 +212,7 @@
 		    self.searchComplete = ko.observable(true);
 		    self.customField = ko.observable("");
 		    self.searchTerms = ko.observable("");
+		    self.selectedLimit = ko.observable(10);
 			// computed data
 		    self.haveAccountInputs = ko.computed(function () {
 		    	if (self.account_id() === "" || self.client_id() === "" || self.client_secret() === "") {
@@ -352,7 +358,7 @@
 		    			str += toDateValue.toISOString();
 		    		}
 		    	}
-		    	url += str;
+		    	url += str + "&limit=" + self.selectedLimit();
 		    	self.apiURL.innerHTML = url;
 		    	self.submitRequest();
 		    });

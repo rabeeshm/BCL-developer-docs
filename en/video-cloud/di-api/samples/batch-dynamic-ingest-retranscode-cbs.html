@@ -74,36 +74,7 @@
 				<p>This script expects a data set as a JSON array of objects like this:</p>
 				<p>
     				Video data:
-    				<textarea id="videoData">[
-    {
-        "name": "Woodpecker",
-        "description": "A bird that hunts insects inside wood",
-        "url": "http://learning-services-media.brightcove.com/videos/mp4/Bird_Woodpecker.mp4",
-        "reference_id": "Bird_Woodpecker.mp4",
-        "tags": ["bird", "air", "nature"]
-    },
-    {
-        "name": "Chickadee",
-        "description": "A small friendly bird",
-        "url": "http://learning-services-media.brightcove.com/videos/mp4/Bird_Chickadee.mp4",
-        "reference_id": "Bird_Chickadee.mp4",
-        "tags": ["bird", "air", "nature"]
-    },
-    {
-        "name": "Great Blue Heron",
-        "description": "Pair of great blue herons",
-        "url": "http://learning-services-media.brightcove.com/videos/mp4/greatblueheron.mp4",
-        "reference_id": "greatblueheron.mp4",
-        "tags": ["bird", "air", "nature"]
-    },
-    {
-        "name": "Great Horned Owl",
-        "description": "Mother and child owls",
-        "url": "http://learning-services-media.brightcove.com/videos/mp4/greathornedowl.mp4",
-        "reference_id": "greathornedowl.mp4",
-        "tags": ["bird", "air", "nature"]
-    }
-]</textarea>
+    				<textarea id="videoData"></textarea>
 				<p>This is the actual data used in this sample. You could include other metadata fields, but you would need to modify the script a little to send those with the first API call. You'll also notice that these are risky values to use for reference ids, especially for a sample like this that will be run multiple times - but I am getting around the duplication issue by appending the current epoch time in milliseconds to whatever is in the data.</p>
 				    <div class="form-wrapper">
 				    	<fieldset>
@@ -111,24 +82,19 @@
 
 				    			<p>
 				    				Account: (defaults to Brightcove sample account)
-				    				<input name="account_id" id="account_id" type="text" value="">
+				    				<input name="account_id" id="account_id" type="text" value="3755095928001">
 				    			</p>
 				    			<p>
 				    				Client id: (defaults to Brightcove sample account)
-				    				<input name="client_id" id="client_id" type="text" value="">
+				    				<input name="client_id" id="client_id" type="text" value="b32bc4e1-24db-467c-9cd5-fb6a8b69c449">
 				    			</p>
 				    			<p>
 				    				Client secret: (defaults to Brightcove sample account)
-				    				<input name="client_secret" id="client_secret" type="text" value="">
+				    				<input name="client_secret" id="client_secret" type="text" value="TndFuFNPozrjwAEgV5lKdyPmQADt08AhYeSTch3K6mS4t8N_lOLc2w5me-X5SjqTKzaR8CHDvf7V76LZU4SwGA">
 				    			</p>
 
 				    			<p>
-				    				Full request URL for the CMS API call:<br />
-				    				<textarea name="url" id="cms_url"></textarea>
-				    				(automatically generated - for information only)
-				    			</p>
-				    			<p>
-				                    Full request URL for the DI API call:<br />
+				                    Full request URL for the API call:<br />
 				                    <textarea name="url" id="di_url"></textarea>
 				                    (automatically generated - for information only)
 				                </p>
@@ -175,8 +141,6 @@
 			client_id,
 			client_secret_display = document.getElementById("client_secret"),
 			client_secret,
-			cms_url_display = document.getElementById("cms_url"),
-			cmsURL = "http://solutions.brightcove.com:8006",
 			videoDataDisplay = document.getElementById("videoData"),
 			// Dynamic Ingest API stuff
 			di_url_display = document.getElementById("di_url"),
@@ -186,7 +150,6 @@
 			videoData = [],
 			totalVideos,
 			videoNumber = 0,
-			t1,
 			t2,
 			totalIngested = 0,
 			defaults = {account_id: 57838016001,client_id: "37cd3c5d-6f18-4702-bfb6-4fbc1cd095f1",client_secret: "gLSQANqe6A2PzJce_6xA4bTNu844up5-CSrC-jxNfur4EaOgWKRcqq_GTxKjhMpPSflMdNEhFdBmNe0qsTIZSQ"},
@@ -196,12 +159,11 @@
 			logResponse,
 			doIngest,
 			submitRequest,
-			setCMSOptions,
 			setDIOptions;
 
 		// is defined
 		isDefined = function(x){
-			if(x !== "" && x !== null && x !== undefined){
+			if (x !== "" && x !== null && x !== undefined){
 			    return true;
 			} else{
 			    return false;
@@ -213,24 +175,13 @@
 			str = str.replace(/\s/g, "");
 			return str;
 		};
-		// set options for the CMS API request
-		setCMSOptions = function () {
-			var options = {};
-			// truncate description if too long
-			videoData[videoNumber].description = videoData[videoNumber].description.substr(0, 120) + "...";
-			options.client_id = client_id;
-			options.client_secret = client_secret;
-			options.requestBody = '{"name":"' + videoData[videoNumber].name + '","description":"' + videoData[videoNumber].description + '","reference_id":"' + videoData[videoNumber].reference_id + '","tags":' + JSON.stringify(videoData[videoNumber].tags) + '}';
-			options.requestType = "POST"
-			options.url = cms_url_display.value;
-			// now submit the request
-			submitRequest(options, cmsURL, "cms");
-		};
 	    // set options for the Dynamic Ingest API request
 		setDIOptions = function () {
+			console.log("in setDIOptions");
 			var options = {};
 			options.client_id = client_id;
 			options.client_secret = client_secret;
+			di_url_display.value = "https://ingest.api.brightcove.com/v1/accounts/" + account_id + "/videos/" + videoData[videoNumber].id + "/ingest-requests"
 			options.requestBody = '{"master":{"url":"' + videoData[videoNumber].url +'"},"profile":"balanced-high-definition"}';
 			options.requestType = "POST"
 			options.url = di_url_display.value;
@@ -254,28 +205,23 @@
 					      if (httpRequest.status === 200) {
 					        logResponse(type, httpRequest.responseText);
 					        responseData = httpRequest.responseText;
-					        switch (type) {
-					        	case "cms":
-					        	if (responseData.indexOf("TIMEOUT") > 0) {
-									videoNumber++;
-									t1 = setTimeout(setCMSOptions, 1000);
-								} else {
-									parsedData = JSON.parse(responseData);
-									di_url_display.value = "https://ingest.api.brightcove.com/v1/accounts/" + account_id + "/videos/" + parsedData.id + "/ingest-requests";
-									setDIOptions();
-								}
-								break;
-								case "di":
-								totalIngested++;
-								logResponse("totalIngested", totalIngested);
-								if (videoNumber < totalVideos - 1) {
-									videoNumber++;
-									logResponse("Processing video number", videoNumber);
-									// pause to avoid CMS API timeouts
-									t2 = setTimeout(setCMSOptions, 1000);
-								}
-								break;
-					        }
+					        if (responseData.indexOf("error_code") < 0) {
+					        	// handle the response
+							totalIngested++;
+							logResponse("totalIngested", totalIngested);
+							if (videoNumber < totalVideos - 1) {
+								videoNumber++;
+								logResponse("Processing video number", videoNumber);
+								// give proxy a second to rest
+								t2 = setTimeout(setDIOptions, 1000);
+							}
+						} else {
+							logResponse("DI", "Request failed; retrying video number: " + videoData[videoNumber].id);
+							videoNumber++;
+							// give proxy a second to rest
+							t2 = setTimeout(setDIOptions, 1000);
+						}
+
 					      } else {
 					        alert("There was a problem with the request. Request returned " + httpRequest.status);
 					      }
@@ -297,13 +243,11 @@
 			httpRequest.send(requestData);
 		};
 		di_submit_display.addEventListener("click", function () {
-			var i, now = new Date().valueOf();
+			console.log("in button handler", videoDataDisplay.value);
 			videoData = JSON.parse(videoDataDisplay.value);
 			totalVideos = videoData.length;
+			console.log("videoData length");
 			// to insure uniqueness,
-			for (i = 0; i < totalVideos; i++) {
-				videoData[i].reference_id += "_" + now.toString();
-			}
 			console.log("totalVideos", totalVideos);
 			// in case of stop/start, reset videoNumber to 0
 			videoNumber = 0;
@@ -311,9 +255,8 @@
 			account_id = isDefined(account_id_display.value) ? account_id_display.value : defaults.account_id;
 			client_id = isDefined(client_id_display.value) ? client_id_display.value : defaults.client_id;
 			client_secret = isDefined(client_secret_display.value) ? client_secret_display.value : defaults.client_secret;
-			cms_url_display.value = "https://cms.api.brightcove.com/v1beta1/accounts/" + account_id + "/videos";
 			// set CMS API options for first video
-			setCMSOptions();
+			setDIOptions();
 		});
 	})(window, document);
 	</script>
