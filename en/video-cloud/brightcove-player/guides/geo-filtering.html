@@ -45,27 +45,27 @@
 				<p>It is possible to restrict where a video can be viewed via geo-filtering. The <a href="http://support.brightcove.com/en/video-cloud/docs/geo-filtering-your-videos">Geo-filtering your Videos</a> document shows you how to use Video Cloud to apply geographic restrictions. The document you are now reading instructs you how to implement code to inform users that a video is geo-filtered.</p>
 				<p>By default, Brightcove Player does not inform the user that a video is geo-filtered. It simply does not play. If you view the console you will see the following.</p>
 				<p><code data-gist-id="8cf94f062cf27a9efdd7" data-gist-hide-footer="true" data-gist-line="1"></code></p>
-				<p>This is not terribly helpful as you cannot be guaranteed the reason the video is forbidden to view is geo-filtering.</p>
+				<p>This is not terribly helpful as you cannot be guaranteed from this error that the reason the video is forbidden to view is geo-filtering.</p>
 				<p>This document implement a strategy to let the user know the video they are trying to watch is geo-filtered.</p>
 			</div>
 			<div id="errorobject" class="section">
 				<h2>Player catalog's error object</h2>
-				<p>The key to creating a user friendly message is the <code>error</code> object contained in Brightcove Player's <code>catalog</code>, shown below in a screenshot from a browser's console. Notice that the object contains a <code>data</code> property, which contains an array. The array will contain the last error the catalog encountered loading a video. In the example you see the element in the array is reporting a geo-filtering access issue.</p>
+				<p>The key to creating a user friendly message is the <code>error</code> object contained in Brightcove Player's <code>catalog</code>. An example of a geo-filtering error is shown below in a screenshot from a browser's console. Notice that the object contains a <code>data</code> property, which itself contains an array. The array will hold the last error the catalog encountered loading a video. In the example you see the element in the array is reporting a geo-filtering access issue.</p>
 				<p><img src="/en/video-cloud/brightcove-player/guides/assets/error-object.png"></p>
 			</div>
       <div id="htmlmessage" class="section">
         <h2>Message in HTML</h2>
-        <p>Once you understand the structure of the error that is produced, and where it is located, you can use some JavaScript to display a description error for the user. The basic implementation steps are:</p>
+        <p>Once you understand the structure of the error that is produced, and where it is located, you can use JavaScript to display a descriptive error for the user. The basic implementation steps are:</p>
 				<ul>
-				    <li>Create a target element in which to display the message</li>
-				    <li>Be sure the player is ready to act upon</li>
-				    <li>Check to see if any error has occurred</li>
-				    <li>Check to see if the error is a geo-filtering issue</li>
-				    <li>Display message to user</li>
+				    <li>Create a target element in which to display the message.</li>
+				    <li>Be sure the player is ready to act upon.</li>
+				    <li>Check to see if any error has occurred.</li>
+				    <li>If yes, check to see if the error is a geo-filtering issue.</li>
+				    <li>If yes, display message to user.</li>
 				</ul>
 				<p>The following code implements these steps.</p>
 				<ul>
-				    <li>Line 13: Insert some HTML element, in this case a paragraph, created; give an <code>id</code> for targeting purposed.</li>
+				    <li>Line 13: Insert an HTML element, in this case a paragraph, in which to inject text; give the element an <code>id</code> for targeting purposes.</li>
 				    <li>Line 18: Use the <code>ready()</code> method to be sure player is ready to act upon.</li>
 				    <li>Line 21: Use an <code>if</code> statement to be sure some error has occurred.</li>
 				    <li>Line 22: Assign a variable the specific error information from Brightcove Player catalog's error object.</li>
@@ -78,27 +78,26 @@
       </div>
       <div id="error plugin" class="section">
 				<h2>Message via errors plugin</h2>
-        <p>You may wish to have the message displayed in the player and/or not have the even the poster appear if the video is geo-filtered. You can do this utilizing the errors plugin. The errors plugin is automatically loaded into the player, so you do not need to explicitly perform that operation. For details on the errors plugin beyond what will be mentioned in this document see the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/errors-plugin.html">Display Error Messages Plugin</a> document.</p>
+        <p>You may wish to have the message displayed in the player and/or not have even the poster appear if the video is geo-filtered. You can do this utilizing the errors plugin. The errors plugin is automatically loaded into the player, so you do not need to explicitly perform that operation. For details on the errors plugin beyond what will be mentioned here, see the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/errors-plugin.html">Display Error Messages Plugin</a> document.</p>
 				<ul>
 				    <li>Line 45: Use the <code>ready()</code> method to be sure player is ready to act upon.</li>
-				    <li>Lines 48-55: Call the player's <code>error()</code> method, passing in the <code>errors</code> object which defines the error code and information to display in the error. Note that the choice of <code>-3</code> for the error code is arbitrary, and the only guidance is not to use a standard error code.</li>
-				    <li>Line 59: Call the <code>error()</code> method to display the custom error information. The logic as to when to display the error is the same as above. The object passed as an argument defines which error message to display.</li>
+				    <li>Lines 48-55: Call the player's <code>error()</code> method, passing in as an argument JSON that defines the <code>errors</code> information to display. Note that the choice of <code>-3</code> for the error code is arbitrary, and the only guidance is not to use a standard error code (currently 1-5).</li>
+				    <li>Line 59: Call the <code>error()</code> method to display the custom error information. The logic used to determine when the geo-filtering error has occurred is the same as above. The object passed as an argument defines which error message to display.</li>
 				</ul>
 				<p><code data-gist-id="8cf94f062cf27a9efdd7" data-gist-hide-footer="true" data-gist-line="44-63" data-gist-highlight-line="45,48-55,59"></code></p>
-				<p>The following screenshot shows an appropriate error in the player that the video is geo-filtered.</p>
+				<p>The following screenshot shows the error plugin's display of the defined error.</p>
 				<p><img src="/en/video-cloud/brightcove-player/guides/assets/geo-filtering-errors-plugin.png"></p>
       </div>
       <div id="generalerror" class="section">
         <h2>General error display</h2>
         <p>The two sections above deal specifically with displaying the error generated when a geo-restricted video is viewed from a restricted locale. Some errors do not provide the level of detail the geo-filtering restriction does. An example error object of this type is shown here. Notice that the <strong>data</strong> field is empty, whereas with the geo-filtering error it contained key error information.</p>
 				<p><img src="/en/video-cloud/brightcove-player/guides/assets/geo-filtering-general-error.png"></p>
-				<p>The following code shows ho to display information from the <code>catalog.error</code> no matter the level of detail. At a high-level the code performs the following:</p>
+				<p>The following code shows how to display information from <code>catalog.error</code> no matter the level of detail. At a high-level, the code performs the following:</p>
 				<ul>
 				    <li>Checks if a catalog error has occurred.</li>
-				    <li>Checks if in the error object the <code>data</code> field contains specific error information, if it does NOT the general error message is defined.</li>
-				    <li>If there is specific error information AND it is geo-filtering related an appropriate message is displayed.</li>
-				    <li>If there is specific error information, and it is not geo-filtering related, the specific error's message is displayed.</li>
-				    <li></li>
+				    <li>Checks if in the error object the <code>data</code> field contains specific error information. If it does NOT, the general error message is injected into the HTML.</li>
+				    <li>If there is specific error information AND it is geo-filtering related an appropriate message is injected into the HTML.</li>
+				    <li>If there is specific error information, and it is not geo-filtering related, the specific error's message is injected into the HTML.</li>
 				</ul>
 				<p><code data-gist-id="8cf94f062cf27a9efdd7" data-gist-hide-footer="true" data-gist-line="70-85" data-gist-highlight-line="45,48-55,59"></code></p>
 				<p>The following screenshot shows the general error message being displayed in HTML. Of course you could also use the errors plugin to display the message, as shown previous section of this document.</p>
