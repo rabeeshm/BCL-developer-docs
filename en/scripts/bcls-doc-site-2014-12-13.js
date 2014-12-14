@@ -375,7 +375,6 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
     };
     // create the index of section pages for the landing page
     createLandingPageSections = function (data) {
-        bclslog("createLandingPageSectionsData", data);
         var $sections = $("#sections"),
             sections = document.getElementById("sections"),
             i,
@@ -397,7 +396,6 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
 
         if (exists(sections)) {
             data = data.items;
-            bclslog("section exists Data", data);
             max = data.length;
             for (i = 0; i < max; i++) {
                 item = data[i];
@@ -582,6 +580,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                         // we're on the section landing page
                         subsection = null;
                         createLandingPageSections(bclsNavData[product].sections[section]);
+                        bclslog("bclsNavData[product].sections[section]", bclsNavData[product].sections[section]);
                     } else {
                         subsection = pathArray[3];
                     }
@@ -589,11 +588,9 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     if (exists(subsection)) {
                         switch (subsection) {
                         case "brightcove-player-sdk-for-ios":
-                            var dataIndex;
                             subsectionName = "Brightcove Player SDK for iOS";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
                             if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
+                                createSubsectionLandingPageSections();
                             } else {
                                 // we're in a subsubsection
                                 subsubsection = pathArray[4];
@@ -601,25 +598,17 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 switch (subsubsection) {
                                     case "guides":
                                     subsubsectionName = "Guides";
-                                    if (pathArray[5] === "index.html") {
-                                        createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
-                                    }
                                     break;
                                     case "samples":
                                     subsubsectionName = "Code Samples";
-                                    if (pathArray[5] === "index.html") {
-                                        createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
-                                    }
                                     break;
                                 }
                             }
                             break;
                         case "brightcove-player-sdk-for-android":
-                            var dataIndex;
                             subsectionName = "Brightcove Player SDK for Android";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
                             if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
+                                createSubsectionLandingPageSections();
                             } else {
                                 // we're in a subsubsection
                                 subsubsection = pathArray[4];
@@ -627,34 +616,24 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 switch (subsubsection) {
                                     case "guides":
                                     subsubsectionName = "Guides";
-                                    if (pathArray[5] === "index.html") {
-                                        createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
-                                    }
                                     break;
                                     case "samples":
                                     subsubsectionName = "Code Samples";
-                                    if (pathArray[5] === "index.html") {
-                                        createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
-                                    }
                                     break;
                                 }
                             }
                             break;
                         case "general":
-                            var dataIndex;
                             subsectionName = "General Info";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
                             if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
+                                createSubsectionLandingPageSections();
                             }
                             break;
                         case "players-module":
-                            var dataIndex;
                             subsectionName = "Players Module";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
                             // check to see if on landing page
                             if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
+                                createSubsectionLandingPageSections();
                             } else {
                                 // we're in a subsubsection
                                 subsubsection = pathArray[4];
@@ -677,17 +656,15 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 // bclslog("subsubsectionName", subsubsectionName);
                                 if (pathArray[5] === "index.html") {
                                     // on subsubsection landing page
-                                    createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
+                                    createSubsectionLandingPageSections();
                                 }
                             }
                             break;
                         case "upload-module":
-                            var dataIndex;
                             subsectionName = "Upload Module (pre-release)";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
                             // check to see if on landing page
                             if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
+                                createSubsectionLandingPageSections();
                             } else {
                                 // we're in a subsubsection
                                 subsubsection = pathArray[4];
@@ -700,17 +677,15 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 // bclslog("subsubsectionName", subsubsectionName);
                                 if (pathArray[5] === "index.html") {
                                     // on subsubsection landing page
-                                    createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
+                                    createSubsectionLandingPageSections();
                                 }
                             }
                             break;
                         case "media-module":
-                            var dataIndex;
                             subsectionName = "Media Module (pre-release)";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
                             // check to see if on landing page
                             if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
+                                createSubsectionLandingPageSections();
                             } else {
                                 // we're in a subsubsection
                                 subsubsection = pathArray[4];
@@ -723,56 +698,38 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 // bclslog("subsubsectionName", subsubsectionName);
                                 if (pathArray[5] === "index.html") {
                                     // on subsubsection landing page
-                                    createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
+                                    createSubsectionLandingPageSections();
                                 }
                             }
                             break;
                         case "references":
-                            var dataIndex;
                             subsectionName = "API References";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
                             if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section]);
+                                createSubsectionLandingPageSections();
                             }
                             break;
                         case "reference":
-                            var dataIndex;
-                            subsectionName = "API References";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
+                            subsectionName = "API Reference";
                             if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section]);
-                            }
-                            break;
-                        case "getting-started":
-                            var dataIndex;
-                            subsectionName = "Get Started";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
-                            if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section]);
+                                createSubsectionLandingPageSections();
                             }
                             break;
                         case "guides":
-                            var dataIndex;
                             subsectionName = "Guides";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
                             if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section]);
+                                createSubsectionLandingPageSections();
                             }
                             break;
                         case "samples":
-                            var dataIndex;
                             subsectionName = "Code Samples";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
                             if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section]);
+                                createSubsectionLandingPageSections();
                             }
                             break;
                         case "solutions":
-                            var dataIndex;
                             subsectionName = "Solutions";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
                             if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section]);
+                                createSubsectionLandingPageSections();
                             }
                             break;
                         case "creating-players":
