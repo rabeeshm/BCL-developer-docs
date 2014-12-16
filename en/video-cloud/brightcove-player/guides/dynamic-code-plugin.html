@@ -43,53 +43,99 @@ img<!DOCTYPE html>
 			<div id="top" class="section">
 				<h1>Dynamic Code Plugin</h1>
 				<!-- Place document intro sentence(s) here -->
-				<p>The Google Analytics plugin sends player and video event data to your Google Analytics account. This allows you to see some of your player/video data along with any other analytic metrics you are collecting all in one place.</p> 
-        <p class="BCL-aside">The Google Analytics plugin only works with a Brightcove player that is created with a Video Cloud account. It will not work with players created with a Perform account.</p>
-        <p>Event names tracked are those used by the Brightcove player where applicable. Event names can be customized or localized using plugin options.</p>
-        <p>The Video Id and name are read from the player and tracked as the event label.</p>
-        <p><img src="assets/google-analytics-plugin/event-list.png" alt="event-list" title="event-list"></p>
+				<p>This guide shows you how to create a bootstrap plugin which adds functionality and styles at runtime. You will want to use this only if you are working with a partner who needs to add JavaScript and CSS to your player without having to re-build all of your players.</p> 
+        <p><img src="assets/dynamic-code-plugin/dynamic-code-plugin.png" alt="dynamic-code-plugin" title="dynamic-code-plugin"></p>
+        <p>You will implement this example in two steps:</p>
+        <ol>
+          <li>Add the first plugin to the player. This could contain the base functionality for your player.</li>
+          <li>Add the dynamic code plugin which will load additional JavaScript and CSS at runtime.</li>
+        </ol>
       </div>
-      
-      <div id="implementation" class="section">
-        <h2>Implementation</h2>
-        <ul>
-          <li><strong>embed-in-page</strong></li>
-          <ul>
-            <li>With the embed_in_page implementation, this plugin supports both the Google Analytics <code>ga.js</code> library and the newer <code>analytics.js</code> library. The plugin detects which library you are using.</li>
-            <li>Google Analytics must be separately loaded on the page before the player.</li>
-          </ul>
-          <li><strong>iframe or direct player URL</strong></li>
-          <ul>
-            <li>With the iframe implementation or the direct player URL, and a <code>tracker</code> code is provided, the <code>analytics.js</code> library is loaded.</li>
-            <li>The Google universal analytics script will be loaded by the plugin.</li>
-          </ul>
-        </ul>
-			</div>
 				
       <div id="getstarted" class="section">
         <h2>Get started</h2>
         <p>You can create your Brightcove player using Video Cloud Studio. There you can quickly create a player, associate a video and publish the player. For details, see the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/getting-started/quick-start-bc-player.html">Quick Start to Brightcove player</a> document.</p>
         <p>After you have published the player, copy the <strong>In-Page Embed Code</strong> for the published player. It should look something like this:</p>
 
-        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="28-35"></code></p>
+        <p><code data-gist-id="869b1ca879e55a5c9c12" data-gist-hide-footer="true" data-gist-line="18-25"></code></p>
         <p class="BCL-aside">Notice that we have added an <code>id</code> attribute so that we can get a reference to the player in later steps.</p>
+        <p>Next, you will use the embed-in-page implementation to test that the plugins are working. Then, you will switch to the iframe implementation.</p>
       </div>
       
-      <div id="implementplugin" class="section">
-        <h2>Implement plugin</h2>
-        <p>For the embed-in-page implementation, Google Analytics must be separately loaded on the page before the player. Follow these steps to add the plugin:</p>
+      <div id="firstplugin" class="section">
+        <h2>First plugin</h2>
+        <p>With the embed-in-page implementation, you will add the <code>firstPlugin</code> plugin to your player. This could be the base functionality that you have added to your player. You can keep the following files a local folder for testing. Later, you will place this in an internet accessible URL.</p>
+        
+        <h3>The JavaScript code</h3>
+        <p>Here is the JavaScript code for the <code>firstPlugin</code> plugin.</p>
+        <p><code data-gist-id="869b1ca879e55a5c9c12" data-gist-hide-footer="true" data-gist-line="59-65"></code></p>
+        
+        <h3>The stylesheet</h3>
+        <p>This example uses styles for the <code>firstPlugin</code> text box.</p>
+        <p><code data-gist-id="869b1ca879e55a5c9c12" data-gist-hide-footer="true" data-gist-line="69-78"></code></p>
+        
+        <h3>The HTML code</h3>
+        <p>Add the following HTML to your page code.</p>
         <ol>
-          <p><li>Before the <code>video</code> element in the player code, add tracking code to load Google Analytics. You can get this tracking code from your Google Analytics <strong>Admin</strong> page.</li></p>
-          <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="17-25"></code></p>
-          <p><li>Download the <a href="https://github.com/mister-ben/videojs-ga-videocloud">Google Analytics Plugin for Video Cloud</a>, and place the plugin JavaScript file (found in the <strong>dist</strong> folder) in an internet accessible URL.</li></p>
-          <p><li>After your player code, add a <code>script</code> tag pointing to the plugin JavaScript file that you placed in the previous step.</li></p>
-          <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="38"></code></p>
-          <p><li>Add custom script to get a reference to the player and call the plugin.</li></p>
-          <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="40-48"></code></p>
-        <p>Notice in this code that we are writing the player's <code>mediinfo</code> object to the console. This is for informational purposes only. The Google Analytics plugin uses the <code>id</code> property found in this object.</p>
+          <p><li>For the <code>firstPlugin</code> plugin, add a link to the CSS file and include the JavaScript file .</li></p>
+          <p><code data-gist-id="869b1ca879e55a5c9c12" data-gist-hide-footer="true" data-gist-line="1-28" data-gist-highlight-line="7,28"></code></p>
+          <p><li>After the code above, add a <code>script</code> section as follows:</li></p>
+          <ul>
+            <li>Line 36: Waits for your player to load.</li>
+            <li>Line 37: Gets a reference to your player.</li>
+            <li>Line 39: Initializes the <code>firstPlugin</code> plugin.</li>
+          </ul>
+          <p><code data-gist-id="869b1ca879e55a5c9c12" data-gist-hide-footer="true" data-gist-line="33-39,45-47"></code></p>
         </ol>
-        <p>Your embed-in-page code should look something like this:</p>
-        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="1-52"></code></p>
+        <p>When you run this code in the browser, you should see the first plugin text displayed.</p>
+        <p><img src="assets/dynamic-code-plugin/first-plugin.png" alt="first-plugin" title="first-plugin"></p>
+      </div>
+        
+      <div id="dynamiccodeplugin" class="section">
+        <h2>Dynamic code plugin</h2>
+        <p>Now, you are ready to add the dynamic code plugin to the player. This will allow you or a partner to add JavaScript and CSS to your player at runtime without having to rebuild the player. You can keep the following files a local folder for testing. Later, you will place this in an internet accessible URL.</p>
+        
+        <h3>The JavaScript code</h3>
+        <p>Here is the JavaScript code which will load your dynamic code and styles at runtime.</p>
+        <ul>
+          <li>Line 89: Gets a reference to the player.</li>
+          <li>Lines 95,98: Dynamically create a <code>&lt;script&gt;</code> and a <code>&lt;link&gt;</code> element in your HTML code.</li>
+          <li>Line 100: Sets a flag so that the script load handler is only excuted once.</li>
+          <li>Lines 104-113: Define the <code>script.onload()</code> handler function to call the <code>init()</code> function when the runtime resources have been downloaded.</li>
+          <li>Lines 118,122: Define the URL to the custom JavaScript and CSS files to be loaded dynamically. </li>
+          <li>Lines 124-125: Add attributes and values you just defined to the Define the URL to the <code>&lt;script&gt;</code> and a <code>&lt;link&gt;</code> elements.</li>
+          <li>Line 129: Initializes the plugin with your dynamic code and styles. You will add this <code>secondPlugin</code> code to your HTML in the next section.</li>
+        </ul>
+        <p><code data-gist-id="869b1ca879e55a5c9c12" data-gist-hide-footer="true" data-gist-line="82-131"></code></p>
+      </div>
+        
+      <div id="dynamiccode" class="section">
+        <h2>Dynamic code</h2>
+        <p>This section shows you how to easily add JavaScript functionality and custom styles to your player at runtime. You can keep the following files a local folder for testing. Later, you will place this in an internet accessible URL.</p>
+        <h3>Dynamic JavaScript code</h3>
+        <p>This plugin contains any JavaScript code that you want to load at runtime. In this example, it will create another text box overlay in the player, below the first.</p>
+        <p><code data-gist-id="869b1ca879e55a5c9c12" data-gist-hide-footer="true" data-gist-line="135-141"></code></p>
+        
+        <h3>Dynamic styles</h3>
+        <p>This example uses styles for the <code>secondPlugin</code> text box.</p>
+        <p><code data-gist-id="869b1ca879e55a5c9c12" data-gist-hide-footer="true" data-gist-line="69-78"></code></p>
+    
+        <h3>The HTML code</h3>
+        <p>Add the following HTML to your page code.</p>
+        <ol>
+          <p><li>For the <code>dynamicCode</code> plugin, include the JavaScript file.</li></p>
+          <p><code data-gist-id="869b1ca879e55a5c9c12" data-gist-hide-footer="true" data-gist-line="18-31" data-gist-highlight-line="31"></code></p>
+          <p><li>After the code above, add code to the <code>script</code> section as follows:</li></p>
+          <ul>
+            <li>Line 36: Waits for your player to load.</li>
+            <li>Line 37: Gets a reference to your player.</li>
+            <li>Line 39: Initializes the <code>firstPlugin</code> plugin.</li>
+          </ul>
+          <p><code data-gist-id="869b1ca879e55a5c9c12" data-gist-hide-footer="true" data-gist-line="33-47" data-gist-highlight-line="41-44"></code></p>
+        </ol>
+        <p>When you run this code in the browser, you should see the additional text box displayed in the player along with the original plugin text box.</p>
+        <p><img src="assets/dynamic-code-plugin/second-plugin.png" alt="second-plugin" title="second-plugin"></p>
+          
       </div>
       
       <div id="iframe" class="section">
@@ -113,55 +159,9 @@ img<!DOCTYPE html>
         <p>Your page code should look something like this:</p>
         <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="131-149"></code></p>   
 			</div>
-      
-      <div id="options" class="section">
-        <h2>Options</h2>
-        <p>You can provide options to the plugin to override default values. Here is an example of how to add options to your embed-in-page code:</p>
-        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="57-62"></code></p>
-        <p>This plugin supports the following options:</p>
-        <h3>tracker</h3>
-        <p>If set, this tracker code will be used for the iframe implementation and the direct player URL. This is not used for the embed-in-page implementation.</p>
-        <p>Default: Not set</p>
-        <p>Example:</p>
-        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="66-68"></code></p>
-        <h3>eventNames</h3>
-        <p>You can override or localize the names for the player events.</p>
-        <p>Default:</p>
-        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="72-87"></code></p>
-        <p>Example:</p>
-        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="89-93"></code></p>
-        <h3>eventCategory</h3>
-        <p>This is the category sent to Google Analytics. For details about using categories, see the <a href="https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide">Google Analytics Event Tracking</a> guide.</p>
-        <p>Default: <code>'Brightcove Player'</code></p>
-        <p>Example:</p>
-        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="98-100"></code></p>
-        <h3>eventLabel</h3>
-        <p>This is the label sent to Google Analytics. For details about using labels, see the <a href="https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide">Google Analytics Event Tracking</a> guide.</p>
-        <p>Default: <code>VIDEO_ID</code> or <code>VIDEO_NAME</code>. If either of these values is not available, then the plugin will use the base name of the video path. If the path is <code>http://s3.amazonaws.com/tiger.mp4</code>, then the label would be <code>tiger</code>.</p>
-        <p>Example:</p>
-        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="105-107"></code></p>
-        <h3>eventsToTrack</h3>
-        <p>These are the events you would like to track. They include the following:</p>
-        <ul>
-				  <li><code>player_load</code> : The player has loaded.</li>
-          <li><code>video_load</code> : The video has loaded. This event will fire again when another video is loaded.</li>
-          <li><code>percent_played</code> : Every x% of the video played, with the percentage as a value, where x is defined by the <code>percentsPlayedInterval</code> option. The default is 10.</li>
-          <li><code>start</code> : Video playback has started. Triggered once per video load.</li>
-          <li><code>end</code> : Video playback has completed. Triggered once per video load.</li>
-        </ul>
-        <p>Default:</p>
-        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="112-113"></code></p>
-        <p>Example:</p>
-        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="116-120"></code></p>
-        <h3>percentsPlayedInterval</h3>
-        <p>This option goes with the <code>percent_played</code> event. Every x% of the video played will be sent to Google Analytics, where x is defined by the the <code>percentsPlayedInterval</code> value.</p>
-        <p>Default: 10</p>
-        <p>Example:</p>
-        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="125-127"></code></p>       
-      </div>
 			
 			<div class="section" id="BCLreferences">
-				<h2>Related topics</h2>
+				<h2>Related Topics</h2>
 				<ul>
 					<li> <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-dev-quick-start.html#passdatatoplugin">Quick Start to Plugin Development</a>
 					</li>
