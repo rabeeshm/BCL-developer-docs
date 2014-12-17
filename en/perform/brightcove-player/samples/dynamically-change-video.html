@@ -46,7 +46,6 @@
         <p class="video-cloud-only">It is a common use-case to dynamically change the video loaded in the player. This topic shows you how to do this using both the embed_in_page and the embed_code (iframe) implementations. When you select a button on the HTML page, the source video will change.</p>
         <p class="perform-only">It is a common use-case to dynamically change the video loaded in the player. This topic shows you how to do this using both the embed_in_page and the embed_code (iframe) implementations.</p>
       </div>
-			
       <div id="createplayer" class="section">
         <h2>Create a player</h2>
       <p class="video-cloud-only">You can use Studio to create a player or refer to the <a href="/en/video-cloud/player-management/guides/vc-player-mgmt-quick-start.html">Quick Start to Player Management</a> guide to create a player using the API directly.</p>
@@ -69,7 +68,7 @@
         <p>This code gets a reference to the player and changes the video content.</p>
         <ul>
           <li>Lines 132,133,135: Gets a reference to the player when it is ready.</li>
-          <li>Line 134: Uses the <code>src</code> method to load the video into the player.</li>
+          <li>Line 134: Uses the <code>src()</code> method to load the video into the player.</li>
         </ul>
 		    <p><code data-gist-id="b62528eb1aac500b1dcb" data-gist-hide-footer="true" data-gist-line="131-136"></code></p>
         <p class="BCL-aside">Note: If the player was created with no video content initially assigned you must use an object with <code>type</code> and <code>src</code> properties for the argument of the <code>src()</code> method, as shown here. If initially a video source is assigned, you can use just the URL string for the argument.</p>
@@ -123,8 +122,33 @@
         <p><code data-gist-id="b62528eb1aac500b1dcb" data-gist-line="10-60"  data-gist-hide-footer="true"></code></p>
         <p>Browse the HTML page. When you select the <strong>change video</strong> button you should see the new video in the player.</p>
     </div>
-          
-    <div id="iframe" class="section">
+
+    <div id="iframe" class="section perform-only">
+        <h2>Use iframe</h2>
+      <p>It is a best practice to use the iframe player implementation if you can. The recommended approach to changing the video source is to is to create a plugin that basically performs the JavaScript shown in the previous section. The process is complicated a bit since the JavaScript must be in a plugin to work in the iframe, as well as the new video's URL must be passed into the iframe. To pass data into the iframe you must use HTML's <code>postMessage()</code> method. This is explained at length in the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/samples/listen-for-play-button.html">Brightcove Player Sample: Play Video from iframe Parent</a> document.</p>
+     
+        <h3><a name="HTMLCode"></a>The HTML code</h3>
+            <p>The additions to the standard HTML page are the iframe tag for the player and a button.</p>
+        <p><code data-gist-id="b62528eb1aac500b1dcb" data-gist-hide-footer="true" data-gist-line="177-180"></code></p>
+        <h3>The JavaScript code</h3>
+        <p>When the button is clicked, the event handler function dispatches an event into the iframe. Note that the first argument of the <code>postMessage()</code> method is passed into the iframe's event listener as the <code>data</code> object in the event object. This provides access to the new video's URL in the iframe.</p>
+        <p><code data-gist-id="b62528eb1aac500b1dcb" data-gist-hide-footer="true" data-gist-line="182-190"></code></p>
+        <h3><a name="JSCode"></a>The plugin code</h3>
+        <p>This code gets a reference to the player and changes the video content.</p>
+        <ul>
+          <li>Line 143: Standard declaration for a plugin. Note the name of the plugin is <code>dynamicVideo</code> and the <code>options</code> argument is accepted by the function that defines the plugin.</li>
+          <li>Line 144: Creates a variable to hold player instance.</li>
+          <li>Line 145: Uses the <code>src()</code> method to load the video into the player. The <code>videoURL</code> defined in the <code>options</code> object is used as the video source.</li>
+          <li>Line 146: Plays the video (optional, of course).</li>
+        </ul>
+        <p><code data-gist-id="b62528eb1aac500b1dcb" data-gist-hide-footer="true" data-gist-line="152-161"></code></p>
+        <p>Once you have the code entered you need to save the file to an Internet accessible URL. Once you do this you can go into Studio and provide the URL to the player as shown:</p>
+        <p><img src="/en/video-cloud/brightcove-player/samples/assets/dynamic-add-plugin.png"></p>
+        <p>To pass in the data for the options enter the JSON for the dynamicURL in Studio, as shown:</p>
+        <p><img src="/en/video-cloud/brightcove-player/samples/assets/dynamic-add-options.png"></p>
+        <p>Of course, the plugin name supplied must match the name given to the plugin in the associated JavaScript.</p>
+    </div>
+    <div id="iframe" class="section video-cloud-only">
         <h2>Use iframe</h2>
 		  <p>It is a best practice to use the iframe player implementation if you can. The recommended approach to changing the video source is to append a query string in the form <code>?videoId=12345</code> to the <code>iframe</code>'s <code>src</code> attribute.</p>
 		 
@@ -161,7 +185,11 @@
       <div class="section" id="BCLreferences">
         <h2>Related Topics</h2>
         <ul>
-          <li><a href="/en/video-cloud/player-management/guides/vc-player-mgmt-quick-start.html">Quick Start to Player Management</a></li>
+          <li class="video-cloud-only"><a href="//docs.brightcove.com/en/video-cloud/player-management/guides/vc-player-mgmt-quick-start.html">Quick Start to Player Management</a></li>
+          <li class="perform-only"><a href="//docs.brightcove.com/en/perform/player-management/guides/vc-player-mgmt-quick-start.html">Quick Start to Player Management</a></li>
+          <li class="perform-only"><a href="//docs.brightcove.com/en/perform/brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a></li>
+          <li class="video-cloud-only"><a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a></li>
+          <li  class="perform-only"><a href="//docs.brightcove.com/en/video-cloud/brightcove-player/samples/listen-for-play-button.html">Brightcove Player Sample: Play Video from iframe Parent</a></li>
         </ul>
       </div>
     </div>
