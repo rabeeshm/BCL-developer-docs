@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+sna<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -137,9 +137,16 @@
 								<td><input id="toDate" class="date" data-bind="enable: haveDateType"></td>
 							</tr>
 						</table>
+						<p>Items found: <span data-bind="text: itemCount"></span><br />
+							Offset (number of items to skip): <select id="offset" data-bind="options: offsets, value: selectedOffset"></select>
+						</p>
 						<p>
 							Number of items to return:
 							<select id="limit" data-bind="options: limit, value: selectedLimit"></select>
+						</p>
+						<p>
+							Sort results by:
+							<select id="sort" data-bind="options: sortOptions, value: selectedSortOption"></select>
 						</p>
 						<p><button class="BCL-btn" id="submitRequest" data-bind="click: setupURL, enable: haveSearchTermsOrDateRange">Submit Request</button></p>
 					</fieldset>
@@ -150,6 +157,7 @@
 				    <h2>Results</h2>
 				    <fieldset>
 				    	<legend>Outputs</legend>
+				    	<p>Note that if you request multiple result sets using the offset, new items will be appended to the existing ones.</p>
 						<p>
 							API request:
 							<textarea id="apiURL"></textarea>
@@ -198,6 +206,7 @@
 		    self.searchState = ["ACTIVE", "INACTIVE", "DELETED","PENDING"];
 		    self.limit = [10, 25, 50, 100];
 		    self.dateRangeType = ["updated_at", "created_at", "published_at", "schedule.starts_at", "schedule.ends_at"];
+		    self.sortOptions = ["name", "reference_id", "created_at", "published_at", "updated_at", "schedule_starts_at", "schedule_ends_at", "state", "plays_total", "plays_trailing_week"]
 		    self.proxyURL = ko.observable("//solutions.brightcove.com:8006");
 
 		    // editable data
@@ -213,6 +222,10 @@
 		    self.customField = ko.observable("");
 		    self.searchTerms = ko.observable("");
 		    self.selectedLimit = ko.observable(10);
+            self.itemCount = ko.observable("");
+            self.offsets = ko.observableArray([0]);
+            self.selectedOffset = ko.observable();
+            self.selectedSortOption = ko.observable();
 			// computed data
 		    self.haveAccountInputs = ko.computed(function () {
 		    	if (self.account_id() === "" || self.client_id() === "" || self.client_secret() === "") {
@@ -226,6 +239,13 @@
 		    		return true;
 		    	} else {
 		    		return false;
+		    	}
+		    });
+		    self.haveItemCount = ko.computed(function () {
+		    	if (self.itemCount() === "") {
+		    		return false;
+		    	} else {
+		    		return true;
 		    	}
 		    });
 		    self.haveSearchField = ko.computed(function () {
@@ -250,7 +270,6 @@
 		    	}
 		    });
 		    self.haveSearchTerms = ko.computed(function () {
-		    	console.log("searchTerms", self.searchTerms());
 		    	if (self.searchTerms() === "") {
 		    		return false;
 		    	} else {
@@ -266,24 +285,20 @@
 		    });
 
 		    // operations
-		    self.setupURL = (function () {
-			    console.log("haveCustomField", self.haveCustomField());
-		    	var str = "?q=",
-		    		url = "https://cms.api.brightcove.com/v1beta1/accounts/" + self.account_id() + "/videos",
+	    	// function to write the request to the page
+			self.logResponse = function (data) {
+				response.innerHTML += data + ",<br />"
+			};
+			// function to set up the request
+			self.setupURL = (function () {
+		    	var str = "https://cms.api.brightcove.com/v1beta1/accounts/" + self.account_id() + "/counts/videos?q=",
 		    		fromDateValue = rome(fromDate).getDate(),
 		    		toDateValue = rome(toDate).getDate();
-		    		console.log("haveSearchField", self.haveSearchField());
-		    		console.log("haveSearchTerms", self.haveSearchTerms());
-		    		console.log("searchTerms", self.searchTerms());
-		    		console.log("customField", self.customField());
-		    		console.log("fromDate", fromDateValue);
-		    		console.log("toDate", toDateValue);
 		    	if (self.haveSearchField()) {
 		    		if (self.haveSearchState()) {
 		    			str += self.selectedSearchField() + ":" + self.selectedSearchState();
 		    		} else if (self.haveSearchTerms()) {
 		    			var termsArray = self.searchTerms().split(" "), i, iMax, item;
-		    			console.log("termsArray", termsArray);
 		    			imax = termsArray.length;
 		    			if (self.exactMatch()) {
 		    				for (i = 0; i < iMax; i++) {
@@ -298,56 +313,45 @@
 		    				}
 		    			}
 		    			str += termsArray.join(" ");
-		    			console.log("str for searchField", str);
 		    		}
 		    	} else if (self.haveCustomField()) {
 		    		if (self.haveSearchTerms()) {
 		    			var termsArray = self.searchTerms().split(" "), i, iMax, item;
-		    			console.log("termsArray", termsArray);
-			    		console.log("customField", self.customField());
 		    			iMax = termsArray.length;
 		    			if (self.exactMatch()) {
 		    				for (i = 0; i < iMax; i++) {
 		    					termsArray[i] = '\"' + termsArray[i] + '\"';
 		    				}
 		    			}
-						console.log("adding custom field");
 						for (i = 0; i < iMax; i++) {
 		    				termsArray[i] = self.customField() + ":" + termsArray[i];
-		    				console.log("i in customField", "i");
 		    				if (self.excludeTerms) {
 		    					item = "-" + item;
 		    				}
 		    			}
 		    			str += termsArray.join(" ");
-		    			console.log("str for customField", str);
 		    		}
 		    	} else if (self.haveSearchTerms()) {
 		    		// don't have field type
 		    		if (self.exactMatch()) {
 		    			if (self.excludeTerms()) {
 		    				str += '-"' + self.searchTerms() + '"';
-		    			console.log("str for exact match searchField", str);
 		    			} else {
 		    				str += '"' + self.searchTerms() + '"';
-		    			console.log("str for no exact match searchField", str);
 		    			}
 		    		} else if (self.excludeTerms()) {
 		    			for (i = 0; i < iMax; i++) {
 	    					termsArray[i] = '-' + termsArray[i];
 	    					str += termsArray.join(" ");
-		    			console.log("str for exclude searchField", str);
 	    				}
 		    		} else {
 		    			str += self.searchTerms();
-		    			console.log("just searchTerms", str);
 		    		}
 		    	}
 		    	if (self.haveDateType()) {
 		    		// add a plus if there are also search terms
 		    		if (self.haveSearchTerms) {
 		    			str += "+";
-		    			console.log("+ str", str);
 		    		}
 		    		if (fromDateValue !== null) {
 		    			str += self.selectedDateRangeType() + ":";
@@ -358,12 +362,26 @@
 		    			str += toDateValue.toISOString();
 		    		}
 		    	}
-		    	url += str + "&limit=" + self.selectedLimit();
-		    	self.apiURL.innerHTML = url;
-		    	self.submitRequest();
+		    	str += "&limit=" + self.selectedLimit();
+		    	str += "&offset=" + self.selectedOffset();
+		    	str += "&sort=" + self.selectedSortOption();
+		    	url = str;
+		    	self.apiURL.value = url;
+		    	self.submitRequest("counts", function (count) {
+		    		var totalSets = Math.ceil(count / self.selectedLimit()),
+		    			i;
+		    			self.itemCount(count);
+		    			for (i = 1; i < totalSets; i++) {
+		    				self.offsets.push(i * self.selectedLimit());
+		    			}
+		    			url = url.replace("/counts/videos", "/videos");
+		    			self.apiURL.value = url;
+		    			self.submitRequest("items", function (response){
+		    				self.logResponse(response);
+		    			});
+		    	});
 		    });
-		    self.submitRequest = function () {
-		    	console.log("submitting request");
+		    self.submitRequest = function (type, callback) {
 		    	var httpRequest = new XMLHttpRequest(),
 					requestData,
 					// handler for response from the proxy
@@ -371,7 +389,18 @@
 						try {
 						    if (httpRequest.readyState === 4) {
 						      if (httpRequest.status === 200) {
-						        logResponse(httpRequest.responseText);
+						        switch (type) {
+						        	case "counts":
+						        	var count = JSON.parse(httpRequest.responseText).count;
+						        	callback(count);
+						        	break;
+						        	case "items":
+						        	callback(httpRequest.responseText);
+						        	break;
+						        	default:
+						        	self.logResponse("Unexpected response: " + httpRequest.responseText);
+						        	break;
+						        }
 						      } else {
 						        alert("There was a problem with the request. Request returned " + httpRequest.status);
 						      }
@@ -380,10 +409,6 @@
 						  catch(e) {
 						    alert('Caught Exception: ' + e);
 						  }
-					},
-					// function to set the request
-					logResponse = function (data) {
-						response.innerHTML += data + ",<br />"
 					};
 		    	// check for required account info
 		    	if (!self.haveAccountInputs) {
