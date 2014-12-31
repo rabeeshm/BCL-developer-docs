@@ -90,20 +90,7 @@
             <div class="section" id="dimensionsOverview">
                 <h2>Dimensions</h2>
                 <p>You can request reports on the following data dimension:</p>
-                <ul>
-                    <li>account</li>
-                    <li>player</li>
-                    <li>video</li>
-                    <li>country</li>
-                    <li>city</li>
-                    <li>region</li>
-                    <li>day</li>
-                    <li>destination_domain</li>
-                    <li>referrer_domain</li>
-                    <li>source_type</li>
-                    <li>search_terms</li>
-                    <li>device_type</li>
-                    <li>device_os</li>
+                <ul id="dimensionsList">
                 </ul>
             </div>
             <div class="section" id="metrics">
@@ -124,6 +111,8 @@
                    <dd class="bcls-answer"><ul id="day"></ul></dd>
                    <dt class="bcls-question">destination_domain</dt>
                    <dd class="bcls-answer"><ul id="destination_domain"></ul></dd>
+                   <dt class="bcls-question">destination_path</dt>
+                   <dd class="bcls-answer"><ul id="destination_path"></ul></dd>
                    <dt class="bcls-question">referrer_domain</dt>
                    <dd class="bcls-answer"><ul id="referrer_domain"></ul></dd>
                    <dt class="bcls-question">source_type</dt>
@@ -138,7 +127,7 @@
             </div>
             <div class="section" id="reportDimensions">
                 <h2>Multiple Dimensions</h2>
-                <p>You can request reports on multiple dimensions, but some combinations are not valid. For invalid dimension combinations, no data will be returned.</p>
+                <p>You can request reports on multiple dimensions, but some combinations are not valid. For invalid dimension combinations, no data will be returned. Below are the dimensions that can be combined.</p>
             </div>
             <div class="section" id="filterValues">
                 <h2>Where filter values</h2>
@@ -148,13 +137,13 @@
 <pre><code>where=video==123456789;day=2013-09-21;device_type==tablet</code></pre>
                 <p>Commas are treated as logical ORs, and semicolons as logical ANDs. For example, <code>where=video==1234,5678;player=9876</code> is interpreted as "where video = 1234 <strong>OR</strong> 5678 <strong>AND</strong> player = 9876"</p>
                 <h3>Spaces and special characters</h3>
-                <!-- <p>Strings should be URI encoded so that characters like ?, &amp;, semi-colons, and commas in your strings are not misinterpreted as part of the URL. You can also escape special characters using a "\":</p>
-<pre><code>where=search_terms==boston\,%20ma</code></pre> -->
+                <p>String values should be URI encoded. You can also escape special characters using a "\":</p>
+<pre><code>where=search_terms==boston\,%20ma</code></pre>
                 <p>You can use the following dimensions as filters:</p>
+                <ul id="filtersList">
+                </ul>
+                <p>The following filters match only specific values:</p>
                 <ul>
-                    <li>player = one or more active player IDs in the account</li>
-                    <li>video = one or more active video IDs in the account</li>
-                    <li>referrer_domain = any valid domain name such as <code>brightcove.com</code></li>
                     <li>source_type = one of the following values:
                         <ul>
                             <li>direct</li>
@@ -164,7 +153,6 @@
                             <li>secure_search</li>
                         </ul>
                     </li>
-                    <li>search_terms = any <a href="//docs.brightcove.com/en/video-cloud/utilities/URLencoder.html">URL-encoded</a> string</li>
                     <li>device_type = any of the following values:
                         <ul>
                             <li>mobile</li>
@@ -197,8 +185,8 @@
                 <ul>
                     <li>Text values:
                         <ul>
-                            <li> <code>from=alltime</code> (can be use for all GET requests <strong>except</strong>rollups)</li>
-                            <li> <code>to=now</code> (available and the default value for all GET requests)</li>
+                            <li> <code>from=alltime</code> (can be use for all requests <strong>except</strong>rollups)</li>
+                            <li> <code>to=now</code> (available and the default value for all requests)</li>
                         </ul>
                     </li>
                     <li>Epoch time values in milliseconds, such as <code>1377047323000</code>
@@ -271,14 +259,12 @@
     <script src="/en/scripts/docs-nav-data.min.js"></script>
     <script src="/en/scripts/bcls-doc-site.js"></script>
     <script src="/en/scripts/bclsfaq.js"></script>
-    <script>
-        $(document).foundation();
-    </script>
     <script id="pageScript" type="text/javascript">
     var BCLS = ( function () {
         var metricsTemplate = "{{#items}}<li>{{this}}</li>{{/items}}",
             template = Handlebars.compile(metricsTemplate),
-            dimensions = ["account", "video", "player", "day", "destination_domain", "destination_path", "country", "city", "region", ]
+            dimensions = ["account", "video", "player", "day", "destination_domain", "destination_path", "country", "city", "region", "referrer_domain", "source_type", "search_terms", "device_type", "device_os"],
+            filters = ["video", "player", "day", "destination_domain", "destination_path", "country", "city", "region", "referrer_domain", "source_type", "search_terms", "device_type", "device_os"],
             baseFields = {"items": ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed"]},
             accountFields = {"items": ["account", "active_media", "bytes_delivered", "bytes_in", "bytes_out", "bytes_overhead", "bytes_player", "bytes_stored", "cdn_log_line", "chimera_report", "content_delivered", "drm_bytes_packaged", "engagement_score", "licenses_served", "play_rate", "player_load", "video_engagement_1", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_engagement_100", "video_impression", "video_percent_viewed", "video_seconds_viewed", "live_seconds_viewed", "video_view"]},
             videoFields = {"items": baseFields.items.concat(["video", "video_name", "video_duration", "video_engagement", "video_engagement_1", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_engagement_100", "bytes_delivered", "content_delivered"])},
@@ -302,6 +288,8 @@
             $region = $("#region"),
             $city = $("#city"),
             $destination_domain = $("#destination_domain"),
+            $destination_path = $("#destination_path"),
+            $dimensionsList = $("#dimensionsList")
             $referrer_domain = $("#referrer_domain"),
             $source_type = $("#source_type"),
             $search_terms = $("#search_terms"),
@@ -323,6 +311,10 @@
         return {}
     })();
     </script>
+    <script>
+        $(document).foundation();
+    </script>
+
     <div class="footer text-center"><a href="mailto:docs@brightcove.com">Questions or comments?</a></div>
 	</body>
 
