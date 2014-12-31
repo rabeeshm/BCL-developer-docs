@@ -127,7 +127,10 @@
             </div>
             <div class="section" id="reportDimensions">
                 <h2>Multiple Dimensions</h2>
-                <p>You can request reports on multiple dimensions, but some combinations are not valid. For invalid dimension combinations, no data will be returned. Below are the dimensions that can be combined.</p>
+                <p>You can request reports on multiple dimensions, but some combinations are not valid. For invalid dimension combinations, no data will be returned. Below are the supported dimension combinations.</p>
+                <ul id="dimensionCombinations">
+                    
+                </ul>
             </div>
             <div class="section" id="filterValues">
                 <h2>Where filters</h2>
@@ -259,27 +262,12 @@
     <script src="/en/scripts/docs-nav-data.min.js"></script>
     <script src="/en/scripts/bcls-doc-site.js"></script>
     <script src="/en/scripts/bclsfaq.js"></script>
+    <script src="/en/video-cloud/analytics-api/getting-started/assets/aapi-model.js"></script>
     <script id="pageScript" type="text/javascript">
     var BCLS = ( function () {
         var metricsTemplate = "{{#items}}<li>{{this}}</li>{{/items}}",
-            template = Handlebars.compile(metricsTemplate),
-            dimensions = ["account", "video", "player", "day", "destination_domain", "destination_path", "country", "city", "region", "referrer_domain", "source_type", "search_terms", "device_type", "device_os"],
-            filters = ["video", "player", "day", "destination_domain", "destination_path", "country", "city", "region", "referrer_domain", "source_type", "search_terms", "device_type", "device_os"],
-            baseFields = {"items": ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed"]},
-            accountFields = {"items": ["account", "active_media", "bytes_delivered", "bytes_in", "bytes_out", "bytes_overhead", "bytes_player", "bytes_stored", "cdn_log_line", "chimera_report", "content_delivered", "drm_bytes_packaged", "engagement_score", "licenses_served", "play_rate", "player_load", "video_engagement_1", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_engagement_100", "video_impression", "video_percent_viewed", "video_seconds_viewed", "live_seconds_viewed", "video_view"]},
-            videoFields = {"items": baseFields.items.concat(["video", "video_name", "video_duration", "video_engagement", "video_engagement_1", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_engagement_100", "bytes_delivered", "content_delivered"])},
-            playerFields = {"items": baseFields.items.concat(["player", "player_name", "video_duration", "video_engagement", "video_engagement_1", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_engagement_100"])},
-            dayFields = {"items": ["account", "active_media", "bytes_delivered", "bytes_in", "bytes_out", "bytes_overhead", "bytes_player", "bytes_stored", "cdn_log_line", "chimera_report", "content_delivered", "day", "drm_bytes_packaged", "engagement_score", "licenses_served", "play_rate", "player_load", "video_engagement_1", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_engagement_100", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"]},
-            countryFields = {"items": baseFields.items.concat(["country", "country_name"])},
-            cityFields = {"items": baseFields.items.concat(["city"])},
-            regionFields = {"items": baseFields.items.concat(["region"])},
-            destination_domainFields = {"items": baseFields.items.concat(["destination_domain"])},
-            destination_pathFields = {"items": baseFields.items.concat(["destination_path"])},
-            referrer_domainFields = {"items": baseFields.items.concat(["player_load", "referrer_domain"])},
-            source_typeFields = {"items": baseFields.items.concat(["player_load", "source_type"])},
-            search_termsFields = {"items": baseFields.items.concat(["player_load", "search_terms"])},
-            device_typeFields = {"items": baseFields.items.concat(["player_load", "device_type"])},
-            device_osFields = {"items": baseFields.items.concat(["player_load", "device_os"])},
+            dimensionsTemplate = "{{#dimensions}}<li>{{this}}</li>{{/dimensions}}",
+            filtersTemplate = "{{#filters}}<li>{{this}}</li>{{/filters}}",
             $account = $("#account"),
             $player = $("#player"),
             $video = $("#video"),
@@ -289,25 +277,42 @@
             $city = $("#city"),
             $destination_domain = $("#destination_domain"),
             $destination_path = $("#destination_path"),
-            $dimensionsList = $("#dimensionsList")
+            $dimensionsList = $("#dimensionsList"),
+            $filtersList = $("#filtersList"),
             $referrer_domain = $("#referrer_domain"),
             $source_type = $("#source_type"),
             $search_terms = $("#search_terms"),
             $device_type = $("#device_type"),
-            $device_os = $("#device_os");
-            $account.html(template(accountFields));
-            $player.html(template(playerFields));
-            $video.html(template(videoFields));
-            $day.html(template(dayFields));
-            $country.html(template(countryFields));
-            $region.html(template(regionFields));
-            $city.html(template(cityFields));
-            $destination_domain.html(template(destination_domainFields));
-            $referrer_domain.html(template(referrer_domainFields));
-            $source_type.html(template(source_typeFields));
-            $search_terms.html(template(search_termsFields));
-            $device_type.html(template(device_typeFields));
-            $device_os.html(template(device_osFields));
+            $device_os = $("#device_os"),
+            dimensionCombinations = document.getElementById("dimensionCombinations"),
+            combination;
+        // set dimensions
+        template = Handlebars.compile(dimensionsTemplate);
+        $dimensionsList.html(template(aapi_model));
+        // set filters
+        template = Handlebars.compile(filtersTemplate);
+        $filtersList.html(template(aapi_model));
+        // set dimension combinations
+        console.log(aapi_model);
+        for (combination in aapi_model.dimensionCombinations) {
+            dimensionCombinations.innerHTML += "<li>" + aapi_model.dimensionCombinations[combination].join(",") + "</li>";
+        }
+        // set response fields
+        template = Handlebars.compile(metricsTemplate);
+        $account.html(template(aapi_model.accountFields));
+        $player.html(template(aapi_model.playerFields));
+        $video.html(template(aapi_model.videoFields));
+        $day.html(template(aapi_model.dayFields));
+        $country.html(template(aapi_model.countryFields));
+        $region.html(template(aapi_model.regionFields));
+        $city.html(template(aapi_model.cityFields));
+        $destination_domain.html(template(aapi_model.destination_domainFields));
+        $destination_path.html(template(aapi_model.destination_pathFields));
+        $referrer_domain.html(template(aapi_model.referrer_domainFields));
+        $source_type.html(template(aapi_model.source_typeFields));
+        $search_terms.html(template(aapi_model.search_termsFields));
+        $device_type.html(template(aapi_model.device_typeFields));
+        $device_os.html(template(aapi_model.device_osFields));
         return {}
     })();
     </script>
