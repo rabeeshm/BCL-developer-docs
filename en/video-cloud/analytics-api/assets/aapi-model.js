@@ -1,4 +1,4 @@
-var aapi_model =  {
+var aapi_model = {
         dimensions : ["account", "video", "player", "day", "destination_domain", "destination_path", "country", "city", "region", "referrer_domain", "source_type", "search_terms", "device_type", "device_os"],
         filters : ["video", "player", "day", "destination_domain", "destination_path", "country", "city", "region", "referrer_domain", "source_type", "search_terms", "device_type", "device_os"],
         baseFields : {items : ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed"]},
