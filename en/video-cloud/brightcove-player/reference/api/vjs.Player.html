@@ -84,7 +84,11 @@
 <li><a href="#currentType">currentType</a></li> <!--test-->
 <li><a href="#dispose">dispose</a></li>
 <li><a href="#duration-seconds-">duration</a></li>
+<li><a href="#ended">ended</a></li> <!--test-->
+<li><a href="#error">error</a></li> <!--test-->
+<li><a href="#exitFullscreen">exitFullscreen</a></li> <!--test-->
 <li><a href="#init-tag-options-ready-">init</a></li>
+<li><a href="#isFullscreen">isFullscreen</a></li> <!--test-->
 <li><a href="#muted-muted-">muted</a></li>
 <li><a href="#pause">pause</a></li>
 <li><a href="#paused">paused</a></li>
@@ -102,10 +106,13 @@
 <li><a href="#contentel">contentEl</a> <em><code>inherited</code></em></li>
 <li><a href="#createel-tagname-attributes-">createEl</a> <em><code>inherited</code></em></li>
 <li><a href="#dimensions-width-height-">dimensions</a> <em><code>inherited</code></em></li>
-<li><a href="#disable">disable</a> <em><code>inherited</code></em></li>
+<!--<li><a href="#disable">disable</a> <em><code>inherited</code></em></li>-->
 <li><a href="#el">el</a> <em><code>inherited</code></em></li>
+<li><a href="#enableTouchActivity">enableTouchActivity</a> <em><code>inherited</code></em></li> <!--test-->
+<li><a href="#exitFullscreen">exitFullscreen</a> <em><code>inherited</code></em></li> <!--test-->
 <li><a href="#getchild-name-">getChild</a> <em><code>inherited</code></em></li>
 <li><a href="#getchildbyid-id-">getChildById</a> <em><code>inherited</code></em></li>
+<li><a href="#hasClass">hasClass</a> <em><code>inherited</code></em></li><!--test-->
 <li><a href="#height-num-skiplisteners-">height</a> <em><code>inherited</code></em></li>
 <li><a href="#hide">hide</a> <em><code>inherited</code></em></li>
 <li><a href="#id">id</a> <em><code>inherited</code></em></li>
@@ -558,6 +565,7 @@ myPlayer.currentTime(120); // 2 minutes into the video
 
 <hr>
 
+<!--
 <h3 id="disable">disable()</h3>
 
 <blockquote>
@@ -567,6 +575,7 @@ myPlayer.currentTime(120); // 2 minutes into the video
 <p><em>inherited from</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/component.js#L691">src/js/component.js#L691</a></p>
 
 <hr>
+-->
 
 <h3 id="dispose">dispose()</h3>
 
@@ -628,10 +637,83 @@ playing.</p>
 <li><code>Element</code> </li>
 </ul>
 
-<p><em>inherited from</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/component.js#L201">src/js/component.js#L201</a></p>
+<p><em>inherited from</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/component.js#L220"> src/js/component.js#L220</a></p>
 
 <hr>
 
+<h3 id="enableTouchActivity">enableTouchActivity()</h3>
+
+<blockquote>
+<p>Report user touch activity when touch events occur</p>
+<p>User activity is used to determine when controls should show/hide. It's relatively simple when it comes to mouse events, because any mouse event should show the controls. So we capture mouse events that bubble up to the player and report activity when that happens.</p>
+<p>With touch events it isn't as easy. We can't rely on touch events at the player level, because a tap (touchstart + touchend) on the video itself on mobile devices is meant to turn controls off (and on). User activity is checked asynchronously, so what could happen is a tap event on the video turns the controls off, then the touchend event bubbles up to the player, which if it reported user activity, would turn the controls right back on. (We also don't want to completely block touch events from bubbling up)</p>
+<p>Also a touchmove, touch+hold, and anything other than a tap is not supposed to turn the controls back on on a mobile device.</p>
+<p>Here we're setting the default component behavior to report user activity whenever touch events happen, and this can be turned off by components that want touch events to act differently.</p>
+
+</blockquote>
+
+<p><em>inherited from</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/component.js#L1120"> src/js/component.js#L1120</a></p>
+
+<hr>
+	
+<h3 id="ended">ended()</h3>
+
+<blockquote>
+<p>Returns whether or not the player is in the "ended" state</p>
+</blockquote>
+	
+<h5>RETURNS:</h5>
+
+<ul>
+<li><code>Boolean</code> True if the player is in the ended state, false if not</li>
+</ul>
+
+<p><em>defined in</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/player.js#L1476">src/js/player.js#L1476</a></p>
+
+<hr>
+	
+<h3 id="error">error( err )</h3>
+
+<blockquote>
+<p>Set or get the current MediaError</p>
+</blockquote>
+	
+<h5>PARAMETERS:</h5>
+
+<ul>
+<li><strong>err</strong> <code>*</code> A MediaError or a String/Number to be turned into a MediaError</li>
+</ul>
+	
+<h5>RETURNS:</h5>
+
+<ul>
+<li><code>vjs.MediaError|null</code> when getting</li>
+<li><code>vjs.Player</code> when setting</li>
+</ul>
+
+<p><em>defined in</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/player.js#L1440">src/js/player.js#L1440</a></p>
+
+<hr>
+	
+<h3 id="exitFullscreen">exitFullscreen()</h3>
+
+<blockquote>
+<p>Return the video to its normal size after having been in full screen mode</p>
+</blockquote>
+	
+<pre><code>myPlayer.exitFullscreen();
+</code></pre>
+	
+<h5>RETURNS:</h5>
+
+<ul>
+<li><code>vjs.Player</code> self</li>
+</ul>
+
+<p><em>defined in</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/player.js#L1017">src/js/player.js#L1017</a></p>
+
+<hr>
+	
 <h3 id="getchild-name-">getChild( name )</h3>
 
 <blockquote>
@@ -650,7 +732,7 @@ playing.</p>
 <li><code>vjs.Component</code> </li>
 </ul>
 
-<p><em>inherited from</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/component.js#L311">src/js/component.js#L311</a></p>
+<p><em>inherited from</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/component.js#L330">src/js/component.js#L330</a></p>
 
 <hr>
 
@@ -672,7 +754,29 @@ playing.</p>
 <li><code>vjs.Component</code> </li>
 </ul>
 
-<p><em>inherited from</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/component.js#L294">src/js/component.js#L294</a></p>
+<p><em>inherited from</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/component.js#L313">src/js/component.js#L313</a></p>
+
+<hr>
+	
+<h3 id="hasClass">hasClass( classToCheck )</h3>
+
+<blockquote>
+<p>Check if a component's element has a CSS class name</p>
+</blockquote>
+
+<h5>PARAMETERS:</h5>
+
+<ul>
+<li><strong>classToCheck</strong> <code>String</code> Classname to check</li>
+</ul>
+
+<h5>RETURNS:</h5>
+
+<ul>
+<li><code>vjs.Component</code> </li>
+</ul>
+
+<p><em>inherited from</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/component.js#L816">src/js/component.js#L816</a></p>
 
 <hr>
 
@@ -701,7 +805,7 @@ not the actual computed width/height.</p>
 <li><code>Number|String</code> The height, when getting</li>
 </ul>
 
-<p><em>inherited from</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/component.js#L726">src/js/component.js#L726</a></p>
+<p><em>inherited from</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/component.js#L927">src/js/component.js#L927</a></p>
 
 <hr>
 
@@ -717,7 +821,7 @@ not the actual computed width/height.</p>
 <li><code>vjs.Component</code> </li>
 </ul>
 
-<p><em>inherited from</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/component.js#L659">src/js/component.js#L659</a></p>
+<p><em>inherited from</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/component.js#L857">src/js/component.js#L857</a></p>
 
 <hr>
 
@@ -736,7 +840,7 @@ not the actual computed width/height.</p>
 <li><code>String</code> </li>
 </ul>
 
-<p><em>inherited from</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/component.js#L239">src/js/component.js#L239</a></p>
+<p><em>inherited from</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/component.js#L258">src/js/component.js#L258</a></p>
 
 <hr>
 
@@ -770,12 +874,62 @@ MyComponent.prototype.options_.children = {
     myChildOption: true
   }
 }
-</code></pre>
+
+// Or when creating the component
+var myComp = new MyComponent(player, {
+  children: {
+    myChildComponent: {
+      myChildOption: true
+    }
+  }
+});</code></pre>
+<p>The children option can also be an Array of child names or child options objects (that also include a 'name' key).</p>
+<pre><code>var myComp = new MyComponent(player, {
+  children: [
+    'button',
+    {
+      name: 'button',
+      someOtherOption: true
+    }
+  ]
+});</code></pre>
 </blockquote>
 
-<p><em>inherited from</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/component.js#L439">src/js/component.js#L439</a></p>
+<p><em>inherited from</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/component.js#L481">src/js/component.js#L481</a></p>
 
 <hr>
+	
+<h3 id="isFullscreen">isFullscreen( [isFS] )</h3>
+
+<blockquote>
+<p>Check if the player is in fullscreen mode</p>
+
+<pre><code>// get
+var fullscreenOrNot = myPlayer.isFullscreen();
+
+// set
+myPlayer.isFullscreen(true); // tell the player it's in fullscreen
+</code></pre>
+<p>NOTE: As of the latest HTML5 spec, isFullscreen is no longer an official property and instead document.fullscreenElement is used. But isFullscreen is still a valuable property for internal player workings.</p>
+</blockquote>
+
+<h5>PARAMETERS:</h5>
+
+<ul>
+<li><strong>isFS</strong> <code>Boolean</code> <em>(OPTIONAL)</em> Update the player's fullscreen state</li>
+</ul>
+
+<h5>RETURNS:</h5>
+
+<ul>
+<li><code>Boolean</code>  true if fullscreen, false if not</li>
+<li><code>vjs.Player</code> self, when setting</li>
+</ul>
+
+<p><em>defined in</em>: <a href="https://github.com/videojs/video.js/blob/master/src/js/player.js#L928">src/js/player.js#L928</a></p>
+
+<hr>
+
 
 <h3 id="muted-muted-">muted( [muted] )</h3>
 
