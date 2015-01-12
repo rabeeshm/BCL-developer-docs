@@ -58,9 +58,8 @@
 				<h2>Getting Credentials</h2>
 				<p>To get a <code>client_id</code> and <code>client_secret</code>, you will need to go to the OAuth UI and register this app:</p>
 					<ul>
-						<li>Video Cloud: <a href="https://sadmin.brightcove.com/oauth_module/v1/">https://sadmin.brightcove.com/oauth_module/v1/</a></li>
 						<li>
-							Video Cloud (Next Generation Player Beta): <a href="https://studio.brightcove.com/products/videocloud/admin/oauthsettings">https://studio.brightcove.com/products/videocloud/admin/oauthsettings</a>
+							<a href="https://studio.brightcove.com/products/videocloud/admin/oauthsettings">https://studio.brightcove.com/products/videocloud/admin/oauthsettings</a>
 						</li>
 					</ul>
 				<p>You can also get your credentials via CURL or Postman - see:</p>
@@ -122,7 +121,12 @@
 				    				Client secret: (defaults to Brightcove sample account)
 				    				<input name="client_secret" id="client_secret" type="text" value="">
 				    			</p>
-
+								<p>
+									Ingest profile:
+									<select id="ingest_profile_display"></select>
+									<br>or Custom Profile:
+									<input id="custom_profile_display" name="custom_profile_display" type="text" value="balanced-high-definition-with-image-renditions"> (you must use the name exactly as it appears in the Video Cloud system, or the request will fail)
+								</p>
 				    			<p>
 				    				Full request URL for the CMS API call:<br />
 				    				<textarea name="url" id="cms_url"></textarea>
@@ -176,10 +180,14 @@
 			client_id,
 			client_secret_display = document.getElementById("client_secret"),
 			client_secret,
+			ingest_profile_display = document.getElementById("ingest_profile_display"),
+			ingest_profile,
+			custom_profile_display = document.getElementById("custom_profile_display"),
 			cms_url_display = document.getElementById("cms_url"),
 			cmsURL = "http://solutions.brightcove.com:8006",
 			videoDataDisplay = document.getElementById("videoData"),
 			// Dynamic Ingest API stuff
+			profilesArray = ["balanced-high-definition", "balanced-standard-definition", "Express Standard", "Live - HD", "Live - Premium HD", "Live - Standard", "audio-only", "high-bandwidth-devices", "low-bandwidth-devices", "mp4-only", "screencast", "single-rendition"],
 			di_url_display = document.getElementById("di_url"),
 			di_submit_display = document.getElementById("di_Submit"),
 			diURL = "http://solutions.brightcove.com:8004",
@@ -193,12 +201,12 @@
 			defaults = {account_id: 57838016001,client_id: "37cd3c5d-6f18-4702-bfb6-4fbc1cd095f1",client_secret: "gLSQANqe6A2PzJce_6xA4bTNu844up5-CSrC-jxNfur4EaOgWKRcqq_GTxKjhMpPSflMdNEhFdBmNe0qsTIZSQ"},
 			// functions
 			isDefined,
-			cleanString,
 			logResponse,
 			doIngest,
 			submitRequest,
 			setCMSOptions,
-			setDIOptions;
+			setDIOptions,
+			init;
 
 		// is defined
 		isDefined = function(x){
@@ -207,12 +215,6 @@
 			} else{
 			    return false;
 			}
-		};
-		// function to remove spaces from string
-		cleanString = function (str) {
-			// remove spaces
-			str = str.replace(/\s/g, "");
-			return str;
 		};
 		// set options for the CMS API request
 		setCMSOptions = function () {
@@ -229,10 +231,17 @@
 		};
 	    // set options for the Dynamic Ingest API request
 		setDIOptions = function () {
-			var options = {};
+			var options = {},
+				custom_profile_display_value = custom_profile_display.value;
+			// get the ingest profile
+			if (isDefined(custom_profile_display_value)) {
+				ingest_profile = custom_profile_display_value;
+			} else {
+				ingest_profile = ingest_profile_display.options[ingest_profile_display.selectedIndex].value;
+			}
 			options.client_id = client_id;
 			options.client_secret = client_secret;
-			options.requestBody = '{"master":{"url":"' + videoData[videoNumber].url +'"},"profile":"balanced-high-definition-with-image-renditions"}';
+			options.requestBody = '{"master":{"url":"' + videoData[videoNumber].url +'"},"profile":"' + ingest_profile + '"}';
 			options.requestType = "POST"
 			options.url = di_url_display.value;
 			// now submit the request
@@ -316,6 +325,19 @@
 			// set CMS API options for first video
 			setCMSOptions();
 		});
+		// initialize
+		init = function () {
+			var i,
+				iMax = profilesArray.length,
+				newOpt;
+			// add options for standard ingest profiles
+			for (i = 0; i < iMax; i++) {
+				newOpt = new Option(profilesArray[i]);
+				ingest_profile_display.add(newOpt);
+			}
+		}
+		// call init to set things up
+		init();
 	})(window, document);
 	</script>
 </body>
