@@ -127,20 +127,15 @@
                             <td><a href="#geo">geo object</a></td>
                             <td>no</td>
                             <td>see <a href="#geo">geo object</a></td>
-                            <td>if geo-restriction is enabled for the account, this object will contain geo-restriction properties for the video</td>
+                            <td>if geo-restriction is enabled for the account<sup class="once-red"><strong><a href="#note1-3">[1-3]</a></strong></sup>, this object will contain geo-restriction properties for the video</td>
                         </tr>
                         <tr>
                             <td>images</td>
-                            <td>map of image objects</td>
+                            <td>map of image objects<sup class="once-red"><strong><a href="#note1-4">[1-4]</a></strong></sup></td>
                             <td>no</td>
                             <td>empty object</td>
                             <td>
-                                <p>each property is a object name, with properties <code>id</code> and <code>src</code>:</p>
-<pre><code>"poster" : {
-  "id" : "3984091889001",
-  "src" : "http://brightcove.vo.llnwd.net/v1/unsecured/media/57838016001/57838016001_3984091889001_greathornedowl-vs.jpg?pubId=57838016001"
-}</code></pre>
-                                <p>Note that you can <strong>not</strong> add remote images by updating the <code>src</code> attribute. Remote image files must be ingested via the <a href="//docs.brightcove.com/en/video-cloud/di-api/index.html">Dynamic Ingest API</a>. The functionality to add images does not yet exist, but will be added to the Dynamic Ingest API.</p>
+
                             </td>
                         </tr>
                         <tr>
@@ -218,6 +213,16 @@
                 <h3>Notes</h3>
                 <li id="note1-1"><sup class="once-red"><strong>[1-1]</strong></sup> Note that that a scheduled video is <strong>not</strong> inactive outside the period of scheduled availability</li>
                 <li id="note1-2"><sup class="once-red"><strong>[1-2]</strong></sup> The modification may have been made by a user or the Video Cloud system</li>
+                <li id="note1-3"><sup class="once-red"><strong>[1-3]</strong></sup> Geo-restriction is a paid add-on to Video Cloud; if you want to purchase geo-restriction capability, contact your Account Manager</li>
+                <li id="note1-4"><sup class="once-red"><strong>[1-4]</strong></sup>
+                    <p>Each property of the images object is a named object with properties <code>id</code> and <code>src</code>:</p>
+<pre><code>"poster" : {
+  "id" : "3984091889001",
+  "src" : "http://brightcove.vo.llnwd.net/v1/unsecured/media/57838016001/57838016001_3984091889001_greathornedowl-vs.jpg?pubId=57838016001"
+}</code></pre>
+                                <p>Currently the only supported image objects are "poster" and "thumbnail".</p>
+                                <p>Note that you can <strong>not</strong> add remote images by updating the <code>src</code> attribute. Remote image files must be ingested via the <a href="//docs.brightcove.com/en/video-cloud/di-api/index.html">Dynamic Ingest API</a>. The functionality to add images does not yet exist, but will be added to the Dynamic Ingest API.</p>
+                </li>
         </div>
         <div class="section" id="cue_point">
             <h2>Cue point object</h2>
@@ -236,46 +241,190 @@
                         <td>name</td>
                         <td>string</td>
                         <td>no</td>
-                        <td></td>
-                        <td></td>
+                        <td>null</td>
+                        <td>optional name for the cue point</td>
                     </tr>
                     <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td>type</td>
+                        <td>string</td>
+                        <td>no</td>
+                        <td>AD</td>
+                        <td>AD or CODE</td>
                     </tr>
                     <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td>time</td>
+                        <td>number</td>
+                        <td>no</td>
+                        <td>none</td>
+                        <td>time of the cue point in seconds; example: 10.527</td>
                     </tr>
                     <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td>metadata</td>
+                        <td>string</td>
+                        <td>no</td>
+                        <td>null</td>
+                        <td>optional metadata string; 128 single-byte characters maximum</td>
                     </tr>
                     <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td>force-stop</td>
+                        <td>boolean</td>
+                        <td>no</td>
+                        <td>false</td>
+                        <td>whether video is force-stopped at the cue point</td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+        <div class="section" id="geo">
+            <h2>geo object</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Read-only</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>countries</td>
+                        <td>array of strings</td>
+                        <td>no</td>
+                        <td>null</td>
+                        <td><a href="https://www.iso.org/obp/ui/#search">ISO 3166 list of 2-letter codes</a> for countries that will be whitelisted or blacklisted for viewing the video</td>
+                    </tr>
+                    <tr>
+                        <td>exclude_countries</td>
+                        <td>boolean</td>
+                        <td>no</td>
+                        <td>false</td>
+                        <td>if true, country array is treated as a list of countries excluded from viewing</td>
+                    </tr>
+                    <tr>
+                        <td>restricted</td>
+                        <td>boolean</td>
+                        <td>no</td>
+                        <td>false</td>
+                        <td>whether geo-restriction is enabled for thie video</td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+        <div class="section" id="link">
+            <h2>link object</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Read-only</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>text</td>
+                        <td>string</td>
+                        <td>no</td>
+                        <td>null</td>
+                        <td>Display text for the link</td>
+                    </tr>
+                    <tr>
+                        <td>url</td>
+                        <td>string</td>
+                        <td>no</td>
+                        <td>null</td>
+                        <td>URL for the link</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="section" id="schedule">
+            <h2>schedule object</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Read-only</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ends_at</td>
+                        <td>ISO 8601 date-time string</td>
+                        <td>no</td>
+                        <td>null</td>
+                        <td>date-time when video will become unavailable</td>
+                    </tr>
+                    <tr>
+                        <td>starts_at</td>
+                        <td>ISO 8601 date-time string</td>
+                        <td>no</td>
+                        <td>null</td>
+                        <td>date-time when video will become available</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="section" id="sharing">
+            <h2>sharing object</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Read-only</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>by_external_acct</td>
+                        <td>boolean</td>
+                        <td>yes</td>
+                        <td>false</td>
+                        <td>whether the video was shared from another account</td>
+                    </tr>
+                    <tr>
+                        <td>by_id</td>
+                        <td>string</td>
+                        <td>yes</td>
+                        <td>null</td>
+                        <td>id of the account that shared the video</td>
+                    </tr>
+                    <tr>
+                        <td>source_id</td>
+                        <td>string</td>
+                        <td>yes</td>
+                        <td>null</td>
+                        <td>id of the video in its original account</td>
+                    </tr>
+                    <tr>
+                        <td>to_external_acct</td>
+                        <td>boolean</td>
+                        <td>yes</td>
+                        <td>false</td>
+                        <td>whether the video is shared to another account</td>
+                    </tr>
+                    <tr>
+                        <td>by_reference</td>
+                        <td>boolean</td>
+                        <td>yes</td>
+                        <td>false</td>
+                        <td>whether the video is shared by reference<sup class="once-red"><strong><a href="#notesharing-1">[sharing-1]</a></strong></sup></td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Notes</h3>
+            <li id="notesharing-1"><sup class="once-red"><strong>[sharing-1]</strong></sup> When a video is shared by reference, replacing or retranscoding the video in the original account will automatically update the renditions in the shared-to account</li>
         </div>
 		<div class="section" id="BCLreferences">
 			<h2>Related topics</h2>
