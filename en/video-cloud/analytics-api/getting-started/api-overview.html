@@ -70,6 +70,21 @@
 <pre><code>Authorization: Bearer {access_token}</code></pre>
                 <p>The <code>access_token</code> expires after five minutes, so you must obtain a new one for each request, or check to make sure that your token is still valid. See the <a href="quick-start.html">Analytics API Quick Start</a> for a tutorial that walks you through obtaining client credentials and access token, and then making an API call. See the </p>
             </div>
+            <div class="section" id="concurrency">
+                <h2>Concurrent Requests</h2>
+                <p>The number of concurrent requests for reports on the same account is limited to a single request at a time.</p>
+                <p>For example:
+                <ol>
+                    <li>Start an API request "A"</li>
+                    <li>Start API request "B" for the same account</li>
+                    <li>Request "B" will not complete until "A" completes.</li>
+                    <li>If request "A" takes too long request "A" will receive an error saying "your request is pending try again".</li>
+                    <li>If request "A" takes too long it may cause request "B" to receive the same error. Note that request "B" will get an error if the time to complete A + B is greater than our timeout value. </li>
+                </ol>
+                <p>If you make a multiple of concurrent requests we will handle them roughly one at a time.</p>
+                <p>Reports that received the "pending error" will be completed and saved into cache, this means that a future request for the same report will return instantly as long as its the same report request, and it was made before the cache expired.</p>
+                <p>Your system should handle the pending error by waiting a small period of time and making the same request again.</p>
+            </div>
             <div class="section" id="requestTypes">
                 <h2>Request types</h2>
                 <p>The Analytics API accepts two request types</p>
