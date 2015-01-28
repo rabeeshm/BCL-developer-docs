@@ -1,17 +1,11 @@
 var BCLS = (function ($, Handlebars) {
     "use strict";
     var callNumber = 0,
-        $accountID = $("#accountID"),
+        accountID = 20318290001,
         $token = $("#token"),
         $playerSelector = $("#playerSelector"),
-        $videoSelector = $("#videoSelector"),
-        $geoSelector = $("#geoSelector"),
-        $sortSelector = $("#sortSelector"),
         $reportTableBody = $("#reportTableBody"),
-        $fromDate = $("#fromDatePicker"),
-        $toDate = $("#toDatePicker"),
-        $limit = $("#limit"),
-        $offset = $("#offset"),
+        fromDate = "2015-01-19",
         $getData = $("#getData"),
         $gettingDataDisplay = $("#gettingDataDisplay"),
         $video_player_info = $("#video_player_info"),
@@ -21,13 +15,13 @@ var BCLS = (function ($, Handlebars) {
         analyticsData = {},
         chartData = [],
         dataDisplayBodyTemplate = "{{#items}}<tr><td>{{player_name}}</td><td>{{video_view}}</td><td>{{play_rate}}</td><td>{{average_seconds_viewed}}</td><td>{{engagement_score}}</td></tr>{{/items}}",
-        playerSelectTemplate = "<option value=\"\">Select a player</option>{{#items}}<option value=\"{{player}}\">{{player_name}}</options>{{/items}}",
-        videoSelectTemplate = "<option value=\"\">Select a video</option>{{#items}}<option value=\"{{video}}\">{{video_name}}</options>{{/items}}",
-        callType,
         // more robust test for strings "not defined"
-        isDefined =  function (v) {
-            if(v !== "" && v !== null && v !== "undefined") { return true; }
-            else { return false; }
+        isDefined = function (v) {
+            if (v !== "" && v !== null && v !== "undefined") {
+                return true;
+            } else {
+                return false;
+            }
         },
         displayData = function () {
             var displayStr, template, results;
@@ -46,7 +40,7 @@ var BCLS = (function ($, Handlebars) {
             results = template(analyticsData);
             $reportTableBody.html(results);
             // chart
-            $.plot("#chartView", [ chartData] , {
+            $.plot("#chartView", [chartData], {
                 series: {
                     bars: {
                         show: true,
@@ -64,13 +58,13 @@ var BCLS = (function ($, Handlebars) {
             // clear chart data
             chartData = [];
             $.ajax({
-            url: callURL,
-            headers: {
-                Authorization : "Bearer " + $token.val()
-            },
-            success : function (data) {
-                var template, i, itemsmax, item, selectedGeo = $geoSelector.val();
-                switch (callType) {
+                url: callURL,
+                headers: {
+                    Authorization: "Bearer " + $token.val()
+                },
+                success: function (data) {
+                    var template, i, itemsmax, item, selectedGeo = $geoSelector.val();
+                    switch (callType) {
                     case "players":
                         callNumber++;
                         template = Handlebars.compile(playerSelectTemplate);
@@ -98,10 +92,9 @@ var BCLS = (function ($, Handlebars) {
                         $gettingDataDisplay.text("Data retrieved - " + callNumber + " API calls made");
                         displayData();
                         break;
-                }
-            },
-            error : function (XMLHttpRequest, textStatus, errorThrown)
-                {
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
                     $gettingDataDisplay.text("Sorry, your request was not successful. Here's what the server sent back: " + errorThrown);
                 }
             });
@@ -111,86 +104,12 @@ var BCLS = (function ($, Handlebars) {
             var callURL;
             $gettingDataDisplay.text("Getting analytics data...");
             callType = "analytics";
-            currentPlayer = $playerSelector.val();
-            currentVideo = $videoSelector.val();
-            callURL = "https://data.brightcove.com/analytics-api/videocloud/accounts/" + $accountID.val()+ "/report/?dimensions=country,city,region&sort_by=" + $sortSelector.val();
+            callURL = "https://data.brightcove.com/analytics-api/videocloud/accounts/" + $accountID.val() + "/report/?dimensions=country,city,region&sort_by=" + $sortSelector.val();
 
-            if (isDefined($fromDate.val())) {
-                callURL += "&from=" + $fromDate.val();
-            }
-            if (isDefined($toDate.val())) {
-                callURL += "&to=" + $toDate.val();
-            }
-            if (isDefined(currentPlayer)) {
-                if (isDefined(currentVideo)) {
-                    callURL += "&where=player==" + currentPlayer + ";video==" + currentVideo;
-                } else {
-                    callURL += "&where=player==" + currentPlayer;
-                }
-            } else if (isDefined(currentVideo)) {
-                callURL += "video==" + currentVideo;
-            }
-            if (isDefined($limit.val())) {
-                callURL += "&limit=" + $limit.val();
-            }
-            if (isDefined($offset.val())) {
-                callURL += "&offset=" + $offset.val();
-            }
-            $requestURL.text(callURL);
-            makeAnalyticsCall(callURL);
 
         },
-        /** get the videos for the time period
-        * note the limit of 200 videos - to get more simply
-        * change that value, or you could provide an additional field
-        * to let the user decide how many to retrieve
-        */
-        getVideoData = function () {
-            var callURL = "";
-            $gettingDataDisplay.text("Getting video data...");
-            callType = "videos";
-            callURL = "https://data.brightcove.com/analytics-api/videocloud/accounts/" + $accountID.val()+ "/report/?dimensions=video&limit=200&fields=video,video_name&sort=video_view";
-            makeAnalyticsCall(callURL);
-        },
-        /** get the players for the time period
-        * note the limit of 100 players - to get more simply
-        * change that value, or you could provide an additional field
-        * to let the user decide how many to retrieve
-        */
-        getPlayersData = function () {
-            var callURL = "";
-            $gettingDataDisplay.text("Getting player data...");
-            callType = "players";
-            callURL = "https://data.brightcove.com/analytics-api/videocloud/accounts/" + $accountID.val()+ "/report/?dimensions=player&limit=100&fields=player,player_name&sort=video_view";
-            makeAnalyticsCall(callURL);
-        };
-    // add date pickers to the date input fields
-    new datepickr ("fromDatePicker", {
-        "fullCurrentMonth": false,
-        "dateFormat": "Y-m-d"
-    });
-    new datepickr ("toDatePicker", {
-        "fullCurrentMonth": false,
-        "dateFormat": "Y-m-d"
-    });
 
-    // set event listeners
-
-    $videoSelector.on("change", function () {
-        $playerSelector.val(0);
-        getAnalyticsData();
-    });
-    $playerSelector.on("change", function () {
-        $videoSelector.val(0);
-        getAnalyticsData();
-    });
-    $getData.on("click", getAnalyticsData);
-    $token.on("blur", function () {
-        // refetch player and video data
-        getPlayersData();
-    })
-    // get initial players and video data
-    getPlayersData();
-    return {
-    };
+        // set event listeners
+        $getData.on("click", getAnalyticsData);
+    return {};
 })($, Handlebars);
