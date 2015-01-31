@@ -191,23 +191,23 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             if (index > 0) {
                 $this = $(this);
                 switch (product) {
-                    case "video-cloud":
-                        if (!$this.hasClass("perform-only")) {
-                            navObj = {};
-                            navObj.link = $this.attr("id");
-                            navObj.text = $this.find("h2:first").text();
-                            navLabel.push(navObj);
-                        }
-                        break;
-                    case "perform":
-                        if (!$this.hasClass("video-cloud-only")) {
-                            navObj = {};
-                            navObj.link = $this.attr("id");
-                            navObj.text = $this.find("h2:first").text();
-                            navLabel.push(navObj);
-                        }
-                        break;
-                    default:
+                case "video-cloud":
+                    if (!$this.hasClass("perform-only")) {
+                        navObj = {};
+                        navObj.link = $this.attr("id");
+                        navObj.text = $this.find("h2:first").text();
+                        navLabel.push(navObj);
+                    }
+                    break;
+                case "perform":
+                    if (!$this.hasClass("video-cloud-only")) {
+                        navObj = {};
+                        navObj.link = $this.attr("id");
+                        navObj.text = $this.find("h2:first").text();
+                        navLabel.push(navObj);
+                    }
+                    break;
+                default:
                     navObj = {};
                     navObj.link = $this.attr("id");
                     navObj.text = $this.find("h2:first").text();
@@ -269,9 +269,9 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         }
         if (exists(sectionName)) {
             if (section === "video-cloud" || section === "perform" || section === "player-management") {
-                str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + sectionName.toLowerCase() + "/index.html\"><strong>" + sectionName + "</strong></a></li>";
+                str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + sectionName.toLowerCase() + "/index.html\"><strong>" + sectionName.replace("-", " ") + "</strong></a></li>";
             } else {
-                str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + section + "/index.html\"><strong>" + section + "</strong></a></li>";
+                str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + section + "/index.html\"><strong>" + section.replace("-", " ") + "</strong></a></li>";
             }
         }
         if (exists(subsection)) {
@@ -572,8 +572,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                         sectionName = "player-management";
                     } else if (section === "studio-prerelease") {
                         sectionName = "Studio (pre-release)";
-                        if (pathArray[3] === "index.html") {
-                        }
+                        if (pathArray[3] === "index.html") {}
                     } else {
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
                     }
@@ -598,13 +597,13 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 subsubsection = pathArray[4];
                                 // set subsubsection name
                                 switch (subsubsection) {
-                                    case "guides":
+                                case "guides":
                                     subsubsectionName = "Guides";
                                     if (pathArray[5] === "index.html") {
                                         createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
                                     }
                                     break;
-                                    case "samples":
+                                case "samples":
                                     subsubsectionName = "Code Samples";
                                     if (pathArray[5] === "index.html") {
                                         createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
@@ -623,13 +622,13 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 subsubsection = pathArray[4];
                                 // set subsubsection name
                                 switch (subsubsection) {
-                                    case "guides":
+                                case "guides":
                                     subsubsectionName = "Guides";
                                     if (pathArray[5] === "index.html") {
                                         createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
                                     }
                                     break;
-                                    case "samples":
+                                case "samples":
                                     subsubsectionName = "Code Samples";
                                     if (pathArray[5] === "index.html") {
                                         createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
@@ -656,16 +655,16 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 subsubsection = pathArray[4];
                                 // set subsubsection name
                                 switch (subsubsection) {
-                                    case "creating-players":
+                                case "creating-players":
                                     subsubsectionName = "Create Players";
                                     break;
-                                    case "getting-started":
+                                case "getting-started":
                                     subsubsectionName = "Get Started";
                                     break;
-                                    case "managing-accounts":
+                                case "managing-accounts":
                                     subsubsectionName = "Manage Accounts";
                                     break;
-                                    case "publishing-players":
+                                case "publishing-players":
                                     subsubsectionName = "Publish Player";
                                     break;
                                 }
@@ -687,7 +686,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 // we're in a subsubsection
                                 subsubsection = pathArray[4];
                                 switch (subsubsection) {
-                                    case "getting-started":
+                                case "getting-started":
                                     subsubsectionName = "Get Started";
                                     break;
                                 }
@@ -709,7 +708,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 // we're in a subsubsection
                                 subsubsection = pathArray[4];
                                 switch (subsubsection) {
-                                    case "getting-started":
+                                case "getting-started":
                                     subsubsectionName = "Get Started";
                                     break;
                                 }
@@ -876,13 +875,13 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 subsubsection = pathArray[4];
                                 // set subsubsection name
                                 switch (subsubsection) {
-                                    case "guides":
+                                case "guides":
                                     subsubsectionName = "Guides";
                                     if (pathArray[5] === "index.html") {
                                         createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
                                     }
                                     break;
-                                    case "samples":
+                                case "samples":
                                     subsubsectionName = "Code Samples";
                                     if (pathArray[5] === "index.html") {
                                         createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
@@ -902,13 +901,13 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 subsubsection = pathArray[4];
                                 // set subsubsection name
                                 switch (subsubsection) {
-                                    case "guides":
+                                case "guides":
                                     subsubsectionName = "Guides";
                                     if (pathArray[5] === "index.html") {
                                         createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
                                     }
                                     break;
-                                    case "samples":
+                                case "samples":
                                     subsubsectionName = "Code Samples";
                                     if (pathArray[5] === "index.html") {
                                         createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
