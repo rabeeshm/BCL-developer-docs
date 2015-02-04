@@ -198,14 +198,25 @@
 			t2,
 			totalIngested = 0,
 			defaults = {account_id: 57838016001,client_id: "37cd3c5d-6f18-4702-bfb6-4fbc1cd095f1",client_secret: "gLSQANqe6A2PzJce_6xA4bTNu844up5-CSrC-jxNfur4EaOgWKRcqq_GTxKjhMpPSflMdNEhFdBmNe0qsTIZSQ"},
+			callbacks = '["http://solutions.brightcove.com/bcls/di-api/di-callbacks.php"]',
 			// functions
 			isDefined,
 			logResponse,
+			bclslog,
 			doIngest,
 			submitRequest,
 			setCMSOptions,
 			setDIOptions,
 			init;
+
+		/*************************
+		logging
+		*************************/
+		bclslog = function (context, message) {
+		    if (window["console"] && console["log"]) {
+		      console.log(context, message);
+		    };
+		};
 
 		// is defined
 		isDefined = function(x){
@@ -240,7 +251,8 @@
 			}
 			options.client_id = client_id;
 			options.client_secret = client_secret;
-			options.requestBody = '{"master":{"url":"' + videoData[videoNumber].url +'"},"profile":"' + ingest_profile + '"}';
+			options.requestBody = '{"master":{"url":"' + videoData[videoNumber].url +'"},"profile":"' + ingest_profile + '","callbacks":' + callbacks + '}';
+			bclslog("di request body ", options.requestBody);
 			options.requestType = "POST"
 			options.url = di_url_display.value;
 			// now submit the request

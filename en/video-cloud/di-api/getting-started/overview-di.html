@@ -219,14 +219,14 @@
                 <h2>DRM and HLSe</h2>
                 <p>Dynamic Ingest handles videos that use any of the DRM types supported by Brightcove. HLSe is also supported.</p>
             </div>
-            <div class="section" id="errorNotifications">
-                <h2>Error notifications</h2>
-                <p>You can specify a callback URL to receive error notications in case anything goes wrong during the ingest process. The URL you specify should be for an app than can accept POST requests. The error notications will be sent in JSON format.</p>
+            <div class="section" id="notifications">
+                <h2>Notifications</h2>
+                <p>You can specify a one or more callback URLs to receive notications of the results of the ingest process. The URLs you specify should be for apps than can accept POST requests. Notications will be sent in JSON format.</p>
                 <p class="BCL-aside">Note: up to 10 subscribers for error notifications are supported. You can include more than 10 URLs to have notifications sent to, but only the first 10 will be processed.</p>
                 <p>Here’s an example. For a user with pub id 1234567890123 who wants to use Dynamic Ingest to upload a source video file located at https://s3.amazonaws.com/bucket/mysourcevideo.mp4 to an existing title in the catalog with video id 99988877766655 using the balanced-high-definition profile and who, furthermore, wants to receive callbacks at two endpoints located at http://host1/path1 and http://host2/path2 respectively, the DI request would be like this:</p>
 
                 <pre>
-                    <code>POST https://ingest.api.brightcove.com/v1/accounts/1234567890123/videos/99988877766655/ingest-requests { "master": { "url": "https://s3.amazonaws.com/bucket/mysourcevideo.mp4" }, "profile": "balanced-high-definition", "callbacks": [ "http://host1/path1”, “http://host2/path2”] }
+                    <code>POST https://ingest.api.brightcove.com/v1/accounts/1234567890123/videos/99988877766655/ingest-requests { "master": { "url": "https://s3.amazonaws.com/bucket/mysourcevideo.mp4" }, "profile": "balanced-high-definition", "callbacks": ["http://host1/path1”, “http://host2/path2”] }
                     </code>
                 </pre>
                 <p>The notification will include:</p>
@@ -243,13 +243,17 @@
                                 <code>status</code>
                             </td>
                             <td>will be
-                                <code>FAILED</code> if the ingest or creation of a rendition was not successful</td>
+                                <code>FAILED</code> if the ingest or creation of a rendition was not successful, <code>SUCCESS</code> if the request succeeded</td>
+                        </tr>
+                        <tr>
+                            <td>entity</td>
+                            <td>if it exists, the Video Cloud id of the asset that was ingested or failed (if the video object was successfully created in Video Cloud)</td>
                         </tr>
                         <tr>
                             <td>
                                 <code>errorMessage</code>
                             </td>
-                            <td>an explanation of why the ingest failed</td>
+                            <td>an explanation of why the ingest failed if it did</td>
                         </tr>
                         <tr>
                             <td>
@@ -261,6 +265,31 @@
                         </tr>
                     </tbody>
                 </table>
+                <p>Below is a simple PHP app for handling Dynamic Ingest notifications, followed by a sample of its output:</p>
+                <h3>PHP code</h3>
+                <div><script src="https://gist.github.com/da693cff4205ff80f91e.js"></script></div>
+                <h3>Sample output</h3>
+<pre><code>2015-02-04 21:04:50 UTC:
+Version: 1
+Entity: 4032679456001
+Type: ASSET
+Status: SUCCESS
+Action: CREATE
+-------------------------------
+2015-02-04 21:04:50 UTC:
+Version: 1
+Entity: 4032681133001
+Type: ASSET
+Status: SUCCESS
+Action: CREATE
+-------------------------------
+2015-02-04 21:04:50 UTC:
+Version: 1
+Entity: 4032681462001
+Type: ASSET
+Status: SUCCESS
+Action: CREATE
+-------------------------------</code></pre>
             </div>
             <div class="section" id="limitations">
                 <h2>Limitations</h2>
