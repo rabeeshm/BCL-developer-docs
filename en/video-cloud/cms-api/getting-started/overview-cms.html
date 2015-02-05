@@ -49,26 +49,23 @@
                 <!-- Place document intro sentence(s) here -->
                 <p class="BCL-aside">The CMS API is currently in beta and is not supported by Brightcove Support. If you would like access to the beta, please contact your Brightcove Account Manager.</p>
                 <p>The CMS API is used to manage content metadata for Video Cloud. Managing content means creating, editing, deleting, searching, and organizing videos and playlists.</p>
-                <p class="BCL-aside">Note: The CMS API methods never returns deleted videos. The 'state:DELETED' clause will be ignored by the CMS API whether you're asking for a count or for the videos themselves. CMS API <a href="#notifications">Notifications</a> will inform you when videos are deleted (or other changes to videos are made).</p>
+                <p class="BCL-aside">Note: The CMS API methods never return deleted videos. The <code>'state:DELETED'</code> clause will be ignored by the CMS API whether you're asking for a count or for the videos themselves. CMS API <a href="#notifications">Notifications</a> will inform you when videos are deleted (or other changes to videos are made).</p>
             </div>
             <div class="section" id="baseURL">
                 <h2>Base URL</h2>
                 <p>The base URL for the CMS API is:</p>
-                <pre>
-                    <code>https://cms.api.brightcove.com/v1beta1</code>
-                </pre>
+                <pre><code>https://cms.api.brightcove.com/v1beta1</code></pre>
+							
                 <h3>Account path</h3>
-                <p>In all cases, requests will be made for a specific Video Cloud Account, so you will always add to the base URL the account path:</p>
-                <pre>
-                    <code>/accounts/{account_id}</code>
-                </pre>
+                <p>In all cases, requests will be made for a specific Video Cloud Account. So, you will always add the term <code>accounts</code> followed by your account id to the base URL:</p>
+                <pre><code>https://cms.api.brightcove.com/v1beta1<strong>/accounts/{account_id}</strong></code></pre>
+							
             </div>
             <div class="section" id="authentication">
                 <h2>Authentication</h2>
                 <p>Authentication for requests requires an Authorization header:</p>
-                <pre>
-                    <code>Authorization: Bearer {access_token}</code>
-                </pre>
+                <pre><code>Authorization: Bearer {access_token}</code></pre>
+							
                 <p>The
                     <code>access_token</code> is a temporary OAuth2 access token that must be obtained from the Brightcove OAuth service. For details on how to obtain client credentials and use them to retrieve access tokens, see the <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/oauth-api-overview.html">Brightcove OAuth Overview</a>.</p>
             </div>
@@ -76,11 +73,24 @@
                 <h2>Operations</h2>
                 <p>When you request client credentials, you will need to specify the type of account access or operations that you want. The following is a list of the currently supported operations for the CMS API:</p>
                 <ul>
-                    <li>video-cloud/video/read</li>
-                    <li>video-cloud/video/create</li>
-                    <li>video-cloud/video/update</li>
-                    <li>video-cloud/video/all</li>
-                    <li>video-cloud/notifications/all (for <a href="#notifications">Notifications</a>)</li>
+                    <li>Video data:</li>
+                    <ul>
+                        <li>video-cloud/video/read</li>
+                        <li>video-cloud/video/create</li>
+                        <li>video-cloud/video/update</li>
+                        <li>video-cloud/video/all</li>
+                    </ul>
+                    <li>Playlist data:</li>
+                    <ul>
+                        <li>video-cloud/playlist/read</li>
+                        <li>video-cloud/playlist/create</li>
+                        <li>video-cloud/playlist/update</li>
+                        <li>video-cloud/playlist/all</li>
+                    </ul>
+                    <li>Notifications:</li>
+                    <ul>
+                        <li>video-cloud/notifications/all (for <a href="#notifications">Notifications</a>)</li>
+                    </ul>    
                 </ul>
             </div>
             <div class="section" id="rateLimiting">
@@ -97,6 +107,7 @@
                     <li>GET</li>
                     <li>POST</li>
                     <li>PATCH</li>
+				    <li>DELETE</li>
                 </ul>
             </div>
             <div class="section" id="resources">
@@ -142,6 +153,18 @@
                             <td>Metadata for all of this video's images: poster, thumbnail, logo overlay</td>
                         </tr>
                         <tr>
+                            <td>/videos/{video_id}/references
+                            </td>
+                            <td>Returns an array of manual playlist IDs that the video ID is contained in. Note that this request does not look at smart playlists.</td>
+                        </tr>
+                        <tr>
+                            <td>/counts/playlists
+                            </td>
+                            <td>Returns a count of playlists in the account</td>
+                        </tr>
+                        
+                        <!-- endpoints using video_reference_id -->
+                        <tr>
                             <td>/videos/ref:{video_reference_id}
                             </td>
                             <td>Metadata and asset information about the video with the given reference ID</td>
@@ -155,6 +178,11 @@
                             <td>/videos/ref:{video_reference_id}/images
                             </td>
                             <td>Metadata for all of this this video's images: poster, thumbnail, logo overlay</td>
+                        </tr>
+                        <tr>
+                            <td>/videos/ref:{video_reference_id}/references
+                            </td>
+                            <td>Returns an array of manual playlist IDs that the video reference ID is contained in. Note that this request does not look at smart playlists.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -214,9 +242,7 @@
                 <p>Brightcove's CMS API provides a programmatic way to search for videos in your Video Cloud library.</p>
                 <p>To perform basic and complex searches on your video data, you will use the
                     <code>q</code> parameter:</p>
-                <pre>
-                    <code>https://cms.api.brightcove.com/v1beta1/accounts/921483702001/videos?q={search terms}</code>
-                </pre>
+                <pre><code>https://cms.api.brightcove.com/v1beta1/accounts/921483702001/videos?q={search terms}</code></pre>
                 <p>For details on how to search for videos, see the <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/search-videos.html">Using the CMS API: Search Videos</a> document.</p>
             </div>
             <div class="section" id="videosEndpoint">
@@ -224,21 +250,16 @@
                 <p>Brightcove's CMS API provides a programmatic way to access data for videos in your Video Cloud library.</p>
                 <p>To retrieve media data using the HTTP
                     <code>GET</code> method, you will append resources to the base URL with your account id:</p>
-                <pre>
-                    <code>https://cms.api.brightcove.com/v1beta1/accounts/{account_id}/{resource}</code>
-                </pre>
+                <pre><code>https://cms.api.brightcove.com/v1beta1/accounts/{account_id}/{resource}</code></pre>
                 <p>For a list of resources and details on how to retrieve video data, see the <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/retrieve-video-data.html">Using the CMS API: Retrieve Video Data</a> document.</p>
                 <p>Know that you can easily combine these resources with the search criteria from the previous section.</p>
             </div>
             <div class="section" id="videoEndpoint">
                 <h2>Retrieve single video</h2>
                 <p>You can also get the data for a single video by issuing a GET request to:</p>
-                <pre>
-                    <code>https://cms.api.brightcove.com/v1beta1/accounts/
+                <pre><code>https://cms.api.brightcove.com/v1beta1/accounts/
                         <em>{YOUR_ACCOUNT_ID}</em>/videos/
-                        <em>{VIDEO_ID}</em>
-                    </code>
-                </pre>
+                        <em>{VIDEO_ID}</em></code></pre>
             </div>
             <div class="section" id="countsEndpoint">
                 <h2>Get count of videos</h2>
@@ -252,7 +273,7 @@
                     <code>offset</code> parameter to page through result sets that are larger than the
                     <code>limit</code>. The
                     <code>offset</code>is the number of items to skip. For example, for a search like this:</p>
-                <pre>/videos?q=updated_at:2014-01-01..2014-06-30&amp;limit=25&amp;offset=50</pre>
+                <pre><code>/videos?q=updated_at:2014-01-01..2014-06-30&amp;limit=25&amp;offset=50</code></pre>
                 <p>would return videos 51-75 of the total result set, assuming the total result set has at least 75 videos.</p>
             </div>
             <div class="section" id="sorting">
@@ -678,6 +699,18 @@
                     </tbody>
                 </table>
             </div>
+            
+            <div id="deletevideo" class="section">
+                <h2>Delete video</h2>
+                <p>You can delete a video object in your account.</p>
+                <p class="BCL-aside">Note: You will not be able to delete the sharer copy of a shared video.</p>
+                <p>The fundamental call information for deleting a video object is:</p>
+                <ul>
+                    <li>HTTP method: <code>DELETE</code></li>
+                    <li>Endpoint: <code>https://cms.api.brightcove.com/v1beta1/accounts/{account_id}/videos/{video_id}</code></li>
+                </ul>
+            </div>
+            
             <div class="section" id="paging">
                 <h2>Paging</h2>
                 <p>Brightcove's CMS API provides a programmatic way to page through large sets of data. These smaller groups of data gives you a more manageable experience and also improves performance.</p>
@@ -698,24 +731,21 @@
                 </ul>
                 <p>These values are subject to change in the future. The IPs are within the AWS ec2 us-east-1 address space and we anticipate that future IP addresses will also be, if you don't want to deal with specific IP address changes, you can configure your firewalls and routing rules to allow traffic from any of us-east-1.</p>
                 <h3>Endpoint for notification subscriptions</h3>
-                <pre>
-                    <code>/accounts/{account_id}/subscriptions</code>
-                </pre>
+                <pre><code>/accounts/{account_id}/subscriptions</code></pre>
+                
                 <h3>Create a new subscription</h3>
                 <p>To create a new subscription, submit a POST request with a request body including the endpoint that you want notifications delivered to and
                     <code>video-change</code> as the single item in an
                     <code>events</code> array:</p>
-                <pre>
-                    <code>{ "endpoint": "http://solutions.brightcove.com:9002", "events": [ "video-change" ] }
-                    </code>
-                </pre>
+                <pre><code>{ "endpoint": "http://solutions.brightcove.com:9002", "events": [ "video-change" ] }
+                    </code></pre>
+                
                 <h3>Get a list of your subscriptions</h3>
                 <p>To get a list of all your subscriptions, send a GET request to the subscriptions endpoint.</p>
                 <h3>Get or Delete a single subscription</h3>
                 <h4>Endpoint</h4>
-                <pre>
-                    <code>/accounts/{account_id}/subscriptions/{aubscription_id}</code>
-                </pre>
+                <pre><code>/accounts/{account_id}/subscriptions/{aubscription_id}</code></pre>
+                
                 <p>A GET request will retrieve the subscription. A DELETE request will delete the subscription. You cannot update a subscription at this time. If you need to modify a subscription, you will need to delete it and create a new one.</p>
             </div>
             <div class="section" id="BCLreferences">
