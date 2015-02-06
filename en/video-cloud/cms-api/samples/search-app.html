@@ -136,13 +136,17 @@ sna
                     <p>Limit search to this custom field:
                         <input type="text" id="customField" data-bind="value: customField, disable: haveSearchField">
                     </p>
-                    <div data-bind="visible: !haveSearchState()">
+                    <div data-bind="visible: !haveSearchState() && !havePlayable()">
                         Search terms:
                         <input id="searchTerms" type="text" data-bind="value: searchTerms">
                     </div>
                     <div data-bind="visible: haveSearchState">
                         State:
                         <select id="searchStates" data-bind="options: searchState, value: selectedSearchState"></select>
+                    </div>
+                    <div data-bind="visible: havePlayable">
+                        State:
+                        <select id="searchStates" data-bind="options: searchPlayable, value: selectedSearchState"></select>
                     </div>
                     <table>
                         <caption>Limit search by dates:</caption>
@@ -238,8 +242,9 @@ sna
         		rome(fromDate);
         		rome(toDate);
         		self.apiURL = document.getElementById("apiURL");
-        		self.searchField = ["name", "text", "tags", "reference_id", "custom_fields", "state"];
+        		self.searchField = ["name", "text", "tags", "reference_id", "custom_fields", "state", "playable"];
         		self.searchState = ["ACTIVE", "INACTIVE", "PENDING"];
+                self.searchPlayable = ["true", "false"];
         		self.limit = [10, 25, 50, 100];
         		self.dateRangeType = ["updated_at", "created_at", "published_at", "schedule.starts_at", "schedule.ends_at"];
         		self.sortOptions = ["name", "reference_id", "created_at", "published_at", "updated_at", "schedule_starts_at", "schedule_ends_at", "state", "plays_total", "plays_trailing_week"]
@@ -270,8 +275,15 @@ sna
         				return true;
         			}
         		});
-        		self.haveSearchState = ko.computed(function() {
-        			if (self.selectedSearchField() === "state") {
+                self.haveSearchState = ko.computed(function() {
+                    if (self.selectedSearchField() === "state") {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+        		self.havePlayable = ko.computed(function() {
+        			if (self.selectedSearchField() === "playable") {
         				return true;
         			} else {
         				return false;
