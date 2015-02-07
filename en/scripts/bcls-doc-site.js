@@ -690,6 +690,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                     subsubsectionName = "Get Started";
                                     break;
                                 }
+
                                 // subsubsectionName = bclsNavData.studio.items[subsection].items[subsubsection].name;
                                 // bclslog("subsubsectionName", subsubsectionName);
                                 if (pathArray[5] === "index.html") {
@@ -711,8 +712,19 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 case "getting-started":
                                     subsubsectionName = "Get Started";
                                     break;
+                                case "managing-videos":
+                                    subsubsectionName = "Manage Videos";
+                                    if (pathArray[5] === "index.html") {
+                                        createSubsectionLandingPageSections();
+                                    }
+                                    break;
+                                case "publishing-videos":
+                                    subsubsectionName = "Publish Videos";
+                                    if (pathArray[5] === "index.html") {
+                                        createSubsectionLandingPageSections();
+                                    }
+                                    break;
                                 }
-                                // subsubsectionName = bclsNavData.studio.items[subsection].items[subsubsection].name;
                                 // bclslog("subsubsectionName", subsubsectionName);
                                 if (pathArray[5] === "index.html") {
                                     // on subsubsection landing page
@@ -786,8 +798,8 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 createSubsectionLandingPageSections();
                             }
                             break;
-                        case "publishing-players":
-                            subsectionName = "Publish Players";
+                        case "publishing-videos":
+                            subsectionName = "Publish Videos";
                             if (pathArray[4] === "index.html") {
                                 createSubsectionLandingPageSections();
                             }
