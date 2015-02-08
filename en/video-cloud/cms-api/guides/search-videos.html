@@ -141,7 +141,7 @@
 
       <div class="section" id="requiredexcludedterms">
         <h2>Required/excluded terms</h2>
-				<p>You can mark a search term as required (returned videos MUST match) or excluded (returned videos must NOT match). This is controlled with a <code>-</code> sign immediately preceding the term.</p>
+				<p>You can mark a search term as required (returned videos MUST match) or excluded (returned videos must NOT match). This is controlled with a URI-encoded <code>+ (%2B)</code> or <code>- (%2D)</code> sign immediately preceding the term.</p>
 				<table>
 					<thead>
 						<tr>
@@ -152,19 +152,30 @@
 					</thead>
 					<tbody>
 						<tr>
+							<td>+foo</td>
+							<td>%2Bfoo</td>
+							<td>videos MUST include the term 'foo' in the name, description, long_description, tags, reference_id or custom fields</td>
+						</tr>
+						<tr>
+							<td>+custom_fields:foo</td>
+							<td>%2Bcustom_fields:foo</td>
+							<td>video MUST include the value 'foo' for some custom field</td>
+						</tr>
+						<tr>
 							<td>-foo</td>
-							<td>%2D</td>
+							<td>%2Dfoo</td>
 							<td>videos must NOT include the term 'foo' in the name, description, long_description, tags, reference_id or custom fields</td>
 						</tr>
 						<tr>
 							<td>-name:foo</td>
-							<td>%2D</td>
+							<td>%2Dname:foo</td>
 							<td>videos must NOT include the term 'foo' in the name</td>
 						</tr>
 					</tbody>
 				</table>
         <p>Example: This request returns videos which DO NOT have a value of <strong>sea</strong> in the <code>tags</code> field.</p>
-      <pre><code>https://cms.api.brightcove.com/v1beta1/accounts/921483702001/videos?q=-tags:sea</code></pre>
+<pre><code>https://cms.api.brightcove.com/v1beta1/accounts/921483702001/videos?q=-tags:sea</code></pre>
+		<p>See <a href="#combinesearchcriteria">Combining search criteria</a> below to see how to use required/excluded syntax to enforce AND logic for multiple search terms.</p>
       </div>
 
       <div class="section" id="quotedsearchterms">
@@ -259,12 +270,18 @@ q=my_field:"foo"
 		    <p>You can perform or filter searches by the state of the video using the paramater:</p>
 		    <pre><code>q=state:ACTIVE | INACTIVE | DELETED | PENDING</code></pre>
 		</div>
-       <div class="section" id="combinesearchcriteria">
-        <h2>Combine search criteria</h2>
-				<p>You can combine criteria for complex searches.</p>
-         <p>Example: This request searches for videos with a <code>name</code> value of <strong>gossip</strong>, which were updated between August 1, 2010 and October 8, 2010. It then sorts the response data by <code>updated_at</code> date in decending order.</p>
+        <div class="section" id="combinesearchcriteria">
+			<h2>Combine search criteria</h2>
+			<p>You can combine criteria for complex searches.</p>
+	        <p>Example: This request searches for videos with a <code>name</code> value of <strong>gossip</strong>, which were updated between August 1, 2010 and October 8, 2010. It then sorts the response data by <code>updated_at</code> date in decending order.</p>
 <pre><code>q=%2Bname:gossip+%2Bupdated_at:2010-08-01T00:00:00Z..2010-10-08T00:00:00Z&amp;sort=-updated_at</code></pre>
-			</div>
+			<h3>Combining terms for AND logic</h3>
+			<p>Use the <a href="#requiredexcludedterms">required/excluded syntax</a> to return videos that have <strong>all</strong> of the specified terms.</p>
+			<p>For example, if you search on <code>q=name:foo+tags:bar</code>, the response will contain videos that have 'foo' in the name OR the tag 'bar' (or both). If you want to return only those videos that have 'foo' in the name AND the tag 'bar', you must search on:</p>
+<pre><code>q=<strong>%2B</strong>name:foo+<strong>%2B</strong>tags:bar</code></pre>
+			<p>Similarly, if you want to return only videos that have 'foo' in the name, but do <strong>not</strong> have the tag 'bar', you would search on:</p>
+<pre><code>q=<strong>%2B</strong>name:foo+<strong>%2D</strong>tags:bar</code></pre>
+		</div>
 
 		<div class="section" id="BCLreferences">
 			<h2>Related topics</h2>
