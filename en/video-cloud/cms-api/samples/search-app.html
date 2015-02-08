@@ -125,6 +125,8 @@ sna
                     <p>
                         <input type="checkbox" id="exactMatch" data-bind="checked: exactMatch"> Require exact match on search terms</p>
                     <p>
+                        <input type="checkbox" id="requiredTerms" data-bind="checked: requiredTerms"> Only return videos that have <strong>all</strong> the search terms</p>
+                    <p>
                         <input type="checkbox" id="excludeTerms" data-bind="checked: excludeTerms"> Only return videos that do
                         <strong>not</strong> have the search terms</p>
                     <p>
@@ -255,6 +257,7 @@ sna
         		self.client_secret = ko.observable("");
         		self.account_id = ko.observable("");
         		self.exactMatch = ko.observable(false);
+                self.requiredTerms = ko.observable(false);
         		self.excludeTerms = ko.observable(false);
         		self.selectedSearchState = ko.observable();
         		self.selectedSearchField = ko.observable();
@@ -357,11 +360,13 @@ sna
         					for (i = 0; i < iMax; i++) {
         						item = termsArray[i];
         						item = self.selectedSeachField() + ":" + item;
-        						if (self.excludeTerms) {
-        							item = "-" + item;
-        						}
+        						if (self.excludeTerms()) {
+        							item = "%2D" + item;
+        						} else if (self.requiredTerms()) {
+                                    item = "%2B" + item;
+                                }
         					}
-        					str += termsArray.join(" ");
+        					str += termsArray.join("+");
         				}
         			} else if (self.haveCustomField()) {
         				if (self.haveSearchTerms()) {
@@ -375,26 +380,35 @@ sna
         					}
         					for (i = 0; i < iMax; i++) {
         						termsArray[i] = self.customField() + ":" + termsArray[i];
-        						if (self.excludeTerms) {
-        							item = "-" + item;
-        						}
+        						if (self.excludeTerms()) {
+        							item = "%2D" + item;
+        						} else if (self.requiredTerms()) {
+                                    item = "%2B" + item;
+                                }
         					}
-        					str += termsArray.join(" ");
+        					str += termsArray.join("+");
         				}
         			} else if (self.haveSearchTerms()) {
         				// don't have field type
         				if (self.exactMatch()) {
         					if (self.excludeTerms()) {
-        						str += '-"' + self.searchTerms() + '"';
-        					} else {
+        						str += '%2D"' + self.searchTerms() + '"';
+        					} else if (self.requiredTerms()) {
+                                str += '%2B"' + self.searchTerms() + '"';
+                            } else {
         						str += '"' + self.searchTerms() + '"';
         					}
         				} else if (self.excludeTerms()) {
         					for (i = 0; i < iMax; i++) {
-        						termsArray[i] = '-' + termsArray[i];
+        						termsArray[i] = '%2D' + termsArray[i];
         						str += termsArray.join(" ");
         					}
-        				} else {
+        				} else if (self.requiredTerms()) {
+                            for (i = 0; i < iMax; i++) {
+                                termsArray[i] = '%2B' + termsArray[i];
+                                str += termsArray.join(" ");
+                            }
+                        } else {
         					str += self.searchTerms();
         				}
         			}
