@@ -65,23 +65,6 @@ var BCLS = (function ($, Handlebars) {
                 },
                 success: function (data) {
                     var template, i, itemsmax, item, selectedGeo = $geoSelector.val();
-                    switch (callType) {
-                    case "players":
-                        callNumber++;
-                        template = Handlebars.compile(playerSelectTemplate);
-                        $playerSelector.html(template(data));
-                        $gettingDataDisplay.text("Player data retrieved");
-                        // now get the videos data
-                        getVideoData();
-                        break;
-                    case "videos":
-                        callNumber++;
-                        // populate the video selector
-                        template = Handlebars.compile(videoSelectTemplate);
-                        $videoSelector.html(template(data));
-                        $gettingDataDisplay.text("Video data retrieved");
-                        break;
-                    case "analytics":
                         callNumber++;
                         itemsmax = data.items.length;
                         for (i = 0; i < itemsmax; i++) {
@@ -92,8 +75,6 @@ var BCLS = (function ($, Handlebars) {
                         analyticsData = data;
                         $gettingDataDisplay.text("Data retrieved - " + callNumber + " API calls made");
                         displayData();
-                        break;
-                    }
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     $gettingDataDisplay.text("Sorry, your request was not successful. Here's what the server sent back: " + errorThrown);
