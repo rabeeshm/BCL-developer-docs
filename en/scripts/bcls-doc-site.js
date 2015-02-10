@@ -403,12 +403,8 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                 item = data[i];
                 bclslog("landing page item", item);
                 if (exists(item.items)) {
-                    str += blockTemplateStart(item);
-                }
-
-
-                if (exists(item.items)) {
                     kMax = item.items.length;
+                    str += blockTemplateStart(item);
                     for (k = 0; k < kMax; k++) {
                         var kItem = item.items[k];
                         // check for submenus
@@ -424,6 +420,8 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                             str += itemTemplate(kItem);
                         }
                     }
+                } else {
+                    str += itemTemplate(item);
                 }
                 str += blockEndTemplate;
             }
@@ -640,6 +638,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                         case "general":
                             subsectionName = "General Info";
                             dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
+                            bclslog("general data index", dataIndex);
                             if (pathArray[4] === "index.html") {
                                 createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
                             }
