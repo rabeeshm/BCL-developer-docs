@@ -43,19 +43,94 @@
     <!-- content -->
     <!-- content -->
     <div class="row">
-        <div id="main" class="large-12 small-12 columns">
-        <div id="top" class="section">
-            <h1>OAuth Overview</h1>
-            <p>This page has moved to: <a href="../getting-started/oauth-api-overview.html">OAuth Overview</a></p>
-            <script type="text/javascript">
-                var loc = document.location.href;
-                loc = loc.replace("/guides/", "/getting-started/");
-                document.location.href = loc;
-            </script>
+        <div class="large-2 columns show-for-large-up">
+            <div id="sidenav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+            <div id="top" class="section">
+                <h1>Getting Access Tokens</h1>
+                <p>This explains how to get access tokens and shows you strategies for implementing this logic in your apps.</p>
+            </div>
+            <div class="section" id="gettingToken">
+                <h2>Getting a token</h2>
+                <p>Tokens are obtained from the Brightcove OAuth API. Before you can get access tokens, you first need to obtain client credentials (a client id and a client) that are specific to the API and operations that you want access to. To get your client credentials, see <a class="video-cloud-only" href="../../studio/managing-accounts/managing-api-credentials.html">Managing API Credentials</a><a class="perform-only" href="http://support.brightcove.com/en/perform/docs/managing-api-credentials">Managing API Authentication Credentials</a>.</p>
+                <p>Once you have your credentials, you obtain an access token by making a call to:</p>
+    <pre><code>https://oauth.brightcove.com/v3/access_token</code></pre>
+                <p>You must pass the following headers with this call:</p>
+                <ul>
+                    <li><code>Content-Type: application/x-www-form-urlencoded</code></li>
+                    <li><code>Authorization: Basic {client_id}:{client_secret}</code></li>
+                </ul>
+                <p>The entire <code>{client_id}:{client_secret}</code> string must be Base64-encoded (curl will automatically Base64-encode the string if you pass it as <code>--user</code> credentials; in other languages, you'll need to handle the Base64-encoding yourself).</p>
+                <p>You must also send the following key/value pair as the request body or as URL parameter:</p>
+    <pre><code>grant_type=client_credentials</code></pre>
+                <p>The response will look like this (pretty-printed here for readability):</p>
+    <pre><code>{
+    	"access_token": "ANB7xKhiUZmwltVd3f1odcHHM9VAwg02kwmLwtZwHv3SxGCOWLUf5W4G7X22PRjmR9StvFUqzpVZ1suOfyfOigdi-rnohxyEaSSuZceeLw_9OBW7fXldOG05HEgkeK3N-DBZZZyilodmjA1JWZHbgI3IU7Rmz5IPGyi-sDxHN3KlOr1BDZlLZpXPdFPwEyb6idq-z8AL-blKTSMtNI3_fz3oNBisfrHGUv5tXHoQT4B7FYcvdrap16gTOO7_wNt1zmgLJiUHvyxZgsgBchm_AhohVL-AYgcfCbCR0v7d2hgI4ag35pnZNeujDiBLfnCFcVMlqQGq8UEVZrmU9a8y4pVAGih_EImmghqmSrkxLPYZ800-vIWX-lw",
+    	"token_type": "Bearer",
+    	"expires_in": 300
+    }</code></pre>
+                <p>The <code>access_token</code> value is what you must pass in an <code>Authorization</code> header with your API call in this form:</p>
+    <pre><code>Authorization: Bearer {access_token}</code></pre>
+                <p>The <code>expired_in</code> value is the number of seconds that the access token is valid for.</p>
+            </div>
+            <div class="section" id="implementation">
+                <h2>Implementation Strategies</h2>
+                <p>If your app will only be making sporadic calls to the Brightcove APIs, you might as well ignores the <code>expires_in</code> parameter and just fetch a new access token for every call. In that case, the processing sequence will look like this:</p>
+                <p><img src="assets/get-token-new-token.png" alt="get-token-new-token" width="456" height="82"></p>
+                <p>On the other hand if you know that your app will frequently make many API calls in quick succession (for, say, generating long reports), then it will be more efficient to fetch access tokens only when you need them. There are two basic ways of doing this:</p>
+                <ol>
+                    <li>Go ahead and try the API call, and if you get an <code>UNAUTHORIZED</code> error in response, go fetch a new token and make the API call again. In this case the processing sequence will look like this:
+                    <p><img src="assets/get-token-check-call-fail.png" alt="get-token-check-call-fail" width="626" height="274"></p>
+                    </li>
+                    <li>Another approach would be to add the <code>expires_in</code> value to the current time in Epoch seconds each time you fetch a token, and then on later API calls, check the expires time against the current time to see if you need to fetch a new token. In this case, your processing sequence will look like this:
+                    <p><img src="assets/get-token-check-expiration.png" alt="get-token-check-expiration" width="492" height="248"></p>
+                    </li>
+                </ol>
+            </div>
+            <div class="section" id="codeSamples">
+                <h2>Code Samples</h2>
+                <p>Here are some code samples to help you get started.</p>
+                <h3>Shell script example</h3>
+                <p>The first example is a shell script that implements the first implementation logic above: it takes inputs from the user, always gets a new token, and then makes the API call. The script will work on any of the Brightcove APIs, and you may find it useful for testing API calls as you build your app.</p>
+                <div class="BCL-aside">
+                    <p>Note: this script uses cURL, and also the jq command line app. See <a href="../../concepts/curl/curl.html">Set up cURL and jq</a> for setup instructions. The Python json.tool is also used to pretty-print the response, but that should already be installed on your system.</p>
+                    <p>To run the script, save the code as <strong>api-tester.sh</strong> on your system, open a command line in the same folder, and enter <code>bash api-tester.sh</code> - you will be prompted for the following inputs:</p>
+                    <ul>
+                        <li>client id (required)</li>
+                        <li>client secret (required)</li>
+                        <li>the full API call (required)</li>
+                        <li>the HTTP verb for the call: GET | POST | PATCH | PUT | DELETE  (required)</li>
+                        <li>data for the request body (optional)</li>
+                    </ul>
+                </div>
+                <h4>Shell script code</h4>
+                <p><script src="https://gist.github.com/999cd134e48421c1ec8b.js"></script></p>
+                <h3>Ruby example</h3>
+                <p>The next example is a Ruby script that also employs the first implementation logic: always get a token and then make the API call. This example makes a call to the Analytics API, but can be adapted to work with any of the APIs.</p>
+                <h4>Ruby code</h4>
+                <p><script src="https://gist.github.com/7c23bdbc48c870bd79e6.js"></script></p>
+                <h3>Python example</h3>
+                <p>The last sample is a Python script that implements the 3rd implementation logic above. It attempts to make an Analytics API call, but if the call fails on an UNAUTHORIZED error, it fetches a new access token and retries the call.</p>
+                <p>
+                    This script also reads the client credentials from an external file - the credentials data file is shown below the Python code.
+                </p>
+                <h4>Python code</h4>
+                <p><script src="https://gist.github.com/797a6dd98f1581e786b7.js"></script></p>
+                <h5>Credentials file for Python sample</h5>
+                <p><script src="https://gist.github.com/2e46e622f289fc121141.js"></script></p>
+            </div>
+            <div class="section" id="references">
+                <h2>Related Topics</h2>
+                <ul>
+                    <li><a href="oauth-api-overview.html">OAuth Overview</a></li>
+                    <li><a href="../reference/versions/v3/">OAuth API Reference</a></li>
+                </ul>
+            </div>
         </div>
     </div>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/1.9/gist-embed.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/1.9/gist-embed.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.3/fastclick.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/js/foundation.min.js"></script>
