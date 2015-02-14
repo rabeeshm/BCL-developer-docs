@@ -16,6 +16,6 @@ token = JSON.parse(response)["access_token"]
 puts "The extracted token is:" + token + "\n\n\n"
 
 
-data = RestClient.get 'https://data.brightcove.com/analytics-api/videocloud/account/1305620570001/report?dimensions=video&from=2014-01-01&to=2014-03-30', { 'Authorization' => "Bearer #{token}" }
+data = RestClient.get 'https://data.brightcove.com/analytics-api/videocloud/account/1234567890001/report?dimensions=video&from=2014-01-01&to=2014-03-30', { 'Authorization' => "Bearer #{token}" }
 
 puts "This is the result from the query: \n" + data
