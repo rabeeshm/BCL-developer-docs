@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <!-- change title to match the h1 heading -->
+    <title id="bclPageTitle">Brightcove Player SDK for iOS Architecture</title>
+    <link href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/css/foundation.min.css" rel="stylesheet" type="text/css" />
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
+    <script>
+        (function(i, s, o, g, r, a, m) {
+        	i['GoogleAnalyticsObject'] = r;
+        	i[r] = i[r] || function() {
+        		(i[r].q = i[r].q || []).push(arguments)
+        	}, i[r].l = 1 * new Date();
+        	a = s.createElement(o),
+        	m = s.getElementsByTagName(o)[0];
+        	a.async = 1;
+        	a.src = g;
+        	m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-2728311-29', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/js/vendor/modernizr.js"></script>
+</head>
+
+<body>
+    <!-- header navbar -->
+    <div id="navWrapper" class="fixed"></div>
+    <!-- breadcrumbs -->
+    <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+    <!-- search -->
+    <div id="searchModal" class="reveal-modal" data-reveal></div>
+    <!-- content -->
+    <!-- content -->
+    <div class="row">
+        <div class="large-2 columns show-for-large-up">
+            <div id="sidenav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+            <div class="section" id="top">
+                <h1>Brightcove Player SDK for iOS Architecture</h1>
+            </div>
+            <div id="top" class="section" title="Top">
+                <p>The Brightcove SDK for iOS is built on top of the existing native video player provided by Apple, the AVPlayer.  This allows us to inherit all of the advantages of Apple's work, and focus on improving it’s limitations.</p>
+            </div>
+            
+            <div class="section" id="overview">
+                <h2>Overview</h2>
+
+<!--                <p><img src="./assets/architecture01.png" alt="Architectural Overview 1"/></p>-->
+                <p><img src="./assets/ios-architecture.png" alt="Architectural Overview"/></p>
+                <p>The Brightcove SDK for iOS is built on top of existing iOS tools, simplifying video playback and the use of your Video Cloud videos and playlists.</p>
+				<p>The <code>BCOVPlayerSDKManager</code> object is the entry point for the Brightcove player.</p>
+				<p>If you use the Brightcove player and Catalog included in the SDK to retrieve and play videos, analytics data will be automatically collected and will appear in your Video Cloud Analytics.</p>
+                <p>If you override the <code>BCOVVideo</code> class or do not use the Brightcove player and catalog, you need to send your Publisher ID to Video Cloud Analytics.</p>
+                
+            </div>
+            
+            <div class="section" id="playbackcontroller">
+                <h2>Playback controller</h2>
+                <p>The entry point to the Brightcove Player SDK for iOS is the <a href="https://github.com/brightcove/brightcove-player-sdk-ios/blob/master/Headers/BCOVPlayerSDKManager.h"><code>BCOVPlayerSDKManager</code></a> singleton object. This Manager handles registration of plugin components and some other housekeeping tasks, but it primarily serves as an object factory. Your app&#39;s view controller obtains a reference to the Manager, and uses it to create a <a href="https://github.com/brightcove/brightcove-player-sdk-ios/blob/master/Headers/BCOVPlaybackController.h"><code>BCOVPlaybackController</code></a>. The playback controller&#39;s <code>view</code> property exposes a UIView containing the AVPlayerLayer object that ultimately presents your video content on the screen. The playback controller also accepts a <a href="https://github.com/brightcove/brightcove-player-sdk-ios/blob/master/Headers/BCOVPlaybackController.h#L210-L220"><code>BCOVPlaybackControllerDelegate</code></a>, which you can implement to respond to various video playback events.</p>
+
+                <p>The playback controller offers methods and properties to affect playback of the current video. However, internally, the playback controller delegates to a <a href="https://github.com/brightcove/brightcove-player-sdk-ios/blob/master/Headers/BCOVPlaybackSession.h"><code>BCOVPlaybackSession</code></a> object. Playback sessions do the actual work of preparing and playing video content, and contain the video&#39;s metadata and AVPlayer. The playback controller has mechanisms to advance from the current playback session to the next playback session, either automatically at the end of a video, or manually with a method call. Once the playback controller has advanced to a new session, the previous session is discarded and cannot be used again.</p>
+
+                <p>There are two other elements of the playback controller: a <a href="https://github.com/brightcove/brightcove-player-sdk-ios/blob/master/Headers/BCOVPlaybackSessionProvider.h"><code>BCOVPlaybackSessionProvider</code></a>, and a list of <a href="https://github.com/brightcove/brightcove-player-sdk-ios/blob/master/Headers/BCOVPlaybackController.h#L194-L198"><code>BCOVPlaybackSessionConsumer</code></a>s. As the name would suggest, the playback session provider is responsible for creating playback sessions and delivering them to the playback controller. The playback controller then delivers the session to each of the playback session consumers in the list. Both the session provider and session consumer APIs are designed for use by plugin developers, and are not detailed in this document.</p>
+
+                <p>In addition to the playback functionality provided by the classes described above, there are a handful of value classes. These are used to hold data specific to the Player SDK for iOS. There are also <a href="https://github.com/brightcove/brightcove-player-sdk-ios/blob/master/Headers/BCOVCatalogService.h"><code>BCOVCatalogService</code></a> and <a href="https://github.com/brightcove/brightcove-player-sdk-ios/blob/master/Headers/BCOVMediaRequestFactory.h"><code>BCOVMediaRequestFactory</code></a>, which offer functionality for querying content remotely stored in your Brightcove Video Cloud account. Each of these is described in more detail in its own section below.</p>
+            </div>
+            
+            <div class="section" id="subclassing">
+                <h2>A Word on Subclassing</h2>
+                <p>Except where explicitly documented otherwise, none of the classes in the Player SDK for iOS are designed to be subclassed. Creating a subclass of any SDK class that is not explicitly designed to be subclassed, especially any of the value classes, could result in unpredictable behavior.</p>
+            </div>
+            
+            <div class="section" id="values">
+                <h2>Values</h2>
+                <p>Also known as &quot;model objects&quot;, these classes (<code>BCOVPlaylist</code>, <code>BCOVVideo</code>, <code>BCOVSource</code>, <code>BCOVCuePoint</code>, <code>BCOVCuePointCollection</code>) are used to represent data in the Player SDK for iOS. It is crucial to understand that these data types are treated as <em>values</em>, rather than <em>identities</em>. By this, we mean that if you have two instances of a value class which have the exact same data, they represent the same idea or value, even though they are technically two different objects at separate memory addresses. In other words, neither SDK code nor your client code should ever use identity comparisons (&quot;pointer equality&quot;) with value objects. Instead, each value class implements <code>-isEqual:</code> and provides a class-specific equality method overload, either of which should be used instead.</p>
+
+                <p>This is bad:</p>
+
+<pre><code>if (myVideo == session.video) // Could lead to bugs!
+</code></pre>
+
+                <p>These are good (and functionally equivalent):</p>
+
+<pre><code>if ([myVideo isEqualToVideo:session.video])
+if ([myVideo isEqual:session.video])
+</code></pre>
+
+                <p>The internals of the Player SDK for iOS may do such things as memoize values or make defensive copies, so relying on the pointer address to check for equality will end up causing you pain.</p>
+
+                <p>Another quality of value classes in the Player SDK for iOS is that they are <em>immutable</em>. Once you have an instance of a value, you should not try to subvert this immutability in any way, as it may lead to unpredictable behavior. If in your code you wish to &quot;modify&quot; a value in some fashion, your only recourse is to create a new value. As a convenience to help clients obtain &quot;modified&quot; values, each of the value classes offers an <code>-update:</code> method which takes a block that allows you to operate on a mutable copy of the original value.</p>
+
+                <p>Here is an example of using this method to create a &quot;modified&quot; version of an existing video object, but with different properties:</p>
+
+<pre><code>BCOVVideo *video1; // (properties include a key &quot;foo&quot; whose value is &quot;bar&quot;)
+BCOVVideo *video2 = [video1 update:^(id&lt;BCOVMutableVideo&gt; mutable) {
+
+    mutable.properties = @{ @&quot;foo&quot;: @&quot;quux&quot; };
+
+}];
+
+NSLog(@&quot;foo is %@&quot;, video1.properties[@&quot;foo&quot;]); // prints &quot;foo is bar&quot;
+NSLog(@&quot;foo is %@&quot;, video2.properties[@&quot;foo&quot;]); // prints &quot;foo is quux&quot;
+
+// Both video1 and video2 are still immutable objects:
+video1.properties = otherDictionary; // causes compiler error
+video2.properties = otherDictionary; // causes compiler error
+</code></pre>
+
+                <p>As you can see in the example, <code>video1</code> has not been changed by the <code>-update</code> method call. Instead, this method returns a copy of <code>video1</code>, except with the modifications made in the body of the block. You should never allow the mutable copy to escape the block (such as by assigning it to a <code>__block</code> variable), instead use the immutable object returned by the <code>-update</code> method after you have made your modifications.</p>
+
+                <p>(Thanks to <a href="http://www.jonmsterling.com/posts/2012-12-27-a-pattern-for-immutability.html">Jon Sterling</a> for publishing the Objective-C implementation of this pattern.)</p>
+            </div>
+            
+            <div class="section" id="catalog">
+                <h2>Catalog</h2>
+                <p>The catalog classes provide functionality for retrieving information about your Brightcove assets via the Brightcove Media API. For most purposes, <code>BCOVCatalogService</code> provides sufficient functionality to obtain value class instances from input data such as playlist or video IDs, or reference IDs.</p>
+
+                <p>If for some reason you need to customize the request that the catalog sends to the Brightcove Media API, you may find <code>BCOVMediaRequestFactory</code> helpful. This utility, which is used by the catalog service, generates parameterized Brightcove Media API NSURLRequest objects, which you can use in your own HTTP communication.</p>
+            </div>
+            
+            <div class="section" id="viewstrategy">
+                <h2>View Strategy</h2>
+                <p><code>BCOVPlaybackController</code> objects are constructed with a <strong>view strategy</strong>, which allows you, as the client of the SDK, to define the exact UIView object that is returned from the playback controller&#39;s <code>view</code> property. This is important when using plugins that affect the playback controller&#39;s view, such as an advertising plugin that overlays the video view with an ad view. Imagine trying to integrate custom controls with such a plugin: normally, custom controls are just regular UIView objects in the view hierarchy that float above the playback controller&#39;s video view. But with an advertising plugin, you generally want the ads to float over your custom controls. How to accomplish this without having in-depth knowledge of the structure of the playback controller&#39;s view hierarchy? The solution is to construct a view strategy that composes the video view, your custom controls, and the advertising view in a hierarchy of your choosing. The playback controller will call this view strategy the first time you access its <code>view</code> property. The final UIView object returned from the strategy will serve as its view permanently (until the controller is destroyed).</p>
+
+                <p>Many apps will have no need to create a view strategy, and can simply pass <code>nil</code> when creating a new playback controller. This will create a standard video view in the playback controller. However, for apps that do need the control offered by a view strategy, we provide a more detailed explanation here.</p>
+
+                <p>The <code>BCOVPlaybackControllerViewStrategy</code> typedef aliases (and documents) this more complex block signature:</p>
+
+<pre><code>UIView *(^)(UIView *view, id&lt;BCOVPlaybackController&gt; playbackController);
+</code></pre>
+
+                <p>This signature describes an Objective-C block that returns a UIView and takes two parameters: a UIView and a playback controller. The return value is easy to understand: it is the UIView object that you want the playback controller&#39;s <code>view</code> property to point to. But what about the parameters to the block; what is the UIView that is passed as the first parameter? And why is the playback controller passed as the second parameter?</p>
+
+                <p>The first parameter is a UIView that <em>would</em> have become the playback controller&#39;s <code>view</code> property, if your view strategy didn&#39;t exist to specify otherwise. To illustrate, you could create a pointless no-op view strategy by implementing the block to return its <code>view</code> parameter directly:</p>
+
+<pre><code>BCOVPlaybackControllerViewStrategy viewStrategy =
+        ^ UIView *(UIView *videoView, id&lt;BCOVPlaybackController&gt; playbackController) {
+
+    return videoView;
+
+};
+</code></pre>
+
+                <p>This has the same effect as passing a <code>nil</code> view strategy when creating the playback controller.</p>
+
+                <p>The second parameter is the same playback controller object to which the view strategy has been given. Why would the view strategy need to reference its playback controller? In many cases, it probably doesn&#39;t, and the second parameter can be safely ignored. But some apps might need a view strategy that adds a session consumer to the playback controller. For example, to update custom controls every time the controller advances to a new playback session, you need to be notified of new sessions. The playback controller is made available in the second parameter to the block, so that the view strategy can add any necessary session consumers.</p>
+
+                <p>It is very important not to retain this reference to the playback controller. That is, it is safe to use within the block if you need, but don&#39;t try to assign it to a <code>__block</code> variable or global variable so that you can access it later. The parameter is passed in only because there is no playback controller reference that can be closed-over within the block at the time the view strategy is defined.</p>
+
+                <p>Here&#39;s an example of a more sensible view strategy implementation:</p>
+
+<pre><code>BCOVPlaybackControllerViewStrategy viewStrategy =
+        ^(UIView *videoView, id&lt;BCOVPlaybackController&gt; playbackController) {
+
+    // Create some custom controls for the video view,
+    // and compose both into a container view.
+    UIView&lt;BCOVPlaybackSessionConsumer&gt; *myControlsView = [[MyControlsView alloc] init];
+    UIView *controlsAndVideo = [[UIView alloc] init];
+    [controlsAndVideo addSubview:videoView];
+    [controlsAndVideo addSubview:myControls];
+
+    // Compose the container with an advertising view
+    // into another container view.
+    UIView&lt;BCOVPlaybackSessionConsumer&gt; *adView = [[SomeAdPluginView alloc] init];
+    UIView *adViewAndVideo = [[UIView alloc] init];
+    [adViewAndVideo addSubview:controlsAndVideoContainer];
+    [adViewAndVideo addSubview:adView];
+
+    [playbackController addSessionConsumer:myControls];
+    [playbackController addSessionConsumer:adView];
+
+    // This container view will become `playbackController.view`.
+    return adViewAndVideo;
+
+};
+</code></pre>
+
+                <p>Let&#39;s review what this view strategy does in detail: first, it creates a custom controls view that conforms to the <code>BCOVPlaybackSessionConsumer</code> protocol. (Note that custom views are not required to conform to this protocol; some other non-view object could have been added as a session consumer instead. This just makes the example easier to follow.) Notice how the view hierarchy is composed in this view strategy block: a container view is created to hold both the video view and the controls. These views are added in an order such that the controls will appear <em>over</em> the video view. Next, a container view is created to hold the ad view and the first container view. They are added in an order such that the ad view will appear over the container with the custom controls and video view. Finally, the custom controls and the ad view are registered as session consumers, so that when a new playback session is delivered to the playback controller, these views can subscribe to the appropriate events on the session.</p>
+
+                <p>Again, for most use cases it should suffice to not use a view strategy at all. Just add the playback controller&#39;s view to a view hierarchy, and compose custom controls on top of it. But for more nuanced cases such as when using certain plugins, it helps to have an opportunity to take control of the composition of the playback controller&#39;s view, and that&#39;s exactly why you can pass a view strategy to the <code>BCOVPlayerSDKManager</code> when creating a new playback controller.</p>
+
+                <p>There is one caveat to using a view strategy: you must not access the playback controller&#39;s <code>view</code> property from within the view strategy block. Since the block is being called <em>because</em> the playback controller&#39;s <code>view</code> property was accessed for the first time, accessing the <code>view</code> property again <em>within</em> the view strategy block could cause a rip in the fabric of space and time, and your program will crash.</p>
+            </div>
+
+            <div class="section" id="resizingplayer">
+                <h2 id="toc_9">Resizing AVPlayerLayer</h2>
+              <p>One reason to assume control over the resizing animation of the <code>AVPlayerLayer</code> would be to implement a "full screen" button.</p>
+              <p>If you want to do this, Brightcove recommends that you create your own <code>UIView</code> and capture the <code>AVPlayerLayer</code> that is created for each <code>BCOVPlaybackSession</code> and not use <code>BCOVPlaybackController.view</code> at all.</p>
+              <p>The SDK adds the <code>AVPlayerLayer</code> to the <code>BCOVPlaybackController.view</code> every time a new playback session is sent to the playback controller. This is done for each video since each video's session has a unique <code>playerLayer</code> oject.</p>
+              <p>Each time the <code>AVPlayerLayer</code> is added to the <code>BCOVPlaybackController.view</code>, the SDK disables its animation by setting the bounds and position entries in the <code>AVPlayerLayer.actions</code> dictionary to <code>NSNull</code>. If you try to mutate the actions dictionary directly, you will have to update it every time it advances to a new playback session.</p>
+              <p>Here is an example of what you might do:</p>
+              <ol>
+                <li>If you are using the code from the Basic Player Sample, in the <code>viewDidLoad</code> method, comment any references to the <code>playbackController.view</code>.</li>
+                <pre><code>// self.playbackController.view.frame = self.videoContainer.bounds;
+// self.playbackController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+// [self.videoContainer addSubview:self.playbackController.view];
+</code></pre>
+                <li>Then, in the <code>didAdvanceToPlaybackSession</code> method, add the <code>AVPlayerLayer</code> to the layer of your view.</li>
+              </ol>
+              <p>If you really need to use <code>BCOVPlaybackController.view</code>, you can remove the bounds and position entries from the <code>AVPlayerLayer.actions</code> dictionary, but you’ll have to assume responsibility for setting up the <code>CALayer</code> animations to look good in your code.</p>
+            </div>
+            
+            
+              
+        </div>
+    </div>
+    <!-- bcl scripts -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.3/fastclick.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/js/foundation.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
+
+    <script src="/en/scripts/docs-nav-data.min.js"></script>
+    <script src="/en/scripts/bcls-doc-site.js"></script>
+    <script>
+        $(document).foundation();
+    </script>
+</body>
+
+</html>
