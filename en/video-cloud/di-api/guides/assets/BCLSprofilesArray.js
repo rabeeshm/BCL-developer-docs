@@ -1,16 +1,16 @@
 var bclsProfiles = {
     BCLSprofilesArray: [ {
   "id" : "519e25f0e4b0af57f9995e34",
-  "version" : 1369318896967,
+  "version" : 1423840460340,
   "name" : "Express Standard",
   "account_id" : -1,
   "brightcove_standard" : false,
   "archive_master" : true,
   "date_created" : 1369318896959,
-  "date_last_modified" : 1369318896959,
+  "date_last_modified" : 1423840460335,
   "renditions" : [ {
     "media_type" : "video",
-    "id" : "519e25f0e4b0af57f9995e2e",
+    "id" : "54de14cce4b0a6d2bf9cb08a",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -24,7 +24,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "519e25f0e4b0af57f9995e2f",
+    "id" : "54de14cce4b0a6d2bf9cb08b",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -38,7 +38,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "519e25f0e4b0af57f9995e30",
+    "id" : "54de14cce4b0a6d2bf9cb08c",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -52,7 +52,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "519e25f0e4b0af57f9995e31",
+    "id" : "54de14cce4b0a6d2bf9cb08d",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -67,7 +67,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "video",
-    "id" : "519e25f0e4b0af57f9995e32",
+    "id" : "54de14cce4b0a6d2bf9cb08e",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -82,7 +82,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "video",
-    "id" : "519e25f0e4b0af57f9995e33",
+    "id" : "54de14cce4b0a6d2bf9cb08f",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -95,21 +95,35 @@ var bclsProfiles = {
     "height" : 576,
     "h264_profile" : "high",
     "h264_bframes" : 2
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a7",
+    "format" : "png",
+    "label" : "poster",
+    "width" : 480,
+    "height" : 360
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a8",
+    "format" : "png",
+    "label" : "thumbnail",
+    "width" : 160,
+    "height" : 90
   } ],
   "packages" : [ ]
 }, {
   "id" : "510fd4e4e4b0c9164cbe9b2d",
-  "version" : 1382627564354,
+  "version" : 1422985252226,
   "name" : "Live - HD",
   "description" : "profile.descriptions.live_hd",
   "account_id" : -1,
   "brightcove_standard" : false,
   "archive_master" : true,
   "date_created" : 1359992036954,
-  "date_last_modified" : 1382627564346,
+  "date_last_modified" : 1422985252222,
   "renditions" : [ {
     "media_type" : "video",
-    "id" : "526938ece4b02fa1015f9459",
+    "id" : "54d10824e4b09dcd1831110c",
     "format" : "flv",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -125,7 +139,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938ece4b02fa1015f945a",
+    "id" : "54d10824e4b09dcd1831110d",
     "format" : "flv",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -141,7 +155,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938ece4b02fa1015f945b",
+    "id" : "54d10824e4b09dcd1831110e",
     "format" : "flv",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -157,7 +171,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938ece4b02fa1015f945c",
+    "id" : "54d10824e4b09dcd1831110f",
     "format" : "flv",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -173,7 +187,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938ece4b02fa1015f945d",
+    "id" : "54d10824e4b09dcd18311110",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -181,7 +195,6 @@ var bclsProfiles = {
     "hls_optimized_ts" : true,
     "live_stream" : true,
     "live_sliding_window_duration" : 300,
-    "max_hls_protocol_version" : 3,
     "video_codec" : "h264",
     "video_bitrate" : 265,
     "decoder_bitrate_cap" : 398,
@@ -193,7 +206,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938ece4b02fa1015f945e",
+    "id" : "54d10824e4b09dcd18311111",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -201,7 +214,6 @@ var bclsProfiles = {
     "hls_optimized_ts" : true,
     "live_stream" : true,
     "live_sliding_window_duration" : 300,
-    "max_hls_protocol_version" : 3,
     "video_codec" : "h264",
     "video_bitrate" : 600,
     "decoder_bitrate_cap" : 900,
@@ -213,7 +225,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938ece4b02fa1015f945f",
+    "id" : "54d10824e4b09dcd18311112",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -221,7 +233,6 @@ var bclsProfiles = {
     "hls_optimized_ts" : true,
     "live_stream" : true,
     "live_sliding_window_duration" : 300,
-    "max_hls_protocol_version" : 3,
     "video_codec" : "h264",
     "video_bitrate" : 1100,
     "decoder_bitrate_cap" : 1650,
@@ -233,7 +244,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938ece4b02fa1015f9460",
+    "id" : "54d10824e4b09dcd18311113",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -241,7 +252,6 @@ var bclsProfiles = {
     "hls_optimized_ts" : true,
     "live_stream" : true,
     "live_sliding_window_duration" : 300,
-    "max_hls_protocol_version" : 3,
     "video_codec" : "h264",
     "video_bitrate" : 2500,
     "decoder_bitrate_cap" : 3750,
@@ -255,17 +265,17 @@ var bclsProfiles = {
   "packages" : [ ]
 }, {
   "id" : "510fd4e5e4b0c9164cbe9b3a",
-  "version" : 1382627554605,
+  "version" : 1422985253019,
   "name" : "Live - Premium HD",
   "description" : "profile.descriptions.live_premium_hd",
   "account_id" : -1,
   "brightcove_standard" : false,
   "archive_master" : true,
   "date_created" : 1359992037245,
-  "date_last_modified" : 1382627554594,
+  "date_last_modified" : 1422985253014,
   "renditions" : [ {
     "media_type" : "video",
-    "id" : "526938e2e4b02fa1015f944d",
+    "id" : "54d10825e4b09dcd18311115",
     "format" : "flv",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -281,7 +291,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938e2e4b02fa1015f944e",
+    "id" : "54d10825e4b09dcd18311116",
     "format" : "flv",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -297,7 +307,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938e2e4b02fa1015f944f",
+    "id" : "54d10825e4b09dcd18311117",
     "format" : "flv",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -313,7 +323,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938e2e4b02fa1015f9450",
+    "id" : "54d10825e4b09dcd18311118",
     "format" : "flv",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -329,7 +339,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938e2e4b02fa1015f9451",
+    "id" : "54d10825e4b09dcd18311119",
     "format" : "flv",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -345,7 +355,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938e2e4b02fa1015f9452",
+    "id" : "54d10825e4b09dcd1831111a",
     "format" : "flv",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -361,7 +371,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938e2e4b02fa1015f9453",
+    "id" : "54d10825e4b09dcd1831111b",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -369,7 +379,6 @@ var bclsProfiles = {
     "hls_optimized_ts" : true,
     "live_stream" : true,
     "live_sliding_window_duration" : 300,
-    "max_hls_protocol_version" : 3,
     "video_codec" : "h264",
     "video_bitrate" : 600,
     "decoder_bitrate_cap" : 900,
@@ -381,7 +390,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938e2e4b02fa1015f9454",
+    "id" : "54d10825e4b09dcd1831111c",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -389,7 +398,6 @@ var bclsProfiles = {
     "hls_optimized_ts" : true,
     "live_stream" : true,
     "live_sliding_window_duration" : 300,
-    "max_hls_protocol_version" : 3,
     "video_codec" : "h264",
     "video_bitrate" : 910,
     "decoder_bitrate_cap" : 1365,
@@ -401,7 +409,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938e2e4b02fa1015f9455",
+    "id" : "54d10825e4b09dcd1831111d",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -409,7 +417,6 @@ var bclsProfiles = {
     "hls_optimized_ts" : true,
     "live_stream" : true,
     "live_sliding_window_duration" : 300,
-    "max_hls_protocol_version" : 3,
     "video_codec" : "h264",
     "video_bitrate" : 1250,
     "decoder_bitrate_cap" : 1875,
@@ -421,7 +428,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938e2e4b02fa1015f9456",
+    "id" : "54d10825e4b09dcd1831111e",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -429,7 +436,6 @@ var bclsProfiles = {
     "hls_optimized_ts" : true,
     "live_stream" : true,
     "live_sliding_window_duration" : 300,
-    "max_hls_protocol_version" : 3,
     "video_codec" : "h264",
     "video_bitrate" : 1750,
     "decoder_bitrate_cap" : 2625,
@@ -441,7 +447,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938e2e4b02fa1015f9457",
+    "id" : "54d10825e4b09dcd1831111f",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -449,7 +455,6 @@ var bclsProfiles = {
     "hls_optimized_ts" : true,
     "live_stream" : true,
     "live_sliding_window_duration" : 300,
-    "max_hls_protocol_version" : 3,
     "video_codec" : "h264",
     "video_bitrate" : 2750,
     "decoder_bitrate_cap" : 4125,
@@ -463,17 +468,17 @@ var bclsProfiles = {
   "packages" : [ ]
 }, {
   "id" : "510fd4e5e4b0c9164cbe9b48",
-  "version" : 1382627572561,
+  "version" : 1422985253772,
   "name" : "Live - Standard",
   "description" : "profile.descriptions.live_standard",
   "account_id" : -1,
   "brightcove_standard" : false,
   "archive_master" : true,
   "date_created" : 1359992037660,
-  "date_last_modified" : 1382627572557,
+  "date_last_modified" : 1422985253769,
   "renditions" : [ {
     "media_type" : "video",
-    "id" : "526938f4e4b02fa1015f9462",
+    "id" : "54d10825e4b0f66e5c937e2a",
     "format" : "flv",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -489,7 +494,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938f4e4b02fa1015f9463",
+    "id" : "54d10825e4b0f66e5c937e2b",
     "format" : "flv",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -505,7 +510,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938f4e4b02fa1015f9464",
+    "id" : "54d10825e4b0f66e5c937e2c",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -513,7 +518,6 @@ var bclsProfiles = {
     "hls_optimized_ts" : true,
     "live_stream" : true,
     "live_sliding_window_duration" : 300,
-    "max_hls_protocol_version" : 3,
     "video_codec" : "h264",
     "video_bitrate" : 580,
     "decoder_bitrate_cap" : 870,
@@ -525,7 +529,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "526938f4e4b02fa1015f9465",
+    "id" : "54d10825e4b0f66e5c937e2d",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -533,7 +537,6 @@ var bclsProfiles = {
     "hls_optimized_ts" : true,
     "live_stream" : true,
     "live_sliding_window_duration" : 300,
-    "max_hls_protocol_version" : 3,
     "video_codec" : "h264",
     "video_bitrate" : 910,
     "decoder_bitrate_cap" : 1365,
@@ -547,16 +550,16 @@ var bclsProfiles = {
   "packages" : [ ]
 }, {
   "id" : "510fd4e3e4b0c9164cbe9aff",
-  "version" : 1359992035683,
+  "version" : 1422985254528,
   "name" : "audio-only",
   "account_id" : -1,
   "brightcove_standard" : false,
   "archive_master" : true,
   "date_created" : 1359992035677,
-  "date_last_modified" : 1359992035677,
+  "date_last_modified" : 1422985254526,
   "renditions" : [ {
     "media_type" : "video",
-    "id" : "510fd4e3e4b0c9164cbe9af9",
+    "id" : "54d10826e4b0a6d2bf9caffe",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -565,7 +568,7 @@ var bclsProfiles = {
     "keyframe_rate" : 0.5
   }, {
     "media_type" : "video",
-    "id" : "510fd4e3e4b0c9164cbe9afa",
+    "id" : "54d10826e4b0a6d2bf9cafff",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -574,7 +577,7 @@ var bclsProfiles = {
     "keyframe_rate" : 0.5
   }, {
     "media_type" : "video",
-    "id" : "510fd4e3e4b0c9164cbe9afb",
+    "id" : "54d10826e4b0a6d2bf9cb000",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 256,
@@ -583,7 +586,7 @@ var bclsProfiles = {
     "keyframe_rate" : 0.5
   }, {
     "media_type" : "audio",
-    "id" : "510fd4e3e4b0c9164cbe9afc",
+    "id" : "54d10826e4b0a6d2bf9cb001",
     "format" : "ts",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -591,7 +594,7 @@ var bclsProfiles = {
     "skip_video" : true
   }, {
     "media_type" : "audio",
-    "id" : "510fd4e3e4b0c9164cbe9afd",
+    "id" : "54d10826e4b0a6d2bf9cb002",
     "format" : "ts",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -599,7 +602,7 @@ var bclsProfiles = {
     "skip_video" : true
   }, {
     "media_type" : "audio",
-    "id" : "510fd4e3e4b0c9164cbe9afe",
+    "id" : "54d10826e4b0a6d2bf9cb003",
     "format" : "ts",
     "audio_codec" : "aac",
     "audio_bitrate" : 256,
@@ -609,16 +612,16 @@ var bclsProfiles = {
   "packages" : [ ]
 }, {
   "id" : "510fd4e4e4b0c9164cbe9b10",
-  "version" : 1359992036077,
+  "version" : 1423840461325,
   "name" : "balanced-high-definition",
   "account_id" : -1,
   "brightcove_standard" : false,
   "archive_master" : true,
   "date_created" : 1359992036068,
-  "date_last_modified" : 1359992036068,
+  "date_last_modified" : 1423840461317,
   "renditions" : [ {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b00",
+    "id" : "54de14cde4b0f66e5c937e8e",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -632,7 +635,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b01",
+    "id" : "54de14cde4b0f66e5c937e8f",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -646,7 +649,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b02",
+    "id" : "54de14cde4b0f66e5c937e90",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -660,7 +663,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b03",
+    "id" : "54de14cde4b0f66e5c937e91",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -675,7 +678,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b04",
+    "id" : "54de14cde4b0f66e5c937e92",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -690,7 +693,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b05",
+    "id" : "54de14cde4b0f66e5c937e93",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -705,7 +708,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b06",
+    "id" : "54de14cde4b0f66e5c937e94",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -720,7 +723,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "audio",
-    "id" : "510fd4e4e4b0c9164cbe9b07",
+    "id" : "54de14cde4b0f66e5c937e95",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -728,7 +731,7 @@ var bclsProfiles = {
     "skip_video" : true
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b08",
+    "id" : "54de14cde4b0f66e5c937e96",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -744,7 +747,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b09",
+    "id" : "54de14cde4b0f66e5c937e97",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -760,7 +763,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b0a",
+    "id" : "54de14cde4b0f66e5c937e98",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -776,7 +779,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b0b",
+    "id" : "54de14cde4b0f66e5c937e99",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -792,7 +795,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b0c",
+    "id" : "54de14cde4b0f66e5c937e9a",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -808,7 +811,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b0d",
+    "id" : "54de14cde4b0f66e5c937e9b",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -824,7 +827,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b0e",
+    "id" : "54de14cde4b0f66e5c937e9c",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -840,7 +843,7 @@ var bclsProfiles = {
     "h264_profile" : "high"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b0f",
+    "id" : "54de14cde4b0f66e5c937e9d",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -854,21 +857,35 @@ var bclsProfiles = {
     "width" : 1280,
     "height" : 960,
     "h264_profile" : "high"
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a7",
+    "format" : "png",
+    "label" : "poster",
+    "width" : 480,
+    "height" : 360
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a8",
+    "format" : "png",
+    "label" : "thumbnail",
+    "width" : 160,
+    "height" : 90
   } ],
   "packages" : [ ]
 }, {
   "id" : "546a53c4e4b043fd6f492414",
-  "version" : 1421686595992,
+  "version" : 1423840462225,
   "name" : "balanced-nextgen-player",
   "description" : "A balanced rendition set optimized for Brightcove's Next Gen player",
   "account_id" : -1,
   "brightcove_standard" : true,
   "archive_master" : true,
   "date_created" : 1416254404316,
-  "date_last_modified" : 1421686595987,
+  "date_last_modified" : 1423840462220,
   "renditions" : [ {
     "media_type" : "video",
-    "id" : "54bd3743e4b09dcd18311049",
+    "id" : "54de14cee4b09dcd1831117a",
     "reference_id" : "mp4_1",
     "format" : "mp4",
     "audio_codec" : "aac",
@@ -887,7 +904,7 @@ var bclsProfiles = {
     "constant_bitrate" : false
   }, {
     "media_type" : "video",
-    "id" : "54bd3743e4b09dcd1831104a",
+    "id" : "54de14cee4b09dcd1831117b",
     "reference_id" : "mp4_2",
     "format" : "mp4",
     "audio_codec" : "aac",
@@ -906,7 +923,7 @@ var bclsProfiles = {
     "constant_bitrate" : false
   }, {
     "media_type" : "audio",
-    "id" : "54bd3743e4b09dcd1831104b",
+    "id" : "54de14cee4b09dcd1831117c",
     "reference_id" : "hls_audio",
     "format" : "ts",
     "type" : "segmented",
@@ -915,7 +932,7 @@ var bclsProfiles = {
     "skip_video" : true
   }, {
     "media_type" : "video",
-    "id" : "54bd3743e4b09dcd1831104c",
+    "id" : "54de14cee4b09dcd1831117d",
     "reference_id" : "hls_1",
     "format" : "ts",
     "type" : "segmented",
@@ -935,7 +952,7 @@ var bclsProfiles = {
     "constant_bitrate" : false
   }, {
     "media_type" : "video",
-    "id" : "54bd3743e4b09dcd1831104d",
+    "id" : "54de14cee4b09dcd1831117e",
     "reference_id" : "hls_2",
     "format" : "ts",
     "type" : "segmented",
@@ -955,7 +972,7 @@ var bclsProfiles = {
     "constant_bitrate" : false
   }, {
     "media_type" : "video",
-    "id" : "54bd3743e4b09dcd1831104e",
+    "id" : "54de14cee4b09dcd1831117f",
     "reference_id" : "hls_3",
     "format" : "ts",
     "type" : "segmented",
@@ -975,7 +992,7 @@ var bclsProfiles = {
     "constant_bitrate" : false
   }, {
     "media_type" : "video",
-    "id" : "54bd3743e4b09dcd1831104f",
+    "id" : "54de14cee4b09dcd18311180",
     "reference_id" : "hls_4",
     "format" : "ts",
     "type" : "segmented",
@@ -995,7 +1012,7 @@ var bclsProfiles = {
     "constant_bitrate" : false
   }, {
     "media_type" : "video",
-    "id" : "54bd3743e4b09dcd18311050",
+    "id" : "54de14cee4b09dcd18311181",
     "reference_id" : "hls_5",
     "format" : "ts",
     "type" : "segmented",
@@ -1015,7 +1032,7 @@ var bclsProfiles = {
     "constant_bitrate" : false
   }, {
     "media_type" : "video",
-    "id" : "54bd3743e4b09dcd18311051",
+    "id" : "54de14cee4b09dcd18311182",
     "reference_id" : "hls_6",
     "format" : "ts",
     "type" : "segmented",
@@ -1033,20 +1050,34 @@ var bclsProfiles = {
     "height" : 1080,
     "h264_profile" : "high",
     "constant_bitrate" : false
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a7",
+    "format" : "png",
+    "label" : "poster",
+    "width" : 480,
+    "height" : 360
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a8",
+    "format" : "png",
+    "label" : "thumbnail",
+    "width" : 160,
+    "height" : 90
   } ],
   "packages" : [ ]
 }, {
   "id" : "510fd4e4e4b0c9164cbe9b1a",
-  "version" : 1359992036358,
+  "version" : 1423840463124,
   "name" : "balanced-standard-definition",
   "account_id" : -1,
   "brightcove_standard" : false,
   "archive_master" : true,
   "date_created" : 1359992036353,
-  "date_last_modified" : 1359992036353,
+  "date_last_modified" : 1423840463119,
   "renditions" : [ {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b11",
+    "id" : "54de14cfe4b0a6d2bf9cb091",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -1060,7 +1091,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b12",
+    "id" : "54de14cfe4b0a6d2bf9cb092",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -1074,7 +1105,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b13",
+    "id" : "54de14cfe4b0a6d2bf9cb093",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -1089,7 +1120,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b14",
+    "id" : "54de14cfe4b0a6d2bf9cb094",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -1104,7 +1135,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "audio",
-    "id" : "510fd4e4e4b0c9164cbe9b15",
+    "id" : "54de14cfe4b0a6d2bf9cb095",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1112,7 +1143,7 @@ var bclsProfiles = {
     "skip_video" : true
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b16",
+    "id" : "54de14cfe4b0a6d2bf9cb096",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1128,7 +1159,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b17",
+    "id" : "54de14cfe4b0a6d2bf9cb097",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1144,7 +1175,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b18",
+    "id" : "54de14cfe4b0a6d2bf9cb098",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1160,7 +1191,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b19",
+    "id" : "54de14cfe4b0a6d2bf9cb099",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1174,20 +1205,34 @@ var bclsProfiles = {
     "width" : 1024,
     "height" : 768,
     "h264_profile" : "high"
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a7",
+    "format" : "png",
+    "label" : "poster",
+    "width" : 480,
+    "height" : 360
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a8",
+    "format" : "png",
+    "label" : "thumbnail",
+    "width" : 160,
+    "height" : 90
   } ],
   "packages" : [ ]
 }, {
   "id" : "510fd4e4e4b0c9164cbe9b24",
-  "version" : 1359992036697,
+  "version" : 1423840464297,
   "name" : "high-bandwidth-devices",
   "account_id" : -1,
   "brightcove_standard" : false,
   "archive_master" : true,
   "date_created" : 1359992036692,
-  "date_last_modified" : 1359992036692,
+  "date_last_modified" : 1423840464292,
   "renditions" : [ {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b1b",
+    "id" : "54de14d0e4b0f66e5c937e9f",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -1202,7 +1247,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b1c",
+    "id" : "54de14d0e4b0f66e5c937ea0",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -1217,7 +1262,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b1d",
+    "id" : "54de14d0e4b0f66e5c937ea1",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -1232,7 +1277,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b1e",
+    "id" : "54de14d0e4b0f66e5c937ea2",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -1247,7 +1292,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "audio",
-    "id" : "510fd4e4e4b0c9164cbe9b1f",
+    "id" : "54de14d0e4b0f66e5c937ea3",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1255,7 +1300,7 @@ var bclsProfiles = {
     "skip_video" : true
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b20",
+    "id" : "54de14d0e4b0f66e5c937ea4",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1271,7 +1316,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b21",
+    "id" : "54de14d0e4b0f66e5c937ea5",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1287,7 +1332,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b22",
+    "id" : "54de14d0e4b0f66e5c937ea6",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1303,7 +1348,7 @@ var bclsProfiles = {
     "h264_profile" : "high"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e4e4b0c9164cbe9b23",
+    "id" : "54de14d0e4b0f66e5c937ea7",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1317,20 +1362,34 @@ var bclsProfiles = {
     "width" : 1280,
     "height" : 960,
     "h264_profile" : "high"
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a7",
+    "format" : "png",
+    "label" : "poster",
+    "width" : 480,
+    "height" : 360
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a8",
+    "format" : "png",
+    "label" : "thumbnail",
+    "width" : 160,
+    "height" : 90
   } ],
   "packages" : [ ]
 }, {
   "id" : "510fd4e5e4b0c9164cbe9b52",
-  "version" : 1359992037838,
+  "version" : 1423840465162,
   "name" : "low-bandwidth-devices",
   "account_id" : -1,
   "brightcove_standard" : false,
   "archive_master" : true,
   "date_created" : 1359992037834,
-  "date_last_modified" : 1359992037834,
+  "date_last_modified" : 1423840465157,
   "renditions" : [ {
     "media_type" : "video",
-    "id" : "510fd4e5e4b0c9164cbe9b49",
+    "id" : "54de14d1e4b0f66e5c937ea9",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -1344,7 +1403,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e5e4b0c9164cbe9b4a",
+    "id" : "54de14d1e4b0f66e5c937eaa",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -1358,7 +1417,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e5e4b0c9164cbe9b4b",
+    "id" : "54de14d1e4b0f66e5c937eab",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -1372,7 +1431,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e5e4b0c9164cbe9b4c",
+    "id" : "54de14d1e4b0f66e5c937eac",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -1387,7 +1446,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "audio",
-    "id" : "510fd4e5e4b0c9164cbe9b4d",
+    "id" : "54de14d1e4b0f66e5c937ead",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1395,7 +1454,7 @@ var bclsProfiles = {
     "skip_video" : true
   }, {
     "media_type" : "video",
-    "id" : "510fd4e5e4b0c9164cbe9b4e",
+    "id" : "54de14d1e4b0f66e5c937eae",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1411,7 +1470,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e5e4b0c9164cbe9b4f",
+    "id" : "54de14d1e4b0f66e5c937eaf",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1427,7 +1486,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e5e4b0c9164cbe9b50",
+    "id" : "54de14d1e4b0f66e5c937eb0",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1443,7 +1502,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e5e4b0c9164cbe9b51",
+    "id" : "54de14d1e4b0f66e5c937eb1",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1457,20 +1516,34 @@ var bclsProfiles = {
     "width" : 640,
     "height" : 480,
     "h264_profile" : "baseline"
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a7",
+    "format" : "png",
+    "label" : "poster",
+    "width" : 480,
+    "height" : 360
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a8",
+    "format" : "png",
+    "label" : "thumbnail",
+    "width" : 160,
+    "height" : 90
   } ],
   "packages" : [ ]
 }, {
   "id" : "510fd4e6e4b0c9164cbe9b68",
-  "version" : 1359992038381,
+  "version" : 1423840466028,
   "name" : "mp4-only",
   "account_id" : -1,
   "brightcove_standard" : false,
   "archive_master" : true,
   "date_created" : 1359992038378,
-  "date_last_modified" : 1359992038378,
+  "date_last_modified" : 1423840466023,
   "renditions" : [ {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b61",
+    "id" : "54de14d2e4b0a6d2bf9cb09b",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -1484,7 +1557,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b62",
+    "id" : "54de14d2e4b0a6d2bf9cb09c",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -1498,7 +1571,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b63",
+    "id" : "54de14d2e4b0a6d2bf9cb09d",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -1512,7 +1585,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b64",
+    "id" : "54de14d2e4b0a6d2bf9cb09e",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -1527,7 +1600,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b65",
+    "id" : "54de14d2e4b0a6d2bf9cb09f",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -1542,7 +1615,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b66",
+    "id" : "54de14d2e4b0a6d2bf9cb0a0",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -1557,7 +1630,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b67",
+    "id" : "54de14d2e4b0a6d2bf9cb0a1",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -1570,20 +1643,34 @@ var bclsProfiles = {
     "height" : 960,
     "h264_profile" : "high",
     "h264_bframes" : 2
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a7",
+    "format" : "png",
+    "label" : "poster",
+    "width" : 480,
+    "height" : 360
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a8",
+    "format" : "png",
+    "label" : "thumbnail",
+    "width" : 160,
+    "height" : 90
   } ],
   "packages" : [ ]
 }, {
   "id" : "510fd4e6e4b0c9164cbe9b5e",
-  "version" : 1359992038058,
+  "version" : 1423840466971,
   "name" : "screencast",
   "account_id" : -1,
   "brightcove_standard" : false,
   "archive_master" : true,
   "date_created" : 1359992038054,
-  "date_last_modified" : 1359992038054,
+  "date_last_modified" : 1423840466965,
   "renditions" : [ {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b53",
+    "id" : "54de14d2e4b09dcd18311184",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -1597,7 +1684,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b54",
+    "id" : "54de14d2e4b09dcd18311185",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 64,
@@ -1612,7 +1699,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b55",
+    "id" : "54de14d2e4b09dcd18311186",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -1627,7 +1714,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b56",
+    "id" : "54de14d2e4b09dcd18311187",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -1642,7 +1729,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b57",
+    "id" : "54de14d2e4b09dcd18311188",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -1657,7 +1744,7 @@ var bclsProfiles = {
     "h264_bframes" : 2
   }, {
     "media_type" : "audio",
-    "id" : "510fd4e6e4b0c9164cbe9b58",
+    "id" : "54de14d2e4b09dcd18311189",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1665,7 +1752,7 @@ var bclsProfiles = {
     "skip_video" : true
   }, {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b59",
+    "id" : "54de14d2e4b09dcd1831118a",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1681,7 +1768,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b5a",
+    "id" : "54de14d2e4b09dcd1831118b",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1697,7 +1784,7 @@ var bclsProfiles = {
     "h264_profile" : "baseline"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b5b",
+    "id" : "54de14d2e4b09dcd1831118c",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1713,7 +1800,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b5c",
+    "id" : "54de14d2e4b09dcd1831118d",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1729,7 +1816,7 @@ var bclsProfiles = {
     "h264_profile" : "main"
   }, {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b5d",
+    "id" : "54de14d2e4b09dcd1831118e",
     "format" : "ts",
     "type" : "segmented",
     "audio_codec" : "aac",
@@ -1743,20 +1830,34 @@ var bclsProfiles = {
     "width" : 1280,
     "height" : 960,
     "h264_profile" : "high"
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a7",
+    "format" : "png",
+    "label" : "poster",
+    "width" : 480,
+    "height" : 360
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a8",
+    "format" : "png",
+    "label" : "thumbnail",
+    "width" : 160,
+    "height" : 90
   } ],
   "packages" : [ ]
 }, {
   "id" : "510fd4e6e4b0c9164cbe9b60",
-  "version" : 1359992038156,
+  "version" : 1423840467728,
   "name" : "single-rendition",
   "account_id" : -1,
   "brightcove_standard" : false,
   "archive_master" : true,
   "date_created" : 1359992038155,
-  "date_last_modified" : 1359992038155,
+  "date_last_modified" : 1423840467726,
   "renditions" : [ {
     "media_type" : "video",
-    "id" : "510fd4e6e4b0c9164cbe9b5f",
+    "id" : "54de14d3e4b0f66e5c937eb3",
     "format" : "mp4",
     "audio_codec" : "aac",
     "audio_bitrate" : 128,
@@ -1768,6 +1869,20 @@ var bclsProfiles = {
     "width" : 480,
     "height" : 360,
     "h264_profile" : "baseline"
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a7",
+    "format" : "png",
+    "label" : "poster",
+    "width" : 480,
+    "height" : 360
+  }, {
+    "media_type" : "image",
+    "id" : "54d02903e4b0c948249cb2a8",
+    "format" : "png",
+    "label" : "thumbnail",
+    "width" : 160,
+    "height" : 90
   } ],
   "packages" : [ ]
 }, {
