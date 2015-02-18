@@ -568,10 +568,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     } else if (section === "player-management") {
                         section = "player-management";
                         sectionName = "player-management";
-                    } else if (section === "studio-prerelease") {
-                        sectionName = "Studio (pre-release)";
-                        if (pathArray[3] === "index.html") {}
-                    } else {
+                    }  else {
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
                     }
                     // check to see if we're on the section landing page
@@ -676,7 +673,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                             }
                             break;
                         case "upload-module":
-                            subsectionName = "Upload Module (pre-release)";
+                            subsectionName = "Upload Module";
                             dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
                             // check to see if on landing page
                             if (pathArray[4] === "index.html") {
@@ -699,7 +696,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                             }
                             break;
                         case "media-module":
-                            subsectionName = "Media Module (pre-release)";
+                            subsectionName = "Media Module";
                             dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
                             // check to see if on landing page
                             if (pathArray[4] === "index.html") {
