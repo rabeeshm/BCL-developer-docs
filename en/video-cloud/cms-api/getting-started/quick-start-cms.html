@@ -72,7 +72,7 @@
             <li>The request verb - one of the following: GET | POST | PATCH | PUT | DELETE</li>
             <li>Request data - used for POST, PATCH, and PUT; for GET and DELETE requests, you will leave this blank and just press <strong>return</strong></li>
         </ul>
-        <p>For each part of this tutorial, you will be given the values for each of these inputs to use with a Brightcove demo account. If you prefer to use your own account, then you can enter information in form fields below to get the inputs to use for your account.</p>
+        <p>For each part of this tutorial, you will be given the values for each of these inputs to use with your account.</p>
     </div>
     <div id="obtaincredentials" class="section">
         <h2>Obtain credentials</h2>
@@ -91,7 +91,7 @@
     <h2>Assign values</h2>
     <p>Values you just retrieved in the previous section will be used in calls to the CMS API. These values will be entered and assigned in the following form. The <strong>account ID</strong> and <strong>account ID</strong> will also be dynamically inserted into form request URLs later in the quick start to make filling out the forms easier.</p>
     <ol start="2">
-      <li>Enter the corresponding values for each of the following. If you do not have a video ID some of the later tasks in this quick start will not function. This step <strong>MUST</strong> be completed if you want to use your own account for steps that follow.</li>
+      <li>Enter the corresponding values for each of the following. If you do not have a video ID some of the later tasks in this quick start will not function. This step <strong>MUST</strong> be completed before you perform the steps that follow.</li>
   </ol>
   <div class="form-wrapper">
       <fieldset>
@@ -114,7 +114,7 @@
           <input name="video_id" id="cms_video_id" type="text">
       </p> -->
       <p>
-          <input id="initialValues_Submit" type="submit" value="Assign Values">
+          <input id="initialValues_Submit" class="BCLbutton" type="submit" value="Assign Values">
       </p>
       <p><span id="assignConfirm"></span></p>
   </fieldset>
@@ -127,10 +127,10 @@
         <li>HTTP method: <code>GET</code></li>
         <li>Endpoint: <code>https://cms.api.brightcove.com/v1beta1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos</code></li>
     </ul>
-    <p class="BCL-aside">Note: Before completing this task you must perform steps 1 and 2 above to retrieve and assign account and credential information, or you can use the Brightcove demo account. Note that if you are using your own account and have a large number of videos, this is going to return <strong>a lot of data</strong>, and may take some time.</p>
+    <p class="BCL-aside">Note: Before completing this task you must perform steps 1 and 2 above to retrieve and assign account and credential information, or you can use the Brightcove demo account. Note that since we are not specifying limit, we will get back 20 videos - you can set the limit to any integer up to 100.</p>
     <ol start="3">
-      <li>You will now use the api-tester.sh script to retrieve all videos. You will enter the following values:
-<pre id="task1"></pre>
+      <li>You will now use the api-tester.sh script to retrieve all videos. Run <code>bash api-tester.sh</code> using the input values below:
+<pre id="taskRetrieveAll"></pre>
       </li>
   </ol>
 </div>
@@ -146,24 +146,6 @@
     <ol start="4">
       <li>You will now use the proxy in conjunction with the following form to create a video. Be sure to alter the body so the <code>name</code> property reflects your choice for the video name.</li>
   </ol>
-  <div class="form-wrapper">
-      <fieldset>
-        <legend>Caller for the CMS API - Create a Video</legend>
-        <p>Submits to http://solutions.brightcove.com:<strong>8006</strong>
-        </p>
-        <p>
-          Call type:
-          <select name="requestType" id="cms_requestType2">
-            <option>GET</option>
-            <option selected="selected">POST</option>
-            <option>PUT</option>
-            <option>PATCH</option>
-            <option>DELETE</option>
-        </select>
-    </p>
-    <p>
-      Call body:
-      <br />
       <textarea name="requestBody" id="cms_requestBody2">{"name":"My test Video"}</textarea>
   </p>
   <p>
@@ -445,145 +427,86 @@
 <script type="text/javascript">
     /******** Any scripts specific to page samples should go here *********/
     var BCLS = (function ($) {
-      var // CMS API stuff
-      $cms_client_id = $("#cms_client_id"),
-      $cms_client_secret = $("#cms_client_secret"),
-      $cms_submit = $("#cms_Submit"),
-      $cms_account_id = $("#cms_account_id"),
-      $cms_response = $("#cms_response"),
-      $cms_video_id = $("#cms_video_id"),
-      cmsURL = "https://cms.api.brightcove.com/v1beta1/accounts/",
-        // functions
-        bclslog,
-        submitRequest,
-        cleanString,
-        setCMSInputs;
-      // IE safe logger
-      bclslog = function (context, message) {
-        if (console) {
-          console.log(context, message);
-      }
-  }
-        // function to remove spaces and line breaks
-        cleanString = function (str) {
-          // remove line breaks
-          str = str.replace(/(\r\n|\n|\r)/gm,"");
-          // remove spaces
-          // here we have to be careful - spaces fine within strings
-          // but not outside them
-          if (str != "") {str = JSON.stringify(JSON.parse(str));};
-          return str;
-      };
-      // set options for the CMS API request
-      setCMSOptionsRetrieveAll = function () {
-        var options = {};
-        options.client_id = $cms_client_id.val();
-        options.client_secret = $cms_client_secret.val();
-        $cms_requestBody1 = $("#cms_requestBody1");
-        options.requestBody = cleanString($cms_requestBody1.val());
-        options.requestType = $("#cms_requestType1").val();
-        options.url = $("#cms_url1").val();
-        // now submit the request
-        submitRequest(options, cmsURL, $("#cms_response1"));
-    };
-    setCMSOptionsCreate = function () {
-        var options = {};
-        options.client_id = $cms_client_id.val();
-        options.client_secret = $cms_client_secret.val();
-        $cms_requestBody2 = $("#cms_requestBody2");
-        options.requestBody = cleanString($cms_requestBody2.val());
-        options.requestType = $("#cms_requestType2").val();
-        options.url = $("#cms_url2").val();
-        // now submit the request
-        submitRequest(options, cmsURL, $("#cms_response2"));
-    };
-    setCMSOptionsRetrieveOne = function () {
-        var options = {};
-        options.client_id = $cms_client_id.val();
-        options.client_secret = $cms_client_secret.val();
-        $cms_requestBody3 = $("#cms_requestBody3");
-        options.requestBody = cleanString($cms_requestBody3.val());
-        options.requestType = $("#cms_requestType3").val();
-        options.url = $("#cms_url3").val();
-        // now submit the request
-        submitRequest(options, cmsURL, $("#cms_response3"));
-    };
-    setCMSOptionsRetrieveRenditions = function () {
-        var options = {};
-        options.client_id = $cms_client_id.val();
-        options.client_secret = $cms_client_secret.val();
-        $cms_requestBody4 = $("#cms_requestBody4");
-        options.requestBody = cleanString($cms_requestBody4.val());
-        options.requestType = $("#cms_requestType4").val();
-        options.url = $("#cms_url4").val();
-        // now submit the request
-        submitRequest(options, cmsURL, $("#cms_response4"));
-    };
-    setCMSOptionsSearchByTags = function () {
-        var options = {};
-        options.client_id = $cms_client_id.val();
-        options.client_secret = $cms_client_secret.val();
-        $cms_requestBody6 = $("#cms_requestBody6");
-        options.requestBody = cleanString($cms_requestBody6.val());
-        options.requestType = $("#cms_requestType6").val();
-        options.url = $("#cms_url6").val();
-        // now submit the request
-        submitRequest(options, cmsURL, $("#cms_response6"));
-    };
-    setCMSOptionsSearchByDate = function () {
-        var options = {};
-        options.client_id = $cms_client_id.val();
-        options.client_secret = $cms_client_secret.val();
-        $cms_requestBody7 = $("#cms_requestBody7");
-        options.requestBody = cleanString($cms_requestBody7.val());
-        options.requestType = $("#cms_requestType7").val();
-        options.url = $("#cms_url7").val();
-        // now submit the request
-        submitRequest(options, cmsURL, $("#cms_response7"));
-    };
-    setCMSOptionsUpdateVideo = function () {
-        var options = {};
-        options.client_id = $cms_client_id.val();
-        options.client_secret = $cms_client_secret.val();
-        $cms_requestBody8 = $("#cms_requestBody8");
-        options.requestBody = cleanString($cms_requestBody8.val());
-        options.requestType = $("#cms_requestType8").val();
-        options.url = $("#cms_url8").val();
-        // now submit the request
-        submitRequest(options, cmsURL, $("#cms_response8"));
-    };
-      // function to submit Request
-      submitRequest = function (options, proxyURL, responseLocation) {
-        var parsedData = {};
-        $.ajax({
-          url: proxyURL,
-          type: "POST",
-          data: options,
-          success: function (data) {
-            bclslog(data);
-            parsedData = JSON.parse(data);
-            responseLocation.html(data);
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            responseLocation.html("The called failed; here's what the server sent back: " + errorThrown);
+        var // CMS API stuff
+            $cms_client_id = $("#cms_client_id"),
+            $cms_client_secret = $("#cms_client_secret"),
+            $cms_submit = $("#cms_Submit"),
+            $cms_account_id = $("#cms_account_id"),
+            $cms_response = $("#cms_response"),
+            $cms_video_id = $("#cms_video_id"),
+            $taskRetrieveAll = $("#taskRetrieveAll"),
+            $cms_retrieveall_Submit = $("#cms_retrieveall_Submit"),
+            options = {
+            client_id: "578b5b79-0883-47bb-a231-4fb5692ecd9c",
+            client_secret: "spF_alkXCIJydgUluDNCWKxmk0-bvy-WI6PCxT2DzPo_JlwP-yDedLGqW4qIhXYh0eJyALABE5wHNPeS0CZmUw",
+            account_id: "57838016001",
+            video_id_create: "",
+            video_id_renditions: "1032828084001",
+            cmsURL: "https://cms.api.brightcove.com/v1beta1/accounts/"
+            },
+            // functions
+            bclslog,
+            setCMSOptionsRetrieveAll,
+            setCMSOptionsCreate,
+            setCMSOptionsRetrieveOne,
+            setCMSOptionsRetrieveRenditions,
+            setCMSOptionsSearchByTags,
+            setCMSOptionsSearchByDate,
+            setCMSOptionsUpdateVideo;
+        // IE safe logger
+        bclslog = function (context, message) {
+            if (console) {
+                console.log(context, message);
+            }
         }
-    });
-    };
-    setInitialValues = function () {
+        // set options for the CMS API request
+        setCMSOptionsRetrieveAll = function () {
+            $taskRetrieveAll.html(
+                " <strong>Client id:</strong> " + options.client_id + "\n" +
+                " <strong>Client secret:</strong> " +options.client_secret + "\n" +
+                " <strong>Full API call:</strong> " + options.cmsURL + "\n" +
+                " <strong>Request verb:</strong> " + "GET \n" +
+                " <strong>Request data:</strong>"  + "{no data - just press return}"
+            );
+        };
+        setCMSOptionsCreate = function () {
+            $taskRetrieveAll.html(
+                " <strong>Client id:</strong> " + options.client_id + "\n" +
+                " <strong>Client secret:</strong> " +options.client_secret + "\n" +
+                " <strong>Full API call:</strong> " + options.cmsURL + "\n" +
+                " <strong>Request verb:</strong> " + "GET \n" +
+                " <strong>Request data:</strong>"  + "{\"name\":\"My test Video\"}"
+            );
+        };
+        setCMSOptionsRetrieveOne = function () {
+        };
+        setCMSOptionsRetrieveRenditions = function () {
+        };
+        setCMSOptionsSearchByTags = function () {
+        };
+        setCMSOptionsSearchByDate = function () {
+            submitRequest(options, cmsURL, $("#cms_response7"));
+        };
+        setCMSOptionsUpdateVideo = function () {
+        };
+        setInitialValues = function () {
         var elem = document.getElementById("assignConfirm");
+        options.cmsURL += $cms_account_id.val() + "/videos";
+        options.client_id = $cms_client_id.val();
+        options.client_secret = $cms_client_secret.val();
         elem.innerHTML = "    Values Assigned!";
-        $(".cms_url").html("https://cms.api.brightcove.com/v1beta1/accounts/" + $cms_account_id.val() + "/videos");
-        $(".cms_url_videoID").html("https://cms.api.brightcove.com/v1beta1/accounts/" + $cms_account_id.val() + "/videos/" + $cms_video_id.val());
-    };
-    $("#initialValues_Submit").on("click", setInitialValues);
-    $("#cms_retrieveall_Submit").on("click", setCMSOptionsRetrieveAll);
-    $("#cms_create_Submit").on("click", setCMSOptionsCreate);
-    $("#cms_retrieveone_Submit").on("click", setCMSOptionsRetrieveOne);
-    $("#cms_retrieverenditions_Submit").on("click", setCMSOptionsRetrieveRenditions);
-    $("#cms_searchbytags_Submit").on("click", setCMSOptionsSearchByTags);
-    $("#cms_searchbydate_Submit").on("click", setCMSOptionsSearchByDate);
-    $("#cms_udpateVideo_Submit").on("click", setCMSOptionsUpdateVideo);
-})($);
+        setCMSOptionsRetrieveAll();
+        setCMSOptionsCreate();
+        };
+        $("#initialValues_Submit").on("click", setInitialValues);
+        $("#cms_retrieveall_Submit").on("click", setCMSOptionsRetrieveAll);
+        $("#cms_create_Submit").on("click", setCMSOptionsCreate);
+        $("#cms_retrieveone_Submit").on("click", setCMSOptionsRetrieveOne);
+        $("#cms_retrieverenditions_Submit").on("click", setCMSOptionsRetrieveRenditions);
+        $("#cms_searchbytags_Submit").on("click", setCMSOptionsSearchByTags);
+        $("#cms_searchbydate_Submit").on("click", setCMSOptionsSearchByDate);
+        $("#cms_udpateVideo_Submit").on("click", setCMSOptionsUpdateVideo);
+    })($);
 </script>
 <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
 <script>
