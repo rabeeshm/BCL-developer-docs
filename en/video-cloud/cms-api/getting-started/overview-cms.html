@@ -48,7 +48,7 @@
             <div id="top" class="section">
                 <h1>CMS API Overview</h1>
                 <!-- Place document intro sentence(s) here -->
-                
+
                 <p>This CMS API provides uncached read access to the data. This is important for time-sensitive publishing workflows because you make a changes to videos and playlists using the CMS API and quickly read the data to verify that is correct.</p>
                 <div class="BCL-aside">
                     <p>Note: The CMS API is intended for integrations and publishing workflows. You should <strong>never</strong> make client-side calls to this API from a public web page, as doing so would involve exposing your client credentials for the API.</p>
@@ -114,6 +114,7 @@
                     <li>GET</li>
                     <li>POST</li>
                     <li>PATCH</li>
+                    <li>PUT</li>
 				    <li>DELETE</li>
                 </ul>
             </div>
@@ -153,12 +154,6 @@
                             <td>Returns an array of manual playlist IDs that the video ID is contained in. Note that this request does not look at smart playlists.</td>
                         </tr>
                         <tr>
-                            <td>/counts/playlists</td>
-                            <td>Returns a count of playlists in the account</td>
-                        </tr>
-
-                        <!-- endpoints using video_reference_id -->
-                        <tr>
                             <td>/videos/ref:{video_reference_id}</td>
                             <td>Metadata and asset information about the video with the given reference ID</td>
                         </tr>
@@ -174,13 +169,53 @@
                             <td>/videos/ref:{video_reference_id}/references</td>
                             <td>Returns an array of manual playlist IDs that the video reference ID is contained in. Note that this request does not look at smart playlists.</td>
                         </tr>
+                        <tr>
+                            <td>/folders</td>
+                            <td>Used to create a folder or get a list of folders</td>
+                        </tr>
+                        <tr>
+                            <td>/folders/{folder_id}</td>
+                            <td>Used to get information about a folder, update the folder name, or delete the folder</td>
+                        </tr>
+                        <tr>
+                            <td>/folders/{folder_id}/videos</td>
+                            <td>Used to get a list of videos contained in a folder</td>
+                        </tr>
+                        <tr>
+                            <td>/folders/{folder_id}/videos/{video_id}</td>
+                            <td>Used to add a video to a folder or remove it from the folder</td>
+                        </tr>
+                        <tr>
+                            <td>/counts/playlists</td>
+                            <td>Returns a count of playlists in the account</td>
+                        </tr>
+                        <tr>
+                            <td>/playlists</td>
+                            <td>Used to create a playlist or get a list of playlists</td>
+                        </tr>
+                        <tr>
+                            <td>/playlists/{playlist_id}</td>
+                            <td>Used to get, update, or delete a single playlist</td>
+                        </tr>
+                        <tr>
+                            <td>/playlists/{playlist_id}/video</td>
+                            <td>Used to get the videos contained in a playlist</td>
+                        </tr>
+                        <tr>
+                            <td>/subscriptions</td>
+                            <td>Used create a notification subscription or get a list of subscriptions</td>
+                        </tr>
+                        <tr>
+                            <td>/subscriptions/{subscription_id}</td>
+                            <td>Used to retrieve or delete a single subscription</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
             <div class="section" id="parameters">
+                <h2>Video GET parameters</h2>
                 <p>Note that all parameters are
                     <strong>optional</strong>.</p>
-                <h2>GET parameters</h2>
                 <table>
                     <thead>
                         <tr>
@@ -234,7 +269,7 @@
             </div>
             <div class="section" id="videosEndpoint">
                 <h2>Get video data</h2>
-                <p>Brightcove's CMS API provides a programmatic way to access data for videos in your Video Cloud library.</p>
+                <p>Brightcove's CMS API provides a programmatic way to access data for videos in your Video Cloud library. See the <a href="../references/video-fields-reference.html">Video Fields Reference</a> for information on fields returned.</p>
                 <p>To retrieve media data using the HTTP
                     <code>GET</code> method, you will append resources to the base URL with your account id:</p>
 <pre><code>https://cms.api.brightcove.com/v1/accounts/{account_id}/videos</code></pre>
@@ -247,14 +282,15 @@
 <pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/videos/<em>{video_id}</em></code></pre>
             </div>
             <div class="section" id="playlistsEndpoint">
-                <h2>Get playlist</h2>
-                <p>You can retrieve a single playlist object for the account by issuing a GET request to:</p>
-<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/playlists/<em>{playlist_id}</em></code></pre>
-            </div>
-            <div class="section" id="playlistEndpoint">
                 <h2>Get list of playlists</h2>
                 <p>You can retrieve an array of playlist objects for the account by issuing a GET request to:</p>
 <pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/playlists</code></pre>
+                <p>See the <a href="../references/playlist-fields-reference.html">Playlist Fields Reference</a> for details of the fields returned.</p>
+            </div>
+            <div class="section" id="playlistEndpoint">
+                <h2>Get/Create playlist</h2>
+                <p>You can retrieve a single playlist object for the account by issuing a GET request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/playlists/<em>{playlist_id}</em></code></pre>
             </div>
             <div class="section" id="countsEndpoint">
                 <h2>Get counts</h2>
@@ -266,10 +302,11 @@
                 <p>Use the <code>limit</code> parameter to specify how many items you want to return on a request - up to 100. You can then use the <code>offset</code> parameter to page through result sets that are larger than the <code>limit</code>. The <code>offset</code>is the number of items to skip. For example, for a search like this:</p>
 <pre><code>/videos?q=updated_at:2014-01-01..2014-06-30&amp;limit=25&amp;offset=50</code></pre>
                 <p>would return videos 51-75 of the total result set, assuming the total result set has at least 75 videos.</p>
+                <p><code>limit</code> and <code>offset</code> can be used for both videos and playlists.</p>
             </div>
             <div class="section" id="sorting">
                 <h2>Sorting results</h2>
-                <p>Use the parameter <code>sort=field_name</code> (or <code>sort=-field_name</code> for descending order)to specify how the results should be sorted. You can sort on the following fields:</p>
+                <p>Use the parameter <code>sort=field_name</code> (or <code>sort=-field_name</code> for descending order)to specify how the results should be sorted - you can sort both video and playlists. You can sort on the following video fields:</p>
                 <ul>
                     <li>name</li>
                     <li>reference_id</li>
@@ -290,9 +327,16 @@
                 <ul>
                     <li id="note1"><sup class="once-red"><strong>[1]</strong></sup> You can sort on <code>plays_total</code> or <code>plays_trailing_week</code>, but these fields are not included in the results</li>
                 </ul>
-                <p>If you do not provide a sort value for a search call, the results will be sorted by relevance. If you do not provide a sort value for a list call, the results will be sorted by <code>updated_at</code> descending.</p>
+                <p>You can sort playlists on the following fields:</p>
+                <ul>
+                    <li>name</li>
+                    <li>created_at (default)</li>
+                    <li>updated_at</li>
+                    <li>reference_id</li>
+                </ul>
+                <p>If you do not provide a sort value for a video search call, the results will be sorted by relevance. If you do not provide a sort value for a list call, the results will be sorted by <code>updated_at</code> descending.</p>
             </div>
-            <div id="settingvalues" class="section">
+            <div id="createVideo" class="section">
                 <h2>Create video</h2>
                 <p>
                     <code>POST</code> requests will create a new video object in the account. Only the object is created - this is not a method that allows you to upload a video. See the <a href="../../di-api/index.html">Dynamic Ingest API</a> for information on how to send the video source file to Brightcove.</p>
@@ -443,13 +487,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- <tr>
+                    <tr>
                       	<td>ad_keys</td>
                       	<td>String</td>
                       	<td>no</td>
                       	<td></td>
                       </tr>
-                      <tr>
+                      <!-- <tr>
                       	<td>allow_viral_syndication</td>
                       	<td>Boolean</td>
                       	<td>no</td>
@@ -677,7 +721,88 @@
                     <li>Endpoint: <code>https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}</code></li>
                 </ul>
             </div>
-
+            <div class="section" id="folderOperations">
+                <h2>Folder operations</h2>
+                <p>This section describes:</p>
+                <ul>
+                    <li>Getting a list of folders</li>
+                    <li>Creating a folder</li>
+                    <li>Updating a folder name</li>
+                    <li>Deleting a folder</li>
+                    <li>Adding a video to a folder</li>
+                    <li>Removing a video from a folder</li>
+                </ul>
+                <h3>Get a list of folders</h3>
+                <p>To get a list of folders, make a GET request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/folders</code></pre>
+                <h3>Create a folder</h3>
+                <p>To create a folder</p>
+            </div>
+            <div class="section" id="createPlaylist">
+                <h2>Create a playlist</h2>
+                <p>You can create a playlist by making a POST request to the endpoint:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/playlists</code></pre>
+                <p>In the request body, include JSON for the playlist properties. For example:</p>
+<pre><code>{
+  "description" : "My first bird playlist",
+  "name" : "Bird Videos",
+  "reference_id" : "bird-playlist-1",
+  "type" : "EXPLICIT,
+  "video_ids" : ["123456789" , "987654321", "999888777666"]
+}</code></pre>
+                <p>Fields for new playlists</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>description</td>
+                            <td>String</td>
+                            <td>no</td>
+                        </tr>
+                        <tr>
+                            <td>favorite</td>
+                            <td>Boolean</td>
+                            <td>not yet supported</td>
+                        </tr>
+                        <tr>
+                            <td>limit</td>
+                            <td>Number</td>
+                            <td>not yet supported</td>
+                        </tr>
+                        <tr>
+                            <td>name</td>
+                            <td>String</td>
+                            <td>yes</td>
+                        </tr>
+                        <tr>
+                            <td>reference_id</td>
+                            <td>String</td>
+                            <td>no</td>
+                        </tr>
+                        <tr>
+                            <td>search</td>
+                            <td>String, smart playlists only</td>
+                            <td>no</td>
+                        </tr>
+                        <tr>
+                            <td>type</td>
+                            <td>String value of established enum</td>
+                            <td>yes</td>
+                        </tr>
+                        <tr>
+                            <td>video_ids</td>
+                            <td>Array of Strings, EXPLICIT (manual) type only</td>
+                            <td>no</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
             <div class="section" id="notifications">
                 <h2>Notifications</h2>
