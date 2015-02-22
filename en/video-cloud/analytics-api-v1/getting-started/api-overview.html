@@ -39,13 +39,12 @@
         <div id="main" class="large-10 small-12 columns">
             <div class="section" id="top">
                 <h1>Analytics API v1 Overview</h1>
-                <p>The Analytics API allows you to obtain analytics data for your Video Cloud accounts directly. You can also view the built-in analytics reports in the Analytics Module of <a href="//videocloud.brightcove.com">Video Cloud Studio</a>. Accessing
-                    the data programmatically gives you additional flexibility for such purposes as:</p>
+                <p>The Analytics API allows you to obtain analytics data for your Video Cloud accounts directly. You can also view the built-in analytics reports in the Analytics Module of <a href="//videocloud.brightcove.com">Video Cloud Studio</a>. Accessing the data programmatically gives you additional flexibility for such purposes as:</p>
                 <ul>
                     <li>Creating custom charts and displays</li>
-                    <li>Merging or aggregating data from multiple accounts</li>
+                    <li>Working with multiple APIs together - for example, getting video data using the CMS API for videos with the most views over the previous week</li>
                     <li>Combining your video analytic data with other site analytics data</li>
-                    <li>For some sample solutions, see
+                    <li>.for some sample solutions, see
                         <ul>
                             <li> <a href="//solutions.brightcove.com/bcls/analytics-api/most-popular-videos.html">Most Popular Videos</a>
                             </li>
@@ -60,7 +59,7 @@
             <div class="section" id="baseURL">
                 <h2>Base URL</h2>
                 <p>The base URL for the Analytics API is:</p>
-<pre><code>https://data.brightcove.com/analytics-api/videocloud</code></pre>
+<pre><code>https://analytics.api.brightcove.com/v1</code></pre>
             </div>
             <div class="section" id="headers">
                 <h2>Headers</h2>
@@ -69,14 +68,15 @@
                 <p>You will first need to obtain client credentials (a <code>client_id</code> and <code>client_secret</code>). This is a one-time operation that can be performed using the <a href="http://docs.brightcove.com/en/video-cloud/analytics-api/guides/managing-api-credentials.html">OAuth Credentials UI</a>. You can get client credentials directly from the Brightcove OAuth Service using <a href="/en/video-cloud/oauth-api/guides/get-client-credentials.html">CURL</a> or <a href="/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">Postman</a>.</p>
                 <p>You will also need an <code>access_token</code>, which is obtained using the <code>client_id</code> and <code>client_secret</code> and passed in an Authorization header with your API request:</p>
 <pre><code>Authorization: Bearer {access_token}</code></pre>
-                <p>The <code>access_token</code> expires after five minutes, so you must obtain a new one for each request, or check to make sure that your token is still valid. See the <a href="quick-start.html">Analytics API Quick Start</a> for a tutorial that walks you through obtaining client credentials and access token, and then making an API call. See the </p>
+                <p>The <code>access_token</code> expires after five minutes, so you must obtain a new one for each request, or check to make sure that your token is still valid. See <a href="../../oauth-api/guides/get-token.hmlt">Getting Access Tokens</a> for a detailed explanation of how to get access tokens, including code samples.</p>
                 <h3>Accept-Encoding: gzip (optional)</h3>
                 <p>Passing this header will cause the response to be returned in compressed form. This will improved performance for large reports.</p>
+                <p class="BCL-aside">Note: the permanent Analytics API tokens issued during the Limited Availability program are no longer supported. Access tokens must be acquired from the Brightcove OAuth Service.</p>
             </div>
             <div class="section" id="concurrency">
                 <h2>Concurrent Requests</h2>
                 <p>The number of concurrent requests for reports on the same account is limited to a single request at a time.</p>
-                <p>For example:
+                <p>.for example:
                 <ol>
                     <li>Start an API request "A"</li>
                     <li>Start API request "B" for the same account</li>
@@ -95,19 +95,23 @@
                     <dt>Report</dt>
                     <dd>
                         A report on one or more <a href="#dimensionsOverview">dimensions</a>. The endpoint for a report request is:
-<pre><code>https://data.brightcove.com/analytics-api/videocloud/accounts/{account_id}/report?dimensions={dimensions}</code></pre>
+<pre><code>https://analytics.api.brightcove.com/v1/data?accounts={account_id(s)}&dimensions={dimensions}</code></pre>
                     </dd>
-                    <dt>Rollup</dt>
+                    <dt>Data endpoint</dt>
                     <dd>
-                        A summary report for the account. The endpoint for a rollup request is:
-<pre><code>https://data.brightcove.com/analytics-api/videocloud/accounts/1234</code></pre>
+                        A specific piece of analytics data served with minimal latency. See <a href="/docs.brightcove.com/en/video-cloud/analytics-api/guides/video-information-endpoint.html">Video Data Endpoint</a> for more information.
                     </dd>
                 </dl>
-                <p><a href="#filterValues">Where filters</a> and <a href="#dateRanges">date ranges</a> can be applied to both reports and rollups. Report requests can have additional parameters detailed below.</p>
+                <p><a href="#filterValues">Where filters</a> and <a href="#dateRanges">date ranges</a> can be applied to reports. Report requests can have additional parameters detailed below.</p>
+            </div>
+            <div class="section" id="accounts">
+                <h2>Accounts</h2>
+                <p>The Video Cloud account(s) that you want a report for are specified using the <code>accounts</code> parameter. For example:</p>
+<pre><code>https://analytics.api.brightcove.com/v1/data?accounts={account_id(s)}</code></pre>
             </div>
             <div class="section" id="metrics">
-                <h2>Dimensions and metrics</h2>
-                <p>Below are the dimensions you can currently report on. Click on a dimension below to see the metrics that are returned for it.</p>
+                <h2>Dimensions and fields</h2>
+                <p>Below are the dimensions you can currently report on. Click on a dimension below to see the fields that are returned for it.</p>
                 <dl>
                    <dt class="bcls-question">account</dt>
                    <dd class="bcls-answer"><ul id="account"></ul></dd>
@@ -119,8 +123,10 @@
                    <dd class="bcls-answer"><ul id="country"></ul></dd>
                    <dt class="bcls-question">region</dt>
                    <dd class="bcls-answer"><ul id="region"></ul></dd>
-                   <dt class="bcls-question">day</dt>
-                   <dd class="bcls-answer"><ul id="day"></ul></dd>
+                   <dt class="bcls-question">date</dt>
+                   <dd class="bcls-answer"><ul id="date"></ul></dd>
+                   <dt class="bcls-question">date_hour</dt>
+                   <dd class="bcls-answer"><ul id="date_hour"></ul></dd>
                    <dt class="bcls-question">destination_domain</dt>
                    <dd class="bcls-answer"><ul id="destination_domain"></ul></dd>
                    <dt class="bcls-question">destination_path</dt>
@@ -139,13 +145,13 @@
             </div>
             <div class="section" id="reportDimensions">
                 <h2>Multiple Dimensions</h2>
-                <p>You can request reports on multiple dimensions, but some combinations are not valid. For invalid dimension combinations, no data will be returned. Below are the supported dimension combinations.</p>
+                <p>You can request reports on multiple dimensions, but some combinations are not valid. For invalid dimension combinations, no data will be returned. For valid combinations, the fields returned will be the union of the fields returned for the individual dimensions. Below are the supported dimension combinations.</p>
                 <ul id="dimensionCombinations">
 
                 </ul>
                 <h3>Example</h3>
                 <p>A typical use case for getting a report on multiple dimensions: you want a breakdown of video views between desktop and mobile devices, and also want to know how many of the mobile device views were on iOS versus Android devices, and how many of the desktop views were on Macs versus Windows machines. Currently there is no standard report in the Studio Analytics Module that provides this information, but you can obtain it via this Analytics API call:</p>
-<pre><code>https://data.brightcove.com/analytics-api/videocloud/accounts/{account_id}/report?dimensions=video,device_type,device_os&amp;from=2014-01-01&amp;to=2014-04-01&amp;limit=all&amp;format=json&amp;fields=video_view</code></pre>
+<pre><code>https:≈dimensions=video,device_type,device_os&amp;from=2014-01-01&amp;to=2014-04-01&amp;limit=all&amp;format=json&amp;fields=video_view</code></pre>
                 <p>(In this case we are requesting views for the period from January 1 to April 1 in 2014.)</p>
 
             </div>
@@ -153,9 +159,9 @@
                 <h2>Where filters</h2>
                 <p>The general syntax for filters is:</p>
 <pre><code>where=dimension1==value1;dimension2==value2</code></pre>
-                <p>For example:</p>
+                <p>.for example:</p>
 <pre><code>where=video==123456789;day=2013-09-21;device_type==tablet</code></pre>
-                <p>Commas are treated as logical ORs, and semicolons as logical ANDs. For example, <code>where=video==1234,5678;player=9876</code> is interpreted as "where video = 1234 <strong>OR</strong> 5678 <strong>AND</strong> player = 9876"</p>
+                <p>Commas are treated as logical ORs, and semicolons as logical ANDs. .for example, <code>where=video==1234,5678;player=9876</code> is interpreted as "where video = 1234 <strong>OR</strong> 5678 <strong>AND</strong> player = 9876"</p>
                 <h3>Spaces and special characters</h3>
                 <p>String values should be URI encoded. You can also escape special characters using a "\":</p>
 <pre><code>where=search_terms==boston\,%20ma</code></pre>
@@ -211,7 +217,7 @@
                     </li>
                     <li>Epoch time values in milliseconds, such as <code>1377047323000</code>
                     </li>
-                    <li>Dates expressed in ISO 8601 standard international date format: <code>YYYY-MM-DD</code>format, such as <code>2013-09-12</code>. For dates expressed in this format:
+                    <li>Dates expressed in ISO 8601 standard international date format: <code>YYYY-MM-DD</code>format, such as <code>2013-09-12</code>. .for dates expressed in this format:
                         <ul>
                             <li>Any date range specified will be interpreted <em>in the current timezone</em>for the user</li>
                             <li>The time for the date give will be interpreted as midnight ( <code>00:00:00</code>) on the date specified <em>in the user's timezone</em>
@@ -231,7 +237,7 @@
                 <h2>Geographical reports</h2>
                 <h3>Dimensions for geographical analytics</h3>
                 <pre><code>* country - As the ISO-3611-1 country code. eg: 'US' * region - As the ISO-3611-2 region code. eg: 'US-WA' * city - City name. eg: Seattle</code></pre>
-                <p>Note: For unknown country or region the API returns "ZZ" as the code (As per ISO-3611-alpha2).</p>
+                <p>Note: .for unknown country or region the API returns "ZZ" as the code (As per ISO-3611-alpha2).</p>
             </div>
             <div class="section" id="fieldsAndSorting">
                 <h2>Fields and Sorting</h2>
@@ -257,7 +263,7 @@
                             <td>Authorization failed &mdash; make sure you have got a valid auth token for your account, and that you are including it in your request correctly</td>
                         </tr>
                         <tr>
-                            <td>404 Not Found</td>
+                            <td>404 Not .found</td>
                             <td>Make sure your request is valid, including the service URL and your account id</td>
                         </tr>
                         <tr>
@@ -281,13 +287,14 @@
     <script src="/en/scripts/bclsfaq.js"></script>
     <script src="/en/video-cloud/analytics-api/assets/aapi-model.js"></script>
     <script id="pageScript" type="text/javascript">
-    var BCLS = ( function () {
-        var metricsTemplate = "{{#items}}<li>{{this}}</li>{{/items}}",
-            filtersTemplate = "{{#filters}}<li>{{this}}</li>{{/filters}}",
+    var BCLS = ( function ($, window, document, aapi_model) {
+        var filtersTemplate = "{{#filters}}<li>{{this}}</li>{{/filters}}",
+            fieldsTemplate = "{{#fields}}<li>{{this}}</li>{{/fields}}",
             $account = $("#account"),
             $player = $("#player"),
             $video = $("#video"),
-            $day = $("#day"),
+            $date = $("#date"),
+            $date_hour = $("#date_hour"),
             $country = $("#country"),
             $region = $("#region"),
             $city = $("#city"),
@@ -300,32 +307,96 @@
             $device_type = $("#device_type"),
             $device_os = $("#device_os"),
             dimensionCombinations = document.getElementById("dimensionCombinations"),
-            combination;
+            combination,
+            // functions
+            bclslog,
+            buildComboFields,
+            dedupe,
+            copyArray;
+
+        /**
+         * logging
+         */
+        bclslog = function (context, message) {
+            if (window["console"] && console["log"]) {
+              console.log(context, message);
+            };
+        };
+        /**
+         * dedupe a simple array of strings or numbers
+         */
+        dedupe = function (arr) {
+        var i,
+        len = arr.length,
+        out = [],
+        obj = {};
+
+        for (i = 0;i < len; i++) {
+        obj[arr[i]] = 0;
+        }
+        for (i in obj) {
+        out.push(i);
+        }
+        return out;
+        }
+        /**
+         * copy all values from one array into another
+         * arguments: a, b
+         * adds elements of a to b
+         * returns: b
+         */
+        copyArray = function (a,b) {
+            var i, imax;
+            if (a !== undefined && b !== undefined && a.constructor === Array && b.constructor === Array) {
+                imax = a.length;
+                for (i = 0; i < imax; i++) {
+                    b.push(a[i]);
+                }
+            }
+            return b;
+        }
+        /**
+         * build the field for the dimension combinations
+         */
+        buildComboFields = function () {
+            var combo;
+            for (combo in aapi_model.combinations) {
+                var i,
+                    dimensions = aapi_model.combinations[combo].dimensions,
+                    imax = dimensions.length,
+                    tmpArray = [];
+                for (i = 0; i < imax; i++) {
+                    tmpArray = tmpArray.concat(aapi_model[dimensions[i]].fields);
+                }
+                tmpArray = dedupe(tmpArray);
+                aapi_model.combinations[combo].fields = copyArray(tmpArray, aapi_model.combinations[combo].fields);
+                dimensionCombinations.innerHTML += "<li>" + aapi_model.combinations[combo].dimensions.join(", ") + "</li>";
+            }
+        }
         // set filters
         template = Handlebars.compile(filtersTemplate);
         $filtersList.html(template(aapi_model));
         // set dimension combinations
-        for (combination in aapi_model.dimensionCombinations) {
-            dimensionCombinations.innerHTML += "<li>" + aapi_model.dimensionCombinations[combination].join(",") + "</li>";
-        }
+        buildComboFields();
         // set response fields
-        template = Handlebars.compile(metricsTemplate);
-        $account.html(template(aapi_model.accountFields));
-        $player.html(template(aapi_model.playerFields));
-        $video.html(template(aapi_model.videoFields));
-        $day.html(template(aapi_model.dayFields));
-        $country.html(template(aapi_model.countryFields));
-        $region.html(template(aapi_model.regionFields));
-        $city.html(template(aapi_model.cityFields));
-        $destination_domain.html(template(aapi_model.destination_domainFields));
-        $destination_path.html(template(aapi_model.destination_pathFields));
-        $referrer_domain.html(template(aapi_model.referrer_domainFields));
-        $source_type.html(template(aapi_model.source_typeFields));
-        $search_terms.html(template(aapi_model.search_termsFields));
-        $device_type.html(template(aapi_model.device_typeFields));
-        $device_os.html(template(aapi_model.device_osFields));
+        template = Handlebars.compile(fieldsTemplate);
+        $account.html(template(aapi_model.account));
+        $player.html(template(aapi_model.player));
+        $video.html(template(aapi_model.video));
+        $date.html(template(aapi_model.date));
+        $date_hour.html(template(aapi_model.date_hour));
+        $country.html(template(aapi_model.country));
+        $region.html(template(aapi_model.region));
+        $city.html(template(aapi_model.city));
+        $destination_domain.html(template(aapi_model.destination_domain));
+        $destination_path.html(template(aapi_model.destination_path));
+        $referrer_domain.html(template(aapi_model.referrer_domain));
+        $source_type.html(template(aapi_model.source_type));
+        $search_terms.html(template(aapi_model.search_terms));
+        $device_type.html(template(aapi_model.device_type));
+        $device_os.html(template(aapi_model.device_os));
         return {}
-    })();
+    })($, window, document, aapi_model);
     </script>
     <script>
         $(document).foundation();
