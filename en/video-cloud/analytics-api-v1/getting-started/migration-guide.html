@@ -45,110 +45,53 @@
         </div>
         <div id="main" class="large-10 small-12 columns">
             <div id="top" class="section">
-                <h1>Analytics API Migration Guide: v0 to v1</h1>
+                <h1>Analytics API Migration: v0 to v1</h1>
                 <p>This topic provides information for developers who are migrating apps and integrations from the v0 (Limited Availabilty) version of the Analytics API to version v1.</p>
-                
-                <p class="text-warning" id="curlNote">Note: The steps in the document involve
-                    <code>curl</code> and other command-line tools that are native to Mac and Linux systems, but not part of the Windows operating system. If you are on Windows, you can get these tools by installing <a href="//cygwin.com">cygwin</a>. During the install you will be prompted for packages to install. Open the
-                    <strong>Net</strong> package, then check the
-                    <strong>curl</strong> option and then finish the installation. Once you have done this you will be able to follow the Quick Start to Player Management successfully as written using the cygwin command line. Tools are available to run curl at the normal Windows command line, but not detailed in this document.</p>
             </div>
             <!--break-->
-            <div class="section" id="getCredentials">
-                <h2>Get client credentials</h2>
-                <p>Although you can get client credentials (a
-                    <code>client_id</code> and
-                    <code>client_secret</code>) directly from the Brightcove OAuth Service using <a href="/en/video-cloud/oauth-api/guides/get-client-credentials.html">CURL</a> or <a href="/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">Postman</a>, the easiest way is to use the <a href="http://docs.brightcove.com/en/video-cloud/analytics-api/guides/managing-api-credentials.html">OAuth Credentials UI</a>. We will use that method here.</p>
-                <ol>
-                    <li>Login to <a href="https://signin.brightcove.com/?redirect=https%3A%2F%2Fstudio.brightcove.com%2F">Video Cloud Studio</a>.</li>
-                    <li>Click the gear icon
-                        <img alt="" src="http://img.brightcove.com/node14056-gear-icon.png" /> in the header.</li>
-                    <li>Click the
-                        <strong>API Authentication</strong> link:
-                        <br />
-                        <img src="assets/oauth-account-settings.png" alt="account settings link" width="182" height="181">
-                    </li>
-                    <li>The API Authentication page will open displaying your current client registrations.
-                        <br />
-                        <img alt="current client registrations" src="assets/oauth-start-screen.png" width="757" height="329" />
-                        <br />
-                        <p class="BCL-aside">Note: Only the client registrations for the account you are logged into will display.</p>
-                    </li>
-                    <li>Click
-                        <strong>Register New Application</strong>.</li>
-                    <li>Enter a
-                        <strong>Name</strong> and
-                        <strong>Short Description</strong> for the client registration.</li>
-                    <li>Select one or more of your accounts for authorization. You can select multiple accounts and click
-                        <strong>&gt;</strong> to add them or click
-                        <strong>&gt;&gt;</strong> to add all accounts. Click
-                        <strong>&lt;</strong> to remove an account or
-                        <strong>&lt;&lt;</strong> to remove all accounts.</li>
-                    <li>Select the API(s) and permission(s) to enable for this registration.
-                        <br />
-                        <img alt="register new app" src="assets/oauth-registering-new-app.png" width="878" height="779" />
-                    </li>
-                    <li>Click
-                        <strong>Save</strong>.</li>
-                    <li>A
-                        <strong>Client ID</strong> and
-                        <strong>Client secret</strong> will be returned.
-                        <br />
-                        <img alt="OAuth" src="assets/oauth-client-secret.png" width="601" height="452" />
-                        <br/>
-                        <p class="BCL-aside">Note: Copy the client secret and store it in a secure location as the client secret
-                            <strong>will not</strong> be displayed again.</p>
-                    </li>
-                </ol>
-            </div>
-            <div class="section" id="getToken">
-                <h2>Get access token</h2>
-                <p>Now that we have client credentials, we're ready to get an access token. We will do this using CURL. Because we will need to do this repeatedly if we are going to make multiple calls to API over more than a five minute period, we will export the
-                    <code>client_id</code> and
-                    <code>client_secret</code> as system variables to make it easier to rerun the CURL request.</p>
-                <ol start="12">
-                    <li>
-                        At a command line, export the client id and secret you obtained in the previous steps as
-                        <code>CLIENT_ID</code> and
-                        <code>CLIENT_SECRET</code>:
-<pre><code>$ export CLIENT_ID=<em>{your client id}</em>
-$ export CLIENT_SECRET=<em>{your client secret}</em></code></pre>
-                    </li>
-                    <li>
-                        Send the following CURL request to the OAuth Service (note that we are using the client id and secret as a username/password pair):
-<pre><code>curl \ --silent \ --user $CLIENT_ID:$CLIENT_SECRET \ --header "Content-Type: application/x-www-form-urlencoded" \ --data "grant_type=client_credentials" \ https://oauth.brightcove.com/v3/access_token</code></pre>
-                    </li>
-                    <li>
-                        You should see a JSON response that includes the
-                        <code>access_token</code>:
-<pre><code>{"access_token":"APA-eethQBfNsqKrK6jpR9zuqFc3GqCuJkBmJlV15MPCO9yv_4V1GD_dHnBf5SuMi_BPgDRDjsp0VnZlOb_RBlw55FnI7NSPkPxeNdvgmz2vhGjX08EB-9xsfkEgqNQmCbtIaZcrvFjfj5hvdac5PRw05CqxBX2tqmfyZ9yJnQiUdAyK-I6814LYDdLYhYggq38eWsUNLhwSep4Yjiw0wCbWJr3yci6dWuGDixsGHvp9IKYCRDbELDNuiVzfzq6pd3yux5ZvovuJJILrPiatQW2HOOOtIqCh629Sf-_c64QNSFgKGIy2Aeuv9F1qCYmgbTsz7WafRCiwmHosjPsIHTjKnud7zxKJCyTnoIDdK9Fvo4_qUwkWU17sBWz-D_9cgJsFGMP3BRl1-5begFnSZhfStJcjnwDG4RchJ4X377uuabEd-uP98qYqyKsBAH8FK7FJ1pGOFRV2","token_type":"Bearer","expires_in":300}</code></pre>
-                    </li>
-                    <li>Copy the value for the
-                        <code>access_token</code> (not including the quotation marks).</li>
-                    <li>
-                        Export the
-                        <code>access_token</code> as ACCESS_TOKEN:
-<pre><code>$ export ACCESS_TOKEN=<em>{your access token}</em></code></pre>
-                    </li>
-                    <li>Whenever the access token expires, you need to repeat steps 13-16 to get a new one.</li>
-                </ol>
-            </div>
-            <div class="section" id="makeAPICall">
-                <h2>Make the API call</h2>
-                <p>Now we are ready to make the API request.</p>
-                <ol start="18">
-                    <li>
-                        Run the following CURL command to make the API request, substituting your Video Cloud account id for
-                        <code><strong><em>{account_id}</em></strong></code>:
-<pre><code>curl -s \ "https://data.brightcove.com/analytics-api/videocloud/accounts/
-<strong>{account_id}</strong>/report/?dimensions=video,referrer_domain&amp;limit=2&amp;offset=0&amp;fields=all&amp;sort=engagement_score&amp;format=json" \ -H "Authorization: Bearer $ACCESS_TOKEN"</code></pre>
-                    </li>
-                    <li>
-                        The response should look like this (the response here has been prettified for readability):
-<pre><code id="apiResponse">>{"account":"20318290001","item_count":2251,"items":[{"engagement_score":200,"play_rate":0.5,"referrer_domain":"plstudios.com","video":"1854105390001","video_duration":"218.0","video_impression":2,"video_name":"Adding Captions to Videos","video_percent_viewed":200,"video_seconds_viewed":436,"video_view":1},{"engagement_score":200,"play_rate":0.17,"referrer_domain":"ratchetlocal.com","video":"594316519001","video_duration":"28.0","video_impression":6,"video_name":"Sea_LionFish","video_percent_viewed":200,"video_seconds_viewed":56,"video_view":1}],"summary":{"engagement_score":55.09,"video_seconds_viewed":789819,"video_percent_viewed":362308.4,"video_impression":105084,"video_view":6577,"play_rate":0.06}}</code></pre>
-                    </li>
-                    <li>If you got an unauthorized request response instead, try repeating steps 13-16 to get a new access token, and make sure that account id that you used in the request matches one that got client credentials for in steps 1-12.</li>
-                </ol>
+            <div class="section" id="changes">
+                <h2>Changes to the Analytics API</h2>
+                <dl>
+                    <dt id="baseURL">Base URL</dt>
+                    <dd>The base URL for the API has changed:
+                    <p>Old URL:</p>
+<pre><code>https://data.brightcove.com/analytics-api/videocloud</code></pre>
+                    <p><strong>New URL:</strong></p>
+<pre><code><strong>https://analytics.api.brightcove.com/v1</strong></code></pre>
+                    </dd>
+                    <dt id="authentication">Authentication</dt>
+                    <dd>Authentication via the v0 (Limited Availabilty) is no longer supported. You must get access tokens for the Analytics API via the <a href="//docs.brightcove.com/en/video-cloud/oauth-api/getting-started/oauth-api-overview.html">Brightcove OAuth Service</a>. See <a href="../guides/managing-api-credentials.html">Managing API Credentials</a> for information on obtaining client credentials for the Analytics API.</dd>
+                    <dt id="rollups">Rollups</dt>
+                    <dd>Account rollup calls are no longer supported. If you were using rollups to get detailed engagement information on recent video views, you will now be able to obtain these through the new <a href="#engagement">engagement endpoints</a>.</dd>
+                    <dt id="reports">Reports</dt>
+                    <dd>Reports are now accessed through the <code>data</code> resource rather than <code>report</code>:
+                    <p>Old report endpoint</p>
+<pre><code>https://data.brightcove.com/analytics-api/videocloud/accounts/{accountId}/report</code></pre>
+                    <p><strong>New report endpoint</strong></p>
+<pre><code><strong>https://analytics.api.brightcove.com/v1/data</strong></code></pre>
+                    </dd>
+                    <dt id="accounts">Accounts</dt>
+                    <dd>For <a href="#reports">reports</a>, <code>accounts</code> is now a parameter rather than a resource in the URL path - this allows generation of reports on multiple accounts:
+                    <p>Old way:</p>
+<pre><code>.../accounts/{accountId}/report...</code></pre>
+                    <p><strong>New way:</strong></p>
+<pre><code><strong>.../data?accounts={account_id1},{account_id2}...</strong></code></pre>
+                    <p class="BCL-aside">Note: the new <a href="#engagement">engagement endpoints</a> and the <a href="../guides/video-information-endpoint.html">video information endpoint</a> still have <code>/accounts/{account_id}/ in the URL path, and accept requests for a single account only.</code></p>
+                    </dd>
+                    <dt id="day"><code>day</code> dimension</dt>
+                    <dd>The <code>day</code> dimension for reports is replaced by the <strong><code>date</code></strong> dimension. The <code>date</code> dimension works in the same way and returns the same data as the old <code>day</code> dimension.</dd>
+                    <dt id="date_time"><code>date_time</code> dimension</dt>
+                    <dd>The <code>date_time</code> dimension is used like the <code><span id="#day">date</span></code> dimension, but allows you to get hourly data for periods within the previous 32 days. If the range for the <code>date_time</code> requests extends outside the previous 32 days, an error will be returned. To specify hours of the day for request, set the <code>from</code> and <code>to</code> parameters to millisecond value of epoch time rather than using MM-DD-YYYY dates. For example:
+<pre><code id="date_hour_example"></code></pre>
+                    </dd>
+                    <dt></dt>
+                    <dd></dd>
+                    <dt></dt>
+                    <dd></dd>
+                    <dt></dt>
+                    <dd></dd>
+                </dl>
+
             </div>
         </div>
     </div>
@@ -161,21 +104,21 @@ $ export CLIENT_SECRET=<em>{your client secret}</em></code></pre>
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
     <script src="/en/scripts/docs-nav-data.min.js"></script>
     <script src="/en/scripts/bcls-doc-site.js"></script>
-    <script>
-        $(document).foundation();
-    </script>
-    <script id="pageScript" type="text/javascript">
-        /******** Any scripts specific to page samples should go here *********/
-        var jsonStr = JSON.parse('{"account":"20318290001","item_count":2251,"items":[{"engagement_score":200,"play_rate":0.5,"referrer_domain":"plstudios.com","video":"1854105390001","video_duration":"218.0","video_impression":2,"video_name":"Adding Captions to Videos","video_percent_viewed":200,"video_seconds_viewed":436,"video_view":1},{"engagement_score":200,"play_rate":0.17,"referrer_domain":"ratchetlocal.com","video":"594316519001","video_duration":"28.0","video_impression":6,"video_name":"Sea_LionFish","video_percent_viewed":200,"video_seconds_viewed":56,"video_view":1}],"summary":{"engagement_score":55.09,"video_seconds_viewed":789819,"video_percent_viewed":362308.4,"video_impression":105084,"video_view":6577,"play_rate":0.06}}'),
-            responseBlock = document.getElementById("apiResponse");
-        responseBlock.innerHTML = JSON.stringify(jsonStr, true, 2);
-        console.log(JSON.stringify(jsonStr, null, "  "));
-    </script>
     <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a>
     </div>
+    <script type="text/javascript">
+    var now = new Date().valueOf(),
+        twoHoursAgo = new Date().valueOf() - 7200000,
+        date_hour_example = document.getElementById("date_hour_example");
+        date_hour_example.innerHTML = ".../data?accounts={account_id}&amp;dimensions=date_time&amp;from=" + twoHoursAgo + "&amp;to=" + now
+
+    </script>
     <script>
         var feedbackMail = document.getElementById("feedbackMail");
         feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+    </script>
+    <script>
+        $(document).foundation();
     </script>
 </body>
 
