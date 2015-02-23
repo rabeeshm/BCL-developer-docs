@@ -48,9 +48,8 @@
                 <h1>Analytics API Migration: v0 to v1</h1>
                 <p>This topic provides information for developers who are migrating apps and integrations from the v0 (Limited Availabilty) version of the Analytics API to version v1.</p>
             </div>
-            <!--break-->
-            <div class="section" id="changes">
-                <h2>Changes to the Analytics API</h2>
+            <div id="generalChanges" class="section">
+                <h2>General changes</h2>
                 <dl>
                     <dt id="baseURL">Base URL</dt>
                     <dd>The base URL for the API has changed:
@@ -62,7 +61,12 @@
                     <dt id="authentication">Authentication</dt>
                     <dd>Authentication via the v0 (Limited Availabilty) is no longer supported. You must get access tokens for the Analytics API via the <a href="//docs.brightcove.com/en/video-cloud/oauth-api/getting-started/oauth-api-overview.html">Brightcove OAuth Service</a>. See <a href="../guides/managing-api-credentials.html">Managing API Credentials</a> for information on obtaining client credentials for the Analytics API.</dd>
                     <dt id="rollups">Rollups</dt>
-                    <dd>Account rollup calls are no longer supported. If you were using rollups to get detailed engagement information on recent video views, you will now be able to obtain these through the new <a href="#engagement">engagement endpoints</a>.</dd>
+                    <dd>Account rollup calls are no longer supported. If you were using rollups to get detailed engagement information on recent video views, you will now be able to obtain these through the new <a href="#engagementEndpoints">engagement endpoints</a>.</dd>
+                </dl>
+            </div>
+            <div class="section" id="reportChanges">
+                <h2>Report Changes</h2>
+                <dl>
                     <dt id="reports">Reports</dt>
                     <dd>Reports are now accessed through the <code>data</code> resource rather than <code>report</code>:
                     <p>Old report endpoint</p>
@@ -76,7 +80,7 @@
 <pre><code>.../accounts/{accountId}/report...</code></pre>
                     <p><strong>New way:</strong></p>
 <pre><code><strong>.../data?accounts={account_id1},{account_id2}...</strong></code></pre>
-                    <p class="BCL-aside">Note: the new <a href="#engagement">engagement endpoints</a> and the <a href="../guides/video-information-endpoint.html">video information endpoint</a> still have <code>/accounts/{account_id}/ in the URL path, and accept requests for a single account only.</code></p>
+                    <p class="BCL-aside">Note: the new <a href="#engagementEndpoints">engagement endpoints</a> and the <a href="../guides/video-information-endpoint.html">video information endpoint</a> still have <code>/accounts/{account_id}/ in the URL path, and accept requests for a single account only.</code></p>
                     </dd>
                     <dt id="date"><code>day</code> becomes <code>date</code> dimension</dt>
                     <dd>The <code>day</code> dimension for reports is replaced by the <strong><code>date</code></strong> dimension. The <code>date</code> dimension works in the same way and returns the same data as the old <code>day</code> dimension. See the <a href="../guides/date.html">guide to the <code>date</code> dimension</a> for more information.</dd>
@@ -94,11 +98,30 @@
                     </ul>
                     </dd>
                     <dt id="multipleDimensions">Fields for reports on multiple dimensions</dt>
-                    <dd>Fields returned for reports on multiple dimensions will be a union of the fields for each dimension included in the request. See the <a href="./api-overview.html"></dd>
-                    <dt></dt>
-                    <dd></dd>
+                    <dd>Fields returned for reports on multiple dimensions will be a union of the fields for each dimension included in the request. See the <a href="./api-overview.html#reportDimensions">Analytics API Overview</a> for information on what dimensions can be combined in reports.</dd>
+                    <dt id="fieldValidation">Strict validation on <code>fields</code> parameter</dt>
+                    <dd>The <code>fields</code> parameter is strictly validated. If you include a field that is not supported for the call you are making, an <code>UNSUPPORTED_FIELD_COMBINATION_ERROR</code> message will be returned.</dd>
+                    <dt id="refID">video.reference_id</dt>
+                    <dd>If you include <code>video.reference_id</code> in <code>fields</code> for reports on the <code>video</code> dimension, the reference id will be returned in the response (or <code>null</code> if there is no reference id).</dd>
+                    <dt id="tags">video.tags</dt>
+                    <dd>If you include <code>video.tags</code> in <code>fields</code> for reports on the <code>video</code> dimension, the video tags will be returned in the response (or <code>null</code> if there are no tags).</dd>
                 </dl>
-
+            </div>
+            <div class="section" id="engagementEndpoints">
+                <h2>Engagement endpoints</h2>
+                <dl>
+                    <dt>Engagement endpoints</dt>
+                    <dd>Three new engagement endpoints allow you to get granular engagement information for each 100th part of videos:
+                    <p>Account averages</p>
+<pre><code>.../engagement/accounts/{account_id}</code></pre>
+                    <p>Averages for a player</p>
+<pre><code>.../engagement/accounts/{account_id}/players/{player_id}</code></pre>
+                    <p>Engagement for a video</p>
+<pre><code>.../engagement/accounts/{account_id}/videos/{video_id}</code></pre>
+                    <p>The only parameters supported for engagement endpoints are <code>from</code> and <code>to</code>.</p>
+                    <p>Only periods within the previous 32 days are supported for engagement endpoints.</p>
+                    </dd>
+                </dl>
             </div>
         </div>
     </div>
@@ -106,7 +129,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.3/fastclick.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/js/foundation.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/js/foundation.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
     <script src="/en/scripts/docs-nav-data.min.js"></script>
@@ -115,7 +138,7 @@
     </div>
     <script type="text/javascript">
     var now = new Date().valueOf(),
-        twoHoursAgo = new Date().valueOf() - 7200000,
+        twoHoursAgo = now - 7200000,
         date_hour_example = document.getElementById("date_hour_example");
         date_hour_example.innerHTML = ".../data?accounts={account_id}&amp;dimensions=date_hour&amp;from=" + twoHoursAgo + "&amp;to=" + now
 
