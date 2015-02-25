@@ -13,7 +13,7 @@ var aapi_model = {
             },
             {
                 name: "player",
-
+                fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "player", "player_name", "video_duration", "video_engagement", "video_engagement_1", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_engagement_100"],
                 filter_values: "player ids as a comma-delimited list"
             },
             {
@@ -34,6 +34,8 @@ var aapi_model = {
             },
             {
                 name: "country",
+                fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "country", "country_name"],
+                filter_values: "comma-delimited list of ISO-3611-1 country codes - e.g.: KO,US"
             },
             {
                 name: "city",
@@ -123,15 +125,9 @@ var aapi_model = {
                 default: "now"
             }
         ],
-        date_hour: {
-        },
-        video: {
-        },
         player: {
-            fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "player", "player_name", "video_duration", "video_engagement", "video_engagement_1", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_engagement_100"]
         },
         country: {
-            fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "country", "country_name"]
         },
         city: {
             fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "city"]
