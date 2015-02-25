@@ -114,35 +114,7 @@
             <div class="section" id="metrics">
                 <h2>Dimensions and fields</h2>
                 <p>Below are the dimensions you can currently report on. Click on a dimension below to see the fields that are returned for it.</p>
-                <dl>
-                   <dt class="bcls-question">account</dt>
-                   <dd class="bcls-answer"><ul id="account"></ul></dd>
-                   <dt class="bcls-question">player</dt>
-                   <dd class="bcls-answer"><ul id="player"></ul></dd>
-                   <dt class="bcls-question">video</dt>
-                   <dd class="bcls-answer"><ul id="video"></ul></dd>
-                   <dt class="bcls-question">country</dt>
-                   <dd class="bcls-answer"><ul id="country"></ul></dd>
-                   <dt class="bcls-question">region</dt>
-                   <dd class="bcls-answer"><ul id="region"></ul></dd>
-                   <dt class="bcls-question">date</dt>
-                   <dd class="bcls-answer"><ul id="date"></ul></dd>
-                   <dt class="bcls-question">date_hour</dt>
-                   <dd class="bcls-answer"><ul id="date_hour"></ul></dd>
-                   <dt class="bcls-question">destination_domain</dt>
-                   <dd class="bcls-answer"><ul id="destination_domain"></ul></dd>
-                   <dt class="bcls-question">destination_path</dt>
-                   <dd class="bcls-answer"><ul id="destination_path"></ul></dd>
-                   <dt class="bcls-question">referrer_domain</dt>
-                   <dd class="bcls-answer"><ul id="referrer_domain"></ul></dd>
-                   <dt class="bcls-question">source_type</dt>
-                   <dd class="bcls-answer"><ul id="source_type"></ul></dd>
-                   <dt class="bcls-question">search_terms</dt>
-                   <dd class="bcls-answer"><ul id="search_terms"></ul></dd>
-                   <dt class="bcls-question">device_type</dt>
-                   <dd class="bcls-answer"><ul id="device_type"></ul></dd>
-                   <dt class="bcls-question">device_os</dt>
-                   <dd class="bcls-answer"><ul id="device_os"></ul></dd>
+                <dl id="dimensionsList">
                 </dl>
             </div>
             <div class="section" id="reportDimensions">
@@ -255,12 +227,13 @@ city - City name. eg: Seattle</code></pre>
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
     <script src="/en/scripts/docs-nav-data.min.js"></script>
     <script src="/en/scripts/bcls-doc-site.js"></script>
-    <script src="/en/scripts/bclsfaq.js"></script>
     <script src="../assets/aapi-model.js"></script>
     <script id="pageScript" type="text/javascript">
     var BCLS = ( function ($, window, document, aapi_model) {
         var filtersTemplate = "{{#filters}}<li>{{this}}</li>{{/filters}}",
             fieldsTemplate = "{{#fields}}<li>{{this}}</li>{{/fields}}",
+            questions,
+            answers,
             $account = $("#account"),
             $player = $("#player"),
             $video = $("#video"),
@@ -279,12 +252,18 @@ city - City name. eg: Seattle</code></pre>
             $device_os = $("#device_os"),
             $filterAllowableValues = $("#filterAllowableValues"),
             dimensionCombinations = document.getElementById("dimensionCombinations"),
+            dimensionsList = document.getElementById("dimensionsList"),
             combination,
             // functions
             bclslog,
             buildComboFields,
+            buildDimensions,
             dedupe,
-            copyArray;
+            findObjectInArray,
+            copyArray,
+            showAnswer,
+            setQAinteractions,
+            init;
 
         /**
          * logging
@@ -326,7 +305,87 @@ city - City name. eg: Seattle</code></pre>
                 }
             }
             return b;
+        };
+        /*
+        find index of an object in array of objects
+        based on some property value
+        returns index if found, otherwise returns -1
+        */
+        findObjectInArray = function (targetArray, objProperty, value) {
+            var i, totalItems = targetArray.length, objFound = false;
+            for (i = 0; i < totalItems; i++) {
+                if (targetArray[i][objProperty] === value) {
+                    objFound = true;
+                    return i;
+                }
+            }
+            if (objFound === false) {
+                return -1;
+            }
+        };
+        /**
+         * show answers
+         */
+        showAnswer = function (evt) {
+            var answerNumber = parseInt(evt.target.id.substring(1)),
+                i = 0,
+                j = answers.length;
+                bclslog("evt", evt);
+                bclslog("answerNumber", answerNumber);
+            // hide all answers except the one for the selected question
+            for (i = 0; i < j; i++) {
+                if (i === answerNumber) {
+                    answers[i].style.display = "block";
+                } else {
+                    answers[i].style.display = "none";
+                }
+            }
+        };
+        /**
+         * set up interactions for questions and answers
+         */
+        setQAinteractions = function () {
+            var i, iMax;
+            questions = document.getElementsByClassName("bcls-question");
+            answers = document.getElementsByClassName("bcls-answer");
+            iMax = questions.length;
+            bclslog("answers", answers);
+            for (i = 0; i < iMax; i++) {
+                // set ids for answers
+                answers[i].setAttribute("id", ("a" + i.toString()));
+                // hide all answers initially
+                answers[i].setAttribute("style", "display:none");
+                // set ids for questions
+                questions[i].setAttribute("id", ("q" + i.toString()));
+                // add event listeners
+                questions[i].addEventListener("click", showAnswer);
+            }
         }
+        /**
+         * build dimensions/fields list
+         */
+        buildDimensions = function () {
+            var thisDimension,
+                thisFieldlist,
+                i,
+                iMax = aapi_model.dimensions.length,
+                j,
+                jMax,
+                str = "";
+            for (i = 0; i < iMax; i++) {
+                thisDimension = aapi_model.dimensions[i];
+                str += "<dt class=\"bcls-question\">" + thisDimension.name + "</dt><dd class=\"bcls-answer\"><ul id=\"" + thisDimension.name + "\">";
+                thisFieldlist = document.getElementById(thisDimension.name);
+                jMax = thisDimension.fields.length;
+                for (j = 0; j < jMax; j++) {
+                    str += "<li>" + thisDimension.fields[j] + "</li>";
+                }
+                str += "</ul></dd>";
+                dimensionsList.innerHTML = str;
+                setQAinteractions();
+            }
+        };
+
         /**
          * build the field for the dimension combinations
          */
@@ -334,39 +393,24 @@ city - City name. eg: Seattle</code></pre>
             var combo;
             for (combo in aapi_model.combinations) {
                 var i,
+                    dimensionIndex,
                     dimensions = aapi_model.combinations[combo].dimensions,
                     imax = dimensions.length,
                     tmpArray = [];
                 for (i = 0; i < imax; i++) {
-                    tmpArray = tmpArray.concat(aapi_model[dimensions[i]].fields);
+                    dimensionIndex = findObjectInArray(aapi_model.dimensions, "name", dimensions[i]);
+                    tmpArray = tmpArray.concat(aapi_model.dimensions[dimensionIndex].fields);
                 }
                 tmpArray = dedupe(tmpArray);
                 aapi_model.combinations[combo].fields = copyArray(tmpArray, aapi_model.combinations[combo].fields);
                 dimensionCombinations.innerHTML += "<li>" + aapi_model.combinations[combo].dimensions.join(", ") + "</li>";
             }
         }
-        // set filters
-        template = Handlebars.compile(filtersTemplate);
-        $filtersList.html(template(aapi_model));
-        // set dimension combinations
-        buildComboFields();
-        // set response fields
-        template = Handlebars.compile(fieldsTemplate);
-        $account.html(template(aapi_model.account));
-        $player.html(template(aapi_model.player));
-        $video.html(template(aapi_model.video));
-        $date.html(template(aapi_model.date));
-        $date_hour.html(template(aapi_model.date_hour));
-        $country.html(template(aapi_model.country));
-        $region.html(template(aapi_model.region));
-        $city.html(template(aapi_model.city));
-        $destination_domain.html(template(aapi_model.destination_domain));
-        $destination_path.html(template(aapi_model.destination_path));
-        $referrer_domain.html(template(aapi_model.referrer_domain));
-        $source_type.html(template(aapi_model.source_type));
-        $search_terms.html(template(aapi_model.search_terms));
-        $device_type.html(template(aapi_model.device_type));
-        $device_os.html(template(aapi_model.device_os));
+        init = function () {
+            buildDimensions();
+            buildComboFields();
+        };
+        init();
         return {}
     })($, window, document, aapi_model);
     </script>

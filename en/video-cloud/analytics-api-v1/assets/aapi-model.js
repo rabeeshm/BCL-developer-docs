@@ -4,59 +4,77 @@ var aapi_model = {
             {
                 name: "account",
                 fields: ["account", "active_media", "bytes_delivered", "bytes_in", "bytes_out", "bytes_overhead", "bytes_player", "bytes_stored", "cdn_log_line", "chimera_report", "content_delivered", "drm_bytes_packaged", "engagement_score", "licenses_served", "play_rate", "player_load", "video_engagement_1", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_engagement_100", "video_impression", "video_percent_viewed", "video_seconds_viewed", "live_seconds_viewed", "video_view"],
-                filter_values: "account ids as a comma-delimited list"
+                filter_values: ["account ids as a comma-delimited list"]
             },
             {
                 name: "video",
                 fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "video", "video_name", "video_duration", "video_engagement", "video_engagement_1", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_engagement_100", "bytes_delivered", "content_delivered"],
-                filter_values: "video ids as a comma-delimited list"
+                filter_values: ["video ids as a comma-delimited list"]
             },
             {
                 name: "player",
                 fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "player", "player_name", "video_duration", "video_engagement", "video_engagement_1", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_engagement_100"],
-                filter_values: "player ids as a comma-delimited list"
+                filter_values: ["player ids as a comma-delimited list"]
             },
             {
                 name: "date",
                 fields: ["account", "active_media", "bytes_delivered", "bytes_in", "bytes_out", "bytes_overhead", "bytes_player", "bytes_stored", "cdn_log_line", "chimera_report", "content_delivered", "day", "drm_bytes_packaged", "engagement_score", "licenses_served", "play_rate", "player_load", "video_engagement_1", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_engagement_100", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
-                filter_values: null
+                filter_values: ["none"]
             },
             {
                 name: "date_hour",
                 fields: ["account", "active_media", "bytes_delivered", "bytes_in", "bytes_out", "bytes_overhead", "bytes_player", "bytes_stored", "cdn_log_line", "chimera_report", "content_delivered", "day", "drm_bytes_packaged", "engagement_score", "licenses_served", "play_rate", "player_load", "video_engagement_1", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_engagement_100", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
-                filter_values: null
+                filter_values: ["none"]
             },
             {
                 name: "destination_domain",
+                fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "destination_domain"],
+                filter_values: ["comma-delimited list of domains - e.g. brightcove.com"]
             },
             {
                 name: "destination_path",
+                fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "destination_path"],
+                filter_values: ["comma-delimited list of paths - e.g. /en/video-cloud/docs/editing-settings-players-plug-ins-tab"]
             },
             {
                 name: "country",
                 fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "country", "country_name"],
-                filter_values: "comma-delimited list of ISO-3611-1 country codes - e.g.: KO,US"
+                filter_values: ["comma-delimited list of ISO-3611-1 country codes - e.g.: KO,US"]
             },
             {
                 name: "city",
+                fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "city"],
+                filter_values: ["comma-delimited list of city names - e.g. Seattle,Boston"]
             },
             {
                 name: "region",
+                fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "region"],
+                filter_values: ["comma-delimited list of the ISO-3611-2 region code - e.g. 'US-WA'"]
             },
             {
                 name: "referrer_domain",
+                fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "player_load", "referrer_domain"],
+                filter_values: ["comma-delimited list of domains - e.g. brightcove.net"]
             },
             {
                 name: "source_type",
+                fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "player_load", "source_type"],
+                filter_values: ["direct", "referral", "organic_search", "paid_search", "secure_search"]
             },
             {
                 name: "search_terms",
+                fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "player_load", "search_terms"],
+                filter_values: ["comma-delimited list of search terms - e.g. players,videos"]
             },
             {
                 name: "device_type",
+                fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "player_load", "device_type"],
+                filter_values: ["mobile", "tablet", "tv", "desktop", "other"]
             },
             {
                 name: "device_os",
+                fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "player_load", "device_os"],
+                filter_values: ["android", "bada", "ios", "rim", "symbian", "web_os", "windows", "os_x", "mac", "linux", "other"]
             }
         ],
         filters: ["video", "player", "destination_domain", "destination_path", "country", "city", "region", "referrer_domain", "source_type", "search_terms", "device_type", "device_os"],
@@ -67,7 +85,7 @@ var aapi_model = {
                 description: "the accounts you want to report on",
                 values: "one or more account ids as a comma-delimited list",
                 default: "none"
-            }
+            },
             {
                 name: "dimensions",
                 required: true,
@@ -125,37 +143,6 @@ var aapi_model = {
                 default: "now"
             }
         ],
-        player: {
-        },
-        country: {
-        },
-        city: {
-            fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "city"]
-        },
-        region: {
-            fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "region"]
-        },
-        destination_domain: {
-            fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "destination_domain"]
-        },
-        destination_path: {
-            fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "destination_path"]
-        },
-        referrer_domain: {
-            fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "player_load", "referrer_domain"]
-        },
-        source_type: {
-            fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "player_load", "source_type"]
-        },
-        search_terms: {
-            fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "player_load", "search_terms"]
-        },
-        device_type: {
-            fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "player_load", "device_type"]
-        },
-        device_os: {
-            fields: ["engagement_score", "play_rate", "player_load", "video_impression", "video_view", "video_percent_viewed", "video_seconds_viewed", "player_load", "device_os"]
-        },
         combinations: {
             account_player: {dimensions: ["account", "player"], fields: []},
             account_video: {dimensions: ["account", "video"], fields: []},
