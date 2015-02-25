@@ -44,7 +44,7 @@
                     <li>Creating custom charts and displays</li>
                     <li>Working with multiple APIs together - for example, getting video data using the CMS API for videos with the most views over the previous week</li>
                     <li>Combining your video analytic data with other site analytics data</li>
-                    <li>.for some sample solutions, see
+                    <li>For some sample solutions, see
                         <ul>
                             <li> <a href="//solutions.brightcove.com/bcls/analytics-api/most-popular-videos.html">Most Popular Videos</a>
                             </li>
@@ -76,7 +76,7 @@
             <div class="section" id="concurrency">
                 <h2>Concurrent Requests</h2>
                 <p>The number of concurrent requests for reports on the same account is limited to a single request at a time.</p>
-                <p>.for example:
+                <p>For example:
                 <ol>
                     <li>Start an API request "A"</li>
                     <li>Start API request "B" for the same account</li>
@@ -94,9 +94,11 @@
                 <dl>
                     <dt>Report</dt>
                     <dd>
-                        A report on one or more <a href="#dimensionsOverview">dimensions</a>. The endpoint for a report request is:
-<pre><code>https://analytics.api.brightcove.com/v1/data?accounts={account_id(s)}&dimensions={dimensions}</code></pre>
+                        A report on one or more <a href="#metrics">dimensions</a>. The endpoint for a report request is:
+<pre><code>https://analytics.api.brightcove.com/v1/data?accounts={account_id(s)}&amp;dimensions={dimensions}</code></pre>
                     </dd>
+                    <dt>Engagement report</dt>
+                    <dd>Detailed engagement data that is available for periods within the past 32 days. See <a href="#engagement">the engagement section</a> for more details.</dd>
                     <dt>Data endpoint</dt>
                     <dd>
                         A specific piece of analytics data served with minimal latency. See <a href="/docs.brightcove.com/en/video-cloud/analytics-api/guides/video-information-endpoint.html">Video Data Endpoint</a> for more information.
@@ -146,22 +148,20 @@
             <div class="section" id="reportDimensions">
                 <h2>Multiple Dimensions</h2>
                 <p>You can request reports on multiple dimensions, but some combinations are not valid. For invalid dimension combinations, no data will be returned. For valid combinations, the fields returned will be the union of the fields returned for the individual dimensions. Below are the supported dimension combinations.</p>
-                <ul id="dimensionCombinations">
-
-                </ul>
+                <ul id="dimensionCombinations"></ul>
                 <h3>Example</h3>
                 <p>A typical use case for getting a report on multiple dimensions: you want a breakdown of video views between desktop and mobile devices, and also want to know how many of the mobile device views were on iOS versus Android devices, and how many of the desktop views were on Macs versus Windows machines. Currently there is no standard report in the Studio Analytics Module that provides this information, but you can obtain it via this Analytics API call:</p>
-<pre><code>https:≈dimensions=video,device_type,device_os&amp;from=2014-01-01&amp;to=2014-04-01&amp;limit=all&amp;format=json&amp;fields=video_view</code></pre>
-                <p>(In this case we are requesting views for the period from January 1 to April 1 in 2014.)</p>
+<pre><code>https:≈dimensions=video,device_type,device_os&amp;from=2014-01-01&amp;to=2014-04-01&amp;fields=video_view</code></pre>
+                <p>(In this case we are requesting video views for the period from January 1 to April 1 in 2014.)</p>
 
             </div>
             <div class="section" id="filterValues">
                 <h2>Where filters</h2>
                 <p>The general syntax for filters is:</p>
 <pre><code>where=dimension1==value1;dimension2==value2</code></pre>
-                <p>.for example:</p>
+                <p>For example:</p>
 <pre><code>where=video==123456789;day=2013-09-21;device_type==tablet</code></pre>
-                <p>Commas are treated as logical ORs, and semicolons as logical ANDs. .for example, <code>where=video==1234,5678;player=9876</code> is interpreted as "where video = 1234 <strong>OR</strong> 5678 <strong>AND</strong> player = 9876"</p>
+                <p>Commas are treated as logical ORs, and semicolons as logical ANDs. For example, <code>where=video==1234,5678;player=9876</code> is interpreted as "where video = 1234 <strong>OR</strong> 5678 <strong>AND</strong> player = 9876"</p>
                 <h3>Spaces and special characters</h3>
                 <p>String values should be URI encoded. You can also escape special characters using a "\":</p>
 <pre><code>where=search_terms==boston\,%20ma</code></pre>
@@ -217,7 +217,7 @@
                     </li>
                     <li>Epoch time values in milliseconds, such as <code>1377047323000</code>
                     </li>
-                    <li>Dates expressed in ISO 8601 standard international date format: <code>YYYY-MM-DD</code>format, such as <code>2013-09-12</code>. .for dates expressed in this format:
+                    <li>Dates expressed in ISO 8601 standard international date format: <code>YYYY-MM-DD</code>format, such as <code>2013-09-12</code>. For dates expressed in this format:
                         <ul>
                             <li>Any date range specified will be interpreted <em>in the current timezone</em>for the user</li>
                             <li>The time for the date give will be interpreted as midnight ( <code>00:00:00</code>) on the date specified <em>in the user's timezone</em>
@@ -236,8 +236,10 @@
             <div class="section" id="geoReports">
                 <h2>Geographical reports</h2>
                 <h3>Dimensions for geographical analytics</h3>
-                <pre><code>* country - As the ISO-3611-1 country code. eg: 'US' * region - As the ISO-3611-2 region code. eg: 'US-WA' * city - City name. eg: Seattle</code></pre>
-                <p>Note: .for unknown country or region the API returns "ZZ" as the code (As per ISO-3611-alpha2).</p>
+<pre><code>country - As the ISO-3611-1 country code. eg: 'US'
+region - As the ISO-3611-2 region code. eg: 'US-WA'
+city - City name. eg: Seattle</code></pre>
+                <p>Note: For unknown country or region the API returns "ZZ" as the code (As per ISO-3611-alpha2).</p>
             </div>
             <div class="section" id="fieldsAndSorting">
                 <h2>Fields and Sorting</h2>
@@ -245,8 +247,31 @@
                 <p>Use the <code>sort</code> parameter to specify which metric field is used to sort the returned items; for example: <code>sort=video_wiew</code>.</p>
                 <p class="text-warning">Note: the fields available to return or sort on depend on the <a href="#metrics">metrics</a> returned for the dimension(s) you are reporting on. These parameters are strictly validated, and your request will return an error if the <code>fields</code> or <code>sort</code> parameter points to a field not valid for the request.</p>
             </div>
+            <div class="section" id="engagement">
+                <h2>Engagement reports</h2>
+                <p>Detailed engagement reports showing views for each 100th part of videos (or the averages across all videos for an account or player) are available for periods within the past 32 days. (Requests for date ranges outside the past 32 days will return and error.)</p>
+                <div class="BCL-aside">
+                    <p>Note: there are several limitations on requests to the engagement endpoints:</p>
+                    <ul>
+                        <li>Reports are available only for a single account, player, or video</li>
+                        <li><code>where</code> filters are not supported</li>
+                        <li>The only parameters supported are <code>from</code> and <code>to</code></li>
+                        <li>If you provide <code>from</code> and <code>to</code> values in date format (MM-DD-YYYY), the report will reflect full day values</li>
+                        <li>If you want hourly engagement data, the <code>from</code> and <code>to</code> values must be given in epoch milliseconds values that fall within the hours you want to report on</li>
+                    </ul>
+                </div>
+                    <h3>Account engagement</h3>
+                    <p>To get average values for engagement on viewed videos, use the endpoint:</p>
+<pre><code>https://analytics.api.brightcove.com/v1/engagement/accounts/<em>{account_id}</em></code></pre>
+                    <h3>Player engagement</h3>
+                    <p>To get average values for all videos viewed in a player, use the endpoint:</p>
+<pre><code>https://analytics.api.brightcove.com/v1/engagement/accounts/<em>{account_id}</em>/players/<em>{player_id}</em></code></pre>
+                    <h3>Video engagement</h3>
+                    <p>To get engagement data for a specific video, use the endpoint:</p>
+<pre><code>https://analytics.api.brightcove.com/v1/engagement/accounts/<em>{account_id}</em>/videos/<em>{video_id}</em></code></pre>
+            </div>
             <div class="section" id="responseStatus">
-                <h2><a name="responseStatus"></a>Response Status Codes</h2>
+                <h2>Response Status Codes</h2>
                 <p>Status codes returned from your requests will tell you if it was successful, and if not, give you some explanation.</p>
                 <table>
                     <tbody>
@@ -256,19 +281,19 @@
                         </tr>
                         <tr>
                             <td>200 OK</td>
-                            <td>You got data &mdash; successful request</td>
+                            <td>You got data - successful request</td>
                         </tr>
                         <tr>
                             <td>401 Not Authorized</td>
-                            <td>Authorization failed &mdash; make sure you have got a valid auth token for your account, and that you are including it in your request correctly</td>
+                            <td>Authorization failed - make sure you have got a valid auth token for your account, and that you are including it in your request correctly</td>
                         </tr>
                         <tr>
-                            <td>404 Not .found</td>
+                            <td>404 Not Found</td>
                             <td>Make sure your request is valid, including the service URL and your account id</td>
                         </tr>
                         <tr>
                             <td>5xx</td>
-                            <td>The system is temporarily unavailable &mdash; please wait and retry your request later.</td>
+                            <td>The system is temporarily unavailable - please wait and retry your request later.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -285,7 +310,7 @@
     <script src="/en/scripts/docs-nav-data.min.js"></script>
     <script src="/en/scripts/bcls-doc-site.js"></script>
     <script src="/en/scripts/bclsfaq.js"></script>
-    <script src="/en/video-cloud/analytics-api/assets/aapi-model.js"></script>
+    <script src="../assets/aapi-model.js"></script>
     <script id="pageScript" type="text/javascript">
     var BCLS = ( function ($, window, document, aapi_model) {
         var filtersTemplate = "{{#filters}}<li>{{this}}</li>{{/filters}}",
@@ -398,15 +423,15 @@
         return {}
     })($, window, document, aapi_model);
     </script>
-    <script>
-        $(document).foundation();
-    </script>
 
     <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
     <script>
-	var feedbackMail = document.getElementById("feedbackMail");
-	feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
-	</script>
+    var feedbackMail = document.getElementById("feedbackMail");
+    feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+    </script>
+    <script>
+        $(document).foundation();
+    </script>
     </body>
 
 </html>
