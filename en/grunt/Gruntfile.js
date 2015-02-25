@@ -16,6 +16,7 @@ module.exports = function (grunt) {
                         'source/analytics-api-v1.json',
                         'source/batch-provisioning.json',
                         'source/mobile-sdks.json',
+                        'source/mobile-sdks-v1.json',
                         'source/studio.json',
                         'source/studio-prerelease.json',
                         'source/brightcove-player.json',
