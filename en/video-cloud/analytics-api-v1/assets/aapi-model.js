@@ -1,5 +1,37 @@
 var aapi_model = {
         baseURL: "https://analytics.api.brightcove.com/v1",
+        endpointGroups: [
+            {
+                name: "report",
+                endpoints: [
+                    {
+                        name: "Report",
+                        path: "/data",
+                        methods: ["GET"]
+                    }
+                ]
+            },
+            {
+                name: "engagement",
+                endpoints: [
+                    {
+                        name: "Account engagement",
+                        path: "/accounts/{account_id}",
+                        methods: ["GET"]
+                    },
+                    {
+                        name: "Player engagement",
+                        path: "/accounts/{account_id}/players/{player_id}",
+                        methods: ["GET"]
+                    },
+                    {
+                        name: "Video engagement",
+                        path: "/accounts/{account_id}/videos/{video_id}",
+                        methods: ["GET"]
+                    }
+                ]
+            }
+        ],
         dimensions: [
             {
                 name: "account",

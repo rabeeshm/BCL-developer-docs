@@ -140,7 +140,7 @@
                             <th>Default</th>
                         </tr>
                     </thead>
-                    <tbode id="paramTable"></tbode>
+                    <tbody id="paramTable"></tbody>
                 </table>
             </div>
             <div class="section" id="filterValues">
@@ -266,7 +266,7 @@ city - City name. eg: Seattle</code></pre>
             $search_terms = $("#search_terms"),
             $device_type = $("#device_type"),
             $device_os = $("#device_os"),
-            $filterAllowableValues = $("#filterAllowableValues"),
+            filterAllowableValues = document.getElementById("filterAllowableValues"),
             dimensionCombinations = document.getElementById("dimensionCombinations"),
             dimensionsList = document.getElementById("dimensionsList"),
             paramTable = document.getElementById("paramTable"),
@@ -281,6 +281,7 @@ city - City name. eg: Seattle</code></pre>
             showAnswer,
             setQAinteractions,
             buildParamTable,
+            buildFilterValueTable,
             init;
 
         /**
@@ -296,9 +297,9 @@ city - City name. eg: Seattle</code></pre>
          */
         dedupe = function (arr) {
         var i,
-        len = arr.length,
-        out = [],
-        obj = {};
+            len = arr.length,
+            out = [],
+            obj = {};
 
         for (i = 0;i < len; i++) {
         obj[arr[i]] = 0;
@@ -348,8 +349,6 @@ city - City name. eg: Seattle</code></pre>
             var answerNumber = parseInt(evt.target.id.substring(1)),
                 i = 0,
                 j = answers.length;
-                bclslog("evt", evt);
-                bclslog("answerNumber", answerNumber);
             // hide all answers except the one for the selected question
             for (i = 0; i < j; i++) {
                 if (i === answerNumber) {
@@ -367,7 +366,6 @@ city - City name. eg: Seattle</code></pre>
             questions = document.getElementsByClassName("bcls-question");
             answers = document.getElementsByClassName("bcls-answer");
             iMax = questions.length;
-            bclslog("answers", answers);
             for (i = 0; i < iMax; i++) {
                 // set ids for answers
                 answers[i].setAttribute("id", ("a" + i.toString()));
@@ -431,23 +429,41 @@ city - City name. eg: Seattle</code></pre>
             var thisParam,
                 str = "",
                 i,
-                iMax = aapi_model.params.length,
-                j,
-                jMax;
+                iMax = aapi_model.params.length;
                 for (i = 0; i < iMax; i++) {
                     thisParam = aapi_model.params[i];
-                    jMax = thisParam.values.length;
-                    str += "<tr><td>" + thisParam.name + "</td><td>" + thisParam.required + "</td><td>" + thisParam.description + "</td><td><ul>";
-                    for (j = 0; j < jMax; j++) {
-                        str =+ "<li>" + thisParam.values[i] + "</li>";
-                    }
-                    str += "</ul></td><td>" + thisParam.default + "</td></tr>";
+                    str += "<tr><td>" + thisParam.name + "</td><td>" + thisParam.required + "</td><td>" + thisParam.description + "</td><td>" + thisParam.values + "</td><td>" + thisParam.default + "</td></tr>";
                 }
                 paramTable.innerHTML = str;
+        };
+        /**
+         * built filter values
+         */
+        buildFilterValueTable = function () {
+            var thisDimension,
+                thisValues,
+                i,
+                iMax = aapi_model.dimensions.length,
+                j,
+                jMax,
+                str = "";
+            for (i = 0; i < iMax; i++) {
+                thisDimension = aapi_model.dimensions[i];
+                thisValues = thisDimension.filter_values;
+                str += "<tr><td>" + thisDimension.name + "</td><td><ul>";
+                jMax = thisValues.length;
+                for (j = 0; j < jMax; j++) {
+                    str += "<li>" + thisValues[j] + "</li>";
+                }
+                str += "</td></tr>";
+            }
+            filterAllowableValues.innerHTML = str;
         }
         init = function () {
             buildDimensions();
             buildComboFields();
+            buildParamTable();
+            buildFilterValueTable();
         };
         init();
         return {}
