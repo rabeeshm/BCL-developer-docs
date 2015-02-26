@@ -82,63 +82,63 @@ var aapi_model = {
             {
                 name: "account",
                 required: true,
-                description: "the accounts you want to report on",
+                description: "The accounts you want to report on",
                 values: "one or more account ids as a comma-delimited list",
                 default: "none"
             },
             {
                 name: "dimensions",
                 required: true,
-                description: "the dimension(s) to report on",
+                description: "The dimension(s) to report on",
                 values: "one or more dimensions as a comma-delimited list (some combinations are not valid)",
                 default: "none"
             },
             {
                 name: "where",
                 required: false,
-                description: "used to specify filters for reports",
+                description: "Used to specify filters for reports",
                 values: "{dimension}=={value} - one or more as a semi-colon-delimited list",
                 default: "none"
             },
             {
                 name: "limit",
                 required: false,
-                description: "number of items to return",
+                description: "Number of items to return",
                 values: "positive integer",
                 default: 10
             },
             {
                 name: "offset",
                 required: false,
-                description: "number of items to skip",
+                description: "Number of items to skip",
                 values: "positive integer",
                 default: 0
             },
             {
                 name: "sort",
                 required: false,
-                description: "field to sort items on",
+                description: "Field to sort items on",
                 values: "a valid field for the request",
                 default: "video_view"
             },
             {
                 name: "fields",
                 required: false,
-                description: "fields to return",
+                description: "Fields to return",
                 values: "varies according to the dimension you are reporting on",
                 default: "video_view"
             },
             {
                 name: "from",
                 required: false,
-                description: "the beginning of the date range for the request",
+                description: "The beginning of the date range for the request",
                 values: "an ISO 8601 date (MM-DD-YYYY) or epoch time in milliseconds",
                 default: "30 days prior to now"
             },
             {
                 name: "to",
                 required: false,
-                description: "the end of the date range for the request",
+                description: "The end of the date range for the request",
                 values: "an ISO 8601 date (MM-DD-YYYY) or epoch time in milliseconds",
                 default: "now"
             }

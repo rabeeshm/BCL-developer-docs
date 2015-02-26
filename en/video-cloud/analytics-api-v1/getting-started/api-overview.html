@@ -127,6 +127,22 @@
                 <p>(In this case we are requesting video views for the period from January 1 to April 1 in 2014.)</p>
 
             </div>
+            <div class="section" id="params">
+                <h2>Parameters</h2>
+                <p>Below is a summary table of parameters for the Analytics API. The use of the parameters is discussed in more detail in the sections that follow.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                            <th>Values</th>
+                            <th>Default</th>
+                        </tr>
+                    </thead>
+                    <tbode id="paramTable"></tbode>
+                </table>
+            </div>
             <div class="section" id="filterValues">
                 <h2>Where filters</h2>
                 <p>The general syntax for filters is:</p>
@@ -253,6 +269,7 @@ city - City name. eg: Seattle</code></pre>
             $filterAllowableValues = $("#filterAllowableValues"),
             dimensionCombinations = document.getElementById("dimensionCombinations"),
             dimensionsList = document.getElementById("dimensionsList"),
+            paramTable = document.getElementById("paramTable"),
             combination,
             // functions
             bclslog,
@@ -263,6 +280,7 @@ city - City name. eg: Seattle</code></pre>
             copyArray,
             showAnswer,
             setQAinteractions,
+            buildParamTable,
             init;
 
         /**
@@ -405,6 +423,27 @@ city - City name. eg: Seattle</code></pre>
                 aapi_model.combinations[combo].fields = copyArray(tmpArray, aapi_model.combinations[combo].fields);
                 dimensionCombinations.innerHTML += "<li>" + aapi_model.combinations[combo].dimensions.join(", ") + "</li>";
             }
+        };
+        /**
+         * builds param summary table
+         */
+        buildParamTable = function () {
+            var thisParam,
+                str = "",
+                i,
+                iMax = aapi_model.params.length,
+                j,
+                jMax;
+                for (i = 0; i < iMax; i++) {
+                    thisParam = aapi_model.params[i];
+                    jMax = thisParam.values.length;
+                    str += "<tr><td>" + thisParam.name + "</td><td>" + thisParam.required + "</td><td>" + thisParam.description + "</td><td><ul>";
+                    for (j = 0; j < jMax; j++) {
+                        str =+ "<li>" + thisParam.values[i] + "</li>";
+                    }
+                    str += "</ul></td><td>" + thisParam.default + "</td></tr>";
+                }
+                paramTable.innerHTML = str;
         }
         init = function () {
             buildDimensions();
