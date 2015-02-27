@@ -45,16 +45,21 @@
 				<!-- Place document intro sentence(s) here -->
 				<p>Cue points can be set for a video then an event dispatched with the cue points are hit during video playback.</p>
 			</div>
+      <div id="keyconcepts" class="section">
+        <h2>Key concepts</h2>
+        <p>A few concepts must be understood to effectively use cue points in Brightcove Player. These concepts are explained in this section of the document.</p>
+        <p>The first concept to understand has to do with terminology.  In Brightcove Player cue points are stored as text tracks, per the HTML standard. This means that when a Video Cloud video is used, any "Video Cloud style" cue points are converted into text tracks. These "Video Cloud style" cue points can also be referred to as "catalog" cue points since they are read from the Video Cloud catalog. See the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/player-catalog.html">Player Catalog</a> document for more information on the catalog.</p>
+				<p>The next concept to understand is that there is significant difference between catalog cue points and the HTML standard in structure. This difference is that in HTML a cue point can have a duration, so the cue point is defined by two cues. One to start the cue point and one to conclude the cue point. In the conversion process every catalog cue point is converted into two HTML cue points, both with identical start and stop times. This means that for every catalog cue point two cue point events will be dispatched, and has to be accounted for in code.</p>
+				<p>Another important conceptual point to understand when dealing with HTML cue points is the <code>activeCues</code> array. All the cue points are defined in an array. There is another array, <code>activeCues</code>, which holds the cue points which are "active", meaning the playback time is between their start and stop times. When using catalog cue points the start and stop times are identical, so they will be active only for the second defined. Also, with catalog cue points it is highly unlikely two cue points will be active at the same time since they will not overlap. </p>
+				<p class="BCL-aside">Note: There can be multiple sets of text tracks, for instance one set for cue points and another for video captions. In the example code in this document the assumption is made the cue points text tracks are located in the zeroth array element position in the TextTracks array.</p>
+      </div>
 			<div id="vccuepoints" class="section">
 				<h2>Video Cloud cue points</h2>
-				<p>In this section of the document you will learn ho to both set cue points</p>
+				<p>In this section of the document you will learn to to both set cue points and listen for cue point event dispatches. </p>
 				<h3>Setting Video Cloud cue points</h3>
 				<p>Video Cloud cue points can be associated with a video using the Video Cloud Studio, and a number of other ways, detailed in this document: <a href="//support.brightcove.com/en/video-cloud/docs/adding-cue-points-videos">Adding Cue Points to Videos</a>.</p>
-				<h3>Acting on Video Cloud cue points - Video associated with the player</h3>
-				<p>In Brightcove Player cue points are stored as text tracks, per the HTML standard. This means that when a Video Cloud video is used any catalog ("Video Cloud style") cue points are converted into text tracks. There is significant difference between catalog cue points and the HTML standard, that is that in HTML cue point can have a duration. So in the conversion process every catalog cue point is converted into two HTML cue points, both with identical start and stop times. This does mean that for every catalog cue points two cue point events will be dispatched, and have to be accounted for in code.</p>
-				<p>Another important conceptual point to understand when dealing with HTML cue points is the <code>activeCues</code> array. All the cue points are defined in an array. There is another array, <code>activeCues</code>, which holds the cue points which are "active", meaning the playback time is between their start and stop times. When using Smart Player cue points the start and stop times are identical, so they will be active only for the second defined. Also, with Smart Player cue points it is highly unlikely two cue points will be active at the same time since they will not overlap. </p>
-				<p class="BCL-aside">Note: There can be multiple sets of text tracks, for instance one set for cue points and another for video captions. In the example code in this document the assumption is made the cue points text tracks are located in the zeroth array element position in the TextTracks array.</p>
-				<p>To prevent a race condition of trying to process cue points before they are loaded, you need to use the <code>loadedmetadata</code> event to be dispatched before dealing with the cue points. Once the proper text track has been read you use the <code>oncuechange</code> event to listen for cue points events to be dispatched. The following <code>script</code> block shows listening for cue points and displaying the data from the cue point. Note that in this example the video is statically bound to the Player, meaning the video is associated with the player in Studio or a curl statement.</p>
+				<h3>Acting on Video Cloud cue points - video statically bound to the player</h3>
+				<p>To prevent a race condition of trying to process cue points before they are loaded, you need to use the <code>loadedmetadata</code> event to be dispatched before dealing with the cue points. Once the proper text track has been read you use the <code>oncuechange</code> event to listen for cue points events to be dispatched. The following code shows listening for cue points and displaying the data from the cue point. Note that in this example the video is statically bound to the Player, meaning the video is associated with the player in Studio or a curl statement.</p>
 				<ul>
 				    <li>Lines 24: A paragraph element is created as a location in which to inject dynamically created HTML.</li>
 				    <li>Lines 31,43: Use the <code>one()</code> to listen for the <code>loadedmetadata</code> event only once then remove the event listener. The event handler function is defined here anonymously.</li>
@@ -64,7 +69,7 @@
 				    <li>Lines 35-39: Dynamically create HTML using information from the cue point and inject into the HTML page.</li>
 				    <li>Line 42: Play the video, optionally of course.</li>
 				</ul>
-	      <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="28-45"></code></p>
+	      <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="17-45"></code></p>
 			</div>
 			<div id="change-to-section-name" class="section">
 				<h2>Change-to-section-title</h2>
