@@ -5,7 +5,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
 	<!-- change title to match the h1 heading -->
-	<title></title>
+	<title>Use Cue Points</title>
 	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/css/foundation.min.css" />
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/css/normalize.css" />
 	<script src="//use.edgefonts.net/source-code-pro.js"></script>
@@ -24,6 +24,12 @@
 
 </script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/js/vendor/modernizr.js"></script>
+  <style type="text/css">
+    .video-js {
+      width: 640px;
+      height: 360px;
+    }
+  </style>
 </head>
 
 <body>
@@ -41,13 +47,45 @@
 		</div>
 		<div id="main" class="large-10 small-12 columns">
 			<div id="top" class="section">
-				<h1></h1>
+				<h1>Use Cue Points</h1>
 				<!-- Place document intro sentence(s) here -->
-				<p></p>
+				<p>Cue points can be set for a video then an event is dispatched when the cue points are hit during video playback. The following shows a player displaying cue point information at pre-roll, 5, 10, 12 and post roll times.</p>
+		  <video id="myPlayerID"
+		    data-account="1507807800001"
+		    data-player="6aac508a-741e-41a2-bc7a-5805644cf089"
+		    data-embed="default"
+		    data-video-id="1507781667001"
+		    class="video-js" controls></video>
+		 
+		  <p id="insertionPoint"></p>
+
+		  <p class="BCL-aside">Note: The <strong>id</strong> variables have no associated values since they were not assigned in Video Cloud.</p>
 			</div>
-			<div id="change-to-section-name" class="section">
-				<h2>Change-to-section-title</h2>
-				<p></p>
+      <div id="keyconcepts" class="section">
+        <h2>Key concepts</h2>
+        <p>A few concepts must be understood to effectively use cue points in Brightcove Player. These concepts are explained in this section of the document.</p>
+        <p>The first concept to understand has to do with terminology.  In Brightcove Player cue points are stored as text tracks, per the HTML standard. This means that when a Video Cloud video is used, any "Video Cloud style" cue points are converted into text tracks. These "Video Cloud style" cue points can also be referred to as "catalog" cue points since they are read from the Video Cloud catalog. See the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/player-catalog.html">Player Catalog</a> document for more information on the catalog.</p>
+				<p>The next concept to understand is that there is significant difference between catalog cue points and the HTML standard in structure. This difference is that in HTML a cue point can have a duration, so the cue point is defined by two cues. One to start the cue point and one to conclude the cue point. In the conversion process every catalog cue point is converted into two HTML cue points, both with identical start and stop times. This means that for every catalog cue point two cue point events will be dispatched, and has to be accounted for in code.</p>
+				<p>Another important conceptual point to understand when dealing with HTML cue points is the <code>activeCues</code> array. All the cue points are defined in an array. There is another array, <code>activeCues</code>, which holds the cue points which are "active", meaning the playback time is between their start and stop times. When using catalog cue points the start and stop times are identical, so they will be active only for the second defined. Also, with catalog cue points it is highly unlikely two cue points will be active at the same time since they will not overlap. </p>
+				<p class="BCL-aside">Note: There can be multiple sets of text tracks, for instance one set for cue points and another for video captions. In the example code in this document the assumption is made the cue points text tracks are located in the zeroth array element position in the TextTracks array.</p>
+      </div>
+			<div id="vccuepoints" class="section">
+				<h2>Video Cloud cue points</h2>
+				<p>In this section of the document you will learn to to both set cue points and listen for cue point event dispatches. </p>
+				<h3>Setting Video Cloud cue points</h3>
+				<p>Video Cloud cue points can be associated with a video using the Video Cloud Studio, and a number of other ways, detailed in this document: <a href="//support.brightcove.com/en/video-cloud/docs/adding-cue-points-videos">Adding Cue Points to Videos</a>.</p>
+				<h3>Acting on Video Cloud cue points - video statically bound to the player</h3>
+				<p>To prevent a race condition of trying to process cue points before they are loaded, you need to use the <code>loadedmetadata</code> event to be dispatched before dealing with the cue points. Once the proper text track has been read you use the <code>oncuechange</code> event to listen for cue points events to be dispatched. The following code shows listening for cue points and displaying the data from the cue point. Note that in this example the video is statically bound to the Player, meaning the video is associated with the player in Studio or a curl statement.</p>
+				<ul>
+				    <li>Line 24: A paragraph element is created as a location in which to inject dynamically created HTML.</li>
+				    <li>Lines 31,43: Use the <code>one()</code> method to add an event listener for the <code>loadedmetadata</code> event only once, then remove the event listener. The event handler function is defined here anonymously.</li>
+				    <li>Line 32: Retrieve the TextTracks array using the <code>textTracks()</code> method, then assign the zeroth element, which holds the cue points, to the variable <code>tt</code>. Note that it may be possible in some implementations that the cue points could be in a different array element.</li>
+				    <li>Lines 33,41: Sets the event handler function for a cue point event dispatch.</li>
+				    <li>Line 34: Check to be sure the you are getting the first (zeroth array element) cue point dispatch. Without this condition you would see that each cue point would be acted upon twice. Note that if you are using cue points that have duration this condition would have to be different.</li>
+				    <li>Lines 35-39: Dynamically create HTML using information from the cue point and inject into the HTML page.</li>
+				    <li>Line 42: Play the video.</li>
+				</ul>
+	      <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="17-45"></code></p>
 			</div>
 			<div id="change-to-section-name" class="section">
 				<h2>Change-to-section-title</h2>
@@ -61,6 +99,9 @@
 			</div>
 		</div>
 	</div>
+
+  <script src="//players.brightcove.net/1507807800001/6aac508a-741e-41a2-bc7a-5805644cf089_default/index.min.js"></script>
+ 
 	<!-- bcl scripts -->
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/1.9/gist-embed.min.js"></script>
@@ -76,9 +117,26 @@
 	<script>
 		$(document).foundation();
 	</script>
-	<script type="text/javascript">
-		/******** Any scripts specific to page samples should go here *********/
-	</script>
+
+  <script>
+    videojs("myPlayerID").ready(function(){
+      var player = this;
+      player.one("loadedmetadata",function(){
+        var tt = player.textTracks()[0];
+        tt.oncuechange = function() {
+          if(tt.activeCues[0] !== undefined){
+            var dynamicHTML = "id: " + tt.activeCues[0].id + ", ";
+            dynamicHTML += "text: " + tt.activeCues[0].text + ", ";
+            dynamicHTML += "startTime: " + tt.activeCues[0].startTime + ",  ";
+            dynamicHTML += "endTime: " + tt.activeCues[0].endTime;
+            document.getElementById("insertionPoint").innerHTML += dynamicHTML + "<br/>";
+          }
+        }
+        player.play();
+        player.muted(true);
+      });
+    });
+  </script>	
 	<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
     <script>
 	var feedbackMail = document.getElementById("feedbackMail");
