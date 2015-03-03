@@ -77,19 +77,42 @@
 				<h3>Acting on Video Cloud cue points - video statically bound to the player</h3>
 				<p>To prevent a race condition of trying to process cue points before they are loaded, you need to use the <code>loadedmetadata</code> event to be dispatched before dealing with the cue points. Once the proper text track has been read you use the <code>oncuechange</code> event to listen for cue points events to be dispatched. The following code shows listening for cue points and displaying the data from the cue point. Note that in this example the video is statically bound to the Player, meaning the video is associated with the player in Studio or a curl statement.</p>
 				<ul>
-				    <li>Line 24: A paragraph element is created as a location in which to inject dynamically created HTML.</li>
+				    <li>Line 24: Create a paragraph element as a location in which to inject dynamically created HTML.</li>
 				    <li>Lines 31,43: Use the <code>one()</code> method to add an event listener for the <code>loadedmetadata</code> event only once, then remove the event listener. The event handler function is defined here anonymously.</li>
 				    <li>Line 32: Retrieve the TextTracks array using the <code>textTracks()</code> method, then assign the zeroth element, which holds the cue points, to the variable <code>tt</code>. Note that it may be possible in some implementations that the cue points could be in a different array element.</li>
-				    <li>Lines 33,41: Sets the event handler function for a cue point event dispatch.</li>
+				    <li>Lines 33,41: Sets the event handler function for when the <code>oncuechange</code>event is dispatched.</li>
 				    <li>Line 34: Check to be sure the you are getting the first (zeroth array element) cue point dispatch. Without this condition you would see that each cue point would be acted upon twice. Note that if you are using cue points that have duration this condition would have to be different.</li>
 				    <li>Lines 35-39: Dynamically create HTML using information from the cue point and inject into the HTML page.</li>
 				    <li>Line 42: Play the video.</li>
 				</ul>
 	      <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="17-45"></code></p>
+        <h3>Acting on Video Cloud cue points - dynamically load video in the player</h3>
+        <p>When you use the player catalog to get and load the video using cue points is bit easier, as you do not need to use the <code>loadedmetadata</code> event, but conceptually similar.</p>
+        <ul>
+            <li>Line 76: Create a paragraph element as a location in which to inject dynamically created HTML.</li>
+            <li>Lines 83,97: Use the <code>catalog.getViceo()</code> method to retrieve a video. The callback function is defined here anonymously.</li>
+            <li>Line 85: Use the <code>catalog.load()</code> method to load the video into the player.</li>
+            <li>Line 86: Retrieve the TextTracks array using the <code>textTracks()</code> method, then assign the zeroth element, which holds the cue points, to the variable <code>tt</code>. Note that it may be possible in some implementations that the cue points could be in a different array element.</li>
+            <li>Lines 87,95: Sets the event handler function for when the <code>oncuechange</code>event is dispatched.</li>
+            <li>Line 88: Check to be sure the you are getting the first (zeroth array element) cue point dispatch. Without this condition you would see that each cue point would be acted upon twice. Note that if you are using cue points that have duration this condition would have to be different.</li>
+            <li>Lines 89-93: Dynamically create HTML using information from the cue point and inject into the HTML page.</li>
+            <li>Line 96: Play the video.</li>
+        </ul>
+        <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="69-99"></code></p>
 			</div>
-			<div id="change-to-section-name" class="section">
-				<h2>Change-to-section-title</h2>
-				<p></p>
+			<div id="standardcuepoints" class="section">
+				<h2>HTML5 standard cue points</h2>
+				<p>HTML5 standard cue points can be stored track elements in a prescribed format. Good introductory content can be found in the following HTML5 Rocks tutorial: <a href="//www.html5rocks.com/en/tutorials/track/basics/">Getting Started With the Track Element</a>. </p>
+        <p>The basics steps to use HTML5 standard cue points are:</p>
+        <ol>
+            <li>Create Brightcove Player to use.</li>
+            <li>In a <code>loadstart</code> event handler use the <code>addRemoteTextTrack()</code> method to read in the WEBVTT file containing the cue points.</li>
+            <li>In a <code>loadedmetadata</code> event handler retrieve the proper text track element.</li>
+            <li>In the same event handler, configure a second event handler for the <code>oncuechange</code> cue point event.</li>
+            <li>In the <code>oncuechange</code> event handler, check if the <code>activecues</code> array object has zeroth element defined, if yes, act on the cue point start.</li>
+            <p class="BCL-aside">Note: You will have <code>oncuechange</code> events dispatched when the cue point both starts and stops. The <code>activecues</code> array will have a value only for the duration of the cue point. </p>
+            <li></li>
+        </ol>
 			</div>
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
