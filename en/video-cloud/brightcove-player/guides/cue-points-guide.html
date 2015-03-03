@@ -81,7 +81,7 @@
 				<p>To prevent a race condition of trying to process cue points before they are loaded, you need to use the <code>loadedmetadata</code> event to be dispatched before dealing with the cue points. Once the proper text track has been read you use the <code>oncuechange</code> event to listen for cue points events to be dispatched. The following code shows listening for cue points and displaying the data from the cue point. Note that in this example the video is statically bound to the Player, meaning the video is associated with the player in Studio or a curl statement.</p>
 				<ul>
 				    <li>Line 24: Create a paragraph element as a location in which to inject dynamically created HTML.</li>
-				    <li>Lines 31,43: Use the <code>one()</code> method to add an event listener for the <code>loadedmetadata</code> event only once, then remove the event listener. The event handler function is defined here anonymously.</li>
+				    <li>Lines 31,43: Use the <code>one()</code> method to add an event listener for the <code>loadedmetadata</code> event only once. The event handler function is defined here anonymously.</li>
 				    <li>Line 32: Retrieve the TextTracks array using the <code>textTracks()</code> method, then assign the zeroth element, which holds the cue points, to the variable <code>tt</code>. Note that it may be possible in some implementations that the cue points could be in a different array element.</li>
 				    <li>Lines 33,41: Sets the event handler function for when the <code>oncuechange</code>event is dispatched.</li>
 				    <li>Line 34: Check to be sure the you are getting the first (zeroth array element) cue point dispatch. Without this condition you would see that each cue point would be acted upon twice. Note that if you are using cue points that have duration this condition would have to be different.</li>
@@ -121,6 +121,17 @@
         <p class="BCL-aside">Note: You can validate your WebVTT format with this <a href="//quuz.org/webvtt/">validator</a>.</p>
         <p>The following is a valid WebVTT cue point document that defines two cue points, one with a duration from 2-5 seconds and another with duration from 10-15 seconds:</p>
         <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="166-184"></code></p>
+        <p>When you play the following video you will see the cue point WebVTT file shown above processed. At the start of a cue point you see dynamically created HTML injected into the page, followed by some parsed JSON from the <strong>text</strong> field displayed. At the end of the cue point the message <strong>Cue point duration over</strong> is displayed.</p>
+        <video id="myPlayerID2"
+          data-account="1752604059001"
+          data-player="8cfb6785-c4be-43b4-af68-7ca2fe3a6ebf"
+          data-embed="default"
+          data-video-id="3851380732001"
+          class="video-js" controls></video>
+
+        <p>******** Cue Point Information ********</p>
+        <p id="insertionPoint2"></p>
+        <p>****** End Cue Point Information ******</p>
         <h3>Process cue points overview</h3>
         <p>The basics steps to use HTML5 standard cue points are:</p>
         <ol>
@@ -133,17 +144,21 @@
             <li>In the <code>oncuechange</code> event handler, check if the <code>activecues</code> array object has zeroth element defined, if no, act on the cue point stop.</li>
         </ol>
         <p class="BCL-aside">Note: If your cue points have overlapping durations, the logic in the above steps will need to be slightly altered.</p>
-        <video id="myPlayerID2"
-          data-account="1752604059001"
-          data-player="8cfb6785-c4be-43b4-af68-7ca2fe3a6ebf"
-          data-embed="default"
-          data-video-id="3851380732001"
-          class="video-js" controls></video>
-
-        <p>******** Cue Point Information ********</p>
-        <p id="insertionPoint2"></p>
-        <p>****** End Cue Point Information ******</p>
- 
+        <h3>Process cue points code</h3>
+        <p></p>
+        <ul>
+            <li>Line 122: Create a paragraph element as a location in which to inject dynamically created HTML.</li>
+            <li>Lines 130,135: Use the <code>one()</code> method to listen only once for the <code>loadstart</code> event.</li>
+            <li>Lines 131-134: In the anonymously defined event handler function use the <code>AddRemoteTrack()</code> method to read the cue points WebVTT file. For cuepoints the <code>kind</code> is assigned <code>metadata</code>.</li>
+            <li>Lines 137,154: Use the <code>one()</code> method to listen only once for the <code>loadedmetadata</code> event. The event handler function is defined here anonymously.</li>
+            <li>Line 138: Retrieve the TextTracks array using the <code>textTracks()</code> method, then assign the first array element, which holds the cue points, to the variable <code>tt</code>. Note that it may be possible in some implementations that the cue points could be in a different array element.</li>
+            <li>Lines 139,151: Sets the event handler function for when the <code>oncuechange</code>event is dispatched.</li>
+            <li>Line 140: Check to be sure the first (zeroth array element) cue point is defined. This tells you that this is a start cue point event.</li>
+            <li>Lines 141-147: Dynamically create HTML using information from the cue point and inject into the HTML page.</li>
+            <li>Lines 148-149: Display a note that the cue point end has been reached.</li>
+            <li>Line 152: Play the video.</li>
+        </ul>
+        <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="115-156"></code></p>
 			</div>
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
