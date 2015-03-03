@@ -64,32 +64,56 @@
       <div id="keyconcepts" class="section">
         <h2>Key concepts</h2>
         <p>A few concepts must be understood to effectively use cue points in Brightcove Player. These concepts are explained in this section of the document.</p>
-        <p>The first concept to understand has to do with terminology.  In Brightcove Player cue points are stored as text tracks, per the HTML standard. This means that when a Video Cloud video is used, any "Video Cloud style" cue points are converted into text tracks. These "Video Cloud style" cue points can also be referred to as "catalog" cue points since they are read from the Video Cloud catalog. See the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/player-catalog.html">Player Catalog</a> document for more information on the catalog.</p>
-				<p>The next concept to understand is that there is significant difference between catalog cue points and the HTML standard in structure. This difference is that in HTML a cue point can have a duration, so the cue point is defined by two cues. One to start the cue point and one to conclude the cue point. In the conversion process every catalog cue point is converted into two HTML cue points, both with identical start and stop times. This means that for every catalog cue point two cue point events will be dispatched, and has to be accounted for in code.</p>
+        <p>The first concept to understand has to do with terminology.  In Brightcove Player cue points are stored as text track elements, per the HTML standard. This means that when a Video Cloud video is used, any "Video Cloud style" cue points are converted into text tracks. These "Video Cloud style" cue points can also be referred to as "catalog" cue points since they are read from the Video Cloud catalog. See the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/player-catalog.html">Player Catalog</a> document for more information on the catalog.</p>
+				<p>The next concept to understand is that there is significant difference between catalog cue points and the HTML standard in structure. This difference is that in HTML a cue point can have a duration. This means for every cue point two cue point change events will be dispatched, one on start the cue point and one on end the cue point. In the conversion process every catalog cue point is converted into a cue point with identical start and stop times. This means that for every catalog cue point two cue point events will be dispatched, and has to be accounted for in code.</p>
 				<p>Another important conceptual point to understand when dealing with HTML cue points is the <code>activeCues</code> array. All the cue points are defined in an array. There is another array, <code>activeCues</code>, which holds the cue points which are "active", meaning the playback time is between their start and stop times. When using catalog cue points the start and stop times are identical, so they will be active only for the second defined. Also, with catalog cue points it is highly unlikely two cue points will be active at the same time since they will not overlap. </p>
-				<p class="BCL-aside">Note: There can be multiple sets of text tracks, for instance one set for cue points and another for video captions. In the example code in this document the assumption is made the cue points text tracks are located in the zeroth array element position in the TextTracks array.</p>
+				<p class="BCL-aside">Note: There can be multiple sets of text tracks, for instance one set for cue points and another for video captions. In the example code in this document the assumption is made the cue points text tracks are located in both the first and second elements in the TextTracks array.</p>
       </div>
 			<div id="vccuepoints" class="section">
 				<h2>Video Cloud cue points</h2>
-				<p>In this section of the document you will learn to to both set cue points and listen for cue point event dispatches. </p>
+				<p>In this section of the document you will learn to to both set cue points and listen for cue point event dispatches.</p>
 				<h3>Setting Video Cloud cue points</h3>
 				<p>Video Cloud cue points can be associated with a video using the Video Cloud Studio, and a number of other ways, detailed in this document: <a href="//support.brightcove.com/en/video-cloud/docs/adding-cue-points-videos">Adding Cue Points to Videos</a>.</p>
 				<h3>Acting on Video Cloud cue points - video statically bound to the player</h3>
 				<p>To prevent a race condition of trying to process cue points before they are loaded, you need to use the <code>loadedmetadata</code> event to be dispatched before dealing with the cue points. Once the proper text track has been read you use the <code>oncuechange</code> event to listen for cue points events to be dispatched. The following code shows listening for cue points and displaying the data from the cue point. Note that in this example the video is statically bound to the Player, meaning the video is associated with the player in Studio or a curl statement.</p>
 				<ul>
-				    <li>Line 24: A paragraph element is created as a location in which to inject dynamically created HTML.</li>
+				    <li>Line 24: Create a paragraph element as a location in which to inject dynamically created HTML.</li>
 				    <li>Lines 31,43: Use the <code>one()</code> method to add an event listener for the <code>loadedmetadata</code> event only once, then remove the event listener. The event handler function is defined here anonymously.</li>
 				    <li>Line 32: Retrieve the TextTracks array using the <code>textTracks()</code> method, then assign the zeroth element, which holds the cue points, to the variable <code>tt</code>. Note that it may be possible in some implementations that the cue points could be in a different array element.</li>
-				    <li>Lines 33,41: Sets the event handler function for a cue point event dispatch.</li>
+				    <li>Lines 33,41: Sets the event handler function for when the <code>oncuechange</code>event is dispatched.</li>
 				    <li>Line 34: Check to be sure the you are getting the first (zeroth array element) cue point dispatch. Without this condition you would see that each cue point would be acted upon twice. Note that if you are using cue points that have duration this condition would have to be different.</li>
 				    <li>Lines 35-39: Dynamically create HTML using information from the cue point and inject into the HTML page.</li>
 				    <li>Line 42: Play the video.</li>
 				</ul>
 	      <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="17-45"></code></p>
+        <h3>Acting on Video Cloud cue points - dynamically load video in the player</h3>
+        <p>When you use the player catalog to get and load the video using cue points is bit easier, as you do not need to use the <code>loadedmetadata</code> event, but conceptually similar.</p>
+        <ul>
+            <li>Line 76: Create a paragraph element as a location in which to inject dynamically created HTML.</li>
+            <li>Lines 83,97: Use the <code>catalog.getViceo()</code> method to retrieve a video. The callback function is defined here anonymously.</li>
+            <li>Line 85: Use the <code>catalog.load()</code> method to load the video into the player.</li>
+            <li>Line 86: Retrieve the TextTracks array using the <code>textTracks()</code> method, then assign the zeroth element, which holds the cue points, to the variable <code>tt</code>. Note that it may be possible in some implementations that the cue points could be in a different array element.</li>
+            <li>Lines 87,95: Sets the event handler function for when the <code>oncuechange</code>event is dispatched.</li>
+            <li>Line 88: Check to be sure the you are getting the first (zeroth array element) cue point dispatch. Without this condition you would see that each cue point would be acted upon twice. Note that if you are using cue points that have duration this condition would have to be different.</li>
+            <li>Lines 89-93: Dynamically create HTML using information from the cue point and inject into the HTML page.</li>
+            <li>Line 96: Play the video.</li>
+        </ul>
+        <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="69-99"></code></p>
 			</div>
-			<div id="change-to-section-name" class="section">
-				<h2>Change-to-section-title</h2>
-				<p></p>
+			<div id="standardcuepoints" class="section">
+				<h2>HTML5 standard cue points</h2>
+				<p>HTML5 standard cue points can be stored as track elements in a prescribed format. Good introductory content can be found in the following HTML5 Rocks tutorial: <a href="//www.html5rocks.com/en/tutorials/track/basics/">Getting Started With the Track Element</a>. </p>
+        <p>The basics steps to use HTML5 standard cue points are:</p>
+        <ol>
+            <li>Create Brightcove Player to use.</li>
+            <li>In a <code>loadstart</code> event handler, use the <code>addRemoteTextTrack()</code> method to read in the WEBVTT file containing the cue points.</li>
+            <li>In a <code>loadedmetadata</code> event handler retrieve the proper text track element.</li>
+            <li>In the same event handler, configure a second event handler for the <code>oncuechange</code> cue point event.</li>
+            <li>In the <code>oncuechange</code> event handler, check if the <code>activecues</code> array object has zeroth element defined, if yes, act on the cue point start.</li>
+            <p class="BCL-aside">Note: You will have <code>oncuechange</code> events dispatched when the cue point both starts and stops. The <code>activecues</code> array will have a value only for the duration of the cue point. Hence, if an <code>oncuechange</code> event occurs and there are no defined objects in the <code>activecues</code> array, you know the dispatched event is for a cue point stop.</p>
+            <li>In the <code>oncuechange</code> event handler, check if the <code>activecues</code> array object has zeroth element defined, if no, act on the cue point stop.</li>
+        </ol>
+        <p class="BCL-aside">Note: If your cue points have overlapping durations, the logic in the above steps will need to be slightly altered.</p>
 			</div>
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
