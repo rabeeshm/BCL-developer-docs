@@ -57,7 +57,9 @@
 		    data-video-id="1507781667001"
 		    class="video-js" controls></video>
 		 
+      <p>******** Cue Point Information ********</p>
 		  <p id="insertionPoint"></p>
+      <p>****** End Cue Point Information ******</p>
 
 		  <p class="BCL-aside">Note: The <strong>id</strong> variables have no associated values since they were not assigned in Video Cloud.</p>
 			</div>
@@ -75,6 +77,7 @@
 				<h3>Setting Video Cloud cue points</h3>
 				<p>Video Cloud cue points can be associated with a video using the Video Cloud Studio, and a number of other ways, detailed in this document: <a href="//support.brightcove.com/en/video-cloud/docs/adding-cue-points-videos">Adding Cue Points to Videos</a>.</p>
 				<h3>Acting on Video Cloud cue points - video statically bound to the player</h3>
+        <p>In this section of the document you will learn to process catalog cue points when the video has been statically bound to the player, meaning the video has been loaded in the player either in Studio or using the Player Management API directly.</p>
 				<p>To prevent a race condition of trying to process cue points before they are loaded, you need to use the <code>loadedmetadata</code> event to be dispatched before dealing with the cue points. Once the proper text track has been read you use the <code>oncuechange</code> event to listen for cue points events to be dispatched. The following code shows listening for cue points and displaying the data from the cue point. Note that in this example the video is statically bound to the Player, meaning the video is associated with the player in Studio or a curl statement.</p>
 				<ul>
 				    <li>Line 24: Create a paragraph element as a location in which to inject dynamically created HTML.</li>
@@ -87,7 +90,8 @@
 				</ul>
 	      <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="17-45"></code></p>
         <h3>Acting on Video Cloud cue points - dynamically load video in the player</h3>
-        <p>When you use the player catalog to get and load the video using cue points is bit easier, as you do not need to use the <code>loadedmetadata</code> event, but conceptually similar.</p>
+        <p>In this section of the document you will learn to process catalog cue points when the video is dynamically loaded into the player using the <code>catalog.getVideo()</code> and <code>catalog.load()</code> methods.</p>
+        <p>When you use the player catalog to get and load the video processing cue points is bit easier than when you use a statically bound video, as you do not need to use the <code>loadedmetadata</code> event, but conceptually similar.</p>
         <ul>
             <li>Line 76: Create a paragraph element as a location in which to inject dynamically created HTML.</li>
             <li>Lines 83,97: Use the <code>catalog.getViceo()</code> method to retrieve a video. The callback function is defined here anonymously.</li>
@@ -102,11 +106,26 @@
 			</div>
 			<div id="standardcuepoints" class="section">
 				<h2>HTML5 standard cue points</h2>
-				<p>HTML5 standard cue points can be stored as track elements in a prescribed format. Good introductory content can be found in the following HTML5 Rocks tutorial: <a href="//www.html5rocks.com/en/tutorials/track/basics/">Getting Started With the Track Element</a>. </p>
+				<p>HTML5 standard cue points are stored as track elements in a prescribed format. Good introductory content can be found in the following HTML5 Rocks tutorial: <a href="//www.html5rocks.com/en/tutorials/track/basics/">Getting Started With the Track Element</a>. In this section of the document you will learn the format of WebVTT cue point files and then how to process those cue points.</p>
+        <h3>WebVTT file format for cue points</h3>
+        <p>The WebVTT file format is strictly defined. For cue points the file is composed as follows:</p>
+        <ul>
+            <li>The string <strong>WebVTT</strong> as the first line of the file</li>
+            <li>A single blank line</li>
+            <li>The identifier for a specific cue point</li>
+            <li>The duration in the form <strong>00:00:00.000 --> 00:00:00.000</strong>; this is hours:minutes:seconds.milliseconds format and is strictly parsed, numbers must be zero padded if necessary</li>
+            <li>The characters following the duration to the next blank line are place into a <strong>text</strong> value; if you wish to store multiple, disparate values here JSON works well as it can be easily parsed</li>
+            <li>A single blank line</li>
+            <li>Multiple cue points can be added using the identifier/duration/text format</li>
+        </ul>
+        <p class="BCL-aside">Note: You can validate your WebVTT format with this <a href="//quuz.org/webvtt/">validator</a>.</p>
+        <p>The following is a valid WebVTT cue point document that defines two cue points, one with a duration from 2-5 seconds and another with duration from 10-15 seconds:</p>
+        <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="166-184"></code></p>
+        <h3>Process cue points overview</h3>
         <p>The basics steps to use HTML5 standard cue points are:</p>
         <ol>
             <li>Create Brightcove Player to use.</li>
-            <li>In a <code>loadstart</code> event handler, use the <code>addRemoteTextTrack()</code> method to read in the WEBVTT file containing the cue points.</li>
+            <li>In a <code>loadstart</code> event handler, use the <code>addRemoteTextTrack()</code> method to read in the WebVTT file containing the cue points.</li>
             <li>In a <code>loadedmetadata</code> event handler retrieve the proper text track element.</li>
             <li>In the same event handler, configure a second event handler for the <code>oncuechange</code> cue point event.</li>
             <li>In the <code>oncuechange</code> event handler, check if the <code>activecues</code> array object has zeroth element defined, if yes, act on the cue point start.</li>
@@ -114,6 +133,17 @@
             <li>In the <code>oncuechange</code> event handler, check if the <code>activecues</code> array object has zeroth element defined, if no, act on the cue point stop.</li>
         </ol>
         <p class="BCL-aside">Note: If your cue points have overlapping durations, the logic in the above steps will need to be slightly altered.</p>
+        <video id="myPlayerID2"
+          data-account="1752604059001"
+          data-player="8cfb6785-c4be-43b4-af68-7ca2fe3a6ebf"
+          data-embed="default"
+          data-video-id="3851380732001"
+          class="video-js" controls></video>
+
+        <p>******** Cue Point Information ********</p>
+        <p id="insertionPoint2"></p>
+        <p>****** End Cue Point Information ******</p>
+ 
 			</div>
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
@@ -125,6 +155,7 @@
 	</div>
 
   <script src="//players.brightcove.net/1507807800001/6aac508a-741e-41a2-bc7a-5805644cf089_default/index.min.js"></script>
+ <script src="//players.brightcove.net/1752604059001/8cfb6785-c4be-43b4-af68-7ca2fe3a6ebf_default/index.min.js"></script>
  
 	<!-- bcl scripts -->
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -161,6 +192,39 @@
       });
     });
   </script>	
+ 
+ <script type="text/javascript">
+    videojs("myPlayerID2").ready(function(){
+      var myPlayer = this;
+ 
+      myPlayer.one("loadstart",function(){
+        var cueTrack = myPlayer.addRemoteTextTrack({
+          kind: 'metadata',
+          src: 'http://solutions.brightcove.com/bcls/tests/player/cuepoints.vtt'
+        }); //end addRemoteTextTrack
+      }); //end loadstart
+
+      myPlayer.one("loadedmetadata",function(){
+        var tt = myPlayer.textTracks()[1];
+        tt.oncuechange = function() {
+          if(tt.activeCues[0] !== undefined){
+            var dynamicHTML = "id: " + tt.activeCues[0].id + ", ";
+            dynamicHTML += "text: " + tt.activeCues[0].text + ", ";
+            dynamicHTML += "startTime: " + tt.activeCues[0].startTime + ",  ";
+            dynamicHTML += "endTime: " + tt.activeCues[0].endTime;
+            document.getElementById("insertionPoint2").innerHTML += dynamicHTML + "<br/><br/>";
+            jsonData = JSON.parse(tt.activeCues[0].text);
+            document.getElementById("insertionPoint2").innerHTML += jsonData.title + ": " + jsonData.description + "<br/><br/>";
+          } else {
+            document.getElementById("insertionPoint2").innerHTML += "Cue point duration over" + "<br/><br/>";
+          }
+        } //end oncuechange
+        myPlayer.muted(true);
+      }); //end loadedmetadata
+
+    }); //end ready
+  </script>
+
 	<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
     <script>
 	var feedbackMail = document.getElementById("feedbackMail");
