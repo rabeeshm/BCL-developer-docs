@@ -43,7 +43,7 @@
 			<div id="top" class="section">
 				<h1>FreeWheel Plugin</h1>
 				<!-- Place document intro sentence(s) here -->
-				<p>This topic covers the use of the FreeWheel plugin and how it can be implemented using Video Cloud Studio and through custom coding.</p>
+				<p>This topic covers the use of the FreeWheel plugin, and how it can be implemented using Video Cloud Studio and through custom coding.</p>
         <p>This plugin enables FreeWheel ad technology, for either Flash or HTML5, in Brightcove Player. The plugin will attempt to select the best rendering option to be used for the lifetime of the player.</p>
 			</div>
 			<div id="implementplayersmodule" class="section">
@@ -54,21 +54,27 @@
 			    <li>Click the link for the player to open the player properties.</li>
 			    <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
 			    <li>The JavaScript for the plugin is provided and will not change for different plugin implementations. For the <strong>JavaScript URL</strong>, enter:</li>
-                <p><pre> https://players.brightcove.net/videojs-freewheel/videojs-freewheel.min.js</pre></p>
+          <p><pre> https://players.brightcove.net/videojs-freewheel/videojs-freewheel.min.js</pre></p>
 			    <li>The CSS for the plugin is provided and will not change for different plugin implementations. For the <strong>CSS URL</strong>, enter:<br/>
-                <p><pre> https://players.brightcove.net/videojs-freewheel/videojs-freewheel.min.css</pre></p></li>
-                <li>For the <strong>FreeWheelPlugin</strong>, enter <strong>PLUGIN NAME</strong>.</li>
-                <li>Enter the plugin options. The example below will ...<br/>
+          <p><pre> https://players.brightcove.net/videojs-freewheel/videojs-freewheel.min.css</pre></p></li>
+          <li>For the plugin name, enter <strong>FreeWheelPlugin</strong>.</li>
+          <li>The Options provided in the form configure playback technology where <code>Flash</code> and <code>Html5</code> configuration sections are provided by FreeWheel. A slightly altered (for security reasons) complete configuration is shown <a href="#exampleconfiguration">below</a> .  A stub example is shown here:<br/>
 <pre><code>{
-  "overlays": [
-    {
-      "align": "bottom",
-      "start": 2
-    }
-  ],
-  "content": "<strong>Default overlay content</strong>"
+  "adTechOrder": ["flash", "html5"],
+  "Flash": {
+    "sdkurl": "http://adm.fwmrm.net/...",
+    "serverUrl": "http://cue.v.fwmrm.net/..."
+    "profile": "3aaa_profile",
+    ...
+  },
+  "Html5": {
+    "sdkurl": "http://adm.fwmrm.net/...",
+    "serverUrl": "http://cue.v.fwmrm.net/..."
+    "profile": "3aaa_profile",
+    ...
+  }
 }</code></pre>
-	              <p><img src="/en/video-cloud/brightcove-player/guides/assets/overlay-plugin.png"></p>
+	              <p><img src="/en/video-cloud/brightcove-player/guides/assets/freewheel-studio.png"></p>
                 </li>
                 <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
 		      </ol>
@@ -80,39 +86,112 @@
               <li>https://players.brightcove.net/videojs-freewheel/videojs-freewheel.min.js</li>
               <li>https://players.brightcove.net/videojs-freewheel/videojs-freewheel.min.css</li>
       </ul>
-        <p>The name of the plugin is <code>FreeWheelPlugin</code>, and an example set of options is:</p>
-        <p><code data-gist-id="6edffc8c896381fb71e9" data-gist-hide-footer="true" data-gist-line="1-5"></code></p>
+        <p>The name of the plugin is <code>FreeWheelPlugin</code>. The options configure playback technology where <code>Flash</code> and <code>Html5</code> configuration sections are provided by FreeWheel. A slightly altered (for security reasons) complete configuration is shown <a href="#exampleconfiguration">below</a> .  A stub example is shown here:</p>
+        <p><code data-gist-id="4b6225289fba75490d61" data-gist-hide-footer="true" data-gist-line="71-84"></code></p>
         <p>The following shows using the In-Page Embed implementation of the player to associate the FreeWheel Plugin with a single instance of a player.</p>
           <ul>
-              <li>Line 31: Uses a <code>link</code> tag to include the plugin's CSS in the <code>head</code> of the HTML page.</li>
-              <li>Line 38: Gives the <code>video</code> tag an <code>id</code> attribute, with some value, in this case <strong>video_1</strong>.</li>
-              <li>Line 46: Uses a <code>script</code> tag to include the plugin's JavaScript in the <code>body</code> of the HTML page.</li>
-              <li>Line 53: Creates a reference to the player.</li>
-              <li>Lines 56-58: Initializes the plugin and passes in custom options.</li>
+              <li>Line 90: Uses a <code>link</code> tag to include the plugin's CSS in the <code>head</code> of the HTML page.</li>
+              <li>Line 92: Gives the <code>video</code> tag an <code>id</code> attribute, with some value, in this case <strong>myPlayerID</strong>.</li>
+              <li>Line 100: Uses a <code>script</code> tag to include the plugin's JavaScript in the <code>body</code> of the HTML page.</li>
+              <li>Line 107: Creates a reference to the player.</li>
+              <li>Lines 110-124: Initializes the plugin and passes in custom options.</li>
           </ul>
-          <p><code data-gist-id="6edffc8c896381fb71e9" data-gist-hide-footer="true" data-gist-line="31,37-60"></code></p>
+          <p><code data-gist-id="4b6225289fba75490d61" data-gist-hide-footer="true" data-gist-line="90-126"></code></p>
 
 			</div>
+      <div id="renderingoptions" class="section">
+        <h2>Rendering options</h2>
+        <p>The following table shows the Tech in which the FreeWheel plugin will render an ad (column 3) based on Tech selections in Brightcove Player (column 1) and the <code>adTechOrder</code> set in the plugin (column 2).</p>
+        <table>
+          <tr>
+            <th>Brightcove Player<br />Selected Tech</th>
+            <th>FreeWheelPlugin adTechOrder</th>
+            <th>FreeWheel Plugin<br />Selected Ad Tech</th>
+          </tr>
+          <tr>
+            <td>html5</td>
+            <td>["flash","html5"]</td>
+            <td>flash</td>
+          </tr>
+          <tr>
+            <td>html5</td>
+            <td>["html5","flash"]</td>
+            <td>html5</td>
+          </tr>
+          <tr>
+            <td>html5</td>
+            <td>["html5"]</td>
+            <td>html5</td>
+          </tr>
+          <tr>
+            <td>html5</td>
+            <td>["flash"]</td>
+            <td>flash</td>
+          </tr>
+          <tr>
+            <td>flash</td>
+            <td>["flash","html5"]</td>
+            <td>flash</td>
+          </tr>
+          <tr>
+            <td>flash</td>
+            <td>["html5","flash"]</td>
+            <td>flash</td>
+          </tr>
+          <tr>
+            <td>flash</td>
+            <td>["html5"]</td>
+            <td>Not possible</td>
+          </tr>
+          <tr>
+            <td>flash</td>
+            <td>["flash"]</td>
+            <td>flash</td>
+          </tr>
+        </table>
+        <p>The following table shows the supported ad types based on the Tech (playback technology) the FreeWheel plugin is using to render the ad.</p>
+        <table>
+          <tr>
+            <th>FreeWheel plugin Tech</th>
+            <th>Supported Ads</th>
+          </tr>
+          <tr>
+            <td>HTML5</td>
+            <td>pre-roll, post-roll, overlay</td>
+          </tr>
+          <tr>
+            <td>Flash</td>
+            <td>pre-roll, mid-roll, post-roll, overlay</td>
+          </tr>
+        </table>
+
+      </div>
       <div id="properties" class="section">
         <h2>Properties</h2>
-        <p>The following plugin properties are used to control the NAME plugin:</p>
+        <p>The following plugin properties are used to control the Freewheel plugin:</p>
 		<ul>
-      <li><code>PROPNAME</code>: 
+      <li><strong>adTechOrder</strong>: 
         <ul>
-          <li>Type: <code>string</code></li>
-          <li>explanation</li>
+          <li>Type: <code>array</code> Default Value: <code>["flash","html5"]</code></li>
+          <li>The array contains the ad integration technologies to attempt to use, in order of descending precedence. The FreeWheel plugin will test each ad tech in order on initialization and use the first supported one for the lifetime of the player.</li>
         </ul>
       </li>
-      <li><code>PROPNAME</code>: 
+      <li><strong>Flash</strong>: 
         <ul>
-          <li>Type: <code>string</code></li>
-          <li>explanation</li>
+          <li>Type: <code>object</code></li>
+          <li>An object for Tech specific FreeWheel configuration (provided by FreeWheel)</li>
         </ul>
       </li>
-      <li><code>PROPNAME</code>: 
+      <li><strong>swfurl</strong>: 
         <ul>
-          <li>Type: <code>string</code></li>
-          <li>explanation</li>
+          <li>Type: <code>string</code> Default Value: <code>http://players.brightcove.net/videojs-freewheel/videojs.freewheel.swf</code></li>
+          <li>Must be a child property of the <code>Flash</code> object. The path to the Freewheel Flash plugin. This will be directly applied to the object element if the Flash ad tech is used.</li>
+        </ul>
+      </li>
+      <li><strong>Html5</strong>: 
+        <ul>
+          <li>Type: <code>object</code></li>
+          <li>An object for HTML5 FreeWheel configuration (provided by FreeWheel)</li>
         </ul>
       </li>
       </div>
@@ -120,6 +199,15 @@
         <h2>Example configuration</h2>
         <p></p>
         <p><code data-gist-id="4b6225289fba75490d61" data-gist-hide-footer="true" data-gist-line="1-67"></code></p>
+      </div>
+      <div id="knownissues" class="section">
+        <h2>Known issues</h2>
+        <ul>
+            <li>Resizing player during ad playback: If the player is resized during ad or video playback, ad content will not resize unless the player's dimensions function is called to resize the player. Resizing the player using other methods (style width and height, for example) will not resize the ad.</li>
+            <li>Overlay ads: If the FreeWheel plugin is rendering an ad in Flash, overlay ads are not clickable. If the FreeWheel plugin is rendering an ad in HTML5, overlays are not displayed at correct coordinates.</li>
+            <li>Mid-rolls: Mid-roll ads are not supported for HTML5 rendering.</li>
+            <li>Replay of content after post-roll: Sometimes replay of the video content is not possible after a post-roll ad has played.</li>
+        </ul>
       </div>
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
