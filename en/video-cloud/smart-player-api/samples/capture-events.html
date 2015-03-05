@@ -86,7 +86,7 @@
 
             </div>
 
-            <p>Play the video, starting and stopping playback. In the event display area, you should see messages for the the <code>PLAY</code> and <code>STOP</code> events. When the video ends, replay it. Notice these events continue to work when the video is replayed.</p>
+            <p>Play the video, starting and stopping playback. In the event display area, you should see messages for the <code>PLAY</code> and <code>STOP</code> events. When the video ends, replay it. Notice these events continue to work when the video is replayed.</p>
 
             <!-- Start of Brightcove Player -->
 
@@ -140,34 +140,31 @@
         <div id="logic" class="section" >
           <h2><a name="logic"></a>How it is done</h2>
           <p>This sample uses the Smart Player API to listen for media events.</p>
+            
           <h3>The Smart Player API part</h3>
-          <p>When the video player is ready, we get a reference to the <code>VIDEO_PLAYER</code> module and use the <code>play()</code> method to start playback of the current video.</p>
-          <code data-gist-id="7457328" data-gist-hide-footer="true" data-gist-line="57-64"></code><br/>
-          <p>Then the <code>addEventListener()</code> method is called to listen for the <code>brightcove.api.events.MediaEvent.PROGRESS</code> event.</p>
-          <code data-gist-id="7457328" data-gist-hide-footer="true" data-gist-line="70"></code><br/>
-          <p>The <code>PROGRESS</code> event returns an object that contains the video duration and current position. It is dispatched approximately 4-5 times a second. So, in the <code>onProgress()</code> event handler, we can check the video's position relative to its duration. You don't want to wait until the values are equal because the video will stop. Instead, we can use a conditional statement to check when the position is close to the end (.25 seconds from completion) and use the <code>seek()</code> method to return to the beginning of the video.</p>
-          <code data-gist-id="7457328" data-gist-hide-footer="true" data-gist-line="74-78"></code>
-          <p class="BCL-aside">In rare instances the value of <code>.25</code> will not catch the end of the video. If you experience this, use the following as your condition <code>if (evt.position > ((evt.media.length/1000)-0.1)){</code>.</p>
-          <h3>Looping videos on iOS and Android devices</h3>
-          <p>When attempting to make a video loop on iOS and Android devices, you will find that the <code>PROGRESS</code> event introduces some unexpected behavior to the video player. To work around these issues, you must first check to see if the user is browsing on an iOS or Android device. Create two variables, one for Android and one for iOS, that sets the <code>userAgent</code> property to match their respective platforms. </p>
-          <code data-gist-id="7457328" data-gist-hide-footer="true" data-gist-line="54-55"></code><br/>
-          <p>Next, when the video player is ready, use a conditional statement to check if the user is on an iOS or Android device. If they are, listen for the <code>STOP</code> event. Otherwise, listen for the <code>PROGRESS</code> event.</p>
-          <code data-gist-id="7457328" data-gist-hide-footer="true" data-gist-line="66-71"></code><br/>
-          <p>When the video ends, the <code>onStop()</code> event handler fires and the <code>play()</code> method is called to restart playback of the video.</p>
-          <code data-gist-id="7457328" data-gist-hide-footer="true" data-gist-line="80-82"></code><br/>
-          <p class="text-warning">Note: The STOP event is dispatched when playback of a video is paused or when a video has ended. In the case of this example, selecting the Pause button on your mobile device will not result in the video pausing.</p>          
+          <p>When the video player is ready, we get a reference to the <code>VIDEO_PLAYER</code> module and add event listeners for the <code>PLAY</code> and <code>STOP</code> events. </p>
+          <p><code data-gist-id="52ed3fe28b8cc0e8a91b" data-gist-hide-footer="true" data-gist-line="82-93"></code></p>
+            
+          <p>When the <code>PLAY</code> event is triggered, log a message when the video starts at the beginning or at some other point, resuming play after pausing it.</p>
+          <p><code data-gist-id="52ed3fe28b8cc0e8a91b" data-gist-hide-footer="true" data-gist-line="95-104"></code></p>
+            
+            <p>When the <code>STOP</code> event is triggered, log a message when the video is paused and when it ends. Notice that on Android devices, the media position is 0 when the video ends.</p>
+          <p><code data-gist-id="52ed3fe28b8cc0e8a91b" data-gist-hide-footer="true" data-gist-line="106-118"></code></p>
+            
+            <p>The following code checks if the user is viewing on an Android device and saves the Android version:</p>
+          <p><code data-gist-id="52ed3fe28b8cc0e8a91b" data-gist-hide-footer="true" data-gist-line="67-73" data-gist-highlight-line="70,71"></code></p>          
           
-          <h3>Using the COMPLETE event</h3>
-          <p>Rather than using the <code>PROGRESS</code> and <code>STOP</code> events to loop videos on desktop and mobile devices, listening for the <code>COMPLETE</code> event and then calling the <code>play()</code> method may seem like an easier solution. However, that doesn't quite work because the <code>COMPLETE</code> event only fires on the video's initial playback. As a result, the video will only replay once. In addition, the milliseconds it takes for the event to fire and the <code>play()</code> method to execute results in a flash of a black video screen between the plays.</p>
         </div><!-- div id="logic" -->
 
         <div id="code" class="section">
           <h2><a name="code"></a>The code</h2>
-          <p>See the full code sample <a href="https://gist.github.com/bcls/7457328">here</a>.</p>
+          <p>View or download the full code sample <a href="https://gist.github.com/bcls/52ed3fe28b8cc0e8a91b">here</a>.</p>
           <h3>Modifications made to the player publishing code</h3>
-          <code data-gist-id="7457328" data-gist-hide-footer="true" data-gist-line="34-37"></code>
+          <code data-gist-id="52ed3fe28b8cc0e8a91b" data-gist-hide-footer="true" data-gist-line="42-45"></code>
+          <h3>HTML used for event display information</h3>
+          <code data-gist-id="52ed3fe28b8cc0e8a91b" data-gist-hide-footer="true" data-gist-line="58-62"></code>
           <h3>JavaScript used for this sample</h3>
-          <code data-gist-id="7457328" data-gist-hide-footer="true" data-gist-line="50-84"></code>
+          <code data-gist-id="52ed3fe28b8cc0e8a91b" data-gist-hide-footer="true" data-gist-line="65-120"></code>
         </div><!-- div id="code" -->
 
       </div><!-- div id="main" -->
