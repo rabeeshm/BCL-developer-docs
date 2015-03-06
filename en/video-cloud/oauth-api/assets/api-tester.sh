@@ -10,8 +10,10 @@ echo 'Enter the full API call:'
 read API_CALL
 echo Your API call: $API_CALL
 echo --------------------------
-echo 'Enter the call verb (GET | POST | PATCH | PUT | DELETE):'
+echo 'Enter the call verb (GET [default] | POST | PATCH | PUT | DELETE):'
 read VERB
+if [ "$VERB" = "" ]
+	then VERB = "GET"
 echo Your call verb: $VERB
 echo --------------------------
 echo 'Enter data to be submitted in the request body:'
