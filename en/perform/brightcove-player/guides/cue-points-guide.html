@@ -5,7 +5,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
 	<!-- change title to match the h1 heading -->
-	<title>Use Cue Points</title>
+	<title>Using Cue Points</title>
 	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/css/foundation.min.css" />
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/css/normalize.css" />
 	<script src="//use.edgefonts.net/source-code-pro.js"></script>
@@ -47,7 +47,7 @@
 		</div>
 		<div id="main" class="large-10 small-12 columns">
 			<div id="top" class="section">
-				<h1>Use Cue Points</h1>
+				<h1>Using Cue Points</h1>
 				<!-- Place document intro sentence(s) here -->
 				<p>Cue points can be set for a video. During video playback, an event is dispatched when each cue point is hit.</p>
                 <p>Play the following video to see the player display cue point information at pre-roll, mid-roll (5 seconds, 10 seconds, 12 seconds) and post roll times.</p>
@@ -130,19 +130,23 @@
         <p>The following is a valid WebVTT cue point document that defines two cue points, one with a duration from 2-5 seconds and another with duration from 10-15 seconds:</p>
         <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="166-184"></code></p>
         <p>When you play the following video, you will see the cue point WebVTT file shown above processed. At the start of a cue point, you see dynamically created HTML injected into the page, followed by some parsed JSON from the <strong>text</strong> field. At the end of the cue point the message <strong>Cue point duration over</strong> is displayed.</p>
- <video id="myPlayerID2"
-  data-account="1752604059001"
-  data-player="8cfb6785-c4be-43b4-af68-7ca2fe3a6ebf"
-  data-embed="default"
-  data-video-id="3851380732001"
-  class="video-js" controls></video>
-         <p>******** Cue Point Information ********</p>
+        <video id="myPlayerID2"
+          data-account="1752604059001"
+          data-player="8cfb6785-c4be-43b4-af68-7ca2fe3a6ebf"
+          data-embed="default"
+          data-video-id="3851380732001"
+          class="video-js" controls>
+
+          <track kind="metadata" src="https://solutions.brightcove.com/bcls/tests/player/cuepoints.vtt" />
+
+        </video>
+        <p>******** Cue Point Information ********</p>
         <p id="insertionPoint2"></p>
         <p>****** End Cue Point Information ******</p>
         <h3>Process cue points overview</h3>
         <p>The basics steps to use HTML5 standard cue points are:</p>
         <ol>
-            <li>In a <code>loadstart</code> event handler, use the <code>addRemoteTextTrack()</code> method to read in the WebVTT file containing the cue points.</li>
+            <li>Read in the WebVTT file containing the cue points using a <code>&lt;track></code> tag nested as a child of the <code>&lt;video></code> tag.</li>
             <li>In a <code>loadedmetadata</code> event handler, retrieve the proper text track element.</li>
             <li>In the same event handler, configure a second event handler for the <code>oncuechange</code> cue point event.</li>
             <li>In the <code>oncuechange</code> event handler, check if the <code>activecues</code> array object has zeroth element defined, if yes, act on the cue point start.</li>
@@ -153,22 +157,33 @@
         <h3>Process cue points code</h3>
         <p></p>
         <ul>
-            <li>Line 122: Create a paragraph element as a location in which to inject dynamically created HTML.</li>
-            <li>Lines 130,135: Use the <code>one()</code> method to listen only once for the <code>loadstart</code> event.</li>
-            <li>Lines 131-134: In the anonymously defined event handler function, use the <code>addRemoteTextTrack()</code> method to read the cue points WebVTT file. The HTML5 standard dictates that for cuepoints the <code>kind</code> is assigned the value <code>metadata</code>.</li>
-            <li>Lines 137,154: Use the <code>one()</code> method to listen only once for the <code>loadedmetadata</code> event. The event handler function is defined here anonymously.</li>
-            <li>Line 138: Retrieve the TextTracks array using the <code>textTracks()</code> method, then assign the first array element, which holds the cue points, to the variable <code>tt</code>. Note that it may be possible in some implementations that the cue points could be in a different array element.</li>
-            <li>Lines 139,151: Sets the event handler function for when the <code>oncuechange</code>event is dispatched.</li>
-            <li>Line 140: Check to be sure the first (zeroth array element) cue point is defined. This tells you that this is a start cue point event.</li>
-            <li>Lines 141-147: Dynamically create HTML using information from the cue point and inject into the HTML page. This includes parsing JSON and displaying various fields of that JSON.</li>
-            <li>Lines 148-149: Display a note that the cue point end has been reached.</li>
-            <li>Line 152: Play the video.</li>
+            <li>Line 122: Create a text track by reading in the WebVTT file using the <code>&lt;track></code> tag.</li>
+            <li>Line 126: Create a paragraph element as a location in which to inject dynamically created HTML.</li>
+            <li>Lines 134,152: Use the <code>one()</code> method to listen only once for the <code>loadedmetadata</code> event. The event handler function is defined here anonymously.</li>
+            <li>Line 135: Assign to a variable the index of the last text track loaded.</li>
+            <li>Line 136: Retrieve the textTracks array using the <code>textTracks()</code> method the assign the last element of the array to a variable using the index determined in the previous step.</li>
+            <li>Lines 137,149: Sets the event handler function for when the <code>oncuechange</code>event is dispatched.</li>
+            <li>Line 138: Check to be sure the first (zeroth array element) cue point is defined in the activeCues array. This tells you that this is a start cue point event.</li>
+            <li>Lines 139-145: Dynamically create HTML using information from the cue point and inject into the HTML page. This includes parsing JSON and displaying various fields of that JSON.</li>
+            <li>Lines 146-147: Display a note that the cue point end has been reached.</li>
+            <li>Line 150: Play the video.</li>
         </ul>
-        <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="115-156"></code></p>
+        <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="115-155"></code></p>
+        <p>One could assume you could add the WebVTT file programmatically using the <code>addRemoteTextTrack()</code> method. In this case, it would not be reliable since you can experience a race condition where the cue points would not be ready to process before trying to use them. It is safe to add the WebVTT file using the <code>&lt;track></code> tag as shown.</p>
 			</div>
-      <div id="dynamiccuepoints" class="section">
-        <h2>Dynamic cue points</h2>
-        <p></p>
+      <div id="programmaticcuepoints" class="section">
+        <h2>Programmatic cue points</h2>
+        <p>It is possible to programmatically add cue points. The key method comes from the the HTML5 <code>VTTCue</code> interface. You can create cue points use the following syntax:</p>
+        <pre><code>new VTTCue( startTime, endTime, text )</code></pre>
+        <p>The logic of processing the cue points is very similar to previous examples, so only the code to create the cue points will be detailed.</p>
+        <ul>
+            <li>Line 209: Add a <code>textTrack</code> element to the player using the player's <code>addTextTrack()</code> method. Specify the <code>kind</code> to be <strong>metadata</strong>, and a <code>name</code>, in this case <strong>Timed Cue Point</strong>.</li>
+            <li>Lines 210, 211: Create two cue points using the player's <code>addCue()</code> method. The cue points are instantiated using HTML5's <code>VTTCue()</code> constructor.</li>
+        </ul>
+        <p class="BCL-aside">Note: Outside of the learning sample code that follows, it is very likely the cue points would be created looping over some data structure containing key cue point info.</p>
+        <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="192-226"></code></p>
+        <p>The code generates output as shown in the following screenshot. Note the the <strong>id</strong> values are not supplied a value when using the <code>VTTCue()</code> constructor method.</p>
+        <p><img src="/en/video-cloud/brightcove-player/guides/assets/cue-points-dynamic.png"></p>
       </div>
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
@@ -183,7 +198,7 @@
 	</div>
 
   <script src="//players.brightcove.net/1507807800001/6aac508a-741e-41a2-bc7a-5805644cf089_default/index.min.js"></script>
-<script src="//players.brightcove.net/1752604059001/8cfb6785-c4be-43b4-af68-7ca2fe3a6ebf_default/index.min.js"></script>
+ <script src="//players.brightcove.net/1752604059001/8cfb6785-c4be-43b4-af68-7ca2fe3a6ebf_default/index.min.js"></script>
  
 	<!-- bcl scripts -->
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -221,23 +236,14 @@
     });
   </script>	
  
- <script type="text/javascript">
+  <script type="text/javascript">
     videojs("myPlayerID2").ready(function(){
       var myPlayer = this;
  
-      myPlayer.one("loadstart",function(){
-        var cueTrack = myPlayer.addRemoteTextTrack({
-          kind: 'metadata',
-          src: 'http://solutions.brightcove.com/bcls/tests/player/cuepoints.vtt'
-        }); //end addRemoteTextTrack
-      }); //end loadstart
-
       myPlayer.one("loadedmetadata",function(){
-console.log('textTracks',myPlayer.textTracks());        
-        var tt = myPlayer.textTracks()[0];
-console.log('tt',tt);        
+        var trackIndex = myPlayer.textTracks().length -1;
+        var tt = myPlayer.textTracks()[trackIndex];
         tt.oncuechange = function() {
-console.log('in oncuechange');          
           if(tt.activeCues[0] !== undefined){
             var dynamicHTML = "id: <strong>" + tt.activeCues[0].id + "</strong>, ";
             dynamicHTML += "text: <strong>" + tt.activeCues[0].text + "</strong>, ";
@@ -247,9 +253,10 @@ console.log('in oncuechange');
             jsonData = JSON.parse(tt.activeCues[0].text);
             document.getElementById("insertionPoint2").innerHTML += jsonData.title + ": " + jsonData.description + "<br/><br/>";
           } else {
-            document.getElementById("insertionPoint2").innerHTML += "Cue point duration over" + "<br/><br/>";
+            document.getElementById("insertionPoint2").innerHTML += "<strong>Cue point duration over</strong>" + "<br/><br/>";
           }
         } //end oncuechange
+        //myPlayer.play();
         myPlayer.muted(true);
       }); //end loadedmetadata
 
