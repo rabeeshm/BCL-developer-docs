@@ -1,3 +1,5 @@
+bold=`tput bold`
+normal=`tput sgr0`
 echo 'Enter your client id:'
 read CLIENT_ID
 echo Your client id: $CLIENT_ID
@@ -10,11 +12,26 @@ echo 'Enter the full API call:'
 read API_CALL
 echo Your API call: $API_CALL
 echo --------------------------
-echo 'Enter the call verb: [ GET (default) | POST | PATCH | PUT | DELETE ]:'
+echo "Enter the call verb: [ ${bold}g${normal} (GET - default) | ${bold}po${normal} (POST) | ${bold}pa${normal} (PATCH) | ${bold}pu${normal} (PUT) | ${bold}d${normal} (DELETE) ]:"
 read VERB
 if [ "$VERB" = "" ]
 	then
 	export VERB="GET"
+elif [ "$VERB" = "g" ]
+	then
+	export VERB="GET"
+elif [ "$VERB" = "po" ]
+	then
+	export VERB="POST"
+elif [ "$VERB" = "pa" ]
+	then
+	export VERB="PATCH"
+elif [ "$VERB" = "pu" ]
+	then
+	export VERB="PUT"
+elif [ "$VERB" = "d" ]
+	then
+	export VERB="DELETE"
 fi
 echo Your call verb: $VERB
 echo --------------------------
