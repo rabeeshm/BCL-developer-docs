@@ -891,7 +891,6 @@
 	                    <td>
 	                        <p>
 	                            The content has completed processing and is available for delivery<br>
-
 	                        </p>
 	                    </td>
 	                </tr>
@@ -1028,1382 +1027,1134 @@
 	}
 }</code></pre>
         </div>
-        <h1>
-            Content Ingestion
-        </h1>
-        <h2>
-            <strong>Creating an API-based ingest job</strong>
-        </h2>
-        <p>
-            API Base URL:
-        </p>
-        <p>
-            https://api.unicornmedia.com/ingest-api/
-        </p>
-        <p>
-            Syntax:
-        </p>
-        <p>
-            https://api.unicornmedia.com/ingest-api/{domain}/catalogs/{catalog}
-        </p>
-        <p>
-            Example:
-        </p>
-        <p>
-            https://api.unicornmedia.com/ingest-api/b207b479-c841-4095-8918-978be9e18dee/catalogs/bc6cb7d4-be99-471b-adf3-7c501172b317
-        </p>
-        <p>
-            Brightcoveâ€™s Once API Ingest service is a RESTful API that accepts HTTPS POST requests, supplying JSON as the data structure and passing the API key in the header. When the video has been successfully generated, the core profiles required for delivery on the Once VOD platform are generated. Videos linked to for SourceURLs must be progressive formats and publicly addressable URLs. Ingesting files via S3 is also supported by the API Ingest system as a source location. If your files are publicly available, no further action is necessary. If your files require authentication, please see the using S3 buckets section for authorizing the Once platform to access protected URLs. If the request fails, a validation error will be returned in the response body as JSON with details of the error event. Upon success the response will return a Request ID in the content body that can be used to track the job details from the Status API. Example below.
-        </p>
-        <p>
-            As a best practice recommendation the source video should be at a video bitrate between 5-10 Mbps, frame size of 1920x1080 and contain keyframes at least every 6 seconds.
-        </p>
-        <h2>
-            <strong>Creating an SNS-based ingest job</strong>
-        </h2>
-        <p>
-            The following steps will be necessary to ensure Brightcove can configure the proper mechanisms to pull content from your AWS account.
-        </p>
-        <ol>
-            <li>The SNS Topic ARN<br>
-            </li>
-            <li>Allow the Brightcove AWS account root permission to subscribe to the SNS topic<br>
-            </li>
-        </ol>
-        <ul>
-            <li>Brightcove Root: <strong>arn:aws:iam::453163911362:root</strong><br>
-            </li>
-        </ul>
-        <h4>
-            Example policy statement
-        </h4>
-        <p>
-            {
-        </p>
-        <p>
-            "Sid": "__console_sub_0",
-        </p>
-        <p>
-            "Effect": "Allow",
-        </p>
-        <p>
-            "Principal": {
-        </p>
-        <p>
-            "AWS": "arn:aws:iam::453163911362:root"
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "Action": ["SNS:Subscribe",
-        </p>
-        <p>
-            "SNS:Receive"],
-        </p>
-        <p>
-            "Resource": "arn:aws:sns:us-west-2:866653344564:Brightcove-Ingest",
-        </p>
-        <p>
-            "Condition": {
-        </p>
-        <p>
-            "StringEquals": {
-        </p>
-        <p>
-            "SNS:Protocol": "sqs"
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            <strong>Note:</strong> If the source files are stored on S3, the URLs should be in the format <em>s3://BUCKET/KEY</em> to ensure the URLs are signed appropriately.
-        </p>
-        <h3>
-            <strong>Using S3 buckets</strong>
-        </h3>
-        <p>
-            If the bucket is not publicly accessible, the Brightcove transcoding engine will need to be granted access through a bucket policy or to the Brightcove AWS account.
-        </p>
-        <h4>
-            Option #1 - Create a bucket policy
-        </h4>
-        <p>
-            To set up a bucket policy, login to your AWS Console, select your bucket on the left side of the screen, then click "properties". On the last row click "Add bucket policy". We'll put a Bucket Policy together below, which you'll copy into the Bucket Policy text box.
-        </p>
-        <p>
-            <strong>Recommended bucket policy:</strong>
-        </p>
-        <p>
-            {
-        </p>
-        <p>
-            "Version": "2008-10-17",
-        </p>
-        <p>
-            "Id": "ZencoderBucketPolicy",
-        </p>
-        <p>
-            "Statement": [
-        </p>
-        <p>
-            {
-        </p>
-        <p>
-            "Sid": "Stmt1295042087538",
-        </p>
-        <p>
-            "Effect": "Allow",
-        </p>
-        <p>
-            "Principal": {
-        </p>
-        <p>
-            "AWS": "arn:aws:iam::395540211253:root"
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "Action": [
-        </p>
-        <p>
-            "s3:GetObjectAcl",
-        </p>
-        <p>
-            "s3:GetObject",
-        </p>
-        <p>
-            "s3:PutObjectAcl",
-        </p>
-        <p>
-            "s3:PutObject",
-        </p>
-        <p>
-            "s3:ListMultipartUploadParts"
-        </p>
-        <p>
-            ],
-        </p>
-        <p>
-            "Resource": "arn:aws:s3:::MY-BUCKET/*"
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            {
-        </p>
-        <p>
-            "Sid": "Stmt1295042087538",
-        </p>
-        <p>
-            "Effect": "Allow",
-        </p>
-        <p>
-            "Principal": {
-        </p>
-        <p>
-            "AWS": "arn:aws:iam::395540211253:root"
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "Action": [
-        </p>
-        <p>
-            "s3:ListBucketMultipartUploads",
-        </p>
-        <p>
-            "s3:GetBucketLocation"
-        </p>
-        <p>
-            ],
-        </p>
-        <p>
-            "Resource": "arn:aws:s3:::MY-BUCKET"
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            There is only one change you will have to make to this bucket policy before it's ready to go.
-        </p>
-        <ol>
-            <li>Replace MY-BUCKET with the name of your bucket. Leave the /* at the end of the line, as that will apply the policy to every file within the bucket.<br>
-            </li>
-            <li>Optionally, replace the Action array with the actions you want to allow. Valid actions that Brightcove may need are:<br>
-            </li>
-        </ol>
-        <p>
-            Object Permissions - first action array in the example above
-        </p>
-        <ul>
-            <li>s3:PutObject - allow Brightcove to upload files to the bucket<br>
-            </li>
-            <li>s3:GetObject - allow Brightcove to download files from the bucket<br>
-            </li>
-            <li>s3:GetObjectAcl - allow Brightcove to get ACL permissions for files<br>
-            </li>
-            <li>s3:PutObjectAcl - allow Brightcove to set ACL permissions for other users on files<br>
-            </li>
-            <li>s3:ListMultipartUploadParts - allow Brightcove to list which parts of a multipart file have been uploaded to the bucket<br>
-            </li>
-        </ul>
-        <p>
-            Bucket Permissions - second action array in the example above
-        </p>
-        <ul>
-            <li>s3:GetBucketLocation - allow Brightcove to get the location of the bucket (US, EU, Asia, etc.)<br>
-            </li>
-            <li>s3:ListBucketMultipartUploads - allow Brightcove to view any multipart uploads currently happening on the bucket<br>
-            </li>
-        </ul>
-        <p>
-            ex: If you want Zencoder to be able to download and upload files, replace the first Action array with:
-        </p>
-        <p>
-            <strong>["s3:PutObject", "s3:GetObject"]</strong>
-        </p>
-        <p>
-            If you'd like to build your own Bucket Policy, you can use <a href="http://awspolicygen.s3.amazonaws.com/policygen.html">Amazon's Policy Generator</a>. Use arn:aws:iam::395540211253:root as the AWS Principal to allow Brightcove access.
-        </p>
-        <h4>
-            Option #2 - grant access to Brightcove AWS
-        </h4>
-        <p>
-            Grant Access to the Brightcove AWS account at aws@zencoder.com. If the setup requires the canonical ID you can use:
-        </p>
-        <p>
-            6c8583d84664a381db0c6af0e79b285ede571885fbe768e7ea50e5d3760597dd
-        </p>
-        <h2>
-            <strong>Example ingest syntax</strong>
-        </h2>
-        <h3>
-            <strong>Request</strong>
-        </h3>
-        <p>
-            Required HTTP Header:
-        </p>
-        <p>
-            X-BC-ONCE-API-KEY : {yourApiKey}
-        </p>
-        <h4>
-            Schema
-        </h4>
-        <p>
-            <strong>See Appendix A</strong>
-        </p>
-        <h4>
-            Example Body
-        </h4>
-        <p>
-            {
-        </p>
-        <p>
-            "title": "brightcove-once",
-        </p>
-        <p>
-            "foreignKey": "brightcove-once",
-        </p>
-        <p>
-            "metadata": {
-        </p>
-        <p>
-            "accoundId": "12345",
-        </p>
-        <p>
-            "company": "brightcove",
-        </p>
-        <p>
-            "product": "once",
-        </p>
-        <p>
-            "eventId": "321"
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "media": {
-        </p>
-        <p>
-            "sourceURL": "http://mirror.cessen.com/blender.org/peach/trailer/trailer_1080p.mov"
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "priority": "normal",
-        </p>
-        <p>
-            "publicationRules": [
-        </p>
-        <p>
-            {
-        </p>
-        <p>
-            "channel": "a8cf98a9-8946-4bd4-b97c-a2b5dbc635c5",
-        </p>
-        <p>
-            "startDate": 1412025402,
-        </p>
-        <p>
-            "endDate": 1601414189,
-        </p>
-        <p>
-            "clientFilters": [
-        </p>
-        <p>
-            {
-        </p>
-        <p>
-            "variableName": "IpAddress",
-        </p>
-        <p>
-            "value": "127.0.0.1",
-        </p>
-        <p>
-            "filterType": "Equals",
-        </p>
-        <p>
-            "isDenied": true
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            ],
-        </p>
-        <p>
-            "countryRules": [
-        </p>
-        <p>
-            {
-        </p>
-        <p>
-            "countryCode": "UK",
-        </p>
-        <p>
-            "isDenied": true
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            ],
-        </p>
-        <p>
-            "cuePoints": [
-        </p>
-        <p>
-            {
-        </p>
-        <p>
-            "valueIn": 10,
-        </p>
-        <p>
-            "unit": "Seconds"
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            {
-        </p>
-        <p>
-            "valueIn": 25,
-        </p>
-        <p>
-            "unit": "Seconds"
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            }
-        </p>
-        <h3>
-            <strong>Response</strong>
-        </h3>
-        <h4>
-            Body (error)
-        </h4>
-        <p>
-            {
-        </p>
-        <p>
-            "requestId": "2796350e-2125-4f04-b33a-59488aaa76c7",
-        </p>
-        <p>
-            "error": "Validation Errors",
-        </p>
-        <p>
-            "fieldErrors": {
-        </p>
-        <p>
-            "publicationRule": [
-        </p>
-        <p>
-            "Publication rule with end date 0.0 is in the past.",
-        </p>
-        <p>
-            "Publication rule end date: 0.0 preceeds 1412025402"
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            }
-        </p>
-        <h4>
-            Body (success)
-        </h4>
-        <p>
-            {
-        </p>
-        <p>
-            "requestId": "2796350e-2125-4f04-b33a-59488aaa76c7"
-        </p>
-        <p>
-            }
-        </p>
-        <h2>
-            <strong>Brief Object Explanation</strong>
-        </h2>
-        <p>
-            While we recommend the use of optional field â€˜titleâ€™ for search and human readability, only the following highlighted fields are required for all ingest job requests. If the required fields are not present in the API request; a response body will be returned with a corresponding error message.
-        </p>
-        <table>
-            <tbody>
-                <tr>
-                    <td>
-                        <p>
-                            <strong>Object</strong>
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            <strong>sub-object</strong>
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            <strong>Req'd</strong>
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            <strong>Description</strong>
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            title
-                        </p>
-                    </td>
-                    <td></td>
-                    <td>
-                        <p>
-                            No
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Title of the asset, used for subsequent notifications and item lookup
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            <strong>foreignKey</strong>
-                        </p>
-                    </td>
-                    <td></td>
-                    <td>
-                        <p>
-                            <strong>Yes</strong>
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Unique identifier per domain to indicate a media item and it's associations.
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            keywords
-                        </p>
-                    </td>
-                    <td></td>
-                    <td>
-                        <p>
-                            No
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Keywords used to describe the media item.
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            description
-                        </p>
-                    </td>
-                    <td></td>
-                    <td>
-                        <p>
-                            No
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Brief description of the media item.
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            metadata
-                        </p>
-                    </td>
-                    <td></td>
-                    <td>
-                        <p>
-                            No
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Key value pairs that can be stored with a media item and dynamically retrieved for audience beaconing or ad server requests.
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            <strong>media</strong>
-                        </p>
-                    </td>
-                    <td></td>
-                    <td>
-                        <p>
-                            <strong>Yes</strong>
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Container for the defined source video
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <p>
-                            sourceURL
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Yes
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Location of the video media item
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            timedText
-                        </p>
-                    </td>
-                    <td></td>
-                    <td>
-                        <p>
-                            No
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Defining or association closed captioning and/or subtitles to ingest in conjuction to the video media item.
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <p>
-                            media
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Yes
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Container for the defined source document of a subtitle or flagged as passthrough when the document is embedded on the video container
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <p>
-                            timedTextType
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Yes
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Defines the timed text output as a subtitle, closed-caption, or embedded.
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <p>
-                            languages
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Yes
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Country code defined by ISO 639-1
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <p>
-                            alternateId
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            No
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Defines a timed text output when multiple variations of the same language is utilized. Output will be named as "{language}-{alternateId}"
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            priority
-                        </p>
-                    </td>
-                    <td></td>
-                    <td>
-                        <p>
-                            No
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Reserved for future use.
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            publicationRules
-                        </p>
-                    </td>
-                    <td></td>
-                    <td>
-                        <p>
-                            No
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Sets timing, geo filtering, and client filters to restrict content based on business requirements. By default, publication rules are open for 10 years of when account was open. Please see Media Mangement for configuration details.
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <p>
-                            channel
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Yes
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            The channel Id associated with the domain.
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <p>
-                            startDate
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Yes
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Begin content availability.
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <p>
-                            endDate
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Yes
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            End content availability.
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <p>
-                            clientFilters
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            No
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Allows the setting of client restrictions based on IP Address, useragent, or referring host.
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <p>
-                            countryRules
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            No
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Geo restrictions based on ISO 639-1 country codes.
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            cuePoints
-                        </p>
-                    </td>
-                    <td></td>
-                    <td>
-                        <p>
-                            No
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Segmentation points of the mediaitem to insert midroll ads (when available and configured).
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <p>
-                            valueIn
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Yes
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Value of the cuepoint in relation to the content duration
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <p>
-                            unit
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Yes
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Unit of measurement for the valueIn
-                        </p>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <h1>
-            Closed-Captioning and Subtitles
-        </h1>
-        <p>
-            Brightcove Once enables multinational publishers to provide subtitles or closed-captioning to global audiences. These subtitles or closed captions can be rendered by players and native OS playback components that allow the viewer to choose the language of their choice, either via OS default localization settings or via a UI selection. Subtitles should not be confused with closed captions for the purpose of this implementation. While both utilize timed-text and in many cases in a similar manner, it is important to make the distinction from a regulatory and user experience perspective. In some cases, both will be required as a given piece of content could be published in North America and rest-of-world simultaneously. As digital technology evolves, closed-captioning will no longer be restrained by formatting by embedded captions and can be used in conjunction with timed-text outputs.
-        </p>
-        <h3>
-            <strong>Closed-Captioning input/output:</strong>
-        </h3>
-        <table>
-            <tbody>
-                <tr>
-                    <td rowspan="2" colspan="2" valign="middle">
-                        <p>
-                            <strong>Closed-Captioning</strong>
-                        </p>
-                    </td>
-                    <td colspan="5">
-                        <p>
-                            Output
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            <strong>CEA-608</strong>
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            <strong>SRT</strong>
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            <strong>WebVTT (in-manifest)</strong>
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            <strong>WebVTT sidecar</strong>
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            <strong>DFXP</strong>
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td rowspan="6" valign="middle">
-                        <p>
-                            Input
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            CEA-608
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            **
-                        </p>
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            Sidecar SRT
-                        </p>
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>
-                        <p>
-                            ***
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            Sidecar WebVTT
-                        </p>
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>
-                        <p>
-                            ***
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            Sidecar DFXP
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            **
-                        </p>
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            Sidecar SAMI
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            **
-                        </p>
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            Sidecar SCC
-                        </p>
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
-        <p>
-            Note:
-        </p>
-        <p>
-            **If the input document (or file) contains multiple languages, only the first language is selected. The file format must be in a MP4/M4V video container with caption tracks in CEA-608 format.
-        </p>
-        <p>
-            ***A simple timed-text input format to a rich output is not recommended, although supported by using default styling to work with most platforms.
-        </p>
-        <h5>
-            Current Restrictions/Limitations
-        </h5>
-        <p>
-            For CEA-608:
-        </p>
-        <ul>
-            <li>Sidecar output will not be generated for extracted closed captioning<br>
-            </li>
-            <li>Output as Closed-Captioning will be presented in HLS manifests following the IETF HLS draft version 14.<br>
-            </li>
-        </ul>
-        <p>
-            For SRT:
-        </p>
-        <ul>
-            <li>Positioning and styling are not supported.<br>
-            </li>
-            <li>Text formatting derived from HTML tags will be treated as text.<br>
-            </li>
-            <li>Output as a sidecar through Once UX only<br>
-            </li>
-        </ul>
-        <p>
-            For WebVTT:
-        </p>
-        <ul>
-            <li>Input files must not be segmented.<br>
-            </li>
-            <li>Sidecar output will file will be outputted as a full file.<br>
-            </li>
-            <li>Positioning and styling are not supported.<br>
-            </li>
-            <li>Text formatting derived from HTML tags will be treated as text.<br>
-            </li>
-            <li>Output as a sidecar through Once UX only<br>
-            </li>
-        </ul>
-        <p>
-            For DFXP:
-        </p>
-        <ul>
-            <li>Multiple languages in &lt;div&gt; tags in a single document is supported, but the languages must be defined at ingest.<br>
-            </li>
-            <li>Output files will not support more than one &lt;div&gt; tag with itâ€™s associated language. Each language will be a separate sidecar file.<br>
-            </li>
-            <li>Output as Closed-Captioning will be presented in HLS manifests following the IETF HLS draft version 14.<br>
-            </li>
-            <li>As CEA-608 output:<br>
-            </li>
-            <li>
-                <ul>
-                    <li>Animation, layout, and region features are not supported.<br>
-                    </li>
-                    <li>Styles can be inline or referenced by ID, but only the tts:textAlign property is applied.<br>
-                    </li>
-                    <li>Nested DIV and P tags are ignored<br>
-                    </li>
-                    <li>SPAN tags are ignored<br>
-                    </li>
-                    <li>Explicit breaks may be inserted with BR tags<br>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-        <p>
-            For SAMI:
-        </p>
-        <ul>
-            <li>Inline styles are not supported<br>
-            </li>
-            <li>Layout-related styling tags are not supported<br>
-            </li>
-            <li>Explicit breaks may be inserted by using separate P tags.<br>
-            </li>
-            <li>Output as Closed-Captioning will be presented in HLS manifests following the IETF HLS draft version 14.<br>
-            </li>
-        </ul>
-        <p>
-            Example Once UX presentation:
-        </p>
-        <p>
-            ...
-        </p>
-        <p>
-            &lt;uo:timedText&gt;
-        </p>
-        <p>
-            &lt;uo:item type="caption" language="en"&gt;
-        </p>
-        <p>
-            &lt;![CDATA[http://.../en/content.{output_extension}]]&gt;
-        </p>
-        <p>
-            &lt;/uo:item&gt;
-        </p>
-        <p>
-            &lt;uo:item type="caption" language="fr"&gt;
-        </p>
-        <p>
-            &lt;![CDATA[http://.../fr/content.{output_extension}]]&gt;
-        </p>
-        <p>
-            &lt;/uo:item&gt;
-        </p>
-        <p>
-            &lt;/uo:timedText&gt;
-        </p>
-        <p>
-            ...
-        </p>
-        <h3>
-            <strong>Subtitles input/output:</strong>
-        </h3>
-        <table>
-            <tbody>
-                <tr>
-                    <td rowspan="2" colspan="2" valign="middle">
-                        <p>
-                            <strong>Subtitles</strong>
-                        </p>
-                    </td>
-                    <td colspan="5">
-                        <p>
-                            Output
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            <strong>embedded 608</strong>
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            <strong>SRT</strong>
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            <strong>WebVTT (in-manifest)</strong>
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            <strong>WebVTT sidecar</strong>
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            <strong>DFXP</strong>
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td rowspan="3" valign="middle">
-                        <p>
-                            Input
-                        </p>
-                    </td>
-                    <td>
-                        <p>
-                            Sidecar SRT
-                        </p>
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>
-                        <p>
-                            ***
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            Sidecar WebVTT
-                        </p>
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>
-                        <p>
-                            ***
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p>
-                            Sidecar DFXP
-                        </p>
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
-        <p>
-            Note:
-        </p>
-        <p>
-            ***A simple timed-text input format to a rich output is not recommended, although supported by using default styling to work with most platforms.
-        </p>
-        <h5>
-            Current Restrictions/Limitations
-        </h5>
-        <p>
-            For SRT:
-        </p>
-        <ul>
-            <li>Positioning and styling are not supported.<br>
-            </li>
-            <li>Text formatting derived from HTML tags will be treated as text.<br>
-            </li>
-            <li>Output as a sidecar through Once UX only<br>
-            </li>
-        </ul>
-        <p>
-            For WebVTT:
-        </p>
-        <ul>
-            <li>Input files must not be segmented.<br>
-            </li>
-            <li>Sidecar output will file will be outputted as a full file.<br>
-            </li>
-            <li>Positioning and styling are not supported.<br>
-            </li>
-            <li>Text formatting derived from HTML tags will be treated as text.<br>
-            </li>
-            <li>Output as a sidecar through Once UX only<br>
-            </li>
-        </ul>
-        <p>
-            For DFXP:
-        </p>
-        <ul>
-            <li>Multiple languages in &lt;div&gt; tags in a single document is supported, but the languages must be defined at ingest.<br>
-            </li>
-            <li>Output files will not support more than one &lt;div&gt; tag with itâ€™s associated language. Each language will be a separate sidecar file.<br>
-            </li>
-            <li>Output as WebVTT in-manifest for HLS will be segmented and follow the IETF HLS draft version 14.<br>
-            </li>
-        </ul>
-        <p>
-            Example Once UX presentation:
-        </p>
-        <p>
-            ...
-        </p>
-        <p>
-            &lt;uo:timedText&gt;
-        </p>
-        <p>
-            &lt;uo:item type="subtitle" language="en"&gt;
-        </p>
-        <p>
-            &lt;![CDATA[http://.../en/content.{output_extension}]]&gt;
-        </p>
-        <p>
-            &lt;/uo:item&gt;
-        </p>
-        <p>
-            &lt;uo:item type="subtitle" language="fr"&gt;
-        </p>
-        <p>
-            &lt;![CDATA[http://.../fr/content.{output_extension}]]&gt;
-        </p>
-        <p>
-            &lt;/uo:item&gt;
-        </p>
-        <p>
-            &lt;/uo:timedText&gt;
-        </p>
-        <p>
-            ...
-        </p>
-        <p>
-            Example in-manifest WebVTT (master playlist):
-        </p>
-        <p>
-            ...
-        </p>
-        <p>
-            #EXT-X-MEDIA:TYPE=SUBTITLES,URI="http://.../content.m3u8",GROUP-ID="subs",LANGUAGE="en",NAME="English"
-        </p>
-        <p>
-            #EXT-X-MEDIA:TYPE=SUBTITLES,URI="http://.../content.m3u8",GROUP-ID="subs",LANGUAGE="fr",NAME="French"
-        </p>
-        <p>
-            ...
-        </p>
-        <p>
-            Example in-manifest WebVTT (media playlist):
-        </p>
-        <p>
-            ...
-        </p>
-        <p>
-            #EXTINF:240.000,0
-        </p>
-        <p>
-            http://.../segment1.vtt
-        </p>
-        <p>
-            #EXTINF:240.000,0
-        </p>
-        <p>
-            http://.../segment2.vtt
-        </p>
-        <p>
-            ...
-        </p>
-        <p>
-            #EXT-X-ENDLIST
-        </p>
+        <div class="section" id="ingestion">
+	        <h2>
+	            Content Ingestion
+	        </h2>
+	        <h3>
+	            <strong>Creating an API-based ingest job</strong>
+	        </h3>
+	        <p>
+	            API Base URL:
+	        </p>
+	        <p>
+	            https://api.unicornmedia.com/ingest-api/
+	        </p>
+	        <p>
+	            Syntax:
+	        </p>
+	        <p>
+	            https://api.unicornmedia.com/ingest-api/{domain}/catalogs/{catalog}
+	        </p>
+	        <p>
+	            Example:
+	        </p>
+	        <p>
+	            https://api.unicornmedia.com/ingest-api/b207b479-c841-4095-8918-978be9e18dee/catalogs/bc6cb7d4-be99-471b-adf3-7c501172b317
+	        </p>
+	        <p>
+	            Brightcove's Once API Ingest service is a RESTful API that accepts HTTPS POST requests, supplying JSON as the data structure and passing the API key in the header. When the video has been successfully generated, the core profiles required for delivery on the Once VOD platform are generated. Videos linked to for SourceURLs must be progressive formats and publicly addressable URLs. Ingesting files via S3 is also supported by the API Ingest system as a source location. If your files are publicly available, no further action is necessary. If your files require authentication, please see the using S3 buckets section for authorizing the Once platform to access protected URLs. If the request fails, a validation error will be returned in the response body as JSON with details of the error event. Upon success the response will return a Request ID in the content body that can be used to track the job details from the Status API. Example below.
+	        </p>
+	        <p>
+	            As a best practice recommendation the source video should be at a video bitrate between 5-10 Mbps, frame size of 1920x1080 and contain keyframes at least every 6 seconds.
+	        </p>
+	        <h3>
+	            <strong>Creating an SNS-based ingest job</strong>
+	        </h3>
+	        <p>
+	            The following steps will be necessary to ensure Brightcove can configure the proper mechanisms to pull content from your AWS account.
+	        </p>
+	        <ol>
+	            <li>The SNS Topic ARN<br>
+	            </li>
+	            <li>Allow the Brightcove AWS account root permission to subscribe to the SNS topic<br>
+	            </li>
+	        </ol>
+	        <ul>
+	            <li>Brightcove Root: <strong>arn:aws:iam::453163911362:root</strong><br>
+	            </li>
+	        </ul>
+	        <h4>
+	            Example policy statement
+	        </h4>
+	<pre><code>{
+		"Sid": "__console_sub_0",
+		"Effect": "Allow",
+		"Principal": {
+			"AWS": "arn:aws:iam::453163911362:root"
+		},
+		"Action": ["SNS:Subscribe",
+		"SNS:Receive"],
+		"Resource": "arn:aws:sns:us-west-2:866653344564:Brightcove-Ingest",
+		"Condition": {
+			"StringEquals": {
+				"SNS:Protocol": "sqs"
+			}
+		}
+	}</code></pre>
+	        <p>
+	            <strong>Note:</strong> If the source files are stored on S3, the URLs should be in the format <em>s3://BUCKET/KEY</em> to ensure the URLs are signed appropriately.
+	        </p>
+	        <h3>
+	            <strong>Using S3 buckets</strong>
+	        </h3>
+	        <p>
+	            If the bucket is not publicly accessible, the Brightcove transcoding engine will need to be granted access through a bucket policy or to the Brightcove AWS account.
+	        </p>
+	        <h4>
+	            Option #1 - Create a bucket policy
+	        </h4>
+	        <p>
+	            To set up a bucket policy, login to your AWS Console, select your bucket on the left side of the screen, then click "properties". On the last row click "Add bucket policy". We'll put a Bucket Policy together below, which you'll copy into the Bucket Policy text box.
+	        </p>
+	        <p>
+	            <strong>Recommended bucket policy:</strong>
+	        </p>
+	<pre><code>{
+		"Version": "2008-10-17",
+		"Id": "ZencoderBucketPolicy",
+		"Statement": [
+			{
+				"Sid": "Stmt1295042087538",
+				"Effect": "Allow",
+				"Principal": {
+				"AWS": "arn:aws:iam::395540211253:root"
+			},
+			"Action": [
+				"s3:GetObjectAcl",
+				"s3:GetObject",
+				"s3:PutObjectAcl",
+				"s3:PutObject",
+				"s3:ListMultipartUploadParts"
+			],
+			"Resource": "arn:aws:s3:::MY-BUCKET/*"
+		},
+		{
+			"Sid": "Stmt1295042087538",
+			"Effect": "Allow",
+			"Principal": {
+				"AWS": "arn:aws:iam::395540211253:root"
+			},
+			"Action": [
+			"s3:ListBucketMultipartUploads",
+			"s3:GetBucketLocation"
+			],
+			"Resource": "arn:aws:s3:::MY-BUCKET"
+		}
+		]
+	}</code></pre>
+	        <p>
+	            There is only one change you will have to make to this bucket policy before it's ready to go.
+	        </p>
+	        <ol>
+	            <li>Replace <code>MY-BUCKET</code> with the name of your bucket. Leave the /* at the end of the line, as that will apply the policy to every file within the bucket.<br>
+	            </li>
+	            <li>Optionally, replace the <code>Action</code> array with the actions you want to allow. Valid actions that Brightcove may need are:<br>
+	            </li>
+	        </ol>
+	        <p>
+	            Object Permissions - first action array in the example above
+	        </p>
+	        <ul>
+	            <li>s3:PutObject - allow Brightcove to upload files to the bucket<br>
+	            </li>
+	            <li>s3:GetObject - allow Brightcove to download files from the bucket<br>
+	            </li>
+	            <li>s3:GetObjectAcl - allow Brightcove to get ACL permissions for files<br>
+	            </li>
+	            <li>s3:PutObjectAcl - allow Brightcove to set ACL permissions for other users on files<br>
+	            </li>
+	            <li>s3:ListMultipartUploadParts - allow Brightcove to list which parts of a multipart file have been uploaded to the bucket<br>
+	            </li>
+	        </ul>
+	        <p>
+	            Bucket Permissions - second action array in the example above
+	        </p>
+	        <ul>
+	            <li>s3:GetBucketLocation - allow Brightcove to get the location of the bucket (US, EU, Asia, etc.)<br>
+	            </li>
+	            <li>s3:ListBucketMultipartUploads - allow Brightcove to view any multipart uploads currently happening on the bucket<br>
+	            </li>
+	        </ul>
+	        <p>
+	            Example: If you want Zencoder to be able to download and upload files, replace the first Action array with:
+	        </p>
+	        <p>
+	            <code>["s3:PutObject", "s3:GetObject"]</code>
+	        </p>
+	        <p>
+	            If you'd like to build your own Bucket Policy, you can use <a href="http://awspolicygen.s3.amazonaws.com/policygen.html">Amazon's Policy Generator</a>. Use <code>arn:aws:iam::395540211253:root</code> as the AWS Principal to allow Brightcove access.
+	        </p>
+	        <h4>
+	            Option #2 - grant access to Brightcove AWS
+	        </h4>
+	        <p>
+	            Grant Access to the Brightcove AWS account at aws@zencoder.com. If the setup requires the canonical ID you can use:
+	        </p>
+	        <p>
+	            <code>6c8583d84664a381db0c6af0e79b285ede571885fbe768e7ea50e5d3760597dd</code>
+	        </p>
+	        <h3>
+	            <strong>Example ingest syntax</strong>
+	        </h3>
+	        <h4>
+	            <strong>Request</strong>
+	        </h4>
+	        <p>
+	            Required HTTP Header:
+	        </p>
+	        <p>
+	            <code>X-BC-ONCE-API-KEY : {yourApiKey}</code>
+	        </p>
+	        <h5>
+	            Schema
+	        </h5>
+	        <p>
+	            <strong>See Appendix A</strong>
+	        </p>
+	        <h5>
+	            Example Body
+	        </h5>
+	<pre><code>{
+		"title": "brightcove-once",
+		"foreignKey": "brightcove-once",
+		"metadata": {
+			"accoundId": "12345",
+			"company": "brightcove",
+			"product": "once",
+			"eventId": "321"
+		},
+		"media": {
+			"sourceURL": "http://mirror.cessen.com/blender.org/peach/trailer/trailer_1080p.mov"
+		},
+		"priority": "normal",
+		"publicationRules": [
+			{
+				"channel": "a8cf98a9-8946-4bd4-b97c-a2b5dbc635c5",
+				"startDate": 1412025402,
+				"endDate": 1601414189,
+				"clientFilters": [
+					{
+						"variableName": "IpAddress",
+						"value": "127.0.0.1",
+						"filterType": "Equals",
+						"isDenied": true
+					}
+				],
+				"countryRules": [
+					{
+						"countryCode": "UK",
+						"isDenied": true
+					}
+				]
+			}
+		],
+		"cuePoints": [
+			{
+				"valueIn": 10,
+				"unit": "Seconds"
+			},
+			{
+				"valueIn": 25,
+				"unit": "Seconds"
+			}
+		]
+	}</code></pre>
+	        <h4>
+	            <strong>Response</strong>
+	        </h4>
+	        <h5>
+	            Body (error)
+	        </h5>
+<pre><code>{
+	"requestId": "2796350e-2125-4f04-b33a-59488aaa76c7",
+	"error": "Validation Errors",
+	"fieldErrors": {
+		"publicationRule": [
+			"Publication rule with end date 0.0 is in the past.",
+			"Publication rule end date: 0.0 preceeds 1412025402"
+		]
+	}
+}</code></pre>
+	        <h4>
+	            Body (success)
+	        </h4>
+<pre><code>{
+	"requestId": "2796350e-2125-4f04-b33a-59488aaa76c7"
+}</code></pre>
+	        <h3>
+	            <strong>Brief Object Explanation</strong>
+	        </h3>
+	        <p>
+	            While we recommend the use of optional field "˜title' for search and human readability, only the following highlighted fields are required for all ingest job requests. If the required fields are not present in the API request; a response body will be returned with a corresponding error message.
+	        </p>
+	        <table>
+	            <tbody>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            <strong>Object</strong>
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            <strong>sub-object</strong>
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            <strong>Req'd</strong>
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            <strong>Description</strong>
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            title
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            No
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Title of the asset, used for subsequent notifications and item lookup
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            <strong>foreignKey</strong>
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            <strong>Yes</strong>
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Unique identifier per domain to indicate a media item and it's associations.
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            keywords
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            No
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Keywords used to describe the media item.
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            description
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            No
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Brief description of the media item.
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            metadata
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            No
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Key value pairs that can be stored with a media item and dynamically retrieved for audience beaconing or ad server requests.
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            <strong>media</strong>
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            <strong>Yes</strong>
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Container for the defined source video
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            sourceURL
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Yes
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Location of the video media item
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            timedText
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            No
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Defining or association closed captioning and/or subtitles to ingest in conjuction to the video media item.
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            media
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Yes
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Container for the defined source document of a subtitle or flagged as passthrough when the document is embedded on the video container
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            timedTextType
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Yes
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Defines the timed text output as a subtitle, closed-caption, or embedded.
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            languages
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Yes
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Country code defined by ISO 639-1
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            alternateId
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            No
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Defines a timed text output when multiple variations of the same language is utilized. Output will be named as "{language}-{alternateId}"
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            priority
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            No
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Reserved for future use.
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            publicationRules
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            No
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Sets timing, geo filtering, and client filters to restrict content based on business requirements. By default, publication rules are open for 10 years of when account was open. Please see Media Mangement for configuration details.
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            channel
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Yes
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            The channel Id associated with the domain.
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            startDate
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Yes
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Begin content availability.
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            endDate
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Yes
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            End content availability.
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            clientFilters
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            No
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Allows the setting of client restrictions based on IP Address, useragent, or referring host.
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            countryRules
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            No
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Geo restrictions based on ISO 639-1 country codes.
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            cuePoints
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            No
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Segmentation points of the mediaitem to insert midroll ads (when available and configured).
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            valueIn
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Yes
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Value of the cuepoint in relation to the content duration
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            unit
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Yes
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Unit of measurement for the valueIn
+	                        </p>
+	                    </td>
+	                </tr>
+	            </tbody>
+	        </table>
+        </div>
+        <div class="section" id="captioning">
+	        <h2>
+	            Closed-Captioning and Subtitles
+	        </h2>
+	        <p>
+	            Brightcove Once enables multinational publishers to provide subtitles or closed-captioning to global audiences. These subtitles or closed captions can be rendered by players and native OS playback components that allow the viewer to choose the language of their choice, either via OS default localization settings or via a UI selection. Subtitles should not be confused with closed captions for the purpose of this implementation. While both utilize timed-text and in many cases in a similar manner, it is important to make the distinction from a regulatory and user experience perspective. In some cases, both will be required as a given piece of content could be published in North America and rest-of-world simultaneously. As digital technology evolves, closed-captioning will no longer be restrained by formatting by embedded captions and can be used in conjunction with timed-text outputs.
+	        </p>
+	        <h3>
+	            <strong>Closed-Captioning input/output:</strong>
+	        </h3>
+	        <table>
+	            <tbody>
+	                <tr>
+	                    <th rowspan="2" colspan="2" valign="middle">
+	                        <p>
+	                            <strong>Closed-Captioning</strong>
+	                        </p>
+	                    </th>
+	                    <th colspan="5">
+	                        <p>
+	                            Output
+	                        </p>
+	                    </th>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            <strong>CEA-608</strong>
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            <strong>SRT</strong>
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            <strong>WebVTT (in-manifest)</strong>
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            <strong>WebVTT sidecar</strong>
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            <strong>DFXP</strong>
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <th rowspan="6" valign="middle">
+	                        <p>
+	                            Input
+	                        </p>
+	                    </th>
+	                    <td>
+	                        <p>
+	                            CEA-608
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            **
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            Sidecar SRT
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            ***
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            Sidecar WebVTT
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            ***
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            Sidecar DFXP
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            **
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            Sidecar SAMI
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            **
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            Sidecar SCC
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                </tr>
+	            </tbody>
+	        </table>
+	        <p>
+	            Note:
+	        </p>
+	        <p>
+	            **If the input document (or file) contains multiple languages, only the first language is selected. The file format must be in a MP4/M4V video container with caption tracks in CEA-608 format.
+	        </p>
+	        <p>
+	            ***A simple timed-text input format to a rich output is not recommended, although supported by using default styling to work with most platforms.
+	        </p>
+	        <h4>
+	            Current Restrictions/Limitations
+	        </h4>
+	        <p>
+	            For CEA-608:
+	        </p>
+	        <ul>
+	            <li>Sidecar output will not be generated for extracted closed captioning<br>
+	            </li>
+	            <li>Output as Closed-Captioning will be presented in HLS manifests following the IETF HLS draft version 14.<br>
+	            </li>
+	        </ul>
+	        <p>
+	            For SRT:
+	        </p>
+	        <ul>
+	            <li>Positioning and styling are not supported.<br>
+	            </li>
+	            <li>Text formatting derived from HTML tags will be treated as text.<br>
+	            </li>
+	            <li>Output as a sidecar through Once UX only<br>
+	            </li>
+	        </ul>
+	        <p>
+	            For WebVTT:
+	        </p>
+	        <ul>
+	            <li>Input files must not be segmented.<br>
+	            </li>
+	            <li>Sidecar output will file will be outputted as a full file.<br>
+	            </li>
+	            <li>Positioning and styling are not supported.<br>
+	            </li>
+	            <li>Text formatting derived from HTML tags will be treated as text.<br>
+	            </li>
+	            <li>Output as a sidecar through Once UX only<br>
+	            </li>
+	        </ul>
+	        <p>
+	            For DFXP:
+	        </p>
+	        <ul>
+	            <li>Multiple languages in &lt;div&gt; tags in a single document is supported, but the languages must be defined at ingest.<br>
+	            </li>
+	            <li>Output files will not support more than one &lt;div&gt; tag with it's associated language. Each language will be a separate sidecar file.<br>
+	            </li>
+	            <li>Output as Closed-Captioning will be presented in HLS manifests following the IETF HLS draft version 14.<br>
+	            </li>
+	            <li>As CEA-608 output:<br>
+	            </li>
+	            <li>
+	                <ul>
+	                    <li>Animation, layout, and region features are not supported.<br>
+	                    </li>
+	                    <li>Styles can be inline or referenced by ID, but only the tts:textAlign property is applied.<br>
+	                    </li>
+	                    <li>Nested DIV and P tags are ignored<br>
+	                    </li>
+	                    <li>SPAN tags are ignored<br>
+	                    </li>
+	                    <li>Explicit breaks may be inserted with BR tags<br>
+	                    </li>
+	                </ul>
+	            </li>
+	        </ul>
+	        <p>
+	            For SAMI:
+	        </p>
+	        <ul>
+	            <li>Inline styles are not supported<br>
+	            </li>
+	            <li>Layout-related styling tags are not supported<br>
+	            </li>
+	            <li>Explicit breaks may be inserted by using separate P tags.<br>
+	            </li>
+	            <li>Output as Closed-Captioning will be presented in HLS manifests following the IETF HLS draft version 14.<br>
+	            </li>
+	        </ul>
+	        <p>
+	            Example Once UX presentation:
+	        </p>
+	        <p>
+	            ...
+	        </p>
+	        <p>
+	            &lt;uo:timedText&gt;
+	        </p>
+	        <p>
+	            &lt;uo:item type="caption" language="en"&gt;
+	        </p>
+	        <p>
+	            &lt;![CDATA[http://.../en/content.{output_extension}]]&gt;
+	        </p>
+	        <p>
+	            &lt;/uo:item&gt;
+	        </p>
+	        <p>
+	            &lt;uo:item type="caption" language="fr"&gt;
+	        </p>
+	        <p>
+	            &lt;![CDATA[http://.../fr/content.{output_extension}]]&gt;
+	        </p>
+	        <p>
+	            &lt;/uo:item&gt;
+	        </p>
+	        <p>
+	            &lt;/uo:timedText&gt;
+	        </p>
+	        <p>
+	            ...
+	        </p>
+	        <h3>
+	            <strong>Subtitles input/output:</strong>
+	        </h3>
+	        <table>
+	            <tbody>
+	                <tr>
+	                    <td rowspan="2" colspan="2" valign="middle">
+	                        <p>
+	                            <strong>Subtitles</strong>
+	                        </p>
+	                    </td>
+	                    <td colspan="5">
+	                        <p>
+	                            Output
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            <strong>embedded 608</strong>
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            <strong>SRT</strong>
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            <strong>WebVTT (in-manifest)</strong>
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            <strong>WebVTT sidecar</strong>
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            <strong>DFXP</strong>
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td rowspan="3" valign="middle">
+	                        <p>
+	                            Input
+	                        </p>
+	                    </td>
+	                    <td>
+	                        <p>
+	                            Sidecar SRT
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            ***
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            Sidecar WebVTT
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                    <td>
+	                        <p>
+	                            ***
+	                        </p>
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td>
+	                        <p>
+	                            Sidecar DFXP
+	                        </p>
+	                    </td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                    <td></td>
+	                </tr>
+	            </tbody>
+	        </table>
+	        <p>
+	            Note:
+	        </p>
+	        <p>
+	            ***A simple timed-text input format to a rich output is not recommended, although supported by using default styling to work with most platforms.
+	        </p>
+	        <h5>
+	            Current Restrictions/Limitations
+	        </h5>
+	        <p>
+	            For SRT:
+	        </p>
+	        <ul>
+	            <li>Positioning and styling are not supported.<br>
+	            </li>
+	            <li>Text formatting derived from HTML tags will be treated as text.<br>
+	            </li>
+	            <li>Output as a sidecar through Once UX only<br>
+	            </li>
+	        </ul>
+	        <p>
+	            For WebVTT:
+	        </p>
+	        <ul>
+	            <li>Input files must not be segmented.<br>
+	            </li>
+	            <li>Sidecar output will file will be outputted as a full file.<br>
+	            </li>
+	            <li>Positioning and styling are not supported.<br>
+	            </li>
+	            <li>Text formatting derived from HTML tags will be treated as text.<br>
+	            </li>
+	            <li>Output as a sidecar through Once UX only<br>
+	            </li>
+	        </ul>
+	        <p>
+	            For DFXP:
+	        </p>
+	        <ul>
+	            <li>Multiple languages in &lt;div&gt; tags in a single document is supported, but the languages must be defined at ingest.<br>
+	            </li>
+	            <li>Output files will not support more than one &lt;div&gt; tag with it's associated language. Each language will be a separate sidecar file.<br>
+	            </li>
+	            <li>Output as WebVTT in-manifest for HLS will be segmented and follow the IETF HLS draft version 14.<br>
+	            </li>
+	        </ul>
+	        <p>
+	            Example Once UX presentation:
+	        </p>
+<pre><code>...
+&lt;uo:timedText&gt;
+&lt;uo:item type="subtitle" language="en"&gt;
+&lt;![CDATA[http://.../en/content.{output_extension}]]&gt;
+&lt;/uo:item&gt;
+&lt;uo:item type="subtitle" language="fr"&gt;
+&lt;![CDATA[http://.../fr/content.{output_extension}]]&gt;
+&lt;/uo:item&gt;
+&lt;/uo:timedText&gt;
+...</code></pre>
+	        <p>
+	            Example in-manifest WebVTT (master playlist):
+	        </p>
+<pre><code>...
+#EXT-X-MEDIA:TYPE=SUBTITLES,URI="http://.../content.m3u8",GROUP-ID="subs",LANGUAGE="en",NAME="English"
+#EXT-X-MEDIA:TYPE=SUBTITLES,URI="http://.../content.m3u8",GROUP-ID="subs",LANGUAGE="fr",NAME="French"
+...</code></pre>
+	        <p>
+	            Example in-manifest WebVTT (media playlist):
+	        </p>
+<pre><code>...
+#EXTINF:240.000,0
+http://.../segment1.vtt
+#EXTINF:240.000,0
+http://.../segment2.vtt
+...</code></pre>
+	        <p>
+	            #EXT-X-ENDLIST
+	        </p>
+        </div>
         <h1>
             Status API
         </h1>
@@ -2414,26 +2165,26 @@
             https://api.unicornmedia.com/status-api/
         </p>
         <p>
-            The Status API allows customers to query the processing statuses of a particular Request ID (returned in the response body of an Ingest Request). Only the HTTP GET verb is supported and must be made over SSL. If you donâ€™t know the Request ID you can query by Foreign Key, which will return a list of all the Request IDs for that particular asset. The status data returned will be summary of the major milestones along with any errors that occurred during processing. If more granular data is required, the request can be modified to fetch â€œrawâ€ data and provide data for each activity within the workflow.
+            The Status API allows customers to query the processing statuses of a particular Request ID (returned in the response body of an Ingest Request). Only the HTTP GET verb is supported and must be made over SSL. If you don't know the Request ID you can query by Foreign Key, which will return a list of all the Request IDs for that particular asset. The status data returned will be summary of the major milestones along with any errors that occurred during processing. If more granular data is required, the request can be modified to fetch "raw" data and provide data for each activity within the workflow.
         </p>
-        <h2>
+        <h3>
             <strong>Checking a Job Status</strong>
-        </h2>
+        </h3>
         <p>
             Syntax:
         </p>
         <p>
-            https://api.unicornmedia.com/status-api/statuses/{referenceId}
+            <code>https://api.unicornmedia.com/status-api/statuses/{referenceId}</code>
         </p>
         <p>
-            https://api.unicornmedia.com/status-api/statuses/{referenceId}/raw
+            <code>https://api.unicornmedia.com/status-api/statuses/{referenceId}/raw</code>
         </p>
         <p>
-            https://api.unicornmedia.com/status-api/statuses?foreignkey={foreignKey}&amp;catalog={catalogId}
+            <code>https://api.unicornmedia.com/status-api/statuses?foreignkey={foreignKey}&amp;catalog={catalogId}</code>
         </p>
-        <h3>
+        <h4>
             <strong>Status Definitions:</strong>
-        </h3>
+        </h4>
         <table>
             <tbody>
                 <tr>
@@ -2522,348 +2273,144 @@
                 </tr>
             </tbody>
         </table>
-        <h3>
+        <h4>
             <strong>Example: Status API Job Requests</strong>
-        </h3>
+        </h4>
         <p>
             Request ID (GET):
         </p>
         <p>
-            https://api.unicornmedia.com/status-api/statuses/2796350e-2125-4f04-b33a-59488aaa76c7
+            <code>https://api.unicornmedia.com/status-api/statuses/2796350e-2125-4f04-b33a-59488aaa76c7</code>
         </p>
         <p>
             Request ID Raw (GET):
         </p>
         <p>
-            https://api.unicornmedia.com/status-api/statuses/2796350e-2125-4f04-b33a-59488aaa76c7/raw
+            <code>https://api.unicornmedia.com/status-api/statuses/2796350e-2125-4f04-b33a-59488aaa76c7/raw</code>
         </p>
         <p>
             Foreign Key &amp; Catalog (GET):
         </p>
         <p>
-            https://api.unicornmedia.com/status-api/statuses?foreignkey=brightcove-once&amp;catalog=bc6cb7d4-be99-471b-adf3-7c501172b317
+            <code>https://api.unicornmedia.com/status-api/statuses?foreignkey=brightcove-once&amp;catalog=bc6cb7d4-be99-471b-adf3-7c501172b317</code>
         </p>
-        <h4>
+        <h5>
             Request
-        </h4>
+        </h5>
         <p>
             Required HTTP Header:
         </p>
         <p>
-            X-BC-ONCE-API-KEY : {yourApiKey}
+            <code>X-BC-ONCE-API-KEY : {yourApiKey}</code>
         </p>
-        <h4>
-            Response(s)
-        </h4>
         <h5>
-            Body (Request ID)
+            Response(s)
         </h5>
-        <p>
+        <h6>
+            Body (Request ID)
+        </h6>
             {
-        </p>
-        <p>
             "status": "COMPLETE",
-        </p>
-        <p>
             "startTime": 1415648939000,
-        </p>
-        <p>
             "completeTime": 1415649217000,
-        </p>
-        <p>
             "steps": {
-        </p>
-        <p>
             "ingest": {
-        </p>
-        <p>
             "name": "ingest",
-        </p>
-        <p>
             "status": "COMPLETE",
-        </p>
-        <p>
             "startTime": 1415648939000,
-        </p>
-        <p>
             "completeTime": 1415648942000,
-        </p>
-        <p>
             "input": {
-        </p>
-        <p>
             "foreignKey": "brightcove-once",
-        </p>
-        <p>
             "domain": "b207b479-c841-4095-8918-978be9e18dee",
-        </p>
-        <p>
             "catalog": "bc6cb7d4-be99-471b-adf3-7c501172b317",
-        </p>
-        <p>
             "keywords": {
-        </p>
-        <p>
             "brightcove",
-        </p>
-        <p>
             "once"
-        </p>
-        <p>
             },
-        </p>
-        <p>
             "metadata": {
-        </p>
-        <p>
              "accoundId": "12345",
-        </p>
-        <p>
             "company": "brightcove",
-        </p>
-        <p>
              "product": "once",
-        </p>
-        <p>
              "eventId": "321"
-        </p>
-        <p>
             },
-        </p>
-        <p>
             "media": {
-        </p>
-        <p>
             "sourceURL": "http://mirror.cessen.com/blender.org/peach/trailer/trailer_1080p.mov"
-        </p>
-        <p>
             },
-        </p>
-        <p>
             "notifications": [],
-        </p>
-        <p>
             "publicationRules": [],
-        </p>
-        <p>
             "cuePoints": [
-        </p>
-        <p>
             {
-        </p>
-        <p>
             "valueIn": 10,
-        </p>
-        <p>
             "unit": "Seconds"
-        </p>
-        <p>
             },
-        </p>
-        <p>
             {
-        </p>
-        <p>
             "valueIn": 25,
-        </p>
-        <p>
             "unit": "Seconds"
-        </p>
-        <p>
             }
-        </p>
-        <p>
             ]
-        </p>
-        <p>
             },
-        </p>
-        <p>
             "output": {
-        </p>
-        <p>
             "mediaItemGuid": "2d1d6fe7-6924-4d1d-ba06-d49b2d9f5f4b",
-        </p>
-        <p>
             "hasChanged": true,
-        </p>
-        <p>
             "description": {
-        </p>
-        <p>
             "url": "http://mirror.cessen.com/blender.org/peach/trailer/trailer_1080p.mov",
-        </p>
-        <p>
             "lastModified": "Wed, 07 May 2014 22:21:59 GMT",
-        </p>
-        <p>
             "etag": "\"b2f673c3426acf1:0\"",
-        </p>
-        <p>
             "fileSize": 60047891
-        </p>
-        <p>
             }
-        </p>
-        <p>
             }
-        </p>
-        <p>
             },
-        </p>
-        <p>
             "transcode": {
-        </p>
-        <p>
             "name": "transcode",
-        </p>
-        <p>
             "status": "COMPLETE",
-        </p>
-        <p>
             "startTime": 1415648968000,
-        </p>
-        <p>
             "completeTime": 1415649216000,
-        </p>
-        <p>
             "output": {
-        </p>
-        <p>
             "profiles": [
-        </p>
-        <p>
             "3345fa40-bbb6-11e3-87e6-005056835b09",
-        </p>
-        <p>
             "45dd911d-54ac-11e4-9f45-005056835b09",
-        </p>
-        <p>
             "8249c274-b49d-11e3-87e6-005056835b09",
-        </p>
-        <p>
             "824d3f86-b49d-11e3-87e6-005056835b09",
-        </p>
-        <p>
             "825072a0-b49d-11e3-87e6-005056835b09",
-        </p>
-        <p>
             "8253a884-b49d-11e3-87e6-005056835b09",
-        </p>
-        <p>
             "8256d34a-b49d-11e3-87e6-005056835b09",
-        </p>
-        <p>
             "825a2774-b49d-11e3-87e6-005056835b09",
-        </p>
-        <p>
             "825d7a04-b49d-11e3-87e6-005056835b09",
-        </p>
-        <p>
             "8260dd62-b49d-11e3-87e6-005056835b09",
-        </p>
-        <p>
             "d34d2cfb-3478-11e4-8b0b-005056835b09",
-        </p>
-        <p>
             "d34d2d07-3478-11e4-8b0b-005056835b09"
-        </p>
-        <p>
             ]
-        </p>
-        <p>
             }
-        </p>
-        <p>
             },
-        </p>
-        <p>
             "notification": {
-        </p>
-        <p>
             "name": "notification",
-        </p>
-        <p>
             "status": "COMPLETE",
-        </p>
-        <p>
             "startTime": 1415649020000,
-        </p>
-        <p>
             "completeTime": 1415649217000,
-        </p>
-        <p>
             "input": {
-        </p>
-        <p>
             "mediaItem": "2d1d6fe7-6924-4d1d-ba06-d49b2d9f5f4b",
-        </p>
-        <p>
             "domain": "b207b479-c841-4095-8918-978be9e18dee",
-        </p>
-        <p>
             "catalog": "bc6cb7d4-be99-471b-adf3-7c501172b317",
-        </p>
-        <p>
             "version": 0,
-        </p>
-        <p>
             "durationMS": 87754,
-        </p>
-        <p>
             "notificationOverrides": []
-        </p>
-        <p>
             },
-        </p>
-        <p>
             "output": {
-        </p>
-        <p>
             "sentNotification": false
-        </p>
-        <p>
             }
-        </p>
-        <p>
             },
-        </p>
-        <p>
             "publish": {
-        </p>
-        <p>
             "name": "publish",
-        </p>
-        <p>
             "status": "COMPLETE",
-        </p>
-        <p>
             "startTime": 1415649217000,
-        </p>
-        <p>
             "completeTime": 1415649217000,
-        </p>
-        <p>
             "output": {
-        </p>
-        <p>
             "version": 0,
-        </p>
-        <p>
             "duration": 87754
-        </p>
-        <p>
             }
-        </p>
-        <p>
             }
-        </p>
-        <p>
             }
-        </p>
-        <p>
             }
-        </p>
         <h5>
             Body (Foreign Key &amp; Catalog)
         </h5>
@@ -3909,7 +3456,7 @@
             <strong>Adaptive</strong>
         </h3>
         <p>
-            The Once platform utilizes the HTTP Live Streaming (HLS) protocol for adaptive, multi-bitrate playback to devices that support this method. Requesting an adaptive response will force an HLS response with discontinuities between content switching and keeps the Once platform's logic in place for determining remaining device specific parameters including the range of profiles to be returned and segment length. If you wish to tailor the profiles returned on a request, you can denote those specific profiles by using the additional query string parameters â€“ umoprofiles or umaprofiles.
+            The Once platform utilizes the HTTP Live Streaming (HLS) protocol for adaptive, multi-bitrate playback to devices that support this method. Requesting an adaptive response will force an HLS response with discontinuities between content switching and keeps the Once platform's logic in place for determining remaining device specific parameters including the range of profiles to be returned and segment length. If you wish to tailor the profiles returned on a request, you can denote those specific profiles by using the additional query string parameters "“ umoprofiles or umaprofiles.
         </p>
         <table>
             <tbody>
@@ -3953,7 +3500,7 @@
             <strong>Continuous Adaptive (ctAdaptive)</strong>
         </h3>
         <p>
-            Similar to an adaptive request, the ctadaptive response will force a HLS response with the discontinuities removed to create a single linear stream playable on even the most simple implementations of HLS devices (e.g. native Android players). We recommend using a regular adaptive stream where possible for the best cache efficiency, but ctadaptive will solve difficult platforms and the majority of devices or player implementations for HLS. If you wish to tailor the profiles returned on a request, you can denote those specific profiles by using the additional query string parameters â€“ umoprofiles or umaprofiles.
+            Similar to an adaptive request, the ctadaptive response will force a HLS response with the discontinuities removed to create a single linear stream playable on even the most simple implementations of HLS devices (e.g. native Android players). We recommend using a regular adaptive stream where possible for the best cache efficiency, but ctadaptive will solve difficult platforms and the majority of devices or player implementations for HLS. If you wish to tailor the profiles returned on a request, you can denote those specific profiles by using the additional query string parameters "“ umoprofiles or umaprofiles.
         </p>
         <table>
             <tbody>
@@ -4111,7 +3658,7 @@
             Ad params
         </h4>
         <h5>
-            UMADPARAM <strong>â€“ Specify the Ads Served Back by Ad Provider</strong>
+            UMADPARAM <strong>"“ Specify the Ads Served Back by Ad Provider</strong>
         </h5>
         <p>
             UMADPARAM{Key}={Value}
@@ -4148,7 +3695,7 @@
             The Once VOD URL example above would make the ad call and return ads specific to the country and state values provided.
         </p>
         <h5>
-            UMPTPARAM <strong>â€“ Pass Values Through with No System Manipulation</strong>
+            UMPTPARAM <strong>"“ Pass Values Through with No System Manipulation</strong>
         </h5>
         <p>
             UMPTPARAM{Key}={Value}
@@ -4180,7 +3727,7 @@
             <br>
         </p>
         <h5>
-            UMLITERAL <strong>â€“ Pass Set Number of Characters Right of '&amp;' as One String Value</strong>
+            UMLITERAL <strong>"“ Pass Set Number of Characters Right of '&amp;' as One String Value</strong>
         </h5>
         <p>
             UMLITERAL{Key},{Integer}&amp;{Value}
@@ -4373,7 +3920,7 @@
             <strong>Default profile sets for umo/umaprofiles:</strong>
         </p>
         <p>
-            Default profile sets are tailored to cover a broad set of profile configurations to cover the most commonly used profile settings. Custom profile sets and SetIdâ€™s are configurable, please contact your Brightcove representative to define your own requirement.
+            Default profile sets are tailored to cover a broad set of profile configurations to cover the most commonly used profile settings. Custom profile sets and SetId's are configurable, please contact your Brightcove representative to define your own requirement.
         </p>
         <p>
             Note* When defining your own set of profiles on delivery, any duplicate profiles will be ignored (e.g. defining sdmed,sdhigh will discard the duplicate sd1200)
@@ -4794,7 +4341,7 @@
                 <tr>
                     <td colspan="4">
                         <ul>
-                            <li>Userâ€™s IP address<br>
+                            <li>User's IP address<br>
                             </li>
                         </ul>
                     </td>
@@ -4920,7 +4467,7 @@
                 <tr>
                     <td colspan="4">
                         <ul>
-                            <li>String of the userâ€™s postal code (if available) from ip intelligence.<br>
+                            <li>String of the user's postal code (if available) from ip intelligence.<br>
                             </li>
                         </ul>
                     </td>
@@ -4938,7 +4485,7 @@
                 <tr>
                     <td colspan="4">
                         <ul>
-                            <li>Used to extract extended metadata defined at ingest by the â€œmetadataâ€ object for the key and its set value.<br>
+                            <li>Used to extract extended metadata defined at ingest by the "metadata" object for the key and its set value.<br>
                             </li>
                         </ul>
                     </td>
@@ -6422,881 +5969,301 @@
                 </tr>
             </tbody>
         </table>
-        <h1>
+        <div class="section" id="appendixA">
+        <h2>
             APPENDIX A - JSON SCHEMA
-        </h1>
-        <p>
-            {
-        </p>
-        <p>
-            "$schema": "http://json-schema.org/draft-04/schema#",
-        </p>
-        <p>
-            "type": "object",
-        </p>
-        <p>
-            "title": "root",
-        </p>
-        <p>
-            "description": "Ingest API Container",
-        </p>
-        <p>
-            "additionalProperties": false,
-        </p>
-        <p>
-            "properties": {
-        </p>
-        <p>
-            "title": {
-        </p>
-        <p>
-            "type": "string",
-        </p>
-        <p>
-            "description": "The title of the asset",
-        </p>
-        <p>
-            "minLength": 0,
-        </p>
-        <p>
-            "maxLength": 255,
-        </p>
-        <p>
-            "additionalProperties": false
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "foreignKey": {
-        </p>
-        <p>
-            "type": "string",
-        </p>
-        <p>
-            "description": "The unique identifier for the asset",
-        </p>
-        <p>
-            "minLength": 1,
-        </p>
-        <p>
-            "maxLength": 255,
-        </p>
-        <p>
-            "additionalProperties": false
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "metadata": {
-        </p>
-        <p>
-            "type": "object",
-        </p>
-        <p>
-            "description": "An array of key value pairs for Extended Metadata",
-        </p>
-        <p>
-            "additionalProperties": true,
-        </p>
-        <p>
-            "properties": {
-        </p>
-        <p>
-            "key": {
-        </p>
-        <p>
-            "type": "string",
-        </p>
-        <p>
-            "description": "The key of an Extended Metadata key value pair",
-        </p>
-        <p>
-            "minLength": 0,
-        </p>
-        <p>
-            "additionalProperties": false
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "media": {
-        </p>
-        <p>
-            "type": "object",
-        </p>
-        <p>
-            "description": "Container for the source URL of the asset being ingested",
-        </p>
-        <p>
-            "additionalProperties": false,
-        </p>
-        <p>
-            "properties": {
-        </p>
-        <p>
-            "sourceURL": {
-        </p>
-        <p>
-            "type": "string",
-        </p>
-        <p>
-            "description": "The URL string to the source asset",
-        </p>
-        <p>
-            "minLength": 1,
-        </p>
-        <p>
-            "maxLength": 1000,
-        </p>
-        <p>
-            "additionalProperties": false
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "required": [
-        </p>
-        <p>
-            "sourceURL"
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "timedText": {
-        </p>
-        <p>
-            â€œtypeâ€: â€œarrayâ€,
-        </p>
-        <p>
-            â€œdescriptionâ€: â€œAn array of timed text associations for the media itemâ€,
-        </p>
-        <p>
-            â€œminItemsâ€: 1,
-        </p>
-        <p>
-            â€œuniqueItemsâ€: false,
-        </p>
-        <p>
-            â€œadditionalPropertiesâ€: false,
-        </p>
-        <p>
-            â€œitemsâ€: {
-        </p>
-        <p>
-            "media": {
-        </p>
-        <p>
-            â€œtypeâ€: â€œobjectâ€,
-        </p>
-        <p>
-            â€œdescriptionâ€: â€œContainer for the source URL of the asset being ingestedâ€,
-        </p>
-        <p>
-            "sourceURL": {
-        </p>
-        <p>
-            â€œtypeâ€: â€œstringâ€,
-        </p>
-        <p>
-            â€œdescriptionâ€: â€œThe URL string to the source assetâ€,
-        </p>
-        <p>
-            â€œminLengthâ€: 1,
-        </p>
-        <p>
-            â€œmaxLengthâ€: 1000,
-        </p>
-        <p>
-            â€œadditionalPropertiesâ€: false
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            â€œpassThroughâ€: {
-        </p>
-        <p>
-            â€œtypeâ€: â€œbooleanâ€,
-        </p>
-        <p>
-            â€œdescriptionâ€: â€œOnly required when informing the encoder of embedded captions to be extractedâ€,
-        </p>
-        <p>
-            â€œadditionalPropertiesâ€: false
-        </p>
-        <p>
-            "timedTextType": {
-        </p>
-        <p>
-            â€œtypeâ€: â€œstringâ€,
-        </p>
-        <p>
-            â€œdescriptionâ€: â€œType of timed text outputâ€,
-        </p>
-        <p>
-            â€œadditionalPropertiesâ€: false,
-        </p>
-        <p>
-            â€œenumâ€: [
-        </p>
-        <p>
-            â€œsubtitlesâ€,
-        </p>
-        <p>
-            â€œcaptionâ€,
-        </p>
-        <p>
-            â€œembeddedâ€
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "languages": {
-        </p>
-        <p>
-            â€œtypeâ€: â€œstringâ€,
-        </p>
-        <p>
-            â€œdescriptionâ€: â€œLanguage code defined by ISO 639-1â€,
-        </p>
-        <p>
-            â€œadditionalPropertiesâ€: false,
-        </p>
-        <p>
-            â€œenumâ€: [ "AF", "AL", "DZ", "AS", "AD", "AO", "AI", "AQ", "AG", "AR", "AM", "AW", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "IO", "VG", "BN", "BG", "BF", "MM", "BI", "KH", "CM", "CA", "CV", "CF", "TD", "CL", "CN", "CX", "CC", "CO", "KM", "CK", "CR", "HR", "CU", "CY", "CZ", "CD", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "GQ", "ER", "EE", "ET", "FK", "FO", "FJ", "FI", "FR", "PF", "GA", "GM", "GE", "DE", "GH", "GI", "GR", "GL", "GD", "GU", "GT", "GN", "GW", "GY", "HT", "VA", "HN", "HK", "HU", "IS", "IN", "ID", "IR", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JP", "JE", "JO", "KZ", "KE", "KI", "KW", "KG", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "ME", "MS", "MA", "MZ", "NA", "NR", "NP", "NL", "AN", "NC", "NZ", "NI", "NE", "NG", "NU", "KP", "MP", "NO", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PN", "PL", "PT", "PR", "QA", "CG", "RO", "RU", "RW", "BL", "SH", "KN", "LC", "MF", "PM", "VC", "WS", "SM", "ST", "SA", "SN", "RS", "SC", "SL", "SG", "SK", "SI", "SB", "SO", "ZA", "KR", "ES", "LK", "SD", "SR", "SJ", "SZ", "SE", "CH", "SY", "TW", "TJ", "TZ", "TH", "TL", "TG", "TK", "TO", "TT", "TN", "TR", "TM", "TC", "TV", "UG", "UA", "AE", "GB", "US", "UY", "VI", "UZ", "VU", "VE", "VN", "WF", "EH", "YE", "ZM", "ZW"]
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            â€œalternateIdâ€: {
-        </p>
-        <p>
-            â€œtypeâ€: â€œstringâ€,
-        </p>
-        <p>
-            â€œdescriptionâ€: â€œBrief description of the fileâ€,
-        </p>
-        <p>
-            â€œaddtionalPropertiesâ€: false
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            â€œrequiredâ€: [
-        </p>
-        <p>
-            â€œsourceURLâ€,
-        </p>
-        <p>
-            â€œtimedTextTypeâ€,
-        </p>
-        <p>
-            â€œlanguagesâ€
-        </p>
-        <p>
-            ],
-        </p>
-        <p>
-            }â€œrequiredâ€: [
-        </p>
-        <p>
-            â€œ0â€
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "priority": {
-        </p>
-        <p>
-            "type": "string",
-        </p>
-        <p>
-            "description": "Denotes the transcode priority of the asset",
-        </p>
-        <p>
-            "minLength": 0,
-        </p>
-        <p>
-            "additionalProperties": false,
-        </p>
-        <p>
-            "enum": ["Normal"]
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "publicationRules": {
-        </p>
-        <p>
-            "type": "array",
-        </p>
-        <p>
-            "description": "An array of Publication Rules for the asset",
-        </p>
-        <p>
-            "minItems": 1,
-        </p>
-        <p>
-            "uniqueItems": false,
-        </p>
-        <p>
-            "additionalProperties": false,
-        </p>
-        <p>
-            "items": {
-        </p>
-        <p>
-            "type": "object",
-        </p>
-        <p>
-            "description": "Container for Client Filters and Country Rules for the Publication Rules",
-        </p>
-        <p>
-            "additionalProperties": false,
-        </p>
-        <p>
-            "properties": {
-        </p>
-        <p>
-            "channel": {
-        </p>
-        <p>
-            "type": "string",
-        </p>
-        <p>
-            "description": "The Channel Id for the Publication Rule",
-        </p>
-        <p>
-            "minLength": 36,
-        </p>
-        <p>
-            "maxLength": 36,
-        </p>
-        <p>
-            "additionalProperties": false
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "startDate": {
-        </p>
-        <p>
-            "type": "integer",
-        </p>
-        <p>
-            "description": "The start date for the Publication Rule",
-        </p>
-        <p>
-            "minimum": 0,
-        </p>
-        <p>
-            "maximum": 2147483647,
-        </p>
-        <p>
-            "additionalProperties": false
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "endDate": {
-        </p>
-        <p>
-            "type": "integer",
-        </p>
-        <p>
-            "description": "The end date for the Publication Rule",
-        </p>
-        <p>
-            "minimum": 0,
-        </p>
-        <p>
-            "maximum": 2147483647,
-        </p>
-        <p>
-            "additionalProperties": false
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "clientFilters": {
-        </p>
-        <p>
-            "type": "array",
-        </p>
-        <p>
-            "description": "And array of Client Filters for the Publication Rule",
-        </p>
-        <p>
-            "minItems": 1,
-        </p>
-        <p>
-            "uniqueItems": false,
-        </p>
-        <p>
-            "additionalProperties": false,
-        </p>
-        <p>
-            "items": {
-        </p>
-        <p>
-            "type": "object",
-        </p>
-        <p>
-            "description": "Container for a Client Filter",
-        </p>
-        <p>
-            "additionalProperties": false,
-        </p>
-        <p>
-            "properties": {
-        </p>
-        <p>
-            "variableName": {
-        </p>
-        <p>
-            "type": "string",
-        </p>
-        <p>
-            "description": "The variable name that the Client Filter will key off of",
-        </p>
-        <p>
-            "additionalProperties": false,
-        </p>
-        <p>
-            "enum": [
-        </p>
-        <p>
-            "IpAddress",
-        </p>
-        <p>
-            "UserAgent",
-        </p>
-        <p>
-            "ReferringHost"
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "value": {
-        </p>
-        <p>
-            "type": "string",
-        </p>
-        <p>
-            "description": "The value that the Client Filter will key off of",
-        </p>
-        <p>
-            "minLength": 0,
-        </p>
-        <p>
-            "maxLength": 255,
-        </p>
-        <p>
-            "additionalProperties": false
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "filterType": {
-        </p>
-        <p>
-            "type": "string",
-        </p>
-        <p>
-            "description": "The type of filtering used to compare the value",
-        </p>
-        <p>
-            "additionalProperties": false,
-        </p>
-        <p>
-            "enum": [
-        </p>
-        <p>
-            "Equals",
-        </p>
-        <p>
-            "NotEquals",
-        </p>
-        <p>
-            "In",
-        </p>
-        <p>
-            "NotIn",
-        </p>
-        <p>
-            "Contains",
-        </p>
-        <p>
-            "NotContains",
-        </p>
-        <p>
-            "StartsWith",
-        </p>
-        <p>
-            "NotStartsWith",
-        </p>
-        <p>
-            "EndsWith",
-        </p>
-        <p>
-            "NotEndsWith"
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "isDenied": {
-        </p>
-        <p>
-            "type": "boolean",
-        </p>
-        <p>
-            "description": "Denotes whether a successful comparison of the Client Filter is denied or allowed",
-        </p>
-        <p>
-            "additionalProperties": false
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "required": [
-        </p>
-        <p>
-            "variableName",
-        </p>
-        <p>
-            "value",
-        </p>
-        <p>
-            "filterType",
-        </p>
-        <p>
-            "isDenied"
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "required": [
-        </p>
-        <p>
-            "0"
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "countryRules": {
-        </p>
-        <p>
-            "type": "array",
-        </p>
-        <p>
-            "description": "An array of Country Rules for the asset",
-        </p>
-        <p>
-            "minItems": 1,
-        </p>
-        <p>
-            "uniqueItems": false,
-        </p>
-        <p>
-            "additionalProperties": false,
-        </p>
-        <p>
-            "items": {
-        </p>
-        <p>
-            "type": "object",
-        </p>
-        <p>
-            "description": "Container for the Country Rule",
-        </p>
-        <p>
-            "additionalProperties": false,
-        </p>
-        <p>
-            "properties": {
-        </p>
-        <p>
-            "countryCode": {
-        </p>
-        <p>
-            "type": "string",
-        </p>
-        <p>
-            "description": "The Country Code defined by ISO 3166-1",
-        </p>
-        <p>
-            "minLength": 2,
-        </p>
-        <p>
-            "maxLength": 2,
-        </p>
-        <p>
-            "additionalProperties": false,
-        </p>
-        <p>
-            "enum": [ "AF", "AL", "DZ", "AS", "AD", "AO", "AI", "AQ", "AG", "AR", "AM", "AW", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "IO", "VG", "BN", "BG", "BF", "MM", "BI", "KH", "CM", "CA", "CV", "CF", "TD", "CL", "CN", "CX", "CC", "CO", "KM", "CK", "CR", "HR", "CU", "CY", "CZ", "CD", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "GQ", "ER", "EE", "ET", "FK", "FO", "FJ", "FI", "FR", "PF", "GA", "GM", "GE", "DE", "GH", "GI", "GR", "GL", "GD", "GU", "GT", "GN", "GW", "GY", "HT", "VA", "HN", "HK", "HU", "IS", "IN", "ID", "IR", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JP", "JE", "JO", "KZ", "KE", "KI", "KW", "KG", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "ME", "MS", "MA", "MZ", "NA", "NR", "NP", "NL", "AN", "NC", "NZ", "NI", "NE", "NG", "NU", "KP", "MP", "NO", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PN", "PL", "PT", "PR", "QA", "CG", "RO", "RU", "RW", "BL", "SH", "KN", "LC", "MF", "PM", "VC", "WS", "SM", "ST", "SA", "SN", "RS", "SC", "SL", "SG", "SK", "SI", "SB", "SO", "ZA", "KR", "ES", "LK", "SD", "SR", "SJ", "SZ", "SE", "CH", "SY", "TW", "TJ", "TZ", "TH", "TL", "TG", "TK", "TO", "TT", "TN", "TR", "TM", "TC", "TV", "UG", "UA", "AE", "GB", "US", "UY", "VI", "UZ", "VU", "VE", "VN", "WF", "EH", "YE", "ZM", "ZW"]
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "isDenied": {
-        </p>
-        <p>
-            "type": "boolean",
-        </p>
-        <p>
-            "description": "Denotes whether a successful comparison of the Client Filter is denied or allowed",
-        </p>
-        <p>
-            "additionalProperties": false
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "required": [
-        </p>
-        <p>
-            "countryCode",
-        </p>
-        <p>
-            "isDenied"
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "required": [
-        </p>
-        <p>
-            "0"
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "required": [
-        </p>
-        <p>
-            "channel",
-        </p>
-        <p>
-            "startDate",
-        </p>
-        <p>
-            "endDate"
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "required": [
-        </p>
-        <p>
-            "0"
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "cuePoints": {
-        </p>
-        <p>
-            "type": "array",
-        </p>
-        <p>
-            "description": "An array of Cue Points for the asset",
-        </p>
-        <p>
-            "minItems": 1,
-        </p>
-        <p>
-            "uniqueItems": true,
-        </p>
-        <p>
-            "additionalProperties": false,
-        </p>
-        <p>
-            "items": [{
-        </p>
-        <p>
-            "type": "object",
-        </p>
-        <p>
-            "description": "A key value pair of the time in which the Cue Point and unit type of the value",
-        </p>
-        <p>
-            "additionalProperties": false,
-        </p>
-        <p>
-            "properties": {
-        </p>
-        <p>
-            "valueIn": {
-        </p>
-        <p>
-            "type": "integer",
-        </p>
-        <p>
-            "description": "The time in which the Cue Point will be inserted",
-        </p>
-        <p>
-            "minimum": 0,
-        </p>
-        <p>
-            "maximum": 2147483647,
-        </p>
-        <p>
-            "additionalProperties": false
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "unit": {
-        </p>
-        <p>
-            "type": "string",
-        </p>
-        <p>
-            "description": "The type of unit the time value",
-        </p>
-        <p>
-            "minLength": 0,
-        </p>
-        <p>
-            "additionalProperties": false,
-        </p>
-        <p>
-            "enum": [
-        </p>
-        <p>
-            "Seconds"
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "required": [
-        </p>
-        <p>
-            "valueIn",
-        </p>
-        <p>
-            "unit"
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            }],
-        </p>
-        <p>
-            "required": [
-        </p>
-        <p>
-            "0"
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            }
-        </p>
-        <p>
-            },
-        </p>
-        <p>
-            "required": [
-        </p>
-        <p>
-            "foreignKey",
-        </p>
-        <p>
-            "media"
-        </p>
-        <p>
-            ]
-        </p>
-        <p>
-            }
-        </p>
+        </h2>
+<pre><code>{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"title": "root",
+	"description": "Ingest API Container",
+	"additionalProperties": false,
+	"properties": {
+		"title": {
+			"type": "string",
+			"description": "The title of the asset",
+			"minLength": 0,
+			"maxLength": 255,
+			"additionalProperties": false
+		},
+		"foreignKey": {
+			"type": "string",
+			"description": "The unique identifier for the asset",
+			"minLength": 1,
+			"maxLength": 255,
+			"additionalProperties": false
+		},
+		"metadata": {
+			"type": "object",
+			"description": "An array of key value pairs for Extended Metadata",
+			"additionalProperties": true,
+			"properties": {
+				"key": {
+				"type": "string",
+				"description": "The key of an Extended Metadata key value pair",
+				"minLength": 0,
+				"additionalProperties": false
+				}
+			}
+		},
+		"media": {
+			"type": "object",
+			"description": "Container for the source URL of the asset being ingested",
+			"additionalProperties": false,
+			"properties": {
+				"sourceURL": {
+					"type": "string",
+					"description": "The URL string to the source asset",
+					"minLength": 1,
+					"maxLength": 1000,
+					"additionalProperties": false
+				}
+			},
+			"required": [
+			"sourceURL"
+			]
+		},
+		"timedText": {
+			"type": "array",
+			"description": "An array of timed text associations for the media item",
+			"minItems": 1,
+			"uniqueItems": false,
+			"additionalProperties": false,
+			"items": {
+			"media": {
+			"type": "object",
+			"description": "Container for the source URL of the asset being ingested",
+			"sourceURL": {
+			"type": "string",
+			"description": "The URL string to the source asset",
+			"minLength": 1,
+			"maxLength": 1000,
+			"additionalProperties": false
+			},
+			"passThrough": {
+			"type": "boolean",
+			"description": "Only required when informing the encoder of embedded captions to be extracted",
+			"additionalProperties": false,
+			"timedTextType": {
+			"type": "string",
+			"description": "Type of timed text output",
+			"additionalProperties": false,
+			"enum": [
+			"subtitles",
+			"caption",
+			"embedded"
+			]
+			},
+		"languages": {
+		"type": "string",
+		"description": "Language code defined by ISO 639-1",
+		"additionalProperties": false,
+		"enum": [ "AF", "AL", "DZ", "AS", "AD", "AO", "AI", "AQ", "AG", "AR", "AM", "AW", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "IO", "VG", "BN", "BG", "BF", "MM", "BI", "KH", "CM", "CA", "CV", "CF", "TD", "CL", "CN", "CX", "CC", "CO", "KM", "CK", "CR", "HR", "CU", "CY", "CZ", "CD", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "GQ", "ER", "EE", "ET", "FK", "FO", "FJ", "FI", "FR", "PF", "GA", "GM", "GE", "DE", "GH", "GI", "GR", "GL", "GD", "GU", "GT", "GN", "GW", "GY", "HT", "VA", "HN", "HK", "HU", "IS", "IN", "ID", "IR", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JP", "JE", "JO", "KZ", "KE", "KI", "KW", "KG", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "ME", "MS", "MA", "MZ", "NA", "NR", "NP", "NL", "AN", "NC", "NZ", "NI", "NE", "NG", "NU", "KP", "MP", "NO", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PN", "PL", "PT", "PR", "QA", "CG", "RO", "RU", "RW", "BL", "SH", "KN", "LC", "MF", "PM", "VC", "WS", "SM", "ST", "SA", "SN", "RS", "SC", "SL", "SG", "SK", "SI", "SB", "SO", "ZA", "KR", "ES", "LK", "SD", "SR", "SJ", "SZ", "SE", "CH", "SY", "TW", "TJ", "TZ", "TH", "TL", "TG", "TK", "TO", "TT", "TN", "TR", "TM", "TC", "TV", "UG", "UA", "AE", "GB", "US", "UY", "VI", "UZ", "VU", "VE", "VN", "WF", "EH", "YE", "ZM", "ZW"]
+		},
+		"alternateId": {
+		"type": "string",
+		"description": "Brief description of the file",
+		"addtionalProperties": false
+		},
+		"required": [
+		"sourceURL",
+		"timedTextType",
+		"languages"
+		],
+		}"required": [
+		"0"
+		]
+		},
+	"priority": {
+	"type": "string",
+	"description": "Denotes the transcode priority of the asset",
+	"minLength": 0,
+	"additionalProperties": false,
+	"enum": ["Normal"]
+	},
+	"publicationRules": {
+	"type": "array",
+	"description": "An array of Publication Rules for the asset",
+	"minItems": 1,
+	"uniqueItems": false,
+	"additionalProperties": false,
+	"items": {
+	"type": "object",
+	"description": "Container for Client Filters and Country Rules for the Publication Rules",
+	"additionalProperties": false,
+	"properties": {
+	"channel": {
+	"type": "string",
+	"description": "The Channel Id for the Publication Rule",
+	"minLength": 36,
+	"maxLength": 36,
+	"additionalProperties": false
+	},
+	"startDate": {
+	"type": "integer",
+	"description": "The start date for the Publication Rule",
+	"minimum": 0,
+	"maximum": 2147483647,
+	"additionalProperties": false
+	},
+	"endDate": {
+	"type": "integer",
+	"description": "The end date for the Publication Rule",
+	"minimum": 0,
+	"maximum": 2147483647,
+	"additionalProperties": false
+	},
+	"clientFilters": {
+	"type": "array",
+	"description": "And array of Client Filters for the Publication Rule",
+	"minItems": 1,
+	"uniqueItems": false,
+	"additionalProperties": false,
+	"items": {
+	"type": "object",
+	"description": "Container for a Client Filter",
+	"additionalProperties": false,
+	"properties": {
+	"variableName": {
+	"type": "string",
+	"description": "The variable name that the Client Filter will key off of",
+	"additionalProperties": false,
+	"enum": [
+	"IpAddress",
+	"UserAgent",
+	"ReferringHost"
+	]
+	},
+	"value": {
+	"type": "string",
+	"description": "The value that the Client Filter will key off of",
+	"minLength": 0,
+	"maxLength": 255,
+	"additionalProperties": false
+	},
+	"filterType": {
+	"type": "string",
+	"description": "The type of filtering used to compare the value",
+	"additionalProperties": false,
+	"enum": [
+	"Equals",
+	"NotEquals",
+	"In",
+	"NotIn",
+	"Contains",
+	"NotContains",
+	"StartsWith",
+	"NotStartsWith",
+	"EndsWith",
+	"NotEndsWith"
+	]
+	},
+	"isDenied": {
+	"type": "boolean",
+	"description": "Denotes whether a successful comparison of the Client Filter is denied or allowed",
+	"additionalProperties": false
+	}
+	},
+	"required": [
+	"variableName",
+	"value",
+	"filterType",
+	"isDenied"
+	]
+	},
+	"required": [
+	"0"
+	]
+	},
+	"countryRules": {
+	"type": "array",
+	"description": "An array of Country Rules for the asset",
+	"minItems": 1,
+	"uniqueItems": false,
+	"additionalProperties": false,
+	"items": {
+	"type": "object",
+	"description": "Container for the Country Rule",
+	"additionalProperties": false,
+	"properties": {
+	"countryCode": {
+	"type": "string",
+	"description": "The Country Code defined by ISO 3166-1",
+	"minLength": 2,
+	"maxLength": 2,
+	"additionalProperties": false,
+	"enum": [ "AF", "AL", "DZ", "AS", "AD", "AO", "AI", "AQ", "AG", "AR", "AM", "AW", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BR", "IO", "VG", "BN", "BG", "BF", "MM", "BI", "KH", "CM", "CA", "CV", "CF", "TD", "CL", "CN", "CX", "CC", "CO", "KM", "CK", "CR", "HR", "CU", "CY", "CZ", "CD", "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "GQ", "ER", "EE", "ET", "FK", "FO", "FJ", "FI", "FR", "PF", "GA", "GM", "GE", "DE", "GH", "GI", "GR", "GL", "GD", "GU", "GT", "GN", "GW", "GY", "HT", "VA", "HN", "HK", "HU", "IS", "IN", "ID", "IR", "IQ", "IE", "IM", "IL", "IT", "CI", "JM", "JP", "JE", "JO", "KZ", "KE", "KI", "KW", "KG", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "ME", "MS", "MA", "MZ", "NA", "NR", "NP", "NL", "AN", "NC", "NZ", "NI", "NE", "NG", "NU", "KP", "MP", "NO", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PH", "PN", "PL", "PT", "PR", "QA", "CG", "RO", "RU", "RW", "BL", "SH", "KN", "LC", "MF", "PM", "VC", "WS", "SM", "ST", "SA", "SN", "RS", "SC", "SL", "SG", "SK", "SI", "SB", "SO", "ZA", "KR", "ES", "LK", "SD", "SR", "SJ", "SZ", "SE", "CH", "SY", "TW", "TJ", "TZ", "TH", "TL", "TG", "TK", "TO", "TT", "TN", "TR", "TM", "TC", "TV", "UG", "UA", "AE", "GB", "US", "UY", "VI", "UZ", "VU", "VE", "VN", "WF", "EH", "YE", "ZM", "ZW"]
+	},
+	"isDenied": {
+	"type": "boolean",
+	"description": "Denotes whether a successful comparison of the Client Filter is denied or allowed",
+	"additionalProperties": false
+	}
+	},
+	"required": [
+	"countryCode",
+	"isDenied"
+	]
+	},
+	"required": [
+	"0"
+	]
+	}
+	},
+	"required": [
+	"channel",
+	"startDate",
+	"endDate"
+	]
+	},
+	"required": [
+	"0"
+	]
+	},
+	"cuePoints": {
+	"type": "array",
+	"description": "An array of Cue Points for the asset",
+	"minItems": 1,
+	"uniqueItems": true,
+	"additionalProperties": false,
+	"items": [{
+	"type": "object",
+	"description": "A key value pair of the time in which the Cue Point and unit type of the value",
+	"additionalProperties": false,
+	"properties": {
+	"valueIn": {
+	"type": "integer",
+	"description": "The time in which the Cue Point will be inserted",
+	"minimum": 0,
+	"maximum": 2147483647,
+	"additionalProperties": false
+	},
+	"unit": {
+	"type": "string",
+	"description": "The type of unit the time value",
+	"minLength": 0,
+	"additionalProperties": false,
+	"enum": [
+	"Seconds"
+	]
+	}
+	},
+	"required": [
+	"valueIn",
+	"unit"
+	]
+	}],
+	"required": [
+	"0"
+	]
+	}
+	},
+	"required": [
+	"foreignKey",
+	"media"
+	]
+}</code></pre>
+            </div>
     </body>
 </html>
