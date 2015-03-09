@@ -167,7 +167,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
     };
     // create navigation for page sections
     createInPageNavMenu = function () {
-        var str = "<ul class=\"side-nav\">",
+        var str = "<ul class=\"side-nav show-for-xlarge-up\">",
             i,
             max = navLabel.length,
             $navElements;
