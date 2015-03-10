@@ -180,8 +180,6 @@ var aapi_model = {
             account_video: {dimensions: ["account", "video"], fields: []},
             account_player_video: {dimensions: ["account", "player", "video"], fields: []},
             account_traffic_sources: {dimensions: ["account", "referrer_domain", "source_type", "search_terms"], fields: []},
-            account_player_traffic_sources: {dimensions: ["account", "player", "referrer_domain", "source_type", "search_terms"], fields: []},
-            account_video_traffic_sources: {dimensions: ["account", "video", "referrer_domain", "source_type", "search_terms"], fields: []},
             account_devices: {dimensions: ["account", "device_type", "device_os"], fields: []},
             account_player_devices: {dimensions: ["account", "player", "device_type", "device_os"], fields: []},
             account_video_devices: {dimensions: ["account", "video", "device_type", "device_os"], fields: []},

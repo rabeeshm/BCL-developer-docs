@@ -68,14 +68,14 @@
                 <p>You will first need to obtain client credentials (a <code>client_id</code> and <code>client_secret</code>). This is a one-time operation that can be performed using the <a href="../guides/managing-api-credentials.html">OAuth Credentials UI</a>. You can get client credentials directly from the Brightcove OAuth Service using <a href="../../oauth-api/guides/get-client-credentials.html">CURL</a> or <a href="../..//oauth-api/guides/get-client-credentials-postman.html">Postman</a>.</p>
                 <p>You will also need an <code>access_token</code>, which is obtained using the <code>client_id</code> and <code>client_secret</code> and passed in an Authorization header with your API request:</p>
 <pre><code>Authorization: Bearer {access_token}</code></pre>
-                <p>The <code>access_token</code> expires after five minutes, so you must obtain a new one for each request, or check to make sure that your token is still valid. See <a href="../../oauth-api/guides/get-token.hmlt">Getting Access Tokens</a> for a detailed explanation of how to get access tokens, including code samples.</p>
+                <p>The <code>access_token</code> expires after five minutes, so you must obtain one for each request, or check to make sure that your token is still valid. See <a href="../../oauth-api/guides/get-token.hmlt">Getting Access Tokens</a> for a detailed explanation of how to get access tokens, including code samples.</p>
                 <h3>Accept-Encoding: gzip (optional)</h3>
-                <p>Passing this header will cause the response to be returned in compressed form. This will improved performance for large reports.</p>
+                <p>Passing this header will cause the response to be returned in compressed form. This may improve performance for large reports.</p>
                 <p class="BCL-aside">Note: the permanent Analytics API tokens issued during the Limited Availability program are no longer supported. Access tokens must be acquired from the Brightcove OAuth Service.</p>
             </div>
             <div class="section" id="concurrency">
                 <h2>Concurrent Requests</h2>
-                <p>The number of concurrent requests for reports on the same account is limited to a single request at a time.</p>
+                <p>A single account is limited to one request at a time. Multiple concurrent requests will execute in series.</p>
                 <p>For example:
                 <ol>
                     <li>Start an API request "A"</li>
@@ -84,22 +84,22 @@
                     <li>If request "A" takes too long request "A" will receive an error saying "your request is pending try again".</li>
                     <li>If request "A" takes too long it may cause request "B" to receive the same error. Note that request "B" will get an error if the time to complete A + B is greater than our timeout value. </li>
                 </ol>
-                <p>If you make a multiple of concurrent requests we will handle them roughly one at a time.</p>
-                <p>Reports that received the "pending error" will be completed and saved into cache, this means that a future request for the same report will return instantly as long as its the same report request, and it was made before the cache expired.</p>
-                <p>Your system should handle the pending error by waiting a small period of time and making the same request again.</p>
+                <p>If you make multiple concurrent requests, we will handle them roughly one at a time.</p>
+                <p>Requests that return with a “pending error” will eventually complete and be saved to our cache. This means that future requests for the same data will return almost instantly, but only if the request is made before the five minute cache expires.</p>
+                <p>Your systems should handle the pending error by waiting 2-4 minutes and making the same request again.</p>
             </div>
             <div class="section" id="requestTypes">
                 <h2>Request types</h2>
-                <p>The Analytics API accepts two request types</p>
+                <p>The Analytics API accepts three request types</p>
                 <dl>
-                    <dt>Report</dt>
+                    <dt>Data (also called a Report)</dt>
                     <dd>
                         A report on one or more <a href="#metrics">dimensions</a>. The endpoint for a report request is:
 <pre><code>https://analytics.api.brightcove.com/v1/data?accounts={account_id(s)}&amp;dimensions={dimensions}</code></pre>
                     </dd>
                     <dt>Engagement report</dt>
                     <dd>Detailed engagement data that is available for periods within the past 32 days. See <a href="#engagement">the engagement section</a> for more details.</dd>
-                    <dt>Data endpoint</dt>
+                    <dt>Video information endpoint</dt>
                     <dd>
                         A specific piece of analytics data served with minimal latency. See <a href="../guides/video-information-endpoint.html">Video Data Endpoint</a> for more information.
                     </dd>
