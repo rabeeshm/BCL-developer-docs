@@ -33,7 +33,7 @@ elif [ "$VERB" = "d" ]
 	then
 	export VERB="DELETE"
 fi
-echo Your call verb: $VERB
+echo "Your request type: $VERB"
 echo --------------------------
 echo 'Enter data to be submitted in the request body:'
 read DATA

@@ -41,43 +41,34 @@
       <div id="top" class="section">  
       <h1>Delivering HLS Videos</h1>
       </div>
-      <p class="BCL-objective">HTTP Live Streaming (HLS) is a protocol implemented by Apple for delivering video to Apple mobile devices. This protocol breaks the video into a sequence of small file downloads, each download loading one short chunk of the video using HTTP. The Apple App Store rules call for the use of HLS for long form video content (greater than 5 Mb or 10 minutes).</p>
+      <p class="BCL-objective">HTTP Live Streaming (HLS) is a  HTTP-based media streaming protocol implemented by Apple. This protocol breaks the video into a sequence of small file downloads, each download loading one short chunk of the video using HTTP. As the stream is played, the client may select from a number of different alternate streams containing the same material encoded at a variety of data rates, allowing the streaming session to adapt to the available data rate. At the start of the streaming session, it downloads an extended playlist containing the metadata for the various sub-streams which are available.</p>
     <!-- break -->
-    <p class="text-warning">Note: If you deliver video via progressive download to iOS devices, iOS will attempt to download the entire video, even if the viewer never tries to play it. This can increase your bandwidth usage if you have many viewers on iOS devices. You can prevent this by insuring that there are HLS renditions for all of your videos.</p> 
+    <p class="text-warning">Note: If you deliver video via progressive download to iOS devices, iOS will attempt to download the entire video, even if the viewer never tries to play it. This can increase your bandwidth usage if you have many viewers on iOS devices. You can prevent this by insuring that there are HLS renditions for all of your videos.</p>
+    <p class="text-warning">HLS has become a de-facto standard for streaming video on mobile devices thanks to its native support on iOS and Android. There are a number of benefits to delivering video using HLS:</p>
+    <ul>
+      <li> Supports (client-driven) adaptive bitrate selection</li>
+      <li> Delivered over standard HTTP ports</li>
+      <li> Simple, text-based manifest format</li>
+      <li> No proprietary streaming servers required</li>
+    </ul> 
     <p>Note: HLS has nothing to do with live video. For a list of all the options available from Brightcove for delivering live streaming video, see <a href="//support.brightcove.com/en/video-cloud/docs/delivering-live-streams">Delivering Live Streams</a>.</p>
 	<div id="creating" class="section">
         <h2>Creating HLS</h2>
-        <p>Video Cloud supports HLS as a video encoding option, along with H.264 (MP4) and H.263 (FLV). Ingest profiles determine the number and type of renditions that are created when videos are uploading using the Dynamic Ingest API or Upload module. Depending on in the ingest profile that is used when uploading, HLS renditions may be created automatically as part of that profile. For more information on ingest profiles and the types of renditions that are created with each profile, see <a href="http://docs.brightcove.com/en/video-cloud/di-api/guides/standard-profiles.html">Standard Ingest Profiles</a>. </p>
+        <p>Video Cloud supports HLS as a video encoding option, along with H.264 (MP4) and H.263 (FLV). Ingest profiles determine the number and type of renditions that are created when videos are uploaded using the Dynamic Ingest API or Upload module. Depending on in the ingest profile that is used when uploading, HLS renditions may be created automatically as part of that profile. For more information on ingest profiles and the types of renditions that are created with each profile, see <a href="http://docs.brightcove.com/en/video-cloud/di-api/guides/standard-profiles.html">Standard Ingest Profiles</a>. </p>
         <p>Dynamic Ingest does support custom ingest profiles but at this time you cannot create your own custom profiles. If you need a custom profile, contact your Brightcove Solutions Engineer  or Account Manager.        </p>
         <p>Once you have selected, or created, an ingest profile that includes one or more HLS renditions, then every time you upload a video, whether you use the Dynamic Ingest API or Upload mdoule, the video will include HLS renditions along with any other multi-bitrate renditions that were specificed as part of the profile.&nbsp;</p>
       </div>
       <div id="playing" class="section">
         <h2>Playing HLS</h2>
-        <p>The default behavior is to start with the lowest non-audio rendition. With connection=wifi appended to the dynamic URL for the m3u8 file, initial playback will use a 440 kbps or nearest lower bitrate stream available.</p>
-        <p>Any native apps you create for Apple devices using the Video Cloud App&nbsp;SDK for iOS can access and play back your HLS  renditions. You can also access your HLS  renditions using the Media API, by setting the <span style="font-family: 'Courier New';">media_delivery</span> argument to <span style="font-family: 'Courier New';">http_ios</span> and including the <span style="font-family: Courier New;">FLVURL</span> property in the <span style="font-family: Courier New;">Video</span> objects you retrieve with the Media API, as described in <a href="//docs.brightcove.com/en/video-cloud/media/guides/accessing-video-content-media-api.html">Accessing Video Content with the Media API</a>.</p>
+        <p>The Brightcove Player includes an HLS playback engine by default. If the video you provide to the player includes HLS renditions, it will play those before it tries MP4 because the default playback order is HLS, then HTML5, then Flash. If the browser supports HLS natively, it will use that capability (e.g. Safari on desktop or iOS). If the browser doesn't support HLS, but the browser has Flash installed, it will load the Flash fallback. You can change this behavior by changing the tech order of the player. For more information, see the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/tech.html">Playback Technology Guide</a>.</p>
         <p>Video Cloud  offers HLS encryption which lets you send encrypted video over HTTP for playback on devices running iOS. See <a href="//support.brightcove.com/en/video-cloud/docs/protecting-videos-devices-hls-encryption">Protecting Videos on iOS Devices with HLS Encryption</a> for details.</p>
-      </div>
-      <div id="devices" class="section">
-        <h2>HLS on devices</h2>
-        <p>For other Android devices including Kindle, assuming the video does have HLS renditions available, the logic for selecting HLS on Android is as follows:</p>
-        <ul>
-        	<li>If you are on Android &lt; 4.x, you will never get HLS</li>
-        	<li>If you are on Android 4.2 and above, you will always get HLS</li>
-        	<li>If you are on Android 4.0 or 4.1, and there are no playable PD renditions available, you will get HLS        </li>
-        </ul>
-        <p>Video Cloud supports HLS renditions on Kindle Fire HD devices running Silk 2.3+ browsers meaning HLS will be the default delivery on those devices regardless of whether or not mp4 renditions are available. Due to a number of other issues, there is no official support for HTML players on Kindle at this time.&nbsp;</p>
-        <p>Support for HLS playback on Android only as a fallback when there are no other playable rendtions (i.e. mp4 renditions), because of a number of issues with Android support for HLS which are documented publicly.</p>
-        <p>There are some limitations when using HLS on Android. For more information, see <a href="http://docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/hls-limitations.html">Limitations of HLS on Android</a>.<br/>
-      </p>
-      </div>
-      <div id="cookies" class="section">
-        <h2>HLS and cookies</h2>
-        <p>Although tangential to CORS, the client browser needs to accept all session cookies for Token Authorized HLS content delivery to work properly. While some client browsers such as Google Chrome and Mozilla Firefox accept session cookies by default, other browsers, such as Internet Explorer, do not so this option must be enabled by the user.</p>
+        <p>The Brightcove Player tries to ensure the highest-quality viewing experience possible, given the available bandwidth and encodings. This doesn't always mean using the highest-bitrate rendition available. If the player is 300px by 150px, it would be a  waste of bandwidth to download a 4K stream. By default, the player attempts to load the highest-bitrate variant that is less than the most recently detected segment bandwidth, with one condition: if there are multiple variants with dimensions greater than the current player size, it will only switch up one size greater than the current player size.</p>
+        <p>There are some limitations when using HLS on Android. For more information, see <a href="http://docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/hls-limitations.html">Limitations of HLS on Android</a>.</p>
       </div>
       <div class="section" id="BCLreferences">
         <h2>Related Topics</h2>
         <ul>
-          <li><a href="//support.brightcove.com/en/video-cloud/docs/working-apple-media-stream-validator">Working with the Apple Media Stream Validator</a></li>
+          <li><a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/tech.html">Playback Technology Guide</a></li>
           <li><a href="cors/cors.html">CORS</a></li>
         </ul>
       </div>
