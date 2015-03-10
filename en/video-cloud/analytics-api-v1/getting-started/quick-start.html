@@ -66,14 +66,14 @@
                   <li>Client ID (see the <a href="#obtaincredentials">next section</a> on obtaining client credentials)</li>
                   <li>Client Secret (see the <a href="#obtaincredentials">next section</a> on obtaining client credentials)</li>
                   <li>The full API call (example: <code>https://cms.api.brightcove.com/v1/accounts/12345678/videos</code></li>
-                  <li>The request verb - one of the following: GET | POST | PATCH | PUT | DELETE</li>
+                  <li>The HTTP request method - one of the following: g (GET - the default) | p (POST) | pa (PATCH) | pu (PUT) | d (DELETE) (note: for Analytics API requests, this will always be GET - the default</li>
                   <li>Request data - used for POST, PATCH, and PUT; for GET and DELETE requests, you will leave this blank and just press <strong>return</strong></li>
                 </ul>
                 <p>For each part of this quick start, you will be given the values for each of these inputs to use with your account.</p>
               </div>
               <div id="obtaincredentials" class="section">
                 <h2>Obtain credentials</h2>
-                <p>To use the Analytics API you will need proper credentials. Later in this quick start, you will use the credentials in a form when submitting requests to the API.</p>
+                <p>To use the Analytics API you will need proper credentials. Later in this quick start, you will use the credentials in a form when submitting requests to the API. You will also need to enter some information about one of your videos for later tasks in the quick start.</p>
                 <ol>
                   <li>To obtain credentials follow the instructions in <a href="../guides/managing-api-credentials.html">Managing API Credentials</a>. This is the recommended way of obtaining your client credentials.</li>
                   </ul>
@@ -100,6 +100,18 @@
                         Account ID:
                         <input name="account_id" id="aapi_account_id" type="text" size="30">
                       </p>
+                      <p>
+                        Video ID (for any active video in your account):
+                        <input name="video_id" id="aapi_video_id" type="text" size="30">
+                      </p>
+                      <p>
+                        Video Reference ID (for any active video in your account, if any have reference ids):
+                        <input name="reference_id" id="aapi_reference_id" type="text" size="30">
+                      </p>
+                      <p>
+                        A tag (assigned to any active video in your account, if use tags):
+                        <input name="tag" id="aapi_tag" type="text" size="30">
+                      </p>
               <!-- <p>
                   Video Cloud Video ID (if available):
                   <input name="video_id" id="aapi_video_id" type="text">
@@ -112,7 +124,8 @@
             <div class="section" id="getReports">
                 <h2>Get reports</h2>
                 <p>Once you've entered the information needed above, you will see a series of steps below that walk you through requesting a report on each of the Analytics dimensions.</p>
-                <p>We will keep things simple here by accepting the default values for all parameters and using no filters. Remember, however, that the api-tester.sh script can make any request, so feel free to experiment with the parameters.</p>
+                <p>We will keep things simple here by accepting the default values for all parameters and using filters only in the last few steps. Remember, however, that the <code>api-tester.sh</code> script can make any request, so feel free to experiment with the parameters.</p>
+                <p class="BCL-aside">There are no dependencies between the steps, so feel free to skip some if you like.</p>
                 <ol id="taskList" start="3"></ol>
             </div>
         </div>
@@ -132,18 +145,22 @@
             var // Analytics API stuff
                 $aapi_client_id = $("#aapi_client_id"),
                 $aapi_client_secret = $("#aapi_client_secret"),
-                $aapi_initial_values_submit = $("#aapi_initial_values_submit"),
-                $aapi_create_submit = $("#aapi_create_submit"),
                 $aapi_account_id = $("#aapi_account_id"),
+                $aapi_video_id = $("#aapi_video_id"),
+                $aapi_reference_id = $("#aapi_reference_id"),
+                $aapi_tag = $("#aapi_tag"),
+                $aapi_initial_values_submit = $("#aapi_initial_values_submit"),
                 options = {
-                  client_id: "578b5b79-0883-47bb-a231-4fb5692ecd9c",
-                  client_secret: "spF_alkXCIJydgUluDNCWKxmk0-bvy-WI6PCxT2DzPo_JlwP-yDedLGqW4qIhXYh0eJyALABE5wHNPeS0CZmUw",
-                  account_id: "57838016001",
-                  aapiURL: "https://analytics.api.brightcove.com/v1/data?"
+                  client_id: "",
+                  client_secret: "",
+                  account_id: "",
+                  video_id: "",
+                  reference_id: "",
+                  tag: "",
+                  aapiURL: "https://analytics.api.brightcove.com/v1/"
                 },
                 today = new Date().toISOString(),
                 nowMS = new Date().valueOf(),
-                aapiBaseURL = "https://analytics.api.brightcove.com/v1/data?",
                 taskList = document.getElementById("taskList"),
                 // functions
                 bclslog,
@@ -165,9 +182,12 @@
                     thisDimension;
                 for (i = 0; i < iMax; i++) {
                     thisDimension = aapi_model.dimensions[i];
-                    str += "<li>Now you will get a report on the <strong>" + thisDimension.name + "</strong> dimension. Go to the command line and enter <code>bash api-tester.sh</code>. Enter the following values for the inputs:<p><strong>Client ID: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_id + "\"></p><p><strong>Client Secret: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\"></p><p><strong>API Call: </strong><input type=\"text\" size=\"50\" value=\"https://analytics.api.brightcove.com/v1/data?accounts=" + options.account_id + "&amp;dimensions=" + thisDimension.name + "\"></p><p><strong>Call verb: </strong><input type=\"text\" size=\"50\" value=\"GET\"></p><p><strong>Request data: </strong><input type=\"text\" size=\"50\" value=\"{none - just press return}\"></p></li>"
+                    str += "<li>Now you will get a report on the <strong>" + thisDimension.name + "</strong> dimension. Go to the command line and enter <code>bash api-tester.sh</code>. Enter the following values for the inputs:<p><strong>Client ID: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_id + "\"></p><p><strong>Client Secret: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\"></p><p><strong>API Call: </strong><input type=\"text\" size=\"50\" value=\"" + options.aapiURL + "data?accounts=" + options.account_id + "&amp;dimensions=" + thisDimension.name + "\"></p><p><strong>HTTP method: </strong><input type=\"text\" size=\"50\" value=\"GET\"></p><p><strong>Request data: </strong><input type=\"text\" size=\"50\" value=\"{none - just press return}\"></p></li>";
                 }
-                str += "<li>Finally, you will get an engagement report on the account for the past 30 days. Go to the command line and enter <code>bash api-tester.sh</code>. Enter the following values for the inputs:<p><strong>Client ID: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_id + "\"></p><p><strong>Client Secret: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\"></p><p><strong>API Call: </strong><input type=\"text\" size=\"50\" value=\"https://analytics.api.brightcove.com/v1/engagement/accounts/" + options.account_id + "\"></p><p><strong>Call verb: </strong><input type=\"text\" size=\"50\" value=\"GET\"></p><p><strong>Request data: </strong><input type=\"text\" size=\"50\" value=\"{none - just press return}\"></p></li>"
+                str += "<li>Next, you will get an engagement report on the account for the past 30 days. Go to the command line and enter <code>bash api-tester.sh</code>. Enter the following values for the inputs:<p><strong>Client ID: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_id + "\"></p><p><strong>Client Secret: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\"></p><p><strong>API Call: </strong><input type=\"text\" size=\"50\" value=\"" + options.aapiURL + "engagement/accounts/" + options.account_id + "\"></p><p><strong>HTTP method: </strong><input type=\"text\" size=\"50\" value=\"GET\"></p><p><strong>Request data: </strong><input type=\"text\" size=\"50\" value=\"{none - just press return}\"></p></li>";
+                str += "<li>Next, you will get an engagement report on the video (that you entered an id for above) for the past 30 days. Go to the command line and enter <code>bash api-tester.sh</code>. Enter the following values for the inputs:<p><strong>Client ID: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_id + "\"></p><p><strong>Client Secret: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\"></p><p><strong>API Call: </strong><input type=\"text\" size=\"50\" value=\"" + options.aapiURL + "engagement/accounts/" + options.account_id + "/videos/" + options.video_id + "\"></p><p><strong>HTTP method: </strong><input type=\"text\" size=\"50\" value=\"GET\"></p><p><strong>Request data: </strong><input type=\"text\" size=\"50\" value=\"{none - just press return}\"></p></li>";
+                str += "<li>Next, you will get a report on the video with the reference id (that you entered above) for the past 30 days. Go to the command line and enter <code>bash api-tester.sh</code>. Enter the following values for the inputs:<p><strong>Client ID: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_id + "\"></p><p><strong>Client Secret: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\"></p><p><strong>API Call: </strong><input type=\"text\" size=\"50\" value=\"" + options.aapiURL + "data?accounts=/" + options.account_id + "&amp;dimensions=video&amp;where=video.q==reference_id:" + options.reference_id + "\"></p><p><strong>HTTP method: </strong><input type=\"text\" size=\"50\" value=\"GET\"></p><p><strong>Request data: </strong><input type=\"text\" size=\"50\" value=\"{none - just press return}\"></p></li>";
+                str += "<li>Finally, you will get a report on the videos with the tags (that you entered above) for the past 30 days. Go to the command line and enter <code>bash api-tester.sh</code>. Enter the following values for the inputs:<p><strong>Client ID: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_id + "\"></p><p><strong>Client Secret: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\"></p><p><strong>API Call: </strong><input type=\"text\" size=\"50\" value=\"" + options.aapiURL + "data?accounts=/" + options.account_id + "&amp;dimensions=video&amp;where=video.q==tags:" + options.tag+ "\"></p><p><strong>HTTP method: </strong><input type=\"text\" size=\"50\" value=\"GET\"></p><p><strong>Request data: </strong><input type=\"text\" size=\"50\" value=\"{none - just press return}\"></p></li>";
                 taskList.innerHTML = str;
             };
             /**
@@ -177,6 +197,9 @@
               options.client_id = $aapi_client_id.val();
               options.client_secret = $aapi_client_secret.val();
               options.account_id = $aapi_account_id.val();
+              options.video_id = $aapi_video_id.val();
+              options.reference_id = $aapi_reference_id.val();
+              options.tag = $aapi_tag.val();
               today = today.substring(0, today.indexOf("T"));
               $aapi_initial_values_submit.attr("value", "Values Assigned!");
               $aapi_initial_values_submit.off("click", setInitialValues);
