@@ -42,28 +42,37 @@
 		<div id="main" class="large-10 small-12 columns">
 			<div id="top" class="section">
 				<h1>Add View/Manage Layout</h1>
-				<!-- Place document intro sentence(s) here -->
+                <p>This document explains how to manage the layout of a <code>View</code> added to the <code>BrightcoveVideoView</code>.</p>
+			</div>
+      
+			<div id="introduction" class="section">
+				<h2>Introduction</h2>
 				<p>This topic discusses managing the layout of a View added to the BrightcoveVideoView.</p>
+				<ul>
+				    <li>the <code>BrightcoveSurfaceView</code> with a <code>SeamlessSurfaceView</code></li>
+				    <li>the <code>DefaultSourceSelectionController</code> with a <code>SeamlessSourceSelectionController</code></li>
+				    <li>the <code>VideoDisplayComponent</code> with a <code>SeamlessVideoDisplayComponent</code></li>
+				</ul>
+				<p>The HLS player also adds the <code>seekToLive()</code> method to support live streams.</p>
 			</div>
-			<div id="addview" class="section">
-				<h2>Overriding <code>setLayoutParams()</code></h2>
-				<p>If you’re adding a View to the BrightcoveVideoView, which is the parent class of SeamlessVideoView, then you’ll need to override the <code>setLayoutParams()</code> method on the View child to only apply the layout params that make sense for the View child. This is what the BrightcoveVideoView's <code>setLayoutParams()</code> does:</p>
-				<pre><code>@Override
-public void setLayoutParams(ViewGroup.LayoutParams layoutParams) {
-    Log.v(TAG, "setLayoutParams: " + layoutParams);
-    super.setLayoutParams(layoutParams);
-    if (layoutParams != null) {
-        int childCount = getChildCount();
-        FrameLayout.LayoutParams frameLayoutParams =
-            new FrameLayout.LayoutParams(layoutParams.width, layoutParams.height);
-        frameLayoutParams.gravity = Gravity.CENTER;
-        for (int i = 0; i < childCount; i++) {
-            getChildAt(i).setLayoutParams(frameLayoutParams);
-        }
-    }
-}</code></pre>
-				<p>This allows the SurfaceView and the ImageView to get the layout params specified for the BrightcoveVideoView. Although it is possible to only apply the layout params to the SurfaceView and ImageView children, but then it would be difficult for additional children to react when the BrightcoveVideoView had it's layout params updated. Brightcove suggests overriding <code>setLayoutParams()</code> in the LinearLayout child such that it passes through the width, but leaves the height and gravity unmodified.</p>
+			<div id="SurfaceView" class="section">
+				<h2>Surface view</h2>
+				<p><code>SeamlessSurfaceView</code>, which extends <code>BrightcoveSurfaceView</code>, overrides the <code>onSizeChanged()</code> method to set the fixed size of the surface and overrides the <code>invalidate()</code> and <code>requestLayout()</code> methods to prevent unnecessary measure and layout passes, which can cause flickering. Its <code>SurfaceHolder</code> also overrides the <code>setFixedSize()</code> method to prevent setting the surface to the same size as the video width and height. This allows the layout constraints to determine the width and height of the surface.</p>
 			</div>
+      
+			<div class="section" id="SelectionController">
+        <h2>Selection controller</h2>
+        <p><code>SeamlessSourceSelectionController</code> overrides the <code>getMinimumHLSVersion()</code>
+method to allow HLS playback as far back as Gingerbread (Android 2.3.3).</p>
+    </div>
+      
+    <div class="section" id="DisplayComponent">
+        <h2>Video display component</h2>
+        <p>The bulk of the HLS implementation is in <code>SeamlessVideoDisplayComponent</code>, which extends <code>VideoDisplayComponent</code>. This class uses a <code>voOSBasePlayer</code> instead of an Android <code>MediaPlayer</code> to render the video. It also contains a second <code>voOSBasePlayer</code> instance, which is used to pre-buffer subsequent videos in a playlist. Just like <code>VideoDisplayComponent</code>, a <code>ScheduledFuture</code> is used to emit <code>PROGRESS</code> events at a fixed interval of 500 milliseconds.</p>
+        <p>Some methods, like <code>getMediaPlayer()</code> become unsupported, as they are replaced by methods like <code>getSeamlessPlayer()</code>.</p>
+        <p>Other methods, like <code>getClosedCaptionsEnabled()</code>, <code>setClosedCaptionsEnabled()</code>, <code>redraw()</code>, <code>isLive()</code>, <code>setBufferMaxSize()</code>, provide additional functionality.</p>
+    </div>    
+      
 		</div>
 	</div>
 	<!-- bcl scripts -->
