@@ -36,7 +36,7 @@ var aapi_model = {
             {
                 name: "account",
                 fields: ["account", "active_media", "bytes_delivered", "daily_unique_viewers", "drm_bytes_packaged", "engagement_score", "licenses_served", "live_seconds_streamed", "play_rate", "player_load", "video_engagement_1", "video_engagement_100", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
-                filter_values: ["account ids as a comma-delimited list"]
+                filter_values: ["a single account id"]
             },
             {
                 name: "video",
@@ -184,10 +184,10 @@ var aapi_model = {
             account_player_devices: {dimensions: ["account", "player", "device_type", "device_os"], fields: []},
             account_video_devices: {dimensions: ["account", "video", "device_type", "device_os"], fields: []},
             account_geo: {dimensions: ["account", "country", "region", "city"], fields: []},
-            account_player_geo: {dimensions: ["account", "player", "country", "region", "city"], fields: []},
-            account_video_geo: {dimensions: ["account", "video", "country", "region", "city"], fields: []},
             account_destination: {dimensions: ["account", "destination_domain", "destination_path"], fields: []},
-            account_player_destination: {dimensions: ["account", "player", "destination_domain", "destination_path"], fields: []},
-            account_video_destination: {dimensions: ["account", "video", "destination_domain", "destination_path"], fields: []}
+            account_destination_domain: {dimensions: ["account", "destination_domain"], fields: []},
+            account_destination_path: {dimensions: ["account", "destination_path"], fields: []},
+            account_player_destination_domain: {dimensions: ["account", "player", "destination_domain"], fields: []},
+            account_video_destination_domain: {dimensions: ["account", "video", "destination_domain"], fields: []}
         }
     };
