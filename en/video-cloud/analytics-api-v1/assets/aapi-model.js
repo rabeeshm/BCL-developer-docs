@@ -41,7 +41,7 @@ var aapi_model = {
             {
                 name: "video",
                 fields: ["account", "bytes_delivered", "engagement_score", "play_rate", "video", "video_duration", "video_engagement_1", "video_engagement_100", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_impression", "video_name", "video_percent_viewed", "video_seconds_viewed", "video_view", "video.reference_id", "video.tags"],
-                filter_values: ["video ids as a comma-delimited list or video.q==tags:{tag list} or video.q==reference_id:{reference_id list}"]
+                filter_values: ["video ids as a comma-delimited list or video.q=={video field}:{value}"]
             },
             {
                 name: "player",

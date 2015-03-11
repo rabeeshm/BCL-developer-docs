@@ -43,5 +43,8 @@ TOKEN=$(curl -s --data "grant_type=client_credentials" https://oauth.brightcove.
 echo Your token: $TOKEN
 echo --------------------------
 RESPONSE=$(curl -s -X $VERB "$API_CALL" -d "$DATA" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json")
+echo $RESPONSE
+echo --------------------------
+
 echo $RESPONSE | python -m json.tool
 echo
