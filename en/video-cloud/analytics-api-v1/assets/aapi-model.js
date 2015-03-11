@@ -109,7 +109,7 @@ var aapi_model = {
                 filter_values: ["android", "bada", "ios", "rim", "symbian", "web_os", "windows", "os_x", "mac", "linux", "other"]
             }
         ],
-        filters: ["video", "player", "destination_domain", "destination_path", "country", "city", "region", "referrer_domain", "source_type", "search_terms", "device_type", "device_os"],
+        filters: ["video", "video.q", "player", "destination_domain", "destination_path", "country", "city", "region", "referrer_domain", "source_type", "search_terms", "device_type", "device_os"],
         params: [
             {
                 name: "account",
