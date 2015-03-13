@@ -128,66 +128,56 @@
                     <tbody>
                         <tr>
                             <td><a href="#videosEndpoint">/videos</a></td>
-                            <td>Metadata and asset information about videos. Will list a page of videos if no video ID is given. Supports search (<code>q</code> param), <code>sort</code>, and paging (<code>limit</code> and <code>offset</code>)</td>
+                            <td>Metadata and asset information about videos. GET will <a href="#videosEndpoint">list a page of videos</a>. Supports <a href="#search">search</a> (<code>q</code> param), <a href="#sort"><code>sort</code></a>, and <a href="#paging">paging</a> (<code>limit</code> and <code>offset</code>)
+                            <p>POST will <a href="#createVideo">create a video</a></p></td>
                         </tr>
                         <tr>
                             <td><a href="#countsEndpoint">/counts/videos</a></td>
                             <td>Returns the <code>count</code> of videos. Supports search (<code>q</code> param)</td>
                         </tr>
                         <tr>
-                            <td><a href="#videoEndpoint">/videos/{video_id}</a></td>
-                            <td>Metadata and asset information about the video with the given ID</td>
+                            <td><a href="#videoEndpoint">/videos/{video_id} or /videos/ref:{reference_id}</a></td>
+                            <td>GET will return metadata and asset information about the video with the given ID
+                            <p>PATCH will <a href="#updatevideo">update the video metadata</a></p>
+                            <p>DELETE will <a href="#deletevideo">delete the video</a></p>
+                            </td>
                         </tr>
                         <tr>
-                            <td>/videos/{video_id}/sources</td>
+                            <td><a href="#sourcesEndpoint">/videos/{video_id}/sources or /videos/ref:{reference_id}/sources</a></td>
                             <td>Metadata for this video's sources (renditions)</td>
                         </tr>
                         <tr>
-                            <td>/videos/{video_id}/images</td>
+                            <td><a href="videoImagesEndpoint">/videos/{video_id}/images or /videos/ref:{reference_id}/images</a></td>
                             <td>Metadata for all of this video's images: poster, thumbnail, logo overlay</td>
                         </tr>
                         <tr>
-                            <td>/videos/{video_id}/references</td>
-                            <td>Returns an array of manual playlist IDs that the video ID is contained in. Note that this request does not look at smart playlists.</td>
+                            <td><a href="#videoReferencesEndpoint">/videos/{video_id}/references or /videos/ref:{reference_id}/references</a></td>
+                            <td>GET returns an array of manual playlist IDs that the video ID is contained in. Note that this request does not look at smart playlists.
+                            <p>DELETE will remove the video from manual playlists</p>
+                            </td>
                         </tr>
                         <tr>
-                            <td>/videos/ref:{video_reference_id}</td>
-                            <td>Metadata and asset information about the video with the given reference ID</td>
+                            <td><a href="#folderOperations">/folders</a></td>
+                            <td><a href="#createFolder">POST to create</a> a folder or <a href="#getFolderList">GET a list of folders</a></td>
                         </tr>
                         <tr>
-                            <td>/videos/ref:{video_reference_id}/sources</td>
-                            <td>Metadata for this video's sources (renditions)</td>
+                            <td><a href="#getFolderInfo">/folders/{folder_id}</a></td>
+                            <td><a href="#getFolderInfo">GET information</a> about a folder, <div id="#updateFolder">PATCH to update</div> the folder name, or <a href="#deleteFolder">DELETE the folder</a></td>
                         </tr>
                         <tr>
-                            <td>/videos/ref:{video_reference_id}/images</td>
-                            <td>Metadata for all of this this video's images: poster, thumbnail, logo overlay</td>
+                            <td><a href="#getVideosInFolder">/folders/{folder_id}/videos</a></td>
+                            <td>GET a list of videos contained in a folder</td>
                         </tr>
                         <tr>
-                            <td>/videos/ref:{video_reference_id}/references</td>
-                            <td>Returns an array of manual playlist IDs that the video reference ID is contained in. Note that this request does not look at smart playlists.</td>
+                            <td><a href="#addVideoToFolder">/folders/{folder_id}/videos/{video_id}</a></td>
+                            <td>Used to add a video to a folder or <a href="#removeVideoFromFolder">remove it </a>from the folder</td>
                         </tr>
                         <tr>
-                            <td>/folders</td>
-                            <td>Used to create a folder or get a list of folders</td>
-                        </tr>
-                        <tr>
-                            <td>/folders/{folder_id}</td>
-                            <td>Used to get information about a folder, update the folder name, or delete the folder</td>
-                        </tr>
-                        <tr>
-                            <td>/folders/{folder_id}/videos</td>
-                            <td>Used to get a list of videos contained in a folder</td>
-                        </tr>
-                        <tr>
-                            <td>/folders/{folder_id}/videos/{video_id}</td>
-                            <td>Used to add a video to a folder or remove it from the folder</td>
-                        </tr>
-                        <tr>
-                            <td>/counts/playlists</td>
+                            <td><div id="#getPlaylistCount">/counts/playlists</div></td>
                             <td>Returns a count of playlists in the account</td>
                         </tr>
                         <tr>
-                            <td>/playlists</td>
+                            <td><a href="#playlistOperations">/playlists</a></td>
                             <td>Used to create a playlist or get a list of playlists</td>
                         </tr>
                         <tr>
@@ -235,14 +225,14 @@
                         </tr>
                         <tr>
                             <td>
-                                <code><a href="#paging">offset</a>
+                                <code><a href="#offset">offset</a>
                                 </code>
                             </td>
                             <td>Number of videos to skip (for paging results). Must be a positive integer. <strong>Default: 0</strong></td>
                         </tr>
                         <tr>
                             <td>
-                                <code><a href="#sorting">sort</a></code>
+                                <code><a href="#sort">sort</a></code>
                             </td>
                             <td>A string that specifies the field to sort by. Start with <code>-</code> to sort descending. If a value for <code>q</code> is provided, then the default sort is by "score" (relevance of the search results to the original query). If no value for <code>q</code> is provided, then the default sort is by <code>updated_at</code> descending.</td>
                         </tr>
@@ -255,7 +245,7 @@
                         </tr>
                     </tbody>
                 </table>
-                <h3>Search videos</h3>
+                <h3 id="search">Search videos</h3>
                 <p>Brightcove's CMS API provides a programmatic way to search for videos in your Video Cloud library.</p>
                 <p>To perform basic and complex searches on your video data, you will use the
                     <code>q</code> parameter:</p>
@@ -274,7 +264,7 @@
                         <li>contains any: &quot;tags:foo,bar&quot; contains none: &quot;-tags:foo,bar&quot;</li>
                     </ul>
                     </p>
-                <h3>Paging results</h3>
+                <h3 id="paging">Paging results</h3>
                 <p>Use the <code>limit</code> parameter to specify how many items you want to return on a request - up to 100. You can then use the <code>offset</code> parameter to page through result sets that are larger than the <code>limit</code>. The <code>offset</code>is the number of items to skip. For example, for a search like this:</p>
 <pre><code>/videos?q=updated_at:2014-01-01..2014-06-30&amp;limit=25&amp;offset=50</code></pre>
                 <p>would return videos 51-75 of the total result set, assuming the total result set has at least 75 videos.</p>
@@ -314,7 +304,7 @@
             <div class="section" id="videoRead">
                 <h2>Video read calls</h2>
                 <p>This section explains operations for getting videos.</p>
-                <h3>Get a list of videos</h3>
+                <h3 id="videosEndpoint">Get a list of videos</h3>
                 <p>Brightcove's CMS API provides a programmatic way to access data for videos in your Video Cloud library. See the <a href="../references/video-fields-reference.html">Video Fields Reference</a> for information on fields returned.</p>
                 <p>To retrieve media data using the HTTP
                     <code>GET</code> method, you will append resources to the base URL with your account id:</p>
@@ -324,13 +314,13 @@
                 <h3>Get single video</h3>
                 <p>You can also get the data for a single video by issuing a GET request to:</p>
 <pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/videos/<em>{video_id}</em></code></pre>
-                <h3>Get video sources (renditions)</h3>
+                <h3 id="sourcesEndpoint">Get video sources (renditions)</h3>
                 <p>You can also get the sources (renditions) for a single video by issuing a GET request to:</p>
 <pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/videos/<em>{video_id}</em>/sources</code></pre>
-                <h3>Get video images</h3>
+                <h3 id="videoImagesEndpoint">Get video images</h3>
                 <p>You can also get the images for a single video by issuing a GET request to:</p>
 <pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/videos/<em>{video_id}</em>/images</code></pre>
-                <h3>Get count</h3>
+                <h3 id="countsEndpoint">Get count</h3>
                 <p>Get a count of all videos in the account, or the total number of items that will be returned for a search, using the <code>/{account_id}/counts/videos{q=searchTerms}</code> endpoint. This is useful for <a href="#paging">paging results</a>.</p>
             </div>
             <div class="section" id="createVideo">
@@ -718,7 +708,7 @@
                     <li>Endpoint: <code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/videos/<em>{video_id}</em></code></li>
                 </ul>
             </div>
-            <div class="section" id="videoReferences">
+            <div class="section" id="videoReferencesEndpoint">
                 <h2>Video Playlist References</h2>
                 <p>The videos <code>references</code> endpoint allows you to get a list of ids for the <em>manual</em> playlists that a video belongs to (using a GET request) or remove the video from all <em>manual</em> playlists (using a DELETE request). The latter operation must be performed before the video itself can be deleted (if it is included in any manual playlists).</p>
                 <h3>Get the manual playlists that a video belongs to:</h3>
@@ -745,11 +735,11 @@
                     <li>Adding a video to a folder</li>
                     <li>Removing a video from a folder</li>
                 </ul>
-                <h3>Get a list of folders</h3>
+                <h3 id="getFolderList">Get a list of folders</h3>
                 <p>To get a list of folders, make a GET request to:</p>
 <pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/folders</code></pre>
                 <p>See the <a href="../references/folder-field-reference.html">Folder Field Reference </a>for the fields.</p>
-                <h3>Create a folder</h3>
+                <h3 id="createFolder">Create a folder</h3>
                 <p>To create a folder, make POST request to:</p>
 <pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/folders</code></pre>
                 <p>The request body must contain the following JSON:</p>
@@ -757,38 +747,42 @@
     "name": "{folder_name}"
 }</code></pre>
                 <p>The folder name <strong>must</strong> be unique within the account, and can contain up to 100 characters. The folder name also cannot be blank or contain the character <code>/</code></p>
-                <h3>Update folder name</h3>
+                <h3 id="getFolderInfo">Get information for a folder</h3>
+                <p>To get information for a specific folder, make a GET request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/folders/<em>{folder_id}</em></code></pre>
+                <
+                <h3 id="updateFolder">Update folder name</h3>
                 <p>The only field you can update for a folder is the <code>name</code>. Make a PATCH request to:</p>
 <pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/folders/<em>{folder_id}</em></code></pre>
                 <p>The request body should contain the following JSON:</p>
 <pre><code>{
     "name": "{new_folder_name}"
 }</code></pre>
-                <h3>Delete a folder</h3>
+                <h3 id="deleteFolder">Delete a folder</h3>
                 <p>To delete a folder, make a DELETE request to:</p>
 <pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/folders/<em>{folder_id}</em></code></pre>
                 <p>If the folder contains videos, the delete will fail - you must fist remove all videos from a folder before deleting it.</p>
-                <h3>Get a list of videos in a folder</h3>
+                <h3 id="getVideosInFolder">Get a list of videos in a folder</h3>
                 <p>To get an array of video objects in a folder, make a GET request to:</p>
 <pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/folders/<em>{folder_id}</em>/videos</code></pre>
-                <h3>Add a video to a folder</h3>
+                <h3 id="addVideoToFolder">Add a video to a folder</h3>
                 <p>To add a video to a folder, make a PUT request to:</p>
 <pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/folders/<em>{folder_id}</em>/videos/<em>video_id</em></code></pre>
-                <h3>Remove a video from a folder</h3>
+                <h3 id="removeVideoFromFolder">Remove a video from a folder</h3>
                 <p>To remove a video from a folder, make a DELETE request to:</p>
 <pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/folders/<em>{folder_id}</em>/videos/<em>video_id</em></code></pre>
             </div>
             <div class="section" id="playlistRead">
                 <h2>Playlist read calls</h2>
                 <p>This section explains calls for getting playlists.</p>
-                <h3>Get list of playlists</h3>
+                <h3 id="getPlaylists">Get list of playlists</h3>
                 <p>You can retrieve an array of playlist objects for the account by issuing a GET request to:</p>
 <pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/playlists</code></pre>
                 <p>See the <a href="../references/playlist-fields-reference.html">Playlist Fields Reference</a> for details of the fields returned.</p>
-                <h3>Get playlist</h3>
+                <h3 id="getPlaylist">Get playlist</h3>
                 <p>You can retrieve a single playlist object for the account by issuing a GET request to:</p>
 <pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/playlists/<em>{playlist_id}</em></code></pre>
-                <h3>Get count</h3>
+                <h3 id="getPlaylistCount">Get count</h3>
                 <p>You can also get a count of playlists for the account, or those matching a search, using the endpoint <code>/{account_id}/counts/playlists{?q=tags:foo,bar}</code>.</p>
             </div>
             <div class="section" id="createPlaylist">
