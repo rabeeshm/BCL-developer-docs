@@ -46,8 +46,8 @@
         <p>The Live DVRUX plugin skins the Brightcove Player with DVRUX controls during playback of HLS live video. The plugin changes the appearance and behavior of Brightcove Player to provide a better experience during live HLS playback, focusing primarily on the addition of DVR controls. With this plugin, viewers can seek to earlier points in the HLS stream as available, and they can tell in a glance where they are relative to the video's current live point.</p>
         <p>In a paused state, you will see the play head gradually drift left as the live stream continues on without you. In a 'sliding window' DVR mode, where earlier segments of video are not available after some duration, will eventually cause the play head to reach an unplayable position. In this case, the player will reset to its initial load state and reset to live when the user hits play.</p>
         <p>There are also optional <strong>bumper</strong> features available for publishers to control what happens to the player before and after the live stream occurs.</p>
-        <p>The sample video below demonstrates the use of the Live DVRUX Plugin.</p>
-        <iframe width='640' height='480' src='//players.brightcove.net/1752604059001/12071446-4dc4-4c13-92d7-75e08395518f_default/index.html' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
+        <p>The sample video below demonstrates the use of the Live DVRUX Plugin. You will see the player has recorded two minutes of live video which you can scrub through. As well, you can click the <strong>LIVE</strong> button to see the video in real time.</p>
+        <iframe width='640' height='380' src='//players.brightcove.net/1752604059001/12071446-4dc4-4c13-92d7-75e08395518f_default/index.html' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
       </div>
       <div id="implementplayersmodule" class="section">
         <h2>Implement using Players module</h2>
@@ -61,16 +61,17 @@
           <li>The CSS for the plugin is provided and will not change for different plugin implementations. For the <strong>CSS URL</strong>, enter:<br/>
                 <p><pre> http://players.brightcove.net/videojs-live-dvrux/videojs-live-dvrux.min.css</pre></p></li>
           <li>For the <strong>Name</strong>, enter <strong>dvrux</strong>.</li>
-          <li>Enter the plugin options. The example below will ...<br/>
+          <li>Enter the plugin options. The example below will use the <code>preBumper</code> object to display the text <strong>This live event has not yet started</strong> when someone has opened Brightcove Player but the live event has not yet started. The <code>postBumper</code> will display the source image after the live event has ended and Brightcove Player is still open.<br/>
 <pre><code>{
   "preBumper": {
     "startTime": 1426075200000,
-    "type": "text"
+    "type": "text",
+    "src": "This live event has not yet started"
   },
   "postBumper": {
     "startTime": 1489233600000,
     "type": "image",
-    "src": "test/bcovposter.jpg"
+    "src": "//solutions.brightcove.com/bcls/overlay-image.png"
   }
 }</code></pre>
                 <p><img src="/en/video-cloud/brightcove-player/guides/assets/dvrux-studio.png"></p>
@@ -86,47 +87,98 @@
               <li>http://players.brightcove.net/videojs-live-dvrux/videojs-live-dvrux.min.css</li>
       </ul>
         <p>The name of the plugin is <code>dvrux</code>, and an example set of options is:</p>
-        <p><code data-gist-id="009be88eae8ea8ebb329" data-gist-hide-footer="true" data-gist-line="1-5"></code></p>
+        <p><code data-gist-id="009be88eae8ea8ebb329" data-gist-hide-footer="true" data-gist-line="50-61"></code></p>
         <p>The following shows using the In-Page Embed implementation of the player to associate the Live DVRUX Plugin with a single instance of a player.</p>
           <ul>
-              <li>Line 31: Uses a <code>link</code> tag to include the plugin's CSS in the <code>head</code> of the HTML page.</li>
-              <li>Line 38: Gives the <code>video</code> tag an <code>id</code> attribute, with some value, in this case <strong>video_1</strong>.</li>
-              <li>Line 46: Uses a <code>script</code> tag to include the plugin's JavaScript in the <code>body</code> of the HTML page.</li>
-              <li>Line 53: Creates a reference to the player.</li>
-              <li>Lines 56-58: Initializes the plugin and passes in custom options.</li>
+              <li>Line 13: Uses a <code>link</code> tag to include the plugin's CSS in the <code>head</code> of the HTML page.</li>
+              <li>Line 17: Gives the <code>video</code> tag an <code>id</code> attribute, with some value, in this case <strong>video_1</strong>.</li>
+              <li>Line 26: Uses a <code>script</code> tag to include the plugin's JavaScript in the <code>body</code> of the HTML page.</li>
+              <li>Line 30: Creates a reference to the player.</li>
+              <li>Lines 31-42: Calls the plugin, passing the JSON object as options. If you are not passing any options the function call is simply <code>myPlayer.dvrux()</code>.</li>
           </ul>
-          <p><code data-gist-id="6edffc8c896381fb71e9" data-gist-hide-footer="true" data-gist-line="31,37-60"></code></p>
+          <p><code data-gist-id="009be88eae8ea8ebb329" data-gist-hide-footer="true" data-gist-line="13,15, 17-47"></code></p>
 
       </div>
       <div id="properties" class="section">
         <h2>Properties</h2>
         <p>The following plugin properties are used to control the Live DVRUX plugin:</p>
     <ul>
-      <li><strong>PROPNAME</strong>: 
+      <li><strong>preBumper</strong>: 
         <ul>
-          <li>Type: <code>string</code></li>
-          <li>explanation</li>
+          <li>Type: <code>object</code></li>
+          <li>Creates an overlay to be shown after Brightcove Player has been loaded but before the live event has started</li><br />
+          <p>Contains the following three child properties:</p>
+          <table border="1">
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>startTime</td>
+              <td>number</td>
+              <td>The time the live event is scheduled to start, using epoch time in milliseconds</td>
+            </tr>
+            <tr>
+              <td>type</td>
+              <td>text</td>
+              <td>Must have the value either <code>image</code> or <code>text</code></td>
+            </tr>
+            <tr>
+              <td>src</td>
+              <td>text</td>
+              <td>
+                <ul>
+                    <li>When the <code>type</code> is <code>image</code> the value is a URL to an image which overlays the video; if the image is not already the correct dimensions for the created player, it will be stretched to fill the player</li>
+                    <li>When the <code>type</code> is <code>text</code> the value is the text message to display over the video; if no <code>src</code> is specified, the video will display a message saying either <strong>The event will start at {preBumper time}</strong>, followed by the printed date and time specified in the <code>starTime</code></li>
+                </ul>
+              </td>
+            </tr>
+          </table>
         </ul>
       </li>
-      <li><strong>PROPNAME</strong>: 
+      <li><strong>postBumper</strong>: 
         <ul>
-          <li>Type: <code>string</code></li>
-          <li>explanation</li>
-        </ul>
-      </li>
-      <li><strong>PROPNAME</strong>: 
-        <ul>
-          <li>Type: <code>string</code></li>
-          <li>explanation</li>
+          <li>Type: <code>object</code></li>
+          <li>Creates an overlay to be shown after the live event has completed and Brightcove Player is still open</li><br />
+          <p>Contains the following three child properties:</p>
+          <table border="1">
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>startTime</td>
+              <td>number</td>
+              <td>The time the live event is scheduled to complete, using epoch time in milliseconds</td>
+            </tr>
+            <tr>
+              <td>type</td>
+              <td>text</td>
+              <td>Must have the value either <code>image</code> or <code>text</code></td>
+            </tr>
+            <tr>
+              <td>src</td>
+              <td>text</td>
+              <td>
+                <ul>
+                    <li>When the <code>type</code> is <code>image</code> the value is a URL to an image which overlays the video; if the image is not already the correct dimensions for the created player, it will be stretched to fill the player</li>
+                    <li>When the <code>type</code> is <code>text</code> the value is the text message to display over the video; if no src is specified, the video will display a message saying <strong>The event concluded at (postBumper time)</strong>, followed by the printed date and time specified in the <code>startTime</code></li>
+                </ul>
+              </td>
+            </tr>
+          </table>
         </ul>
       </li>
       </div>
       <div class="section" id="BCLreferences">
         <h2>Related Topics</h2>
         <ul>
-          <li><a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a>
+          <li><a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/live-hls.html">Live HLS</a>
+          <li><a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a>
           </li>
-          <li><a href="http://docs.brightcove.com/en/video-cloud/player-management/getting-started/player-mgmt-quick-start.html">Quick Start to Player Management</a>
+          <li><a href="//docs.brightcove.com/en/video-cloud/player-management/getting-started/player-mgmt-quick-start.html">Quick Start to Player Management</a>
           </li>
         </ul>
       </div>
