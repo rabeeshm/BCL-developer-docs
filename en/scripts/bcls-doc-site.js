@@ -40,7 +40,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             "link": "top"
         },
         navLabel = [topObj],
-        menuRightBase = "<li class=\"search\"><a href=\"#\" data-reveal-id=\"searchModal\"><img src=\"//docs.brightcove.com/en/images/search-white.png\" alt=\"search_icon_small_white\" width=\"18\" height=\"18\"></a></li><li class=\"show-for-large-only\"><a href=\"http://docs.brightcove.com/en/DeveloperDocumentationUpdates.xml\"><img src=\"//docs.brightcove.com/en/images/rss-feed-sm.png\" alt=\"rss-feed-sm\" width=\"14\" height=\"14\"></a></li>",
+        menuRightBase = "<li class=\"search\"><a href=\"#\" data-reveal-id=\"searchModal\"><img src=\"//docs.brightcove.com/en/images/search-white.png\" alt=\"search_icon_small_white\" width=\"18\" height=\"18\"></a></li><li class=\"show-for-large-up\"><a href=\"http://docs.brightcove.com/en/DeveloperDocumentationUpdates.xml\"><img src=\"//docs.brightcove.com/en/images/rss-feed-sm.png\" alt=\"rss-feed-sm\" width=\"14\" height=\"14\"></a></li>",
         vcSupportNav = "<li class=\"smaller show-for-large-up\"><a href=\"//support.brightcove.com\">Support</a></li>",
         onceSupportNav = "<li class=\"smaller show-for-large-up\"><a href=\"mailto:oncesupport@brightcove.com\">Support</a></li>",
         performSupportNav = "vcSupportNav",
