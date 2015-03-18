@@ -381,16 +381,20 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             i,
             j,
             k,
+            l,
             max,
             jMax,
             kMax,
+            lMax,
             item,
             landingPageBlockTemplateStart = "<div class=\"large-3 small-12 columns\" style=\"overflow-x:hidden\"><h2 class=\"index-page\">{{name}}</h2>",
             landingPageSubMenuTemplateStart = "<div><h4 class=\"index-page\">{{name}}</h4>",
+            landingPageSUbSubMenuTemplateStart = "<div><h5 class=\"index-page\">{{name}}</h5>",
             landingPageBlockTemplateEnd = "</div>",
             landingPageBlockTemplate = "<p style=\"font-size:.9rem;line-height:.9rem;margin-bottom:.5rem;\"><a href=\"{{url}}\">{{name}}</a></p>",
             blockTemplateStart = Handlebars.compile(landingPageBlockTemplateStart),
             subTemplateStart = Handlebars.compile(landingPageSubMenuTemplateStart),
+            subsubTemplateStart = Handlebars.compile(landingPageSUbSubMenuTemplateStart),
             itemTemplate = Handlebars.compile(landingPageBlockTemplate),
             blockEndTemplate = landingPageBlockTemplateEnd,
             str = "";
@@ -413,7 +417,16 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                             jMax = kItem.items.length;
                             for (j = 0; j < jMax; j++) {
                                 var jItem = kItem.items[j];
-                                str += itemTemplate(jItem);
+                                // check for subsubmenu
+                                if (exists(jItem.items)) {
+                                    lMax = jItem.items.length;
+                                    for (l = 0; l < lMax; l++) {
+                                        var mItem = jItem.items[l];
+                                        str += itemTemplate(mItem);
+                                    }
+                                } else {
+                                    str += itemTemplate(jItem);
+                                }
                             }
                             str += blockEndTemplate;
                         } else {
