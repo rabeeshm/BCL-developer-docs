@@ -52,7 +52,7 @@
 				<!-- Place document intro sentence(s) here -->
 				<p>This topic shows you how to create a link to allow downloading the best quality MP4 of a video playing in Brightcove Player. The code will eventually be built as a plugin for easy use with different players.</p>
         <p>The link will be implemented in three different ways:</p>
-        <p class="BCL-aside">NOTE: There is a working sample is below in the <strong>The player</strong> section.</p>
+        <p class="BCL-aside">NOTE: There is a working sample below in the <strong>The player</strong> section.</p>
         <ul>
             <li>Icon in the control bar</li>
             <div><img src="/en/video-cloud/brightcove-player/guides/assets/download-icon.png" width="352" height="264"></div>
@@ -109,6 +109,7 @@
             <li><code>options()</code></li>
             <li><code>catalog.getVideo()</code></li>
             <li><code>catalog.load()</code></li>
+            <li><code>el()</code></li>
         </ul>
         <h3>Brightcove Player API events</h3>
         <ul>
@@ -118,7 +119,7 @@
 			<div id="player" class="section">
 				<h2>The player</h2>
 				<p>Click the download icon located on the left side of the control bar to download the highest quality MP4 rendition of the video loaded in the player.</p>
-        <iframe src='//players.brightcove.net/1752604059001/eab91441-ce41-4c12-8322-4b70ce6ac324_default/index.html' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
+        <iframe width='480' height='270' src='//players.brightcove.net/1752604059001/eab91441-ce41-4c12-8322-4b70ce6ac324_default/index.html' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
 			</div>
       
 			<div id="code" class="section">
@@ -131,36 +132,36 @@
           <p>Once your player has been published, you can click the <strong>Embed Code &amp; URL</strong> button and choose the <strong>Published Player</strong> link. You will find the player code in the <strong>In-Page Embed Code</strong> section.</p>
           <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="17-24"></code></p>
 				<h3>The JavaScript code</h3>
-				<p>Although not terribly complex, the code is a bit long. The following provides an overview of the functionality of the code:</p>
+				<p>The following provides an overview of the functionality of the code:</p>
         <ol>
             <li>Retrieve the video ID of video in the player. Notice that the data retrieved by the <code>options()</code> method includes <code>data-video-id</code>.
             <div><img src="/en/video-cloud/brightcove-player/guides/assets/download-options.png"></div>
             </li>
-            <li>Use the video's ID to get the video object and load the video. This may seem unnecessary as the video is already playing, but you need to load the video to populate the <code>mediainfo</code> property. Notice that the data retrieved in the <code>madiainfo</code> property contains a <code>sources</code> array that contains renditions.</li>
+            <li>Use the video's ID to get the video object and load the video. This may seem unnecessary as the video is already playing, but you need to load the video to populate the <code>mediainfo</code> property.</li>
+            <li>Retrieve the <code>sources</code> array from the <code>mediainfo</code> property, which includes as elements all renditions of the currently loaded video.</li>
             <div><img src="/en/video-cloud/brightcove-player/guides/assets/download-mediainfo.png"></div>
-            <li>Retrieve the <code>sources</code> array, from the <code>mediainfo</code> property, which includes as elements all renditions of the currently loaded video.</li>
             <li>Create another array which contains the filtered and sorted renditions so only the MP4 renditions are in a new array, sorted from largest to smallest.</li>
-            <li>Assign the zeroth element of the new array to a variable. The zeroth element is the largest, hence the best quality.</li>
+            <li>Assign the zeroth element of the new array to a variable. The zeroth element contains the rendition with the largest size, hence the best quality.</li>
             <li>Create a link for download.</li>
         </ol>
         <p>The following code is the actual implementation of the general steps above.</p>
         <ul>
             <li>Lines 28-35: Create variables used later in the code.</li>
             <li>Line 36: Assign a variable the video ID, retrieved from data by calling the <code>options()</code> method.</li>
-            <li>Line 37: Use the <code>getVideo()</code> method, passing the video ID as a parameter, to get the currently playing video object.</li>
+            <li>Line 37: Use the <code>getVideo()</code> method, passing the video ID as a parameter, to get the video object of the currently playing video.</li>
             <li>Line 38: Use the <code>load()</code> method.</li>
             <li>Line 39: Assign the <code>name</code> of the video to a variable for later use in the link tag.</li>
             <li>Line 40: Assign the <code>sources</code> array to a variable.</li>
-            <li>Line: 41: Assign the length of the array to variable. You could have also just assigned the <code>length</code> property in <code>sources</code> array.</li>
-            <li>Lines 42-46: Loop over the array and assign to a second array renditions where the <code>container</code> is <strong>MP4</strong>, AND rendition has a <strong>src</strong> property. The MP4 renditions are listed twice, once for with a <strong>src</strong> and once with a <code>stream_name</code>. The first is for progressive download and the second for streaming.</li>
+            <li>Line: 41: Assign the length of the array to variable.</li>
+            <li>Lines 42-46: Loop over the array and assign to a second array renditions where the <code>container</code> is <strong>MP4</strong>, AND the rendition has a <code>src</code> property. The MP4 renditions appear twice in the <code>sources</code> array, once with a <code>src</code> property and once with a <code>stream_name</code> property. The first is for progressive download and the second for streaming.</li>
             <li>Lines 47-49: Sort the array of MP4s.</li>
             <li>Line 50: Assign the largest rendition to a variable.</li>
             <li>Lines 51-54: Create and style a <code>div</code> tag that contains the link.</li>
-            <li>Lines 55-56: Retrieve the <code>vjs-control-bar</code> element and append the newly create <code>div</code> to it. It may seem odd that with an append the icon appears on the left side of the control bar, but this is because all the other elements or positioned are the control bar using CSS.</li>
+            <li>Lines 55-56: Retrieve the <code>vjs-control-bar</code> element and append the newly create <code>div</code> to it. It may seem odd that with an append the icon appears on the left side of the control bar, but this is because all the other elements on the control bar are positioned using CSS.</li>
         </ul>
           <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="26-58"></code></p>
         <h3>The stylesheet</h3>
-				<p>No stylesheet is used in this implementation. The two styles for the icon were assigned via JavaScript.</p>
+				<p>No stylesheet is used in this implementation. The two styles for the icon were assigned via JavaScript, lines 52 and 53 above.</p>
 			</div>
       
 			<div id="plugin" class="section">
@@ -169,15 +170,15 @@
 				<h3>Create the JavaScript file</h3>
 				<p>Move the plugin's JavaScript code into a file and place it in an Internet accessible URL.</p>
 				<ul>
-				    <li>Lines 146,177: Use the standard syntax to begin and end a new player plugin</li>
-				    <li>Line 146: The first argument of the function call is the name of the function defined in the plugin code, in this case <code>downloadVideoPlugin</code></li>
-				    <li>Line 177: The trailing semicolon is required</li>
+				    <li>Lines 146,177: Use the standard syntax to begin and end a Brightcove Player plugin.</li>
+				    <li>Line 146: The first argument of the function call is the name of the function defined in the plugin code, in this case <code>downloadVideoPlugin</code>.</li>
+				    <li>Line 177: The trailing semicolon is required.</li>
 				</ul>
           <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="146-177"></code></p>
 				<h3>Create the CSS file</h3>
-				<p>There is not a CSS file needed for this plugin.</p>
+				<p>There is no CSS file needed for this plugin.</p>
         <h3>Deploy plugin and CSS</h3>
-        <p>To deploy the NAME Plugin using the Players module, follow these steps:</p>
+        <p>To deploy the plugin using the Players module, follow these steps:</p>
         <ol>
           <li>In the new Video Cloud Studio, open the <strong>Players</strong> module and locate the player.</li>
           <li>Click the link for the player to open the player properties.</li>
@@ -194,14 +195,32 @@
       
       <div id="useiframe" class="section">
         <h2>Use iframe</h2>
-        <p>It is a best practice to use the iframe player implementation. If it is possible for this example, replace the embed_in_page implementation with the iframe implementation.</p>
-				<p><code data-gist-id="xxxxx" data-gist-hide-footer="true" data-gist-line="" data-gist-highlight-line=""></code></p>
+        <p>It is a best practice to use the iframe player implementation. Since you can create the download video functionality as a plugin, replace the embed_in_page implementation with the iframe implementation.</p>
+          <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="248-268"></code></p>
+      </div>
+
+      <div id="overlayimplementation" class="section">
+        <h2>Overlay implementation</h2>
+        <p>To replace the icon in the control bar, and have an overlay on the video, you need to make a few changes.</p>
+        <p>First, in the JavaScript remove all the code that creates and displays the linked icon. Replace that code with code that creates and appends an overlay.</p>
+        <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="129-134"></code></p>
+        <p>You will also need to use CSS to style and place the overlay, which obviously can be changed to suit your implementation.</p>
+        <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="79-89"></code></p>
+        <p>If you wish to use this approach for your plugin, you will need to place the CSS into a separate file, save in a Internet accessible URL, and enter that URL when associating the plugin with a player in Studio.</p>
+      </div>
+      
+      <div id="insertionpointimplementation" class="section">
+        <h2>HTML page implementation</h2>
+        <p>To replace the icon in the control bar, and define a location in your HTML page for a download link, you need to make a few changes.</p>
+        <p>First, in your HTML page determine where you wish to insert the link and place the following HTML there.</p>
+        <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="204"></code></p>
+        <p>Next, in the JavaScript remove all the code that creates and displays the linked icon. Replace that code with code that creates a hyperlink and dynamically injects that hyperlink into the HTML page at your insertion point.</p>
+        <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="234-236"></code></p>
       </div>
       
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
 				<ul>
-					<li> <a href="internal:node/XXXX">DOC TITLE</a></li>
 					<li> <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a></li>
 					<li> <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-guide.html">Player Plugin Overview</a></li>
 				</ul>
