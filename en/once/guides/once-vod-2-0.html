@@ -2726,7 +2726,7 @@ http://.../segment2.vtt
             <p>Required HTTP Header</p>
             <p><code>X-BC-ONCE-API-KEY : {yourApiKey}</code></p>
             <h3>Domain</h3>
-            <h4>Get Domain details</h4>
+            <h4 id="getDomain">Get Domain details</h4>
             <p>Returns the essential information of the domain</p>
             <h5>Endpoint: GET <code>/domains/{domainId}</code></h5>
             <h6>
@@ -2741,11 +2741,175 @@ http://.../segment2.vtt
     "id": "4eca7ac5-3954-416d-bb23-e65aa511b85a",
     "name": "BrightcoveOnce"
 }</code></pre>
-            <h4>Get Domain renditions</h4>
+            <h4 id="getRenditions">Get Domain renditions</h4>
             <p>Returns a collection of the transcode renditions available to the domain.</p>
-            <p>
-                <code>/domains/{domainId}/catalogs</code>
-            </p>
+            <h5>Endpoint: GET <code>/domains/{domainId}/renditions</code></h5>
+            <h6>
+                Example
+            </h6>
+            <p>GET</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{DomainId}/renditions</code></p>
+            <p>Response:</p>
+<pre><code>{
+    "results": [
+        {
+            "id": "076ea1a2-a35b-11e4-bfdb-005056837bc7",
+            "name": "OV2 Once 1200 ZC 640x360 1104.96 29.97 B31",
+            "default": true
+        },
+        {
+            "id": "468fb310-a585-11e4-bfdb-005056837bc7",
+            "name": "OV2 Once 4400 ZC 1280x720 4144.256 29.97 H40",
+            "default": true
+        },
+
+    ]
+}</code></pre>
+            <h4 id="getRenditionDetails">Get Domain rendition details</h4>
+            <p>Returns the settings of the selected transcode rendition indicated by the <code>renditionId</code>.</p>
+            <h5>Endpoint: GET <code>/domains/{domainId}/renditions/{reditionId}</code></h5>
+            <h6>
+                Example
+            </h6>
+            <p>GET</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{DomainId}/renditions/{reditionId}</code></p>
+            <p>Response:</p>
+<pre><code>{
+    "id": "076ea1a2-a35b-11e4-bfdb-005056837bc7",
+    "name": "OV2 Once 1200 ZC 640x360 1104.96 29.97 B31",
+    "width": 640,
+    "height": 360,
+    "videoBitRate": 1104,
+    "audioBitRate": 96,
+    "codecsValue": "mp4a.40.2,avc1.42001f"
+}</code></pre>
+            <h4 id="replaceRendition">Replace Domain renditions</h4>
+            <p>Replaces the currently configured domain transcode renditions with the set defined in the request body.</p>
+            <p class="BCL-aside">Note: This method is for replacing. For adding individual renditions please see <a href="#addUpdateRenditions">add or update domain renditions</a>.</p>
+            <h5>Endpoint: PUT <code>/domains/{domainId}/renditions</code></h5>
+            <h6>
+                Example
+            </h6>
+            <p>PUT</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{DomainId}/renditions</code></p>
+            <p>Input:</p>
+<pre><code>[
+    {
+        "id": "076ea1a2-a35b-11e4-bfdb-005056837bc7",
+        "default": true
+    },
+    {
+        "id": "468fb310-a585-11e4-bfdb-005056837bc7",
+        "default": true
+    }
+]</code></pre>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Object</th>
+                        <th>Sub-Object</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td></td>
+                        <td>Yes</td>
+                        <td>The <code>renditionId</code> of the desired rendition</td>
+                    </tr>
+                    <tr>
+                        <td>default</td>
+                        <td></td>
+                        <td>Yes</td>
+                        <td>A boolean value of True or False. The value of True will ensure all catalogs acquire this <code>renditionId</code></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Response:</p>
+<pre><code>[
+    {
+        "id": "076ea1a2-a35b-11e4-bfdb-005056837bc7",
+        "default": true
+    },
+    {
+        "id": "468fb310-a585-11e4-bfdb-005056837bc7",
+        "default": true
+    }
+]</code></pre>
+            <h4 id="addUpdateRenditions">Add or Update Domain rendition</h4>
+            <p>Adds or updates the domain configured renditions. If the input rendition exists in the current domain, its default flag will be updated. If the input rendition does not exist in the domain rendition set, it will be added to the domain renditions.</p>
+            <h5>Endpoint: POST <code>/domains/{domainId}/renditions</code></h5>
+            <h6>
+                Example
+            </h6>
+            <p>POST</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{DomainId}/renditions</code></p>
+            <p>Input:</p>
+<pre><code>{
+    "id": "5ff484d6-a33d-11e4-bfdb-005056837bc7",
+    "default": false
+}</code></pre>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Object</th>
+                        <th>Sub-Object</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td></td>
+                        <td>Yes</td>
+                        <td>The <code>renditionId</code> of the desired rendition</td>
+                    </tr>
+                    <tr>
+                        <td>default</td>
+                        <td></td>
+                        <td>Yes</td>
+                        <td>A boolean value of True or False. The value of True will ensure all catalogs acquire this <code>renditionId</code></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Response:</p>
+<pre><code>[
+    {
+        "id": "8efbb9ca-a586-11e4-bfdb-005056837bc7",
+        "name": "OV2 Once 6500 ZC 1920x1080 6244.256 29.97 H40",
+        "default": true
+    },
+    {
+        "id": "74ba4d0b-a347-11e4-bfdb-005056837bc7",
+        "name": "OV2 Once 764 ZC 480x270 700.64 29.97 B30",
+        "default": true
+    },
+    {
+        "id": "5ff484d6-a33d-11e4-bfdb-005056837bc7",
+        "name": "OV2 Once 264 ZC 256x144 200.64 29.97 B30",
+        "default": false
+    }
+]</code></pre>
+            <h4 id="deleteRendition">Delete Domain Rendition</h4>
+            <p>Deletes the selected rendition indicated by the renditionId from the domain rendition set.</p>
+            <p class="BCL-aside">Note: This delete does not cascade persist through the domain and does not remove the rendition from existing catalogs or media items. It only prevents future catalogs from acquiring this rendition.</p>
+            <h5>Endpoint: DELETE <code>/domains/{domainId}/renditions/{renditionId}</code></h5>
+            <h6>
+                Example
+            </h6>
+            <p>DELETE</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{DomainId}/renditions/{renditionId}</code></p>
+            <p>Response:</p>
+<pre><code>{
+    "id": "5ff484d6-a33d-11e4-bfdb-005056837bc7"
+}</code></pre>
+            <h3 id="catalog">Catalog</h3>
+            <h4 id="getCatalogs">Get Catalogs</h4>
+            <p>Returns a collection of all catalogs within the domain. This method fetches 20 catalogs per page, returns the <code>totalResult</code> to indicate the total number of catalogs and provides previous or next page requests within the body.</p>
+            <p>Endpoint: GET <code>/domains/{domainId}/catalogs</code></p>
             <p>
                 <code>/domains/{domainId}/catalogs/{catalogId}</code>
             </p>
