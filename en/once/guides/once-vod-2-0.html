@@ -53,7 +53,7 @@
         </div>
         <div class="section" id="implementation">
             <h2>
-                Implementation / Configuration
+                Implementation
             </h2>
             <h3>New Customers Initial Set Up</h3>
             <p>
@@ -1077,12 +1077,16 @@
         "onceUrl":"(Desired ApplicationId will need to be configured to utilize this field)"
     }
 }</code></pre>
+            <h3>Notification Retry</h3>
+            <p>Typically notifications will succeed on the first attempt, but there are myriad reasons for why it may fail. If the initial attempt does not result in a successful response from the endpoint, Brightcove will attempt to retry the initial delivery attempt up to three times. Any HTTP status codes 400-499, 500-599, connection timeouts, unreachable endpoints, or bad SSL certificates will result in a failed attempt. Each subsequent retry will be 30 seconds apart not including any queueing that may add an additional delay. If the final attempt does not succeed the notification will be dequeued and require a manual intervention. Please see the Status API documentation for re-sending failed notifications.</p>
         </div>
         <div class="section" id="ingestion">
             <h2>
                 Content Ingestion
             </h2>
             <h3>Creating an API-based ingest job</h3>
+            <p>Brightcove’s Once API Ingest service is a RESTful API that accepts HTTPS POST requests, supplying JSON as the data structure and passing the API key in the header. When the video has been successfully generated, the core renditions required for delivery on the Once VOD platform are generated. Videos linked to for SourceURLs must be progressive formats and publicly addressable URLs. Ingesting files via S3 is also supported by the API Ingest system as a source location. If your files are publicly available, no further action is necessary. If your files require authentication, please see the using S3 buckets section for authorizing the Once platform to access protected URLs. If the request fails, a validation error will be returned in the response body as JSON with details of the error event. Upon success the response will return a Request ID in the content body that can be used to track the job details from the Status API.</p>
+            <p>As a best practice recommendation the source video should be at a video bitrate between 5-10 Mbps, frame size of 1920x1080 and contain keyframes at least every 6 seconds.</p>
             <p>
                 API Base URL:
             </p>
@@ -1101,13 +1105,8 @@
             <p>
                 <code>https://api.unicornmedia.com/ingest-api/b207b479-c841-4095-8918-978be9e18dee/catalogs/bc6cb7d4-be99-471b-adf3-7c501172b317</code>
             </p>
-            <p>
-                Brightcove's Once API Ingest service is a RESTful API that accepts HTTPS POST requests, supplying JSON as the data structure and passing the API key in the header. When the video has been successfully generated, the core profiles required for delivery on the Once VOD platform are generated. Videos linked to for SourceURLs must be progressive formats and publicly addressable URLs. Ingesting files via S3 is also supported by the API Ingest system as a source location. If your files are publicly available, no further action is necessary. If your files require authentication, please see the using S3 buckets section for authorizing the Once platform to access protected URLs. If the request fails, a validation error will be returned in the response body as JSON with details of the error event. Upon success the response will return a Request ID in the content body that can be used to track the job details from the Status API. Example below.
-            </p>
-            <p>
-                As a best practice recommendation the source video should be at a video bitrate between 5-10 Mbps, frame size of 1920x1080 and contain keyframes at least every 6 seconds.
-            </p>
             <h3>Creating an SNS-based ingest job</h3>
+            <p>SNS Content Ingest is the service that allows for the automated ingest of assets and metadata from an Amazon SNS Topic into the Once platform. The SNS Ingest API waits for SNS Messages from all topics that it is subscribed to. Content is passed to the API by posting a Notification message to a topic that SNS Ingest API is subscribed to.</p>
             <p>
                 The following steps will be necessary to ensure Brightcove can configure the proper mechanisms to pull content from your AWS account.
             </p>
@@ -1118,8 +1117,10 @@
             <ul>
                 <li>Brightcove Root: <strong>arn:aws:iam::453163911362:root</strong>
                 </li>
+                <li>Contact Brightcove to complete the configuration and submit a subscription request to your topic</li>
             </ul>
                 </li>
+                <li>Allow permissions to the transcoding engine when using S3 buckets with your content storage</li>
             </ol>
             <h4>
                 Example policy statement
@@ -1139,9 +1140,6 @@
             }
         }
     }</code></pre>
-            <p>
-                <strong>Note:</strong> If the source files are stored on S3, the URLs should be in the format <em>s3://BUCKET/KEY</em> to ensure the URLs are signed appropriately.
-            </p>
             <h3>Using S3 buckets</h3>
             <p>
                 If the bucket is not publicly accessible, the Brightcove transcoding engine will need to be granted access through a bucket policy or to the Brightcove AWS account.
@@ -1155,16 +1153,16 @@
             <p>
                 <strong>Recommended bucket policy:</strong>
             </p>
-    <pre><code>{
-        "Version": "2008-10-17",
-        "Id": "ZencoderBucketPolicy",
-        "Statement": [
-            {
-                "Sid": "Stmt1295042087538",
-                "Effect": "Allow",
-                "Principal": {
-                "AWS": "arn:aws:iam::395540211253:root"
-            },
+<pre><code>{
+    "Version": "2008-10-17",
+    "Id": "ZencoderBucketPolicy",
+    "Statement": [
+        {
+            "Sid": "Stmt1295042087538",
+            "Effect": "Allow",
+            "Principal": {
+            "AWS": "arn:aws:iam::395540211253:root"
+        },
             "Action": [
                 "s3:GetObjectAcl",
                 "s3:GetObject",
@@ -1186,8 +1184,8 @@
             ],
             "Resource": "arn:aws:s3:::MY-BUCKET"
         }
-        ]
-    }</code></pre>
+    ]
+}</code></pre>
             <p>
                 There is only one change you will have to make to this bucket policy before it's ready to go.
             </p>
@@ -1195,8 +1193,6 @@
                 <li>Replace <code>MY-BUCKET</code> with the name of your bucket. Leave the /* at the end of the line, as that will apply the policy to every file within the bucket.
                 </li>
                 <li>Optionally, replace the <code>Action</code> array with the actions you want to allow. Valid actions that Brightcove may need are:
-                </li>
-            </ol>
             <p>
                 Object Permissions - first action array in the example above
             </p>
@@ -1227,6 +1223,9 @@
             <p>
                 <code>["s3:PutObject", "s3:GetObject"]</code>
             </p>
+                </li>
+            </ol>
+            <p class="BCL-aside">Note: If the source files are stored on S3, the URLs should be in the format <code>s3://BUCKET/KEY</code> to ensure the URLs are signed appropriately.</p>
             <p>
                 If you'd like to build your own Bucket Policy, you can use <a href="http://awspolicygen.s3.amazonaws.com/policygen.html">Amazon's Policy Generator</a>. Use <code>arn:aws:iam::395540211253:root</code> as the AWS Principal to allow Brightcove access.
             </p>
@@ -1240,7 +1239,7 @@
                 <code>6c8583d84664a381db0c6af0e79b285ede571885fbe768e7ea50e5d3760597dd</code>
             </p>
             <h3>Example ingest syntax</h3>
-            <h4>Request</h4>
+            <h4>Request Header</h4>
             <p>
                 Required HTTP Header:
             </p>
@@ -1323,7 +1322,7 @@
 }</code></pre>
             <h4>Brief Object Explanation</h4>
             <p>
-                While we recommend the use of optional field "˜title' for search and human readability, only the following highlighted fields are required for all ingest job requests. If the required fields are not present in the API request; a response body will be returned with a corresponding error message.
+                The table below can be used as a quick start for the major fields required for content ingestion along with a description. Please see the ingest schema for a full object mapping. If the required fields are not present in the API request; a response body will be returned with a corresponding validation error. Note: While we recommend the use of an optional field <code>title</code> for search and human readability, only the following highlighted fields are required for all ingest job requests.
             </p>
             <table>
                 <thead>
@@ -1383,7 +1382,7 @@
                         </th>
                         <th>
                             <p>
-                                Unique identifier per domain to indicate a media item and it's associations.
+                                Unique identifier per domain to indicate a media item and its associations
                             </p>
                         </th>
                     </tr>
@@ -1401,7 +1400,7 @@
                         </th>
                         <th>
                             <p>
-                                Keywords used to describe the media item.
+                                Keywords used to describe the media item
                             </p>
                         </th>
                     </tr>
@@ -1419,7 +1418,7 @@
                         </th>
                         <th>
                             <p>
-                                Brief description of the media item.
+                                Brief description of the media item
                             </p>
                         </th>
                     </tr>
@@ -1437,7 +1436,7 @@
                         </th>
                         <th>
                             <p>
-                                Key value pairs that can be stored with a media item and dynamically retrieved for audience beaconing or ad server requests.
+                                Key-value pairs that can be stored with a media item and dynamically retrieved for audience beaconing or ad server requests.
                             </p>
                         </th>
                     </tr>
@@ -1752,10 +1751,10 @@
         </div>
         <div class="section" id="captioning">
             <h2>
-                Closed-Captioning / Subtitles
+                Captioning / Subtitles
             </h2>
             <p>
-                Brightcove Once enables multinational publishers to provide subtitles or closed-captioning to global audiences. These subtitles or closed captions can be rendered by players and native OS playback components that allow the viewer to choose the language of their choice, either via OS default localization settings or via a UI selection. Subtitles should not be confused with closed captions for the purpose of this implementation. While both utilize timed-text and in many cases in a similar manner, it is important to make the distinction from a regulatory and user experience perspective. In some cases, both will be required as a given piece of content could be published in North America and rest-of-world simultaneously. As digital technology evolves, closed-captioning will no longer be restrained by formatting by embedded captions and can be used in conjunction with timed-text outputs.
+                Brightcove Once enables multinational publishers to provide subtitles or closed-captioning to global audiences. These subtitles or closed captions can be rendered by players and native OS playback components that allow the viewer to choose the language of their choice, either via OS default localization settings or via a UI selection. Subtitles should not be confused with closed captions for the purpose of this implementation.  While both utilize timed-text and in many cases in a similar manner, it is important to make the distinction from a regulatory and user experience perspective.  In some cases, both will be required as a given piece of content could be published in North America and rest-of-world simultaneously. As digital technology evolves, closed-captioning will no longer be restrained by formatting by embedded captions and can be used in conjunction with timed-text outputs.
             </p>
             <h3>Subtitles input/output:</h3>
             <table>
@@ -1903,15 +1902,15 @@
             </h5>
 <pre><code>...
 &lt;uo:timedText&gt;
-&lt;uo:item type="subtitle" language="en"&gt;
-&lt;![CDATA[http://.../en/content.{output_extension}]]&gt;
-&lt;/uo:item&gt;
-&lt;uo:item type="subtitle" language="fr"&gt;
-&lt;![CDATA[http://.../fr/content.{output_extension}]]&gt;
-&lt;/uo:item&gt;
+    &lt;uo:item type="subtitle" language="en"&gt;
+        &lt;![CDATA[http://.../en/content.{output_extension}]]&gt;
+    &lt;/uo:item&gt;
+    &lt;uo:item type="subtitle" language="fr"&gt;
+        &lt;![CDATA[http://.../fr/content.{output_extension}]]&gt;
+    &lt;/uo:item&gt;
 &lt;/uo:timedText&gt;
 ...</code></pre>
-            <p class="BCL-aside">Note: The alternateId attribute will only be rendered if declared on ingest.</p>
+            <p class="BCL-aside">Note: The <code>alternateId</code> attribute will only be rendered if declared on ingest.</p>
             <h5>
                 Example in-manifest WebVTT (master playlist):
             </h5>
@@ -2082,7 +2081,7 @@ http://.../segment2.vtt
             <ul>
                 <li>Sidecar output will not be generated for extracted closed captioning
                 </li>
-                <li>Output as Closed-Captioning will be presented in HLS manifests following the <a href="https://www.google.com/url?q=https%3A%2F%2Ftools.ietf.org%2Fhtml%2Fdraft-pantos-http-live-streaming-14&amp;sa=D&amp;sntz=1&amp;usg=AFQjCNFY7fXFI6xzbBR-Q6PdJMbU7Zyu6w">IETF HLS draft version 14</a>.
+                <li>Output as Closed-Captioning will be presented in HLS manifests following the <a href="https%3A%2F%2Ftools.ietf.org%2Fhtml%2Fdraft-pantos-http-live-streaming-14&sa=D&sntz=1&usg=AFQjCNFY7fXFI6xzbBR-Q6PdJMbU7Zyu6w">IETF HLS draft version 14</a>.
                 </li>
             </ul>
             <p>
@@ -2119,7 +2118,7 @@ http://.../segment2.vtt
                 </li>
                 <li>Output files will not support more than one &lt;div&gt; tag with it's associated language. Each language will be a separate sidecar file.
                 </li>
-                <li>Output as Closed-Captioning will be presented in HLS manifests following the <a href="https://www.google.com/url?q=https%3A%2F%2Ftools.ietf.org%2Fhtml%2Fdraft-pantos-http-live-streaming-14&amp;sa=D&amp;sntz=1&amp;usg=AFQjCNFY7fXFI6xzbBR-Q6PdJMbU7Zyu6w">IETF HLS draft version 14</a>.
+                <li>Output as Closed-Captioning will be presented in HLS manifests following the <a href="https%3A%2F%2Ftools.ietf.org%2Fhtml%2Fdraft-pantos-http-live-streaming-14&sa=D&sntz=1&usg=AFQjCNFY7fXFI6xzbBR-Q6PdJMbU7Zyu6w">IETF HLS draft version 14</a>.
                 </li>
                 <li>As CEA-608 output:
                 </li>
@@ -2164,19 +2163,18 @@ http://.../segment2.vtt
     &lt;/uo:item&gt;
 &lt;/uo:timedText&gt;
 ...</code></pre>
+            <p class="BCL-aside">The <code>alternateId</code> attribute will only be rendered if declared on ingest.</p>
         </div>
         <div class="section" id="statusAPI">
             <h2>
                 Status API
             </h2>
+            <p>The Status API is a RESTful API and allows customers to query the processing statuses of a particular Request ID (returned in the response body of an ingest request). Only the HTTP GET verb is supported and must be made over SSL. If you do not know the Request ID you can query by Foreign Key, which will return a list of all the Request IDs for that particular item. The status data returned will be summary of the major milestones along with any errors that occurred during processing. If more granular data is required, the request can be modified to fetch “raw” data and provide data for each activity within the workflow.</p>
             <p>
                 API Base URL:
             </p>
             <p>
                 <code>https://api.unicornmedia.com/status-api/</code>
-            </p>
-            <p>
-                The Status API allows customers to query the processing statuses of a particular Request ID (returned in the response body of an Ingest Request). Only the HTTP GET verb is supported and must be made over SSL. If you don't know the Request ID you can query by Foreign Key, which will return a list of all the Request IDs for that particular asset. The status data returned will be summary of the major milestones along with any errors that occurred during processing. If more granular data is required, the request can be modified to fetch "raw" data and provide data for each activity within the workflow.
             </p>
             <h3>Checking a Job Status</h3>
             <p>
@@ -2189,7 +2187,7 @@ http://.../segment2.vtt
                 <code>https://api.unicornmedia.com/status-api/statuses/{referenceId}/raw</code>
             </p>
             <p>
-                <code>https://api.unicornmedia.com/status-api/statuses?foreignkey={foreignKey}&amp;catalog={catalogId}</code>
+                <code>https://api.unicornmedia.com/status-api/statuses?foreignkey={foreignKey}</code>
             </p>
             <h4>Status Definitions:</h4>
             <table>
@@ -2302,7 +2300,7 @@ http://.../segment2.vtt
                 <code>https://api.unicornmedia.com/status-api/statuses?foreignkey=brightcove-once&amp;catalog=bc6cb7d4-be99-471b-adf3-7c501172b317</code>
             </p>
             <h5>
-                Request
+                Request <HEADER></HEADER>
             </h5>
             <p>
                 Required HTTP Header:
@@ -2513,9 +2511,10 @@ http://.../segment2.vtt
             <p>
                 https://api.unicornmedia.com/status-api/notifications/<a href="about:blank">2796350e-2125-4f04-b33a-59488aaa76c7</a>
             </p>
-            <h6>
-                Response Body
-            </h6>
+            <p><strong>Request header</strong></p>
+            <p>Required HTTP Header:</p>
+            <p><code>X-BC-ONCE-API-KEY : {yourApiKey}</code></p>
+                <p><strong>Response Body</strong></p>
 <pre><code>{
     "notifications": [{
         "sentTime": 1416417989795,
@@ -2668,6 +2667,9 @@ http://.../segment2.vtt
             <p>
                 <code>https://api.unicornmedia.com/status-api/notifications/2796350e-2125-4f04-b33a-59488aaa76c7/transcode</code>
             </p>
+            <h6>Request header</h6>
+            <p>Required HTTP Header:</p>
+            <p><code>X-BC-ONCE-API-KEY : {yourApiKey}</code></p>
             <h5>
                 Response Body
             </h5>
@@ -2694,6 +2696,9 @@ http://.../segment2.vtt
             <p>
                 <code>https://api.unicornmedia.com/status-api/notifications/2796350e-2125-4f04-b33a-59488aaa76c7/transcode?id=77</code>
             </p>
+            <h6>Request header</h6>
+            <p>Required HTTP Header:</p>
+            <p><code>X-BC-ONCE-API-KEY : {yourApiKey}</code></p>
             <h5>
                 Response
             </h5>
@@ -2710,19 +2715,34 @@ http://.../segment2.vtt
             <h2>
                 Media Management API
             </h2>
-            <p>
+            <p>The Media Management API is a RESTful API for accessing and configuring the components of the domain for an authorized user. The multi-faceted and cascading configuration hierarchy gives the domain owner the ability to set-up domain, application, catalog and mediaitem level settings. The authorized user has the ability to create, read, update and delete anything from ad configurations to metadata on independent media items. It provides easy to use methods for fronting UI components in an existing CMS or through a programmatic function.</p>
+            <h3>
                 API Base URL:
-            </p>
+            </h3>
             <p>
                 https://api.unicornmedia.com/media-management-api/
             </p>
-            <p>
-                The Media Management API allows...
-            </p>
-            <h3>Account Paths</h3>
-            <p>
-                <code>/domains/{domainId}</code>
-            </p>
+            <h4>Request header</h4>
+            <p>Required HTTP Header</p>
+            <p><code>X-BC-ONCE-API-KEY : {yourApiKey}</code></p>
+            <h3>Domain</h3>
+            <h4>Get Domain details</h4>
+            <p>Returns the essential information of the domain</p>
+            <h5>Endpoint: GET <code>/domains/{domainId}</code></h5>
+            <h6>
+                Example
+            </h6>
+            <p>GET</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{DomainId}</code></p>
+            <p>or</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/{DomainName}</code></p>
+            <p>Response:</p>
+<pre><code>{
+    "id": "4eca7ac5-3954-416d-bb23-e65aa511b85a",
+    "name": "BrightcoveOnce"
+}</code></pre>
+            <h4>Get Domain renditions</h4>
+            <p>Returns a collection of the transcode renditions available to the domain.</p>
             <p>
                 <code>/domains/{domainId}/catalogs</code>
             </p>
