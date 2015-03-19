@@ -655,10 +655,11 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                             break;
                         case "players-module":
                             subsectionName = "Players Module";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
+                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[3].items, "name", subsectionName);
+                            bclslog("player data index", dataIndex);
                             // check to see if on landing page
                             if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
+                                createLandingPageSections(bclsNavData[product].sections[section].items[3].items[dataIndex]);
                             } else {
                                 // we're in a subsubsection
                                 subsubsection = pathArray[4];
@@ -687,10 +688,11 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                             break;
                         case "upload-module":
                             subsectionName = "Upload Module";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
+                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[3].items, "name", subsectionName);
+                            bclslog("upload data index", dataIndex);
                             // check to see if on landing page
                             if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
+                                createLandingPageSections(bclsNavData[product].sections[section].items[3].items[dataIndex]);
                             } else {
                                 // we're in a subsubsection
                                 subsubsection = pathArray[4];
@@ -710,10 +712,10 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                             break;
                         case "media-module":
                             subsectionName = "Media Module";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
+                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[3].items, "name", subsectionName);
                             // check to see if on landing page
                             if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
+                                createLandingPageSections(bclsNavData[product].sections[section].items[3].items[dataIndex]);
                             } else {
                                 // we're in a subsubsection
                                 subsubsection = pathArray[4];
