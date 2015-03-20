@@ -514,7 +514,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
     // figure out what section we're in
     getSection = function () {
         var pathArray = path.split("/"),
-            server, dataIndex;
+            server, dataIndex, modulesIndex;
         // remove the 0 element, as it will be empty
         pathArray.splice(0, 1);
         // if path ends in a /, add index.html
@@ -581,7 +581,9 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     } else if (section === "player-management") {
                         section = "player-management";
                         sectionName = "player-management";
-                    }  else {
+                    }  else if (section === "studio") {
+                        modulesIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", "Modules")
+                    } else {
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
                     }
                     // check to see if we're on the section landing page
@@ -655,11 +657,12 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                             break;
                         case "players-module":
                             subsectionName = "Players Module";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[3].items, "name", subsectionName);
+
+dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modulesIndex].items, "name", subsectionName);
                             bclslog("player data index", dataIndex);
                             // check to see if on landing page
                             if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section].items[3].items[dataIndex]);
+                                createLandingPageSections(bclsNavData[product].sections[section].items[modulesIndex].items[dataIndex]);
                             } else {
                                 // we're in a subsubsection
                                 subsubsection = pathArray[4];
@@ -688,11 +691,11 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                             break;
                         case "upload-module":
                             subsectionName = "Upload Module";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[3].items, "name", subsectionName);
+                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modulesIndex].items, "name", subsectionName);
                             bclslog("upload data index", dataIndex);
                             // check to see if on landing page
                             if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section].items[3].items[dataIndex]);
+                                createLandingPageSections(bclsNavData[product].sections[section].items[modulesIndex].items[dataIndex]);
                             } else {
                                 // we're in a subsubsection
                                 subsubsection = pathArray[4];
@@ -712,10 +715,10 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                             break;
                         case "media-module":
                             subsectionName = "Media Module";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[3].items, "name", subsectionName);
+                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modulesIndex].items, "name", subsectionName);
                             // check to see if on landing page
                             if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section].items[3].items[dataIndex]);
+                                createLandingPageSections(bclsNavData[product].sections[section].items[modulesIndex].items[dataIndex]);
                             } else {
                                 // we're in a subsubsection
                                 subsubsection = pathArray[4];
