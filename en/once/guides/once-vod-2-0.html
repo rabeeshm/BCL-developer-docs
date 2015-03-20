@@ -944,8 +944,8 @@
     "Principal": {
         "AWS": "arn:aws:iam::453163911362:root"
     },
-    "Action": “SNS:Publish”,
-    "Resource": "{Desired_Topic_ARN}”
+    "Action": "SNS:Publish",
+    "Resource": "{Desired_Topic_ARN}"
 }
 </code></pre>
             <h3>Notification examples</h3>
@@ -2168,7 +2168,7 @@ http://.../segment2.vtt
             <h2>
                 Status API
             </h2>
-            <p>The Status API is a RESTful API and allows customers to query the processing statuses of a particular Request ID (returned in the response body of an ingest request). Only the HTTP GET verb is supported and must be made over SSL. If you do not know the Request ID you can query by Foreign Key, which will return a list of all the Request IDs for that particular item. The status data returned will be summary of the major milestones along with any errors that occurred during processing. If more granular data is required, the request can be modified to fetch “raw” data and provide data for each activity within the workflow.</p>
+            <p>The Status API is a RESTful API and allows customers to query the processing statuses of a particular Request ID (returned in the response body of an ingest request). Only the HTTP GET verb is supported and must be made over SSL. If you do not know the Request ID you can query by Foreign Key, which will return a list of all the Request IDs for that particular item. The status data returned will be summary of the major milestones along with any errors that occurred during processing. If more granular data is required, the request can be modified to fetch "raw" data and provide data for each activity within the workflow.</p>
             <p>
                 API Base URL:
             </p>
@@ -3554,53 +3554,578 @@ http://.../segment2.vtt
                     </tr>
                     <tr>
                         <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td>value</td>
+                        <td>Yes</td>
+                        <td>The desired value to be associated with the variable</td>
                     </tr>
                     <tr>
                         <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td>filterType</td>
+                        <td>Yes</td>
+                        <td>The filter type can contain the following arguements: <code>Equals</code>, <code>NotEquals</code>, <code>In</code>, <code>NotIn</code>, <code>Contains</code>, NotContains, <code>StartsWith</code>, <code>NotStartsWith</code>, <code>EndsWith</code>, or <code>NotEndsWith</code></td>
                     </tr>
                     <tr>
                         <td></td>
+                        <td>isDenied</td>
+                        <td>Yes</td>
+                        <td>A boolean value of true or false for the argument</td>
+                    </tr>
+                    <tr>
+                        <td>countryRules</td>
                         <td></td>
-                        <td></td>
-                        <td></td>
+                        <td>No</td>
+                        <td>A collection of country codes to be granted access or denied</td>
                     </tr>
                     <tr>
                         <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td>countryCode</td>
+                        <td>Yes</td>
+                        <td>Geo restriction based on ISO 639-1 country codes</td>
                     </tr>
                     <tr>
                         <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td>isDenied</td>
+                        <td>Yes</td>
+                        <td>A boolean value of true or false for the argument</td>
                     </tr>
                 </tbody>
             </table>
             <p>Response</p>
-<pre><code>[
-    "c039f7e3-5b3d-4aec-a8d9-6346ccc57dd5",
-    "147184ae-1a51-4a63-bc10-3a9debbe03fa",
-    "b44f0463-7c69-45a2-8dfe-aa556c333b74",
-    "84658fcc-efe6-4dba-99e9-37601fbcf1c9",
-    "671a090b-9cc7-4362-a3b1-4794c1f15326",
-    "5d1d5044-05f0-4be2-9dad-323c9c6adf8f",
-    "e202e955-6653-4f33-91f0-c004b65c8a1e",
-    "a9ff5331-9eb8-45b3-8fc5-2a00bfb84642"
-]</code></pre>
+<pre><code>{
+    "id": "d5c8dea0-fae7-46b2-8cfd-a5db5ac24a28"
+}</code></pre>
+            <h4>Create Catalog PublicationRule</h4>
+            <p>Creates a new domain publication rule within the indicated <code>catalogId</code>.</p>
+            <p class="BCL-aside">Note: The creation of a new catalog publication rule does not cascade down to existing media items. It will ensure future media items ingested to the catalog will acquire the new publication rule.</p>
+            <p>Endpoint: POST <code> /domains/{domainId}/catalogs/{catalogId}/publicationRules</code></p>
+            <p>Example: POST</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{domainId}/catalogs/{catalogId}/publicationRules</code></p>
+            <p>Input</p>
+<pre><code>{
+    "startDate": 1412538800,
+    "endDate": 1838635000,
+    "clientFilters": [
+        {
+            "variableName": "UserAgent",
+            "value": "chrome",
+            "filterType": "Contains",
+            "isDenied": true
+        }
+    ],
+    "countryRules": [
+        {
+            "countryCode": "IN",
+            "isDenied": false
+        }
+    ]
+}</code></pre>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Object</th>
+                        <th>Sub-Object</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>startDate</td>
+                        <td></td>
+                        <td>Yes</td>
+                        <td>Begin content availability in epoch time</td>
+                    </tr>
+                    <tr>
+                        <td>endDate</td>
+                        <td></td>
+                        <td>Yes</td>
+                        <td>End content availability in epoch time</td>
+                    </tr>
+                    <tr>
+                        <td>clientFilters</td>
+                        <td></td>
+                        <td>No</td>
+                        <td>Allows the setting of client restrictions based on <code>IpAddress</code>, <code>UserAgent</code>, or <code>ReferringHost</code></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>variableName</td>
+                        <td>Yes</td>
+                        <td>The name of the client filter to key off of. Its value can be <code>IpAddress</code>, UserAgent or ReferringHost</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>value</td>
+                        <td>Yes</td>
+                        <td>The desired value to be associated with the variable</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>filterType</td>
+                        <td>Yes</td>
+                        <td>The filter type can contain the following arguements: <code>Equals</code>, <code>NotEquals</code>, <code>In</code>, <code>NotIn</code>, <code>Contains</code>, NotContains, <code>StartsWith</code>, <code>NotStartsWith</code>, <code>EndsWith</code>, or <code>NotEndsWith</code></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>isDenied</td>
+                        <td>Yes</td>
+                        <td>A boolean value of true or false for the argument</td>
+                    </tr>
+                    <tr>
+                        <td>countryRules</td>
+                        <td></td>
+                        <td>No</td>
+                        <td>A collection of country codes to be granted access or denied</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>countryCode</td>
+                        <td>Yes</td>
+                        <td>Geo restriction based on ISO 639-1 country codes</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>isDenied</td>
+                        <td>Yes</td>
+                        <td>A boolean value of true or false for the argument</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Response</p>
+<pre><code>{
+    "id": "d5c8dea0-fae7-46b2-8cfd-a5db5ac24a28"
+}</code></pre>
+            <h4>Create MediaItem PublicationRule</h4>
+            <p>Creates a new domain publication rule within the indicated <code>mediaItemId</code>.</p>
+            <p>Endpoint: POST <code> /domains/{domainId}/catalogs/{catalogId}/mediaItems/{mediaItemId}/publicationRules</code></p>
+            <p>Example: POST</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{domainId}/catalogs/{catalogId}/mediaItems/{mediaItemId}/publicationRules</code></p>
+            <p>Input</p>
+<pre><code>{
+    "startDate": 1412538800,
+    "endDate": 1838635000,
+    "clientFilters": [
+        {
+            "variableName": "UserAgent",
+            "value": "chrome",
+            "filterType": "Contains",
+            "isDenied": true
+        }
+    ],
+    "countryRules": [
+        {
+            "countryCode": "IN",
+            "isDenied": false
+        }
+    ]
+}</code></pre>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Object</th>
+                        <th>Sub-Object</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>startDate</td>
+                        <td></td>
+                        <td>Yes</td>
+                        <td>Begin content availability in epoch time</td>
+                    </tr>
+                    <tr>
+                        <td>endDate</td>
+                        <td></td>
+                        <td>Yes</td>
+                        <td>End content availability in epoch time</td>
+                    </tr>
+                    <tr>
+                        <td>clientFilters</td>
+                        <td></td>
+                        <td>No</td>
+                        <td>Allows the setting of client restrictions based on <code>IpAddress</code>, <code>UserAgent</code>, or <code>ReferringHost</code></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>variableName</td>
+                        <td>Yes</td>
+                        <td>The name of the client filter to key off of. Its value can be <code>IpAddress</code>, UserAgent or ReferringHost</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>value</td>
+                        <td>Yes</td>
+                        <td>The desired value to be associated with the variable</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>filterType</td>
+                        <td>Yes</td>
+                        <td>The filter type can contain the following arguements: <code>Equals</code>, <code>NotEquals</code>, <code>In</code>, <code>NotIn</code>, <code>Contains</code>, NotContains, <code>StartsWith</code>, <code>NotStartsWith</code>, <code>EndsWith</code>, or <code>NotEndsWith</code></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>isDenied</td>
+                        <td>Yes</td>
+                        <td>A boolean value of true or false for the argument</td>
+                    </tr>
+                    <tr>
+                        <td>countryRules</td>
+                        <td></td>
+                        <td>No</td>
+                        <td>A collection of country codes to be granted access or denied</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>countryCode</td>
+                        <td>Yes</td>
+                        <td>Geo restriction based on ISO 639-1 country codes</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>isDenied</td>
+                        <td>Yes</td>
+                        <td>A boolean value of true or false for the argument</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Response</p>
+<pre><code>{
+    "id": "d5c8dea0-fae7-46b2-8cfd-a5db5ac24a28"
+}</code></pre>
+            <h4>Delete Domain PublicationRule</h4>
+            <p>Deletes the publication rule for the domain as indicated by the <code>publicationRuleId</code>.</p>
+            <p class="BCL-aside">Note: Deleting a publication rule from the domain does not cascade down to existing catalogs and media items. Any item that has already acquired the rule will not be modified. It will ensure future catalogs do not acquire this rule.</p>
+            <p>Endpoint: DELETE <code>/domains/{domainId}/publicationRules/{publicationRuleId}</code></p>
+            <p>Example: DELETE</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{domainId}/publicationRules/{publicationRuleId}</code></p>
+
+            <p>Response</p>
+<pre><code>{
+    "id": "c039f7e3-5b3d-4aec-a8d9-6346ccc57dd5"
+}</code></pre>
+            <h4>Delete Catalog PublicationRule</h4>
+            <p>Deletes the publication rule for the catalog as indicated by the <code>publicationRuleId</code>.</p>
+            <p class="BCL-aside">Note: Deleting a publication rule from the catalog does not cascade down to existing media items. Any item that has already acquired the rule will not be modified. It will ensure future media items in the catalog do not acquire this rule.</p>
+            <p>Endpoint: DELETE <code>/domains/{domainId}/catalogs/{catalogId}/publicationRules/{publicationRuleId}</code></p>
+            <p>Example: DELETE</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{domainId}/catalogs/{catalogId}/publicationRules/{publicationRuleId}</code></p>
+
+            <p>Response</p>
+<pre><code>{
+    "id" : "215c1ab4-2f4c-43b2-b569-4cfd6eb6f432"
+}</code></pre>
+            <h4>Delete MediaItem PublicationRule</h4>
+            <p>Deletes the publication rule for the mediaItem as indicated by the <code>publicationRuleId</code>.</p>
+            <p>Endpoint: DELETE <code>/domains/{domainId}/catalogs/{catalogId}/mediaItems/{mediaItemId}/publicationRules/{publicationRuleId}</code></p>
+            <p>Example: DELETE</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{domainId}/catalogs/{catalogId}/mediaItems/{mediaItemId}/publicationRules/{publicationRuleId}</code></p>
+
+            <p>Response</p>
+<pre><code>{
+    "id":"13354579-f935-4fbe-bfe5-6c279eea80cc"
+}</code></pre>
+
+            <h3>Applications</h3>
+            <h4>Get Applications</h4>
+            <p>Returns a collection of all applications within a domain. This method fetches 20 applications per page, returns the <code>totalResult</code> to indicate the total number of media items and provides the previous or next page requests within the body.</p>
+            <p>Endpoint: GET <code>/domains/{domainId}/applications</code></p>
+            <p>Example: GET</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{domainId}/applications</code></p>
+            <p>Response</p>
+<pre><code>{
+    "results": [
+        {
+            "id": "79e36ed1-4f2d-4f03-9b49-23d19d34e971",
+            "name": "New Player Template",
+            "domainId": "4eca7ac5-3954-416d-bb23-e65aa511b85a"
+        },
+        {
+            "id": "7aa9fcfe-ea9d-449c-80b6-fd5e7b7a4b72",
+            "name": "Player- Single and Multi Ads",
+            "domainId": "4eca7ac5-3954-416d-bb23-e65aa511b85a"
+        },
+        {
+            "id": "fbfe16ab-0d11-4ca1-b944-1480970c4bf9",
+            "name": "Player- Multi Ads",
+            "domainId": "4eca7ac5-3954-416d-bb23-e65aa511b85a"
+        }
+    ],
+    "prev": null,
+    "next": null,
+    "totalResults": 5
+}</code></pre>
+            <h4>Get Application details</h4>
+            <p>Returns the essential information of the application including the ad configurations. The response will include individual ad slots "pre-roll", "mid-roll", and/or "post-roll" for direct VAST configurations and a single "ad" server configurations that have ad break information determined by the ad decisioning server (e.g. Freewheel SmartXML, DFP ad rules).</p>
+            <p>Endpoint: GET <code>/domains/{domainId}/applications/{applicationId}</code></p>
+            <p>Example: GET</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{domainId}/applications/{applicationId}</code></p>
+            <p>Response</p>
+<pre><code>{
+    "id": "7aa9fcfe-ea9d-449c-80b6-fd5e7b7a4b72",
+    "name": "Player- Single and Multi Ads",
+    "domainId": "4eca7ac5-3954-416d-bb23-e65aa511b85a",
+    "adConfig": {
+        "preRoll": {
+            "id": "5840b954-5094-4e13-b49a-319115342011",
+            "name": "prenewUpdated",
+            "adServerId": "34b353d8-f7d5-4fa1-9dea-49183236df8d",
+            "adServerName": "Fireworks waterfall",
+            "adPosition": "preroll"
+        }
+    }
+}</code></pre>
+            <p>Note: <code>adConfig</code> can be of type single or multi.</p>
+            <h5>Single adConfig example:</h5>
+<pre><code>"adConfig": {
+    "preRoll": {
+        "id": "5840b954-5094-4e13-b49a-319115342011",
+        "name": "prenewUpdated",
+        "adServerId": "34b353d8-f7d5-4fa1-9dea-49183236df8d",
+        "adServerName": "Fireworks waterfall",
+        "adPosition": "preroll"
+    },
+    "midRoll": {
+        "id": "5840b954-5094-4e13-b49a-319115342011",
+        "name": "Mid",
+        "adServerId": "1111-2222-33333-4444-aaaabbbbccccddd",
+        "adServerName": "Test Ad Server",
+        "adPosition": "midroll"
+    },
+    "postRoll": {
+        "id": "5840b954-5094-4e13-b49a-319115342011",
+        "name": "Post",
+        "adServerId": "34b353d8-f7d5-4fa1-9dea-49183236df8d",
+        "adServerName": "Fireworks waterfall",
+        "adPosition": "postroll"
+    }
+}</code></pre>
+            <h5>Multi adConfig example:</h5>
+<pre><code>"adConfig": {
+    "ad": {
+        "id": "5840b954-5094-4e13-b49a-319115342011",
+        "name": "DFP",
+        "adServerId": "34b353d8-f7d5-4fa1-9dea-49183236df8d",
+        "adServerName": "Fireworks waterfall",
+        "adPosition": "dfp"
+    }
+}</code></pre>
+            <h4>Get Application ad configurations</h4>
+            <p>Returns the essential information of the application including the ad configurations. The response will include individual ad slots "pre-roll", "mid-roll", and/or "post-roll" for direct VAST configurations and a single "ad" server configurations that have ad break information determined by the ad decisioning server (e.g. Freewheel SmartXML, DFP ad rules).</p>
+            <p>Endpoint: GET <code>domains/{domainId}/applications/{applicationId}/adConfig</code></p>
+            <p>Example: GET</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{domainId}/applications/{applicationId}/adConfig</code></p>
+            <p>Response</p>
+<pre><code>{
+    "preRoll": {
+        "id": "6a38cbc1-7257-4a9b-99fa-121d4f971768",
+        "name": "pre",
+        "adServerId": "34b353d8-f7d5-4fa1-9dea-49183236df8d",
+        "adServerName": "Fireworks waterfall",
+        "adPosition": "preroll"
+    },
+    "midRoll": {
+        "id": "9989ad10-62a6-4f82-828d-d63ed464a33e",
+        "name": "mid",
+        "adServerId": "34b353d8-f7d5-4fa1-9dea-49183236df8d",
+        "adServerName": "Fireworks waterfall",
+        "adPosition": "midroll"
+    },
+    "postRoll": {
+        "id": "c244fd41-7188-41a4-ba5f-2f6edd6a67fa",
+        "name": "postnew",
+        "adServerId": "34b353d8-f7d5-4fa1-9dea-49183236df8d",
+        "adServerName": "Fireworks waterfall",
+        "adPosition": "postroll"
+    }
+}</code></pre>
+            <h4>Add or Replace adConfig on an Application</h4>
+            <p>Adds or Replaces the currently configured adconfigs. The input adconfig can be individual slots "pre-roll", "mid-roll", and/or "post-roll" for direct VAST campaigns OR a single "ad" campaign to indicate the ad decisioning server will determine the ads breaks (e.g. Freewheel SmartXML, DFP ad rules).</p>
+            <p>Endpoint: POST <code>domains/{domainId}/applications/{applicationId}/adConfig</code></p>
+            <p>Example: POST</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{domainId}/applications/{applicationId}/adConfig</code></p>
+            <p>Input (direct VAST):</p>
+<pre><code>{
+    "preRoll": {
+        "name": "preRollUpdated",
+        "adServerId": "34b353d8-f7d5-4fa1-9dea-49183236df8d"
+    },
+    "postRoll": {
+        "name": "postRollUpdated",
+        "adServerId": "34b353d8-f7d5-4fa1-9dea-49183236df8d"
+    }
+}</code></pre>
+            <p>Input (smartxml or dfp):</p>
+<pre><code>{
+    "ad": {
+        "name": "postRollUpdated",
+        “adPosition”: “smartxml”,
+        "adServerId": "72b453a5-37b5-5fa1-6deb-2958363ade2"
+    }
+}</code></pre>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Object</th>
+                        <th>Sub-Object</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>preRoll</td>
+                        <td></td>
+                        <td>No</td>
+                        <td>The ad slot intended to be updated or replaced. This should only be used with direct VAST campaigns<td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>name</td>
+                        <td>Yes</td>
+                        <td>An arbitrary name for user readability purposes only</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>adServerId</td>
+                        <td>Yes</td>
+                        <td>The <code>adServerId</code> intended to be used with this slot</td>
+                    </tr>
+                    <tr>
+                        <td>midRoll</td>
+                        <td></td>
+                        <td>No</td>
+                        <td>The ad slot intended to be updated or replaced. This should only be used with direct VAST campaigns</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>name</td>
+                        <td>Yes</td>
+                        <td>An arbitrary name for user readability purposes only</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>adServerId</td>
+                        <td>Yes</td>
+                        <td>The <code>adServerId</code> intended to be used with this slot</td>
+                    </tr>
+                    <tr>
+                        <td>postRoll</td>
+                        <td></td>
+                        <td>No</td>
+                        <td>The ad slot intended to be updated or replaced. This should only be used with direct VAST campaigns</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>name</td>
+                        <td>Yes</td>
+                        <td>An arbitrary name for user readability purposes only</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>adServerId</td>
+                        <td>Yes</td>
+                        <td>The <code>adServerId</code> intended to be used with this slot</td>
+                    </tr>
+                    <tr>
+                        <td>ad</td>
+                        <td></td>
+                        <td>No</td>
+                        <td>Only used for Freewheel SmartXML or DFP ad rules where ad slots are defined by the ad decisioning server. Can not be used with defined prerolls, midrolls, and/or postrolls</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>name</td>
+                        <td>Yes</td>
+                        <td>An arbitrary name for user readability purposes only</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>adPosition</td>
+                        <td>Yes</td>
+                        <td>Must be "smartxml" or "dfp"</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>adServerId</td>
+                        <td>Yes</td>
+                        <td>The <code>adServerId</code> intended to be used with this slot</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Response</p>
+<pre><code>{
+    "id": "7aa9fcfe-ea9d-449c-80b6-fd5e7b7a4b72",
+    "name": "Player- Single and Multi Ads",
+    "domainId": "4eca7ac5-3954-416d-bb23-e65aa511b85a",
+    "adConfig": {
+        "postRoll": {
+        "id": "b04116aa-5656-45e3-adc3-c2eda4c6127e",
+        "name": "prenewUpdated",
+        "adServerId": "34b353d8-f7d5-4fa1-9dea-49183236df8d",
+        "adServerName": "Fireworks waterfall",
+        "adPosition": "postroll"
+        }
+    }
+}</code></pre>
+            <h4>Delete Application</h4>
+            <p>Deletes the application from the indicated <code>domainId</code>.</p>
+            <p>Endpoint: DELETE <code>/domains/{domainId}/applications/{applicationId}</code></p>
+            <p>Example: DELETE</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{domainId}/applications/{applicationId}</code></p>
+            <p>Response</p>
+<pre><code>{
+    "id": "7aa9fcfe-ea9d-449c-80b6-fd5e7b7a4b72"
+}</code></pre>
+            <h4>Delete AdConfig</h4>
+            <p>Deletes all of the ad configurations from the indicated <code>applicationId</code>.</p>
+            <p>Endpoint: DELETE <code>/domains/{domainId}/applications/{applicationId}/adConfig</code></p>
+            <p>Example: DELETE</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{domainId}/applications/{applicationId}/adConfig</code></p>
+            <p>Response</p>
+<pre><code>{
+    "id": [
+        "6a38cbc1-7257-4a9b-99fa-121d4f971768",
+        "9989ad10-62a6-4f82-828d-d63ed464a33e",
+        "c244fd41-7188-41a4-ba5f-2f6edd6a67fa"
+    ]
+}</code></pre>
+            <h3>Ad Decisioning Server</h3>
+            <h4>Get Ad Decisioning Servers</h4>
+            <p>Returns a collection of ad decisioning servers configured for the domainId. This method fetches 20 ad servers per page, returns the <code>totalResult</code> to indicate the total number of ad servers and provides the previous or next page requests within the body.</p>
+            <p>Endpoint: GET <code>/domains/{domainId}/adServers</code></p>
+            <p>Example: GET</p>
+            <p><code>https://api.unicornmedia.com/media-management-api/domains/{domainId}/applications</code></p>
+            <p>Response</p>
+<pre><code>{
+    "results": [
+        {
+            "id": "79e36ed1-4f2d-4f03-9b49-23d19d34e971",
+            "name": "New Player Template",
+            "domainId": "4eca7ac5-3954-416d-bb23-e65aa511b85a"
+        },
+        {
+            "id": "7aa9fcfe-ea9d-449c-80b6-fd5e7b7a4b72",
+            "name": "Player- Single and Multi Ads",
+            "domainId": "4eca7ac5-3954-416d-bb23-e65aa511b85a"
+        },
+        {
+            "id": "fbfe16ab-0d11-4ca1-b944-1480970c4bf9",
+            "name": "Player- Multi Ads",
+            "domainId": "4eca7ac5-3954-416d-bb23-e65aa511b85a"
+        }
+    ],
+    "prev": null,
+    "next": null,
+    "totalResults": 5
+}</code></pre>
+
+
+
+
+
 
             <p>
                 <code>/domains/{domainId}/catalogs/{catalogId}/profiles</code>
@@ -3956,7 +4481,7 @@ http://.../segment2.vtt
             </p>
             <h3>Adaptive</h3>
             <p>
-                The Once platform utilizes the HTTP Live Streaming (HLS) protocol for adaptive, multi-bitrate playback to devices that support this method. Requesting an adaptive response will force an HLS response with discontinuities between content switching and keeps the Once platform's logic in place for determining remaining device specific parameters including the range of profiles to be returned and segment length. If you wish to tailor the profiles returned on a request, you can denote those specific profiles by using the additional query string parameters "“ umoprofiles or umaprofiles.
+                The Once platform utilizes the HTTP Live Streaming (HLS) protocol for adaptive, multi-bitrate playback to devices that support this method. Requesting an adaptive response will force an HLS response with discontinuities between content switching and keeps the Once platform's logic in place for determining remaining device specific parameters including the range of profiles to be returned and segment length. If you wish to tailor the profiles returned on a request, you can denote those specific profiles by using the additional query string parameters "" umoprofiles or umaprofiles.
             </p>
             <table>
                 <thead>
@@ -4000,7 +4525,7 @@ http://.../segment2.vtt
             </table>
             <h4>Continuous Adaptive (ctAdaptive)</h4>
             <p>
-                Similar to an adaptive request, the ctadaptive response will force a HLS response with the discontinuities removed to create a single linear stream playable on even the most simple implementations of HLS devices (e.g. native Android players). We recommend using a regular adaptive stream where possible for the best cache efficiency, but ctadaptive will solve difficult platforms and the majority of devices or player implementations for HLS. If you wish to tailor the profiles returned on a request, you can denote those specific profiles by using the additional query string parameters "“ umoprofiles or umaprofiles.
+                Similar to an adaptive request, the ctadaptive response will force a HLS response with the discontinuities removed to create a single linear stream playable on even the most simple implementations of HLS devices (e.g. native Android players). We recommend using a regular adaptive stream where possible for the best cache efficiency, but ctadaptive will solve difficult platforms and the majority of devices or player implementations for HLS. If you wish to tailor the profiles returned on a request, you can denote those specific profiles by using the additional query string parameters "" umoprofiles or umaprofiles.
             </p>
             <table>
                 <thead>
