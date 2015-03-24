@@ -1,6 +1,6 @@
-/*************************
-switch for flash/html
-*************************/
+/**
+ * switch for flash/html
+*/
 // for development purposes only: reopen page with HTML5 player
 document.getElementById("switchToHTML5").addEventListener("click",  function() {
     var separator = "?";
