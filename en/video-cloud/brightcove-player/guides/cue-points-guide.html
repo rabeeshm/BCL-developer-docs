@@ -90,7 +90,7 @@
 				<ul>
 				    <li>Line 24: Create a paragraph element as a location in which to inject dynamically created HTML.</li>
 				    <li>Lines 31,43: Use the <code>one()</code> method to add an event listener for the <code>loadedmetadata</code> event only once. The event handler function is defined here anonymously.</li>
-				    <li>Line 32: Retrieve the TextTracks array using the <code>textTracks()</code> method, then assign the zeroth element, which holds the cue points, to the variable <code>tt</code>. Note that it may be possible in some implementations that the cue points could be in a different array element.</li>
+				    <li>Line 32: Retrieve the TextTracks array using the <code>textTracks()</code> method, then assign the zeroth element, which holds the cue points, to the variable <code>tt</code>. Note that it may be possible in some implementations that the cue points could be in a different array element. See the <a href="#findtrack">Find correct track</a> section below for more information.</li>
 				    <li>Lines 33,41: Sets the event handler function for when the <code>oncuechange</code>event is dispatched.</li>
 				    <li>Line 34: Check to be sure the you are getting the first (zeroth array element) cue point dispatch. Without this condition, you would see that each cue point would be acted upon twice. Note that if you are using cue points that have durations that overlap this condition would have to be different.</li>
 				    <li>Lines 35-39: Dynamically create HTML using information from the cue point and inject into the HTML page.</li>
@@ -104,7 +104,7 @@
             <li>Line 76: Create a paragraph element as a location in which to inject dynamically created HTML.</li>
             <li>Lines 83,97: Use the <code>catalog.getViceo()</code> method to retrieve a video. The callback function is defined here anonymously.</li>
             <li>Line 85: Use the <code>catalog.load()</code> method to load the video into the player.</li>
-            <li>Line 86: Retrieve the TextTracks array using the <code>textTracks()</code> method, then assign the zeroth element, which holds the cue points, to the variable <code>tt</code>. Note that it may be possible in some implementations that the cue points could be in a different array element.</li>
+            <li>Line 86: Retrieve the TextTracks array using the <code>textTracks()</code> method, then assign the zeroth element, which holds the cue points, to the variable <code>tt</code>. Note that it may be possible in some implementations that the cue points could be in a different array element. See the <a href="#findtrack">Find correct track</a> section below for more information.</li>
             <li>Lines 87,95: Sets the event handler function for when the <code>oncuechange</code>event is dispatched.</li>
             <li>Line 88: Check to be sure the first (zeroth array element) cue point is defined. Without this condition you would see that each cue point would be acted upon twice, the second time with no defined elements in the <code>activecues</code> array (since the second cue change is for cue point end). Note that if you are using cue points that have durations that overlap this condition would have to be different.</li>
             <li>Lines 89-93: Dynamically create HTML using information from the cue point and inject into the HTML page.</li>
@@ -161,7 +161,7 @@
             <li>Line 126: Create a paragraph element as a location in which to inject dynamically created HTML.</li>
             <li>Lines 134,152: Use the <code>one()</code> method to listen only once for the <code>loadedmetadata</code> event. The event handler function is defined here anonymously.</li>
             <li>Line 135: Assign to a variable the index of the last text track loaded.</li>
-            <li>Line 136: Retrieve the textTracks array using the <code>textTracks()</code> method the assign the last element of the array to a variable using the index determined in the previous step.</li>
+            <li>Line 136: Retrieve the textTracks array using the <code>textTracks()</code> method the assign the last element of the array to a variable using the index determined in the previous step. See the <a href="#findtrack">Find correct track</a> section below for variations on this logic.</li>
             <li>Lines 137,149: Sets the event handler function for when the <code>oncuechange</code>event is dispatched.</li>
             <li>Line 138: Check to be sure the first (zeroth array element) cue point is defined in the activeCues array. This tells you that this is a start cue point event.</li>
             <li>Lines 139-145: Dynamically create HTML using information from the cue point and inject into the HTML page. This includes parsing JSON and displaying various fields of that JSON.</li>
@@ -184,6 +184,21 @@
         <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="192-226"></code></p>
         <p>The code generates output as shown in the following screenshot. Note the the <strong>id</strong> values are not supplied a value when using the <code>VTTCue()</code> constructor method.</p>
         <div><img src="/en/video-cloud/brightcove-player/guides/assets/cue-points-dynamic.png"></div>
+      </div>
+      <div id="findtrack" class="section">
+        <h2>Find correct track</h2>
+        <p>In a number of places in this document a possible problem could occur if multiple text tracks are associated with a player. An assumption was made that only one text track is associated with the player so this code was used: <code>var tt = myPlayer.textTracks()[0];</code>. Selecting the zeroth array element assumes a single text track associated the the player.</p>
+        <p>Text tracks are not only used for cue points, but other kinds of data also. The <strong>kind</strong> attribute can contain the following values:</p>
+        <ul>
+            <li>subtitles</li>
+            <li>captions</li>
+            <li>descriptions</li>
+            <li>chapters</li>
+            <li>metadata</li>
+        </ul>
+        <p>This means it is very possible multiple text tracks could be associated with the player, and a way is needed to find the correct one for your application logic. The following code loops over the available text tracks until the <strong>metadata</strong> (cue point) value is found:</p>
+        <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="231-248"></code></p>
+        <p>The logic from previous examples could then be used to process the cue points using the <code>tt</code> variable, which contains the wanted text track.</p>
       </div>
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
