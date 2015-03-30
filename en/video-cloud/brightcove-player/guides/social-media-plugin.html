@@ -46,8 +46,16 @@
 				<!-- Place document intro sentence(s) here -->
 				<p>The social media plugin enables users to share a video through Facebook, Google+, Twitter, Tumblr, Pinterest and LinkedIn.</p>
 				<p>Let's say you have a web page with a Brightcove player on it. Now, you want to let users share the video across social media services. This plugin enables your player for video sharing, as shown here.</p>
-				<div><img src="/en/video-cloud/brightcove-player/assets/social-media-plugin1.png" alt="Social Media Share Interface"></div>
-				<div class="BCL-aside">Note: You will need to set a width and height for the player for two reasons. First, if no width or height are set there will be no values to pass to Twitter, which will cause the Twitter card not to validate. Second, the width needs to be wide enough to accommodate the social plugin's interface as shown in the screenshot above. You can also have the interface automatically appear on video end using the <code>displayAfterVideo</code> property, documented below.</div>
+				<div><img src="../assets/social-media-plugin1.png" alt="Social Media Share Interface"></div>
+				<div class="BCL-aside" style="padding-top:1em;padding-left:1em;padding-right:1em;">
+					<p>Note: You will need to set a width and height for the player for two reasons:</p>
+					<ol>
+						<li>If no width or height are set there will be no values to pass to Twitter, which will cause the Twitter card not to validate.</li>
+						<li>The width needs to be wide enough to accommodate the social plugin's interface as shown in the screenshot above. You can also have the interface automatically appear on video end using the <code>displayAfterVideo</code> property, documented below.</li>
+					</ol>  				
+				</div>
+				<br/>
+				<p>Click <a href="http://solutions.brightcove.com/bcls/brightcove-player/social-plugin/social-media.html">here</a> for a working sample of a web page that uses the plugin and includes the social media meta tags.</p>
 			</div>
 			
 			<div id="overview" class="section">
@@ -55,39 +63,56 @@
 				<p>This document walks you through the steps to enable social media sharing for an existing HTML page with your Brightcove player on it. This assumes that you have created a Brightcove player with the proper configuration information and have added the player to an HTML page.</p> 
 				<p>To add the social media plugin, follow these steps:</p>	
 				<ol>
-					<li>Update your Brightcove player using the <code>PATCH</code> method to add and <a href="#implementplugin">implement the plugin</a>.</li>
-					<li>Review the available <a href="#properties">properties</a> to customize the social media plugin.</li>
-					<li>Update your Brightcove player using the <code>PATCH</code> method to <a href="#customizeplugin">customize plugin</a> services.</li>
+					<li><p><a href="#playersmodule">Implement using Players module</a>. This will update your Brightcove player to use the social media plugin.</p></li>
 					<ul>
 						<li>You will need the URL to the HTML page with your Brightcove player.</li>
+						<li>Review the available <a href="#properties">properties</a> to customize the social media plugin.</li>
 					</ul>
 					<li>Add social <a href="#metatags">meta tags</a> to your player's HTML page.</li>
+					<li><a href="#validate">Validate</a> the meta tags on your HTML page for FaceBook and Twitter.</li>
 				</ol>
-				<p>In a browser, open the HTML page with your Brightcove player and use the social sharing icon in the player to share your video. </p>
-				<p>Click <a href="http://solutions.brightcove.com/bcls/brightcove-player/social-plugin/social-media.html">here</a> for a working sample of a web page that uses the plugin and includes the social media meta tags.</p>
-			</div>
+				<p>In a browser, open the HTML page with your Brightcove player and use the social sharing icon in the player to share your video.</p>
+				<p>Optionally, you can implement the social media plugin within your page code, but this is a more advanced solution. For details, see the <a href="#implementcode">Implement using code</a> section.</p>
+			</div>	
 			
-			<div id="implementplugin" class="section">
-				<h2>Implement plugin</h2>
-				<p>The plugin's JavaScript and CSS files are already written for you. Once your player is created, use the HTTP <code>PATCH</code> method to update it as described below.</p>
-				<p>In the <code>data</code> property from the curl statement shown below, you see an example of making the plugin part of a player. There are three properties for which you need to supply values:</p>
+		<div id="playersmodule" class="section">
+			<h2>Implement using Players module</h2>
+			<p>To implement the Social Plugin using the Players module, follow these steps:</p>
+			<ol>
+				<li>Open the Players module and locate the player.</li>
+				<li>Click the link for the player to open the player properties.</li>
+				<li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
+				<li>The JavaScript for the plugin is provided and will not change for different plugin implementations. For the <strong>JavaScript URL</strong>, enter:</li>
+				<p><pre> https://players.brightcove.net/videojs-social/dist/videojs-social.min.js</pre></p>
+				<li>The CSS for the plugin is provided and will not change for different plugin implementations. For the <strong>CSS URL</strong>, enter:<br/>
+				<p><pre> https://players.brightcove.net/videojs-social/dist/videojs-social.css</pre></p></li>
+				<li>For the <strong>Name</strong>, enter <strong>social</strong>.</li>
+				<li><p>Enter the plugin options. The example below will display a social media button at the bottom of the player to share this video with several social media sites. The social sharing screen will automatically display on video end.</p>
+				<p>For details about the plugin options, see the <a href="#properties">Properties</a> section.</p></li>
 				<ul>
-				    <li><code>scripts</code>: This is the JavaScript supplied to you for the plugin. This will not change for different plugin implementations.</li>
-				    <li><code>stylesheets</code>: This is the CSS supplied to you for the plugin. This will not change for different plugin implementations.</li>
-				    <li><code>plugins</code>: This property contains an array of properties and values. For this plugin, you only need to supply the <code>name</code> property with the value of <code>social</code>. The name <code>social</code> is the function name defined in the supplied JavaScript for the plugin, and will not change for different plugin implementations.</li>
+					<li>Lines 3-4: Set the name and description for your video.</li>
+					<li>Line 5: Defines the URL for your custom web page with your video player and social sharing meta tags.</li>
+					<li>Line 6: Sets the social sharing screen to display when the video ends.</li>
+					<li>Lines 7-8: For Twitter, this allows a user to start viewing the video after a 5 second offset.</li>
+					<li>Lines 9-16: Enables social sharing for Facebook, Google, Twitter, Tumblr, Pinterest and LinkedIn.</li>
 				</ul>
 				<p><code data-gist-id="c2fa720dad97e5688f02" data-gist-hide-footer="true" data-gist-line="2-17"></code></p>
-		</div>
+	
+				<div><img src="../assets/social-media-plugin.png"></div>
+                
+                <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
+			</ol>
+        </div>	
+
 		<div id="properties" class="section">
 	        <h2>Properties</h2>
 	        <p>For plugins in general, the <code>options</code> object is used to pass data to the plugin to customize initialization. In this case, you can use the following properties in this object:</p>
 			<ul>
-				<li><code>deeplinking</code>: 
+				<li><code>title</code>: 
 					<ul>
-						<li>The type is boolean with a default value of <code>false</code>.</li>
-						<li>This enables/disables deep linking for the shared video. This feature allows a user to start viewing a video from a specific offset. For more details, view the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/deep-linking.html">Deep Linking</a> document.</li>
+						<li>The type is a string.</li>
+						<li>This is a custom title that will appear when your video is shared.</li>
 					</ul>
-					<p class="BCL-aside">Note: The deep linking feature currently only works with Twitter.</p>
 				</li>
 				<li><code>description</code>: 
 					<ul>
@@ -95,11 +120,24 @@
 						<li>This is a custom description that will be used by the social services which support it.</li>
 					</ul>
 				</li>
+				<li><code>url</code>: 
+					<ul>
+						<li>The type is a string.</li>
+						<li>This is the URL that points to your custom web page which has your video and the meta tags for sharing. Refer to the <a href="#metatags">meta tags</a> section for details on how to add the social media metadata to your player page.</li>
+					</ul>
+				</li>
 				<li><code>displayAfterVideo</code>: 
 					<ul>
 						<li>The type is a boolean.</li>
 						<li>Causes the social screen to automatically show on an <code>ended</code> event</li>
 					</ul>
+				</li>
+				<li><code>deeplinking</code>: 
+					<ul>
+						<li>The type is boolean with a default value of <code>false</code>.</li>
+						<li><p>This enables/disables deep linking for the shared video. This feature allows a user to start viewing a video from a specific offset. For more details, view the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/deep-linking.html">Deep Linking</a> document.</p></li>
+					</ul>
+					<p class="BCL-aside">Note: The deep linking feature currently only works with Twitter.</p>
 				</li>
 				<li><code>offset</code>: 
 					<ul>
@@ -141,46 +179,31 @@
 						</ul>
 					</ul>
 				</li>
-				<li><code>title</code>: 
-					<ul>
-						<li>The type is a string.</li>
-						<li>This is a custom title that will appear when your video is shared.</li>
-					</ul>
-				</li>
-				<li><code>url</code>: 
-					<ul>
-						<li>The type is a string.</li>
-						<li>This is the URL that points to your custom web page which has your video and the meta tags for sharing. Refer to the <a href="#metatags">meta tags</a> section for details on how to add the social media metadata to your player page.</li>
-					</ul>
-				</li>
 			</ul>
-	      </div>	
-		<div id="customizeplugin" class="section">
-	        <h2>Customize plugin</h2>
-			<p>Update your Brightcove player using the <code>PATCH</code> method to customize the social media plugin. Here the properties are set within the <code>options</code> object as follows:</p>
-			<p class="BCL-aside">Note: The <code>url</code> property value is the URL on your server to the HTML page with your Brightcove player.</p>
-			<p><code data-gist-id="c2fa720dad97e5688f02" data-gist-hide-footer="true" data-gist-line="21-46"></code></p>  
-	  </div>	
-			
+	      </div>
+	
 	  <div id="metatags" class="section">
         <h2>Meta tags</h2>
-		<p>After you update your Brightcove player using the <code>PATCH</code> method in the previous step, you will get a response whick looks like this: </p>
-		<p><code data-gist-id="c2fa720dad97e5688f02" data-gist-hide-footer="true" data-gist-line="206-209" data-gist-highlight-line="206"></code></p>
+		<p>After you update your Brightcove player to use the social sharing plugin in the previous section, you are ready to add social meta tags to your HTML page.</p>
+		<p>These meta tags allow social sharing sites to embed your video players and thumbnails in the post.</p>
 		<p>To add social media meta tags to the HTML page with your Brightcove player, follow these steps:</p>
 		<ol>
-			<li>Take the value for the <code>preview_url</code> and paste that into a browser. You should see your player.</li>
-			<p class="BCL-aside">Note: You can also publish your player with the updates and use the <code>url</code> value. The preview url value is used here since there is no caching of the updates, so no waiting is needed to use it.</p>
-			<li>In your browser's address bar, change <code>index.html</code> to <code>social.html</code>.</li>
-			<div><img src="/en/video-cloud/brightcove-player/assets/social-media-plugin2.png" alt="Preview URL"></div>
+			<li>Once your player has been published, click the <strong>Embed Code &amp; URL</strong> button and choose the <strong>Published Player</strong> link.</li>
+			<li>Select the <strong>Player URL</strong> link. You should see your player in a new tab or window.</li>
+			<li>In your browser's address bar, change the URL from <code>index.html</code>:</li>
+			<div><img src="../assets/social-media-plugin2.png" alt="Preview URL"></div>
+			<li>To <code>social.html</code>:</li>
+			<div><img src="../assets/social-media-plugin3.png" alt="Preview URL"></div>
 			<li>Select <strong>enter</strong>. You should now see the following page:</li>
-			<div><img src="/en/video-cloud/brightcove-player/assets/social-media-plugin3.png" alt="Enabling Social Sharing Page"></div>
+			<div><img src="../assets/social-media-plugin4.png" alt="Enabling Social Sharing Page"></div>
 			<li>In the browser, scroll down to the <strong>&lt;code&gt;</strong> section and copy the meta tag code.</li>
-			<li>Edit the HTML page with your Brightcove player. In the <strong>&lt;head&gt;</strong> section, paste the meta tag code. These tags are used by the social media services to include thumbnail images and your video in the post.</li>
-			<p><code data-gist-id="c2fa720dad97e5688f02" data-gist-hide-footer="true" data-gist-line="57-81"></code></p>
+			<li><p>Edit the HTML page with your Brightcove player. In the <strong>&lt;head&gt;</strong> section, paste the meta tag code. These tags are used by the social media services to include thumbnail images and your video in the post.</p></li>
+			<p><code data-gist-id="c2fa720dad97e5688f02" data-gist-hide-footer="true" data-gist-line="19-69"></code></p>
 			<li>Save your changes. You are now ready to use the social media sharing interface with your player.</li>
 		</ol> 
-		<p class="BCL-aside">Note: You will want to provide a secure URL value (<code>&lt;meta property="og:video:secure_url" content=""/&gt;</code>) for Facebook users that use secure browsing (HTTPS). Without this setting, the video  will not play on the Facebook wall, rather the poster image will link to a separate page for viewing. This is a manual process that needs to be done after you retrieve the social media meta tags.</p>
+		<p class="BCL-aside" style="padding:1em;">Note: You will want to provide a secure URL value (<code>&lt;meta property="og:video:secure_url" content=""/&gt;</code>) for Facebook users that use secure browsing (HTTPS). Without this setting, the video  will not play on the Facebook wall, rather the poster image will link to a separate page for viewing. This is a manual process that needs to be done after you retrieve the social media meta tags.</p>
       </div>
+	
       <div id="validate" class="section">
         <h2>Validate</h2>
         <p>Once you have followed the steps to include the meta tags on your page you can validate the page for both Facebook and Twitter.</p>
@@ -188,14 +211,46 @@
         <p>For Twitter, go to the <a href="https://dev.twitter.com/docs/cards/validation/validator">Card Validator</a>, select <strong>Validate and Apply</strong>, paste the URL to the page that contains the meta tags and click <strong>Go!</strong> to validate. An added advantage to validating is that Twitter will then ask you to verify your website and you will go on the waiting list to be approved for Twitter Cards.</p>
         <p>If errors occur in either validation process, update the player configuration as needed.</p>
       </div>
-			
-<!--
-	  <div id="sharevideo" class="section">
-        <h2>Share video</h2>
-		<p>To display an overlay message, use the <code>options</code> property to pass data to the plugin. This example shows how to include 3 overlay messages:</p>
-		
-      </div>
--->
+	
+	  <div id="implementcode" class="section">
+		  <h2>Implement using code</h2>
+		  <p>A more advanced implementation for the social media plugin is to use the <strong>In-Page Embed Code</strong> from the Players module. This will allow you to pass configuration options from within your page code.</p>
+		  <p>To implement the plugin using custom code, follow these steps:</p>
+		  <ol>
+			  <li>Open the Players module and locate the player.</li>
+			  <li>Click the link for the player to open the player properties.</li>
+			  <li>Locate the <strong>Social Sharing</strong> section and make sure that <strong>No</strong> is selected. Your player will no longer have a social sharing button, but that is what you want for now.</li>
+			  <div><img src="../assets/social-media-embed1.png" alt="Enabling Social Sharing Page"></div>
+			  <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
+			  <li>The JavaScript for the plugin is provided and will not change for different plugin implementations. For the <strong>JavaScript URL</strong>, enter:</li>
+				<p><pre> https://players.brightcove.net/videojs-social/dist/videojs-social.min.js</pre></p>
+		  	  <li>The CSS for the plugin is provided and will not change for different plugin implementations. For the <strong>CSS URL</strong>, enter:<br/>
+			    <p><pre> https://players.brightcove.net/videojs-social/dist/videojs-social.css</pre></p></li>
+			  <li>Unlike a standard plugin implementation, <stong>DO NOT</stong> add a value for the <strong>Name</strong> or <strong>Options</strong> fields in the <strong>Plugins</strong> section. </li>		  	
+		  </ol>
+
+			<p>Your player now includes all the code for the social media sharing functionality, but it won't automatically intialize the plugin and create the sharing button.</p>
+			<ol start="8">
+				<li>From the Players module, copy the <strong>In-Page Embed Code</strong> into your HTML page. If you run your page in the browser, notice that the sharing button does not appear in the player. It will once the social plugin has been initialized.</li>
+				<li>To your HTML page code, add JavaScript code as follows:</li>
+				<ul>
+					<li>Line 101: Gets a reference to your player.</li>
+					<li>Lines 103-117: Set the options for the social sharing plugin. For details, see the <a href="#properties">Properties</a> section.</li>
+					<li>Line 119: Initializes the social plugin with the specifiec options.</li>
+				</ul>
+				<p><code data-gist-id="c2fa720dad97e5688f02" data-gist-hide-footer="true" data-gist-line="73-124"></code></p>
+				<p>You should now see the social sharing button in your player.</p>
+				<li>Since the social sharing meta tags are not generated until you initialize the plugin, you will have to add these manually. See the <a href="#metatags">Meta tags</a> section for an example of what these should look like.</li>
+			</ol>
+			<div class="BCL-aside" style="padding:1em;">
+				<p >Note: Since the social sharing button does not show up in your player until the social plugin is initialized, the social button will not show up when your player is directly embedded in Twitter. To have the sharing button show up, you can do either of the following:</p>
+				<ul>
+					<li>Point your meta (og/twitter) tags to another player configured for embedded scenarios.</li>
+					<li>Include an additional script that initializes the social plugin without the options when it detects it is being embedded.</li>
+				</ul>
+			</div>
+		  
+		</div>
 			
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
