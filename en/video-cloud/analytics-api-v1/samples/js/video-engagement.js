@@ -3,50 +3,40 @@ var BCLS = (function ($, window, AnyTime) {
     var // aapi stuff
         $serviceURL = $("#serviceURL"),
         $accountID = $("#accountID"),
-        $token = $("#token"),
-        $startDate = $("#startDate"),
-        $startTime = $("#startTime"),
-        $endDate = $("#endDate"),
-        $endTime = $("#endTime"),
-        $whereInputs = $(".where-input"),
-        $player = $("#player"),
-        $video = $("#video"),
-        $referrer_domain = $("#referrer_domain"),
-        $source_type = $("#source_type"),
-        $search_terms = $("#search_terms"),
+        account_id = "20318290001",
+        $client_id = $("#client_id"),
+        client_id = "5746d707-db97-42b2-b4f0-3db890429ef0",
+        $client_secret = $("#client_secret"),
+        client_secret = "JBdg3PLg0NarokKjIihxa_05i-YVyvhICWlQ5NXMSlUX9H9tzYqQ8FE-4mMfhAWOMs0KxUHyUN3anzkZSr3Bvg",
+        $scopeSelect = $("#scopeSelect"),
+        scope = "account",
+        $playerID = $("#playerID"),
+        player_id = "baf68072-fb1a-4461-a00c-72b8a7f4cb10",
+        $videoID = $("#videoID"),
+        video_id = "821141023001",
+        $pid = $("#pid"),
+        $vid = $("#vid"),
         $requestButton = $("#requestButton"),
         $request = $("#request"),
-        $authorization = $("#authorization"),
-        $authorizationDisplay = $("#authorizationDisplay"),
-        $requestForm = $("#requestForm"),
         $submitButton = $("#submitButton"),
         $required = $(".required"),
-        $format = $("#format"),
         $requestInputs = $(".aapi-request"),
-        $directVideoInput = $("#directVideoInput"),
         $responseFrame = $("#responseFrame"),
         $this,
         separator = "",
         requestTrimmed = false,
         lastChar = "",
-        where = false,
         requestURL = "",
-        authorization = "",
-        endDate = "",
-        startDate = "",
-        rollupDimensionOptions = "<option value=\"account\">account</option>",
-        reportDimensionOptions = "<option value=\"player\">player</option><option value=\"video\">video</option><option value=\"referrer_domain\">referrer_domain</option><option value=\"source_type\">source_type</option><option value=\"search_terms\">search_terms</option><option value=\"device_type\">device_type</option><option value=\"device_os\">device_os</option>",
-        getVideos,
-        onGetVideos,
-        trimRequest,
-        removeSpaces,
-        buildRequest,
+        chartEngagement = "#chartEngagement",
+        responseData,
+        // functions
         isDefined,
         secondsToTime,
+        removeSpaces,
         makeEngagementGraph,
-        getData,
-        chartEngagement = "#chartEngagement",
-        responseData;
+        trimRequest,
+        buildRequest,
+        getData;
 
     // allow array forEach method in older browsers
     if ( !Array.prototype.forEach ) {
@@ -56,6 +46,12 @@ var BCLS = (function ($, window, AnyTime) {
             }
         }
     }
+    // more robust test for strings "not defined"
+    isDefined =  function (v) {
+        if(v !== "" && v !== null && v !== "undefined") { return true; }
+        else { return false; }
+    }
+
     // utility to extract h/m/s from seconds
     secondsToTime = function (secs) {
         var hours, divisor_for_minutes, divisor_for_seconds, seconds, minutes, obj = {};
@@ -86,11 +82,7 @@ var BCLS = (function ($, window, AnyTime) {
         };
         return obj;
     }
-    // more robust test for strings "not defined"
-    isDefined =  function (v) {
-        if(v !== "" && v !== null && v !== "undefined") { return true; }
-        else { return false; }
-    }
+
     // remove spaces from string
     removeSpaces = function (str) {
         if (isDefined(str)) {
@@ -129,48 +121,6 @@ var BCLS = (function ($, window, AnyTime) {
         ctx = document.getElementById("chartEngagement").getContext("2d");
         myNewChart = new Chart(ctx).Line(chartData, options);
     }
-    getVideos = function () {
-        var searchTerms = $searchTerms.val(),
-            searchTermsArray = searchTerms.split(","),
-            searchType = $searchType.val();
-        // hide the direct video input
-        $directVideoInput.hide();
-        BCMAPI.url = $readApiLocation.val();
-        BCMAPI.callback = "BCLS.onGetVideos";
-        BCMAPI.token = $mapitoken.val();
-        params.page_number = pageNumber;
-        params.page_size = $pageSize.val();
-        params.sort_by = $sortBy.val() + ":" + $sortOrder.val();
-        params.video_fields = "id,name";
-        params.get_item_count = true;
-        if (searchTerms !== "") {
-            if (searchType !== "") {
-                searchTermsArray.forEach(function (element, index, array) {
-                    element = searchType + ":" + element;
-                });
-            }
-            params.any = searchTerms;
-        }
-        BCMAPI.search(params);
-        pageNumber++;
-    }
-    onGetVideos = function(JSONdata) {
-        var template, data, result;
-        videoData = JSONdata;
-        totalVideos += JSONdata.total_count;
-        totalPages = Math.ceil(JSONdata.total_count / $pageSize.val());
-        if (totalPages === pageNumber) {
-            $getVideosButton.html("No more videos");
-            $getVideosButton.off("click", this.getVideos);
-        } else {
-            $getVideosButton.html("Get the next " + $pageSize.val() + " videos");
-        }
-        template = Handlebars.compile(videoOptionTemplate);
-        data = JSONdata;
-        result = template(data);
-        $videoSelector.html(result);
-        buildRequest();
-    }
     trimRequest = function () {
         if (!requestTrimmed) {
             lastChar = requestURL.charAt((requestURL.length - 1));
@@ -189,50 +139,16 @@ var BCLS = (function ($, window, AnyTime) {
     }
 
     buildRequest = function () {
-        // reset where to false in case this is a new request
-        where = false;
-        // check for required fields
-        $required.each(function () {
-            $this = $(this);
-            if ($this.val === "") {
-                window.alert("You must provide a service URL, account ID, and a token");
-                // stop right here
-                return;
-            }
-        });
+
+        if (isDefined($accountID.val())) {
+            account_id = $accountID.val();
+        }
         // reset requestTrimmed to false in case of regenerate request
         requestTrimmed = false;
+
         // build the request
-        authorization = "Bearer " + removeSpaces($token.val());
         requestURL = $serviceURL.val();
         requestURL += "/accounts/" + removeSpaces($accountID.val()) + "/?";
-        // check for time filters
-        startDate = $startDate.val() + " " + $startTime.val();
-        if (startDate !== " ") {
-            startDate = new Date(startDate).getTime();
-            requestURL += "from=" + startDate + "&";
-        }
-        endDate = $endDate.val() + " " + $endTime.val();
-        if (endDate !== " ") {
-            endDate = new Date(endDate).getTime();
-            requestURL += "to=" + endDate + "&";
-        }
-        // check for where filters
-        $whereInputs.each(function () {
-            var dimension;
-            $this = $(this);
-            dimension = $this.attr("id");
-            if (dimension === "videoSelector") {
-                dimension = "video";
-            }
-            if (isDefined($this.val())) {
-                if (!where) {
-                    requestURL += "where=";
-                    where = true;
-                }
-                requestURL += dimension + "==" + removeSpaces($this.val()) + ";";
-            }
-        });
         // end the where filters
         requestURL += "&";
         trimRequest();
@@ -243,7 +159,10 @@ var BCLS = (function ($, window, AnyTime) {
     }
     // submit request
     getData = function () {
-        var format = $format.val();
+        var options = {};
+        options.client_id = (isDefined($client_id.val())) ? $client_id.val() : client_id;
+        options.client_secret = (isDefined($client_secret.val())) ? $client_secret.val() : client_secret;
+        options.requestType = "GET";
         $.ajax({
             url: $request.attr("value"),
             headers: {
@@ -281,17 +200,8 @@ var BCLS = (function ($, window, AnyTime) {
         $directVideoInput.hide();
     });
     // listener for videos request
-    $getVideosButton.on("click", getVideos);
-    // set listener for form fields
     $requestInputs.on("change", buildRequest);
     // rebuild request when video selector changes
-    $videoSelector.on("change", buildRequest);
-    // in case search terms added after initial video retrieval
-    $searchTerms.on("change", function () {
-        // re-initialize
-        pageNumber = 0;
-        totalPages = 0;
-    });
     // send request
     $submitButton.on("click", getData);
 
