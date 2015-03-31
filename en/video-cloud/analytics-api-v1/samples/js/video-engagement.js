@@ -1,22 +1,6 @@
 var BCLS = (function ($, window, AnyTime) {
     "use strict";
-    var // media api stuff
-        $pageSize = $("#pageSize"),
-        $searchType = $("#searchType"),
-        $searchTerms = $("#searchTerms"),
-        $sortBy = $("#sortBy"),
-        pageNumber = 0,
-        totalPages = 0,
-        $getVideosButton = $("#getVideosButton"),
-        $videoSelector = $("#videoSelector"),
-        $sortOrder = $("#sortOrder"),
-        $mapitoken = $("#mapitoken"),
-        $readApiLocation = $("#readApiLocation"),
-        videoData,
-        totalVideos = 0,
-        params = {},
-        videoOptionTemplate = "{{#items}}<option value=\"{{id}}\">{{name}}</option>{{/items}}",
-        // aapi stuff
+    var // aapi stuff
         $serviceURL = $("#serviceURL"),
         $accountID = $("#accountID"),
         $token = $("#token"),
