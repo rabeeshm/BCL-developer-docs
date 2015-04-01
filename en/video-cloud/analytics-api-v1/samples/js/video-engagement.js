@@ -2,7 +2,7 @@ var BCLS = (function ($, window) {
     "use strict";
     var // aapi stuff
         $serviceURL = $("#serviceURL"),
-        proxyURL = "http://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
+        proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
         $accountID = $("#accountID"),
         account_id = "20318290001",
         $client_id = $("#client_id"),
