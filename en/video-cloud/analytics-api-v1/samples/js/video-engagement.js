@@ -1,7 +1,8 @@
-var BCLS = (function ($, window, AnyTime) {
+var BCLS = (function ($, window) {
     "use strict";
     var // aapi stuff
         $serviceURL = $("#serviceURL"),
+        proxyURL = "http://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
         $accountID = $("#accountID"),
         account_id = "20318290001",
         $client_id = $("#client_id"),
@@ -23,20 +24,28 @@ var BCLS = (function ($, window, AnyTime) {
         $requestInputs = $(".aapi-request"),
         $responseFrame = $("#responseFrame"),
         $this,
-        separator = "",
-        requestTrimmed = false,
-        lastChar = "",
         requestURL = "",
         chartEngagement = "#chartEngagement",
         responseData,
         // functions
         isDefined,
-        secondsToTime,
-        removeSpaces,
         makeEngagementGraph,
-        trimRequest,
         buildRequest,
-        getData;
+        getData,
+        bclslog;
+
+    /**
+     * Logging function - safe for IE
+     * @param  {string} context description of the data
+     * @param  {*} message the data to be logged by the console
+     * @return {}
+     */
+    bclslog = function (context, message) {
+        if (window["console"] && console["log"]) {
+          console.log(context, message);
+        };
+        return;
+    };
 
     // allow array forEach method in older browsers
     if ( !Array.prototype.forEach ) {
@@ -52,52 +61,23 @@ var BCLS = (function ($, window, AnyTime) {
         else { return false; }
     }
 
-    // utility to extract h/m/s from seconds
-    secondsToTime = function (secs) {
-        var hours, divisor_for_minutes, divisor_for_seconds, seconds, minutes, obj = {};
-        hours = Math.floor(secs / (60 * 60));
-        if (hours < 10 ) {
-            hours = "0" + hours.toString();
-        } else {
-            hours = hours.toString();
-        };
-        divisor_for_minutes = secs % (60 * 60);
-        minutes = Math.floor(divisor_for_minutes / 60);
-        if (minutes < 10 ) {
-            minutes = "0" + minutes.toString();
-        } else {
-            minutes = minutes.toString();
-        };
-        divisor_for_seconds = divisor_for_minutes % 60;
-        seconds = Math.ceil(divisor_for_seconds);
-        if (seconds < 10) {
-            seconds = "0" + seconds.toString();
-        } else {
-            seconds = seconds.toString();
-        };
-        obj = {
-            "h": hours,
-            "m": minutes,
-            "s": seconds
-        };
-        return obj;
-    }
-
-    // remove spaces from string
-    removeSpaces = function (str) {
-        if (isDefined(str)) {
-            str = str.replace(/\s+/g, '');
-        return str;
-        }
-    }
     // create graph
     makeEngagementGraph = function(jsonObject) {
-        var options = {pointDot : false}, chartData = {}, labels = [], data = [], video_engagement = jsonObject.metrics.video_engagement.series.values, video_duration = jsonObject.video_duration, series = {}, video_name = jsonObject.video_name, options = {pointDot : false}, ctx, myNewChart;
+        var options = {pointDot : false},
+            chartData = {},
+            labels = [],
+            data = [],
+            video_engagement = jsonObject.timeline.values,
+            video_duration = 100,
+            series = {},
+            video_name = jsonObject.video_name,
+            options = {pointDot : false},
+            ctx,
+            myNewChart;
         // process response data
         video_engagement.forEach( function (element, index, array) {
-            var timeformatted = secondsToTime((index * video_duration) / 100);
-            if ((index + 1) % 10 === 0) {
-                labels[index] = timeformatted.m + ":" + timeformatted.s;
+            if ((index) % 10 === 0) {
+                labels[index] = index + "%";
             } else {
                 labels[index] = "";
             }
@@ -121,94 +101,70 @@ var BCLS = (function ($, window, AnyTime) {
         ctx = document.getElementById("chartEngagement").getContext("2d");
         myNewChart = new Chart(ctx).Line(chartData, options);
     }
-    trimRequest = function () {
-        if (!requestTrimmed) {
-            lastChar = requestURL.charAt((requestURL.length - 1));
-            if (lastChar === "?" || lastChar === "&" || lastChar === ";") {
-                requestURL = requestURL.substring(0, (requestURL.length - 1));
-                // recall this function until trim finished
-                trimRequest(requestURL);
-            } else if (requestURL.indexOf("&&") > -1) {
-                requestURL = requestURL.replace("&&", "&");
-            } else if (requestURL.indexOf("?&") > -1) {
-                requestURL = requestURL.replace("?&", "?");
-            } else {
-                requestTrimmed = true;
-            }
-        }
-    }
 
     buildRequest = function () {
-
-        if (isDefined($accountID.val())) {
-            account_id = $accountID.val();
-        }
-        // reset requestTrimmed to false in case of regenerate request
-        requestTrimmed = false;
+        var account = (isDefined($accountID.val())) ? $accountID.val() : account_id,
+            player = (isDefined($playerID.val())) ? $playerID.val() : player_id,
+            video = (isDefined($videoID.val())) ? $videoID.val() : video_id;
 
         // build the request
         requestURL = $serviceURL.val();
-        requestURL += "/accounts/" + removeSpaces($accountID.val()) + "/?";
-        // end the where filters
-        requestURL += "&";
-        trimRequest();
+        requestURL += "/engagement/accounts/" + account;
+        if (scope === "players") {
+            requestURL += "/players/" + player;
+        } else if (scope === "videos") {
+            requestURL+= "/videos/" + video;
+        }
         $request.html(requestURL);
-        $authorizationDisplay.html(authorization);
         $request.attr("value", requestURL);
-        $authorization.attr("value", authorization);
     }
     // submit request
     getData = function () {
         var options = {};
         options.client_id = (isDefined($client_id.val())) ? $client_id.val() : client_id;
         options.client_secret = (isDefined($client_secret.val())) ? $client_secret.val() : client_secret;
+        options.url = $request.val();
         options.requestType = "GET";
+        options.requestBody = null;
+        bclslog("options", options);
         $.ajax({
-            url: $request.attr("value"),
-            headers: {
-                Authorization : $authorization.attr("value")
-            },
-            success : function(data) {
-                makeEngagementGraph(data);
+            url: proxyURL,
+            method: "POST",
+            data: options,
+            success : function (data) {
+                try {
+                   var data = JSON.parse(data);
+                } catch (e) {
+                   alert('invalid json');
+                }
+
                 $responseFrame.html(BCLSformatJSON.formatJSON(data));
+                makeEngagementGraph(data);
             }
         })
     }
-    // set up the anytime date/time pickers
-    AnyTime.picker("startDate", {
-        format: "%a %M %d %Y"
-    });
-    AnyTime.picker("startTime", {
-        format: "%H:%i:%s %@",
-        labelTitle: "Time",
-        labelHour: "Hour",
-        labelMinute: "Minute"
-    });
-    AnyTime.picker("endDate", {
-        format: "%a %M %d %Y"
-    });
-    AnyTime.picker("endTime", {
-        format: "%H:%i:%s %@",
-        labelTitle: "Time",
-        labelHour: "Hour",
-        labelMinute: "Minute"
-    });
-
     // set event listeners
-    // if we get a mapi token , hide direct input of video id
-    $mapitoken.on("change", function () {
-        $directVideoInput.hide();
-    });
     // listener for videos request
     $requestInputs.on("change", buildRequest);
-    // rebuild request when video selector changes
+    // rebuild request when scope selector changes
+    $scopeSelect.on("change", function (evt) {
+        scope = $scopeSelect.val();
+        if (scope === "account") {
+            $vid.hide();
+            $pid.hide();
+        } else if (scope === "players") {
+            $vid.hide();
+        } else if (scope === "videos") {
+            $pid.hide();
+        }
+        buildRequest();
+    });
     // send request
     $submitButton.on("click", getData);
 
     // generate initial request
-    // buildRequest();
+    buildRequest();
     return {
-        buildRequest: buildRequest,
-        onGetVideos: onGetVideos
+        buildRequest: buildRequest
     }
-})($, window, AnyTime);
+})($, window);
