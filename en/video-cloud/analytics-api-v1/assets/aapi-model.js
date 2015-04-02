@@ -184,6 +184,8 @@ var aapi_model = {
             account_player_devices: {dimensions: ["account", "player", "device_type", "device_os"], fields: []},
             account_video_devices: {dimensions: ["account", "video", "device_type", "device_os"], fields: []},
             account_geo: {dimensions: ["account", "country", "region", "city"], fields: []},
+            account_player_country: {dimensions: ["account", "player", "country"], fields: []},
+            account_video_country: {dimensions: ["account", "video", "country"], fields: []},
             account_destination: {dimensions: ["account", "destination_domain", "destination_path"], fields: []},
             account_destination_domain: {dimensions: ["account", "destination_domain"], fields: []},
             account_destination_path: {dimensions: ["account", "destination_path"], fields: []},
