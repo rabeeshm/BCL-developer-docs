@@ -74,13 +74,15 @@
     <script type="text/javascript">
         var BCLS = ( function (window, document, Handlebars, bclsProfiles) {
             var  mainSection = document.getElementById("main"),
-            data = bclsProfiles,
-            profileListTemplate = "{{#BCLSprofilesArray}}<tr><td><a href=\"#{{name}}\">{{name}}</a></td><td class=\"bcl-center\">{{numRenditions}}</td><td>{{description}}</td></tr>{{/BCLSprofilesArray}}",
-            // functions
-            buildSummaryTable,
-            buildDetailTables,
-            getProfileData,
-            bclslog;
+                proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
+                        requestData = "client_id=cca7ae2a-503d-472e-996c-3aa664d4aa95&client_secret=OE43iNQ6HluFxM2I_f6QDfGLoSSW28jnDWbX8gDgS6GIFD2P6VNWKbRHyln0I5aVyoSeil0l5ikWYQ2hUbR99g&url=" + encodeURI('https://ingestion.api.brightcove.com/v1/accounts/3921507403001/profiles') + "&requestBody=null&requestType=GET",
+                data = bclsProfiles,
+                profileListTemplate = "{{#BCLSprofilesArray}}<tr><td><a href=\"#{{name}}\">{{name}}</a></td><td class=\"bcl-center\">{{numRenditions}}</td><td>{{description}}</td></tr>{{/BCLSprofilesArray}}",
+                // functions
+                buildSummaryTable,
+                buildDetailTables,
+                getProfileData,
+                bclslog;
 
             /**
              * Logging function - safe for IE
@@ -107,7 +109,7 @@
                     profileTableElem,
                     profiletheadElem,
                     profiletbodyElem,
-                    template,
+                    template = profileListTemplate,
                     profileDescriptions = [
                         {"name": "Express Standard", "description": "Does not include HLS renditions"},
                         {"name": "Live - HD", "description": "All up with HD"},
@@ -176,34 +178,37 @@
                     renditiontheadNode,
                     renditiontbodyNode,
                     sectionHeadingElem,
+                    sectionHeading2Elem,
                     renditionTableElem,
                     renditiontheadElem,
                     renditiontbodyElem,
-                    thTemplate
-                    trTemplate = "{{#renditions}}<tr><td>{{media_type}}</td><td>{{format}}</td><td>{{audio_codec}}</td><td>{{audio_bitrate}}</td><td>{{video_codec}}</td><td>{{video_bitrate}}</td><td>{{width}}</td><td>{{height}}</td><td>{{h264_profile}}</td></tr>{{/renditions}}",
-                    template,
                     i, j, jMax,
                     iMax = data.BCLSprofilesArray.length,
                     headings,
                     rendition,
                     renditionProperty,
-                    thStr = "<tr>",
-                    tbStr = "<tr>";
+                    thStr = "",
+                    tbStr = "";
                 for (i = 0; i < iMax; i++) {
                     newSectionNode = document.createElement("div");
                     sectionHeadingNode = document.createElement("h2");
-                    renditionTableNode = document.createElement("table");
-                    renditiontheadNode = document.createElement("thead");
-                    renditiontbodyNode = document.createElement("tbody");
+                    sectionHeading2Node = document.createElement("h5");
                     newSectionNode.setAttribute("id", data.BCLSprofilesArray[i].name);
                     newSectionNode.setAttribute("class", "section");
                     sectionHeadingNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_summaryTableHeading");
+                    sectionHeading2Node.setAttribute("id", data.BCLSprofilesArray[i].name + "_summaryH3Heading");
                     newSectionNode.appendChild(sectionHeadingNode);
+                    newSectionNode.appendChild(sectionHeading2Node);
                     mainSection.appendChild(newSectionNode);
                     sectionHeadingElem = document.getElementById(data.BCLSprofilesArray[i].name + "_summaryTableHeading");
+                    sectionHeading2Elem = document.getElementById(data.BCLSprofilesArray[i].name + "_summaryH3Heading");
                     sectionHeadingElem.innerHTML = data.BCLSprofilesArray[i].name;
+                    sectionHeading2Elem.innerHTML = "Rendition information";
                     jMax = data.BCLSprofilesArray[i].renditions.length;
                     for (j = 0; j < jMax; j++) {
+                        renditionTableNode = document.createElement("table");
+                        renditiontheadNode = document.createElement("thead");
+                        renditiontbodyNode = document.createElement("tbody");
                         renditionTableNode.setAttribute("id", data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTable");
                         renditiontheadNode.setAttribute("id", data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTableThead");
                         renditiontbodyNode.setAttribute("id", data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTableTbody");
@@ -212,6 +217,8 @@
                         renditionTableNode.appendChild(renditiontbodyNode)
                         renditiontheadElem = document.getElementById(data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTableThead");
                         renditiontbodyElem = document.getElementById(data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTableTbody");
+                        thStr = "<tr>";
+                        tbStr = "<tr>";
                         rendition = data.BCLSprofilesArray[i].renditions[j];
                         for (renditionProperty in rendition) {
                             thStr += "<th>" + renditionProperty + "</th>";
@@ -227,35 +234,41 @@
             getProfileData = function () {
                 var httpRequest = new XMLHttpRequest(),
                     proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
-                    requestData = {},
-                    getResponse;
                     getResponse = function () {
+                        bclslog("getting data");
                         try {
                             if (httpRequest.readyState === 4) {
                               if (httpRequest.status === 200) {
-                                logResponse(httpRequest.responseText);
-                                if (callNumber < totalVideos) {
-                                    callNumber++;
-                                    setRequest();
+                                try {
+                                  data.BCLSprofilesArray = JSON.parse(httpRequest.responseText);
+                                  buildSummaryTable();
+                                  buildDetailTables();
+                                } catch (e) {
+                                  bclslog('invalid json', e);
                                 }
                               } else {
-                                alert("There was a problem with the request. Request returned " + httpRequest.status);
+                                bclslog("There was a problem with the request. Request returned: ", httpRequest.status);
+                                // just use cached data and build the tables
+                                buildSummaryTable();
+                                buildDetailTables();
                               }
                             }
                           }
                           catch(e) {
-                            alert('Caught Exception: ' + e);
+                            bclslog('Caught Exception: ', e);
                           }
                     };
-                    requestData.url = "http://ingestion.api.brightcove.com/v1/accounts/3921507403001/profiles";
-                    requestData.client_id = "cca7ae2a-503d-472e-996c-3aa664d4aa95";
-                    requestData.client_secret = "OE43iNQ6HluFxM2I_f6QDfGLoSSW28jnDWbX8gDgS6GIFD2P6VNWKbRHyln0I5aVyoSeil0l5ikWYQ2hUbR99g";
-                    requestData.requestMethod = "GET";
-                    requestData.requestBody = null;
-                    getResponse();
+                bclslog("requestData", requestData);
+                // set response handler
+                httpRequest.onreadystatechange = getResponse;
+                // open the request
+                httpRequest.open("POST", proxyURL);
+                // set headers
+                httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                // open and send request
+                httpRequest.send(requestData);
             }
-            buildSummaryTable();
-            buildDetailTables();
+            getProfileData();
             // BCLSmain.createInPageNav();
             })(window, document, Handlebars, bclsProfiles);
     </script>
