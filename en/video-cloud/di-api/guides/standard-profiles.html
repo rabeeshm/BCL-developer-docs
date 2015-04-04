@@ -78,7 +78,23 @@
             profileListTemplate = "{{#BCLSprofilesArray}}<tr><td><a href=\"#{{name}}\">{{name}}</a></td><td class=\"bcl-center\">{{numRenditions}}</td><td>{{description}}</td></tr>{{/BCLSprofilesArray}}",
             // functions
             buildSummaryTable,
-            buildDetailTables;
+            buildDetailTables,
+            getProfileData,
+            bclslog;
+
+            /**
+             * Logging function - safe for IE
+             * @param  {string} context description of the data
+             * @param  {*} message the data to be logged by the console
+             * @return {}
+             */
+            bclslog = function (context, message) {
+                if (window["console"] && console["log"]) {
+                  console.log(context, message);
+                };
+                return;
+            };
+
             buildSummaryTable = function () {
                 var newSectionNode = document.createElement("div"),
                     sectionHeadingNode = document.createElement("h2"),
@@ -93,7 +109,7 @@
                     profiletbodyElem,
                     template,
                     profileDescriptions = [
-                        {"name": "Express Standard", "description": "The default for the old Studio - does not include HLS renditions"},
+                        {"name": "Express Standard", "description": "Does not include HLS renditions"},
                         {"name": "Live - HD", "description": "All up with HD"},
                         {"name": "Live - Premium HD", "description": "Larger set without HD"},
                         {"name": "Live - Standard", "description": "Small set that is cost effective"},
@@ -156,47 +172,87 @@
             buildDetailTables = function () {
                 var newSectionNode,
                     sectionHeadingNode,
-                    profileTableNode,
-                    profiletheadNode,
-                    profiletbodyNode,
+                    renditionTableNode,
+                    renditiontheadNode,
+                    renditiontbodyNode,
                     sectionHeadingElem,
-                    profileTableElem,
-                    profiletheadElem,
-                    profiletbodyElem,
+                    renditionTableElem,
+                    renditiontheadElem,
+                    renditiontbodyElem,
+                    thTemplate
                     trTemplate = "{{#renditions}}<tr><td>{{media_type}}</td><td>{{format}}</td><td>{{audio_codec}}</td><td>{{audio_bitrate}}</td><td>{{video_codec}}</td><td>{{video_bitrate}}</td><td>{{width}}</td><td>{{height}}</td><td>{{h264_profile}}</td></tr>{{/renditions}}",
                     template,
                     i, j, jMax,
                     iMax = data.BCLSprofilesArray.length,
-                    headings;
+                    headings,
+                    rendition,
+                    renditionProperty,
+                    thStr = "<tr>",
+                    tbStr = "<tr>";
                 for (i = 0; i < iMax; i++) {
                     newSectionNode = document.createElement("div");
                     sectionHeadingNode = document.createElement("h2");
-                    profileTableNode = document.createElement("table");
-                    profiletheadNode = document.createElement("thead");
-                    profiletbodyNode = document.createElement("tbody");
+                    renditionTableNode = document.createElement("table");
+                    renditiontheadNode = document.createElement("thead");
+                    renditiontbodyNode = document.createElement("tbody");
                     newSectionNode.setAttribute("id", data.BCLSprofilesArray[i].name);
                     newSectionNode.setAttribute("class", "section");
                     sectionHeadingNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_summaryTableHeading");
-                    profileTableNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_profileSummaryTable");
-
-                    profiletheadNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_profileSummaryTableThead");
-                    profiletbodyNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_profileSummaryTableTbody");
                     newSectionNode.appendChild(sectionHeadingNode);
-                    newSectionNode.appendChild(profileTableNode);
-                    profileTableNode.appendChild(profiletheadNode)
-                    profileTableNode.appendChild(profiletbodyNode)
                     mainSection.appendChild(newSectionNode);
                     sectionHeadingElem = document.getElementById(data.BCLSprofilesArray[i].name + "_summaryTableHeading");
-                    profiletheadElem = document.getElementById(data.BCLSprofilesArray[i].name + "_profileSummaryTableThead");
-                    profiletbodyElem = document.getElementById(data.BCLSprofilesArray[i].name + "_profileSummaryTableTbody");
                     sectionHeadingElem.innerHTML = data.BCLSprofilesArray[i].name;
-                    profiletheadElem.innerHTML = "<tr><th>media_type</th><th>format</th><th>audio_codec</th><th>audio_bitrate</th><th>video_codec</th><th>video_bitrate</th><th>width</th><th>height</th><th>h264_profile</th></tr>";
                     jMax = data.BCLSprofilesArray[i].renditions.length;
-                    renditionData = data.BCLSprofilesArray[i]
-                    template = Handlebars.compile(trTemplate);
-                    profiletbodyElem.innerHTML = template(renditionData);
+                    for (j = 0; j < jMax; j++) {
+                        renditionTableNode.setAttribute("id", data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTable");
+                        renditiontheadNode.setAttribute("id", data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTableThead");
+                        renditiontbodyNode.setAttribute("id", data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTableTbody");
+                        newSectionNode.appendChild(renditionTableNode);
+                        renditionTableNode.appendChild(renditiontheadNode)
+                        renditionTableNode.appendChild(renditiontbodyNode)
+                        renditiontheadElem = document.getElementById(data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTableThead");
+                        renditiontbodyElem = document.getElementById(data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTableTbody");
+                        rendition = data.BCLSprofilesArray[i].renditions[j];
+                        for (renditionProperty in rendition) {
+                            thStr += "<th>" + renditionProperty + "</th>";
+                            tbStr += "<td>" + rendition[renditionProperty] + "</td>";
+                        }
+                        thStr += "</tr>";
+                        tbStr += "</tr>";
+                        renditiontheadElem.innerHTML = thStr;
+                        renditiontbodyElem.innerHTML = tbStr;
+                    }
                 }
-
+            };
+            getProfileData = function () {
+                var httpRequest = new XMLHttpRequest(),
+                    proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
+                    requestData = {},
+                    getResponse;
+                    getResponse = function () {
+                        try {
+                            if (httpRequest.readyState === 4) {
+                              if (httpRequest.status === 200) {
+                                logResponse(httpRequest.responseText);
+                                if (callNumber < totalVideos) {
+                                    callNumber++;
+                                    setRequest();
+                                }
+                              } else {
+                                alert("There was a problem with the request. Request returned " + httpRequest.status);
+                              }
+                            }
+                          }
+                          catch(e) {
+                            alert('Caught Exception: ' + e);
+                          }
+                    };
+                    requestData.url = "http://ingestion.api.brightcove.com/v1/accounts/3921507403001/profiles";
+                    requestData.client_id = "cca7ae2a-503d-472e-996c-3aa664d4aa95";
+                    requestData.client_secret = "OE43iNQ6HluFxM2I_f6QDfGLoSSW28jnDWbX8gDgS6GIFD2P6VNWKbRHyln0I5aVyoSeil0l5ikWYQ2hUbR99g";
+                    requestData.requestMethod = "GET";
+                    requestData.requestBody = null;
+                    getResponse();
             }
             buildSummaryTable();
             buildDetailTables();
