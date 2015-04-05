@@ -1045,6 +1045,8 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
     init();
     return {
         "BCLhighlight": BCLhighlight,
-        "createInPageNav": createInPageNav
+        "createInPageNav": createInPageNav,
+        "product": product,
+        "$divsection": $divsection
     };
 })($, window, console, document, Handlebars, bclsNavData, hljs);
