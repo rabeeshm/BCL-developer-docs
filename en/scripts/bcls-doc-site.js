@@ -388,14 +388,18 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             lMax,
             item,
             landingPageBlockTemplateStart = "<div class=\"large-3 small-12 columns\" style=\"overflow-x:hidden\"><h2 class=\"index-page\">{{name}}</h2>",
+            landingPageBlock2TemplateStart = "<h2 class=\"index-page\">{{name}}</h2>",
             landingPageSubMenuTemplateStart = "<div><h4 class=\"index-page\">{{name}}</h4>",
-            landingPageSUbSubMenuTemplateStart = "<div><h5 class=\"index-page\">{{name}}</h5>",
+            landingPageSubSubMenuTemplateStart = "<div><h5 class=\"index-page\">{{name}}</h5>",
             landingPageBlockTemplateEnd = "</div>",
             landingPageBlockTemplate = "<p style=\"font-size:.9rem;line-height:.9rem;margin-bottom:.5rem;\"><a href=\"{{url}}\">{{name}}</a></p>",
+            landingItemTemplate = "<p style=\"font-size:.9rem;line-height:.9rem;margin-bottom:.5rem;margin-left:1rem;\"><a href=\"{{url}}\">{{name}}</a></p>",
             blockTemplateStart = Handlebars.compile(landingPageBlockTemplateStart),
+            blockTemplate2Start = Handlebars.compile(landingPageBlock2TemplateStart),
             subTemplateStart = Handlebars.compile(landingPageSubMenuTemplateStart),
-            subsubTemplateStart = Handlebars.compile(landingPageSUbSubMenuTemplateStart),
+            subsubTemplateStart = Handlebars.compile(landingPageSubSubMenuTemplateStart),
             itemTemplate = Handlebars.compile(landingPageBlockTemplate),
+            SingleItemTemplate = Handlebars.compile(landingItemTemplate),
             blockEndTemplate = landingPageBlockTemplateEnd,
             str = "";
 
@@ -408,7 +412,12 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                 bclslog("landing page item", item);
                 if (exists(item.items)) {
                     kMax = item.items.length;
-                    str += blockTemplateStart(item);
+                    if (i === 1) {
+                        str += blockTemplate2Start(item);
+                    } else {
+                        str += blockTemplateStart(item);
+                    }
+
                     for (k = 0; k < kMax; k++) {
                         var kItem = item.items[k];
                         // check for submenus
@@ -434,9 +443,12 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                         }
                     }
                 } else {
-                    str += itemTemplate(item);
+                    bclslog("item", item);
+                    str += SingleItemTemplate(item);
                 }
-                str += blockEndTemplate;
+                if (i > 0) {
+                    str += blockEndTemplate;
+                }
             }
             $sections.html(str);
             $sections.children("div").filter(":last").addClass("end");
