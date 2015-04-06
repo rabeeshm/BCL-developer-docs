@@ -73,7 +73,7 @@
     <script src="./assets/BCLSprofilesArray.js"></script>
     <script src="/en/scripts/bcls-doc-site.js"></script>
     <script type="text/javascript">
-        var BCLS = ( function (window, document, Handlebars, bclsProfiles, BCLSmain) {
+        var BCLS = ( function (window, document, Handlebars, bclsProfiles, hljs) {
             var  mainSection = document.getElementById("main"),
                 proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
                         requestData = "client_id=cca7ae2a-503d-472e-996c-3aa664d4aa95&client_secret=OE43iNQ6HluFxM2I_f6QDfGLoSSW28jnDWbX8gDgS6GIFD2P6VNWKbRHyln0I5aVyoSeil0l5ikWYQ2hUbR99g&url=" + encodeURI('https://ingestion.api.brightcove.com/v1/accounts/3921507403001/profiles') + "&requestBody=null&requestType=GET",
@@ -120,6 +120,9 @@
                 });
                 // set h2 color to product NewColor
                 $("h1,h2").attr("style", "color:#F3951D;");
+                $("pre>code").each(function (i, e) {
+                    hljs.highlightBlock(e);
+                });
             };
             createInPageNav = function () {
                 var navObj = {},
@@ -244,14 +247,14 @@
                 for (i = 0; i < iMax; i++) {
                     newSectionNode = document.createElement("div");
                     sectionHeadingNode = document.createElement("h2");
-                    sectionSubHeadingNode = document.createElement("h5");
-                    sectionJsonHeadingNode = document.createElement("h5");
+                    // sectionSubHeadingNode = document.createElement("h5");
+                    sectionJsonHeadingNode = document.createElement("h6");
                     profilePreNode = document.createElement("pre");
                     profileCodeNode = document.createElement("code");
                     newSectionNode.setAttribute("id", data.BCLSprofilesArray[i].name);
                     newSectionNode.setAttribute("class", "section");
                     sectionHeadingNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_summaryTableHeading");
-                    sectionSubHeadingNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_summarySubHeading");
+                    // sectionSubHeadingNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_summarySubHeading");
                     sectionJsonHeadingNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_summaryJsonHeading");
                     profilePreNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_summaryPre");
                     profileCodeNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_summaryCode");
@@ -259,41 +262,42 @@
                     newSectionNode.appendChild(sectionJsonHeadingNode);
                     newSectionNode.appendChild(profilePreNode);
                     profilePreNode.appendChild(profileCodeNode)
-                    newSectionNode.appendChild(sectionSubHeadingNode);
+                    // newSectionNode.appendChild(sectionSubHeadingNode);
                     mainSection.appendChild(newSectionNode);
                     sectionHeadingElem = document.getElementById(data.BCLSprofilesArray[i].name + "_summaryTableHeading");
-                    sectionSubHeadingElem = document.getElementById(data.BCLSprofilesArray[i].name + "_summarySubHeading");
+                    // sectionSubHeadingElem = document.getElementById(data.BCLSprofilesArray[i].name + "_summarySubHeading");
                     sectionJsonHeadingElem = document.getElementById(data.BCLSprofilesArray[i].name + "_summaryJsonHeading");
                     profilePreElem = document.getElementById(data.BCLSprofilesArray[i].name + "_summaryPre");
                     profileCodeElem = document.getElementById(data.BCLSprofilesArray[i].name + "_summaryCode");
                     sectionHeadingElem.innerHTML = data.BCLSprofilesArray[i].name;
-                    sectionSubHeadingElem.innerHTML = "Rendition information";
-                    sectionJsonHeadingElem.innerHTML = "Full JSON for the profile"
+                    // sectionSubHeadingElem.innerHTML = "Rendition information";
+                    sectionJsonHeadingElem.innerHTML = "JSON for the <code>" + data.BCLSprofilesArray[i].name + "</code> profile";
+                    profileCodeElem.innerHTML = JSON.stringify(data.BCLSprofilesArray[i], false, "  ");
                     jMax = data.BCLSprofilesArray[i].renditions.length;
-                    for (j = 0; j < jMax; j++) {
-                        renditionTableNode = document.createElement("table");
-                        renditiontheadNode = document.createElement("thead");
-                        renditiontbodyNode = document.createElement("tbody");
-                        renditionTableNode.setAttribute("id", data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTable");
-                        renditiontheadNode.setAttribute("id", data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTableThead");
-                        renditiontbodyNode.setAttribute("id", data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTableTbody");
-                        newSectionNode.appendChild(renditionTableNode);
-                        renditionTableNode.appendChild(renditiontheadNode)
-                        renditionTableNode.appendChild(renditiontbodyNode)
-                        renditiontheadElem = document.getElementById(data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTableThead");
-                        renditiontbodyElem = document.getElementById(data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTableTbody");
-                        thStr = "<tr>";
-                        tbStr = "<tr>";
-                        rendition = data.BCLSprofilesArray[i].renditions[j];
-                        for (renditionProperty in rendition) {
-                            thStr += "<th>" + renditionProperty + "</th>";
-                            tbStr += "<td>" + rendition[renditionProperty] + "</td>";
-                        }
-                        thStr += "</tr>";
-                        tbStr += "</tr>";
-                        renditiontheadElem.innerHTML = thStr;
-                        renditiontbodyElem.innerHTML = tbStr;
-                    }
+                    // for (j = 0; j < jMax; j++) {
+                    //     renditionTableNode = document.createElement("table");
+                    //     renditiontheadNode = document.createElement("thead");
+                    //     renditiontbodyNode = document.createElement("tbody");
+                    //     renditionTableNode.setAttribute("id", data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTable");
+                    //     renditiontheadNode.setAttribute("id", data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTableThead");
+                    //     renditiontbodyNode.setAttribute("id", data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTableTbody");
+                    //     newSectionNode.appendChild(renditionTableNode);
+                    //     renditionTableNode.appendChild(renditiontheadNode)
+                    //     renditionTableNode.appendChild(renditiontbodyNode)
+                    //     renditiontheadElem = document.getElementById(data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTableThead");
+                    //     renditiontbodyElem = document.getElementById(data.BCLSprofilesArray[i].renditions[j].id + "_profileSummaryTableTbody");
+                    //     thStr = "<tr>";
+                    //     tbStr = "<tr>";
+                    //     rendition = data.BCLSprofilesArray[i].renditions[j];
+                    //     for (renditionProperty in rendition) {
+                    //         thStr += "<th>" + renditionProperty + "</th>";
+                    //         tbStr += "<td>" + rendition[renditionProperty] + "</td>";
+                    //     }
+                    //     thStr += "</tr>";
+                    //     tbStr += "</tr>";
+                    //     renditiontheadElem.innerHTML = thStr;
+                    //     renditiontbodyElem.innerHTML = tbStr;
+                    // }
                 }
                 bclslog("content built");
                 createInPageNav();
@@ -340,7 +344,7 @@
             getProfileData();
 
             // BCLSmain.createInPageNav();
-            })(window, document, Handlebars, bclsProfiles, BCLSmain);
+            })(window, document, Handlebars, bclsProfiles, hljs);
     </script>
     <!-- note - since the script above inserts sections into the DOM, the main site script and foundation() must be called after that script runs! -->
     <script>
