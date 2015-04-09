@@ -93,11 +93,12 @@
 			</div>
 			<div id="enableplayer" class="section">
 			  <h2>Enable player</h2>
-			  <p>At some time in the near future you will be able use <span class="video-cloud-only">Video Cloud</span><span class="perform-only">Perform</span> Studio to enable your player to use playlists. Until that time, you need to add a <code>"playlist": true</code> property to your player. You can use the form below to perform the task, or use curl.</p>
-			  <h3>Enable by filling in a form</h3>
+			  <p>At some time in the near future you will be able use <span class="video-cloud-only">Video Cloud</span><span class="perform-only">Perform</span> Studio to enable your player to use playlists. Until that time, you need to add a <code>"playlist": true</code> property to your player. You need to EITHER use the form below to perform the task, OR use the curl statement.</p>
+			  <h3>Enable player using a form</h3>
 			  <p>To use the form you need the following information:</p>
 			  <ul>
-			    <li><strong>Client ID</strong> and <strong>client secret</strong> - An instructional video and instructions on how to obtain these credentials can be found in the <a href="//docs.brightcove.com/en/video-cloud/studio/managing-accounts/managing-api-credentials.html">Managing API Credentials</a> document.</li>
+			    <li><strong>Client ID</strong> and <strong>client secret</strong> - An instructional video and instructions on how to obtain these credentials can be found in the <a href="//docs.brightcove.com/en/video-cloud/studio/managing-accounts/managing-api-credentials.html">Managing API Credentials</a> document. When selecting permissions select <strong>Players > Read/Write</strong>.</li>
+			    <div><img src="/en/video-cloud/brightcove-player/guides/assets/playlist-using-permissions.png"></div>
 			    <li><strong>Account ID</strong> - Obtained from the <em>Home</em> page of Video Cloud Studio.</li>
 			    <div>
 			      <img src="/en/video-cloud/brightcove-player/guides/assets/playlist-using-acctid-studio.png">
@@ -107,11 +108,8 @@
 			      <img src="/en/video-cloud/brightcove-player/guides/assets/playlist-using-playerid-studio.png">
 			    </div>
 			  </ul>
-			  <p>The form will securely submit the information to a proxy, which will then make the API call to update your player. On successful update, the player will then be published.</p>
+			  <p>The form will securely submit the information to a proxy, which will then make the API call to update your player to a proper version to use playlists, and set the <code>playlist</code> value. On successful update, the player will then be published using another API call.</p>
 			  <!-- FORM GOES HERE -->
-				
-				<h3>Enable by using this API proxy</h3>
-        <h4>Request Options</h4>
 				<p>All fields are required.</p>
         <div id="inputFields" class="input-fields">
             <fieldset>
@@ -120,7 +118,7 @@
                     <table>
                         <tbody>
                             <tr>
-                                <td>Service URL:</td>
+                                <td>Service URL: (informational only, no need to change)</td>
                                 <td>
                                     <input id="serviceURL" class="required papi-request" type="text" size="55" value="https://players.api.brightcove.com/v1" />
                                 </td>
@@ -156,10 +154,11 @@
                     <p class="text-warning small" id="n1"><sup class="red">[1]</sup> See <a href="//docs.brightcove.com/en/video-cloud/analytics-api/guides/managing-api-credentials.html">Managing API Credentials</a> for information on getting client credentials.</p>
                 </div>
             </fieldset>
-          
+						<p>
+							<button id="submitButton">Update player for playlists</button>
+						</p>
         </div>
-        <h4>The API Request</h4>
-        <div id="requestSubmitter">
+        <div id="requestSubmitter" style="display:none">
 						<fieldset>
 								<legend>Generated Request</legend>
 								<p>API Request - PATCH</p>
@@ -168,26 +167,29 @@
 								<textarea id="request2" name="request2" rows="2" cols="100"></textarea>
 						</fieldset>
 						<br/>
-						<p>
-							<button id="submitButton">Update player for playlists</button>
-						</p>
         </div>
-        <div id="response">
-            <h4>Response</h4>
-<pre><code id="responseFrame"></code></pre>
+ 				<div id="response">
+ 					<p>After you submit the form, in the following code block you will either see an error or the URL to your playlist enabled player. If you see the error check your form values. IF YOU CHOOSE, you can copy the URL to a browser, and at the end of the URL change the <strong>index.html</strong> to <strong>config.json</strong>. You will see the configuration shows the <code>"playlist" : true</code> value.</p>
+					<pre><code id="responseFrame"></code></pre>
         </div>
 
 			  <!-- END FORM -->
-			  <h3>Enable by using curl</h3>
+			  <h3>Enable player using curl</h3>
+			  <p class="BCL-aside">Note: You need to use the following curl statement ONLY IF you choose not to use the form to playlist enable your player.</p>
 			  <p>If you would rather not use the form, and have the proper skill set, you can patch your player using this curl statement:</p>
 			<pre><code>curl \
---header "Content-Type: application/json" \
---user YOUR_EMAIL \
---request PATCH \
---data '{
-    "playlist": true
+  --header "Content-Type: application/json" \
+  --user YOUR_EMAIL \
+  --request PATCH \
+  --data '{
+      "player": {
+        "template": {
+          "version": "1.14.0"
+        }
+      },
+      "playlist": true
   }' \
-https://players.api.brightcove.com/v1/accounts/YOUR_ACCOUNT_ID/players/YOUR_PLAYER_ID/configuration</code></pre>
+  https://players.api.brightcove.com/v1/accounts/YOUR_ACCOUNT_ID/players/YOUR_PLAYER_ID/configuration</code></pre>
         <p>Be sure to publish your player after making the change.</p>
         <p class="BCL-aside video-cloud-only">Note: Using curl is detailed in the <a href="//docs.brightcove.com/en/video-cloud/player-management/getting-started/player-mgmt-quick-start.html">Quick Start to Player Management</a> document.</p>
         <p class="BCL-aside perform-only">Note: Using curl is detailed in the <a href="//docs.brightcove.com/en/perform/player-management/getting-started/player-mgmt-quick-start.html">Quick Start to Player Management</a> document.</p>
@@ -255,7 +257,7 @@ https://players.api.brightcove.com/v1/accounts/YOUR_ACCOUNT_ID/players/YOUR_PLAY
 	<!-- homegrown utility to format json -->
   <script src="//docs.brightcove.com/en/scripts/format_json.js"></script>
 	<!-- form which calls api via proxy -->
-  <script src="//solutions.brightcove.com/bcls/brightcove-player/playlists/playlist.js"></script>
+  <script src="//docs.brightcove.com/en/scripts/playlist.js"></script>
 	
 	
 	<script>
