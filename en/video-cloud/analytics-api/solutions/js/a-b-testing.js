@@ -2,8 +2,8 @@ var BCLS = (function ($, Handlebars) {
     "use strict";
     var callNumber = 0,
         accountID = 20318290001,
-        client_id = "5746d707-db97-42b2-b4f0-3db890429ef0",
-        client_secret = "JBdg3PLg0NarokKjIihxa_05i-YVyvhICWlQ5NXMSlUX9H9tzYqQ8FE-4mMfhAWOMs0KxUHyUN3anzkZSr3Bvg",
+        client_id = "742d6440-58d1-49ed-b2fb-f60d33bf02ae",
+        client_secret = "xs3vuzzKPz5fWHInsON26SXOL54X1GObFW70KylVqdVuIHdkqwqlCs9yVSCRF3i5u_0NcNb7MrzntCLaveZmeQ",
         $playerSelector = $("#playerSelector"),
         $reportTableBody = $("#reportTableBody"),
         fromDate = "2015-01-19",

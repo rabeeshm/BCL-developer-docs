@@ -13,7 +13,6 @@ module.exports = function (grunt) {
                     'working/docs-nav-data-from-minjson.json': ['source/smart-player-api.json',
                         'source/video-cloud.json',
                         'source/analytics-api.json',
-                        'source/analytics-api-v1.json',
                         'source/analytics-api-v0.json',
                         'source/batch-provisioning.json',
                         'source/mobile-sdks.json',
