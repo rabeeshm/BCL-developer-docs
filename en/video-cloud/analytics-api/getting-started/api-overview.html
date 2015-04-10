@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <title>Analytics API Overview</title>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/css/foundation.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/css/normalize.css" />
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css" />
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2728311-29', 'auto');
+  ga('send', 'pageview');
+
+</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/js/vendor/modernizr.js"></script>
+  </head>
+
+<body>
+    <!-- header navbar -->
+    <div id="navWrapper" class="fixed"></div>
+    <!-- breadcrumbs -->
+    <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+    <!-- search -->
+    <div id="searchModal" class="reveal-modal" data-reveal></div>
+    <!-- content -->
+    <div class="row">
+        <div class="large-2 columns show-for-large-up">
+            <div id="sidenav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+            <div class="section" id="top">
+                <h1>Analytics API v1 Overview</h1>
+                <p>The Analytics API allows you to obtain analytics data for your Video Cloud accounts directly. You can also view the built-in analytics reports in the Analytics Module of <a href="//videocloud.brightcove.com">Video Cloud Studio</a>. Accessing the data programmatically gives you additional flexibility for such purposes as:</p>
+                <ul>
+                    <li>Creating custom charts and displays</li>
+                    <li>Working with multiple APIs together - for example, getting video data using the CMS API for videos with the most views over the previous week</li>
+                    <li>Combining your video analytic data with other site analytics data</li>
+                    <li>For some sample solutions, see
+                        <ul>
+                            <li><a href="//solutions.brightcove.com/bcls/analytics-api/most-popular-videos.html">Most Popular Videos</a>
+                            </li>
+                            <li><a href="//solutions.brightcove.com/bcls/analytics-api/analytics-by-playlist.html">Analytics for Playlists</a>
+                            </li>
+                            <li><a href="//solutions.brightcove.com/bcls/analytics-api/video-views-by-country-and-day/video-views-by-country-and-day.html">Analytics by Country and Day</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="BCL-aside">Note: if you have been using the Limited Availability version of the Analytics API, we strongly encourage you to upgrade your apps to the current version. If you still need the documentation for the Limited Availability version, you can find it <a href="//docs.brightcove.com/en/video-cloud/analytics-api-v0/index.html">here</a>.</p>
+            </div>
+            <div class="section" id="baseURL">
+                <h2>Base URL</h2>
+                <p>The base URL for the Analytics API is:</p>
+<pre><code>https://analytics.api.brightcove.com/v1</code></pre>
+            </div>
+            <div class="section" id="headers">
+                <h2>Headers</h2>
+                <h3>Authentication (required)</h3>
+                <p>The Analytics API uses the Brightcove <a href="../../oauth-api/index.html">OAuth Service</a> to authenticate calls.</p>
+                <p>You will first need to obtain client credentials (a <code>client_id</code> and <code>client_secret</code>). This is a one-time operation that can be performed using the <a href="../guides/managing-api-credentials.html">OAuth Credentials UI</a>. You can get client credentials directly from the Brightcove OAuth Service using <a href="../../oauth-api/guides/get-client-credentials.html">CURL</a> or <a href="../..//oauth-api/guides/get-client-credentials-postman.html">Postman</a>.</p>
+                <p>You will also need an <code>access_token</code>, which is obtained using the <code>client_id</code> and <code>client_secret</code> and passed in an Authorization header with your API request:</p>
+<pre><code>Authorization: Bearer {access_token}</code></pre>
+                <p>The <code>access_token</code> expires after five minutes, so you must obtain one for each request, or check to make sure that your token is still valid. See <a href="../../oauth-api/guides/get-token.hmlt">Getting Access Tokens</a> for a detailed explanation of how to get access tokens, including code samples.</p>
+                <h3>Accept-Encoding: gzip (optional)</h3>
+                <p>Passing this header will cause the response to be returned in compressed form. This may improve performance for large reports.</p>
+                <p class="BCL-aside">Note: the permanent Analytics API tokens issued during the Limited Availability program are no longer supported. Access tokens must be acquired from the Brightcove OAuth Service.</p>
+            </div>
+            <div class="section" id="concurrency">
+                <h2>Concurrent Requests</h2>
+                <p>A single account is limited to one request at a time. Multiple concurrent requests will execute in series.</p>
+                <p>For example:
+                <ol>
+                    <li>Start an API request "A".</li>
+                    <li>Start API request "B" for the same account.</li>
+                    <li>Request "B" will not complete until "A" completes.</li>
+                    <li>If request "A" takes too long, request "A" will receive an error saying "your request is pending try again".</li>
+                    <li>If request "A" takes too long, it may cause request "B" to receive the same error. Note that request "B" will get an error if the time to complete A + B is greater than our timeout value. </li>
+                </ol>
+                <p>If you make multiple concurrent requests, we will handle them roughly one at a time.</p>
+                <p>Requests that return with a “pending error” will eventually complete and be saved to our cache. This means that future requests for the same data will return almost instantly, but only if the request is made before the five minute cache expires.</p>
+                <p>Your systems should handle the pending error by waiting 2-4 minutes and making the same request again.</p>
+            </div>
+            <div class="section" id="requestTypes">
+                <h2>Request types</h2>
+                <p>The Analytics API accepts three request types</p>
+                <dl>
+                    <dt>Data (also called a Report)</dt>
+                    <dd>
+                        A report on one or more <a href="#metrics">dimensions</a>. The endpoint for a report request is:
+<pre><code>https://analytics.api.brightcove.com/v1/data?accounts={account_id(s)}&amp;dimensions={dimensions}</code></pre>
+                    </dd>
+                    <dt>Engagement report</dt>
+                    <dd>Detailed engagement data that is available for periods within the past 32 days. See <a href="#engagement">the engagement section</a> for more details.</dd>
+                    <dt>Video information endpoint</dt>
+                    <dd>
+                        A specific piece of analytics data served with minimal latency. See <a href="../guides/video-information-endpoint.html">Video Data Endpoint</a> for more information.
+                    </dd>
+                </dl>
+                <p><a href="#filterValues">Where filters</a> and <a href="#dateRanges">date ranges</a> can be applied to reports. Report requests can have additional parameters detailed below.</p>
+            </div>
+            <div class="section" id="accounts">
+                <h2>Accounts</h2>
+                <p>The Video Cloud account(s) that you want a report for are specified using the <code>accounts</code> parameter. For example:</p>
+<pre><code>https://analytics.api.brightcove.com/v1/data?accounts={account_id(s)}</code></pre>
+            </div>
+            <div class="section" id="metrics">
+                <h2>Dimensions and fields</h2>
+                <p>Below are the dimensions you can currently report on. Click on a dimension below to see the fields that can be returned for it.</p>
+                <dl id="dimensionsList">
+                </dl>
+            </div>
+            <div class="section" id="reportDimensions">
+                <h2>Multiple Dimensions</h2>
+                <p>You can request reports on multiple dimensions, but some combinations are not valid. For invalid dimension combinations, no data will be returned. For valid combinations, the fields returned will be the union of the fields returned for the individual dimensions. Below are the supported dimension combinations.</p>
+                <ul id="dimensionCombinations"></ul>
+                <h3>Example</h3>
+                <p>A typical use case for getting a report on multiple dimensions: you want a breakdown of video views between desktop and mobile devices, and also want to know how many of the mobile device views were on iOS versus Android devices, and how many of the desktop views were on Macs versus Windows machines. Currently there is no standard report in the Studio Analytics Module that provides this information, but you can obtain it via this Analytics API call:</p>
+<pre><code>https:≈dimensions=video,device_type,device_os&amp;from=2014-01-01&amp;to=2014-04-01&amp;fields=video_view</code></pre>
+                <p>(In this case we are requesting video views for the period from January 1 to April 1 in 2014.)</p>
+
+            </div>
+            <div class="section" id="params">
+                <h2>Parameters</h2>
+                <p>Below is a table summarizing the parameters available in the Analytics API. The use of the parameters is discussed in more detail in the sections that follow.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                            <th>Values</th>
+                            <th>Default</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paramTable"></tbody>
+                </table>
+            </div>
+            <div class="section" id="filterValues">
+                <h2>Where filters</h2>
+                <p>The general syntax for filters is:</p>
+<pre><code>where=dimension1==value1;dimension2==value2</code></pre>
+                <p>For example:</p>
+<pre><code>where=video==123456789;device_type==tablet</code></pre>
+                <p>Commas are treated as logical ORs, and semicolons as logical ANDs. For example, <code>where=video==1234,5678;player=9876</code> is interpreted as "where video = 1234 <strong>OR</strong> 5678 <strong>AND</strong> player = 9876"</p>
+                <h3>Spaces and special characters</h3>
+                <p>String values should be URI encoded. You can also escape special characters using a "\":</p>
+<pre><code>where=search_terms==boston\,%20ma</code></pre>
+                <p>You can use the following dimensions as filters:</p>
+                <h3>Filtering by video properties</h3>
+                <p>Using the special <code>where=video.q=={property}:{value}</code> filter, you can limit your report to a specific set of videos based on a variety of properties, including:</p>
+                <ul>
+                    <li>tags</li>
+                    <li>reference_id</li>
+                    <li>custom_fields</li>
+                    <li>{a_specific_custom_field}</li>
+                    <li>published_at</li>
+                </ul>
+                <p>For a complete explanation of this query syntax, see <a href="http://docs.brightcove.com/en/video-cloud/cms-api/guides/search-videos.html">Using the CMS API: Search for Videos</a>.</p>
+                <div class="BCL-aside">
+                    <p>Note: the data fetched using this filter is cached for 24 hours, and so will not reflect changes made in the past day</p>
+                    <p>Also note: a maximum of 1000 videos can be returned using these filters. The results are sorted by the creation date for the video.</p>
+                </div>
+                <h3>Summary of filters and allowable values</h3>
+                <ul id="filtersList">
+                </ul>
+                <p>The following table shows allowable values for each dimension used as a filter:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Dimension Filter</th>
+                            <th>Allowable Values</th>
+                        </tr>
+                    </thead>
+                    <tbody id="filterAllowableValues"></tbody>
+                </table>
+            </div>
+            <div class="section" id="dateRanges">
+                <h2>Date ranges</h2>
+                <p>Date ranges, specified in <code>from</code>and <code>to</code>parameters for all types of reports, can be indicated in different formats:</p>
+                <ul>
+                    <li>Text values:
+                        <ul>
+                            <li><code>from=alltime</code></li>
+                            <li> <code>to=now</code> (available and the default value for all requests)</li>
+                        </ul>
+                    </li>
+                    <li>Epoch time values in milliseconds, such as <code>1377047323000</code>
+                    </li>
+                    <li>Dates expressed in ISO 8601 standard international date format: <code>YYYY-MM-DD</code>format, such as <code>2013-09-12</code>. For dates expressed in this format:
+                        <ul>
+                            <li>Any date range specified will be interpreted <em>in the current timezone</em>for the user</li>
+                            <li>The time for the date give will be interpreted as midnight ( <code>00:00:00</code>) on the date specified <em>in the user's timezone</em>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>Relative dates: you can express either of the <code>to</code> and <code>from</code> values relative to the other one in d (days) or h (hours). For example:
+                    <ul>
+                        <li>from=2015-01-01&amp;to=31d</li>
+                        <li>from=-48h&amp;to=now</li>
+                        <li>from=-2d&amp;to=now (will give the same results as the previous example)</li>
+                        <li>from=-365d&to=2014-12-31</li>
+                    </ul>
+                    <p>Note that negative numbers (-2d) are interpreted as "before" (the other value) and positive numbers (48h) are treated as "from" (the other value)</p>
+                    </li>
+                </ul>
+                <p>To generate a report on some dimension like "video" for a single day, set the to and from values to that date:</p>
+<pre><code>...?dimensions=video&amp;from=2013-11-01&amp;to=2013-11-01</code></pre>
+
+            </div>
+            <div class="section" id="limit">
+                <h2>Limit and offset</h2>
+                <p>The <code>limit</code> is the number of items to return (default: 10). To return all items, use <code>limit=all</code>. <code>offset</code> is the number of items to skip (default: 0). You can use <code>limit</code> and <code>offset</code> together to create an app that pages through the results.</p>
+            </div>
+            <div class="section" id="geoReports">
+                <h2>Geographical reports</h2>
+                <h3>Dimensions for geographical analytics</h3>
+<pre><code>country - As the ISO-3611-1 country code. eg: 'US'
+region - As the ISO-3611-2 region code. eg: 'US-WA'
+city - City name. eg: Seattle</code></pre>
+                <p>Note: For unknown country or region the API returns "ZZ" as the code (As per ISO-3611-alpha2).</p>
+            </div>
+            <div class="section" id="fieldsAndSorting">
+                <h2>Fields and Sorting</h2>
+                <p>Use the <code>fields</code> parameter to specify the fields you want to return.By default, <code>video_view</code> is returned and the field corresponding to the dimension you are reporting on (e.g. <code>destination_domain</code>) are returned. See <a href="../getting-started/api-overview.html#metrics">dimensions and fields</a> for more details.</p>
+                <p>Use the <code>sort</code> parameter to specify which metric field is used to sort the returned items; for example: <code>sort=video_wiew</code>.</p>
+                <p class="text-warning">Note: the fields available to return or sort on depend on the <a href="#metrics">metrics</a> returned for the dimension(s) you are reporting on. These parameters are strictly validated, and your request will return an error if the <code>fields</code> or <code>sort</code> parameter points to a field not valid for the request.</p>
+            </div>
+            <div class="section" id="engagement">
+                <h2>Engagement reports</h2>
+                <p>Detailed engagement reports showing views for each 100th part of videos (or the averages across all videos for an account or player) are available for periods within the past 32 days. (Requests for date ranges outside the past 32 days will return and error.)</p>
+                <div class="BCL-aside">
+                    <p>Note: there are several limitations on requests to the engagement endpoints:</p>
+                    <ul>
+                        <li>Reports are available only for a single account, player, or video</li>
+                        <li><code>where</code> filters are not supported</li>
+                        <li>The only parameters supported are <code>from</code> and <code>to</code></li>
+                        <li>If you provide <code>from</code> and <code>to</code> values in date format (MM-DD-YYYY), the report will reflect full day values</li>
+                        <li>If you want hourly engagement data, the <code>from</code> and <code>to</code> values must be given in epoch milliseconds values that fall within the hours you want to report on</li>
+                    </ul>
+                </div>
+                    <h3>Account engagement</h3>
+                    <p>To get average values for engagement on viewed videos, use the endpoint:</p>
+<pre><code>https://analytics.api.brightcove.com/v1/engagement/accounts/<em>{account_id}</em></code></pre>
+                    <h3>Player engagement</h3>
+                    <p>To get average values for all videos viewed in a player, use the endpoint:</p>
+<pre><code>https://analytics.api.brightcove.com/v1/engagement/accounts/<em>{account_id}</em>/players/<em>{player_id}</em></code></pre>
+                    <h3>Video engagement</h3>
+                    <p>To get engagement data for a specific video, use the endpoint:</p>
+<pre><code>https://analytics.api.brightcove.com/v1/engagement/accounts/<em>{account_id}</em>/videos/<em>{video_id}</em></code></pre>
+            </div>
+        </div>
+    </div>
+    <!-- bcl scripts -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.3/fastclick.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/js/foundation.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script src="/en/scripts/docs-nav-data.min.js"></script>
+    <script src="/en/scripts/bcls-doc-site.js"></script>
+    <script src="../assets/aapi-model.js"></script>
+    <script id="pageScript" type="text/javascript">
+    var BCLS = ( function ($, window, document, aapi_model) {
+        var filtersTemplate = "{{#filters}}<li>{{this}}</li>{{/filters}}",
+            fieldsTemplate = "{{#fields}}<li>{{this}}</li>{{/fields}}",
+            questions,
+            answers,
+            $account = $("#account"),
+            $player = $("#player"),
+            $video = $("#video"),
+            $date = $("#date"),
+            $date_hour = $("#date_hour"),
+            $country = $("#country"),
+            $region = $("#region"),
+            $city = $("#city"),
+            $destination_domain = $("#destination_domain"),
+            $destination_path = $("#destination_path"),
+            $filtersList = $("#filtersList"),
+            $referrer_domain = $("#referrer_domain"),
+            $source_type = $("#source_type"),
+            $search_terms = $("#search_terms"),
+            $device_type = $("#device_type"),
+            $device_os = $("#device_os"),
+            filterAllowableValues = document.getElementById("filterAllowableValues"),
+            dimensionCombinations = document.getElementById("dimensionCombinations"),
+            dimensionsList = document.getElementById("dimensionsList"),
+            paramTable = document.getElementById("paramTable"),
+            combination,
+            // functions
+            bclslog,
+            buildComboFields,
+            buildDimensions,
+            dedupe,
+            findObjectInArray,
+            copyArray,
+            showAnswer,
+            setQAinteractions,
+            buildParamTable,
+            buildFilterValueTable,
+            init;
+
+        /**
+         * logging
+         */
+        bclslog = function (context, message) {
+            if (window["console"] && console["log"]) {
+              console.log(context, message);
+            };
+        };
+        /**
+         * dedupe a simple array of strings or numbers
+         */
+        dedupe = function (arr) {
+        var i,
+            len = arr.length,
+            out = [],
+            obj = {};
+
+        for (i = 0;i < len; i++) {
+        obj[arr[i]] = 0;
+        }
+        for (i in obj) {
+        out.push(i);
+        }
+        return out;
+        }
+        /**
+         * copy all values from one array into another
+         * arguments: a, b
+         * adds elements of a to b
+         * returns: b
+         */
+        copyArray = function (a,b) {
+            var i, imax;
+            if (a !== undefined && b !== undefined && a.constructor === Array && b.constructor === Array) {
+                imax = a.length;
+                for (i = 0; i < imax; i++) {
+                    b.push(a[i]);
+                }
+            }
+            return b;
+        };
+        /*
+        find index of an object in array of objects
+        based on some property value
+        returns index if found, otherwise returns -1
+        */
+        findObjectInArray = function (targetArray, objProperty, value) {
+            var i, totalItems = targetArray.length, objFound = false;
+            for (i = 0; i < totalItems; i++) {
+                if (targetArray[i][objProperty] === value) {
+                    objFound = true;
+                    return i;
+                }
+            }
+            if (objFound === false) {
+                return -1;
+            }
+        };
+        /**
+         * show answers
+         */
+        showAnswer = function (evt) {
+            var answerNumber = parseInt(evt.target.id.substring(1)),
+                i = 0,
+                j = answers.length;
+            // hide all answers except the one for the selected question
+            for (i = 0; i < j; i++) {
+                if (i === answerNumber) {
+                    answers[i].style.display = "block";
+                } else {
+                    answers[i].style.display = "none";
+                }
+            }
+        };
+        /**
+         * set up interactions for questions and answers
+         */
+        setQAinteractions = function () {
+            var i, iMax;
+            questions = document.getElementsByClassName("bcls-question");
+            answers = document.getElementsByClassName("bcls-answer");
+            iMax = questions.length;
+            for (i = 0; i < iMax; i++) {
+                // set ids for answers
+                answers[i].setAttribute("id", ("a" + i.toString()));
+                // hide all answers initially
+                answers[i].setAttribute("style", "display:none");
+                // set ids for questions
+                questions[i].setAttribute("id", ("q" + i.toString()));
+                // add event listeners
+                questions[i].addEventListener("click", showAnswer);
+            }
+        }
+        /**
+         * build dimensions/fields list
+         */
+        buildDimensions = function () {
+            var thisDimension,
+                thisFieldlist,
+                i,
+                iMax = aapi_model.dimensions.length,
+                j,
+                jMax,
+                str = "";
+            for (i = 0; i < iMax; i++) {
+                thisDimension = aapi_model.dimensions[i];
+                str += "<dt class=\"bcls-question\">" + thisDimension.name + "</dt><dd class=\"bcls-answer\"><ul id=\"" + thisDimension.name + "\">";
+                thisFieldlist = document.getElementById(thisDimension.name);
+                jMax = thisDimension.fields.length;
+                for (j = 0; j < jMax; j++) {
+                    str += "<li>" + thisDimension.fields[j] + "</li>";
+                }
+                str += "</ul></dd>";
+                dimensionsList.innerHTML = str;
+                setQAinteractions();
+            }
+        };
+
+        /**
+         * build the field for the dimension combinations
+         */
+        buildComboFields = function () {
+            var combo;
+            for (combo in aapi_model.combinations) {
+                var i,
+                    dimensionIndex,
+                    dimensions = aapi_model.combinations[combo].dimensions,
+                    imax = dimensions.length,
+                    tmpArray = [];
+                for (i = 0; i < imax; i++) {
+                    dimensionIndex = findObjectInArray(aapi_model.dimensions, "name", dimensions[i]);
+                    tmpArray = tmpArray.concat(aapi_model.dimensions[dimensionIndex].fields);
+                }
+                tmpArray = dedupe(tmpArray);
+                aapi_model.combinations[combo].fields = copyArray(tmpArray, aapi_model.combinations[combo].fields);
+                dimensionCombinations.innerHTML += "<li>" + aapi_model.combinations[combo].dimensions.join(", ") + "</li>";
+            }
+        };
+        /**
+         * builds param summary table
+         */
+        buildParamTable = function () {
+            var thisParam,
+                str = "",
+                i,
+                iMax = aapi_model.params.length;
+                for (i = 0; i < iMax; i++) {
+                    thisParam = aapi_model.params[i];
+                    str += "<tr><td>" + thisParam.name + "</td><td>" + thisParam.required + "</td><td>" + thisParam.description + "</td><td>" + thisParam.values + "</td><td>" + thisParam.default + "</td></tr>";
+                }
+                paramTable.innerHTML = str;
+        };
+        /**
+         * built filter values
+         */
+        buildFilterValueTable = function () {
+            var thisDimension,
+                thisValues,
+                i,
+                iMax = aapi_model.dimensions.length,
+                j,
+                jMax,
+                str = "";
+            for (i = 0; i < iMax; i++) {
+                thisDimension = aapi_model.dimensions[i];
+                thisValues = thisDimension.filter_values;
+                str += "<tr><td>" + thisDimension.name + "</td><td><ul>";
+                jMax = thisValues.length;
+                for (j = 0; j < jMax; j++) {
+                    str += "<li>" + thisValues[j] + "</li>";
+                }
+                str += "</td></tr>";
+            }
+            filterAllowableValues.innerHTML = str;
+        }
+        init = function () {
+            buildDimensions();
+            buildComboFields();
+            buildParamTable();
+            buildFilterValueTable();
+        };
+        init();
+        return {}
+    })($, window, document, aapi_model);
+    </script>
+
+    <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+    <script>
+    var feedbackMail = document.getElementById("feedbackMail");
+    feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+    </script>
+    <script>
+        $(document).foundation();
+    </script>
+    </body>
+
+</html>
