@@ -1,7 +1,8 @@
 var BCLS = (function ($, window) {
     "use strict";
     var // aapi stuff
-        $serviceURL = $("#serviceURL"),
+        useMyAccount = document.getElementById("useMyAccount"),
+        basicInfo = document.getElementById("basicInfo"),
         proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
         $accountID = $("#accountID"),
         account_id = "20318290001",
@@ -108,7 +109,7 @@ var BCLS = (function ($, window) {
             video = (isDefined($videoID.val())) ? $videoID.val() : video_id;
 
         // build the request
-        requestURL = $serviceURL.val();
+        requestURL = "https://analytics.api.brightcove.com/v1";
         requestURL += "/engagement/accounts/" + account;
         if (scope === "players") {
             requestURL += "/players/" + player;
@@ -144,6 +145,9 @@ var BCLS = (function ($, window) {
         })
     }
     // set event listeners
+    useMyAccount.addEventListener("click", function () {
+        basicInfo.className = "height-auto";
+    });
     // listener for videos request
     $requestInputs.on("change", buildRequest);
     // rebuild request when scope selector changes
