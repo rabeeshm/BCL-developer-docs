@@ -146,7 +146,13 @@ var BCLS = (function ($, window) {
     }
     // set event listeners
     useMyAccount.addEventListener("click", function () {
-        basicInfo.className = "height-auto";
+        if (basicInfo.className === "height-zero") {
+            basicInfo.className = "height-auto";
+            useMyAccount.innerHTML = "Use Sample Account";
+        } else {
+            basicInfo.className = "height-zero";
+            useMyAccount.innerHTML = "Use My Account Instead";
+        }
     });
     // listener for videos request
     $requestInputs.on("change", buildRequest);
