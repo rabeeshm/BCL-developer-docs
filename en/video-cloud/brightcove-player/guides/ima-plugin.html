@@ -202,25 +202,6 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                     <p>If the ad implementation takes a long time to initialize and this timeout is too short, then the content video will begin playing before the first preroll opportunity. This has the jarring effect that the viewer would see a little content before the preroll cuts in.</p>
                     <p>In internal Brightcove testing it was found that five seconds seemed to be long enough to accommodate slow initialization in most cases, but still short enough that failures to initialize didn't look like failures of the player or content video.            </p>
             </div>
-          <div id="html5settings" class="section">
-            <h2>HTML5 settings</h2>
-            <p>If the HTML5 ad tech is in use, a number of IMA settings are available on the plugin object at runtime. For instance, to determine the ad ID you you would use:</p>
-<pre><code>var adId = player.ima3.currentAd.getAdId();</code></pre>
-            <p>Be careful interacting directly with these properties. Calling the wrong method can lead to unexpected results and failure of advertisements to play properly.</p>
-            <h3>adsLoader</h3>
-            <p>Type: <code>google.ima.AdsLoader</code></p>
-            <p>The object used to create ads requests. See ima.AdsLoader. The Ads Loader may not be available until adsready has been fired by the plugin.</p>
-            <h3>adsManager</h3>
-            <p>Type: <code>google.ima.AdsManager</code></p>
-            <p>The object responsible for playing ads. See ima.AdsManager. The Ads Manager is not available until adsready has been fired by the plugin.</p>
-            <h3>adDisplayContainer</h3>
-            <p>Type: <code>google.ima.AdDisplayContainer</code></p>
-            <p>The object responsible for managing the display elements for ads. See ima.AdDisplayContainer. The Ads Display container may not be available until adsready has been fired by the plugin.            </p>
-            <h3>currentAd</h3>
-            <p>Type: <code>google.ima.Ad</code></p>
-            <p>When an ad is playing, an object that encapsulates information about the current ad. See ima.Ad.          </p>
-          </div>
-
           <div id="methods" class="section">
             <h2>Methods</h2>
             <h3>player.ima3.adrequest( )</h3>
@@ -247,6 +228,38 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
             <li>Nothing</li>
             </ul>
           </div>
+          <div id="runtimesettings" class="section">
+              <h2>Runtime settings</h2>
+              <p>The following methods are available for both the HTML5 and Flash ad playback technologies.</p>
+              <h3>AdsManager.destroy</h3>
+              <p>Type: <code>google.ima.AdsManager.destroy</code></p>
+              <p>Calling this method destroys the current ads manager. For more information see Google's <a href="//developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.AdsManager.destroy">document</a> on the method.</p>
+              <h3>AdsManager.getRemainingTime</h3>
+              <p>Type: <code>google.ima.AdsManager.getRemainingTime</code></p>
+              <p>Calling this method returns the amount of time remaining for the current ad. If an ad isn't available or has finished playing, it returns -1. For more information see Google's <a href="//developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.AdsManager.getRemainingTime">document</a> on the method.</p>
+              <h3>ImaSdkSettings.setAutoPlayAdBreaks</h3>
+              <p>Type: <code>google.ima.ImaSdkSettings.setAutoPlayAdBreaks</code></p>
+              <p>This method takes a boolean representing whether VMAP and ad rules are automatically played. For more information see Google's <a href="//developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.ImaSdkSettings.setAutoPlayAdBreaks">document</a> on the method.</p>
+            </div>
+          <div id="html5settings" class="section">
+            <h2>HTML5 settings</h2>
+            <p>If the HTML5 ad tech is in use, a number of IMA settings are available on the plugin object at runtime. For instance, to determine the ad ID you you would use:</p>
+<pre><code>var adId = player.ima3.currentAd.getAdId();</code></pre>
+            <p>Be careful interacting directly with these properties. Calling the wrong method can lead to unexpected results and failure of advertisements to play properly.</p>
+            <h3>adsLoader</h3>
+            <p>Type: <code>google.ima.AdsLoader</code></p>
+            <p>The object used to create ads requests. See ima.AdsLoader. The Ads Loader may not be available until adsready has been fired by the plugin.</p>
+            <h3>adsManager</h3>
+            <p>Type: <code>google.ima.AdsManager</code></p>
+            <p>The object responsible for playing ads. See ima.AdsManager. The Ads Manager is not available until adsready has been fired by the plugin.</p>
+            <h3>adDisplayContainer</h3>
+            <p>Type: <code>google.ima.AdDisplayContainer</code></p>
+            <p>The object responsible for managing the display elements for ads. See ima.AdDisplayContainer. The Ads Display container may not be available until adsready has been fired by the plugin.            </p>
+            <h3>currentAd</h3>
+            <p>Type: <code>google.ima.Ad</code></p>
+            <p>When an ad is playing, an object that encapsulates information about the current ad. See ima.Ad.          </p>
+          </div>
+
             <div id="events" class="section">
                 <h2>Events</h2>
                     <p>The plugin emits some custom event types during loading, initialization, and playback. You can listen for IMA3 and ad framework events just like you would any other event:</p>
@@ -254,16 +267,20 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
   console.log(&#39;event&#39;, event);
 });
 </code></pre>
-<h3>adstart</h3>
+<!--  
+                    <h3>adstart</h3>
                     <p>This event indicates the player has entered linear ad playback mode. This event is fired directly as a consequence of calling code. This event only indicates that an ad break has begun. The start and end of individual ads must be signaled through some other mechanism.</p>
-                    <h3>adend</h3>
+                   <h3>adend</h3>
                     <p>This event indicates the player has returned from linear ad playback mode. This event is fired directly as a consequence of calling <code>startLinearAdMode()</code>. Note that multiple ads may have played back between the <code>adstart</code> and <code>adend</code> events.</p>
                     <h3>adtimeout</h3>
                     <p>This event indicates a timeout managed by the plugin has expired and regular video content has begun to play. Ad integrations have a fixed amount of time to inform the plugin of their intent during playback. If the ad integration is blocked by network conditions or an error, this event will be dispatched and regular playback resumes rather than stalling the player indefinitely.</p>
+ -->
                     <h3>ima3error</h3>
                     <p>This event indicates there was an error loading the IMA3 SDK from Google. If it occurs, no ads will be displayed.</p>
                     <h3>ima3-ad-error</h3>
-                    <p>An error has occurred in the IMA3 SDK. You should verify your ad configuration and settings to be sure your DoubleClick account is correctly configured. You can find common troubleshooting tasks at the <a href="https://support.google.com/dfp_premium/">DoubleClick support site</a> or talk to your DoubleClick account representative.            </p>
+                    <p>An error has occurred in the IMA3 SDK. You should verify your ad configuration and settings to be sure your DoubleClick account is correctly configured. You can find common troubleshooting tasks at the <a href="https://support.google.com/dfp_premium/">DoubleClick support site</a> or talk to your DoubleClick account representative. </p>
+                    <h3>ima3-ready</h3>
+                    <p>This event indicates that the ima3 plugin code has loaded and is ready load the IMA SDK.</p>
             </div>
           <div id="playbackmodes" class="section">
             <h2>Playback modes</h2>
