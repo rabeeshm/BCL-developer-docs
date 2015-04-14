@@ -25,6 +25,13 @@ img<!DOCTYPE html>
 
 </script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/js/vendor/modernizr.js"></script>
+	<style>
+		/* player dimensions */
+		iframe {
+			width: 640px;
+            height: 360px;
+		}
+	</style>
 </head>
 
 <body>
@@ -46,9 +53,21 @@ img<!DOCTYPE html>
 				<!-- Place document intro sentence(s) here -->
 				<p>The thumbnail previews plugin allows for the timeline to display a preview image at defined points for your video. The user can mouse over the timeline and images defined by you will be displayed for specified time ranges.</p>
 				<div><img src="../assets/thumbnail-plugin-display.png" alt="thumbnail-plugin-display" width="626" height="348"></div>
+				<p>The sample video below demonstrates the use of the Thumbnails Plugin. Mouse over the progress bar to see three different thumbnail images at user-defined video times.</p>
+				<div id="playerblock">
+					<iframe src='//players.brightcove.net/1752604059001/df4e0a75-2640-4301-ae00-ccba0e97d4db_default/index.html?videoId=3851380732001' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
+				</div>
+				<br/>
+				<p>This topic contains the following sections:</p>
+		      <ul>
+		        <li><a href="#collectimages">Collect thumbnail images</a></li>
+				<li><a href="#playersmodule">Implementing using Players module</a></li>
+		        <li><a href="#properties">Thumbnails Plugin properties</a></li>
+				<li><a href="#cssimagesprites">Using CSS image sprites</a></li>
+	          </ul>
 			</div>
 			<div id="collectimages" class="section">
-				<h2>Collect images</h2>
+				<h2>Collect thumbnail images</h2>
 				<p>At this time you must collect the images yourself. Preview thumbnails can be generated as part of the <a href="https://app.zencoder.com/docs/api/encoding/thumbnails">Zencoder encoding process</a>. Also, tools exist like <a href="//www.jeremycreation.com/osx-apps/snapmotion/">SnapMotion</a> to automate this process. </p>
 				<p>No matter how you generate the images, you need to decide the number of images you wish to use and choose an appropriate size.</p>
 			</div>
@@ -63,36 +82,45 @@ img<!DOCTYPE html>
 				<li>The JavaScript for the plugin is provided and will not change for different plugin implementations. For the <strong>JavaScript URL</strong>, enter:</li>
 				<p><pre> https://players.brightcove.net/videojs-thumbnails/videojs.thumbnails.js</pre></p>
 				<li>The CSS for the plugin is provided and will not change for different plugin implementations. For the <strong>CSS URL</strong>, enter:<br/>
-				<p><pre> https://players.brightcove.net/videojs-thumbnails/videojs.thumbnails.css
- https://players.brightcove.net/svt-videojs-thumbnails/svt.thumbnails.css</pre></p></li>
+				<p><pre> https://players.brightcove.net/videojs-thumbnails/videojs.thumbnails.css</pre></p></li>
 				<li>For the <strong>Name</strong>, enter <strong>thumbnails</strong>.</li>
-				<li><p>Enter the plugin options. The example below will display a social media button at the bottom of the player to share this video with several social media sites. The social sharing screen will automatically display on video end.</p>
+				<li><p>Enter the plugin options. The example below will display a thumbnail preview image as the mouse hovers over the timeline as follows:</p>
+				<p><ul>
+				    <li>The <em>Tiger.jpg</em> image is be displayed from video start to 5 seconds</li>
+				    <li>The <em>Water.jpg</em> image is displayed from 5 seconds to 10 seconds</li>
+				    <li>The <em>BirdsOfAFeather.jpg</em> image is displayed from 10 seconds to the end of the video</li>
+				</ul></p>
 				<p>For details about the plugin options, see the <a href="#properties">Properties</a> section.</p></li>
-				<ul>
-					<li>Lines 3-4: Set the name and description for your video.</li>
-					<li>Line 5: Defines the URL for your custom web page with your video player and social sharing meta tags.</li>
-					<li>Line 6: Sets the social sharing screen to display when the video ends.</li>
-					<li>Lines 7-8: For Twitter, this allows a user to start viewing the video after a 5 second offset.</li>
-					<li>Lines 9-16: Enables social sharing for Facebook, Google, Twitter, Tumblr, Pinterest and LinkedIn.</li>
-				</ul>
 				<p><code data-gist-id="882111e2b91213672f25" data-gist-hide-footer="true" data-gist-line="71-81"></code></p>
 	
 				<div><img src="../assets/thumbnails-plugin-configuration.png"></div>
                 
                 <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
+				<li>In the Media module, select a video and publish it with the player you have just updated with the Thumbnails Plugin.</li>
 			</ol>
         </div>	
 			
-      <div id="optionsproperty" class="section">
-        <h2><code>options</code> property</h2>
-        <p>For plugins in general, the <code>options</code> property is used to pass data to the plugin for utilization at initialization time. In this case, you will use this property to build an object that contains key-value pairs to define times when a particular thumbnail preview image should begin to be displayed, and the URL to the thumbnail preview image.  The options tell the player how to behave when the mouse hovers over the timeline. The example JSON shown below that is the value for the <code>options</code> property causes the plugin to behave as described in the following bullet points:</p>
+      <div id="properties" class="section">
+        <h2>Properties</h2>
+        <p>The following plugin properties are used to control the thumbnail images:</p>
+		<ul>
+			<p><li>first argument: 
 				<ul>
-				    <li>The <em>Tiger.jpg</em> image is be displayed from video start up to 5 seconds</li>
-				    <li>The <em>Water.jpg</em> image is displayed from 5 seconds up to 10 seconds</li>
-				    <li>The <em>BirdsOfAFeather.jpg</em> image is displayed from 10 seconds to the end of the video</li>
+					<li>The value can be a string or number, and is associated with an object.</li>
+					<li>This defines the time in seconds you wish to display your thumbnail image. At a minimum, you need a <code>0</code> property with a <code>src</code> value for when users hover over the beginning of the progress bar. If you have additional times, the plugin will partition the progress bar and display the appropriate image as the user hovers over the progress bar.</li>
 				</ul>
-				<p><code data-gist-id="882111e2b91213672f25" data-gist-hide-footer="true" data-gist-line="17-27"></code></p>
+			</li></p>
+			<p class="BCL-aside">Note: You need to include a <code>0</code> property with a <code>src</code> value. Otherwise, the plugin will try to use the example thumbnail and you may get an error.</p>
+			<li><code>src</code>:
+				<ul>
+					<li>The value must be a string.</li>
+					<li>This is the URL for your thumbnail image.</li>
+				</ul>
+			</li>
+		</ul>
+		<code data-gist-id="882111e2b91213672f25" data-gist-hide-footer="true" data-gist-line="71-81"></code>
       </div>
+
       <div id="cssimagesprites" class="section">
         <h2>CSS image sprites</h2>
         <p>If you choose you can use CSS image sprites as your preview thumbnails. The following JSON is an example for the <code>options</code> property when using a CSS image sprite:</p>
@@ -102,9 +130,9 @@ img<!DOCTYPE html>
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
 				<ul>
-					<li> <a href="../../player-management/getting-started/player-mgmt-quick-start.html#customizePlayer">Quick Start to Player Management - Plugin Section</a>
-					<li> <a href="../../brightcove-player/guides/plugin-guide.html">Plugin Guide</a>
-					</li>
+					<li> <a href="../../player-management/getting-started/player-mgmt-quick-start.html#customizePlayer">Quick Start to Player Management - Customize a player</a></li>
+					<li> <a href="plugin-guide.html">Plugin Guide</a></li>
+					<li> <a href="plugin-dev-quick-start.html">Quick Start to Plugin Development</a></li>
 				</ul>
 			</div>
 		</div>
