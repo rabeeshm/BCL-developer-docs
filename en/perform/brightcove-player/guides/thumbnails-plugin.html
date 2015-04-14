@@ -25,6 +25,13 @@ img<!DOCTYPE html>
 
 </script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/js/vendor/modernizr.js"></script>
+	<style>
+		/* player dimensions */
+		iframe {
+			width: 640px;
+            height: 360px;
+		}
+	</style>
 </head>
 
 <body>
@@ -46,44 +53,91 @@ img<!DOCTYPE html>
 				<!-- Place document intro sentence(s) here -->
 				<p>The thumbnail previews plugin allows for the timeline to display a preview image at defined points for your video. The user can mouse over the timeline and images defined by you will be displayed for specified time ranges.</p>
 				<div><img src="../assets/thumbnail-plugin-display.png" alt="thumbnail-plugin-display" width="626" height="348"></div>
+				<p>The sample video below demonstrates the use of the Thumbnails Plugin. Mouse over the progress bar to see three different thumbnail images at user-defined video times.</p>
+				<div id="playerblock">
+					<iframe src='//players.brightcove.net/1752604059001/df4e0a75-2640-4301-ae00-ccba0e97d4db_default/index.html?videoId=3851380732001' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
+				</div>
+				<br/>
+				<p>This topic contains the following sections:</p>
+		      <ul>
+		        <li><a href="#collectimages">Collect thumbnail images</a></li>
+				<li><a href="#playersmodule">Implementing using Players module</a></li>
+		        <li><a href="#properties">Thumbnails Plugin properties</a></li>
+				<li><a href="#cssimagesprites">Using CSS image sprites</a></li>
+	          </ul>
 			</div>
 			<div id="collectimages" class="section">
-				<h2>Collect images</h2>
+				<h2>Collect thumbnail images</h2>
 				<p>At this time you must collect the images yourself. Preview thumbnails can be generated as part of the <a href="https://app.zencoder.com/docs/api/encoding/thumbnails">Zencoder encoding process</a>. Also, tools exist like <a href="//www.jeremycreation.com/osx-apps/snapmotion/">SnapMotion</a> to automate this process. </p>
 				<p>No matter how you generate the images, you need to decide the number of images you wish to use and choose an appropriate size.</p>
 			</div>
-			<div id="implementplugin" class="section">
-				<h2>Implement plugin</h2>
-				<p>The plugin's JavaScript and CSS are already written for you. To use the plugin you need to configure a player with the proper configuration information. In the <code>data</code> property from the curl statement shown below you see an example of including the plugin with a player. You see the three main properties for which you need to supply values. They are:</p>
-				<ul>
-				    <li><code>scripts</code>: This is the JavaScript supplied to you for the plugin. This will not change for different plugin implementations.</li>
-				    <li><code>stylesheets</code>: This is the CSS supplied to you for the plugin. This will not change for different plugin implementations.</li>
-				    <li><code>plugins</code>: This property has two values. The first is <code>name</code> with the associate value <code>"thumbnails"</code>. The name <code>thumbnails</code> is defined in the supplied JavaScript for the plugin, and this will not change for different plugin implementations. The second property is <code>options</code>, which is discussed in detail below.</li>
-				</ul>
-				<p><code data-gist-id="882111e2b91213672f25" data-gist-hide-footer="true" data-gist-line="5-31"></code></p>
-			</div>
-      <div id="optionsproperty" class="section">
-        <h2><code>options</code> property</h2>
-        <p>For plugins in general, the <code>options</code> property is used to pass data to the plugin for utilization at initialization time. In this case, you will use this property to build an object that contains key-value pairs to define times when a particular thumbnail preview image should begin to be displayed, and the URL to the thumbnail preview image.  The options tell the player how to behave when the mouse hovers over the timeline. The example JSON shown below that is the value for the <code>options</code> property causes the plugin to behave as described in the following bullet points:</p>
-				<ul>
-				    <li>The <em>Tiger.jpg</em> image is be displayed from video start up to 5 seconds</li>
-				    <li>The <em>Water.jpg</em> image is displayed from 5 seconds up to 10 seconds</li>
+			
+		<div id="playersmodule" class="section">
+			<h2>Implement using Players module</h2>
+			<p>Thumbnails can be configured by using the thumbnails plugin. To implement the thumbnails plugin using the Players module, follow these steps:</p>
+			<ol>
+			  <li>Open the Players module and locate the player.</li>
+				<li>Click the link for the player to open the player properties.</li>
+				<li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
+				<li>The JavaScript for the plugin is provided and will not change for different plugin implementations. For the <strong>JavaScript URL</strong>, enter:</li>
+				<p><pre> https://players.brightcove.net/videojs-thumbnails/videojs.thumbnails.js</pre></p>
+				<li>The CSS for the plugin is provided and will not change for different plugin implementations. For the <strong>CSS URL</strong>, enter:<br/>
+				<p><pre> https://players.brightcove.net/videojs-thumbnails/videojs.thumbnails.css</pre></p></li>
+				<li>For the <strong>Name</strong>, enter <strong>thumbnails</strong>.</li>
+				<li><p>Enter the plugin options. The example below will display a thumbnail preview image as the mouse hovers over the timeline as follows:</p>
+				<p><ul>
+				    <li>The <em>Tiger.jpg</em> image is be displayed from video start to 5 seconds</li>
+				    <li>The <em>Water.jpg</em> image is displayed from 5 seconds to 10 seconds</li>
 				    <li>The <em>BirdsOfAFeather.jpg</em> image is displayed from 10 seconds to the end of the video</li>
+				</ul></p>
+				<p>For details about the plugin options, see the <a href="#properties">Properties</a> section.</p></li>
+				<p><code data-gist-id="882111e2b91213672f25" data-gist-hide-footer="true" data-gist-line="71-81"></code></p>
+	
+				<div><img src="../assets/thumbnails-plugin-configuration.png"></div>
+                
+                <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
+				<li>In the Media module, select a video and publish it with the player you have just updated with the Thumbnails Plugin.</li>
+			</ol>
+        </div>	
+			
+      <div id="properties" class="section">
+        <h2>Properties</h2>
+        <p>The following plugin properties are used to control the thumbnail images:</p>
+		<ul>
+			<p><li>first argument: 
+			<p><ul>
+				<li>The value can be a string or number, and is associated with an object.</li>
+				<li>This defines the time in seconds you wish to display your thumbnail image. At a minimum, you need a <code>0</code> property with a <code>src</code> value for when users hover over the beginning of the progress bar. If you have additional times, the plugin will partition the progress bar and display the appropriate image as the user hovers over the progress bar.</li>
+			</ul></p>
+			<p class="BCL-aside">Note: You need to include a <code>0</code> property with a <code>src</code> value. Otherwise, the plugin will try to use the example thumbnail and you may get an error.</p>
+			<li><code>src</code>:
+				<ul>
+					<li>The value must be a string.</li>
+					<li>This is the URL for your thumbnail image.</li>
 				</ul>
-				<p><code data-gist-id="882111e2b91213672f25" data-gist-hide-footer="true" data-gist-line="17-27"></code></p>
+			</li>
+		</ul>
+		<p>Here is an example for setting thumbnail images for three blocks of time in the progress bar:</p>
+		<p><ul>
+			<li>The first image is displayed when a user mouses over the progress bar from video start to 5 seconds</li>
+			<li>The second image is displayed from 5 seconds to 10 seconds</li>
+			<li>The third image is displayed from 10 seconds to video end</li>
+		</ul></p> 
+		  <code data-gist-id="882111e2b91213672f25" data-gist-hide-footer="true" data-gist-line="71-81"></code>
       </div>
+
       <div id="cssimagesprites" class="section">
         <h2>CSS image sprites</h2>
         <p>If you choose you can use CSS image sprites as your preview thumbnails. The following JSON is an example for the <code>options</code> property when using a CSS image sprite:</p>
-				<p><code data-gist-id="882111e2b91213672f25" data-gist-hide-footer="true" data-gist-line="35-68"></code></p>
+				<p><code data-gist-id="882111e2b91213672f25" data-gist-hide-footer="true" data-gist-line="34-67"></code></p>
 			  <p class="BCL-aside">If you are unfamiliar with CSS image sprites see this <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/CSS_Image_Sprites">Mozilla Developer Network document.</a></p>
       </div>
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
 				<ul>
-					<li> <a href="../../player-management/getting-started/player-mgmt-quick-start.html#customizePlayer">Quick Start to Player Management - Plugin Section</a>
-					<li> <a href="../../brightcove-player/guides/plugin-guide.html">Plugin Guide</a>
-					</li>
+					<li> <a href="../../player-management/getting-started/player-mgmt-quick-start.html#customizePlayer">Quick Start to Player Management - Customize a player</a></li>
+					<li> <a href="plugin-guide.html">Plugin Guide</a></li>
+					<li> <a href="plugin-dev-quick-start.html">Quick Start to Plugin Development</a></li>
 				</ul>
 			</div>
 		</div>
