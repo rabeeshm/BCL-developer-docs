@@ -79,7 +79,7 @@ var BCLS = (function ($, window, BCLSformatJSON) {
         options.client_secret = $client_secret.val();
         options.url = $request.val();
         options.requestType = "PATCH";
-        options.requestBody = '{"playlist":true}';
+        options.requestBody = '{"player":{"playlist":true}}';
           bclslog("options", options);
         // wait message
         $responseFrame.html("Loading...");
