@@ -30,6 +30,9 @@
 
     <!-- Required Modernizr file -->
     <script src="//docs.brightcove.com/en/scripts/slides/modernizr.custom.js"></script>
+
+    <!-- syntax highlight styles -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css" />
 </head>
 <body>
 
@@ -40,6 +43,27 @@
         <div id="top" class="section title slide">
             <h1>Your title here</h1>
             <p class="doc-only">Intro paragraph for doc version only</p>
+            <table class="slide-only bcls-float-right bcls-small">
+                <caption>Navigation</caption>
+                <tbody>
+                    <tr>
+                        <td>↓, → </td>
+                        <td> forward</td>
+                    </tr>
+                    <tr>
+                        <td>↑, ← </td>
+                        <td> back</td>
+                    </tr>
+                    <tr>
+                        <td>cmd-m </td>
+                        <td>all slides</td>
+                    </tr>
+                    <tr>
+                        <td>cmd-g </td>
+                        <td>go to</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         <!-- section slide -->
         <div class="section slide" id="enhancements">
@@ -57,7 +81,7 @@
             </div>
         </div>
         <!-- end slide - no content - for slides only -->
-        <div id="endSlide" class="slide endSlide slide-only"></div>
+        <div class="slide endSlide slide-only"></div>
     </div>
 
     <!-- End slides. -->
@@ -98,17 +122,42 @@
 <script src="//docs.brightcove.com/en/scripts/slides/extensions/status/deck.status.js"></script>
 <script src="//docs.brightcove.com/en/scripts/slides/extensions/navigation/deck.navigation.js"></script>
 <script src="//docs.brightcove.com/en/scripts/slides/extensions/scale/deck.scale.js"></script>
+
+<!-- syntax highlighter for pre-code blocks -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+
 <!-- Automatically write the doc h1 heading to the title tag -->
 <script>
-    function BCLSinjectTitle () {
-        var titleEl = document.getElementsByTagName("title")[0],
-            docTitle = document.getElementsByTagName("h1")[0];
-            docTitle.addEventListener("change", function () {
-                titleEl.innerHTML = this.innerHTML;
-            });
-        BCLSinjectTitle();
-    }
+    var BCLSslides = ( function ($, window, document, hljs) {
+        var BCLSinjectTitle,
+            BCLShighlight,
+            $precode = $("pre>code");
+            BCLSinjectTitle = function () {
+                var titleEl = document.getElementsByTagName("title")[0],
+                    docTitle = document.getElementsByTagName("h1")[0];
+                    docTitle.addEventListener("change", function () {
+                        titleEl.innerHTML = this.innerHTML;
+                    });
+            }
+            BCLShighlight = function () {
+                $precode.each(function (i, e) {
+                    hljs.highlightBlock(e);
+                });
+            };
+            // call these initially
+            BCLSinjectTitle();
+            BCLShighlight();
+            /**
+             * return BCLShighlight
+             * public method: BCLSslides.BCLShightlight()
+             */
+            return {
+                "BCLShighlight": BCLShighlight
+            }
+        })($, window, document, hljs);
+
 </script>
+
 <!-- Initialize the deck. You can put this in an external file if desired. -->
 <script>
   $(function() {
