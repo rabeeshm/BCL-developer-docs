@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+	<!-- change title to match the h1 heading -->
+	<title>Brightcove Player Sample: Download Video Plugin</title>
+	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/css/foundation.min.css" />
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/css/normalize.css" />
+	<script src="//use.edgefonts.net/source-code-pro.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css">
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
+	<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2728311-29', 'auto');
+  ga('send', 'pageview');
+
+</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/js/vendor/modernizr.js"></script>
+  <style type="text/css">
+    iframe {
+      width: 640px;
+      height: 480px;
+    }
+  </style>    
+</head>
+
+<body>
+	<!-- header navbar -->
+	<div id="navWrapper" class="fixed"></div>
+	<!-- breadcrumbs -->
+	<nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+	<!-- search -->
+	<div id="searchModal" class="reveal-modal" data-reveal></div>
+	<!-- content -->
+	<!-- content -->
+	<div class="row">
+		<div class="large-2 columns show-for-large-up">
+			<div id="sidenav"></div>
+		</div>
+		<div id="main" class="large-10 small-12 columns">
+			<div id="top" class="section">
+				<h1>Brightcove Player Sample: Download Video Plugin</h1>
+				<!-- Place document intro sentence(s) here -->
+				<p>This topic shows you how to create a link to allow downloading the best quality MP4 of a video playing in Brightcove Player. The code will eventually be built as a plugin for easy use with different players.</p>
+        <p>The link will be implemented in three different ways:</p>
+        <p class="BCL-aside">NOTE: There is a working sample below in the <strong>The player</strong> section.</p>
+        <ul>
+            <li>Icon in the control bar</li>
+            <div><img src="/en/video-cloud/brightcove-player-v1/guides/assets/download-icon.png" width="352" height="264"></div>
+            <li>Overlay placed on the video</li>
+            <div><img src="/en/video-cloud/brightcove-player-v1/guides/assets/download-overlay.png"  width="352" height="264"></div>
+            <li>An HTML link you can place anywhere on your HTML page</li>
+            <div><img src="/en/video-cloud/brightcove-player-v1/guides/assets/download-insertion-point.png"  width="352" height="264"></div>
+        </ul>
+        <p class="BCL-aside">NOTE: Video downloads are not supported on iOS devices.</p>
+			</div>
+			<div id="developmentsequence" class="section">
+        <h2 id="expanderHead"><span id="expanderSign">+</span>Development sequence</h2>
+        <div id="expanderContent" style="display:none">	
+          <p>Here is the recommended development sequence:</p>
+          <ol>
+            <li>Use the embed_in_page player implementation to test the functionality of your player, plugin and CSS (if CSS is needed)</li>
+            <li>Put the plugin's JavaScript and CSS into separate files for local testing</li>
+            <li>Deploy the plugin code and CSS to your server once you have worked out any errors</li>
+            <li>Use the new Video Cloud Studio to add the plugin and CSS to your player</li>
+            <li>Replace the embed_in_page player implementation if you determine that the iframe implementation is a better fit (detailed in next section)</li>
+          </ol>
+          <p>For details about these steps, review the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player-v1/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a> guide.</p>
+          <h3>iframe or embed_in_page</h3> 
+          <p>When developing enhancements for the Brightcove player you will need to decide if the code is a best fit for the iframe or embed_in_page implementation. The best practice recommendation is to build a plugin for use with an iframe implementation. The advantages of using the iframe player are:</p>
+          <ul>
+            <li>No collisions with existing JavaScript and/or CSS</li>
+            <li>Automatically responsive</li>
+            <li>The iframe eases use in social media apps (or whenever the video will need to "travel" into other apps)</li>
+          </ul>
+          <p>Although integrating the embed_in_page player can be more complex, there are times when you will plan your code around that implementation. To generalize, this approach is best when the containing page needs to communicate to the player. Specifically, here are some examples:</p>
+          <ul>
+            <li>Code in the containing page needs to listen for and act on player events</li>
+            <li>The player uses styles from the containing page</li>
+            <li>The iframe will cause application logic to fail, like a redirect from the containing page</li>
+          </ul>
+          <p>Even if your final implementation does not use the iframe player, you can still use the embed_in_page player with a plugin that contains your JavaScript and CSS. This encapsulates your logic so that you can easily use it in multiple players.</p>
+			  </div><!-- id="expanderContent" -->
+      </div>
+      
+      <div id="selectimplementation" class="section">
+				<h2>Select implementation</h2>
+				<p>In this sample, the functionality is contained in the code and CSS with no dependencies on the parent page, so a plugin is a good choice for this functionality.</p>
+			</div>
+      
+			<div id="resources" class="section">
+				<h2>API resources used</h2>
+				<p>The following sections detail resources used from various APIs.</p>
+        <h3>Brightcove Player API properties</h3>
+        <ul>
+            <li><code>mediainfo</code></li>
+        </ul>
+        <h3>Brightcove Player API methods</h3>
+        <ul>
+            <li><code>options()</code></li>
+            <li><code>catalog.getVideo()</code></li>
+            <li><code>catalog.load()</code></li>
+            <li><code>el()</code></li>
+        </ul>
+        <h3>Brightcove Player API events</h3>
+        <ul>
+            <li>none</li>
+        </ul>
+			</div>
+			<div id="player" class="section">
+				<h2>The player</h2>
+				<p>Click the download icon located on the left side of the control bar to download the highest quality MP4 rendition of the video loaded in the player.</p>
+        <iframe width='480' height='270' src='//players.brightcove.net/1752604059001/eab91441-ce41-4c12-8322-4b70ce6ac324_default/index.html' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
+			</div>
+      
+			<div id="code" class="section">
+				<h2>How it works</h2>
+				<p>The following sections explain the player, JavaScript and CSS code used in the example.</p>
+        <h3>Create the player</h3>
+        <p>Login to your Video Cloud Studio account and create a new video player. Open the player's properties page and edit the <strong>Video Content</strong> section. Here you can specify the <strong>Video ID</strong> for the video you wish to publish. Video IDs can be found in the Media module.</p>
+        <div><img src="/en/video-cloud/brightcove-player-v1/samples/assets/navigate-on-video-end-video-id.png" alt="" class="video-cloud-only"></div>
+				<h3>The player code</h3>
+          <p>Once your player has been published, you can click the <strong>Embed Code &amp; URL</strong> button and choose the <strong>Published Player</strong> link. You will find the player code in the <strong>In-Page Embed Code</strong> section.</p>
+          <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="17-24"></code></p>
+				<h3>The JavaScript code</h3>
+				<p>The following provides an overview of the functionality of the code:</p>
+        <ol>
+            <li>Retrieve the video ID of video in the player. Notice that the data retrieved by the <code>options()</code> method includes <code>data-video-id</code>.
+            <div><img src="/en/video-cloud/brightcove-player-v1/guides/assets/download-options.png"></div>
+            </li>
+            <li>Use the video's ID to get the video object and load the video. This may seem unnecessary as the video is already playing, but you need to load the video to populate the <code>mediainfo</code> property.</li>
+            <li>Retrieve the <code>sources</code> array from the <code>mediainfo</code> property, which includes as elements all renditions of the currently loaded video.</li>
+            <div><img src="/en/video-cloud/brightcove-player-v1/guides/assets/download-mediainfo.png"></div>
+            <li>Create another array which contains the filtered and sorted renditions so only the MP4 renditions are in a new array, sorted from largest to smallest.</li>
+            <li>Assign the zeroth element of the new array to a variable. The zeroth element contains the rendition with the largest size, hence the best quality.</li>
+            <li>Create a link for download.</li>
+        </ol>
+        <p>The following code is the actual implementation of the general steps above.</p>
+        <ul>
+            <li>Lines 28-35: Create variables used later in the code.</li>
+            <li>Line 36: Assign a variable the video ID, retrieved from data by calling the <code>options()</code> method.</li>
+            <li>Line 37: Use the <code>getVideo()</code> method, passing the video ID as a parameter, to get the video object of the currently playing video.</li>
+            <li>Line 38: Use the <code>load()</code> method.</li>
+            <li>Line 39: Assign the <code>name</code> of the video to a variable for later use in the link tag.</li>
+            <li>Line 40: Assign the <code>sources</code> array to a variable.</li>
+            <li>Line: 41: Assign the length of the array to variable.</li>
+            <li>Lines 42-46: Loop over the array and assign to a second array renditions where the <code>container</code> is <strong>MP4</strong>, AND the rendition has a <code>src</code> property. The MP4 renditions appear twice in the <code>sources</code> array, once with a <code>src</code> property and once with a <code>stream_name</code> property. The first is for progressive download and the second for streaming.</li>
+            <li>Lines 47-49: Sort the array of MP4s.</li>
+            <li>Line 50: Assign the largest rendition to a variable.</li>
+            <li>Lines 51-54: Create and style a <code>div</code> tag that contains the link.</li>
+            <li>Lines 55-56: Retrieve the <code>vjs-control-bar</code> element and append the newly create <code>div</code> to it. It may seem odd that with an append the icon appears on the left side of the control bar, but this is because all the other elements on the control bar are positioned using CSS.</li>
+        </ul>
+          <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="26-59"></code></p>
+          <div class="BCL-aside">
+            <p>The <code>order</code> style determines the arrangement of icons on the control bar. For older browsers some more styles may be required, as shown here:</p>
+            <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="274-280"></code></p>
+          </div>
+        <h3>The stylesheet</h3>
+				<p>No stylesheet is used in this implementation. The two styles for the icon were assigned via JavaScript, lines 52-54 above.</p>
+			</div>
+      
+			<div id="plugin" class="section">
+				<h2>Use a plugin</h2>
+				<p>It is a best practice to use a plugin so that you can easily add the JavaScript code's functionality to multiple players.</p>
+				<h3>Create the JavaScript file</h3>
+				<p>Move the plugin's JavaScript code into a file and place it in an Internet accessible URL.</p>
+				<ul>
+				    <li>Lines 146,178: Use the standard syntax to begin and end a Brightcove Player plugin.</li>
+				    <li>Line 146: The first argument of the function call is the name of the function defined in the plugin code, in this case <code>downloadVideoPlugin</code>.</li>
+				    <li>Line 178: The trailing semicolon is required.</li>
+				</ul>
+          <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="146-178"></code></p>
+				<h3>Create the CSS file</h3>
+				<p>There is no CSS file needed for this plugin.</p>
+        <h3>Deploy plugin and CSS</h3>
+        <p>To deploy the plugin using the Players module, follow these steps:</p>
+        <ol>
+          <li>In the new Video Cloud Studio, open the <strong>Players</strong> module and locate the player.</li>
+          <li>Click the link for the player to open the player properties.</li>
+          <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
+          <li>For the <strong>JavaScript URL</strong>, enter the URL which specifies the location of where you saved your plugin's JavaScript.</li>
+          <li>There is no CSS file to enter.</li>
+          <li>For the <strong>Name</strong>, enter <strong>downloadVideoPlugin</strong>.</li>
+          <li>There are no plugin options to enter. 
+              <div><img src="/en/video-cloud/brightcove-player-v1/guides/assets/download-studio-plugin.png"></div>
+            </li>
+            <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
+          </ol>
+			</div>
+      
+      <div id="useiframe" class="section">
+        <h2>Use iframe</h2>
+        <p>It is a best practice to use the iframe player implementation. Since you can create the download video functionality as a plugin, replace the embed_in_page implementation with the iframe implementation.</p>
+          <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="248-268"></code></p>
+      </div>
+
+      <div id="overlayimplementation" class="section">
+        <h2>Overlay implementation</h2>
+        <p>To replace the icon in the control bar, and have an overlay on the video, you need to make a few changes.</p>
+        <p>First, in the JavaScript remove all the code that creates and displays the linked icon. Replace that code with code that creates and appends an overlay.</p>
+        <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="129-134"></code></p>
+        <p>You will also need to use CSS to style and place the overlay, which obviously can be changed to suit your implementation.</p>
+        <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="79-89"></code></p>
+        <p>If you wish to use this approach for your plugin, you will need to place the CSS into a separate file, save in a Internet accessible URL, and enter that URL when associating the plugin with a player in Studio.</p>
+      </div>
+      
+      <div id="insertionpointimplementation" class="section">
+        <h2>HTML page implementation</h2>
+        <p>To replace the icon in the control bar, and define a location in your HTML page for a download link, you need to make a few changes.</p>
+        <p>First, in your HTML page determine where you wish to insert the link and place the following HTML there.</p>
+        <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="204"></code></p>
+        <p>Next, in the JavaScript remove all the code that creates and displays the linked icon. Replace that code with code that creates a hyperlink and dynamically injects that hyperlink into the HTML page at your insertion point.</p>
+        <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="234-236"></code></p>
+      </div>
+      
+			<div class="section" id="BCLreferences">
+				<h2>Related Topics</h2>
+				<ul>
+					<li> <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player-v1/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a></li>
+					<li> <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player-v1/guides/plugin-guide.html">Player Plugin Overview</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!-- bcl scripts -->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/1.9/gist-embed.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.3/fastclick.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/js/foundation.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+	<script src="/en/scripts/log.js"></script>
+	<script src="/en/scripts/docs-nav-data.min.js"></script>
+	<script src="/en/scripts/bcls-doc-site.js"></script>
+	<script src="/en/scripts/bc-mapi.js"></script>
+  <script src="/en/scripts/expander.js"></script>
+	<script>
+		$(document).foundation();
+	</script>
+	<script type="text/javascript">
+		/******** Any scripts specific to page samples should go here *********/
+	</script>
+	<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+    <script>
+	var feedbackMail = document.getElementById("feedbackMail");
+	feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+	</script>
+</body>
+
+</html>
