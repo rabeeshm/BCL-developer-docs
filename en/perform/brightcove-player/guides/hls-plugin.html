@@ -81,31 +81,76 @@
                         <li>Internet Explorer &lt; 10</li>
                     </ul>
                 </div>
-      <div id="runtimeproperties" class="section">
+        <div id="options" class="section">
+          <h2>Options</h2>
+          <p>There is one option you can use to configure the HLS plugin. There are two methods to set this value.</p>
+          <h3>Tag Method:</h3>
+          <p>If you are using the in-page embed player implementation you can use the <code>data-setup</code> attribute to configure the plugin:</p>
+          <pre><code>&lt;video data-setup='{ "hls": { "withCredentials": true } }'</code></pre>
+          <h3>Player Management API Method:</h3>
+          <p>Alternatively, if not using the in-page embed player implementation or want the value set for all player instances, you can configure the plugin using the <a href="//docs.brightcove.com/en/video-cloud/player-management/index.html">Player Management API</a> using an HTTP <code>PATCH</code> method, as shown here:</p>
+          <pre><code>curl \
+  --header "Content-Type: application/json" \
+  --user YOUR_EMAIL \
+  --request PATCH \
+  --data '{ "hls": { "withCredentials": true } }' \
+  https://players.api.brightcove.com/v1/accounts/YOUR_ACCOUNT_ID/players/YOUR_PLAYER_ID/configuration</code></pre>
+          <h4>withCredentials</h4>
+          <p>Type: <code>boolean</code></p>
+          <p>When the <code>withCredentials</code> property is set to <true>true</true>, all XHR requests for manifests and segments would have <code>withCredentials</code> set to <code>true</code> as well. This enables storing and passing cookies from the server that the manifests and segments live on. This has some implications on CORS because when set, the <code>Access-Control-Allow-Origin</code> header cannot be set to <code>*</code>, also, the response headers require the addition of <code>Access-Control-Allow-Credentials</code> header which is set to <code>true</code>. See the  <a href="http://www.html5rocks.com/en/tutorials/cors/">HTML5Rocks's article</a> for more info.</p>
+        </div>
+        <div id="runtimeproperties" class="section">
         <h2>Runtime Properties</h2>
-                    <h4>player.hls.master</h4>
-                    <p>Type: <code>object</code>
-                    </p>
-                    <p>An object representing the parsed master playlist. If a media playlist is loaded directly, a master playlist with only one entry will be created.</p>
-                    <h4>player.hls.media</h4>
-                    <p>Type: <code>object</code>
-                    </p>
-                    <p>An object representing the currently selected media playlist. This is the playlist that is being referred to when a additional video data needs
-                        to be downloaded.</p>
-                    <h4>player.hls.mediaIndex</h4>
-                    <p>Type: <code>number</code>
-                    </p>
-                    <p>The index of the next video segment to be downloaded from
+          <h4>player.hls.playlists.master</h4>
+          <p>Type: <code>object</code></p>
+          <p>An object representing the parsed master playlist. If a media playlist is loaded directly, a master playlist with only one entry will be created.</p>
+          <h4>player.hls.playlists.media</h4>
+          <p>Type: <code>function</code></p>
+          <p>A function that can be used to retrieve or modify the currently active media playlist. The active media playlist is referred to when additional video data needs to be downloaded. Calling this function with no arguments returns the parsed playlist object for the active media playlist. Calling this function with a playlist object from the master playlist or a URI string as specified in the master playlist will kick off an asynchronous load of the specified media playlist. Once it has been retrieved, it will become the active media playlist.</p>
+          <h4>player.hls.mediaIndex</h4>
+          <p>Type: <code>number</code>
+          </p>
+          <p>The index of the next video segment to be downloaded from
 <code>player.hls.media</code>.</p>
-                    <h4>player.hls.selectPlaylist</h4>
-                    <p>Type: <code>function</code>
-                    </p>
-                    <p>A function that returns the media playlist object to use to download the next segment. It is invoked by the plugin immediately before a new segment is downloaded. You can override this function to provide your adaptive streaming logic. You must, however, be sure to return a valid media playlist object that is present in <code>player.hls.master</code>.</p> <h3>Events</h3>
-                    <h4>loadedmetadata</h4>
-                    <p>Fired after the first media playlist is downloaded for a stream.</p>
-                    <h4>loadedmanifest</h4>
-                    <p>Fired immediately after a new master or media playlist has been downloaded. By default, the plugin only downloads playlists as they are needed.</p>
-                </div>
+          <h4>player.hls.segmentXhrTime</h4>
+          <p>Type: <code>number</code></p>
+          <p>The number of milliseconds it took to download the last media segment. This value is updated after each segment download completes.</p>
+          <h4>player.hls.bandwidth</h4>
+          <p>Type: <code>number</code></p>
+          <p>The number of bits downloaded per second in the last segment download. This value is used by the default implementation of <code>selectPlaylist</code> to select an appropriate bitrate to play. Before the first video segment has been downloaded, it's hard to estimate bandwidth accurately. The HLS tech uses a heuristic based on the playlist download times to do this estimation by default. If you have a more accurate source of bandwidth information, you can override this value as soon as the HLS tech has loaded to provide an initial bandwidth estimate.</p>
+          <h4>player.hls.bytesReceived</h4>
+          <p>Type: <code>number</code></p>
+          <p>The total number of content bytes downloaded by the HLS tech.</p>
+          <a name="selectplaylist"></a>
+          <h4>player.hls.selectPlaylist</h4>
+          <p>Type: <code>function</code>
+          </p>
+          <p>A function that returns the media playlist object to use to download the next segment. It is invoked by the plugin immediately before a new segment is downloaded. You can override this function to provide your adaptive streaming logic. You must, however, be sure to return a valid media playlist object that is present in <code>player.hls.master</code>.</p> <h3>Events</h3>
+          <h4>loadedmetadata</h4>
+          <p>Fired after the first media playlist is downloaded for a stream.</p>
+          <h4>loadedplaylist</h4>
+          <p>Fired immediately after a new master or media playlist has been downloaded. By default, the plugin only downloads playlists as they are needed.</p>
+          <h4>mediachange</h4>
+          <p>Fired when a new playlist becomes the active media playlist. Note that the actual rendering quality change does not occur simultaneously with this event; a new segment must be requested and the existing buffer depleted first.</p>
+      </div>
+      <div id="adaptiveswitching" class="section">
+        <h2>Adaptive switching</h2>
+        <p>The HLS tech tries to ensure the highest-quality viewing experience possible, given the available bandwidth and encodings. This doesn't always mean using the highest-bitrate rendition available. For instance, if the player is 300px by 150px, it would be a waste of bandwidth to download a 4k stream.</p>
+        <p>By default, the player attempts to load the highest-bitrate variant that is less than the most recently detected segment bandwidth, with one condition: if there are multiple variants with dimensions greater than the current player size, it will only switch up one size greater than the current player size.</p>
+        <p>The process is illustrated below:</p>
+        <ol>
+            <li>Whenever a new segment is downloaded, the download bitrate is calculated based on the size of the segment and the time it took to download:</li>
+            <div><img src="/en/video-cloud/brightcove-player/guides/assets/HLS-rendition-1.png"></div>
+            <li>All the renditions that have a higher bitrate than the new measurement are filtered out:</li>
+            <div><img src="/en/video-cloud/brightcove-player/guides/assets/HLS-rendition-2.png"></div>
+            <li>Any renditions that are bigger than the current player's dimensions are filtered out:</li>
+            <div><img src="/en/video-cloud/brightcove-player/guides/assets/HLS-rendition-3.png"></div>
+            <li>A significant quality drop is not wanted just because your player is one pixel too small, so we add back in the next highest resolution. The highest bitrate rendition that remains is the one that gets used:</li>
+            <div><img src="/en/video-cloud/brightcove-player/guides/assets/HLS-rendition-4.png"></div>
+        </ol>
+        <p>If it turns out no rendition is acceptable based on the filtering described above, the first encoding listed in the master playlist will be used.</p>
+        <p>If you'd like your player to use a different set of priorities, it's possible to completely replace the rendition selection logic. For instance, you could always choose the most appropriate rendition by resolution, even though this might mean more stalls during playback. See the documentation on <a href="#selectplaylist">player.hls.selectPlaylist</a> for more details.</p>
+      </div>
       <div id="inbandmetadata" class="section">
         <h2>In-band metadata</h2>
         <p>Brightcove Player will recognize certain types of ID3 tag information embedded in an HLS video stream. The ID3 standard was originally used to provide metadata about MP3 audio tracks. (The acronym is from <strong>ID</strong>entify MP<strong>3</strong>.) When a stream is encountered with embedded metadata, an in-band metadata text track will automatically be created and populated with cues as they are encountered in the stream. A common use case is the ID3 data would direct when advertisements should be shown in a live stream.</p>
