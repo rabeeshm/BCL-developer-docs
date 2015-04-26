@@ -1,6 +1,6 @@
 var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData, hljs) {
     "use strict";
-    var $precode = $("pre code"),
+    var precode = document.querySelectorAll("pre>code"),
         // for handlebars
         template,
         result,
@@ -17,18 +17,19 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         },
         highlightBackgroundColor = "#000000",
         $this,
-        $pageTitle = $("h1:first"),
         $currentPage,
         $currentItem,
-        $navWrapper = $("#navWrapper"),
-        $breadCrumbWrapper = $("#breadCrumbWrapper"),
+        navWrapper = document.getElementById("navWrapper"),
+        breadCrumbWrapper = document.getElementById("breadCrumbWrapper"),
         $navMenuLeft,
         $navMenuRight,
         $titleArea, // the header
         $siteTitle,
-        $searchModal = $("#searchModal"),
-        $divsection = $("div.section"), // all the content sections
-        $sidenav = $("#sidenav"), // the in-page nav
+        searchModal = document.getElementById("searchModal"),
+        // all the content sections
+        divsection = document.querySelectorAll("div.section"),
+        // the in-page nav
+        sidenav = document.getElementById("sidenav"),
         path = window.location.pathname,
         section,
         subsection,
@@ -69,7 +70,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         // functions
         bclslog,
         lightenDarkenColor,
-        exists,
+        isDefined,
         findObjectInArray,
         setPageTitle,
         forceSecure,
@@ -84,12 +85,19 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         getSection,
         init,
         BCLhighlight;
-    // logging utility
+    /**
+     * Logging function - safe for IE
+     * @param  {string} context description of the data
+     * @param  {*} message the data to be logged by the console
+     * @return {}
+     */
     bclslog = function (context, message) {
-        if (window.console && console.log) {
-            console.log(context, message);
-        }
+        if (window["console"] && console["log"]) {
+          console.log(context, message);
+        };
+        return;
     };
+
     /*
      * Usage
      * Lighten
@@ -129,20 +137,30 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         }
         return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
     };
-    // test for existence
-    exists = function (x) {
-        return (x !== undefined && x !== null && x !== "" && x !== NaN);
-    };
-    /*
-    find index of an object in array of objects
-    based on some property value
-    returns index if found, otherwise returns -1
-    */
-    findObjectInArray = function (targetArray, objProperty, value) {
+    /**
+     * tests for all the ways a variable might be undefined or not have a value
+     * @param {*} x the variable to test
+     * @return {Boolean} true if variable is defined and has a value
+     */
+    isDefined = function (x) {
+        if ( x !== "" && x !== null && x !== undefined && x !== NaN && x !== {} && x !== []){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    /**
+     * find index of an object in array of objects based on some property value
+     * @param {array} targetArray
+     * @param {string} objProp property to evaluate
+     * @param {string} value property value to look for
+     * @return {integer} first index if found, otherwise returns -1
+     */
+    findObjectInArray = function (targetArray, objProp, value) {
         var i, totalItems = targetArray.length,
             objFound = false;
         for (i = 0; i < totalItems; i++) {
-            if (targetArray[i][objProperty] === value) {
+            if (targetArray[i][objProp] === value) {
                 objFound = true;
                 return i;
             }
@@ -151,13 +169,16 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             return -1;
         }
     };
-    // set document title to value of h1 header, if any
+    /**
+     * sets document title to contents of first h1 tag
+     */
     setPageTitle = function () {
-        if ($pageTitle.length > 0) {
-            document.title = $pageTitle.html();
-        }
+        document.title = document.getElementsByTagName("h1")[0].innerHTML;
     };
-    // force into https mode if not already there
+    /**
+     * force into https mode if not already there - currently unused
+     * @return {}
+     */
     forceSecure = function () {
         var pageURL = window.location.href,
             pageProtocol = window.location.protocol;
