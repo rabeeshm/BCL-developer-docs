@@ -203,13 +203,13 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         var str = "<ul class=\"side-nav show-for-large-up\">",
             i,
             max = navLabel.length,
-            $navElements;
+            navElements;
         for (i = 0; i < max; i++) {
             str += "<li><a href=\"#" + navLabel[i].link + "\">" + navLabel[i].text + " </a></li>";
         }
         str += "</ul>";
-        $sidenav.append(str);
-        $navElements = $sidenav.find("a");
+        sidenav.innerHTML += str;
+        navElements = document.querySelectorAll("a");
         $navElements.on("click", function () {
             $navElements.attr("style", "");
             $(this).attr("style", "background-color:" + productColors[product] + ";color:#ffffff");
@@ -228,25 +228,25 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                 bclslog("sectionEl", sectionEL);
                 switch (product) {
                 case "video-cloud":
-                    if (!$this.hasClass("perform-only")) {
+                    if (!hasClass(sectionEL, "perform-only") {
                         navObj = {};
-                        navObj.link = $this.attr("id");
-                        navObj.text = $this.find("h2:first").text();
+                        navObj.link = sectionEl.getAttribute("id");
+                        navObj.text = sectionEl.firstChild.innerHTML;
                         navLabel.push(navObj);
                     }
                     break;
                 case "perform":
-                    if (!$this.hasClass("video-cloud-only")) {
+                    if (!hasClass(sectionEl, "video-cloud-only")) {
                         navObj = {};
-                        navObj.link = $this.attr("id");
-                        navObj.text = $this.find("h2:first").text();
+                        navObj.link = sectionEl.getAttribute("id");
+                        navObj.text = sectionEl.firstChild.innerHTML;
                         navLabel.push(navObj);
                     }
                     break;
                 default:
                     navObj = {};
-                    navObj.link = $this.attr("id");
-                    navObj.text = $this.find("h2:first").text();
+                    navObj.link = sectionEl.getAttribute("id");
+                    navObj.text = sectionEl.firstChild.innerHTML;
                     navLabel.push(navObj);
                     break;
                 }
