@@ -27,7 +27,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         $siteTitle,
         searchModal = document.getElementById("searchModal"),
         // all the content sections
-        divsection = document.querySelectorAll("div.section"),
+        divsections = document.querySelectorAll("div.section"),
         // the in-page nav
         sidenav = document.getElementById("sidenav"),
         path = window.location.pathname,
@@ -71,6 +71,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         bclslog,
         lightenDarkenColor,
         isDefined,
+        hasClass,
         findObjectInArray,
         setPageTitle,
         forceSecure,
@@ -169,6 +170,17 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             return -1;
         }
     };
+
+    /**
+     * determines whether element has a class
+     * @param {HTML element} elem the element
+     * @param {string} cls the name of the class you’re looking for
+     * @return {boolean} true if the element has that class, false if not
+     */
+    function hasClass (elem, cls) {
+        return (" " + elem.className + " " ).indexOf( " " + cls + " " ) > -1
+    };
+
     /**
      * sets document title to contents of first h1 tag
      */
@@ -206,11 +218,14 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         $("h1,h2").attr("style", "color:" + productColors[product]);
     };
     createInPageNav = function () {
-        var navObj = {};
+        var navObj = {},
+            numSections = divsections.length,
+            i;
         // set initial visibilities
-        $divsection.each(function (index) {
-            if (index > 0) {
-                $this = $(this);
+        for (i = 0, i < numSections; i++)
+            if (i > 0) {
+                var sectionEl = divsections.item(i);
+                bclslog("sectionEl", sectionEL);
                 switch (product) {
                 case "video-cloud":
                     if (!$this.hasClass("perform-only")) {
