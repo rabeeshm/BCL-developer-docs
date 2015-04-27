@@ -203,13 +203,23 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         var str = "<ul class=\"side-nav show-for-large-up\">",
             i,
             max = navLabel.length,
-            navElements;
+            navElements,
+            j,
+            jMax,
+            k;
         for (i = 0; i < max; i++) {
             str += "<li><a href=\"#" + navLabel[i].link + "\">" + navLabel[i].text + " </a></li>";
         }
         str += "</ul>";
         sidenav.innerHTML += str;
-        navElements = document.querySelectorAll("a");
+        navElements = document.querySelectorAll("ul.side-nav a");
+        jMax = navElements.length;
+        for (j = 0; j < jMax; j++) {
+            navElements[j].addEventListener("click", function () {
+                $navElements.attr("style", "");
+                $(this).attr("style", "background-color:" + productColors[product] + ";color:#ffffff");
+            });
+        }
         $navElements.on("click", function () {
             $navElements.attr("style", "");
             $(this).attr("style", "background-color:" + productColors[product] + ";color:#ffffff");
