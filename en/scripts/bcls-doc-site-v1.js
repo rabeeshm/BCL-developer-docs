@@ -32,10 +32,10 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         sidenav = document.getElementById("sidenav"),
         path = window.location.pathname,
         section,
-        subsection,
-        subsectionName,
-        subsubsection,
-        subsubsectionName,
+        navArr = [],
+        groupObj = {},
+        alphaArr = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
+        alphaObj = {"a":[], "b":[], "c":[], "d":[], "e":[], "f":[], "g":[], "h":[], "i":[], "j":[], "k":[], "l":[], "m":[] "n":[], "o":[], "p":[], "q":[], "r":[], "s":[], "t":[], "u":[], "v":[], "w":[], "x":[], "y":[], "z":[]},
         topObj = {
             "text": "Top",
             "link": "top"
@@ -61,9 +61,6 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
           })();\
         </script>\
         <gcse:search></gcse:search></div></section>",
-        submenuBlockStart = "<div class=\"large-3 small-12 columns\" style=\"overflow-x:hidden\"><h2>{{name}}</h2>",
-        submenuBlockMiddle = "<h3 class=\"index-page\">{{name}}</h3><ul>{{#items}}<li><a href=\"{{url}}\">{{name}}</a></li>{{/items}}</ul>",
-        submenuBlockEnd = "</div>",
         solutionsPageBlockStart = "<div class=\"large-3 small-12 columns\" style=\"overflow-x:hidden\"><h2>{{name}}</h2>",
         solutionsPageItemsTemplate = "<ul>{{#items}}<li><a href=\"{{url}}\">{{name}}</a></li>{{/items}}</ul>",
         solutionsPageBlockEnd = "</div>",
@@ -74,12 +71,14 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         hasClass,
         findObjectInArray,
         setPageTitle,
+        setAttributeOnNodeList,
         forceSecure,
         createInPageNavMenu,
         createInPageNav,
         highlightCurrentItem,
         buildBreadCrumbs,
         createNavigation,
+        buildPageArrays,
         createLandingPageSections,
         createSolutionsLandingPageSections,
         createSubsectionLandingPageSections,
@@ -187,6 +186,21 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
     setPageTitle = function () {
         document.title = document.getElementsByTagName("h1")[0].innerHTML;
     };
+
+    /**
+     * sets an attribute for each item in a node list
+     * @param {nodeList} list  the node list
+     * @param {[type]} attr  the attribute to set
+     * @param {[type]} value the value for the attribute
+     */
+    setAttributeOnNodeList = function (list, attr, value) {
+        var i,
+            iMax = list.length;
+        for (i = 0; i < iMax; i++) {
+            list[i].setAttribute(attr, value);
+        }
+    }
+
     /**
      * force into https mode if not already there - currently unused
      * @return {}
@@ -198,6 +212,17 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             window.location.href = pageURL.replace("http:", "https:");
         }
     };
+
+    /**
+     * buildPageArrays build arrays of pages from the nav data
+     * works off the section determined in getSection()
+     */
+    buildPageArrays = function () {
+        var navData = bclsNavData[section],
+            i,
+            iMax;
+
+    }
     // create navigation for page sections
     createInPageNavMenu = function () {
         var str = "<ul class=\"side-nav show-for-large-up\">",
@@ -216,14 +241,11 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         jMax = navElements.length;
         for (j = 0; j < jMax; j++) {
             navElements[j].addEventListener("click", function () {
-                $navElements.attr("style", "");
-                $(this).attr("style", "background-color:" + productColors[product] + ";color:#ffffff");
+                setAttributeOnNodeList(navElements, "style", "");
+                navElements[j].setAttribute("style", "background-color:" + productColors[product] + ";color:#ffffff");
             });
         }
-        $navElements.on("click", function () {
-            $navElements.attr("style", "");
-            $(this).attr("style", "background-color:" + productColors[product] + ";color:#ffffff");
-        });
+        // TODO move this to the right place
         // set h2 color to product NewColor
         $("h1,h2").attr("style", "color:" + productColors[product]);
     };
@@ -268,6 +290,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             createInPageNavMenu();
         }
     };
+    // TODO eliminate this but move the calls to build breadcrumbs and inpage nav
     // highlight the current page in the global navigation
     highlightCurrentItem = function () {
         // find current page in navigation menu
@@ -285,14 +308,15 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             return true;
         });
         // current page may be undefined if the site index
-        if (exists($currentPage)) {
+        if (isDefined($currentPage)) {
             $currentPage.attr("style", "background-color:" + highlightBackgroundColor + ";");
             $currentItem.attr("style", "background-color:" + highlightBackgroundColor + ";");
-            if (exists($currentItem) && $currentItem.parents("li").hasClass("has-dropdown")) {
+            if (isDefined($currentItem) && $currentItem.parents("li").hasClass("has-dropdown")) {
                 $currentItem.parents("li").attr("style", "background-color:" + highlightBackgroundColor + ";");
                 $currentItem.parents("li").children("a").attr("style", "background-color:" + highlightBackgroundColor + ";");
             }
         }
+        // TODO - move to another location
         // build breadcrumbs
         buildBreadCrumbs();
         // next create the in-page navigation
@@ -304,41 +328,24 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         bclslog("section: ", section);
         bclslog("sectionName: ", sectionName);
         bclslog("subsection: ", subsection);
-        bclslog("subsubsection", subsubsection);
-        bclslog("subsubsectionName", subsubsectionName);
-        if (exists(product)) {
+        if (isDefined(product)) {
             if (product === "index") {
                 str += "<li><a href=\"//docs.brightcove.com/en/index.html\">" + bclsNavData[product].name + "</a></li>";
             } else {
                 str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/index.html\">" + bclsNavData[product].name + "</a></li>";
             }
         }
-        if (exists(sectionName)) {
+        if (isDefined(sectionName)) {
             if (section === "video-cloud" || section === "perform" || section === "player-management") {
                 str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + sectionName.toLowerCase() + "/index.html\"><strong>" + sectionName.replace("-", " ") + "</strong></a></li>";
             } else {
                 str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + section + "/index.html\"><strong>" + section.replace("-", " ") + "</strong></a></li>";
             }
         }
-        if (exists(subsection)) {
-            if (section === "video-cloud") {
-                str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + section + "/index.html\">" + subsectionName + "</a></li>";
-            } else if (section === "index") {
-                str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + subsection.toLowerCase() + "/index.html\">" + subsectionName + "</a></li>";
-            } else {
-                str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + section.toLowerCase() + "/" + subsection.toLowerCase() + "/index.html\">" + subsectionName + "</a></li>";
-            }
-        }
-        if (exists(subsubsection)) {
-            // only in video cloud but allow for other subsections having subsubsections
-            if (section === "studio" || section === "mobile-sdks") {
-                str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + section.toLowerCase() + "/" + subsection.toLowerCase() + "/" + subsubsection.toLowerCase() + "/index.html\">" + subsubsectionName + "</a></li>";
-            }
-        }
-        if (exists(sectionName)) {
+        if (isDefined(sectionName)) {
             str += "<li class=\"current\">" + document.getElementsByTagName("title")[0].innerHTML + "</li>"
         }
-        $breadCrumbWrapper.html(str);
+        breadCrumbWrapper.innerHTML = str;
     };
     // create the global navigation
     createNavigation = function () {
@@ -361,13 +368,13 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         };
         bclslog("navdata", data);
         processItem = function (item) {
-            if (exists(item.items)) {
+            if (isDefined(item.items)) {
                 // start a dropdown
                 template = listStartTemplate;
                 processTemplate(item);
                 processDropdown(item.items);
                 navHTML += navDropdownEndTemplate;
-            } else if (exists(item.url)) {
+            } else if (isDefined(item.url)) {
                 template = itemTemplate;
                 processTemplate(item);
             }
@@ -382,14 +389,14 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             }
         };
         // see if there are sections and calculate the number of items to process
-        if (exists(data)) {
-            if (exists(data.items)) {
+        if (isDefined(data)) {
+            if (isDefined(data.items)) {
                 // we're on the landing page
                 max = data.items.length;
-            } else if (exists(data.sections)) {
+            } else if (isDefined(data.sections)) {
                 // we're in a product that has sections
                 data = data.sections[section];
-                if (exists(data)) {
+                if (isDefined(data)) {
                     max = data.items.length;
                 }
 
@@ -449,14 +456,14 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             blockEndTemplate = landingPageBlockTemplateEnd,
             str = "";
 
-        if (exists(sections)) {
+        if (isDefined(sections)) {
             data = data.items;
             bclslog("section exists Data", data);
             max = data.length;
             for (i = 0; i < max; i++) {
                 item = data[i];
                 bclslog("landing page item", item);
-                if (exists(item.items)) {
+                if (isDefined(item.items)) {
                     kMax = item.items.length;
                     if (i === 1) {
                         str += blockTemplate2Start(item);
@@ -467,13 +474,13 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     for (k = 0; k < kMax; k++) {
                         var kItem = item.items[k];
                         // check for submenus
-                        if (exists(kItem.items)) {
+                        if (isDefined(kItem.items)) {
                             str += subTemplateStart(kItem);
                             jMax = kItem.items.length;
                             for (j = 0; j < jMax; j++) {
                                 var jItem = kItem.items[j];
                                 // check for subsubmenu
-                                if (exists(jItem.items)) {
+                                if (isDefined(jItem.items)) {
                                     lMax = jItem.items.length;
                                     for (l = 0; l < lMax; l++) {
                                         var mItem = jItem.items[l];
@@ -522,7 +529,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         bclslog("dataIndex: ", dataIndex);
         bclslog("subsection data", data);
         // check for submenus
-        if (exists(data) && exists(data.items[0].items)) {
+        if (isDefined(data) && isDefined(data.items[0].items)) {
             max = data.items.length;
             for (i = 0; i < max; i++) {
                 item = data.items[i];
@@ -550,10 +557,10 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             startTemplate = Handlebars.compile(solutionsPageBlockStart),
             itemTemplate = Handlebars.compile(solutionsPageItemsTemplate),
             str = "";
-        if (exists($sections)) {
+        if (isDefined($sections)) {
             for (prod in data) {
                 p = data[prod];
-                if (exists(p.items && prod !== "video-cloud")) {
+                if (isDefined(p.items && prod !== "video-cloud")) {
                     max = p.items.length;
                     for (i = 0; i < max; i++) {
                         item = p.items[i];
@@ -653,7 +660,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                         subsection = pathArray[3];
                     }
                     // check to see if we're on a subsection landing page
-                    if (exists(subsection)) {
+                    if (isDefined(subsection)) {
                         switch (subsection) {
                         case "brightcove-player-sdk-for-ios":
                             subsectionName = "Brightcove Player SDK for iOS";
@@ -946,7 +953,7 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
                         subsection = pathArray[3];
                     }
                     // check to see if we're on a subsection landing page
-                    if (exists(subsection)) {
+                    if (isDefined(subsection)) {
                         switch (subsection) {
                         case "brightcove-player-sdk-for-ios":
                             var dataIndex;
@@ -1066,7 +1073,7 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
             bclslog("unknown server");
         }
         // create the navigationTrtrrpleann
-        if (exists(section)) {
+        if (isDefined(section)) {
             createNavigation();
         }
     };
