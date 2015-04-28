@@ -32,6 +32,9 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         sidenav = document.getElementById("sidenav"),
         path = window.location.pathname,
         section,
+        subsection,
+        performOnly = document.getElementsByClassName("perform-only"),
+        videoCloudOnly = document.getElementsByClassName("video-cloud-only"),
         navArr = [],
         groupObj = {},
         alphaArr = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
@@ -77,8 +80,6 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         createNavigation,
         buildPageArrays,
         createLandingPageSections,
-        createSolutionsLandingPageSections,
-        createSubsectionLandingPageSections,
         getSection,
         init,
         BCLhighlight;
@@ -140,7 +141,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
      * @return {Boolean} true if variable is defined and has a value
      */
     isDefined = function (x) {
-        if ( x !== "" && x !== null && x !== undefined && x !== NaN && x !== {} && x !== []){
+        if ( x !== "" && x !== null && x !== undefined && !x.isNaN() && x !== {} && x !== []){
             return true;
         } else {
             return false;
@@ -173,8 +174,8 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
      * @param {string} cls the name of the class you’re looking for
      * @return {boolean} true if the element has that class, false if not
      */
-    function hasClass (elem, cls) {
-        return (" " + elem.className + " " ).indexOf( " " + cls + " " ) > -1
+    hasClass = function (elem, cls) {
+        return (" " + elem.className + " " ).indexOf( " " + cls + " " ) > -1;
     };
 
     /**
@@ -379,7 +380,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             }
         }
         if (isDefined(sectionName)) {
-            str += "<li class=\"current\">" + document.getElementsByTagName("title")[0].innerHTML + "</li>"
+            str += "<li class=\"current\">" + document.getElementsByTagName("title")[0].innerHTML + "</li>";
         }
         breadCrumbWrapper.innerHTML = str;
     };
@@ -465,8 +466,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
     // create the index of section pages for the landing page
     createLandingPageSections = function (data) {
         bclslog("createLandingPageSectionsData", data);
-        var $sections = $("#sections"),
-            sections = document.getElementById("sections"),
+        var sections = document.getElementById("sections"),
             i,
             j,
             k,
@@ -539,78 +539,8 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     str += blockEndTemplate;
                 }
             }
-            $sections.html(str);
-            $sections.children("div").filter(":last").addClass("end");
+            sections.innerHTML = str;
         }
-    };
-    // create the index of pages for subsections on the subsection landing page
-    createSubsectionLandingPageSections = function () {
-        var dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName),
-            data = bclsNavData[product].sections[section].items[dataIndex],
-            $top = $("#top"),
-            i,
-            max,
-            item,
-            templateStart = "<div class=\"large-6 small-12 columns\" style=\"overflow-x:hidden\"><ul>",
-            templateMiddle = Handlebars.compile("{{#items}}<li><a href=\"{{url}}\">{{name}}</a></li>{{/items}}"),
-            templateEnd = "</ul></div>",
-            str = "";
-        bclslog("bclsNavData[product].sections[section].items", bclsNavData[product].sections[section].items);
-        // data = data.items;
-        bclslog("product: ", product);
-        bclslog("section: ", section);
-        bclslog("sectionName: ", sectionName);
-        bclslog("subsection: ", subsection);
-        bclslog("subsectionName: ", subsectionName);
-        bclslog("dataIndex: ", dataIndex);
-        bclslog("subsection data", data);
-        // check for submenus
-        if (isDefined(data) && isDefined(data.items[0].items)) {
-            max = data.items.length;
-            for (i = 0; i < max; i++) {
-                item = data.items[i];
-                str += "<div class=\"large-6 small-12 columns\" style=\"overflow-x:hidden\"><h3>" + item.name + "</h3><ul>";
-                str += templateMiddle(item);
-                str += templateEnd;
-            }
-        } else {
-            str += templateStart;
-            str += templateMiddle(data);
-            str += templateEnd;
-        }
-        $top.append(str);
-        // $top.children("div").filter(":last").addClass("end");
-    };
-    // special case - landing page for solutions.brightcove.com -- create index of all solutions
-    createSolutionsLandingPageSections = function () {
-        var data = bclsNavData["video-cloud"].sections,
-            $sections = $("#sections"),
-            prod,
-            i,
-            max,
-            item,
-            p,
-            startTemplate = Handlebars.compile(solutionsPageBlockStart),
-            itemTemplate = Handlebars.compile(solutionsPageItemsTemplate),
-            str = "";
-        if (isDefined($sections)) {
-            for (prod in data) {
-                p = data[prod];
-                if (isDefined(p.items && prod !== "video-cloud")) {
-                    max = p.items.length;
-                    for (i = 0; i < max; i++) {
-                        item = p.items[i];
-                        if (item.name === "Solutions") {
-                            str += startTemplate(p);
-                            str += itemTemplate(item);
-                            str += solutionsPageBlockEnd;
-                        }
-                    }
-                }
-            }
-        }
-        $sections.html(str);
-        $sections.children("div").filter(":last").addClass("end");
     };
     // figure out what section we're in
     getSection = function () {
@@ -643,7 +573,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                 section = "null";
                 product = "index";
                 productName = null;
-                $navMenuRight.html(menuRightBase + vcSupportNav);
+                navMenuRight.innerHTML = menuRightBase + vcSupportNav;
                 break;
             case "video-cloud": // in video cloud
                 product = "video-cloud";
@@ -1105,7 +1035,7 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
             // don't know where we are
             product = null;
             section = null;
-            $navMenuRight.html(menuRightBase + vcSupportNav);
+            navMenuRight.innerHTML = menuRightBase + vcSupportNav;
             bclslog("unknown server");
         }
         // create the navigationTrtrrpleann
@@ -1139,9 +1069,11 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
         syntax highlighting - dependent on highlight.pack.js
         ***************************************************/
     BCLhighlight = function () {
-        $precode.each(function (i, e) {
-            hljs.highlightBlock(e);
-        });
+        var i,
+            iMax = precode.length;
+        for (i = 0; i < iMax; i++) {
+            hljs.highlightBlock(precode[i]);
+        }
     };
     init();
     return {
