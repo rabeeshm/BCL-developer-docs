@@ -21,10 +21,10 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         $currentItem,
         navWrapper = document.getElementById("navWrapper"),
         breadCrumbWrapper = document.getElementById("breadCrumbWrapper"),
-        $navMenuLeft,
-        $navMenuRight,
-        $titleArea, // the header
-        $siteTitle,
+        navMenuLeft,
+        navMenuRight,
+        titleArea, // the header
+        siteTitle,
         searchModal = document.getElementById("searchModal"),
         // all the content sections
         divsections = document.querySelectorAll("div.section"),
@@ -91,7 +91,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
     bclslog = function (context, message) {
         if (window["console"] && console["log"]) {
           console.log(context, message);
-        };
+        }
         return;
     };
 
@@ -145,7 +145,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         } else {
             return false;
         }
-    }
+    };
     /**
      * find index of an object in array of objects based on some property value
      * @param {array} targetArray
@@ -196,7 +196,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         for (i = 0; i < iMax; i++) {
             list[i].setAttribute(attr, value);
         }
-    }
+    };
 
     /**
      * force into https mode if not already there - currently unused
@@ -226,16 +226,17 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         if (isDefined(navData.groups)) {
             iMax = navData.groups.length;
             for (i = 0; i < iMax; i++) {
-                group = navData.groups[i];
+                group = navData.groups[i].name;
                 groupObj[group].items = [];
-                groupObj[group].name =
+                groupObj[group].name = group.name;
+                groupObj[group].header = group.header;
             }
         } else {
-            bclslog("no groups", navdata.groups);
+            bclslog("no groups", navdata);
         }
         // assign items to functional and alpha groups
         if (isDefined(navData.items)) {
-            iMax = navData.items.length
+            iMax = navData.items.length;
             for (i = 0; i < iMax; i++) {
                 item = navData.items[i];
                 // assign to alpha group
@@ -245,15 +246,18 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                 if (isDefined(item.groups)) {
                     jMax = item.groups.length;
                     for (j = 0; j < jMax; j++) {
-
+                        group = item.groups[i].name;
+                        groupObj[group].items.push(item);
                     }
+                } else {
+                    bclslog("no groups for item: ", item);
                 }
             }
         }
 
 
 
-    }
+    };
     // create navigation for page sections
     createInPageNavMenu = function () {
         var str = "<ul class=\"side-nav show-for-large-up\">",
@@ -285,13 +289,14 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             numSections = divsections.length,
             i;
         // set initial visibilities
-        for (i = 0, i < numSections; i++)
+        bclslog("divsections", divsections);
+        for (i = 0; i < numSections; i++) {
             if (i > 0) {
                 var sectionEl = divsections.item(i);
                 bclslog("sectionEl", sectionEL);
                 switch (product) {
                 case "video-cloud":
-                    if (!hasClass(sectionEL, "perform-only") {
+                    if (!hasClass(sectionEL), "perform-only") {
                         navObj = {};
                         navObj.link = sectionEl.getAttribute("id");
                         navObj.text = sectionEl.firstChild.innerHTML;
@@ -314,7 +319,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     break;
                 }
             }
-        });
+        }
         // only create the nav widget if there is more than one item
         if (navLabel.length > 1) {
             // create in-page nav menu
@@ -453,7 +458,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         } else {
             titleStr += "index.html\">" + bclsNavData[product].image + "</a>";
         }
-        $siteTitle.html(titleStr);
+        siteTitle.innerHTML = titleStr;
         highlightBackgroundColor = lightenDarkenColor(productColors[product], -40);
         highlightCurrentItem();
     };
@@ -1115,13 +1120,13 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
         // set the page title in case wrong
         setPageTitle();
         // set up the header
-        $navWrapper.html(titleAreaTemplate);
-        $searchModal.html(searchTemplate);
+        navWrapper.innerHTML = titleAreaTemplate;
+        searchModal.innerHTML = searchTemplate;
         // get references to header sections
-        $navMenuLeft = $("#navMenuLeft");
-        $navMenuRight = $("#navMenuRight");
-        $titleArea = $(".title-area");
-        $siteTitle = $("#siteTitle");
+        navMenuLeft = document.getElementById("navMenuLeft");
+        navMenuRight = document.getElementById("navMenuRight");
+        titleArea = document.getElementsByClassName("title-area")[0];
+        siteTitle = document.getElementById("siteTitle");
         // get the section name
         getSection();
         /*
