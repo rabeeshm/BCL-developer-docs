@@ -35,11 +35,8 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         navArr = [],
         groupObj = {},
         alphaArr = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
-        alphaObj = {"a":[], "b":[], "c":[], "d":[], "e":[], "f":[], "g":[], "h":[], "i":[], "j":[], "k":[], "l":[], "m":[] "n":[], "o":[], "p":[], "q":[], "r":[], "s":[], "t":[], "u":[], "v":[], "w":[], "x":[], "y":[], "z":[]},
-        topObj = {
-            "text": "Top",
-            "link": "top"
-        },
+        alphaObj = {"a":[], "b":[], "c":[], "d":[], "e":[], "f":[], "g":[], "h":[], "i":[], "j":[], "k":[], "l":[], "m":[], "n":[], "o":[], "p":[], "q":[], "r":[], "s":[], "t":[], "u":[], "v":[], "w":[], "x":[], "y":[], "z":[]},
+        topObj = {"text": "Top", "link": "top"},
         navLabel = [topObj],
         menuRightBase = "<li class=\"search\"><a href=\"#\" data-reveal-id=\"searchModal\"><img src=\"//docs.brightcove.com/en/images/search-white.png\" alt=\"search_icon_small_white\" width=\"18\" height=\"18\"></a></li><li class=\"show-for-xlarge-up\"><a href=\"http://docs.brightcove.com/en/DeveloperDocumentationUpdates.xml\"><img src=\"//docs.brightcove.com/en/images/rss-feed-sm.png\" alt=\"rss-feed-sm\" width=\"14\" height=\"14\"></a></li>",
         vcSupportNav = "<li class=\"smaller show-for-xlarge-up\"><a href=\"//support.brightcove.com\">Support</a></li>",
@@ -220,16 +217,40 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
     buildPageArrays = function () {
         var navData = bclsNavData[section],
             i,
-            iMax;
+            iMax,
+            j,
+            jMax,
+            item,
+            firstLetter;
         // create arrays for section groups
         if (isDefined(navData.groups)) {
             iMax = navData.groups.length;
             for (i = 0; i < iMax; i++) {
-                groupObj[navdata.groups[i]] = [];
+                group = navData.groups[i];
+                groupObj[group].items = [];
+                groupObj[group].name =
             }
         } else {
             bclslog("no groups", navdata.groups);
         }
+        // assign items to functional and alpha groups
+        if (isDefined(navData.items)) {
+            iMax = navData.items.length
+            for (i = 0; i < iMax; i++) {
+                item = navData.items[i];
+                // assign to alpha group
+                firstLetter = item.name.charAt(0);
+                alphaObj[firstLetter].push(item);
+                // assign to functional groups
+                if (isDefined(item.groups)) {
+                    jMax = item.groups.length;
+                    for (j = 0; j < jMax; j++) {
+
+                    }
+                }
+            }
+        }
+
 
 
     }
