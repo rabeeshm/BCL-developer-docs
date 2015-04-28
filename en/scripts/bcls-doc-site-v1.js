@@ -221,6 +221,16 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         var navData = bclsNavData[section],
             i,
             iMax;
+        // create arrays for section groups
+        if (isDefined(navData.groups)) {
+            iMax = navData.groups.length;
+            for (i = 0; i < iMax; i++) {
+                groupObj[navdata.groups[i]] = [];
+            }
+        } else {
+            bclslog("no groups", navdata.groups);
+        }
+
 
     }
     // create navigation for page sections
