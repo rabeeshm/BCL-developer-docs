@@ -578,7 +578,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             case "video-cloud": // in video cloud
                 product = "video-cloud";
                 // hide anything perform-only
-                $(".perform-only").hide();
+                setAttributeOnNodeList(performOnly, "class", "display-none");
                 productName = "Video Cloud";
                 if (pathArray[2] === "index.html") {
                     // on video cloud landing page
