@@ -1,4 +1,4 @@
-var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData, hljs) {
+var BCLSmain = (function (window, console, document, bclsNavData, hljs) {
     "use strict";
     var precode = document.querySelectorAll("pre>code"),
         // for handlebars
@@ -19,9 +19,8 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             "perform": "#35498D"
         },
         highlightBackgroundColor = "#000000",
-        $this,
-        $currentPage,
-        $currentItem,
+        currentPage,
+        currentItem,
         navWrapper = document.getElementById("navWrapper"),
         breadCrumbWrapper = document.getElementById("breadCrumbWrapper"),
         navMenuLeft,
@@ -64,9 +63,6 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
           })();\
         </script>\
         <gcse:search></gcse:search></div></section>",
-        solutionsPageBlockStart = "<div class=\"large-3 small-12 columns\" style=\"overflow-x:hidden\"><h2>{{name}}</h2>",
-        solutionsPageItemsTemplate = "<ul>{{#items}}<li><a href=\"{{url}}\">{{name}}</a></li>{{/items}}</ul>",
-        solutionsPageBlockEnd = "</div>",
         // functions
         bclslog,
         lightenDarkenColor,
@@ -363,28 +359,6 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
     // highlight the current page in the global navigation
     highlightCurrentItem = function () {
         // find current page in navigation menu
-        $navMenuLeft.find("a").each(function () {
-            $this = $(this);
-            linkPath = $this.attr("href");
-            // extract path
-            linkPath = linkPath.slice(2); // remove "//"
-            linkPath = linkPath.slice(linkPath.indexOf("/"));
-            if (linkPath === path) {
-                $currentPage = $this;
-                $currentItem = $this.parent("li");
-                return false;
-            }
-            return true;
-        });
-        // current page may be undefined if the site index
-        if (isDefined($currentPage)) {
-            $currentPage.attr("style", "background-color:" + highlightBackgroundColor + ";");
-            $currentItem.attr("style", "background-color:" + highlightBackgroundColor + ";");
-            if (isDefined($currentItem) && $currentItem.parents("li").hasClass("has-dropdown")) {
-                $currentItem.parents("li").attr("style", "background-color:" + highlightBackgroundColor + ";");
-                $currentItem.parents("li").children("a").attr("style", "background-color:" + highlightBackgroundColor + ";");
-            }
-        }
         // TODO - move to another location
         // build breadcrumbs
         buildBreadCrumbs();
@@ -506,70 +480,9 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             kMax,
             lMax,
             item,
-            landingPageBlockTemplateStart = "<div class=\"large-3 small-12 columns\" style=\"overflow-x:hidden\"><h2 class=\"index-page\">{{name}}</h2>",
-            landingPageBlock2TemplateStart = "<h2 class=\"index-page\">{{name}}</h2>",
-            landingPageSubMenuTemplateStart = "<div><h4 class=\"index-page\">{{name}}</h4>",
-            landingPageSubSubMenuTemplateStart = "<div><h5 class=\"index-page\">{{name}}</h5>",
-            landingPageBlockTemplateEnd = "</div>",
-            landingPageBlockTemplate = "<p style=\"font-size:.9rem;line-height:.9rem;margin-bottom:.5rem;\"><a href=\"{{url}}\">{{name}}</a></p>",
-            landingItemTemplate = "<p style=\"font-size:.9rem;line-height:.9rem;margin-bottom:.5rem;margin-left:1rem;\"><a href=\"{{url}}\">{{name}}</a></p>",
-            blockTemplateStart = Handlebars.compile(landingPageBlockTemplateStart),
-            blockTemplate2Start = Handlebars.compile(landingPageBlock2TemplateStart),
-            subTemplateStart = Handlebars.compile(landingPageSubMenuTemplateStart),
-            subsubTemplateStart = Handlebars.compile(landingPageSubSubMenuTemplateStart),
-            itemTemplate = Handlebars.compile(landingPageBlockTemplate),
-            SingleItemTemplate = Handlebars.compile(landingItemTemplate),
-            blockEndTemplate = landingPageBlockTemplateEnd,
             str = "";
 
         if (isDefined(sections)) {
-            var kItem, jItem, mItem;
-            data = data.items;
-            bclslog("section exists Data", data);
-            max = data.length;
-            for (i = 0; i < max; i++) {
-                item = data[i];
-                bclslog("landing page item", item);
-                if (isDefined(item.items)) {
-                    kMax = item.items.length;
-                    if (i === 1) {
-                        str += blockTemplate2Start(item);
-                    } else {
-                        str += blockTemplateStart(item);
-                    }
-
-                    for (k = 0; k < kMax; k++) {
-                        kItem = item.items[k];
-                        // check for submenus
-                        if (isDefined(kItem.items)) {
-                            str += subTemplateStart(kItem);
-                            jMax = kItem.items.length;
-                            for (j = 0; j < jMax; j++) {
-                                jItem = kItem.items[j];
-                                // check for subsubmenu
-                                if (isDefined(jItem.items)) {
-                                    lMax = jItem.items.length;
-                                    for (l = 0; l < lMax; l++) {
-                                        mItem = jItem.items[l];
-                                        str += itemTemplate(mItem);
-                                    }
-                                } else {
-                                    str += itemTemplate(jItem);
-                                }
-                            }
-                            str += blockEndTemplate;
-                        } else {
-                            str += itemTemplate(kItem);
-                        }
-                    }
-                } else {
-                    bclslog("item", item);
-                    str += SingleItemTemplate(item);
-                }
-                if (i > 0) {
-                    str += blockEndTemplate;
-                }
-            }
             sections.innerHTML = str;
         }
     };
@@ -743,8 +656,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             subsection = "solutions";
             subsectionName = "Solutions";
             if (pathArray[1] === "index.html") {
-                section = "video-cloud";
-                createSolutionsLandingPageSections();
+                // do nothing - we won't use this script for solutions landing page
             } else {
                 section = pathArray[1];
                 sectionName = section;
@@ -800,4 +712,4 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         "createInPageNav": createInPageNav,
         "product": product
     };
-})($, window, console, document, Handlebars, bclsNavData, hljs);
+})(window, console, document, bclsNavData, hljs);
