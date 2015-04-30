@@ -96,7 +96,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
      */
     bclslog = function (context, message) {
         if (window["console"] && console["log"]) {
-          console.log(context, message);
+            console.log(context, message);
         }
         return;
     };
@@ -146,7 +146,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
      * @return {Boolean} true if variable is defined and has a value
      */
     isDefined = function (x) {
-        if ( x !== "" && x !== null && x !== undefined && !x.isNaN() && x !== {} && x !== []){
+        if ( x !== "" && x !== null && x !== undefined && x !== NaN && x !== {} && x !== []) {
             return true;
         } else {
             return false;
@@ -244,7 +244,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
      * works off the section determined in getSection()
      */
     buildPageArrays = function () {
-        var navData = bclsNavData[section],
+        var navData = bclsNavData[product].sections[section],
             i,
             iMax,
             j,
@@ -252,11 +252,13 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             item,
             firstLetter,
             group;
+        bclslog("navData", navData);
         // create arrays for section groups
         if (isDefined(navData.groups)) {
             iMax = navData.groups.length;
             for (i = 0; i < iMax; i++) {
                 group = navData.groups[i].name;
+                groupObj[group] = {};
                 groupObj[group].items = [];
                 groupObj[group].name = group;
                 groupObj[group].header = navData.groups[i].header;
@@ -269,14 +271,18 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             iMax = navData.items.length;
             for (i = 0; i < iMax; i++) {
                 item = navData.items[i];
+                bclslog("item", item);
                 // assign to alpha group
-                firstLetter = item.name.charAt(0);
+                firstLetter = item.name.charAt(0).toLowerCase();
+                bclslog("firstLetter", firstLetter);
                 alphaObj[firstLetter].push(item);
                 // assign to functional groups
                 if (isDefined(item.groups)) {
                     jMax = item.groups.length;
                     for (j = 0; j < jMax; j++) {
-                        group = item.groups[j].name;
+                        group = item.groups[j];
+                        bclslog("group", group);
+                        bclslog("groupObj[group]", groupObj[group]);
                         groupObj[group].items.push(item);
                     }
                 } else {
@@ -517,6 +523,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             str = "";
 
         if (isDefined(sections)) {
+            var kItem, jItem, mItem;
             data = data.items;
             bclslog("section exists Data", data);
             max = data.length;
@@ -532,18 +539,18 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     }
 
                     for (k = 0; k < kMax; k++) {
-                        var kItem = item.items[k];
+                        kItem = item.items[k];
                         // check for submenus
                         if (isDefined(kItem.items)) {
                             str += subTemplateStart(kItem);
                             jMax = kItem.items.length;
                             for (j = 0; j < jMax; j++) {
-                                var jItem = kItem.items[j];
+                                jItem = kItem.items[j];
                                 // check for subsubmenu
                                 if (isDefined(jItem.items)) {
                                     lMax = jItem.items.length;
                                     for (l = 0; l < lMax; l++) {
-                                        var mItem = jItem.items[l];
+                                        mItem = jItem.items[l];
                                         str += itemTemplate(mItem);
                                     }
                                 } else {
@@ -626,7 +633,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     } else if (section === "player-management") {
                         sectionName = "player-management";
                     }  else if (section === "studio") {
-                        modulesIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", "Modules")
+                        modulesIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", "Modules");
                     } else {
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
                     }
@@ -652,7 +659,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                 navMenuRight.innerHTML = menuRightBase + vcSupportNav;
                 break;
             case "once": // in once
-                redirectArray = pathArray.slice(0, 2),
+                redirectArray = pathArray.slice(0, 2);
                 landingPagePath = redirectArray.join("/") + "/index.html";
 
                 // there is only one section
@@ -676,7 +683,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                         window.location.href = landingPagePath;
                     }
                 }
-                navMenuRight.innerHTML = menuRightBase + onceSupportNav);
+                navMenuRight.innerHTML = menuRightBase + onceSupportNav;
                 // createNavigation();
                 break;
             case "perform": // in perform
