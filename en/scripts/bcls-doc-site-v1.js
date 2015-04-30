@@ -631,11 +631,11 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     }
                     // check to see if we're on a subsection landing page
                     if (isDefined(subsection)) {
-                        // all we care about is whether we accidentally got onto a 
+                        // all we care about is whether we accidentally got onto a
                         // subsection index page, in which case, we redirect
                         // to section landing page, unless this is an api reference
                         if (isItemInArray(pathArray, "index.html") && !isItemInArray(pathArray, "versions")) {
-                            
+
                             window.location.href = landingPagePath;
                         }
                     }
@@ -659,12 +659,11 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     section = "index";
                     sectionName = null;
                     subsection = "pathArray[2]";
-                    subsectionName = bclsNavData;
+                    subsectionName = bclsNavData.once[subsection].name;
                     // check to see if we're on the section or subsection landing page
-                    if (pathArray[3] === "index.html") {
-                        // we're on the subsection landing page
-                        subsection = "Guides";
-                        // createLandingPageSections(bclsNavData[product].sections[section]);
+                    // and redirect to product landing page if so
+                    if (pathArray[3] === "index.html" && !isItemInArray(pathArray, "versions")) {
+                        window.location.href = landingPagePath;
                     }
                 }
                 $navMenuRight.html(menuRightBase + onceSupportNav);
@@ -673,7 +672,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             case "perform": // in perform
                 product = "perform";
                 // hide anything video-cloud-only
-                $(".video-cloud-only").hide();
+                setAttributeOnNodeList(videoCloudOnly, "class", "display-none");
                 productName = "Perform";
                 if (pathArray[2] === "index.html") {
                     // on perform landing page
