@@ -287,21 +287,25 @@ onTemplateReady : function (evt) {
             </div>
               <p>Here's an example of setting a listener for the media PROGRESS event (using the reference to the <code>mediaEvent</code> class from the <code>templateLoad</code> handler. In the handler for progress events, we'll create a very simple display of the amount of the video that has played by adding a non-breaking space to a <code>span</code> tag (with a background color) each time the event fires:</p>
 <pre><code>
+<!-- in the html -->
+&lt;div id="progress"&gt;&lt;span id="progressBar"&gt;&lt;/span&gt;&lt;/div&gt;
+
+// in the JavaScript
 onTemplateLoad : function (experienceID) {
   // get a reference to the player and API Modules and Events
   player = brightcove.api.getExperience(experienceID);
   APIModules = brightcove.api.modules.APIModules;
   mediaEvent = brightcove.api.events.MediaEvent;
+  videoPlayer = player.getModule(APIModules.VIDEO_PLAYER);
+  videoPlayer.addEventListener(mediaEvent.PROGRESS, onProgress);
 }
 
 /**** media progree event handler ****/
-onMediaComplete : function (evt) {
-  // get references to modules
-  videoPlayer = player.getModule(APIModules.VIDEO_PLAYER);
-  // get the video data for the current video
-  videoPlayer.getCurrentVideo( function(videoDTO) {
-    eVideoName.innerHTML = "Currently watching: <strong>" + videoDTO.displayName + "</strong>";
+return {
+  onProgress : function (evt) {
+    eProgressBar.innerHTML += "&nbsp;";
   }
+}
 </code></pre>
               <p>Note: in the Module pattern, this function must also be included in the <code>return</code> object, so that the player has access to it as <code>BCLS.onProgress</code></p>
               <div class="text-info">
