@@ -12,6 +12,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         isLandingPage = false,
         isSubSectionIndex = false,
         landingPagePath,
+        indexByGroup = true,
         productColors = {
             "index": "#333333",
             "video-cloud": "#dd712e",
@@ -457,11 +458,15 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         }
         siteTitle.innerHTML = titleStr;
         buildBreadCrumbs();
+        if (isLandingPage) {
+            createLandingPageSections();
+        }
     };
     // create the index of section pages for the landing page
-    createLandingPageSections = function (data) {
-        bclslog("createLandingPageSectionsData", data);
-        var sections = document.getElementById("sections"),
+    createLandingPageSections = function () {
+        var groupData = groupObj,
+            alphaData
+            sections = document.getElementById("sections"),
             i,
             j,
             k,
