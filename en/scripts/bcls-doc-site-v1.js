@@ -1,4 +1,4 @@
-var BCLSmain = (function (window, console, document, bclsNavData, hljs) {
+var BCLSmain = (function (window, document, bclsNavData, hljs) {
     "use strict";
     var precode = document.querySelectorAll("pre>code"),
         // for handlebars
@@ -70,6 +70,7 @@ var BCLSmain = (function (window, console, document, bclsNavData, hljs) {
         hasClass,
         findObjectInArray,
         isItemInArray,
+        getURLparam,
         setPageTitle,
         setAttributeOnNodeList,
         forceSecure,
@@ -197,6 +198,20 @@ var BCLSmain = (function (window, console, document, bclsNavData, hljs) {
     };
 
     /**
+     * get value of a URL param if exists
+     * @param {string} name name of the param you want the value fo
+     * @return {string} result value of param if exists or “"
+     */
+    getURLparam = function (name) {
+        var regex,
+            results;
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+        results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    };
+
+    /**
      * sets document title to contents of first h1 tag
      */
     setPageTitle = function () {
@@ -267,7 +282,6 @@ var BCLSmain = (function (window, console, document, bclsNavData, hljs) {
             iMax = navData.items.length;
             for (i = 0; i < iMax; i++) {
                 item = navData.items[i];
-                bclslog("item", item);
                 // assign to alpha group
                 firstLetter = item.name.charAt(0).toLowerCase();
                 bclslog("firstLetter", firstLetter);
@@ -277,8 +291,6 @@ var BCLSmain = (function (window, console, document, bclsNavData, hljs) {
                     jMax = item.groups.length;
                     for (j = 0; j < jMax; j++) {
                         group = item.groups[j];
-                        bclslog("group", group);
-                        bclslog("groupObj[group]", groupObj[group]);
                         groupObj[group].items.push(item);
                     }
                 } else {
@@ -286,8 +298,9 @@ var BCLSmain = (function (window, console, document, bclsNavData, hljs) {
                 }
             }
         }
-
-
+        bclslog("alphaObj", alphaObj);
+        bclslog("groupObj", groupObj);
+        createNavigation();
 
     };
     // create navigation for page sections
@@ -390,74 +403,32 @@ var BCLSmain = (function (window, console, document, bclsNavData, hljs) {
     };
     // create the global navigation
     createNavigation = function () {
-        var data = bclsNavData[product],
+        var data = bclsNavData[product].sections[section],
             item,
             i,
             max,
             navHTML = "",
-            itemTemplate = Handlebars.compile(navItemTemplate),
-            listStartTemplate = Handlebars.compile(navDropdownStartTemplate),
-            // helper functions
-            processTemplate,
-            processItem,
-            processDropdown,
+            getStartedIndex,
+            referencesIndex,
+            learningGuidesIndex,
+
             titleStr = "<a href=\"//docs.brightcove.com/en/";
-        // helper functions
-        processTemplate = function (item) {
-            result = template(item);
-            navHTML += result;
-        };
         bclslog("navdata", data);
-        processItem = function (item) {
-            if (isDefined(item.items)) {
-                // start a dropdown
-                template = listStartTemplate;
-                processTemplate(item);
-                processDropdown(item.items);
-                navHTML += navDropdownEndTemplate;
-            } else if (isDefined(item.url)) {
-                template = itemTemplate;
-                processTemplate(item);
-            }
-        };
-        processDropdown = function (items) {
-            var j = 0,
-                jMax = items.length,
-                subItem;
-            for (j = 0; j < jMax; j++) {
-                subItem = items[j];
-                processItem(subItem);
-            }
-        };
         // see if there are sections and calculate the number of items to process
         if (isDefined(data)) {
-            if (isDefined(data.items)) {
-                // we're on the landing page
-                max = data.items.length;
-            } else if (isDefined(data.sections)) {
-                // we're in a product that has sections
-                data = data.sections[section];
-                if (isDefined(data)) {
-                    max = data.items.length;
-                }
-
-            } else {
-                // something's wrong
-                bclslog("something wrong in nav data", data);
-                return;
-            }
-            // process the nav items
-            for (i = 0; i < max; i++) {
-                item = data.items[i];
-                // check for simple item or dropdown
-                processItem(item);
-                // end dropdown
-                navHTML += navDropdownEndTemplate;
-            }
+            navHTML += "<li class=\"has-dropdown\"><a href=\"#\">Page Index</a><ul class=\"dropdown\">";
+            navHTML += "<li><a href=\"" + landingPagePath + "?show=groups\">By Group</a></li>";
+            navHTML += "<li><a href=\"" + landingPagePath + "?show=alpha\">Alphabetical</a></li>";
         }
-        $navMenuLeft.html(navHTML);
-        $navWrapper.find("nav,ul,section,li,a").attr("style", "background-color:" + productColors[product] + ";");
-        $titleArea.find("ul,li,a,img").attr("style", "background-color:" + productColors.index + ";");
+        navMenuLeft.innerHTML = navHTML;
+        // get reference to nav sections
+        navWrapper = document.querySelectorAll("nav>section>ul");
+        // set the product background color on nav bar
+        setAttributeOnNodeList(navWrapper, "style", "background-color:" + productColors[product] + ";")
+        // get reference to the title area elements
+        titleArea = document.querySelectorAll("ul,li,a,img");
+        // set background color for title area elements
+        setAttributeOnNodeList(titleArea, "style", "background-color:" + productColors.index + ";")
         if (product !== "index") {
             titleStr += product + "/index.html\"><img src=\"" + bclsNavData[product].image + "\"/></a>";
         } else {
@@ -465,7 +436,7 @@ var BCLSmain = (function (window, console, document, bclsNavData, hljs) {
         }
         siteTitle.innerHTML = titleStr;
         highlightBackgroundColor = lightenDarkenColor(productColors[product], -40);
-        highlightCurrentItem();
+        // highlightCurrentItem();
     };
     // create the index of section pages for the landing page
     createLandingPageSections = function (data) {
@@ -712,4 +683,4 @@ var BCLSmain = (function (window, console, document, bclsNavData, hljs) {
         "createInPageNav": createInPageNav,
         "product": product
     };
-})(window, console, document, bclsNavData, hljs);
+})(window, document, bclsNavData, hljs);
