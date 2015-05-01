@@ -403,28 +403,49 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
     };
     // create the global navigation
     createNavigation = function () {
-        var data = bclsNavData[product].sections[section],
+        var data = groupObj,
             item,
             i,
-            max,
+            iMax,
             navHTML = "",
-            getStartedIndex,
-            referencesIndex,
-            learningGuidesIndex,
-
             titleStr = "<a href=\"//docs.brightcove.com/en/";
         bclslog("navdata", data);
-        // see if there are sections and calculate the number of items to process
+
         if (isDefined(data)) {
             navHTML += "<li class=\"has-dropdown\"><a href=\"#\">Page Index</a><ul class=\"dropdown\">";
             navHTML += "<li><a href=\"" + landingPagePath + "?show=groups\">By Group</a></li>";
             navHTML += "<li><a href=\"" + landingPagePath + "?show=alpha\">Alphabetical</a></li>";
+            navHTML += "</ul>";
+            // add getting started items
+            navHTML += "<li class=\"has-dropdown\"><a href=\"#\">Get Started</a><ul class=\"dropdown\">";
+            iMax = data["getting-started"].items.length;
+            for (i = 0; i < iMax; i++) {
+                item = data["getting-started"].items[i];
+                navHTML += "<li><a href=\"" + item.url + "\">" + item.name + "</a></li>";
+            }
+            navHTML += "</ul>";
+            // now references
+            navHTML += "<li class=\"has-dropdown\"><a href=\"#\">References</a><ul class=\"dropdown\">";
+            iMax = data.references.items.length;
+            for (i = 0; i < iMax; i++) {
+                item = data.references.items[i];
+                navHTML += "<li><a href=\"" + item.url + "\">" + item.name + "</a></li>";
+            }
+            navHTML += "</ul>";
+            // now learning guides
+            navHTML += "<li class=\"has-dropdown\"><a href=\"#\">Learning Guides</a><ul class=\"dropdown\">";
+            iMax = data["learning-guides"].items.length;
+            for (i = 0; i < iMax; i++) {
+                item = data["learning-guides"].items[i];
+                navHTML += "<li><a href=\"" + item.url + "\">" + item.name + "</a></li>";
+            }
+            navHTML += "</ul>";
         }
         navMenuLeft.innerHTML = navHTML;
         // get reference to nav sections
-        navWrapper = document.querySelectorAll("nav>section>ul");
+        navWrapper = document.querySelectorAll("nav.top-bar");
         // set the product background color on nav bar
-        setAttributeOnNodeList(navWrapper, "style", "background-color:" + productColors[product] + ";")
+        setAttributeOnNodeList(navWrapper, "style", "background-color:" + productColors.index + ";")
         // get reference to the title area elements
         titleArea = document.querySelectorAll("ul,li,a,img");
         // set background color for title area elements
@@ -435,8 +456,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             titleStr += "index.html\">" + bclsNavData[product].image + "</a>";
         }
         siteTitle.innerHTML = titleStr;
-        highlightBackgroundColor = lightenDarkenColor(productColors[product], -40);
-        // highlightCurrentItem();
+        buildBreadCrumbs();
     };
     // create the index of section pages for the landing page
     createLandingPageSections = function (data) {
