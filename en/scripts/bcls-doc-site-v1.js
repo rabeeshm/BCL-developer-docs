@@ -640,7 +640,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                         // all we care about is whether we accidentally got onto a
                         // subsection index page, in which case, we redirect
                         // to section landing page, unless this is an api reference
-                        if (isItemInArray(pathArray, "index.html") && !isItemInArray(pathArray, "versions")) {
+                        if (isItemInArray(pathArray, "index.html") && !isItemInArray(pathArray, "reference") && !isItemInArray(pathArray, "references")) {
 
                             window.location.href = landingPagePath;
                         }
