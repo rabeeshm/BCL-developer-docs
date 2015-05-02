@@ -13,6 +13,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         isSubSectionIndex = false,
         landingPagePath,
         indexByGroup = true,
+        indexTypeSelector = document.getElementById("indexTypeSelector"),
         productColors = {
             "index": "#333333",
             "video-cloud": "#dd712e",
@@ -37,6 +38,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         divsections = document.querySelectorAll("div.section"),
         // the in-page nav
         sidenav = document.getElementById("sidenav"),
+        sideNavElements,
         path = window.location.pathname,
         section,
         subsection,
@@ -45,7 +47,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         navArr = [],
         groupObj = {},
         alphaArr = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
-        alphaObj = {"a": [], "b": [], "c": [], "d": [], "e": [], "f": [], "g": [], "h": [], "i": [], "j": [], "k": [], "l": [], "m": [], "n": [], "o": [], "p": [], "q": [], "r": [], "s": [], "t": [], "u": [], "v": [], "w": [], "x": [], "y": [], "z": []},
+        alphaObj = {},
         topObj = {"text": "Top", "link": "top"},
         navLabel = [topObj],
         menuRightBase = "<li class=\"search\"><a href=\"#\" data-reveal-id=\"searchModal\"><img src=\"//docs.brightcove.com/en/images/search-white.png\" alt=\"search_icon_small_white\" width=\"18\" height=\"18\"></a></li><li class=\"show-for-xlarge-up\"><a href=\"http://docs.brightcove.com/en/DeveloperDocumentationUpdates.xml\"><img src=\"//docs.brightcove.com/en/images/rss-feed-sm.png\" alt=\"rss-feed-sm\" width=\"14\" height=\"14\"></a></li>",
@@ -83,7 +85,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         highlightCurrentInPageNav,
         createInPageNavMenu,
         createInPageNav,
-        highlightCurrentItem,
         buildBreadCrumbs,
         createNavigation,
         buildPageArrays,
@@ -262,8 +263,12 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
 
     highlightCurrentInPageNav = function (evt) {
         bclslog("evt", evt);
-        setAttributeOnNodeList(navElements, "style", "");
-        this.setAttribute("style", "background-color:" + productColors[product] + ";color:#ffffff");
+        var sideNavElements = document.querySelectorAll("#sidenav li>a"),
+            sideNavListItems = document.querySelectorAll("#sidenav li");
+        setAttributeOnNodeList(sideNavListItems, "style", "padding:.2em;");
+        setAttributeOnNodeList(sideNavElements, "style", "");
+        this.setAttribute("style", "color:#ffffff");
+        this.parentElement.setAttribute("style", "background-color:" + productColors[product] + ";padding:.2em;");
     };
 
     /**
@@ -277,9 +282,9 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             j,
             jMax,
             item,
+            letter,
             firstLetter,
             group;
-        bclslog("navData", navData);
         // create arrays for section groups
         if (isDefined(navData.groups)) {
             iMax = navData.groups.length;
@@ -293,6 +298,14 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         } else {
             bclslog("no groups", navdata);
         }
+        // create item arrays and headers for alpha object
+        iMax = alphaArr.length;
+        for (i = 0; i < iMax; i++) {
+            letter = alphaArr[i];
+            alphaObj[letter] = {};
+            alphaObj[letter].items = [];
+            alphaObj[letter].header = letter.toUpperCase();
+        }
         // assign items to functional and alpha groups
         if (isDefined(navData.items)) {
             iMax = navData.items.length;
@@ -301,7 +314,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 // assign to alpha group
                 firstLetter = item.name.charAt(0).toLowerCase();
                 bclslog("firstLetter", firstLetter);
-                alphaObj[firstLetter].push(item);
+                alphaObj[firstLetter].items.push(item);
                 // assign to functional groups
                 if (isDefined(item.groups)) {
                     jMax = item.groups.length;
@@ -314,8 +327,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 }
             }
         }
-        bclslog("alphaObj", alphaObj);
-        bclslog("groupObj", groupObj);
         createNavigation();
 
     };
@@ -324,23 +335,22 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         var str = "<ul class=\"side-nav show-for-large-up\">",
             i,
             max = navLabel.length,
-            navElements,
+            sideNavElements,
             j,
             jMax,
             k;
         for (i = 0; i < max; i++) {
-            str += "<li><a href=\"#" + navLabel[i].link + "\">" + navLabel[i].text + " </a></li>";
+            str += "<li style=\"padding:.2em\"><a href=\"#" + navLabel[i].link + "\">" + navLabel[i].text + " </a></li>";
         }
         str += "</ul>";
         sidenav.innerHTML += str;
-        navElements = document.querySelectorAll("ul.side-nav a");
-        jMax = navElements.length;
+        sideNavElements = document.querySelectorAll("#sidenav li>a");
+        bclslog("sideNavElements", sideNavElements);
+        // navLinks = document.querySelectorAll("#sidenav a");
+        jMax = sideNavElements.length;
         for (j = 0; j < jMax; j++) {
-            navElements[j].addEventListener("click", highlightCurrentInPageNav);
+            sideNavElements[j].addEventListener("click", highlightCurrentInPageNav);
         }
-        // TODO move this to the right place
-        // set h2 color to product NewColor
-        $("h1,h2").attr("style", "color:" + productColors[product]);
     };
     createInPageNav = function () {
         var navObj = {},
@@ -351,13 +361,13 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         for (i = 0; i < numSections; i++) {
             if (i > 0) {
                 var sectionEl = divsections.item(i);
-                bclslog("sectionEl", sectionEL);
+                bclslog("sectionEl", sectionEl);
                 switch (product) {
                 case "video-cloud":
-                    if (!hasClass(sectionEL, "perform-only")) {
+                    if (!hasClass(sectionEl, "perform-only")) {
                         navObj = {};
                         navObj.link = sectionEl.getAttribute("id");
-                        navObj.text = sectionEl.firstChild.innerHTML;
+                        navObj.text = sectionEl.children[0].innerHTML;
                         navLabel.push(navObj);
                     }
                     break;
@@ -383,16 +393,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             // create in-page nav menu
             createInPageNavMenu();
         }
-    };
-    // TODO eliminate this but move the calls to build breadcrumbs and inpage nav
-    // highlight the current page in the global navigation
-    highlightCurrentItem = function () {
-        // find current page in navigation menu
-        // TODO - move to another location
-        // build breadcrumbs
-        buildBreadCrumbs();
-        // next create the in-page navigation
-        createInPageNav();
     };
     buildBreadCrumbs = function () {
         var str = "<li><a href=\"//docs.brightcove.com/en/index.html\">Developer Docs</li>";
@@ -458,7 +458,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         // set the product background color on nav bar
         setAttributeOnNodeList(navWrapper, "style", "background-color:" + productColors.index + ";")
         // get reference to the title area elements
-        titleArea = document.querySelectorAll("ul,li,a,img");
+        titleArea = document.getElementById("siteTitle");
         // set background color for title area elements
         setAttributeOnNodeList(titleArea, "style", "background-color:" + productColors.index + ";")
         if (product !== "index") {
@@ -470,13 +470,13 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         buildBreadCrumbs();
         if (isLandingPage) {
             createLandingPageSections();
+        } else {
+            createInPageNav();
         }
     };
     // create the index of section pages for the landing page
     createLandingPageSections = function () {
-        var groupData = groupObj,
-            alphaData = alphaObj,
-            i, j,
+        var i, j,
             iMax, jMax,
             item,
             functionalGroup,
@@ -491,63 +491,72 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         bclslog("gettingStartedBlock", gettingStartedBlock);
         bclslog("pageIndexBlock", pageIndexBlock);
         buildGetStartedGroup = function (itemGroup) {
-            str += "<div style=\"width:33%;display:inline-block;vertical-align:top;padding:1em;\"><fieldset id=\"gettingStartedBlock\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em\"><legend>" + groupData[itemGroup].header + "</legend><ul style=\"list-style:none;\">";
-            jMax = groupData[itemGroup].items.length;
+            str += "<li><fieldset id=\"gettingStartedBlock\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em;\"><legend>" + groupObj[itemGroup].header + "</legend><ul style=\"list-style:none;\">";
+            jMax = groupObj[itemGroup].items.length;
             for (j = 0; j < jMax; j++) {
-                item = groupData[itemGroup].items[j];
-                str += "<li><a href=\"" + item.url + "\">" + item.name + "</a></li>";
+                item = groupObj[itemGroup].items[j];
+                str += "<li style=\"font-size:.9rem\"><a href=\"" + item.url + "\">" + item.name + "</a></li>";
             }
-            str += "</ul></fieldset></div>";
+            str += "</ul></fieldset></li>";
             return;
         };
 
         buildPageIndexGroup = function (itemGroup) {
-            str += "<h3 class=\"index-page\">~" + itemGroup + "~</h3><ul style=\"list-style:none;overflow:hidden;\">";
-            jMax = groupData[itemGroup].items.length;
+            str += "<li><h4 class=\"index-page\">" + groupObj[itemGroup].header + "</h4><ul style=\"list-style:none;overflow:hidden;\">";
+            jMax = groupObj[itemGroup].items.length;
             for (j = 0; j < jMax; j++) {
-                item = groupData[itemGroup].items[j];
-                str += "<li><a href=\"" + item.url + "\">" + item.name + "</a></li>";
+                item = groupObj[itemGroup].items[j];
+                str += "<li style=\"font-size:.9rem\"><a href=\"" + item.url + "\">" + item.name + "</a></li>";
             }
-            str += "</ul>";
+            str += "</ul></li>";
             return;
         };
 
         buildPageIndexAlpha = function (itemGroup) {
-            str += "<h3 class=\"index-page\">" + alphaData[itemGroup].header + "</h3><ul style=\"list-style:none;overflow:hidden;\">";
-            jMax = alphaData[itemGroup].items.length;
+            bclslog("itemGroup", itemGroup);
+            str += "<li style=\"font-size:.9rem\"><h4 class=\"index-page\">~" + alphaObj[itemGroup].header + "~</h4><ul style=\"list-style:none;overflow:hidden;\">";
+            jMax = alphaObj[itemGroup].items.length;
             for (j = 0; j < jMax; j++) {
-                item = alphaData[itemGroup].items[j];
-                navHTML += "<li><a href=\"" + item.url + "\">" + item.name + "</a></li>";
+                item = alphaObj[itemGroup].items[j];
+                str += "<li><a href=\"" + item.url + "\">" + item.name + "</a></li>";
             }
-            navHTML += "</ul>";
+            str += "</ul></li>";
             return;
         };
 
         // build the getting started block
         iMax = gettingStartedGroups.length;
+        str += "<ul class=\"small-block-grid-3\">";
         for (i = 0; i < iMax; i++) {
-            buildGetStartedGroup(gettingStartedGroups[i]);
+            if (groupObj[gettingStartedGroups[i]].items.length > 0) {
+                buildGetStartedGroup(gettingStartedGroups[i]);
+            }
         }
-        str += "</fieldset>"
+        str += "</ul>"
         gettingStartedBlock.innerHTML += str;
         // reset string and build index by groups
         str = "";
-        str += "<fieldset id=\"groupIndex\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em\"><legend>Page Index by Group</legend>";
+        str += "<fieldset id=\"groupIndex\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em\"><legend>Page Index by Group</legend><ul class=\"small-block-grid-4\">";
         for (functionalGroup in groupObj) {
-            buildPageIndexGroup(functionalGroup);
+            if (groupObj[functionalGroup].items.length > 0) {
+                buildPageIndexGroup(functionalGroup);
+            }
         }
+        str += "</ul></fieldset>";
         pageIndexBlock.innerHTML += str;
         // reset string and build index alphabetically
         str = "";
-        str += "<fieldset id=\"alphaIndex\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em\"><legend>Page Index by Group</legend>";
-        for (functionalGroup in groupObj) {
-            buildPageIndexGroup(functionalGroup);
+        str += "<fieldset id=\"alphaIndex\" class=\"display-none\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em\"><legend>Page Index by Group</legend><ul class=\"small-block-grid-4\">";
+        for (alphaGroup in alphaObj) {
+            if (alphaObj[alphaGroup].items.length > 0) {
+                buildPageIndexAlpha(alphaGroup);
+            }
         }
         pageIndexBlock.innerHTML += str;
-        groupIndexBlock = document.getElementsById("groupIndex");
-        alphaIndexBlock = document.getElementsById("alphaIndex")
-        // if on landing page see what version of page index to show
-        if (getURLparam(show) === "alpha") {
+        groupIndexBlock = document.getElementById("groupIndex");
+        alphaIndexBlock = document.getElementById("alphaIndex")
+        // if on landing page see what version of page index to show value
+        if (getURLparam("show") === "alpha") {
             setPageIndexType("alpha");
         }
 
@@ -558,7 +567,8 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             server,
             dataIndex,
             modulesIndex,
-            redirectArray;
+            redirectArray,
+            headers = document.querySelectorAll("h1, h2");
         // remove the 0 element, as it will be empty
         pathArray.splice(0, 1);
         // if path ends in a /, add index.html
@@ -589,8 +599,9 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 navMenuRight.innerHTML = menuRightBase + vcSupportNav;
                 break;
             case "video-cloud": // in video cloud
-                redirectArray = pathArray.slice(0, 2);
-                landingPagePath = redirectArray.join("/") + "/index.html";
+                redirectArray = pathArray.slice(0, 3);
+                bclslog("redirectArray", redirectArray);
+                landingPagePath = "//docs.brightcove.com/" + redirectArray.join("/") + "/index.html";
                 product = "video-cloud";
                 // hide anything perform-only
                 setAttributeOnNodeList(performOnly, "class", "display-none");
@@ -638,8 +649,8 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 navMenuRight.innerHTML = menuRightBase + vcSupportNav;
                 break;
             case "once": // in once
-                redirectArray = pathArray.slice(0, 2);
-                landingPagePath = redirectArray.join("/") + "/index.html";
+                redirectArray = pathArray.slice(0, 3);
+                landingPagePath = "//docs.brightcove.com/" + redirectArray.join("/") + "/index.html";
 
                 // there is only one section
                 product = "once";
@@ -667,6 +678,8 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 break;
             case "perform": // in perform
                 product = "perform";
+                redirectArray = pathArray.slice(0, 3);
+                landingPagePath = "//docs.brightcove.com/" + redirectArray.join("/") + "/index.html";
                 // hide anything video-cloud-only
                 setAttributeOnNodeList(videoCloudOnly, "class", "display-none");
                 productName = "Perform";
@@ -735,15 +748,24 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             navMenuRight.innerHTML = menuRightBase + vcSupportNav;
             bclslog("unknown server");
         }
-        // create the navigationTrtrrpleann
+        // if landing page, add event listener for index type selector
+        if (isLandingPage) {
+            indexTypeSelector.addEventListener("change", function (){
+                setPageIndexType(indexTypeSelector.options[indexTypeSelector.selectedIndex].value);
+            });
+        }
+
+        // set header colors to product color
+        setAttributeOnNodeList(headers, "style", "color:" + productColors[product]);
+        // create the data structurs for navigation and landing page content
         if (isDefined(section)) {
             buildPageArrays();
         }
     };
     // initialization: set the page title, set up the header shell, get references to the parts
     init = function () {
-        // force secure page load
-        // forceSecure();
+        var headers = document.querySelectorAll("h1, h2");
+
 
         // set the page title in case wrong
         setPageTitle();
