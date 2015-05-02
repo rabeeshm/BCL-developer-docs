@@ -20,6 +20,10 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             "perform": "#35498D"
         },
         highlightBackgroundColor = "#000000",
+        gettingStartedBlock = document.getElementById("getting-started"),
+        pageIndexBlock = document.getElementById("page-index"),
+        groupIndexBlock,
+        alphaIndexBlock,
         currentPage,
         currentItem,
         navWrapper = document.getElementById("navWrapper"),
@@ -73,6 +77,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         isItemInArray,
         getURLparam,
         setPageTitle,
+        setPageIndexType,
         setAttributeOnNodeList,
         forceSecure,
         highlightCurrentInPageNav,
@@ -218,6 +223,16 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
     setPageTitle = function () {
         document.title = document.getElementsByTagName("h1")[0].innerHTML;
     };
+
+    setPageIndexType = function (indexType) {
+        if (indexType === "alpha") {
+            groupIndexBlock.className = "display-none";
+            alphaIndexBlock.className = "display-block";
+        } else {
+            alphaIndexBlock.className = "display-none";
+            groupIndexBlock.className = "display-block";
+        }
+    }
 
     /**
      * sets an attribute for each item in a node list
@@ -406,41 +421,36 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
     createNavigation = function () {
         var data = groupObj,
             item,
-            i,
-            iMax,
+            i, j,
+            iMax, jMax,
             navHTML = "",
-            titleStr = "<a href=\"//docs.brightcove.com/en/";
+            titleStr = "<a href=\"//docs.brightcove.com/en/",
+            navGroups = ["getting-started", "references", "learning-guides"],
+            // helper function
+            buildNavItem;
         bclslog("navdata", data);
+
+        buildNavItem = function (itemGroup) {
+            navHTML += "<li class=\"has-dropdown\"><a href=\"#\">Get Started</a><ul class=\"dropdown\">";
+            jMax = data[itemGroup].items.length;
+            for (j = 0; j < jMax; j++) {
+                item = data[itemGroup].items[j];
+                navHTML += "<li><a href=\"" + item.url + "\">" + item.name + "</a></li>";
+            }
+            navHTML += "</ul>";
+            return;
+        };
 
         if (isDefined(data)) {
             navHTML += "<li class=\"has-dropdown\"><a href=\"#\">Page Index</a><ul class=\"dropdown\">";
             navHTML += "<li><a href=\"" + landingPagePath + "?show=groups\">By Group</a></li>";
             navHTML += "<li><a href=\"" + landingPagePath + "?show=alpha\">Alphabetical</a></li>";
             navHTML += "</ul>";
-            // add getting started items
-            navHTML += "<li class=\"has-dropdown\"><a href=\"#\">Get Started</a><ul class=\"dropdown\">";
-            iMax = data["getting-started"].items.length;
+            // add other items
+            iMax = navGroups.length;
             for (i = 0; i < iMax; i++) {
-                item = data["getting-started"].items[i];
-                navHTML += "<li><a href=\"" + item.url + "\">" + item.name + "</a></li>";
+                buildNavItem(navGroups[i]);
             }
-            navHTML += "</ul>";
-            // now references
-            navHTML += "<li class=\"has-dropdown\"><a href=\"#\">References</a><ul class=\"dropdown\">";
-            iMax = data.references.items.length;
-            for (i = 0; i < iMax; i++) {
-                item = data.references.items[i];
-                navHTML += "<li><a href=\"" + item.url + "\">" + item.name + "</a></li>";
-            }
-            navHTML += "</ul>";
-            // now learning guides
-            navHTML += "<li class=\"has-dropdown\"><a href=\"#\">Learning Guides</a><ul class=\"dropdown\">";
-            iMax = data["learning-guides"].items.length;
-            for (i = 0; i < iMax; i++) {
-                item = data["learning-guides"].items[i];
-                navHTML += "<li><a href=\"" + item.url + "\">" + item.name + "</a></li>";
-            }
-            navHTML += "</ul>";
         }
         navMenuLeft.innerHTML = navHTML;
         // get reference to nav sections
@@ -465,22 +475,82 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
     // create the index of section pages for the landing page
     createLandingPageSections = function () {
         var groupData = groupObj,
-            alphaData
-            sections = document.getElementById("sections"),
-            i,
-            j,
-            k,
-            l,
-            max,
-            jMax,
-            kMax,
-            lMax,
+            alphaData = alphaObj,
+            i, j,
+            iMax, jMax,
             item,
-            str = "";
+            functionalGroup,
+            alphaGroup,
+            str = "",
+            gettingStartedGroups = ["getting-started", "references", "learning-guides"],
+            // helper functions
+            buildGetStartedGroup,
+            buildPageIndexGroup,
+            buildPageIndexAlpha;
 
-        if (isDefined(sections)) {
-            sections.innerHTML = str;
+        bclslog("gettingStartedBlock", gettingStartedBlock);
+        bclslog("pageIndexBlock", pageIndexBlock);
+        buildGetStartedGroup = function (itemGroup) {
+            str += "<div style=\"width:33%;display:inline-block;vertical-align:top;padding:1em;\"><fieldset id=\"gettingStartedBlock\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em\"><legend>" + groupData[itemGroup].header + "</legend><ul style=\"list-style:none;\">";
+            jMax = groupData[itemGroup].items.length;
+            for (j = 0; j < jMax; j++) {
+                item = groupData[itemGroup].items[j];
+                str += "<li><a href=\"" + item.url + "\">" + item.name + "</a></li>";
+            }
+            str += "</ul></fieldset></div>";
+            return;
+        };
+
+        buildPageIndexGroup = function (itemGroup) {
+            str += "<h3 class=\"index-page\">~" + itemGroup + "~</h3><ul style=\"list-style:none;overflow:hidden;\">";
+            jMax = groupData[itemGroup].items.length;
+            for (j = 0; j < jMax; j++) {
+                item = groupData[itemGroup].items[j];
+                str += "<li><a href=\"" + item.url + "\">" + item.name + "</a></li>";
+            }
+            str += "</ul>";
+            return;
+        };
+
+        buildPageIndexAlpha = function (itemGroup) {
+            str += "<h3 class=\"index-page\">" + alphaData[itemGroup].header + "</h3><ul style=\"list-style:none;overflow:hidden;\">";
+            jMax = alphaData[itemGroup].items.length;
+            for (j = 0; j < jMax; j++) {
+                item = alphaData[itemGroup].items[j];
+                navHTML += "<li><a href=\"" + item.url + "\">" + item.name + "</a></li>";
+            }
+            navHTML += "</ul>";
+            return;
+        };
+
+        // build the getting started block
+        iMax = gettingStartedGroups.length;
+        for (i = 0; i < iMax; i++) {
+            buildGetStartedGroup(gettingStartedGroups[i]);
         }
+        str += "</fieldset>"
+        gettingStartedBlock.innerHTML += str;
+        // reset string and build index by groups
+        str = "";
+        str += "<fieldset id=\"groupIndex\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em\"><legend>Page Index by Group</legend>";
+        for (functionalGroup in groupObj) {
+            buildPageIndexGroup(functionalGroup);
+        }
+        pageIndexBlock.innerHTML += str;
+        // reset string and build index alphabetically
+        str = "";
+        str += "<fieldset id=\"alphaIndex\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em\"><legend>Page Index by Group</legend>";
+        for (functionalGroup in groupObj) {
+            buildPageIndexGroup(functionalGroup);
+        }
+        pageIndexBlock.innerHTML += str;
+        groupIndexBlock = document.getElementsById("groupIndex");
+        alphaIndexBlock = document.getElementsById("alphaIndex")
+        // if on landing page see what version of page index to show
+        if (getURLparam(show) === "alpha") {
+            setPageIndexType("alpha");
+        }
+
     };
     // figure out what section we're in
     getSection = function () {
@@ -674,6 +744,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
     init = function () {
         // force secure page load
         // forceSecure();
+
         // set the page title in case wrong
         setPageTitle();
         // set up the header
