@@ -145,6 +145,10 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         document.title = document.getElementsByTagName("h1")[0].innerHTML;
     };
 
+    /**
+     * sets visibility of the group/alpha indexes for landing page
+     * @param {string} indexType index to show "group" | "alpha"
+     */
     setPageIndexType = function (indexType) {
         if (indexType === "alpha") {
             groupIndexBlock.className = "display-none";
@@ -169,12 +173,26 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         }
     };
 
+    /**
+     * highlights the selected item in the in-page navigation
+     */
     highlightCurrentInPageNav = function () {
         var sideNavListItems = document.querySelectorAll("#sidenav li");
         setAttributeOnNodeList(sideNavListItems, "style", "padding:.2em;");
         setAttributeOnNodeList(sideNavElements, "style", "");
         this.setAttribute("style", "color:#ffffff");
         this.parentElement.setAttribute("style", "background-color:" + productColors[product] + ";padding:.2em;");
+    };
+
+    /**
+     * syntax highlighting - dependent on highlight.pack.js
+     */
+    BCLhighlight = function () {
+        var i,
+            iMax = precode.length;
+        for (i = 0; i < iMax; i++) {
+            hljs.highlightBlock(precode[i]);
+        }
     };
 
     /**
@@ -235,7 +253,9 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         createNavigation();
 
     };
-    // create navigation for page sections
+    /**
+     * create navigation for page sections
+     */
     createInPageNavMenu = function () {
         var str = "<ul class=\"side-nav show-for-large-up\">",
             i,
@@ -254,6 +274,10 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             sideNavElements[j].addEventListener("click", highlightCurrentInPageNav);
         }
     };
+
+    /**
+     * creates the in-page navigation on the side
+     */
     createInPageNav = function () {
         var navObj = {},
             numSections = divsections.length,
@@ -295,11 +319,16 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             createInPageNavMenu();
         }
     };
+
+    /**
+     * builds the breadcrumbs
+     */
     buildBreadCrumbs = function () {
         var str = "<li><a href=\"//docs.brightcove.com/en/index.html\">Developer Docs</li>";
         bclslog("product: ", product);
         bclslog("section: ", section);
         bclslog("sectionName: ", sectionName);
+        // currently don't need subsection, but might for sections like SDKs
         bclslog("subsection: ", subsection);
         if (isDefined(product)) {
             if (product === "index") {
@@ -318,7 +347,10 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         str += "<li class=\"current\">" + document.getElementsByTagName("title")[0].innerHTML + "</li>";
         breadCrumbWrapper.innerHTML = str;
     };
-    // create the global navigation
+
+    /**
+     * create the global navigation
+     */
     createNavigation = function () {
         var data = groupObj,
             item,
@@ -378,7 +410,10 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             createInPageNav();
         }
     };
-    // create the index of section pages for the landing page
+
+    /**
+     * create the index of section pages for the landing page
+     */
     createLandingPageSections = function () {
         var i, j,
             iMax, jMax,
@@ -415,11 +450,11 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         };
 
         buildPageIndexAlpha = function (itemGroup) {
-            str += "<li style=\"font-size:.9rem\"><h4 class=\"index-page\">~" + alphaObj[itemGroup].header + "~</h4><ul style=\"list-style:none;overflow:hidden;\">";
+            str += "<li style=\"font-size:.9rem\"><h4 class=\"index-page\">" + alphaObj[itemGroup].header + "</h4><ul style=\"list-style:none;overflow:hidden;\">";
             jMax = alphaObj[itemGroup].items.length;
             for (j = 0; j < jMax; j++) {
                 item = alphaObj[itemGroup].items[j];
-                str += "<li><a href=\"" + item.url + "\">" + item.name + "</a></li>";
+                str += "<li style=\"font-size:.9rem\"><a href=\"" + item.url + "\">" + item.name + "</a></li>";
             }
             str += "</ul></li>";
             return;
@@ -675,16 +710,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
          */
         hljs.tabReplace = "  ";
         hljs.initHighlightingOnLoad();
-    };
-    /**
-     * syntax highlighting - dependent on highlight.pack.js
-     */
-    BCLhighlight = function () {
-        var i,
-            iMax = precode.length;
-        for (i = 0; i < iMax; i++) {
-            hljs.highlightBlock(precode[i]);
-        }
     };
     init();
     return {
