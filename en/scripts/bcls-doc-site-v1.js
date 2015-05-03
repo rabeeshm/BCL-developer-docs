@@ -447,7 +447,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         pageIndexBlock.innerHTML += str;
         // reset string and build index alphabetically
         str = "";
-        str += "<fieldset id=\"alphaIndex\" class=\"display-none\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em\"><legend>Page Index by Group</legend><ul class=\"small-block-grid-4\">";
+        str += "<fieldset id=\"alphaIndex\" class=\"display-none\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em\"><legend>Alphabetical Page Index</legend><ul class=\"small-block-grid-4\">";
         for (alphaGroup in alphaObj) {
             if (alphaObj[alphaGroup].items.length > 0) {
                 buildPageIndexAlpha(alphaGroup);
