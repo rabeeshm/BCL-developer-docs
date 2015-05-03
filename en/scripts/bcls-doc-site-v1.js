@@ -1,18 +1,12 @@
 var BCLSmain = (function (window, document, bclsNavData, hljs) {
     "use strict";
     var precode = document.querySelectorAll("pre>code"),
-        // for handlebars
-        template,
-        result,
         // navigation vars
-        linkPath,
         product,
         productName,
         sectionName,
         isLandingPage = false,
-        isSubSectionIndex = false,
         landingPagePath,
-        indexByGroup = true,
         indexTypeSelector = document.getElementById("indexTypeSelector"),
         productColors = {
             "index": "#333333",
@@ -20,13 +14,10 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             "once": "#85a93e",
             "perform": "#35498D"
         },
-        highlightBackgroundColor = "#000000",
         gettingStartedBlock = document.getElementById("getting-started"),
         pageIndexBlock = document.getElementById("page-index"),
         groupIndexBlock,
         alphaIndexBlock,
-        currentPage,
-        currentItem,
         navWrapper = document.getElementById("navWrapper"),
         breadCrumbWrapper = document.getElementById("breadCrumbWrapper"),
         navMenuLeft,
@@ -54,9 +45,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         vcSupportNav = "<li class=\"smaller show-for-xlarge-up\"><a href=\"//support.brightcove.com\">Support</a></li>",
         onceSupportNav = "<li class=\"smaller show-for-xlarge-up\"><a href=\"mailto:oncesupport@brightcove.com\">Support</a></li>",
         performSupportNav = "vcSupportNav",
-        navItemTemplate = "<li><a href=\"{{url}}\" title=\"{{name}}\">{{name}}</a></li>",
-        navDropdownStartTemplate = "<li class=\"has-dropdown\"><a href=\"#\">{{name}}</a><ul class=\"dropdown\">",
-        navDropdownEndTemplate = "</ul></li>",
         titleAreaTemplate = "<nav class=\"top-bar\" data-topbar><ul class=\"title-area\"><li class=\"name\" id=\"siteTitle\"><a href=\"//docs.brightcove.com/en/index.html\"><img class=\"bcls-logo bcls-float-left\" src=\"//docs.brightcove.com/en/images/bc-logo-small.png\" alt=\"Brightcove\">DEVELOPER DOCS</a></li><li class=\"toggle-topbar menu-icon\"><a href=\"#\"><span>Menu</span></a></li></ul><section class=\"top-bar-section\"><ul id=\"navMenuLeft\" class=\"left\"></ul></section><section class=\"top-bar-section\"><ul id=\"navMenuRight\" class=\"right\"></ul></section></nav>",
         searchTemplate = "<div class=\"container\"><div class=\"region region-search\"><section id=\"block-search-api-page-new\" class=\"block block-search-api-page\"><div><a class=\"close-reveal-modal\">&#215;</a></div><div id=\"searchBar\"><script>\
           (function() {\
@@ -72,7 +60,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         <gcse:search></gcse:search></div></section>",
         // functions
         bclslog,
-        lightenDarkenColor,
         isDefined,
         hasClass,
         findObjectInArray,
@@ -81,7 +68,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         setPageTitle,
         setPageIndexType,
         setAttributeOnNodeList,
-        forceSecure,
         highlightCurrentInPageNav,
         createInPageNavMenu,
         createInPageNav,
@@ -99,62 +85,19 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
      * @return {}
      */
     bclslog = function (context, message) {
-        if (window["console"] && console["log"]) {
+        if (isDefined(window.console.log)) {
             console.log(context, message);
         }
         return;
     };
 
-    /*
-     * Usage
-     * Lighten
-     * var NewColor = LightenDarkenColor("#F06D06", 20);
-     * Darken
-     * var NewColor = LightenDarkenColor("#F06D06", -20);
-     */
-    lightenDarkenColor = function (col, amt) {
-        var usePound = false,
-            num,
-            r,
-            b,
-            g;
-        if (col[0] === "#") {
-            col = col.slice(1);
-            usePound = true;
-        }
-        num = parseInt(col, 16);
-        r = (num >> 16) + amt;
-        if (r > 255) {
-            r = 255;
-        } else if (r < 0) {
-            r = 0;
-        }
-
-        b = ((num >> 8) & 0x00FF) + amt;
-        if (b > 255) {
-            b = 255;
-        } else if (b < 0) {
-            b = 0;
-        }
-        g = (num & 0x0000FF) + amt;
-        if (g > 255) {
-            g = 255;
-        } else if (g < 0) {
-            g = 0;
-        }
-        return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
-    };
     /**
      * tests for all the ways a variable might be undefined or not have a value
      * @param {*} x the variable to test
      * @return {Boolean} true if variable is defined and has a value
      */
     isDefined = function (x) {
-        if ( x !== "" && x !== null && x !== undefined && x !== NaN && x !== {} && x !== []) {
-            return true;
-        } else {
-            return false;
-        }
+        return (x !== "" && x !== null && x !== undefined) ? true : false;
     };
     /**
      * find index of an object in array of objects based on some property value
@@ -201,7 +144,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
      * @return {boolean} true if the element has that class, false if not
      */
     hasClass = function (elem, cls) {
-        return (" " + elem.className + " " ).indexOf( " " + cls + " " ) > -1;
+        return (" " + elem.className + " ").indexOf(" " + cls + " ") > -1;
     };
 
     /**
@@ -214,8 +157,8 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             results;
         name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
         regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
-        results = regex.exec(location.search);
-        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+        results = regex.exec(window.location.search);
+        return (results === null) ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
     };
 
     /**
@@ -233,7 +176,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             alphaIndexBlock.className = "display-none";
             groupIndexBlock.className = "display-block";
         }
-    }
+    };
 
     /**
      * sets an attribute for each item in a node list
@@ -249,22 +192,8 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         }
     };
 
-    /**
-     * force into https mode if not already there - currently unused
-     * @return {}
-     */
-    forceSecure = function () {
-        var pageURL = window.location.href,
-            pageProtocol = window.location.protocol;
-        if (pageProtocol === "http:") {
-            window.location.href = pageURL.replace("http:", "https:");
-        }
-    };
-
-    highlightCurrentInPageNav = function (evt) {
-        bclslog("evt", evt);
-        var sideNavElements = document.querySelectorAll("#sidenav li>a"),
-            sideNavListItems = document.querySelectorAll("#sidenav li");
+    highlightCurrentInPageNav = function () {
+        var sideNavListItems = document.querySelectorAll("#sidenav li");
         setAttributeOnNodeList(sideNavListItems, "style", "padding:.2em;");
         setAttributeOnNodeList(sideNavElements, "style", "");
         this.setAttribute("style", "color:#ffffff");
@@ -296,7 +225,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 groupObj[group].header = navData.groups[i].header;
             }
         } else {
-            bclslog("no groups", navdata);
+            bclslog("no groups", navData);
         }
         // create item arrays and headers for alpha object
         iMax = alphaArr.length;
@@ -335,10 +264,8 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         var str = "<ul class=\"side-nav show-for-large-up\">",
             i,
             max = navLabel.length,
-            sideNavElements,
             j,
-            jMax,
-            k;
+            jMax;
         for (i = 0; i < max; i++) {
             str += "<li style=\"padding:.2em\"><a href=\"#" + navLabel[i].link + "\">" + navLabel[i].text + " </a></li>";
         }
@@ -355,12 +282,13 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
     createInPageNav = function () {
         var navObj = {},
             numSections = divsections.length,
-            i;
+            i,
+            sectionEl;
         // set initial visibilities
         bclslog("divsections", divsections);
         for (i = 0; i < numSections; i++) {
             if (i > 0) {
-                var sectionEl = divsections.item(i);
+                sectionEl = divsections.item(i);
                 bclslog("sectionEl", sectionEl);
                 switch (product) {
                 case "video-cloud":
@@ -421,8 +349,10 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
     createNavigation = function () {
         var data = groupObj,
             item,
-            i, j,
-            iMax, jMax,
+            i,
+            j,
+            iMax,
+            jMax,
             navHTML = "",
             titleStr = "<a href=\"//docs.brightcove.com/en/",
             navGroups = ["getting-started", "references", "learning-guides"],
@@ -431,7 +361,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         bclslog("navdata", data);
 
         buildNavItem = function (itemGroup) {
-            navHTML += "<li class=\"has-dropdown\"><a href=\"#\">Get Started</a><ul class=\"dropdown\">";
+            navHTML += "<li class=\"has-dropdown\"><a href=\"#\">" + data[itemGroup].header + "</a><ul class=\"dropdown\">";
             jMax = data[itemGroup].items.length;
             for (j = 0; j < jMax; j++) {
                 item = data[itemGroup].items[j];
@@ -449,18 +379,20 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             // add other items
             iMax = navGroups.length;
             for (i = 0; i < iMax; i++) {
-                buildNavItem(navGroups[i]);
+                if (data[navGroups[i]].items.length > 0) {
+                    buildNavItem(navGroups[i]);
+                }
             }
         }
         navMenuLeft.innerHTML = navHTML;
         // get reference to nav sections
         navWrapper = document.querySelectorAll("nav.top-bar");
         // set the product background color on nav bar
-        setAttributeOnNodeList(navWrapper, "style", "background-color:" + productColors.index + ";")
+        setAttributeOnNodeList(navWrapper, "style", "background-color:" + productColors.index + ";");
         // get reference to the title area elements
         titleArea = document.getElementById("siteTitle");
         // set background color for title area elements
-        setAttributeOnNodeList(titleArea, "style", "background-color:" + productColors.index + ";")
+        setAttributeOnNodeList(titleArea, "style", "background-color:" + productColors.index + ";");
         if (product !== "index") {
             titleStr += product + "/index.html\"><img src=\"" + bclsNavData[product].image + "\"/></a>";
         } else {
@@ -532,7 +464,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 buildGetStartedGroup(gettingStartedGroups[i]);
             }
         }
-        str += "</ul>"
+        str += "</ul>";
         gettingStartedBlock.innerHTML += str;
         // reset string and build index by groups
         str = "";
@@ -554,7 +486,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         }
         pageIndexBlock.innerHTML += str;
         groupIndexBlock = document.getElementById("groupIndex");
-        alphaIndexBlock = document.getElementById("alphaIndex")
+        alphaIndexBlock = document.getElementById("alphaIndex");
         // if on landing page see what version of page index to show value
         if (getURLparam("show") === "alpha") {
             setPageIndexType("alpha");
