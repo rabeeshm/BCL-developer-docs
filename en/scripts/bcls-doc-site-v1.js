@@ -75,6 +75,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         getSection,
         init,
         BCLhighlight;
+
     /**
      * Logging function - safe for IE
      * @param  {string} context description of the data
@@ -82,8 +83,8 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
      * @return {}
      */
     bclslog = function (context, message) {
-        if (isDefined(window.console.log)) {
-            console.log(context, message);
+        if (window["console"] && console["log"]) {
+          console.log(context, message);
         }
         return;
     };
