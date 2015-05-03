@@ -35,16 +35,14 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         subsection,
         performOnly = document.getElementsByClassName("perform-only"),
         videoCloudOnly = document.getElementsByClassName("video-cloud-only"),
-        navArr = [],
         groupObj = {},
         alphaArr = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
         alphaObj = {},
         topObj = {"text": "Top", "link": "top"},
         navLabel = [topObj],
         menuRightBase = "<li class=\"search\"><a href=\"#\" data-reveal-id=\"searchModal\"><img src=\"//docs.brightcove.com/en/images/search-white.png\" alt=\"search_icon_small_white\" width=\"18\" height=\"18\"></a></li><li class=\"show-for-xlarge-up\"><a href=\"http://docs.brightcove.com/en/DeveloperDocumentationUpdates.xml\"><img src=\"//docs.brightcove.com/en/images/rss-feed-sm.png\" alt=\"rss-feed-sm\" width=\"14\" height=\"14\"></a></li>",
-        vcSupportNav = "<li class=\"smaller show-for-xlarge-up\"><a href=\"//support.brightcove.com\">Support</a></li>",
-        onceSupportNav = "<li class=\"smaller show-for-xlarge-up\"><a href=\"mailto:oncesupport@brightcove.com\">Support</a></li>",
-        performSupportNav = "vcSupportNav",
+        vcSupportNav = "<li class=\"smaller show-for-large-up\"><a href=\"//support.brightcove.com\">Support</a></li>",
+        onceSupportNav = "<li class=\"smaller show-for-large-up\"><a href=\"mailto:oncesupport@brightcove.com\">Support</a></li>",
         titleAreaTemplate = "<nav class=\"top-bar\" data-topbar><ul class=\"title-area\"><li class=\"name\" id=\"siteTitle\"><a href=\"//docs.brightcove.com/en/index.html\"><img class=\"bcls-logo bcls-float-left\" src=\"//docs.brightcove.com/en/images/bc-logo-small.png\" alt=\"Brightcove\">DEVELOPER DOCS</a></li><li class=\"toggle-topbar menu-icon\"><a href=\"#\"><span>Menu</span></a></li></ul><section class=\"top-bar-section\"><ul id=\"navMenuLeft\" class=\"left\"></ul></section><section class=\"top-bar-section\"><ul id=\"navMenuRight\" class=\"right\"></ul></section></nav>",
         searchTemplate = "<div class=\"container\"><div class=\"region region-search\"><section id=\"block-search-api-page-new\" class=\"block block-search-api-page\"><div><a class=\"close-reveal-modal\">&#215;</a></div><div id=\"searchBar\"><script>\
           (function() {\
@@ -62,7 +60,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         bclslog,
         isDefined,
         hasClass,
-        findObjectInArray,
         isItemInArray,
         getURLparam,
         setPageTitle,
@@ -98,26 +95,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
      */
     isDefined = function (x) {
         return (x !== "" && x !== null && x !== undefined) ? true : false;
-    };
-    /**
-     * find index of an object in array of objects based on some property value
-     * @param {array} targetArray
-     * @param {string} objProp property to evaluate
-     * @param {string} value property value to look for
-     * @return {integer} first index if found, otherwise returns -1
-     */
-    findObjectInArray = function (targetArray, objProp, value) {
-        var i, totalItems = targetArray.length,
-            objFound = false;
-        for (i = 0; i < totalItems; i++) {
-            if (targetArray[i][objProp] === value) {
-                objFound = true;
-                return i;
-            }
-        }
-        if (objFound === false) {
-            return -1;
-        }
     };
 
     /**
@@ -242,7 +219,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 item = navData.items[i];
                 // assign to alpha group
                 firstLetter = item.name.charAt(0).toLowerCase();
-                bclslog("firstLetter", firstLetter);
                 alphaObj[firstLetter].items.push(item);
                 // assign to functional groups
                 if (isDefined(item.groups)) {
@@ -272,7 +248,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         str += "</ul>";
         sidenav.innerHTML += str;
         sideNavElements = document.querySelectorAll("#sidenav li>a");
-        bclslog("sideNavElements", sideNavElements);
         // navLinks = document.querySelectorAll("#sidenav a");
         jMax = sideNavElements.length;
         for (j = 0; j < jMax; j++) {
@@ -285,11 +260,9 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             i,
             sectionEl;
         // set initial visibilities
-        bclslog("divsections", divsections);
         for (i = 0; i < numSections; i++) {
             if (i > 0) {
                 sectionEl = divsections.item(i);
-                bclslog("sectionEl", sectionEl);
                 switch (product) {
                 case "video-cloud":
                     if (!hasClass(sectionEl, "perform-only")) {
@@ -358,7 +331,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             navGroups = ["getting-started", "references", "learning-guides"],
             // helper function
             buildNavItem;
-        bclslog("navdata", data);
 
         buildNavItem = function (itemGroup) {
             navHTML += "<li class=\"has-dropdown\"><a href=\"#\">" + data[itemGroup].header + "</a><ul class=\"dropdown\">";
@@ -420,8 +392,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             buildPageIndexGroup,
             buildPageIndexAlpha;
 
-        bclslog("gettingStartedBlock", gettingStartedBlock);
-        bclslog("pageIndexBlock", pageIndexBlock);
         buildGetStartedGroup = function (itemGroup) {
             str += "<li><fieldset id=\"gettingStartedBlock\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em;\"><legend>" + groupObj[itemGroup].header + "</legend><ul style=\"list-style:none;\">";
             jMax = groupObj[itemGroup].items.length;
@@ -445,7 +415,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         };
 
         buildPageIndexAlpha = function (itemGroup) {
-            bclslog("itemGroup", itemGroup);
             str += "<li style=\"font-size:.9rem\"><h4 class=\"index-page\">~" + alphaObj[itemGroup].header + "~</h4><ul style=\"list-style:none;overflow:hidden;\">";
             jMax = alphaObj[itemGroup].items.length;
             for (j = 0; j < jMax; j++) {
@@ -497,8 +466,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
     getSection = function () {
         var pathArray = path.split("/"),
             server,
-            dataIndex,
-            modulesIndex,
             redirectArray,
             headers = document.querySelectorAll("h1, h2");
         // remove the 0 element, as it will be empty
@@ -554,8 +521,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                         section = "smart-player-api";
                     } else if (section === "player-management") {
                         sectionName = "player-management";
-                    }  else if (section === "studio") {
-                        modulesIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", "Modules");
                     } else {
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
                     }
@@ -598,7 +563,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                     section = "index";
                     sectionName = null;
                     subsection = pathArray[2];
-                    subsectionName = bclsNavData.once[subsection].name;
                     // check to see if we're on the section or subsection landing page
                     // and redirect to product landing page if so
                     if (pathArray[3] === "index.html" && !isItemInArray(pathArray, "versions")) {
@@ -665,13 +629,8 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         } else if (server === "solutions") {
             product = "video-cloud";
             subsection = "solutions";
-            subsectionName = "Solutions";
-            if (pathArray[1] === "index.html") {
-                // do nothing - we won't use this script for solutions landing page
-            } else {
-                section = pathArray[1];
-                sectionName = section;
-            }
+            section = pathArray[1];
+            sectionName = section;
             navMenuRight.innerHTML = menuRightBase + vcSupportNav;
         } else {
             // don't know where we are
@@ -682,7 +641,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         }
         // if landing page, add event listener for index type selector
         if (isLandingPage) {
-            indexTypeSelector.addEventListener("change", function (){
+            indexTypeSelector.addEventListener("change", function () {
                 setPageIndexType(indexTypeSelector.options[indexTypeSelector.selectedIndex].value);
             });
         }
