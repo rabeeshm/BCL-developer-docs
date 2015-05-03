@@ -462,7 +462,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
 
         // build the getting started block
         iMax = gettingStartedGroups.length;
-        str += "<ul class=\"small-block-grid-3\">";
+        str += "<ul class=\"small-block-grid-1 medium-block-grid-3\">";
         for (i = 0; i < iMax; i++) {
             if (groupObj[gettingStartedGroups[i]].items.length > 0) {
                 buildGetStartedGroup(gettingStartedGroups[i]);
@@ -472,7 +472,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         gettingStartedBlock.innerHTML += str;
         // reset string and build index by groups
         str = "";
-        str += "<fieldset id=\"groupIndex\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em\"><legend>Page Index by Group</legend><ul class=\"small-block-grid-4\">";
+        str += "<fieldset id=\"groupIndex\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em\"><legend>Page Index by Group</legend><ul class=\"small-block-grid-1 medium-block-grid-4\">";
         for (functionalGroup in groupObj) {
             if (groupObj[functionalGroup].items.length > 0) {
                 buildPageIndexGroup(functionalGroup);
@@ -482,7 +482,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         pageIndexBlock.innerHTML += str;
         // reset string and build index alphabetically
         str = "";
-        str += "<fieldset id=\"alphaIndex\" class=\"display-none\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em\"><legend>Alphabetical Page Index</legend><ul class=\"small-block-grid-4\">";
+        str += "<fieldset id=\"alphaIndex\" class=\"display-none\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em\"><legend>Alphabetical Page Index</legend><ul class=\"small-block-grid-1 medium-block-grid-4\">";
         for (alphaGroup in alphaObj) {
             if (alphaObj[alphaGroup].items.length > 0) {
                 buildPageIndexAlpha(alphaGroup);
