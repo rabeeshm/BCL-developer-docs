@@ -169,8 +169,12 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
     setAttributeOnNodeList = function (list, attr, value) {
         var i,
             iMax = list.length;
-        for (i = 0; i < iMax; i++) {
-            list[i].setAttribute(attr, value);
+        if (isDefined(list)) {
+            for (i = 0; i < iMax; i++) {
+                if (isDefined(list[1])) {
+                    list[i].setAttribute(attr, value);
+                }
+            }
         }
     };
 
