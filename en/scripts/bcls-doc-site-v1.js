@@ -171,7 +171,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             iMax = list.length;
         if (isDefined(list)) {
             for (i = 0; i < iMax; i++) {
-                if (isDefined(list[1])) {
+                if (isDefined(list[i])) {
                     list[i].setAttribute(attr, value);
                 }
             }
