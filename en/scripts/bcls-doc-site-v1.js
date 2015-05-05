@@ -164,8 +164,8 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
     /**
      * sets an attribute for each item in a node list
      * @param {nodeList} list  the node list
-     * @param {[type]} attr  the attribute to set
-     * @param {[type]} value the value for the attribute
+     * @param {string} attr  the attribute to set
+     * @param {string} value the value for the attribute
      */
     setAttributeOnNodeList = function (list, attr, value) {
         var i,

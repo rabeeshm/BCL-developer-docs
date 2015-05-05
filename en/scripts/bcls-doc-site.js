@@ -129,7 +129,11 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         }
         return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
     };
-    // test for existence
+    /**
+     * [exists description]
+     * @param  {*} x [description]
+     * @return {boolean}   [description]
+     */
     exists = function (x) {
         return (x !== undefined && x !== null && x !== "" && x !== NaN);
     };
