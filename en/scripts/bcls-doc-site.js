@@ -181,8 +181,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             $navElements.attr("style", "");
             $(this).attr("style", "background-color:" + productColors[product] + ";color:#ffffff");
         });
-        // set h2 color to product NewColor
-        $("h1,h2").attr("style", "color:" + productColors[product]);
+
     };
     createInPageNav = function () {
         var navObj = {};
@@ -362,15 +361,17 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             }
         }
         $navMenuLeft.html(navHTML);
-        $navWrapper.find("nav,ul,section,li,a").attr("style", "background-color:" + productColors[product] + ";");
-        $titleArea.find("ul,li,a,img").attr("style", "background-color:" + productColors.index + ";");
+        $navWrapper.find("nav,ul,section,li,a").attr("style", "background-color:#333333;");
+        $titleArea.find("ul,li,a,img").attr("style", "background-color:#333333;");
         if (product !== "index") {
             titleStr += product + "/index.html\"><img src=\"" + bclsNavData[product].image + "\"/></a>";
         } else {
             titleStr += "index.html\">" + bclsNavData[product].image + "</a>";
         }
         $siteTitle.html(titleStr);
-        highlightBackgroundColor = lightenDarkenColor(productColors[product], -40);
+        // set h2 color to product NewColor
+        $("h1,h2").attr("style", "color:" + productColors[product]);
+        highlightBackgroundColor = lightenDarkenColor("#333333", 40);
         highlightCurrentItem();
     };
     // create the index of section pages for the landing page
