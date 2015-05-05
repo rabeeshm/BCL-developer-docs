@@ -20,7 +20,6 @@ module.exports = function (grunt) {
                         'source/studio.json',
                         'source/studio-prerelease.json',
                         'source/brightcove-player.json',
-                        'source/brightcove-player-v1.json',
                         'source/ingest-profiles-api.json',
                         'source/di-api.json',
                         'source/cms-api.json',
