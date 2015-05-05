@@ -7,7 +7,8 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         sectionName,
         isLandingPage = false,
         landingPagePath,
-        indexTypeSelector = document.getElementById("indexTypeSelector"),
+        indexTypeSelectorGroup,
+        indexTypeSelectorAlpha,
         productColors = {
             "index": "#333333",
             "video-cloud": "#dd712e",
@@ -478,6 +479,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         // reset string and build index by groups
         str = "";
         str += "<fieldset id=\"groupIndex\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em\"><legend>Page Index by Group</legend><ul class=\"small-block-grid-1 medium-block-grid-4\">";
+        str += "<p style=\"margin-top:1.5em\"><select id=\"indexTypeSelectorGroup\" style=\"width:240px;font-size:.8rem;margin-left:1rem;margin-top:0;margin-bottom:0;\"><option value=\"groups\">Show Pages by Group</option><option value=\"alpha\">Show Pages Alphabetically</option></select></p>"
         for (functionalGroup in groupObj) {
             if (groupObj[functionalGroup].items.length > 0) {
                 buildPageIndexGroup(functionalGroup);
@@ -488,14 +490,26 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         // reset string and build index alphabetically
         str = "";
         str += "<fieldset id=\"alphaIndex\" class=\"display-none\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em\"><legend>Alphabetical Page Index</legend><ul class=\"small-block-grid-1 medium-block-grid-4\">";
+        str += "<p style=\"margin-top:1.5em\"><select id=\"indexTypeSelectorAlpha\" style=\"width:240px;font-size:.8rem;margin-left:1rem;margin-top:0;margin-bottom:0;\"><option value=\"groups\">Show Pages by Group</option><option value=\"alpha\" selected=\"selected\">Show Pages Alphabetically</option></select></p>"
         for (alphaGroup in alphaObj) {
             if (alphaObj[alphaGroup].items.length > 0) {
                 buildPageIndexAlpha(alphaGroup);
             }
         }
         pageIndexBlock.innerHTML += str;
+        // get references to new elements
         groupIndexBlock = document.getElementById("groupIndex");
         alphaIndexBlock = document.getElementById("alphaIndex");
+        indexTypeSelectorGroup = document.getElementById("indexTypeSelectorGroup");
+        indexTypeSelectorAlpha = document.getElementById("indexTypeSelectorAlpha");
+
+        //add event listeners for index type selector
+        indexTypeSelectorGroup.addEventListener("change", function () {
+            setPageIndexType(indexTypeSelectorGroup.options[indexTypeSelectorGroup.selectedIndex].value);
+        });
+        indexTypeSelectorAlpha.addEventListener("change", function () {
+            setPageIndexType(indexTypeSelectorAlpha.options[indexTypeSelectorAlpha.selectedIndex].value);
+        });
         // if on landing page see what version of page index to show value
         if (getURLparam("show") === "alpha") {
             setPageIndexType("alpha");
@@ -678,12 +692,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             section = null;
             navMenuRight.innerHTML = menuRightBase + vcSupportNav;
             bclslog("unknown server");
-        }
-        // if landing page, add event listener for index type selector
-        if (isLandingPage) {
-            indexTypeSelector.addEventListener("change", function () {
-                setPageIndexType(indexTypeSelector.options[indexTypeSelector.selectedIndex].value);
-            });
         }
 
         // set header colors to product color
