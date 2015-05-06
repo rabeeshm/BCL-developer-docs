@@ -557,6 +557,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 landingPagePath = "//docs.brightcove.com/" + redirectArray.join("/") + "/index.html";
                 product = "video-cloud";
                 // hide anything perform-only
+                bclslog("performOnly", performOnly);
                 setAttributeOnNodeList(performOnly, "class", "display-none");
                 productName = "Video Cloud";
                 if (pathArray[2] === "index.html") {
