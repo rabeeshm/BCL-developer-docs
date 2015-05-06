@@ -306,14 +306,14 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                     if (!hasClass(sectionEl, "video-cloud-only")) {
                         navObj = {};
                         navObj.link = sectionEl.getAttribute("id");
-                        navObj.text = sectionEl.firstChild.innerHTML;
+                        navObj.text = sectionEl.children[0].innerHTML;
                         navLabel.push(navObj);
                     }
                     break;
                 default:
                     navObj = {};
                     navObj.link = sectionEl.getAttribute("id");
-                    navObj.text = sectionEl.firstChild.innerHTML;
+                    navObj.text = sectionEl.children[0].innerHTML;
                     navLabel.push(navObj);
                     break;
                 }
