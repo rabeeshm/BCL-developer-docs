@@ -418,7 +418,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                 if (exists(item.items)) {
                     kMax = item.items.length;
                     if (i === 1) {
-                        str += blockTemplate2Start(item);
+                        str += blockTemplateStart(item);
                     } else {
                         str += blockTemplateStart(item);
                     }
@@ -435,9 +435,10 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 if (exists(jItem.items)) {
                                     lMax = jItem.items.length;
                                     for (l = 0; l < lMax; l++) {
-                                        var mItem = jItem.items[l];
-                                        str += itemTemplate(mItem);
+                                        var lItem = jItem.items[l];
+                                        str += itemTemplate(lItem);
                                     }
+                                    str += blockEndTemplate;
                                 } else {
                                     str += itemTemplate(jItem);
                                 }
@@ -451,9 +452,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     bclslog("item", item);
                     str += SingleItemTemplate(item);
                 }
-                if (i > 0) {
                     str += blockEndTemplate;
-                }
             }
             $sections.html(str);
             $sections.children("div").filter(":last").addClass("end");
