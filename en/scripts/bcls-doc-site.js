@@ -576,7 +576,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                     /**
                      * special cases
                      */
-                    if (section === "open-source" || section === "concepts" || section === "forums") {
+                    if (section === "open-source" || section === "concepts" || section === "forums" || section === "utilities") {
                         switch (section) {
                         case "open-source":
                             sectionName = "Open-Source";
@@ -586,6 +586,9 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                             break;
                         case "forums":
                             sectionName = "Forums";
+                            break;
+                        case "utilities":
+                            sectionName = "Utilities";
                             break;
                         }
                         subsection = null;
