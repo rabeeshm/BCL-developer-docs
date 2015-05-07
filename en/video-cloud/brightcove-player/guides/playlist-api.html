@@ -50,7 +50,7 @@
 				<h1>Playlist API Guide</h1>
 				<!-- Place document intro sentence(s) here -->
 				<p class="BCL-aside">Note: Playlists in Brightcove Player are in beta development.</p>
-				<p>This document provides information on the Playlist API available in Brightcove Player. This API provides the functionality to programmatically control a playlist. For information on using the visual representation of a playlist (a much more common use case) see the <span class="video-cloud-only"><a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/playlist-using.html">Using Playlists</a></span><span class="perform-only"><a href="//docs.brightcove.com/en/perform/brightcove-player/guides/playlist-using.html">Using Playlists</a></span> document.</p>
+				<p>This document provides information on the Playlist API available in Brightcove Player. This API provides the functionality to programmatically control a playlist. For information on implementing the visual representation of a playlist (a much more common use case) see the <span class="video-cloud-only"><a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/playlist-using.html">Using Playlists</a></span><span class="perform-only"><a href="//docs.brightcove.com/en/perform/brightcove-player/guides/playlist-using.html">Using Playlists</a></span> document.</p>
 				<p>The following Brightcove Player has a playlist loaded and using the buttons you can move around in the playlist.</p>
 				<video id="myPlayerID"
 				  data-account="1752604059001"
@@ -76,18 +76,21 @@
 				<h5>Parameter (setter):</h5>
 				<ul>
 			    <li>
-			    	<strong>newPlaylist</strong>: An array of video sources/objects. The objects can either be manually created or simply a Video Cloud playlist ID or reference ID.
+			    	<strong>newPlaylist</strong>: An array of video sources/objects. <span class="video-cloud-only">The objects can either be manually created or simply a Video Cloud playlist ID or reference ID.</span>
 					</li>
 				</ul>
 				<p  class="video-cloud-only">Although you can use the <code>playlist()</code> method as a setter, it is a best practice to utilize Brightcove Player's catalog functionality to load a playlist, for example<code>myPlayer.catalog.getPlaylist( playlistID )</code> and <code>myPlayer.catalog.load( playlist )</code>. See the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/player-catalog.html">Player Catalog</a> document for more information.</p>
+				<p class="perform-only"><a href="#manualcreation"></a> An example use of the method with a manually created playlist follows:</p>
+				<p class="perform-only"><code data-gist-id="3a62e365a173dc2ea43e" data-gist-hide-footer="true" data-gist-line="29-61" data-gist-highlight-line="31"></code></p>
 				<h5>Returned value (getter): </h5>
-				<p>The method returns an <strong>array of objects</strong>. An example of a returned Video Cloud playlist follows:</p>
+				<p>The method returns an <strong>array of objects</strong>.</p>
+				<p class="video-cloud-only">An example of a returned Video Cloud playlist (an array of Video Cloud video objects) follows:</p>
 				<div class="video-cloud-only"><img src="/en/video-cloud/brightcove-player/guides/assets/playlist-vc-object.png"></div>
 				<div class="perform-only"><img src="/en/video-cloud/brightcove-player/guides/assets/playlist-perform-object.png"></div>
-				<p><a href="#manualcreation"></a> An example use of the method with a manually created playlist follows:</p>
-				<p><code data-gist-id="3a62e365a173dc2ea43e" data-gist-hide-footer="true" data-gist-line="29-61" data-gist-highlight-line="31"></code></p>
 				<p class="video-cloud-only">The following example shows using the catalog object's <code>getPlaylist()</code> and <code>load()</code> methods to load a Video Cloud playlist. As mentioned previously, this is the recommended approach when using Video Cloud playlists. For more information see the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/player-catalog.html">Player Catalog</a> document.</p>
 				<p class="video-cloud-only"><code data-gist-id="3a62e365a173dc2ea43e" data-gist-hide-footer="true" data-gist-line="119-122" data-gist-highlight-line=""></code></p>
+				<p class="video-cloud-only">You can use the object returned by the <code>options()</code> method to retrieve the playlist ID. Here is a <code>console.log</code> showing the syntax:</p>
+				<pre><code>console.log('playlist id: ', myPlayer.options()['data-playlist-id']);</code></pre>
 			</div>
 			<div id="autoadvance" class="section">
 				<h2>autoadvance( ) method</h2>
@@ -223,7 +226,16 @@
 				<h2>playlistchange event</h2>
 				<p>The <code>playlistchange</code> event is dispatched asynchronously whenever the playlist is changed. When this event is dispatched the player will start loading the first video in the new playlist.</p>
 			</div>
-			<div id="catalogplaylists" class="section video-cloud-only>
+      <div id="visualplaylist" class="section">
+        <h2>Visual playlists</h2>
+        <p>If you wish to have a visual representation of the playlist in your page you must configure the player to do so. You can update the configuration using <span class="video-cloud-only">Video Cloud</span><span class="perform-only">Perform</span> Studio, in the <strong>Settings</strong> section, as shown here:</p>
+	      <div><img src="/en/video-cloud/brightcove-player/guides/assets/playlist-enable-in-studio.png"></div>
+	      <p>If you wish, you can also so use the Player Management API to configure you player for playlists. The following curl statement will configure the player correctly:</p>
+				<p><code data-gist-id="3a62e365a173dc2ea43e" data-gist-hide-footer="true" data-gist-line="258-265"></code></p>
+				<p>You can programmatically check if this has been set by checking if the value of <code>player.playlistUi</code> is defined.</p>
+				<pre><code>console.log('myPlayer.playlistUi:', myPlayer.playlistUi);</code></pre>
+      </div>
+			<div id="catalogplaylists" class="section video-cloud-only">
 				<h2>Catalog playlists</h2>
 				<p>As mentioned earlier in the document the playlist can be a Video Cloud playlist. You can retrieve a Video Cloud playlist using the <code>player.catalog.getPlaylist()</code> method. You then load the playlist into the player using the <code>player.catalog.load()</code> method. The following code shows this usage:</p>
 				<p><code data-gist-id="3a62e365a173dc2ea43e" data-gist-hide-footer="true" data-gist-line="119-122"></code></p>
@@ -234,7 +246,9 @@
 					<li class="video-cloud-only"><a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/player-catalog.html">Player Catalog</a></li>
 					<li class="video-cloud-only"><a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/playlist-using.html">Using Playlists</a></li>
 					<li class="perform-only"><a href="//docs.brightcove.com/en/perform/brightcove-player/guides/playlist-using.html">Using Playlists</a></li>
-				</ul>
+					<li class="video-cloud-only"><a href="http://docs.brightcove.com/en/video-cloud/player-management/index.html">Player Management API</a> </li>
+					<li class="perform-only"><a href="http://docs.brightcove.com/en/perform/player-management/index.html">Player Management API</a> </li>
+			</ul>
 			</div>
 		</div>
 	</div>
