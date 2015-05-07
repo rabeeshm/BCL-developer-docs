@@ -558,7 +558,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 product = "video-cloud";
                 // hide anything perform-only
                 bclslog("performOnly", performOnly);
-                setAttributeOnNodeList(performOnly, "class", "display-none");
+                setAttributeOnNodeList(performOnly, "style", "display:none");
                 productName = "Video Cloud";
                 if (pathArray[2] === "index.html") {
                     // on video cloud landing page
@@ -632,7 +632,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 redirectArray = pathArray.slice(0, 3);
                 landingPagePath = "//docs.brightcove.com/" + redirectArray.join("/") + "/index.html";
                 // hide anything video-cloud-only
-                setAttributeOnNodeList(videoCloudOnly, "class", "display-none");
+                setAttributeOnNodeList(videoCloudOnly, "style", "display:none");
                 productName = "Perform";
                 if (pathArray[2] === "index.html") {
                     // on perform landing page
