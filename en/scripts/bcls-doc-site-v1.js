@@ -525,8 +525,8 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         // remove the 0 element, as it will be empty
         pathArray.splice(0, 1);
         // if path ends in a /, add index.html
-        if (pathArray[pathArray.length - 1] === "/") {
-            pathArray[pathArray.length - 1] = "/index.html";
+        if (pathArray[pathArray.length - 1] === "") {
+            pathArray[pathArray.length - 1] = "index.html";
         }
         // figure out which server we're on
         if (pathArray[0] === "en") {
