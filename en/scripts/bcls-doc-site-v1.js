@@ -45,18 +45,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         vcSupportNav = "<li class=\"smaller show-for-large-up\"><a href=\"//support.brightcove.com\">Support</a></li>",
         onceSupportNav = "<li class=\"smaller show-for-large-up\"><a href=\"mailto:oncesupport@brightcove.com\">Support</a></li>",
         titleAreaTemplate = "<nav class=\"top-bar\" data-topbar><ul class=\"title-area\"><li class=\"name\" id=\"siteTitle\"><a href=\"//docs.brightcove.com/en/index.html\"><img class=\"bcls-logo bcls-float-left\" src=\"//docs.brightcove.com/en/images/bc-logo-small.png\" alt=\"Brightcove\">DEVELOPER DOCS</a></li><li class=\"toggle-topbar menu-icon\"><a href=\"#\"><span>Menu</span></a></li></ul><section class=\"top-bar-section\"><ul id=\"navMenuLeft\" class=\"left\"></ul></section><section class=\"top-bar-section\"><ul id=\"navMenuRight\" class=\"right\"></ul></section></nav>",
-        searchTemplate = "<div class=\"container\"><div class=\"region region-search\"><section id=\"block-search-api-page-new\" class=\"block block-search-api-page\"><div><a class=\"close-reveal-modal\">&#215;</a></div><div id=\"searchBar\"><script>\
-          (function() {\
-            var cx = '007321107584305483635:pnl5oukzxbq';\
-            var gcse = document.createElement('script');\
-            gcse.type = 'text/javascript';\
-            gcse.async = true;\
-            gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//www.google.com/cse/cse.js?cx=' + cx;\
-            var s = document.getElementsByTagName('script')[0];\
-            s.parentNode.insertBefore(gcse, s);\
-          })();\
-        </script>\
-        <gcse:search></gcse:search></div></section>",
+        searchTemplate = "<div class=\"container\"><div class=\"region region-search\"><section id=\"block-search-api-page-new\" class=\"block block-search-api-page\"><div><a class=\"close-reveal-modal\">&#215;</a></div><div id=\"searchBar\"><gcse:search></gcse:search></div></section>",
         // functions
         bclslog,
         isDefined,
@@ -704,13 +693,19 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
     };
     // initialization: set the page title, set up the header shell, get references to the parts
     init = function () {
-        var headers = document.querySelectorAll("h1, h2");
+        var headers = document.querySelectorAll("h1, h2"),
+            searchScript = document.createElement("script"),
+            searchBar;
 
         // set the page title in case wrong
         setPageTitle();
         // set up the header
         navWrapper.innerHTML = titleAreaTemplate;
         searchModal.innerHTML += searchTemplate;
+        // get a reference to search block
+        searchBar = document.getElementById("searchBar");
+        searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script.js");
+        searchBar.appendChild(searchScript);
         // get references to header sections
         navMenuLeft = document.getElementById("navMenuLeft");
         navMenuRight = document.getElementById("navMenuRight");
