@@ -710,7 +710,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         setPageTitle();
         // set up the header
         navWrapper.innerHTML = titleAreaTemplate;
-        searchModal.innerHTML = searchTemplate;
+        searchModal.innerHTML += searchTemplate;
         // get references to header sections
         navMenuLeft = document.getElementById("navMenuLeft");
         navMenuRight = document.getElementById("navMenuRight");
