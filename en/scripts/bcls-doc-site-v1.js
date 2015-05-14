@@ -638,10 +638,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                         sectionName = "Concepts";
                         subsection = null;
                         section = "perform";
-                    } else if (section === "forums") {
-                        sectionName = "Forums";
-                        subsection = null;
-                        section = "perform";
                     } else {
                         sectionName = bclsNavData[product].sections[section].name;
                     }
@@ -704,7 +700,9 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         searchModal.innerHTML += searchTemplate;
         // get a reference to search block
         searchBar = document.getElementById("searchBar");
+        // set the source for the script that generates the search field
         searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script.js");
+        // append the search script to the appropriate div in the nav bar
         searchBar.appendChild(searchScript);
         // get references to header sections
         navMenuLeft = document.getElementById("navMenuLeft");
