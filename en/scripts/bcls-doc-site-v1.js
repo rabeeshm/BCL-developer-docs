@@ -479,7 +479,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         // reset string and build index alphabetically
         str = "";
         str += "<fieldset id=\"alphaIndex\" class=\"display-none\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em\"><legend>Alphabetical Page Index</legend><ul class=\"small-block-grid-1 medium-block-grid-4\">";
-        str += "<p style=\"margin-top:1.5em\"><select id=\"indexTypeSelectorAlpha\" style=\"width:240px;font-size:.8rem;margin-left:1rem;margin-top:0;margin-bottom:0;\"><option value=\"groups\">Show Pages by Group</option><option value=\"alpha\" selected=\"selected\">Show Pages Alphabetically</option></select></p>";
+        str += "<p style=\"margin-top:1.5em\"><select id=\"indexTypeSelectorAlpha\" style=\"width:240px;font-size:.8rem;margin-left:1rem;margin-top:0;margin-bottom:0;\"><option value=\"groups\">Show Pages by Group</option><option value=\"alpha\">Show Pages Alphabetically</option></select></p>";
         for (alphaGroup in alphaObj) {
             if (alphaObj[alphaGroup].items.length > 0) {
                 buildPageIndexAlpha(alphaGroup);
