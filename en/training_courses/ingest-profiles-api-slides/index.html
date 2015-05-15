@@ -119,6 +119,30 @@
                     <li class="slide">Perform the exercises on a sample account (recommended)</li>
                     <li class="slide">Use your own account <span class="BCL-btn" id="useMyAccount">Use My Account</span></li>
                 </ul>
+                <div id="basicInfo" class="height-zero">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Video Cloud Account (Publisher ID):</td>
+                                <td>
+                                    <input id="account_id" type="text" size="55"></td>
+                            </tr>
+                            <tr>
+                                <td class="align-top no-wrap">Client id:</td>
+                                <td>
+                                    <input id="client_id" type="text" size="100" value="" /><p>
+                                </td>
+                            </tr><tr>
+                                <td>Client secret:</td>
+                                <td>
+                                    <input id="client_secret" type="text" size="100" value="" /><p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p><span class="BCL-btn" id="setOptions">Set Account Options</span></p>
+                    <p>See <a href="//docs.brightcove.com/en/video-cloud/studio/managing-accounts/managing-api-credentials.html">Managing API Credentials</a> for information on getting client credentials.</p>
+                </div>
             </div>
         </div>
         <!-- end slide - no content - for slides only -->
@@ -168,14 +192,87 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
 
 
-<script>
-    var BCLS = ( function ($, window, document) {
-        /* any additional script used for the content here */
-        return {
-
+<script id="pageScript" type="text/javascript">
+var BCLS = (function ($, window, document) {
+    "use strict";
+    var proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
+        useMyAccount = document.getElementById("useMyAccount"),
+        basicInfo = document.getElementById("basicInfo"),
+        account_id = document.getElementById("account_id"),
+        client_id = document.getElementById("client_id"),
+        client_secret = document.getElementById("client_secret"),
+        setOptions = document.getElementById("setOptions"),
+        /**
+         * defaults - Training Video account values here - change to account you want to use
+         * values below are for BrightcoveLearning
+         * id and secret are good for BrightcoveLearning, Brightcove Training, BC Public Demos
+         * permissions for:
+         * Analytics API
+         * CMS API all operations
+         * Player Management API all operation
+         */
+        defaults = {
+            account_id: "57838016001",
+            client_id: "b64fc5691-6559-4095-818f-6ee8516d2fb7",
+            client_secret: "CudATyeQECXAwkGLvLX734EtoluscqbFEbscC1JHzjYnVe3G29KjnjOKKY1eqnP-cD6KIfE3LBLr4P1NSOCpfg"
+        },
+        options = {},
+        // functions
+        isDefined,
+        bclslog,
+        setAccountOptions;
+        /**
+         * tests for all the ways a variable might be undefined or not have a value
+         * @param {*} x the variable to test
+         * @return {Boolean} true if variable is defined and has a value
+         */
+        isDefined = function(x){
+            if ( x !== "" && x !== null && x !== undefined && x !== NaN && x !== {} && x !== []) {
+                return true;
+            } else {
+                return false;
+            }
+        };
+        /**
+         * Logging function - safe for IE
+         * @param  {string} context description of the data
+         * @param  {*} message the data to be logged by the console
+         * @return {}
+         */
+        bclslog = function (context, message) {
+            if (window["console"] && console["log"]) {
+              console.log(context, message);
+            };
+            return;
+        };
+        /**
+         * set up account options when you are ready to assemble the URL and make the API call
+         */
+        setAccountOptions = function () {
+            defaults.account_id = isDefined(account_id.value) ? account_id.value : defaults.account_id;
+            defaults.client_id = isDefined(client_id.value) ? client_id.value : defaults.client_id;
+            defaults.client_secret = isDefined(client_secret.value) ? client_secret.value : defaults.client_secret;
+            bclslog("defaults", defaults);
         }
-    })($, window, document);
-</script>
+        // listeners
+        // toggle sample/customer account
+        useMyAccount.addEventListener("click", function () {
+            if (basicInfo.className === "height-zero") {
+                basicInfo.className = "height-auto";
+                useMyAccount.innerHTML = "Use Sample Account";
+            } else {
+                basicInfo.className = "height-zero";
+                useMyAccount.innerHTML = "Use My Account Instead";
+            }
+        });
+        // set account options
+        setOptions.addEventListener("click", function () {
+            setAccountOptions();
+            setOptions.innerHTML = "Account Options Set!"
+        });
+    return {}
+})($, window, document);
+    </script>
 <!-- Automatically write the doc h1 heading to the title tag
 and creates public method BCLSslides.bclshighlight(), which
 adds syntax highlighting to pre>code blocks

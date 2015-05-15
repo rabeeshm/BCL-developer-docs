@@ -82,7 +82,7 @@
                 proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
                         requestData = "client_id=cca7ae2a-503d-472e-996c-3aa664d4aa95&client_secret=OE43iNQ6HluFxM2I_f6QDfGLoSSW28jnDWbX8gDgS6GIFD2P6VNWKbRHyln0I5aVyoSeil0l5ikWYQ2hUbR99g&url=" + encodeURI('https://ingestion.api.brightcove.com/v1/accounts/3921507403001/profiles') + "&requestBody=null&requestType=GET",
                 data = bclsProfiles_cached,
-                profileListTemplate = "{{#BCLSprofilesArray}}<tr><td><a href=\"#{{name}}\">{{name}}</a></td><td class=\"bcl-center\">{{videoRenditions}}</td><td class=\"bcl-center\">{{imageRenditions}}</td><td>{{description}}</td></tr>{{/BCLSprofilesArray}}",
+                profileListTemplate = "{{#BCLSprofilesArray}}<tr><td><a href=\"#{{name}}\">{{name}}</a></td><td class=\"bcl-center\">{{videoRenditions}}</td><td class=\"bcl-center\">{{audioRenditions}}</td><td class=\"bcl-center\">{{imageRenditions}}</td><td>{{description}}</td></tr>{{/BCLSprofilesArray}}",
                 navLabel = [],
                 // functions
                 buildSummaryTable,
@@ -217,6 +217,7 @@
                 for (i = 0; i < iMax; i++) {
                     item = data.BCLSprofilesArray[i];
                     item.videoRenditions = 0;
+                    item.audioRenditions = 0;
                     item.imageRenditions = 0;
                     jMax = item.renditions.length;
                     item.numRenditions = jMax;
@@ -235,6 +236,8 @@
                             item.videoRenditions++;
                         } else if (item.renditions[j].media_type === "image") {
                             item.imageRenditions++;
+                        } else if (item.renditions[j].media_type === "audio") {
+                            item.audioRenditions++;
                         }
                     }
 
@@ -259,7 +262,7 @@
                 profiletbodyElem = document.getElementById("profileSummaryTableTbody");
                 sectionHeadingElem.innerHTML = "Standard Profiles List";
                 sectionIntroElem.innerHTML = "Click on a profile name to see details of the renditions it includes. Note that the actual renditions created will depend on the quality of the source video.";
-                profiletheadElem.innerHTML = "<tr><th>Profile Name</th><th>Video Renditions</th><th>Image Renditions</th><th>Description</th></tr>";
+                profiletheadElem.innerHTML = "<tr><th>Profile Name</th><th>Video Renditions</th><th>Audio Renditions</th><th>Image Renditions</th><th>Description</th></tr>";
                 template = Handlebars.compile(profileListTemplate);
                 profiletbodyElem.innerHTML = template(data);
             }
