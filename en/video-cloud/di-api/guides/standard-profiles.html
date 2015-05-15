@@ -77,12 +77,12 @@
     <script src="./assets/BCLSprofilesArray.js"></script>
     <script src="/en/scripts/bcls-doc-site.js"></script>
     <script type="text/javascript">
-        var BCLS = ( function (window, document, Handlebars, bclsProfiles, hljs) {
+        var BCLS = ( function (window, document, Handlebars, bclsProfiles_cached, hljs) {
             var  mainSection = document.getElementById("main"),
                 proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
                         requestData = "client_id=cca7ae2a-503d-472e-996c-3aa664d4aa95&client_secret=OE43iNQ6HluFxM2I_f6QDfGLoSSW28jnDWbX8gDgS6GIFD2P6VNWKbRHyln0I5aVyoSeil0l5ikWYQ2hUbR99g&url=" + encodeURI('https://ingestion.api.brightcove.com/v1/accounts/3921507403001/profiles') + "&requestBody=null&requestType=GET",
-                data = bclsProfiles,
-                profileListTemplate = "{{#BCLSprofilesArray}}<tr><td><a href=\"#{{name}}\">{{name}}</a></td><td class=\"bcl-center\">{{numRenditions}}</td><td>{{description}}</td></tr>{{/BCLSprofilesArray}}",
+                data = bclsProfiles_cached,
+                profileListTemplate = "{{#BCLSprofilesArray}}<tr><td><a href=\"#{{name}}\">{{name}}</a></td><td class=\"bcl-center\">{{videoRenditions}}</td><td class=\"bcl-center\">{{imageRenditions}}</td><td>{{description}}</td></tr>{{/BCLSprofilesArray}}",
                 navLabel = [],
                 // functions
                 buildSummaryTable,
@@ -216,6 +216,8 @@
                 // massage data
                 for (i = 0; i < iMax; i++) {
                     item = data.BCLSprofilesArray[i];
+                    item.videoRenditions = 0;
+                    item.imageRenditions = 0;
                     jMax = item.renditions.length;
                     item.numRenditions = jMax;
                     kMax = profileDescriptions.length;
@@ -227,7 +229,12 @@
 
                     for (j = 0; j < jMax; j++) {
                         if (item.renditions[j].format === "ts") {
-                            item.renditions[j].format = "HLS";
+                            item.renditions[j].format = "ts (HLS)";
+                        }
+                        if (item.renditions[j].media_type === "video") {
+                            item.videoRenditions++;
+                        } else if (item.renditions[j].media_type === "image") {
+                            item.imageRenditions++;
                         }
                     }
 
@@ -252,7 +259,7 @@
                 profiletbodyElem = document.getElementById("profileSummaryTableTbody");
                 sectionHeadingElem.innerHTML = "Standard Profiles List";
                 sectionIntroElem.innerHTML = "Click on a profile name to see details of the renditions it includes. Note that the actual renditions created will depend on the quality of the source video.";
-                profiletheadElem.innerHTML = "<tr><th>Profile Name</th><th>Number of Renditions</th><th>Description</th></tr>";
+                profiletheadElem.innerHTML = "<tr><th>Profile Name</th><th>Video Renditions</th><th>Image Renditions</th><th>Description</th></tr>";
                 template = Handlebars.compile(profileListTemplate);
                 profiletbodyElem.innerHTML = template(data);
             }
@@ -372,22 +379,27 @@
                 var httpRequest = new XMLHttpRequest(),
                     proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
                     getResponse = function () {
-                        bclslog("get data");
+                        bclslog("getting data");
                         try {
                             if (httpRequest.readyState === 4) {
                               if (httpRequest.status === 200) {
-                                try {
-                                  // bclslog(httpRequest.responseText);
+                                // try {
+                                  bclslog(httpRequest.responseText);
                                   data.BCLSprofilesArray = JSON.parse(httpRequest.responseText);
                                   buildSummaryTable();
                                   buildDetailTables();
 
-                                } catch (e) {
-                                  bclslog('invalid json', e);
-                                }
+                                // } catch (e) {
+                                //   bclslog('invalid json', e);
+                                //   // just use cached data and build the tables
+                                //     data = bclsProfiles_cached;
+                                //     buildSummaryTable();
+                                //     buildDetailTables();
+                                // }
                               } else {
                                 bclslog("There was a problem with the request. Request returned: ", httpRequest.status);
                                 // just use cached data and build the tables
+                                data = bclsProfiles_cached;
                                 buildSummaryTable();
                                 buildDetailTables();
 
@@ -410,7 +422,7 @@
             getProfileData();
 
             // BCLSmain.createInPageNav();
-            })(window, document, Handlebars, bclsProfiles, hljs);
+            })(window, document, Handlebars, bclsProfiles_cached, hljs);
     </script>
     <!-- note - since the script above inserts sections into the DOM, the main site script and foundation() must be called after that script runs! -->
     <script>
