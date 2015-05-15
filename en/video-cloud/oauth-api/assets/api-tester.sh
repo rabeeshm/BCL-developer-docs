@@ -17,19 +17,19 @@ read VERB
 if [ "$VERB" = "" ]
 	then
 	export VERB="GET"
-elif [ "$VERB" = "g" ]
+elif [ "$VERB" = "g" ] || [ "$VERB" = "GET" ]
 	then
 	export VERB="GET"
-elif [ "$VERB" = "po" ]
+elif [ "$VERB" = "po" ] || [ "$VERB" = "p" ] || [ "$VERB" = "POST" ]
 	then
 	export VERB="POST"
-elif [ "$VERB" = "pa" ]
+elif [ "$VERB" = "pa" ] || [ "$VERB" = "PATCH" ]
 	then
 	export VERB="PATCH"
-elif [ "$VERB" = "pu" ]
+elif [ "$VERB" = "pu" ] || [ "$VERB" = "PUT" ]
 	then
 	export VERB="PUT"
-elif [ "$VERB" = "d" ]
+elif [ "$VERB" = "d" ] || [ "$VERB" = "DELETE" ]
 	then
 	export VERB="DELETE"
 fi
