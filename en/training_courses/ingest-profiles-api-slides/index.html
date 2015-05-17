@@ -163,7 +163,7 @@
             <p>Make the following GET request:</p>
             <textarea id="ex1request"></textarea>
             <p><span id="ex1button" class="bcls-button">Submit Request</span></p>
-<textarea id="ex1response" style="height:12em;"></textarea>
+            <textarea id="ex1response" style="height:12em;">Response will appear here</textarea>
         </div>
         <!-- end slide - no content - for slides only -->
         <div class="slide endSlide slide-only"></div>
@@ -176,16 +176,44 @@
             <pre class="slide"><code>/accounts/{account_id}/profiles</code></pre>
             <p class="slide">Example:</p>
 <pre class="slide"><code>https://ingestion.api.brightcove.com/v1/accounts/57838016001/profiles</code></pre>
-            <p>The JSON for the profile is included as the request body. See the <a href="//docs.brightcove.com/en/video-cloud/ingest-profiles-api/reference/profile-fields-reference.html">Profile Field Reference</a> for Profile, rendition, and DRM package fields</p>
+            <p class="slide">The JSON for the profile is included as the request body. See the <a href="//docs.brightcove.com/en/video-cloud/ingest-profiles-api/reference/profile-fields-reference.html">Profile Field Reference</a> for Profile, rendition, and DRM package fields</p>
         </div>
         <div id="exercise2" class="slide">
             <h3>Exercise 2: Get all profiles</h3>
             <p>Make the following POST request:</p>
             <textarea id="ex2request"></textarea>
-            <textarea id="ex2data"></textarea>
+            <textarea id="ex2data" style="height:4em;"></textarea>
             <p><span id="ex2button" class="bcls-button">Submit Request</span></p>
-<textarea id="ex2response" style="height:12em;"></textarea>
+            <textarea id="ex2response" style="height:12em;">Response will appear here</textarea>
         </div>
+        <!-- end slide - no content - for slides only -->
+        <div class="slide endSlide slide-only"></div>
+        <div id="getProfileByIdSection" class="section slide">
+            <h2>Getting a Single Profile</h2>
+        </div>
+        <div id="getProfileByIdSetup" class="slide">
+            <h3>Getting a profile by id</h3>
+            <p>To retrieve a profile by id, make a GET request to the endpoint:</p>
+            <pre class="slide"><code>/accounts/{account_id}/profiles/{profile_id}</code></pre>
+            <p class="slide">For the <code>profile_id</code>, you can use either the:</p>
+            <ul>
+                <li class="slide">name (e.g. balanced-high-definition)</li>
+                <li class="slide">generated id (e.g. 54de14cce4b0a6d2bf9cb08a)</li>
+            </ul>
+            <p class="slide">Examples:</p>
+<pre class="slide"><code>https://ingestion.api.brightcove.com/v1/accounts/57838016001/profiles/screencast
+https://ingestion.api.brightcove.com/v1/accounts/57838016001/profiles/54de14cce4b0a6d2bf9cb08a
+</code></pre>
+        </div>
+        <div id="exercise3" class="slide">
+            <h3>Exercise 3: Get all profiles</h3>
+            <p>Make the following POST request:</p>
+            <textarea id="ex3request"></textarea>
+            <p><span id="ex3button" class="bcls-button">Submit Request</span></p>
+            <textarea id="ex3response" style="height:12em;">Response will appear here</textarea>
+        </div>
+        <!-- end slide - no content - for slides only -->
+        <div class="slide endSlide slide-only"></div>
         <!-- end slide - no content - for slides only -->
         <div class="slide endSlide slide-only"></div>
     </div>
@@ -257,6 +285,7 @@ var BCLS = (function ($, window, document) {
         // for the exercises
         sampleProfile = {"archive_master":true,"renditions":[{"speed":3,"fixed_keyframe_interval":true,"media_type":"video","keyframe_rate":0.333,"video_codec":"h264","width":848,"reference_id":"mp1","h264_profile":"high","format":"mp4","audio_codec":"aac","audio_bitrate":48,"height":480,"video_bitrate":1280},{"speed":3,"media_type":"video","max_frame_rate":30,"keyframe_rate":0.5,"video_codec":"h264","decoder_bitrate_cap":1920,"reference_id":"hls3","type":"segmented","h264_profile":"high","width":848,"max_hls_protocol_version":2,"format":"ts","audio_codec":"aac","audio_bitrate":48,"hls_optimized_ts":"true","decoder_buffer_size":5120,"height":480,"video_bitrate":1280,"package_format":"zip"},{"height":360,"label":"poster","width":480,"media_type":"image","format":"png"},{"height":90,"label":"thumbnail","width":160,"media_type":"image","format":"png"}],"account_id":"your_account_id","name":"Protected","description":"This will produce 1 MP4 rendition, 1 HLS rendition, and 2 image renditions.","packages":[]},
         profileData,
+        profileDataStr,
         ex1request = document.getElementById("ex1request"),
         ex1response = document.getElementById("ex1response"),
         ex1button = document.getElementById("ex1button"),
@@ -264,6 +293,9 @@ var BCLS = (function ($, window, document) {
         ex2response = document.getElementById("ex2response"),
         ex2button = document.getElementById("ex2button"),
         ex2data = document.getElementById("ex2data"),
+        ex3request = document.getElementById("ex3request"),
+        ex3response = document.getElementById("ex3response"),
+        ex3button = document.getElementById("ex3button"),
         // functions
         isDefined,
         bclslog,
@@ -319,11 +351,11 @@ var BCLS = (function ($, window, document) {
             profileData = copyObj(sampleProfile);
             profileData["account_id"] = defaults.account_id;
             profileData["name"] += new Date().toISOString();
-            profileData = JSON.stringify(exerciseProfile, null, "  ");
-            exerciseProfile.account_id = defaults.account_id;
+            profileDataStr = JSON.stringify(profileData, null, "  ");
             ex1request.value = baseURL + "/accounts/" + defaults.account_id + "/profiles";
             ex2request.value = baseURL + "/accounts/" + defaults.account_id + "/profiles";
-            ex2data.value = profileData;
+            ex2data.value = profileDataStr;
+            ex3request.value = baseURL + "/accounts/" + defaults.account_id + "/profiles/single-rendition";
         };
         // listeners
         // toggle sample/customer account
@@ -364,7 +396,7 @@ var BCLS = (function ($, window, document) {
                     try {
                        var data = JSON.parse(data);
                     } catch (e) {
-                       bclslog('invalid json - something went wrong', e);
+                       bclslog("invalid json - something went wrong", e);
                        data = {"Error": e};
                     }
                     // write the response to the response element
@@ -385,7 +417,9 @@ var BCLS = (function ($, window, document) {
         ex2button.addEventListener("click", function () {
             submitRequest("post", ex2request, ex2response, ex2data);
         });
-        bclslog("profileData", profileData);
+        ex3button.addEventListener("click", function () {
+            submitRequest("get", ex3request, ex3response);
+        });
     return {}
 })($, window, document);
     </script>
