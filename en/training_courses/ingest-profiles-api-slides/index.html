@@ -314,11 +314,12 @@ https://ingestion.api.brightcove.com/v1/accounts/57838016001/profiles/54de14cce4
 </code></pre>
         </div>
         <div id="exercise7" class="slide">
-            <h3>Exercise 5: Delete profile</h3>
-            <p>Make the following DELETE request to update the profile you created (the description will be updated):</p>
-            <textarea id="ex5request"></textarea>
-            <p><span id="ex5button" class="bcls-button">Submit Request</span></p>
-            <textarea id="ex5response" style="height:12em;">Response will appear here</textarea>
+            <h3>Exercise 7: Set default profile</h3>
+            <p>Make the following POST request to set the default profile (note that this will fail if the account already has a default profile - we will update the default in the next exercise):</p>
+            <textarea id="ex7request"></textarea>
+            <textarea id="ex7data" style="height:4em;"></textarea>
+            <p><span id="ex7button" class="bcls-button">Submit Request</span></p>
+            <textarea id="ex7response" style="height:12em;">Response will appear here</textarea>
         </div>
         <!-- end slide - no content - for slides only -->
         <div class="slide endSlide slide-only"></div>
@@ -344,12 +345,13 @@ https://ingestion.api.brightcove.com/v1/accounts/57838016001/profiles/54de14cce4
 <pre class="slide"><code>https://ingestion.api.brightcove.com/v1/accounts/57838016001/configuration
 </code></pre>
         </div>
-        <div id="exercise7" class="slide">
-            <h3>Exercise 5: Delete profile</h3>
+        <div id="exercise8" class="slide">
+            <h3>Exercise 8: Update default profile</h3>
             <p>Make the following DELETE request to update the profile you created (the description will be updated):</p>
-            <textarea id="ex5request"></textarea>
-            <p><span id="ex5button" class="bcls-button">Submit Request</span></p>
-            <textarea id="ex5response" style="height:12em;">Response will appear here</textarea>
+            <textarea id="ex8request"></textarea>
+            <textarea id="ex8data" style="height:4em;"></textarea>
+            <p><span id="ex8button" class="bcls-button">Submit Request</span></p>
+            <textarea id="ex8response" style="height:12em;">Response will appear here</textarea>
         </div>
         <!-- end slide - no content - for slides only -->
         <div class="slide endSlide slide-only"></div>
@@ -422,9 +424,14 @@ var BCLS = (function ($, window, document) {
         // for the exercises
         sampleProfile = {"archive_master":true,"renditions":[{"speed":3,"fixed_keyframe_interval":true,"media_type":"video","keyframe_rate":0.333,"video_codec":"h264","width":848,"reference_id":"mp1","h264_profile":"high","format":"mp4","audio_codec":"aac","audio_bitrate":48,"height":480,"video_bitrate":1280},{"speed":3,"media_type":"video","max_frame_rate":30,"keyframe_rate":0.5,"video_codec":"h264","decoder_bitrate_cap":1920,"reference_id":"hls3","type":"segmented","h264_profile":"high","width":848,"max_hls_protocol_version":2,"format":"ts","audio_codec":"aac","audio_bitrate":48,"hls_optimized_ts":"true","decoder_buffer_size":5120,"height":480,"video_bitrate":1280,"package_format":"zip"},{"height":360,"label":"poster","width":480,"media_type":"image","format":"png"},{"height":90,"label":"thumbnail","width":160,"media_type":"image","format":"png"}],"account_id":"your_account_id","name":"Protected","description":"This will produce 1 MP4 rendition, 1 HLS rendition, and 2 image renditions.","packages":[]},
         profileData,
-        profileDataStr,
+        profileDataStr = "",
         updateData,
-        updateDataStr,
+        updateDataStr = "",
+        defaultData = {"account_id":57838016001,"profile_id":"screencast"},
+        defaultDataStr = "",
+        updateDefaultData = {"id":"","account_id":57838016001,"profile_id":"balanced-high-definition"},
+        updateDefaultDataStr = "",
+        config_id = "",
         ex1request = document.getElementById("ex1request"),
         ex1response = document.getElementById("ex1response"),
         ex1button = document.getElementById("ex1button"),
@@ -442,9 +449,17 @@ var BCLS = (function ($, window, document) {
         ex5request = document.getElementById("ex5request"),
         ex5response = document.getElementById("ex5response"),
         ex5button = document.getElementById("ex5button"),
+        ex6request = document.getElementById("ex6request"),
         ex6response = document.getElementById("ex6response"),
         ex6button = document.getElementById("ex6button"),
-        ex6data = document.getElementById("ex6data"),
+        ex7request = document.getElementById("ex7request"),
+        ex7response = document.getElementById("ex7response"),
+        ex7button = document.getElementById("ex7button"),
+        ex7data = document.getElementById("ex7data"),
+        ex8request = document.getElementById("ex8request"),
+        ex8response = document.getElementById("ex8response"),
+        ex8button = document.getElementById("ex8button"),
+        ex8data = document.getElementById("ex8data"),
         // functions
         isDefined,
         bclslog,
@@ -504,6 +519,9 @@ var BCLS = (function ($, window, document) {
             updateData = copyObj(profileData);
             updateData["description"] = "Test Profile Updated";
             updateDataStr = JSON.stringify(updateData, null, "  ");
+            defaultDataStr = JSON.stringify(defaultData, null, "  ");
+            updateDefaultData["id"] = config_id;
+            updateDefaultDataStr = JSON.stringify(updateDefaultData, null, "  ");
             ex1request.value = baseURL + "/accounts/" + defaults.account_id + "/profiles";
             ex2request.value = baseURL + "/accounts/" + defaults.account_id + "/profiles";
             ex2data.value = profileDataStr;
@@ -511,6 +529,11 @@ var BCLS = (function ($, window, document) {
             ex4request.value = baseURL + "/accounts/" + defaults.account_id + "/profiles/ + profileData["name"]";
             ex4data.value = updateDataStr;
             ex5request.value = baseURL + "/accounts/" + defaults.account_id + "/profiles/ + profileData["name"]";
+            ex6request.value = baseURL + "/accounts/" + defaults.account_id + "/configuration";
+            ex7request.value = baseURL + "/accounts/" + defaults.account_id + "/configuration";
+            ex7data.value = defaultDataStr;
+            ex8request.value = baseURL + "/accounts/" + defaults.account_id + "/configuration";
+            ex8data.value = updateDefaultDataStr;
         };
         // listeners
         // toggle sample/customer account
@@ -535,7 +558,7 @@ var BCLS = (function ($, window, document) {
          * @param  {object:htmlElement} respEl element to write the response to
          * @param  {object:htmlElement} dataEl element that holds request data (optional)
          */
-        submitRequest = function (reqType, reqEl, respEl, dataEl) {
+        submitRequest = function (exNum, reqType, reqEl, respEl, dataEl) {
             var options = {};
             options.client_id = defaults.client_id;
             options.client_secret = defaults.client_secret;
@@ -549,13 +572,28 @@ var BCLS = (function ($, window, document) {
                 data: options,
                 success : function (data) {
                     try {
-                       var data = JSON.parse(data);
+                        var respData = JSON.parse(data);
+                        respEl.value = JSON.stringify(respData, null, "  ");
+                        if (exNum === 6 || exNum === 7) {
+                            config_id = data["id"];
+                            setupExercises();
+                        }
                     } catch (e) {
-                       bclslog("invalid json - something went wrong", e);
-                       data = {"Error": e};
+                         bclslog("invalid json - something went wrong", e);
+                         data = {"Error": e};
+                         switch (exNum) {
+                            case 6:
+                            respEl.value = "There is no default profile - we'll set one in the next execise";
+                            break;
+                            case 7:
+                            respEl.value = "There is already a default profile - we'll update it in the next execise";
+                            break;
+                            default:
+                            respEl.value = "There was a problem with the request";
+                         }
                     }
                     // write the response to the response element
-                    respEl.innerHTML = JSON.stringify(data, null, "  ");
+
                 }
             })
         }
@@ -565,21 +603,30 @@ var BCLS = (function ($, window, document) {
             setOptions.innerHTML = "Setup Complete!";
             setupExercises();
         });
-        // execise button handlers
+        // exercise button handlers
         ex1button.addEventListener("click", function () {
-            submitRequest("get", ex1request, ex1response);
+            submitRequest(1, "get", ex1request, ex1response);
         });
         ex2button.addEventListener("click", function () {
-            submitRequest("post", ex2request, ex2response, ex2data);
+            submitRequest(2, "post", ex2request, ex2response, ex2data);
         });
         ex3button.addEventListener("click", function () {
-            submitRequest("get", ex3request, ex3response);
+            submitRequest(3, "get", ex3request, ex3response);
         });
         ex4button.addEventListener("click", function () {
-            submitRequest("put", ex4request, ex4response, ex4data);
+            submitRequest(4, "put", ex4request, ex4response, ex4data);
         });
         ex5button.addEventListener("click", function () {
-            submitRequest("delete", ex5request, ex5response);
+            submitRequest(5, "delete", ex5request, ex5response);
+        });
+        ex6button.addEventListener("click", function () {
+            submitRequest(6, "get", ex6request, ex6response);
+        });
+        ex7button.addEventListener("click", function () {
+            submitRequest(7, "post", ex7request, ex7response, ex7data);
+        });
+        ex8button.addEventListener("click", function () {
+            submitRequest(8, "post", ex8request, ex8response, ex8data);
         });
     return {}
 })($, window, document);
