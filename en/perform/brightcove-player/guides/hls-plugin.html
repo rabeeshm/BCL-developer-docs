@@ -58,7 +58,7 @@
     }]
 }</code></pre>
                 <p>The rest of this document deals with downloading and using the plugin on its own.</p>
-                <p class="BCL-aside">Cross-origin resource sharing (CORS) can be an issue when using HLS. For more information about using CORS see <a href="../../concepts/cors/cors.html">http://docs.brightcove.com/en/video-cloud/concepts/cors/cors.html</a>.</p>
+                <p class="BCL-aside">Cross-origin resource sharing (CORS) can be an issue when using HLS. For more information about using CORS, see the <a href="../../concepts/cors/cors.html">CORS guide</a>.</p>
             </div>
             <div id="overview" class="section">
                 <h2>Overview</h2>
@@ -97,7 +97,7 @@
   https://players.api.brightcove.com/v1/accounts/YOUR_ACCOUNT_ID/players/YOUR_PLAYER_ID/configuration</code></pre>
           <h4>withCredentials</h4>
           <p>Type: <code>boolean</code></p>
-          <p>When the <code>withCredentials</code> property is set to <true>true</true>, all XHR requests for manifests and segments would have <code>withCredentials</code> set to <code>true</code> as well. This enables storing and passing cookies from the server that the manifests and segments live on. This has some implications on CORS because when set, the <code>Access-Control-Allow-Origin</code> header cannot be set to <code>*</code>, also, the response headers require the addition of <code>Access-Control-Allow-Credentials</code> header which is set to <code>true</code>. See the  <a href="http://www.html5rocks.com/en/tutorials/cors/">HTML5Rocks's article</a> for more info.</p>
+          <p>When the <code>withCredentials</code> property is set to <code>true</code>, all XHR requests for manifests and segments would have <code>withCredentials</code> set to <code>true</code> as well. This enables storing and passing cookies from the server that the manifests and segments live on. This has some implications on CORS because when set, the <code>Access-Control-Allow-Origin</code> header cannot be set to <code>*</code>, also, the response headers require the addition of <code>Access-Control-Allow-Credentials</code> header which is set to <code>true</code>. See the  <a href="http://www.html5rocks.com/en/tutorials/cors/">HTML5Rocks's article</a> for more info.</p>
         </div>
         <div id="runtimeproperties" class="section">
         <h2>Runtime properties</h2>
@@ -121,8 +121,8 @@
           <h4>player.hls.bytesReceived</h4>
           <p>Type: <code>number</code></p>
           <p>The total number of content bytes downloaded by the HLS tech.</p>
-          <a name="selectplaylist"></a>
-          <h4>player.hls.selectPlaylist</h4>
+          
+          <h4 id="selectplaylist">player.hls.selectPlaylist</h4>
           <p>Type: <code>function</code>
           </p>
           <p>A function that returns the media playlist object to use to download the next segment. It is invoked by the plugin immediately before a new segment is downloaded. You can override this function to provide your adaptive streaming logic. You must, however, be sure to return a valid media playlist object that is present in <code>player.hls.master</code>.</p> <h3>Events</h3>
@@ -139,14 +139,14 @@
         <p>By default, the player attempts to load the highest-bitrate variant that is less than the most recently detected segment bandwidth, with one condition: if there are multiple variants with dimensions greater than the current player size, it will only switch up one size greater than the current player size.</p>
         <p>The process is illustrated below:</p>
         <ol>
-            <li>Whenever a new segment is downloaded, the download bitrate is calculated based on the size of the segment and the time it took to download:</li>
-            <div><img src="/en/video-cloud/brightcove-player/guides/assets/HLS-rendition-1.png"></div>
-            <li>All the renditions that have a higher bitrate than the new measurement are filtered out:</li>
-            <div><img src="/en/video-cloud/brightcove-player/guides/assets/HLS-rendition-2.png"></div>
-            <li>Any renditions that are bigger than the current player's dimensions are filtered out:</li>
-            <div><img src="/en/video-cloud/brightcove-player/guides/assets/HLS-rendition-3.png"></div>
-            <li>A significant quality drop is not wanted just because your player is one pixel too small, so we add back in the next highest resolution. The highest bitrate rendition that remains is the one that gets used:</li>
-            <div><img src="/en/video-cloud/brightcove-player/guides/assets/HLS-rendition-4.png"></div>
+            <li>Whenever a new segment is downloaded, the download bitrate is calculated based on the size of the segment and the time it took to download:
+            <div><img src="/en/video-cloud/brightcove-player/guides/assets/HLS-rendition-1.png" alt="HLS rendition1"></div></li>
+            <li>All the renditions that have a higher bitrate than the new measurement are filtered out:
+            <div><img src="/en/video-cloud/brightcove-player/guides/assets/HLS-rendition-2.png" alt="HLS rendition2"></div></li>
+            <li>Any renditions that are bigger than the current player's dimensions are filtered out:
+            <div><img src="/en/video-cloud/brightcove-player/guides/assets/HLS-rendition-3.png" alt="HLS rendition3"></div></li>
+            <li>A significant quality drop is not wanted just because your player is one pixel too small, so we add back in the next highest resolution. The highest bitrate rendition that remains is the one that gets used:
+            <div><img src="/en/video-cloud/brightcove-player/guides/assets/HLS-rendition-4.png" alt="HLS rendition4"></div></li>
         </ol>
         <p>If it turns out no rendition is acceptable based on the filtering described above, the first encoding listed in the master playlist will be used.</p>
         <p>If you'd like your player to use a different set of priorities, it's possible to completely replace the rendition selection logic. For instance, you could always choose the most appropriate rendition by resolution, even though this might mean more stalls during playback. See the documentation on <a href="#selectplaylist">player.hls.selectPlaylist</a> for more details.</p>
@@ -162,7 +162,7 @@
         <p>For more information about text tracks in general see <a href="//www.html5rocks.com/en/tutorials/track/basics/">Getting Started With the Track Element</a>. For information on Brightcove Player and cue points see <a href="cue-points-guide.html">Using Cue Points</a>.</p>
       </div>
             <div id="hosting" class="section">
-                <h2><a name="hosting"></a>Hosting issues</h2>
+                <h2>Hosting issues</h2>
                 <div class="BCL-concept">
                     <p>Unlike a native HLS implementation, the HLS plugin has to comply with the browser&#39;s security policies. That means that all the files that make up the stream must be served from the same domain as the page hosting the video player or from a server that has appropriate <a href="https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS">CORS headers</a> configured. Easy <a href="http://enable-cors.org/server.html">instructions are available</a> for popular webservers and most CDNs should have no trouble turning CORS on for your account.</p> </div>
             </div>
@@ -179,7 +179,7 @@
                     </li>
                 </ul>
             </div>
-        </div>
+        
     </div>
     <!-- bcl scripts============================================================-->
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
