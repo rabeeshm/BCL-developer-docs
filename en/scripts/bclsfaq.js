@@ -13,13 +13,13 @@ var BCLSFAQ = (function (document, console) {
             console.log(context);
             console.log(message);
         }
-    }
+    };
     showAnswer = function (evt) {
         var answerNumber = parseInt(evt.target.id.substring(1)),
             i = 0,
             j = answers.length;
-            logit("evt", evt);
-            logit("answerNumber", answerNumber);
+        logit("evt", evt);
+        logit("answerNumber", answerNumber);
         // hide all answers except the one for the selected question
         for (i = 0; i < j; i++) {
             if (i === answerNumber) {
@@ -40,7 +40,7 @@ var BCLSFAQ = (function (document, console) {
             // set ids for questions
             questions[i].setAttribute("id", ("q" + i.toString()));
             // add styling to questions
-            question[i].setAttribute("style", "margin-top:1em;margin-bottom:1em;")
+            questions[i].setAttribute("style", "margin-top:1em;margin-bottom:1em;");
             // add event listeners
             questions[i].addEventListener("click", showAnswer);
         }
