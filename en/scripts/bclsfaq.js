@@ -39,6 +39,8 @@ var BCLSFAQ = (function (document, console) {
             answers[i].setAttribute("style", "display:none");
             // set ids for questions
             questions[i].setAttribute("id", ("q" + i.toString()));
+            // add styling to questions
+            question[i].setAttribute("style", "margin-top:1em;margin-bottom:1em;")
             // add event listeners
             questions[i].addEventListener("click", showAnswer);
         }
