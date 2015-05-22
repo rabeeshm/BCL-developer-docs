@@ -46,7 +46,11 @@
 	<div id="searchModal" class="reveal-modal" data-reveal></div>
 	<!-- content -->
 	<!-- content -->
-	<div class="row">
+    <div class="perform-only">
+        <h1>Smart Player to Brightcove Player Migration Guide</h1>
+        <p>The information contained in this document is not applicable for Perform customers.</p>
+    </div>
+	<div class="row video-cloud-only">
 		<div class="sidebar large-2 columns show-for-large-up">
 			<div id="sidenav"></div>
 		</div>
@@ -54,37 +58,51 @@
 			<div id="top" class="section">
 				<h1>Smart Player to Brightcove Player Migration Guide</h1>
 				<!-- Place document intro sentence(s) here -->
-				<p>This guide will help you transistion from working with Brightcove's Smart Player to using the new Brightcove Player. You can learn more about this new player in the <a href="en/video-cloud/studio/general/key-features.html">What is the New Brightcove Player?</a> document.</p>
+				<p>This guide will help you transistion from working with Brightcove's Smart Player to using the new Brightcove Player. You can learn more about this new player in the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/getting-started/brightcove-player-overview.html">Brightcove Player Overview</a> document.</p>
 			</div>
             
 			<div id="plugins" class="section">
 				<h2>Plugins</h2>
+                <p>You can create custom plugin code for both the Smart Player and the Brightcove Player, but you will see below that the process has been simplified for the Brightcove Player.</p>
                 <h3>Smart Player</h3>
 				<p>When creating plugins for the Smart Player, you have to do both:</p>
                 <ul>
                     <li>Write a JavaScript plugin for when the player is in HTML5 mode</li>
                     <li>Write an equivalent SWF version of the plugin for when the player is in Flash mode</li>
                 </ul>
+                <p>Here is an example code template for a Smart Player JavaScript plugin:</p>
+                <pre><code>(function() {
+    function onPlayerReady() {
+        //Add functional JavaScript for your plugin here
+    }
+
+    var _player = brightcove.api.getExperience();
+    var videoPlayer = _player.getModule(brightcove.api.modules.APIModules.VIDEO_PLAYER);
+    var experience = _player.getModule(brightcove.api.modules.APIModules.EXPERIENCE);
+
+    if (experience.getReady()) {
+        onPlayerReady();
+    } else {
+        experience.addEventListener(brightcove.player.events.ExperienceEvent.TEMPLATE_READY, onPlayerReady);
+    }
+}());</code></pre>
+                
                 <h3>Brightcove Player</h3>
                 <p>When creating plugins for the Brightcove Player, you only have to:</p>    
                 <ul>
                     <li>Write a JavaScript version of the plugin</li>
                 </ul>
+                <p>Here is an example code template for a Smart Player JavaScript plugin:</p>
+                <pre><code>videojs.plugin('pluginName', function() {
+    var myPlayer = this;
+    //Add functional JavaScript for your plugin here
+  
+});</code></pre>
 				
 			</div>
             
 			<div id="methods" class="section">
 				<h2>Methods</h2>
-<!--
-                <h3>Smart Player</h3>
-				<p>With the Smart Player, you set parameters in the player code to work with the Smart Player API.</p>
-                <pre><code>&lt;!-- smart player api params --&gt;
-  &lt;param name="includeAPI" value="true" /&gt;
-  &lt;param name="templateLoadHandler" value="BCLS.onTemplateLoad" /&gt;
-  &lt;param name="templateReadyHandler" value="BCLS.onTemplateReady" /&gt;</code></pre>
-                <h3>Brightcove Player</h3>
-                <p>When creating plugins for the Brightcove Player, you only have to write a JavaScript version of the plugin.</p>               
--->
 				<p>This table shows the key methods used in the Smart Player and their equivalent counterparts in the Brightcove Player:</p>
                 <ul>
                     <li>For details about the Smart Player methods, see the <a href="//docs.brightcove.com/en/video-cloud/smart-player-api/references/index.html">Smart Player API Reference</a> document.</li>
@@ -130,12 +148,14 @@
                   <tr>
                       <td><code>addEventListener( event, handler, priority)</code></td>
                       <td><code>on(first, second, third)</code><sup class="once-red"><strong><a href="#note1">[1]</a></strong></sup></td>
-				      <td>Smart Player: Add an event handler for the specified event. <br/>BC Player: Add an event listener for a component.</td>
+                      <td><strong>Smart Player</strong>: Add an event handler for the specified event. <br/>
+                          <strong>BC Player</strong>: Add an event listener for a component.</td>
 				  </tr>
                   <tr>
                       <td><code>removeEventListener( event, handler)</code></td>
                       <td><code>off([first], [second], [third])</code><sup class="once-red"><strong><a href="#note1">[1]</a></strong></sup></td>
-				      <td>Smart Player: Remove the event handler for an event. <br/>BC Player: Remove an event listener from a component.</td>
+                      <td><strong>Smart Player</strong>: Remove the event handler for an event. <br/>
+                          <strong>BC Player</strong>: Remove an event listener from a component.</td>
 				  </tr>
                   <tr>
                       <td><code>getVideoDuration()</code></td>
@@ -155,7 +175,8 @@
                   <tr>
                       <td><code>loadVideoByID(id)</code></td>
                       <td><code>catalog.load(video)</code></td>
-				      <td>Smart Player: Load a video for a given Id <br/>BC Player: Load a video object into the player. The video object is returned from the catalog.getVideo() method.</td>
+				      <td><strong>Smart Player</strong>: Load a video for a given Id <br/>
+                          <strong>BC Player</strong>: Load a video object into the player. The video object is returned from the <code>catalog.getVideo()</code> method.</td>
 				  </tr>
                   <tr>
                       <td><code>seek(seconds)</code></td>
@@ -186,8 +207,12 @@
 				<h2>Properties</h2>
                 <p>This table shows the key properties used in the Smart Player and their equivalent counterparts in the Brightcove Player:</p>
                 <ul>
-                    <li>For details about the Smart Player events, see the <a href="//docs.brightcove.com/en/video-cloud/smart-player-api/references/index.html">Smart Player API Reference</a> document.</li>
-                    <li>For details about the Brightcove Player events, see the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/reference/api/vjs.Player.html">Brightcove Player API</a> document.</li>
+                    <li>For details about the Smart Player data structures, see the <a href="//docs.brightcove.com/en/video-cloud/smart-player-api/references/index.html">Smart Player API Reference</a> document.</li>
+                    <li>For details about the Brightcove Player data structures, see the following documents: 
+                        <ul>
+                            <li><a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/mediainfo.html">Video Metadata</a></li>
+                            <li><a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/player-catalog.html">Player Catalog</a></li>
+                        </ul></li>
                 </ul>
                 
 				<table class="table-border">
@@ -197,9 +222,18 @@
 				      <th style="width:50%">Description</th>
 				  </tr>
 				  <tr>
-                      <td><code>data.Media()</code></td>
+                      <td><code>An object of type data.Media()</code></td>
                       <td><code>mediainfo</code></td>
-				      <td><strong>Smart Player</strong>: the data object for the video in the player. <br/><strong>BC Player</strong>: An object that contains metadata for the current video in the player. Note: this property is created and populated after using the catalog.load() method.</td>
+				      <td>An object that contains metadata for the current video in the player. <br/>
+                          <strong>Smart Player</strong>: One of the methods that creates and populates this object is the <code>getCurrentVideo()</code> method.<br/>
+                          <strong>BC Player</strong>: This property is created and populated by the <code>catalog.load()</code> method.</td>
+				  </tr>
+                  <tr>
+                      <td><code>An object of type data.Playlist()</code></td>
+                      <td><code>An array of video objects for the current playlist.</code></td>
+				      <td>A data structure containing the properties for a playlist. <br/>
+                          <strong>Smart Player</strong>: One of the methods that creates and populates this object is the <code>getPlaylistByID()</code> method.<br/>
+                          <strong>BC Player</strong>: This property is created and populated by the <code>catalog.getPlaylist()</code> method.</td>
 				  </tr>
 				</table>
 			</div>
@@ -236,17 +270,17 @@
                   <tr>
                       <td><code></code></td>
                       <td><code>loadedmetadata</code></td>
-				      <td>Fired when the player has initial duration and dimension information</td>
+				      <td>Fired when the player has initial media duration and dimension information</td>
 				  </tr>
                   <tr>
                       <td><code></code></td>
                       <td><code>loadeddata</code></td>
-				      <td>Fired when the player has downloaded data at the current playback position</td>
+				      <td>Fired when the player has downloaded media data at the current playback position</td>
 				  </tr>
                   <tr>
                       <td><code>MediaEvent.BEGIN</code></td>
                       <td><code>myPlayer.one('play');</code></td>
-				      <td>Fired the first time a video is played</td>
+				      <td>Fired the first time the media is played</td>
 				  </tr>
                   <tr>
                       <td><code>MediaEvent.PLAY</code></td>
@@ -284,7 +318,7 @@
 				      <td>Fired when the media is being seeked to a new position</td>
 				  </tr>
                   <tr>
-                      <td><codeMediaEvent.SEEK_NOTIFY</code></td>
+                      <td><code>MediaEvent.SEEK_NOTIFY</code></td>
                       <td><code>seeked</code></td>
 				      <td>Fired when the media has been seeked to a new position</td>
 				  </tr>
