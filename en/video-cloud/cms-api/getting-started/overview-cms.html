@@ -264,7 +264,7 @@
                     </ul>
                     <p>For specific scenarios:
                     <ul>
-                        <li>contains all: &quot;+tags:foo,bar&quot; - NOTE: this currently does not work because of a known issue</li>
+                        <li>contains all: &quot;+tags:foo,bar&quot;</li>
                         <li>contains any: &quot;tags:foo,bar&quot; contains none: &quot;-tags:foo,bar&quot;</li>
                     </ul>
                     </p>
@@ -987,13 +987,24 @@
             <div class="section" id="notifications">
                 <h2>Notifications</h2>
                 <p>You can receive notifications when
-                    <code>video_change</code> events occur in your video library. Notifications will be sent to the URL you specify, which should point to an application capable of handling HTTP POST requests. You can specify up to 10 endpoints to receive notifications.</p>
+                    <code>video_change</code> events occur in your video library. Notifications will be sent to the URL you specify, which should point to an application capable of handling HTTP POST requests. You can specify up to 10 endpoints to receive notifications by making a POST request to <code>https://cms.api.brightcove.com/v1/accounts/{account_id}/subscriptions</code> and including JSON in the request body like this:</p>
+<pre><code>{
+    "endpoint":"http://solutions.brightcove.com/bcls/di-api/di-callbacks.php",
+    "events":["video-change"]
+}</code></pre>
                     <p>Notifications are sent in JSON format. Here's an example:</p>
 <pre><code>{"timestamp":1423840514446,
     "account_id":"775205503001",
     "event":"video-change",
     "video":"4020894387001",
     "version":26}</code></pre>
+                <p>Requests to create a subscription will receive an HTTP 422 error response for the following conditions:</p>
+                <ul>
+                    <li>The <code>endpoint</code> or <code>events</code> field is missing from the request body</li>
+                    <li>The <code>events</code> field value is not a list (array)</li>
+                    <li>the subscription defined already exists</li>
+                    <li>you already have 10 subscriptions to this event</li>
+                </ul>
                 <h3>Notification failures</h3>
                 <p>The notification system treats any 4xx or 5xx return from the customer server as a retriable failure. Failing callbacks will be retried up to 20 times, with an exponentially increasing delay between subsequent callbacks. The first few retries will happen within minutes of the initial callback attempt. If the callback continues failing, and we get all the way out to the 20th retry, the retry delay will be a few days.</p>
                 <p class="BCL-aside">Note:
