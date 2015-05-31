@@ -16,13 +16,10 @@ read OPERATIONS
 echo Here are the operations you requested: $OPERATIONS
 export VERB="POST"
 export DATA='name=ingest-profiles-api-credential&maximum_scope=[{"identity":{"type":"video-cloud-account","account_id":"$ACCOUNT_ID"},\
-"operations":[]}'
-echo Your call verb: $DATA
+"operations":$OPERATIONS}'
+echo Your request data: $DATA
 echo --------------------------
-TOKEN=$(curl -s --data "grant_type=client_credentials" https://oauth.brightcove.com/v3/access_token --header "Content-Type: application/x-www-form-urlencoded" --user "$CLIENT_ID:$CLIENT_SECRET" | sed -E 's/.*access_token\"\:\"([^\"]+)\".*/\1/');
-echo Your token: $TOKEN
-echo --------------------------
-RESPONSE=$(curl -s -v -X $VERB "$API_CALL" -d "$DATA" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json")
+RESPONSE=$(curl -s -v -X --data $DATA https://oauth.brightcove.com/v3/client_credentials --header "Content-Type: application/x-www-form-urlencoded" --header "Authorization:BC_TOKEN $BC_TOKEN" | sed -E 's/.*access_token\"\:\"([^\"]+)\".*/\1/');
 echo Raw response:
 echo $RESPONSE
 echo --------------------------
