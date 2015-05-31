@@ -11,6 +11,9 @@ echo --------------------------
 export API_CALL="https://oauth.brightcove.com/v3/client_credentials"
 echo Here is the API POST request: $API_CALL
 echo --------------------------
+echo 'Enter the API operations you want to authorize as an array (["video-cloud/player/all","video-cloud/video/all"])'
+read OPERATIONS
+echo Here are the operations you requested: $OPERATIONS
 export VERB="POST"
 export DATA='name=ingest-profiles-api-credential&maximum_scope=[{"identity":{"type":"video-cloud-account","account_id":"$ACCOUNT_ID"},\
 "operations":[]}'
