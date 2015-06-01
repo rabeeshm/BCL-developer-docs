@@ -15,11 +15,11 @@ echo 'Enter the API operations you want to authorize as an array (["video-cloud/
 read OPERATIONS
 echo Here are the operations you requested: $OPERATIONS
 export VERB="POST"
-export DATA='name=ingest-profiles-api-credential&maximum_scope=[{"identity":{"type":"video-cloud-account","account_id":"$ACCOUNT_ID"},\
-"operations":$OPERATIONS}'
+export DATA="name=ingest-profiles-api-credential&maximum_scope=[{"identity":{"type":"video-cloud-account","account_id":$ACCOUNT_ID},\
+"operations":$OPERATIONS}"
 echo Your request data: $DATA
 echo --------------------------
-RESPONSE=$(curl -s -v -X --data $DATA https://oauth.brightcove.com/v3/client_credentials --header "Content-Type: application/x-www-form-urlencoded" --header "Authorization:BC_TOKEN $BC_TOKEN" | sed -E 's/.*access_token\"\:\"([^\"]+)\".*/\1/');
+RESPONSE=$(curl -s -v --data $DATA https://oauth.brightcove.com/v3/client_credentials --header "Content-Type: application/x-www-form-urlencoded" --header "Authorization:BC_TOKEN $BC_TOKEN");
 echo Raw response:
 echo $RESPONSE
 echo --------------------------
