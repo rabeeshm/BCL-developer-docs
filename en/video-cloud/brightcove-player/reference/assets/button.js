@@ -6,9 +6,10 @@ import document from 'global/document';
 import assign from 'object.assign';
 
 /**
- * @description Base class for all buttons
+ * Base class for all buttons
  * @param {Player|Object} player
  * @param {Object=} options
+ * @extends Component
  * @class Button
  */
 class Button extends Component {
@@ -26,8 +27,8 @@ class Button extends Component {
 
   /**
   * Create the component's DOM element
-  * @param {string=} type - Element's node type. e.g. 'div'
-  * @param {object=} props - An object of element attributes that should be set on the element Tag name 
+  * @param {String=} type - Element's node type. e.g. 'div'
+  * @param {Object=} props - An object of element attributes that should be set on the element Tag name
   * @returns HTML Element
   * @method createEl
   */
@@ -62,7 +63,7 @@ class Button extends Component {
 
   /**
   * Allows sub components to stack CSS class names
-  * @returns {string}
+  * @return {String}
   * @method buildCSSClass
   */
   buildCSSClass() {
