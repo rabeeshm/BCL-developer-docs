@@ -67,8 +67,7 @@
                     <li>Login to Studio as you normally do.</li>
                     </li>
                     <li>You need your account number (referred to as the Publisher ID in Studio), which you can get by going to your account profile in Studio:<br />
-                    <img class="video-cloud-only" src="assets/account-info-old-studio.png" width="199" height="175">
-                    <img class="perform-only" src="assets/get-account-info-perform.png" width="187" height="193">
+                    <img class="video-cloud-only" src="//docs.brightcove.com/en/video-cloud/oauth-api/guides/assets/account-info-old-studio.png" width="199" height="175">
                     </li>
                     <li>With any page in Studio open, open the developer tools for the browser, go to the Console, and paste in the following code:
 <pre><code>var cookiesArray = document.cookie.split(";"), cookiesObj = {}, i, tmpArray = [];
@@ -153,8 +152,31 @@ https://oauth.brightcove.com/v4/client_credentials</code></pre>
                     <li>Copy and save the <code>client_id</code> and <code>client_secret</code>, as you will need these anytime you need to get an <code>access_token</code>.</li>
                 </ol>
             </div>
-            <div class="section" id="getAccessToken">
-                <h2>Get access tokens</h2>
+            <div class="section" id="accessToken">
+                <h2>Access tokens</h2>
+                <p>Access tokens, unlike client credentials, are short-lived - currently they expire in 5 minutes. You will need to get a new one for each API request. You could, of course, build logic into an app to check the most recent access token to see if it has timed out, but requests to the Ingest Profiles API are likely to be few and far between, so there's no good reason to do that.</p>
+                <p>In fact, we expect the API to be one that you will use infrequently enough that it may not be worth building an app around it at all. An alternative would be to use <a href="//docs.brightcove.com/en/video-cloud/oauth-api/assets/api-tester.sh.zip">this shell script</a> that Brightcove Learning Services built. It allows you to enter your client id and secret, the API request and method, and any request data. It then gets an <code>access_token</code>, makes the API request, and outputs the response. (Note that the shell script uses cURL, which is installed natively on Mac OS X and other Unix/Linux systems, or <a href="//docs.brightcove.com/en/video-cloud/concepts/curl/curl.html">can be installed on Windows</a>.</p>
+                <p>To retrieve access tokens you make a POST request to:</p>
+<pre><code>https://oauth.brightcove.com/v4/access_token</code></pre>
+                <p>You must pass the following headers with this call:</p>
+                <ul>
+                    <li><code>Content-Type: application/x-www-form-urlencoded</code></li>
+                    <li><code>Authorization: Basic {client_id}:{client_secret}</code></li>
+                </ul>
+                <p>The entire <code>{client_id}:{client_secret}</code> string must be Base64-encoded (curl will automatically Base64-encode the string if you pass it as <code>--user</code> credentials; in other languages, you'll need to handle the Base64-encoding yourself).</p>
+                <p>You must also send the following key/value pair as the request body or as URL parameter:</p>
+<pre><code>grant_type=client_credentials</code></pre>
+                <p>The response will look like this (pretty-printed here for readability):</p>
+<pre><code>{
+    "access_token": <strong>"ANB7xKhiUZmwltVd3f1odcHHM9VAwg02kwmLwtZwHv3SxGCOWLUf5W4G7X22PRjmR9StvFUqzpVZ1suOfyfOigdi-rnohxyEaSSuZceeLw_9OBW7fXldOG05HEgkeK3N-DBZZZyilodmjA1JWZHbgI3IU7Rmz5IPGyi-sDxHN3KlOr1BDZlLZpXPdFPwEyb6idq-z8AL-blKTSMtNI3_fz3oNBisfrHGUv5tXHoQT4B7FYcvdrap16gTOO7_wNt1zmgLJiUHvyxZgsgBchm_AhohVL-AYgcfCbCR0v7d2hgI4ag35pnZNeujDiBLfnCFcVMlqQGq8UEVZrmU9a8y4pVAGih_EImmghqmSrkxLPYZ800-vIWX-lw"</strong>,
+    "token_type": "Bearer",
+    "expires_in": 300
+}</code></pre>
+            </p>
+            <p>The <code>access_token</code> value is what you must pass in an <code>Authorization</code> header with your API call in this form:</p>
+<pre><code>Authorization: Bearer {access_token}</code></pre>
+                <p>The <code>expired_in</code> value is the number of seconds that the access token is valid for.</p>
+                <p>For more information and sample code, see <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-token.html">Getting Access Tokens</a>.</p>
             </div>
 		</div>
 	</div>
