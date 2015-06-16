@@ -92,6 +92,7 @@
                 createInPageNavMenu,
                 dedupe,
                 isDefined,
+                createEl,
                 bclslog;
 
             /**
@@ -137,6 +138,25 @@
                     console.log(context, message);
                 }
                 return;
+            };
+            /**
+             * create an element
+             * @param  {string} type - the element type
+             * @param  {object} attributes - attributes to add to the element
+             * @return {object} the HTML element
+             */
+            createEl = function (type, attributes) {
+                var el;
+                if (isDefined(type)) {
+                    el = document.createElement(type);
+                    if (isDefined(attributes)) {
+                        var attr;
+                        for (attr in attributes) {
+                            el.setAttribute(attr, attributes[attr]);
+                        }
+                    }
+                    return el;
+                }
             };
 
             // create navigation for page sections
@@ -268,113 +288,119 @@
             };
             buildDetailTables = function () {
                 bclslog("building data tables");
-                var newSectionNode,
-                    sectionHeadingNode,
-                    sectionSubHeadingNode,
-                    sectionJsonHeadingNode,
-                    sectionTableHeadingNode,
-                    renditionTableNode,
-                    renditiontheadNode,
-                    renditiontbodyNode,
-                    profilePreNode,
-                    profileCodeNode,
-                    sectionHeadingElem,
-                    sectionSubHeadingElem,
-                    sectionJsonHeadingElem,
-                    sectionTableHeadingElem,
-                    profilePreElem,
-                    profileCodeElem,
-                    renditionTableElem,
-                    renditiontheadElem,
-                    renditiontbodyElem,
+                var section,
+                    sectionHeading,
+                    sectionSubHeading,
+                    sectionJsonHeading,
+                    sectionTableHeading,
+                    renditionTable,
+                    renditionthead,
+                    renditiontbody,
+                    tr,
+                    th,
+                    td,
+                    link,
+                    profilePre,
+                    profileCode,
                     i, j, jMax,
                     iMax = data.BCLSprofilesArray.length,
                     headings,
+                    profile,
                     rendition,
                     renditionProperty,
+                    text,
+                    str,
                     re = /_/g;
                 for (i = 0; i < iMax; i++) {
                     var headersArray = [],
-                        thStr = "",
-                        tbStr = "",
                         l,
                         lMax;
-                    newSectionNode = document.createElement("div");
-                    sectionHeadingNode = document.createElement("h2");
-                    sectionSubHeadingNode = document.createElement("p");
-                    sectionJsonHeadingNode = document.createElement("h6");
-                    sectionTableHeadingNode = document.createElement("h6");
-                    profilePreNode = document.createElement("pre");
-                    profileCodeNode = document.createElement("code");
-                    newSectionNode.setAttribute("id", data.BCLSprofilesArray[i].name);
-                    newSectionNode.setAttribute("class", "section");
-                    sectionHeadingNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_summaryTableHeading");
-                    sectionSubHeadingNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_summarySubHeading");
-                    sectionJsonHeadingNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_summaryJsonHeading");
-                    sectionTableHeadingNode.setAttribute("id", data.BCLSprofilesArray[i].id + "_profileSummaryTable");
-                    profilePreNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_summaryPre");
-                    profileCodeNode.setAttribute("id", data.BCLSprofilesArray[i].name + "_summaryCode");
-                    newSectionNode.appendChild(sectionHeadingNode);
-                    newSectionNode.appendChild(sectionSubHeadingNode);
-                    newSectionNode.appendChild(sectionJsonHeadingNode);
-                    newSectionNode.appendChild(profilePreNode);
-                    newSectionNode.appendChild(sectionTableHeadingNode);
-                    profilePreNode.appendChild(profileCodeNode);
+                    profile = data.BCLSprofilesArray[i];
+                    // remove id's from data
+                    delete profile.id;
+                    delete profile.version;
+                    delete profile.brightcove_standard;
+                    delete profile.date_created;
+                    delete profile.date_last_modified;
+                    delete profile.videoRenditions;
+                    delete profile.audioRenditions;
+                    delete profile.imageRenditions;
+                    delete profile.numRenditions;
+                    if (isDefined(profile.renditions)) {
+                        jMax = profile.renditions.length;
+                        for (j = 0; j < jMax; j++) {
+                            delete profile.renditions[j].id;
+                        }
+                    }
+                    section = createEl("div", {id: profile.name, class: "section"});
+                    sectionHeading = createEl("h2");
+                    sectionSubHeading = createEl("p");
+                    sectionJsonHeading = createEl("h6", {id: profile.name + "json"});
+                    sectionTableHeading = createEl("h6");
+                    profilePre = createEl("pre");
+                    profileCode = createEl("code");
+                    profilePre.appendChild(profileCode);
+                    section.appendChild(sectionHeading);
+                    section.appendChild(sectionSubHeading);
+                    section.appendChild(sectionTableHeading);
+                    renditionTable = createEl("table", {class: "profile-data"});
+                    renditionthead = createEl("thead");
+                    renditiontbody = createEl("tbody");
+                    section.appendChild(renditionTable);
+                    renditionTable.appendChild(renditionthead);
 
-                    mainSection.appendChild(newSectionNode);
-                    sectionHeadingElem = document.getElementById(data.BCLSprofilesArray[i].name + "_summaryTableHeading");
-                    sectionSubHeadingElem = document.getElementById(data.BCLSprofilesArray[i].name + "_summarySubHeading");
-                    sectionJsonHeadingElem = document.getElementById(data.BCLSprofilesArray[i].name + "_summaryJsonHeading");
-                    sectionTableHeadingElem = document.getElementById(data.BCLSprofilesArray[i].id + "_profileSummaryTable");
-                    profilePreElem = document.getElementById(data.BCLSprofilesArray[i].name + "_summaryPre");
-                    profileCodeElem = document.getElementById(data.BCLSprofilesArray[i].name + "_summaryCode");
-                    sectionHeadingElem.innerHTML = data.BCLSprofilesArray[i].name;
-                    sectionSubHeadingElem.innerHTML = "<a href=\"#" + data.BCLSprofilesArray[i].id + "_profileSummaryTable\">View rendition information in table form</a>";
-                    sectionJsonHeadingElem.innerHTML = "JSON for the <code>" + data.BCLSprofilesArray[i].name + "</code> profile";
-                    sectionTableHeadingElem.innerHTML = "Table of rendition properties";
-                    profileCodeElem.innerHTML = JSON.stringify(data.BCLSprofilesArray[i], false, "  ");
-                    jMax = data.BCLSprofilesArray[i].renditions.length;
-                    renditionTableNode = document.createElement("table");
-                    renditiontheadNode = document.createElement("thead");
-                    renditiontbodyNode = document.createElement("tbody");
-                    renditionTableNode.setAttribute("id", data.BCLSprofilesArray[i].id + "_profileSummaryTable");
-                    renditionTableNode.setAttribute("class", "profile-data");
-                    renditiontheadNode.setAttribute("id", data.BCLSprofilesArray[i].id + "_profileSummaryTableThead");
-                    renditiontbodyNode.setAttribute("id", data.BCLSprofilesArray[i].id + "_profileSummaryTableTbody");
-                    newSectionNode.appendChild(renditionTableNode);
-                    renditionTableNode.appendChild(renditiontheadNode);
-                    renditionTableNode.appendChild(renditiontbodyNode);
-                    renditiontheadElem = document.getElementById(data.BCLSprofilesArray[i].id + "_profileSummaryTableThead");
-                    renditiontbodyElem = document.getElementById(data.BCLSprofilesArray[i].id + "_profileSummaryTableTbody");
+                    renditionTable.appendChild(renditiontbody);
+
+                    section.appendChild(sectionJsonHeading);
+                    section.appendChild(profilePre);
+                    text = document.createTextNode(JSON.stringify(profile, false, "  "));
+                    profileCode.appendChild(text);
+                    mainSection.appendChild(section);
+                    text = document.createTextNode(profile.name);
+                    sectionHeading.appendChild(text);
+                    link = createEl("a", {href: "#" + profile.name + "json"});
+                    text = document.createTextNode("View rendition information in JSON form");
+                    link.appendChild(text);
+                    sectionSubHeading.appendChild(link);
+                    text = document.createTextNode("Table of rendition properties");
+                    sectionTableHeading.appendChild(text);
+                    // now do the reditions
+                    jMax = profile.renditions.length;
                     // get all properties and build the table headers
                     for (j = 0; j < jMax; j++) {
                         var prop;
-                        thStr += "<tr>";
-                        rendition = data.BCLSprofilesArray[i].renditions[j];
+                        rendition = profile.renditions[j];
                         for (prop in rendition) {
                             headersArray.push(prop);
                         }
                     }
                     // dedupe the headers
                     headersArray = dedupe(headersArray);
+                    bclslog("deduped headers array", headersArray);
                     // write the th elements to the string
+                    // create the table headers
                     lMax = headersArray.length;
+                    tr = createEl("tr");
                     for (l = 0; l < lMax; l++) {
-                        thStr += "<th>" + headersArray[l].replace(re, " ") + "</th>";
+                        th = createEl("th");
+                        text = document.createTextNode(headersArray[l].replace(re, " "));
+                        th.appendChild(text);
+                        tr.appendChild(th);
                     }
-                    thStr += "</tr>";
-                    renditiontheadElem.innerHTML = thStr;
+                    renditionthead.appendChild(tr);
                     // now add the body row for each rendition
+                    jMax = profile.renditions.length;
                     for (j = 0; j < jMax; j++) {
-                        tbStr = "<tr>";
-                        rendition = data.BCLSprofilesArray[i].renditions[j];
+                        tr = createEl("tr");
+                        rendition = profile.renditions[j];
                         for (l = 0; l < lMax; l++) {
-                            tbStr += "<td>";
-                            tbStr += isDefined(rendition[headersArray[l]]) ? rendition[headersArray[l]] : "";
-                            tbStr += "</td>";
+                            td = createEl("td");
+                            str = isDefined(rendition[headersArray[l]]) ? rendition[headersArray[l]] : "";
+                            text = document.createTextNode(str);
+                            td.appendChild(text);
+                            tr.appendChild(td);
                         }
-                        tbStr += "</tr>";
-                        renditiontbodyElem.innerHTML += tbStr;
+                        renditiontbody.appendChild(tr);
                     }
                 }
                 bclslog("content built");
