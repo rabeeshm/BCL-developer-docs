@@ -96,7 +96,7 @@
                     <li>Now open the browser developer console - in most browsers you can do this by pressing OPTION-CMD-i (Mac) or ALT-CTRL-i (Windows), or you should be able to find a menu item also.</li>
                     <li>In the console, paste the following JavaScript and press return to return your BC_TOKEN in a modal dialog:
 <pre><code>var cookiesArray = document.cookie.split(";"), cookiesObj = {}, i, tmpArray = [];
-for (i = 0; i < cookiesArray.length; i++) {
+for (i = 0; i &lt; cookiesArray.length; i++) {
     tmpArray = cookiesArray[i].split("=");
     cookiesObj[tmpArray[0].replace(/\s/g, "")] = tmpArray[1];
 }
@@ -108,6 +108,57 @@ window.prompt("BC_TOKEN:", cookiesObj.BC_TOKEN);</code></pre>
                         <p>... and press return.</p>
                     </li>
                 </ol>
+                <h3>Make the credentials request</h3>
+                <ol start="12">
+                    <li>
+                        To get your client credentials, copy and paste the following cURL command at your command line and press return:
+<pre><code>curl \
+  --include \
+  --header "Authorization: BC_TOKEN $BC_TOKEN" \
+  --data 'name=Sample Client&maximum_scope=[{
+      "identity": {
+        <span class="video-cloud-only">"type": "video-cloud-account",</span><span class="perform-only">"type": "perform-account",</span>
+        "account-id": $ACCOUNT_ID
+      },
+      "operations": [
+        "<span class="video-cloud-only">video-cloud</span><span class="perform-o">perform</span>/player/all"
+      ]
+    }]' \
+https://oauth.brightcove.com/v4/client_credentials</code></pre>
+                    </li>
+                </ol>
+                <ol>
+                    <li>The response should look like this (formatting added):
+<pre><code>{
+    "client_secret":"HHxp9xn0yxMqktLEG2DhzjYB4g6AN2cl02KudMvfK-3dT6JRtiR1tUZ7LiwtHI5vqo4VT7LuD6tM4c0llEw2Rw",
+    "issued_at":"2014-08-11T17:37:24Z",
+    "name":"Test Client",
+    "redirect_url":null,
+    "description_html":"My my test players app",
+    "issued_to":"<em><strong>your email address</strong></em>",
+    "client_id":"9309bb5d-90fb-4d3a-aba4-1795dd5fa0b8",
+    "maximum_scope":[{
+        "identity":{"type":<span class="video-cloud-only">"video-cloud-account"</span><span class="perform-only">perform-account</span>,
+            "account-id":57838016001},
+            "operations":<span class="video-cloud-only">["video-cloud/players/all"]</span><span class="perform-only">["perform/players/all"]</span>
+        }],
+    "trusted":null,
+    "type":"credential",
+    "description":"My my test players app",
+    "expires_at":null,
+    "revoked":null,
+    "name_html":"Test Client",
+    "issued_user":53255203001
+}</code></pre>
+                    </li>
+                    <li>Copy and save the <code>client_id</code> and <code>client_secret</code>, as you will need these anytime you need to get an <code>access_token</code>.</li>
+                    <li>With your <code>client_id</code> on the clipboard, go to the command line and enter:
+<pre><code>export CLIENT_ID=<em>paste the client_id here</em></code></pre>
+                    </li>
+                    <li>Copy your <code>client_secret</code> to the clipboard, go to the command line, and enter:
+<pre><code>export CLIENT_SECRET=<em>paste the client_secret here</em></code></pre>
+                    </li>
+                </ol>
             </div>
             <div class="section" id="BCLreferences">
                 <h2>Related Topics</h2>
@@ -115,6 +166,7 @@ window.prompt("BC_TOKEN:", cookiesObj.BC_TOKEN);</code></pre>
                     <li><a href="oauth-api-overview.html">OAuth Overview</a>
                     </li>
                     <li><a href="../reference/versions/v3/">OAuth API Reference</a>
+                    </li>
                     </li>
                 </ul>
             </div>
