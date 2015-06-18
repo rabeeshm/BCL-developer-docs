@@ -87,9 +87,8 @@
                     <li>Click the settings icon <img alt="" src="http://img.brightcove.com/node14056-gear-icon.png" /> in the Studio header.</li>
                     <li>Select Account Information from the dropdown.</li>
                     <li>Copy your account id from the Account Information page.</li>
-                    <li>At the command line, type:
-<pre><code>export ACCOUNT_ID=<em>paste your account id here</em></code></pre>
-                        <p>... and press return</p>
+                    <li>Enter your account id here:
+                        <p>Account id: <input id="account_id" type="text"></p>
                     </li>
                 </ol>
                 <h4>Get your BC_TOKEN</h4>
@@ -104,9 +103,8 @@ for (i = 0; i &lt; cookiesArray.length; i++) {
 window.prompt("BC_TOKEN:", cookiesObj.BC_TOKEN);</code></pre>
                     </li>
                     <li>Copy the BC_TOKEN to the clipboard.</li>
-                    <li>Return to the system command line and type:
-<pre><code>export BC_TOKEN=<em>paste your BC_TOKEN here</em></code></pre>
-                        <p>... and press return.</p>
+                    <li>Enter your BC_TOKEN here:
+                        <p>BC_TOKEN: <textarea id="BC_TOKEN"></textarea></p>
                     </li>
                 </ol>
                 <h4>Make the credentials request</h4>
@@ -115,16 +113,16 @@ window.prompt("BC_TOKEN:", cookiesObj.BC_TOKEN);</code></pre>
                         To get your client credentials, copy and paste the following cURL command at your command line and press return:
 <pre><code>curl \
   --include \
-  --header \"Authorization: BC_TOKEN $BC_TOKEN\" \
+  --header "Authorization: BC_TOKEN $BC_TOKEN" \
   --data "'name=Sample-Client&amp;maximum_scope=[{
-      \"identity\": {
-        <span class="video-cloud-only">\"type\": \"video-cloud-account\"</span><span class="perform-only">,\"type\": \"perform-account\"</span>,
-        \"account-id\": "$ACCOUNT_ID"
-      },
-      "operations": [
-        \"<span class="video-cloud-only">video-cloud</span><span class="perform-only">perform</span>/player/all\"
-      ]
-    }]'" \
+  \"identity\": { \
+    <span class="video-cloud-only">\"type\": \"video-cloud-account\"</span><span class="perform-only">,\"type\": \"perform-account\"</span>, \
+    \"account-id\": "$ACCOUNT_ID" \
+  }, \
+  \"operations\": [ \
+    \"<span class="video-cloud-only">video-cloud</span><span class="perform-only">perform</span>/player/all\"
+  ]
+}]'" \
 https://oauth.brightcove.com/v4/client_credentials</code></pre>
                     </li>
                     <li>The response should look like this (formatting added):
@@ -203,7 +201,65 @@ https://oauth.brightcove.com/v4/client_credentials</code></pre>
         $(document).foundation();
     </script>
     <script type="text/javascript">
-        /******** Any scripts specific to page samples should go here *********/
+        var BCLS = ( function () {
+            var account_id,
+                BC_TOKEN,
+                client_id,
+                client_secret,
+                account_idEl = document.getElementById("account_id"),
+                BC_TOKENEl = document.getElementById("BC_TOKEN"),
+                client_idEl = document.getElementById("client_id"),
+                client_secretEl = document.getElementById("client_secret"),
+                getCredentialsCall = document.getElementById("getCredentialsCall"),
+                getTokenCall = document.getElementById("getTokenCall"),
+                str,
+                // functions
+                buildCredentialsCall,
+                buildTokenCall,
+                isDefined;
+
+            /**
+             * tests for all the ways a variable might be undefined or not have a value
+             * @param {string|number} x - the variable to test
+             * @return {Boolean} true if variable is defined and has a value
+             */
+            isDefined = function (x) {
+                if ( x === "" || x === null || x === undefined || x === NaN) {
+                    return false;
+                }
+                return true;
+            };
+
+            buildCredentialsCall = function () {
+                account_id = isDefined(account_idEl.value) ? parseInt(account_idEl.value) : NaN;
+                BC_TOKEN = isDefined(BC_TOKENEl.value) ? BC_TOKENEl.value : "";
+                // if we don't have necessary values yet, stop
+                if (!isDefined(account_id) || !isDefined(BC_TOKEN)) {
+                    return;
+                }
+                str = "curl --include \ <br>--header "Authorization: BC_TOKEN $BC_TOKEN" \
+  --data "'name=Sample-Client&amp;maximum_scope=[{
+  \"identity\": { \
+    <span class="video-cloud-only">\"type\": \"video-cloud-account\"</span><span class="perform-only">,\"type\": \"perform-account\"</span>, \
+    \"account-id\": "$ACCOUNT_ID" \
+  }, \
+  \"operations\": [ \
+    \"<span class="video-cloud-only">video-cloud</span><span class="perform-only">perform</span>/player/all\"
+  ]
+}]'" \"
+            };
+
+            buildTokenCall = function () {
+
+            };
+
+              account_idEl.addEventListener("change", function () {
+
+              });
+            return {
+
+            }
+        })();
     </script>
     <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a>
     </div>
