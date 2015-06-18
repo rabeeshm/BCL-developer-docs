@@ -81,18 +81,12 @@
                         <p class="BCL-aside">Note: The <code>BC_TOKEN</code> value is a cookie set when you open Studio. It has no relation to the API Management tokens you deal with in Studio.</p>
                     </li>
                 </ol>
-                <h4>Get your account id</h4>
+                <h4>Get your account id and BC_TOKEN</h4>
                 <ol start="3">
                     <li>First you will need your account id from the Account Information.</li>
                     <li>Click the settings icon <img alt="" src="http://img.brightcove.com/node14056-gear-icon.png" /> in the Studio header.</li>
                     <li>Select Account Information from the dropdown.</li>
-                    <li>Copy your account id from the Account Information page.</li>
-                    <li>Enter your account id here:
-                        <p>Account id: <input id="account_id" type="text"></p>
-                    </li>
-                </ol>
-                <h4>Get your BC_TOKEN</h4>
-                <ol start="8">
+                    <li>Copy your account id from the Account Information page and save it - you will need it in a later step.</li>
                     <li>Now open the browser developer console - in most browsers you can do this by pressing OPTION-CMD-i (Mac) or ALT-CTRL-i (Windows), or you should be able to find a menu item also.</li>
                     <li>In the console, paste the following JavaScript and press return to return your BC_TOKEN in a modal dialog:
 <pre><code>var cookiesArray = document.cookie.split(";"), cookiesObj = {}, i, tmpArray = [];
@@ -103,8 +97,13 @@ for (i = 0; i &lt; cookiesArray.length; i++) {
 window.prompt("BC_TOKEN:", cookiesObj.BC_TOKEN);</code></pre>
                     </li>
                     <li>Copy the BC_TOKEN to the clipboard.</li>
-                    <li>Enter your BC_TOKEN here:
-                        <p>BC_TOKEN: <textarea id="BC_TOKEN"></textarea></p>
+                    <li>Enter your account id and BC_TOKEN here:
+                        <fieldset>
+                            <legend>Client Credential Inputs</legend>
+                            <p>Account id: <input id="account_id" type="text"></p>
+                            <p>BC_TOKEN: <br><textarea id="BC_TOKEN" style="width:500px"></textarea></p>
+                            <p><button id="enterCredentialInputs">Submit id and BC_TOKEN</button></p>
+                        </fieldset>
                     </li>
                 </ol>
                 <h4>Make the credentials request</h4>
@@ -173,6 +172,8 @@ window.prompt("BC_TOKEN:", cookiesObj.BC_TOKEN);</code></pre>
             </div>
         </div>
     </div>
+    <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+
     <!-- bcl scripts -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/1.9/gist-embed.min.js"></script>
@@ -190,7 +191,11 @@ window.prompt("BC_TOKEN:", cookiesObj.BC_TOKEN);</code></pre>
     </script>
     <script type="text/javascript">
         var BCLS = ( function () {
-            var account_id,
+            var path = window.location.href.split("/"),
+                product = path[4],
+                accountType = product + "-account",
+                productOperations = product + "/player/all",
+                account_id,
                 BC_TOKEN,
                 client_id,
                 client_secret,
@@ -200,7 +205,7 @@ window.prompt("BC_TOKEN:", cookiesObj.BC_TOKEN);</code></pre>
                 client_secretEl = document.getElementById("client_secret"),
                 getCredentialsCall = document.getElementById("getCredentialsCall"),
                 getTokenCall = document.getElementById("getTokenCall"),
-                str,
+                enterCredentialInputs = document.getElementById("enterCredentialInputs"),
                 // functions
                 buildCredentialsCall,
                 buildTokenCall,
@@ -219,30 +224,29 @@ window.prompt("BC_TOKEN:", cookiesObj.BC_TOKEN);</code></pre>
             };
 
             buildCredentialsCall = function () {
+                var str;
                 account_id = isDefined(account_idEl.value) ? parseInt(account_idEl.value) : NaN;
                 BC_TOKEN = isDefined(BC_TOKENEl.value) ? BC_TOKENEl.value : "";
+                console.log("account_id", account_id);
+                console.log("bc_token", BC_TOKEN);
                 // if we don't have necessary values yet, stop
                 if (!isDefined(account_id) || !isDefined(BC_TOKEN)) {
                     return;
                 }
-                str = "curl --include \ <br>--header "Authorization: BC_TOKEN" + $BC_TOKEN + " \ <br>--data "'name=Sample-Client&amp;maximum_scope=[<br>{"identity\": { <span class="video-cloud-only">\ <br>"type\": \"video-cloud-account\"</span><span class="perform-only">,\"type\": \"perform-account\"</span>, \ <br>\"account-id\": " + $ACCOUNT_ID + " \ <br>}, \ <br>\"operations\": [ <br>\"<span class="video-cloud-only">video-cloud</span><span class="perform-only">perform</span>/player/all\" <br>] <br>}]'" \"";
+                str = "curl --include --header \"Authorization: BC_TOKEN" + BC_TOKEN + "\" --data 'name=Sample-Client&amp;maximum_scope=[ {\"identity\": { \"type\": \"" + accountType + "\", \"account-id\": \"" + account_id + "\"}, \"operations\": [ \"" + productOperations + "\" ]}]' https://oauth.brightcove.com/v4/client_credentials";
+
                 getCredentialsCall.innerHTML = str;
             };
 
             buildTokenCall = function () {
 
             };
-
-              account_idEl.addEventListener("change", function () {
-
-              });
-            return {
-
-            }
+            console.log("path", path);
+            console.log("product", product);
+            enterCredentialInputs.addEventListener("click", buildCredentialsCall);
+            return {};
         })();
     </script>
-    <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a>
-    </div>
 </body>
 
 </html>
