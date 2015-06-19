@@ -74,7 +74,7 @@
 					<li><a href="#validate">Validate</a> the meta tags on your HTML page for FaceBook and Twitter.</li>
 				</ol>
 				<p>In a browser, open the HTML page with your Brightcove player and use the social sharing icon in the player to share your video.</p>
-				<p>Optionally, you can implement the social media plugin within your page code, but this is a more advanced solution. For details, see the <a href="#implementcode">Implement using code</a> section.</p>
+				<p>Optionally, you can implement the social media plugin within your page code, but this is a more advanced solution. For details, see the <a href="#implementcode">Implement in page code</a> section.</p>
 			</div>	
 			
 		<div id="playersmodule" class="section">
@@ -109,117 +109,227 @@
 		<div id="properties" class="section">
 	        <h2>Properties</h2>
 	        <p>For plugins in general, the <code>options</code> object is used to pass data to the plugin to customize initialization. In this case, you can use the following properties in this object:</p>
-			<ul>
-				<li><code>title</code>: 
-					<ul>
-						<li>Type: string</li>
-						<li>This is a custom title that will appear when your video is shared.</li>
-					</ul>
-				</li>
-				<li><code>description</code>: 
-					<ul>
-						<li>Type: string</li>
-						<li>This is a custom description that will be used by the social services which support it.</li>
-					</ul>
-				</li>
-				<li><code>url</code>: 
-					<ul>
-						<li>Type: string</li>
-						<li>This is the URL that points to your custom web page which has your video and the meta tags for sharing. Refer to the <a href="#metatags">meta tags</a> section for details on how to add the social media metadata to your player page.</li>
-					</ul>
-				</li>
-                <li><code>embedCode</code>: 
-					<ul>
-						<li>Type: string</li>
-						<li>This is the Brightcove player iframe embed code for sharing the video. This allows you to completely override the contents of the <strong>Embed Code</strong> field located in the sharing dialog.
-                        <div><img src="../assets/social-media-embedcode.png" alt="Social Media Embed Code"></div></li>
-					</ul>
-				</li>
-				<li><code>displayAfterVideo</code>: 
-					<ul>
-						<li>Type: boolean</li>
-                        <li>Default: <code>false</code></li>
-						<li>Causes the social screen to automatically show on an <code>ended</code> event</li>
-					</ul>
-				</li>
-				<li><code>deeplinking</code>: 
-					<ul>
-						<li>Type: boolean</li>
-                        <li>Default: <code>false</code></li>
-						<li><p>This enables/disables deep linking for the shared video. This feature allows a user to start viewing a video from a specific offset. For more details, view the <a href="deep-linking.html">Deep Linking</a> document.</p></li>
-					</ul>
-					<p class="BCL-aside">Note: The deep linking feature currently only works with Twitter.</p>
-				</li>
-				<li><code>offset</code>: 
-					<ul>
-						<li>Type: string</li>
-                        <li>Format: <code>00h00m00s</code></li>
-						<li>This is used with the <code>deeplinking</code> property and defines when to start playing the video. To offset 1 minute and 5 seconds, you would write: <code>00h01m05s</code></li>
-					</ul>
-				</li>
-				<li><code>services</code>: Include all service properties in this object. To enable or disable support for a service, set the property value to true or false instead of removing them.  
-					<ul>
-						<li><code>facebook</code>
-						<ul>
-							<li>Type: boolean</li>
-                            <li>Default: <code>true</code></li>
-							<li>This enables the Facebook sharing icon.</li>
-						</ul></li>
-						<li><code>google</code>
-						<ul>
-							<li>Type: boolean</li>
-                            <li>Default: <code>true</code></li>
-							<li>This enables the Google+ sharing icon.</li>
-						</ul></li>
-						<li><code>twitter</code>
-						<ul>
-							<li>Type: boolean</li>
-                            <li>Default: <code>true</code></li>
-							<li>This enables the Twitter sharing icon.</li>
-						</ul></li>
-						<li><code>tumblr</code>
-						<ul>
-							<li>Type: boolean</li>
-                            <li>Default: <code>true</code></li>
-							<li>This enables the Tumblr sharing icon.</li>
-						</ul></li>
-						<li><code>pinterest</code>
-						<ul>
-							<li>Type: boolean</li>
-                            <li>Default: <code>true</code></li>
-							<li>This enables the Pinterest sharing icon.</li>
-						</ul></li>
-						<li><code>linkedin</code>
-						<ul>
-							<li>Type: boolean</li>
-                            <li>Default: <code>true</code></li>
-							<li>This enables the LinkedIn sharing icon.</li>
-						</ul></li>
-					</ul>
-				</li>
-			</ul>
+            <h3>title</h3>
+            <ul>
+                <li>Type: string</li>
+                <li>This is a custom title that will appear when your video is shared.</li>
+            </ul>
+			<h3>description</h3>
+            <ul>
+                <li>Type: string</li>
+                <li>This is a custom description that will be used by the social services which support it.</li>
+            </ul>
+            <h3>url</h3>
+            <ul>
+                <li>Type: string</li>
+                <li>This is the URL that points to your custom web page which has your video and the meta tags for sharing. Refer to the <a href="#metatags">meta tags</a> section for details on how to add the social media metadata to your player page.</li>
+            </ul>
+            <h3>embedCode</h3>
+            <ul>
+                <li>Type: string</li>
+                <li>This is the Brightcove player iframe embed code for sharing the video. This allows you to completely override the contents of the <strong>Embed Code</strong> field located in the sharing dialog.
+                <div><img src="../assets/social-media-embedcode.png" alt="Social Media Embed Code"></div></li>
+                <li><p>If you want the embedded player to play your video within the Facebook wall, you need to specify a Smart Player here. To do this, follow these steps:</p>
+                <ol>
+                    <li>Navigate to legacy studio and copy the URL from either the Quick Publish section in the Media module or from the Code tab in the Publishing module. It is recommended to use a viral player.</li>
+                    <li>Use this URL as the <code>src</code> value in an <code>iframe</code> tag, and add the <code>embedCode</code> property to your social plugin.<br/>
+                    <pre><code>{
+    "embedCode": "&lt;iframe src='http://bcove.me/niqx01er'&gt;"
+}</code></pre>
+                    <p class="BCL-aside">Note: When you override the <code>embedCode</code> property with a Smart Player, it will be used for Facebook as well as the other social sites.</p></li>
+                </ol>
+                </li>
+            </ul>
+            <h3>displayAfterVideo</h3>
+            <ul>
+                <li>Type: boolean</li>
+                <li>Default: <code>false</code></li>
+                <li>Causes the social screen to automatically show on an <code>ended</code> event</li>
+            </ul>
+            <h3>deeplinking</h3>
+            <ul>
+                <li>Type: boolean</li>
+                <li>Default: <code>false</code></li>
+                <li><p>This enables/disables deep linking for the shared video. This feature allows a user to start viewing a video from a specific offset. For more details, view the <a href="deep-linking.html">Deep Linking</a> document.</p>
+                    <p class="BCL-aside">Note: The deep linking feature currently only works with Twitter.</p></li>
+            </ul>
+            <h3>offset</h3>
+            <ul>
+                <li>Type: string</li>
+                <li>Format: <code>00h00m00s</code></li>
+                <li>This is used with the <code>deeplinking</code> property and defines when to start playing the video. To offset 1 minute and 5 seconds, you would write: <code>00h01m05s</code></li>
+            </ul>
+            <h3>services</h3>
+            <p>Include all service properties in this object. To enable or disable support for a service, set the property value to true or false instead of removing them.</p>  
+            <ul>
+                <li><code>facebook</code>
+                <ul>
+                    <li>Type: boolean</li>
+                    <li>Default: <code>true</code></li>
+                    <li>This enables the Facebook sharing icon.</li>
+                </ul></li>
+                <li><code>google</code>
+                <ul>
+                    <li>Type: boolean</li>
+                    <li>Default: <code>true</code></li>
+                    <li>This enables the Google+ sharing icon.</li>
+                </ul></li>
+                <li><code>twitter</code>
+                <ul>
+                    <li>Type: boolean</li>
+                    <li>Default: <code>true</code></li>
+                    <li>This enables the Twitter sharing icon.</li>
+                </ul></li>
+                <li><code>tumblr</code>
+                <ul>
+                    <li>Type: boolean</li>
+                    <li>Default: <code>true</code></li>
+                    <li>This enables the Tumblr sharing icon.</li>
+                </ul></li>
+                <li><code>pinterest</code>
+                <ul>
+                    <li>Type: boolean</li>
+                    <li>Default: <code>true</code></li>
+                    <li>This enables the Pinterest sharing icon.</li>
+                </ul></li>
+                <li><code>linkedin</code>
+                <ul>
+                    <li>Type: boolean</li>
+                    <li>Default: <code>true</code></li>
+                    <li>This enables the LinkedIn sharing icon.</li>
+                </ul></li>
+            </ul>
 	      </div>
 	
 	  <div id="metatags" class="section">
         <h2>Meta tags</h2>
 		<p>After you update your Brightcove player to use the social sharing plugin in the previous section, you are ready to add social meta tags to your HTML page.</p>
-		<p>These meta tags allow social sharing sites to embed your video players and thumbnails in the post.</p>
-		<p>To add social media meta tags to the HTML page with your Brightcove player, follow these steps:</p>
-		<ol>
-			<li>Once your player has been published, click the <strong>Embed Code &amp; URL</strong> button and choose the <strong>Published Player</strong> link.</li>
-			<li>Select the <strong>Player URL</strong> link. You should see your player in a new tab or window.</li>
-			<li>In your browser's address bar, change the URL from <code>index.html</code>:
-			<div><img src="../assets/social-media-plugin2.png" alt="Preview URL"></div></li>
-			<li>To <code>social.html</code>:
-			<div><img src="../assets/social-media-plugin3.png" alt="Preview URL"></div></li>
-			<li>Select <strong>enter</strong>. You should now see the following page:
-			<div><img src="../assets/social-media-plugin4.png" alt="Enabling Social Sharing Page"></div></li>
-			<li>In the browser, scroll down to the <strong>&lt;code&gt;</strong> section and copy the meta tag code.</li>
-			<li><p>Edit the HTML page with your Brightcove player. In the <strong>&lt;head&gt;</strong> section, paste the meta tag code. These tags are used by the social media services to include thumbnail images and your video in the post.</p>
-			<p><code data-gist-id="c2fa720dad97e5688f02" data-gist-hide-footer="true" data-gist-line="19-69"></code></p></li>
+		<p>These meta tags allow social sharing sites to embed your video players and thumbnails in the post. The form below calls the CMS API with your information and retrieves your video data. It then generates social meta tags with your specific data.</p>
+          <p class="text-warning">Note: This form produces code for a single video player only. Also, you should update your meta tags periodically, as URLs can change.</p>
+          <p>To add social media meta tags to the HTML page with your Brightcove player, follow these steps:</p>
+        <ol>
+            <li>Enter your account, player and video information into the form below and select the <strong>Generate Social Tags</strong> button.</li>
+        </ol>
+          
+        <h4>Data Input</h4>
+        <p class="text-warning">
+            <span class="red">All fields are
+                <strong>required</strong>
+            </span>. Enter your own values to get meta tags for your video.</p>
+        <div id="inputFields" class="input-fields">
+            <fieldset>
+                <legend>Account Information</legend>
+                <div id="accountInfo">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Service URL:</td>
+                                <td>https://cms.api.brightcove.com/v1</td>
+                            </tr>
+                            <tr>
+                                <td><span class="video-cloud-only">Video Cloud</span> Account (Publisher ID):</td>
+<!--                                <td><span class="video-cloud-only">Video Cloud</span><span class="perform-only">Perform</span>Account (Publisher ID):</td>-->
+                                <td>
+                                    <input id="accountID" class="required papi-request" type="text" size="60" placeholder="1752604059001" required> <!--Brightcove Learning Doc Samples-->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="align-top no-wrap">Client id:</td>
+                                <td>
+                                    <input id="client_id" class="required papi-request" type="text" size="100" placeholder="your client id" required/>
+                                    <p>
+                                </td>
+                            </tr>
+							<tr>
+                                <td class="align-top no-wrap">Client secret:</td>
+                                <td>
+                                    <input id="client_secret" class="required papi-request" type="text" size="100" placeholder="your client secret" required/>
+                                    <p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Player Information</legend>
+                <div id="playerInfo">
+                    <p>Note: use a single video player</p>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>URL for your player page:</td>
+                                <td>
+                                    <input id="pageURL" type="text" size="60" class="required papi-request" placeholder="https://yourwebpage.com" required />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Player ID (from Players Module):</td>
+                                <td>
+                                    <input id="playerID" class="required papi-request" size="60" placeholder="5df7789d-df7d-4605-a677-952771f8e46b" required />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Player width:</td>
+                                <td>
+                                    <input id="playerWidth" class="required papi-request" type="text" size="60" placeholder="640px" required />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Player height:</td>
+                                <td>
+                                    <input id="playerHeight" class="required papi-request" type="text" size="60" placeholder="360px" required />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Video Information</legend>
+                <div id="videoInfo">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Video ID (from Media Module):</td>
+                                <td>
+                                    <input id="videoID" class="required papi-request" size="60" placeholder="4093643993001" required />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p id="responseFrame"></p>
+                </div>
+            </fieldset>
+            <p>
+                <span id="generateButton" class="bcls-button">Generate Social Tags</span>
+            </p>
+        </div>
+        
+    <ol start="2">
+        <li>Press the <strong>Select the code</strong> button. Then, copy and paste the selected code into the <code>&lt;head&gt;</code> section of your HTML player page.</li>
+    </ol>
+        <h4>The Generated Social Sharing Meta Tags</h4>
+        <!-- <fieldset>
+		<legend>Generated Results</legend>
+		<div id="generatedResults"></div>
+	</fieldset> -->
+        <div id="publishingCodeWrapper">
+            <fieldset>
+                <legend>Metadata Code</legend>
+                <p>
+                    <span class="bcls-button" id="selectCode">Select the code</span> and then copy and paste it into your page.</p>
+                <p>
+                    <textarea id="publishingCode" rows="7"></textarea>
+                </p>
+            </fieldset>
+        </div>
+        <br/>
+          
+		<ol start="3">
 			<li>Save your changes. You are now ready to use the social media sharing interface with your player.</li>
 		</ol> 
-		<p class="BCL-aside" style="padding:1em;">Note: You will want to provide a secure URL value (<code>&lt;meta property="og:video:secure_url" content=""/&gt;</code>) for Facebook users that use secure browsing (HTTPS). Without this setting, the video  will not play on the Facebook wall, rather the poster image will link to a separate page for viewing. This is a manual process that needs to be done after you retrieve the social media meta tags.</p>
+		<p class="BCL-aside" style="padding:1em;">Note: You will want to provide a secure URL value for your HTML player page (<code>&lt;meta property="og:video:secure_url" content=""/&gt;</code>) for Facebook users that use secure browsing (HTTPS). Without this setting, the video  will not play on the Facebook wall, rather the poster image will link to a separate page for viewing.</p>
       </div>
 	
       <div id="validate" class="section">
@@ -231,7 +341,7 @@
       </div>
 	
 	  <div id="implementcode" class="section">
-		  <h2>Implement using code</h2>
+		  <h2>Implement in-page code</h2>
 		  <p>A more advanced implementation for the social media plugin is to use the <strong>In-Page Embed Code</strong> from the Players module. This will allow you to pass configuration options from within your page code.</p>
 		  <p>To implement the plugin using custom code, follow these steps:</p>
 		  <ol>
@@ -296,6 +406,9 @@
 	<script src="/en/scripts/docs-nav-data.min.js"></script>
 	<script src="/en/scripts/bcls-doc-site-v1.js"></script>
 	<script src="/en/scripts/bc-mapi.js"></script>
+    <!-- script for the social meta tag generator form - calls cms api via proxy -->
+    <script src="/en/scripts/social.js"></script>
+
 	<script>
 		$(document).foundation();
 	</script>
