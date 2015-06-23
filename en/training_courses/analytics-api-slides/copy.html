@@ -148,7 +148,7 @@
                             <tr>
                                 <td>Tag (for some video with recent views):</td>
                                 <td>
-                                    <input id="tag" type="text" size="30" value="" /><p>
+                                    <input id="tags" type="text" size="30" value="" /><p>
                                 </td>
                             </tr>
                         </tbody>
@@ -342,7 +342,6 @@
             <h3>Exercise 8: Filter on video tag</h3>
             <p>The following request includes videos based on a tag:</p>
             <textarea id="ex8request"></textarea>
-            <textarea id="ex8data" style="height:12em;"></textarea>
             <p><button id="ex8button" class="bcls-button">Submit Request</button></p>
             <p class="slide-only">(Response will appear on the next slide)</p>
         </div>
@@ -424,57 +423,59 @@
 <script id="pageScript" type="text/javascript">
 var BCLS = (function ($, window, document) {
     "use strict";
-    var proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
-        baseURL = "https://analytics.api.brightcove.com/v1",
-        useMyAccount = document.getElementById("useMyAccount"),
-        basicInfo = document.getElementById("basicInfo"),
-        account_id = document.getElementById("account_id"),
-        client_id = document.getElementById("client_id"),
-        client_secret = document.getElementById("client_secret"),
-        setOptions = document.getElementById("setOptions"),
+    var proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php',
+        baseURL = 'https://analytics.api.brightcove.com/v1',
+        useMyAccount = document.getElementById('useMyAccount'),
+        basicInfo = document.getElementById('basicInfo'),
+        account_id = document.getElementById('account_id'),
+        client_id = document.getElementById('client_id'),
+        client_secret = document.getElementById('client_secret'),
+        video_id = document.getElementById('video_id'),
+        player_id = document.getElementById('player_id'),
+        tags = document.getElementById('tags')
+        setOptions = document.getElementById('setOptions'),
         /**
          * defaults - Brightcove Learning account values here - change to account you want to use
          * permissions for:
          * Analytics API - all operations
          */
         defaults = {
-            account_id: "20318290001",
-            client_id: "2f3b7e79-a8e8-4a21-b2c8-6480cf5f2c8d",
-            client_secret: "PiDmMouSDBNsNJUuEK90u8bpVn-kSw9D-BM5ADI_rnsLP2KXGN_7OxE6ng2-FAykgLnjj47aS3EeBd2N2K5kiA",
-            player_id: "",
-            video_id: "",
-            tags: ""
+            account_id: '20318290001',
+            client_id: '2f3b7e79-a8e8-4a21-b2c8-6480cf5f2c8d',
+            client_secret: 'PiDmMouSDBNsNJUuEK90u8bpVn-kSw9D-BM5ADI_rnsLP2KXGN_7OxE6ng2-FAykgLnjj47aS3EeBd2N2K5kiA',
+            player_id: '',
+            video_id: '',
+            tags: ''
         },
         options = {},
         // for the exercises
-        ex1request = document.getElementById("ex1request"),
-        ex1response = document.getElementById("ex1response"),
-        ex1button = document.getElementById("ex1button"),
-        ex2request = document.getElementById("ex2request"),
-        ex2response = document.getElementById("ex2response"),
-        ex2button = document.getElementById("ex2button"),
-        ex2data = document.getElementById("ex2data"),
-        ex3request = document.getElementById("ex3request"),
-        ex3response = document.getElementById("ex3response"),
-        ex3button = document.getElementById("ex3button"),
-        ex4request = document.getElementById("ex4request"),
-        ex4response = document.getElementById("ex4response"),
-        ex4button = document.getElementById("ex4button"),
-        ex4data = document.getElementById("ex4data"),
-        ex5request = document.getElementById("ex5request"),
-        ex5response = document.getElementById("ex5response"),
-        ex5button = document.getElementById("ex5button"),
-        ex6request = document.getElementById("ex6request"),
-        ex6response = document.getElementById("ex6response"),
-        ex6button = document.getElementById("ex6button"),
-        ex7request = document.getElementById("ex7request"),
-        ex7response = document.getElementById("ex7response"),
-        ex7button = document.getElementById("ex7button"),
-        ex7data = document.getElementById("ex7data"),
-        ex8request = document.getElementById("ex8request"),
-        ex8response = document.getElementById("ex8response"),
-        ex8button = document.getElementById("ex8button"),
-        ex8data = document.getElementById("ex8data"),
+        ex1request = document.getElementById('ex1request'),
+        ex1response = document.getElementById('ex1response'),
+        ex1button = document.getElementById('ex1button'),
+        ex2request = document.getElementById('ex2request'),
+        ex2response = document.getElementById('ex2response'),
+        ex2button = document.getElementById('ex2button'),
+        ex3request = document.getElementById('ex3request'),
+        ex3response = document.getElementById('ex3response'),
+        ex3button = document.getElementById('ex3button'),
+        ex4request = document.getElementById('ex4request'),
+        ex4response = document.getElementById('ex4response'),
+        ex4button = document.getElementById('ex4button'),
+        ex5request = document.getElementById('ex5request'),
+        ex5response = document.getElementById('ex5response'),
+        ex5button = document.getElementById('ex5button'),
+        ex6request = document.getElementById('ex6request'),
+        ex6response = document.getElementById('ex6response'),
+        ex6button = document.getElementById('ex6button'),
+        ex7request = document.getElementById('ex7request'),
+        ex7response = document.getElementById('ex7response'),
+        ex7button = document.getElementById('ex7button'),
+        ex8request = document.getElementById('ex8request'),
+        ex8response = document.getElementById('ex8response'),
+        ex8button = document.getElementById('ex8button'),
+        ex9request = document.getElementById('ex9request'),
+        ex9response = document.getElementById('ex9response'),
+        ex9button = document.getElementById('ex9button'),
         // functions
         isDefined,
         bclslog,
@@ -501,7 +502,7 @@ var BCLS = (function ($, window, document) {
          * @return {}
          */
         bclslog = function (context, message) {
-            if (window["console"] && console["log"]) {
+            if (window['console'] && console['log']) {
               console.log(context, message);
             };
             return;
@@ -528,45 +529,45 @@ var BCLS = (function ($, window, document) {
          */
         setupExercises = function () {
             profileData = copyObj(sampleProfile);
-            profileData["account_id"] = defaults.account_id;
-            profileData["name"] += new Date().toISOString();
-            profileDataStr = JSON.stringify(profileData, null, "  ");
+            profileData['account_id'] = defaults.account_id;
+            profileData['name'] += new Date().toISOString();
+            profileDataStr = JSON.stringify(profileData, null, '  ');
             updateData = copyObj(profileData);
-            updateData["description"] = "Test Profile Updated";
-            updateData["id"] = profile_id;
-            updateDataStr = JSON.stringify(updateData, null, "  ");
-            defaultDataStr = JSON.stringify(defaultData, null, "  ");
-            updateDefaultData["id"] = config_id;
-            updateDefaultData["default_profile_id"] = "screencast";
-            updateDefaultDataStr = JSON.stringify(updateDefaultData, null, "  ");
-            bclslog("updateDefaultDataStr", updateDefaultDataStr);
-            ex1request.value = baseURL + "/accounts/" + defaults.account_id + "/profiles";
-            ex2request.value = baseURL + "/accounts/" + defaults.account_id + "/profiles";
+            updateData['description'] = 'Test Profile Updated';
+            updateData['id'] = profile_id;
+            updateDataStr = JSON.stringify(updateData, null, '  ');
+            defaultDataStr = JSON.stringify(defaultData, null, '  ');
+            updateDefaultData['id'] = config_id;
+            updateDefaultData['default_profile_id'] = 'screencast';
+            updateDefaultDataStr = JSON.stringify(updateDefaultData, null, '  ');
+            bclslog('updateDefaultDataStr', updateDefaultDataStr);
+            ex1request.value = baseURL + '/accounts/' + defaults.account_id + '/profiles';
+            ex2request.value = baseURL + '/accounts/' + defaults.account_id + '/profiles';
             ex2data.value = profileDataStr;
-            ex3request.value = baseURL + "/accounts/" + defaults.account_id + "/profiles/" + profile_id;
-            ex4request.value = baseURL + "/accounts/" + defaults.account_id + "/profiles/" + profile_id;
+            ex3request.value = baseURL + '/accounts/' + defaults.account_id + '/profiles/' + profile_id;
+            ex4request.value = baseURL + '/accounts/' + defaults.account_id + '/profiles/' + profile_id;
             ex4data.value = updateDataStr;
-            ex5request.value = baseURL + "/accounts/" + defaults.account_id + "/profiles/" + profile_id;
-            ex6request.value = baseURL + "/accounts/" + defaults.account_id + "/configuration";
-            ex7request.value = baseURL + "/accounts/" + defaults.account_id + "/configuration";
+            ex5request.value = baseURL + '/accounts/' + defaults.account_id + '/profiles/' + profile_id;
+            ex6request.value = baseURL + '/accounts/' + defaults.account_id + '/configuration';
+            ex7request.value = baseURL + '/accounts/' + defaults.account_id + '/configuration';
             ex7data.value = defaultDataStr;
-            ex8request.value = baseURL + "/accounts/" + defaults.account_id + "/configuration";
+            ex8request.value = baseURL + '/accounts/' + defaults.account_id + '/configuration';
             ex8data.value = updateDefaultDataStr;
         };
         // listeners
         // toggle sample/customer account
-        useMyAccount.addEventListener("click", function () {
-            if (basicInfo.className === "display-none") {
-                basicInfo.className = "display-block";
-                useMyAccount.innerHTML = "Cancel";
+        useMyAccount.addEventListener('click', function () {
+            if (basicInfo.className === 'display-none') {
+                basicInfo.className = 'display-block';
+                useMyAccount.innerHTML = 'Cancel';
             } else {
-                basicInfo.className = "display-none";
-                useMyAccount.innerHTML = "Use My Account";
+                basicInfo.className = 'display-none';
+                useMyAccount.innerHTML = 'Use My Account';
             }
         });
-        useSampleAccount.addEventListener("click", function () {
+        useSampleAccount.addEventListener('click', function () {
             setAccountOptions();
-            useSampleAccount.innerHTML = "Setup Complete!";
+            useSampleAccount.innerHTML = 'Setup Complete!';
             setupExercises();
         });
         /**
@@ -584,77 +585,78 @@ var BCLS = (function ($, window, document) {
             options.url = reqEl.value;
             options.requestType = reqType.toUpperCase();
             options.requestBody = (isDefined(dataEl)) ? dataEl.value : null;
-            bclslog("options", options);
+            bclslog('options', options);
             $.ajax({
                 url: proxyURL,
-                method: "POST",
+                method: 'POST',
                 data: options,
                 success : function (data) {
                     try {
-                        bclslog("data", data);
+                        bclslog('data', data);
                         respData = JSON.parse(data);
-                        respEl.value = JSON.stringify(respData, null, "  ");
+                        respEl.value = JSON.stringify(respData, null, '  ');
                         if (exNum === 2) {
                             profile_id = respData.id;
-                            bclslog("profile_id", profile_id);
+                            bclslog('profile_id', profile_id);
                             setupExercises();
                         }
                         if (exNum === 6 || exNum === 7) {
-                            config_id = respData["id"];
-                            bclslog("config_id", config_id);
+                            config_id = respData['id'];
+                            bclslog('config_id', config_id);
                             setupExercises();
                         }
                     } catch (e) {
-                         bclslog("invalid JSON - something went wrong", e);
-                         data = {"Error": e};
+                         bclslog('invalid JSON - something went wrong', e);
+                         data = {'Error': e};
                          switch (exNum) {
                             case 5:
-                            respEl.value = "[DELETE requests do not return any data - you will just see an empty HTTP 204 response]"
+                            respEl.value = '[DELETE requests do not return any data - you will just see an empty HTTP 204 response]'
                             break;
                             case 6:
-                            respEl.value = "There is no default profile - we'll set one in the next exercise";
+                            respEl.value = 'There is no default profile - we'll set one in the next exercise';
                             break;
                             case 7:
-                            respEl.value = "There is already a default profile - we'll update it in the next exercise";
+                            respEl.value = 'There is already a default profile - we'll update it in the next exercise';
                             break;
                             default:
-                            respEl.value = "There was a problem with the request";
+                            respEl.value = 'There was a problem with the request';
                          }
                     }
                     // write the response to the response element
+
                 }
             })
         }
         // set account options
-        setOptions.addEventListener("click", function () {
+        setOptions.addEventListener('click', function () {
             setAccountOptions();
-            setOptions.innerHTML = "Setup Complete!";
+            setOptions.innerHTML = 'Setup Complete!';
             setupExercises();
         });
         // exercise button handlers
-        ex1button.addEventListener("click", function () {
-            submitRequest(1, "get", ex1request, ex1response);
+        ex1button.addEventListener('click', function () {
+            submitRequest(1, 'get', ex1request, ex1response);
         });
-        ex2button.addEventListener("click", function () {
-            submitRequest(2, "post", ex2request, ex2response, ex2data);
+        ex2button.addEventListener('click', function () {
+            submitRequest(2, 'post', ex2request, ex2response, ex2data);
         });
-        ex3button.addEventListener("click", function () {
-            submitRequest(3, "get", ex3request, ex3response);
+        ex3button.addEventListener('click', function () {
+            submitRequest(3, 'get', ex3request, ex3response);
         });
-        ex4button.addEventListener("click", function () {
-            submitRequest(4, "put", ex4request, ex4response, ex4data);
+        ex4button.addEventListener('click', function () {
+            submitRequest(4, 'put', ex4request, ex4response, ex4data);
         });
-        ex5button.addEventListener("click", function () {
-            submitRequest(5, "delete", ex5request, ex5response);
+        ex5button.addEventListener('click', function () {
+            submitRequest(5, 'delete', ex5request, ex5response);
         });
-        ex6button.addEventListener("click", function () {
-            submitRequest(6, "get", ex6request, ex6response);
+        ex6button.addEventListener('click', function () {
+            submitRequest(6, 'get', ex6request, ex6response);
         });
-        ex7button.addEventListener("click", function () {
-            submitRequest(7, "post", ex7request, ex7response, ex7data);
+        ex7button.addEventListener('click', function () {
+            submitRequest(7, 'post', ex7request, ex7response, ex7data);
         });
-        ex8button.addEventListener("click", function () {
-            submitRequest(8, "post", ex8request, ex8response, ex8data);
+        ex8button.addEventListener('click', function () {
+            submitRequest(8, 'post', ex8request, ex8response, ex8data);
         });
     return {}
 })($, window, document);
@@ -691,6 +693,7 @@ adds syntax highlighting to pre>code blocks
                 "bclshighlight": bclshighlight
             }
         })($, window, document, hljs);
+
 </script>
 <!-- Initialize the deck. You can put this in an external file if desired. -->
 <!-- need to put this at the end in case the script above is generating content dynamically -->
