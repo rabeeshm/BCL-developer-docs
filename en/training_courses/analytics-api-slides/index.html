@@ -421,7 +421,7 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
 
 <script id="pageScript" type="text/javascript">
-var BCLS = (function (window, document) {
+var BCLS = (function(window, document) {
     "use strict";
     var proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php',
         baseURL = 'https://analytics.api.brightcove.com/v1',
@@ -484,11 +484,12 @@ var BCLS = (function (window, document) {
         setupExercises,
         submitRequest;
         /**
-         * tests for all the ways a variable might be undefined or not have a value
+         * tests for all the ways a variable might be
+         * undefined or not have a value
          * @param {*} x the variable to test
          * @return {Boolean} true if variable is defined and has a value
          */
-        isDefined = function(x){
+        isDefined = function(x) {
             if ( x === "" || x === null || x === undefined || x === NaN) {
                 return false;
             }
@@ -497,51 +498,42 @@ var BCLS = (function (window, document) {
         /**
          * Logging function - safe for IE
          * @param  {string} context description of the data
-         * @param  {*} message the data to be logged by the console
-         * @return {}
+         * @param  {*} message data to be logged
          */
-        bclslog = function (context, message) {
+        bclslog = function(context, message) {
             if (window['console'] && console['log']) {
               console.log(context, message);
-            };
-            return;
+            }
         };
         /**
          * get a copy of (rather than reference to) an object
          * @param  {object} obj the object you want a copy
          * @return {object}     the copy
          */
-        copyObj = function (obj) {
-            return JSON.parse(JSON.stringify(obj));
+        copyObj = function(obj) {
+            if (isDefined(obj)) {
+                return JSON.parse(JSON.stringify(obj));
+            }
+            bclslog("copy obj error - no object passed");
+            return {};
         };
         /**
-         * set up account options when you are ready to assemble the URL and make the API call
+         * set up account options when you are ready
+         * to assemble the URL and make the API call
          */
-        setAccountOptions = function () {
+        setAccountOptions = function() {
             defaults.account_id = isDefined(account_id.value) ? account_id.value : defaults.account_id;
             defaults.client_id = isDefined(client_id.value) ? client_id.value : defaults.client_id;
             defaults.client_secret = isDefined(client_secret.value) ? client_secret.value : defaults.client_secret;
             defaults.video_id = isDefined(video_id.value) ? video_id.value : defaults.video_id;
+            defaults.player_id = isDefined(player_id.value) ? player_id.value : defaults.player_id;
             bclslog("defaults", defaults);
         };
         /**
          * set up values for exercises
          */
-        setupExercises = function () {
-            profileData = copyObj(sampleProfile);
-            profileData['account_id'] = defaults.account_id;
-            profileData['name'] += new Date().toISOString();
-            profileDataStr = JSON.stringify(profileData, null, '  ');
-            updateData = copyObj(profileData);
-            updateData['description'] = 'Test Profile Updated';
-            updateData['id'] = profile_id;
-            updateDataStr = JSON.stringify(updateData, null, '  ');
-            defaultDataStr = JSON.stringify(defaultData, null, '  ');
-            updateDefaultData['id'] = config_id;
-            updateDefaultData['default_profile_id'] = 'screencast';
-            updateDefaultDataStr = JSON.stringify(updateDefaultData, null, '  ');
-            bclslog('updateDefaultDataStr', updateDefaultDataStr);
-            ex1request.value = baseURL + '/accounts/' + defaults.account_id + '/profiles';
+        setupExercises = function() {
+            ex1request.value = baseURL + '/data?accounts=' + defaults.account_id + '/profiles';
             ex2request.value = baseURL + '/accounts/' + defaults.account_id + '/profiles';
             ex2data.value = profileDataStr;
             ex3request.value = baseURL + '/accounts/' + defaults.account_id + '/profiles/' + profile_id;
@@ -556,7 +548,7 @@ var BCLS = (function (window, document) {
         };
         // listeners
         // toggle sample/customer account
-        useMyAccount.addEventListener('click', function () {
+        useMyAccount.addEventListener('click', function() {
             if (basicInfo.className === 'display-none') {
                 basicInfo.className = 'display-block';
                 useMyAccount.innerHTML = 'Cancel';
@@ -565,7 +557,7 @@ var BCLS = (function (window, document) {
                 useMyAccount.innerHTML = 'Use My Account';
             }
         });
-        useSampleAccount.addEventListener('click', function () {
+        useSampleAccount.addEventListener('click', function() {
             setAccountOptions();
             useSampleAccount.innerHTML = 'Setup Complete!';
             setupExercises();
@@ -577,7 +569,7 @@ var BCLS = (function (window, document) {
          * @param  {object:htmlElement} respEl element to write the response to
          * @param  {object:htmlElement} dataEl element that holds request data (optional)
          */
-        submitRequest = function (exNum, reqType, reqEl, respEl, dataEl) {
+        submitRequest = function(exNum, reqType, reqEl, respEl, dataEl) {
             var options = {},
                 respData;
             options.client_id = defaults.client_id;
@@ -590,7 +582,7 @@ var BCLS = (function (window, document) {
                 url: proxyURL,
                 method: 'POST',
                 data: options,
-                success : function (data) {
+                success : function(data) {
                     try {
                         bclslog('data', data);
                         respData = JSON.parse(data);
@@ -620,37 +612,37 @@ var BCLS = (function (window, document) {
             });
         }
         // set account options
-        setOptions.addEventListener('click', function () {
+        setOptions.addEventListener('click', function() {
             setAccountOptions();
             setOptions.innerHTML = 'Setup Complete!';
             setupExercises();
         });
         // exercise button handlers
-        ex1button.addEventListener('click', function () {
+        ex1button.addEventListener('click', function() {
             submitRequest(1, 'get', ex1request, ex1response);
         });
-        ex2button.addEventListener('click', function () {
+        ex2button.addEventListener('click', function() {
             submitRequest(2, 'post', ex2request, ex2response, ex2data);
         });
-        ex3button.addEventListener('click', function () {
+        ex3button.addEventListener('click', function() {
             submitRequest(3, 'get', ex3request, ex3response);
         });
-        ex4button.addEventListener('click', function () {
+        ex4button.addEventListener('click', function() {
             submitRequest(4, 'put', ex4request, ex4response, ex4data);
         });
-        ex5button.addEventListener('click', function () {
+        ex5button.addEventListener('click', function() {
             submitRequest(5, 'delete', ex5request, ex5response);
         });
-        ex6button.addEventListener('click', function () {
+        ex6button.addEventListener('click', function() {
             submitRequest(6, 'get', ex6request, ex6response);
         });
-        ex7button.addEventListener('click', function () {
+        ex7button.addEventListener('click', function() {
             submitRequest(7, 'post', ex7request, ex7response, ex7data);
         });
-        ex8button.addEventListener('click', function () {
+        ex8button.addEventListener('click', function() {
             submitRequest(8, 'post', ex8request, ex8response, ex8data);
         });
-        ex9button.addEventListener('click', function () {
+        ex9button.addEventListener('click', function() {
             submitRequest(9, 'post', ex9request, ex9response, ex8data);
         });
     return {};
@@ -661,19 +653,19 @@ and creates public method BCLSslides.bclshighlight(), which
 adds syntax highlighting to pre>code blocks
  -->
 <script>
-    var bclsslides = ( function ($, window, document, hljs) {
+    var bclsslides = ( function($, window, document, hljs) {
         var bclsinjectTitle,
             bclshighlight,
             $precode = $("pre>code");
-            bclsinjectTitle = function () {
+            bclsinjectTitle = function() {
                 var titleEl = document.getElementsByTagName("title")[0],
                     docTitle = document.getElementsByTagName("h1")[0];
-                    docTitle.addEventListener("change", function () {
+                    docTitle.addEventListener("change", function() {
                         titleEl.innerHTML = this.innerHTML;
                     });
             };
-            bclshighlight = function () {
-                $precode.each(function (i, e) {
+            bclshighlight = function() {
+                $precode.each(function(i, e) {
                     hljs.highlightBlock(e);
                 });
             };
