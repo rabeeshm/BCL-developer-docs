@@ -198,9 +198,8 @@
         </div>
         <div id="exercise2" class="slide">
             <h3>Exercise 2: Report on multiple dimensions</h3>
-            <p>Make the following POST request:</p>
+            <p>Make the following GET request:</p>
             <textarea id="ex2request"></textarea>
-            <textarea id="ex2data" style="height:12em;"></textarea>
             <p><button id="ex2button" class="bcls-button">Submit Request</button></p>
             <p class="slide-only">(Response will appear on the next slide)</p>
         </div>
@@ -247,7 +246,6 @@
             <h3>Exercise 4: Sort results</h3>
             <p>Make the following request to sort your results by country:</p>
             <textarea id="ex4request"></textarea>
-            <textarea id="ex4data" style="height:12em;"></textarea>
             <p><button id="ex4button" class="bcls-button">Submit Request</button></p>
             <p class="slide-only">(Response will appear on the next slide)</p>
         </div>
@@ -315,7 +313,7 @@
             <p><code>where</code> filters are used to limit the results based on the value of some dimension:</p>
 <pre class="slide"><code>/data?accounts={account_id(s)}&dimensions={dimension}&fields={field1,field2,field3...}&sort={sort_field}&from={date}&to={date}<strong>&where={dimension1}=={value1};{dimension2}=={value2}</strong></code></pre>
             <p class="slide">Example:</p>
-<pre class="slide"><code>https://analytics.api.brightcove.com/v1//data?accounts=73734234876&dimensions=video,country&fields=video_name,video_view,video_impression,country,country_name&sort=country_name&from=2015-01-01&to=2015-01-31<strong>&where=player==84783749347;country=us</strong>
+<pre class="slide"><code>https://analytics.api.brightcove.com/v1//data?accounts=73734234876&dimensions=video,country&fields=video_name,video_view,video_impression,country,country_name&sort=country_name&from=2015-01-01&to=2015-01-31<strong>&where=player==84783749347;country==us</strong>
 </code></pre>
         </div>
         <div id="exercise7" class="slide">
@@ -422,7 +420,7 @@
 
 <script id="pageScript" type="text/javascript">
 var BCLS = (function(window, document) {
-    "use strict";
+    'use strict';
     var proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php',
         baseURL = 'https://analytics.api.brightcove.com/v1',
         useMyAccount = document.getElementById('useMyAccount'),
@@ -435,7 +433,8 @@ var BCLS = (function(window, document) {
         tags = document.getElementById('tags'),
         setOptions = document.getElementById('setOptions'),
         /**
-         * defaults - Brightcove Learning account values here - change to account you want to use
+         * defaults - Brightcove Learning account values
+         * here - change to account you want to use
          * permissions for:
          * Analytics API - all operations
          */
@@ -445,7 +444,7 @@ var BCLS = (function(window, document) {
             client_secret: 'PiDmMouSDBNsNJUuEK90u8bpVn-kSw9D-BM5ADI_rnsLP2KXGN_7OxE6ng2-FAykgLnjj47aS3EeBd2N2K5kiA',
             player_id: 'baf68072-fb1a-4461-a00c-72b8a7f4cb10',
             video_id: '4230322585001',
-            tags: ''
+            tags: 'drupal'
         },
         options = {},
         // for the exercises
@@ -527,24 +526,29 @@ var BCLS = (function(window, document) {
             defaults.client_secret = isDefined(client_secret.value) ? client_secret.value : defaults.client_secret;
             defaults.video_id = isDefined(video_id.value) ? video_id.value : defaults.video_id;
             defaults.player_id = isDefined(player_id.value) ? player_id.value : defaults.player_id;
+            defaults.tags = isDefined(tags.value) ? tags.value : defaults.tags;
             bclslog("defaults", defaults);
         };
         /**
          * set up values for exercises
          */
         setupExercises = function() {
-            ex1request.value = baseURL + '/data?accounts=' + defaults.account_id + '/profiles';
-            ex2request.value = baseURL + '/accounts/' + defaults.account_id + '/profiles';
-            ex2data.value = profileDataStr;
-            ex3request.value = baseURL + '/accounts/' + defaults.account_id + '/profiles/' + profile_id;
-            ex4request.value = baseURL + '/accounts/' + defaults.account_id + '/profiles/' + profile_id;
-            ex4data.value = updateDataStr;
-            ex5request.value = baseURL + '/accounts/' + defaults.account_id + '/profiles/' + profile_id;
-            ex6request.value = baseURL + '/accounts/' + defaults.account_id + '/configuration';
-            ex7request.value = baseURL + '/accounts/' + defaults.account_id + '/configuration';
-            ex7data.value = defaultDataStr;
-            ex8request.value = baseURL + '/accounts/' + defaults.account_id + '/configuration';
-            ex8data.value = updateDefaultDataStr;
+            var dataAccounts = '/data?accounts=' + defaults.account_id,
+                now = new Date(),
+                nowISO = now.toISOString().substring(0, 9),
+                weekAgo = new Date(now.valueOf() - 14 * 24 * 3600 * 1000),
+                weekAgoISO = weekAgo.toISOString().substring(0, 9);
+            bclslog("now", nowISO);
+            bclslog("week ago", weekAgoISO);
+            ex1request.value = baseURL + dataAccounts + '&dimensions=video';
+            ex2request.value = baseURL + dataAccounts + '&dimensions=video,country';
+            ex3request.value = baseURL + dataAccounts + '&dimensions=video,country&fields=video_name,video_view,video_impression,country,country_name';
+            ex4request.value = baseURL + dataAccounts + '&dimensions=video,country&fields=video_name,video_view,video_impression,country,country_name&sort=country_name';
+            ex5request.value = baseURL + dataAccounts + '&dimensions=video,country&fields=video_name,video_view,video_impression,country,country_name&sort=country_name&limit=5&offset=10';
+            ex6request.value = baseURL + dataAccounts + '&dimensions=video,country&fields=video_name,video_view,video_impression,country,country_name&sort=country_name&limit=5&offset=10&from=' + weekAgoISO + '&to=' + nowISO;
+            ex7request.value = baseURL + dataAccounts + '&dimensions=video,country&fields=video_name,video_view,video_impression,country,country_name&sort=country_name&limit=5&offset=10&from=' + weekAgoISO + '&to=' + nowISO + '&where=video==' + defaults.video_id + 'player==' + defaults.player_id;
+            ex8request.value = baseURL + dataAccounts + '&dimensions=video,country&fields=video_name,video_view,video_impression,country,country_name&sort=country_name&limit=5&offset=10&from=' + weekAgoISO + '&to=' + nowISO + '&where=video.q==tags:' + defaults.tags;
+            ex9request = baseURL;
         };
         // listeners
         // toggle sample/customer account
@@ -580,7 +584,7 @@ var BCLS = (function(window, document) {
             bclslog('options', options);
             $.ajax({
                 url: proxyURL,
-                method: 'POST',
+                method: 'GET',
                 data: options,
                 success : function(data) {
                     try {
@@ -622,28 +626,28 @@ var BCLS = (function(window, document) {
             submitRequest(1, 'get', ex1request, ex1response);
         });
         ex2button.addEventListener('click', function() {
-            submitRequest(2, 'post', ex2request, ex2response, ex2data);
+            submitRequest(2, 'get', ex2request, ex2response);
         });
         ex3button.addEventListener('click', function() {
             submitRequest(3, 'get', ex3request, ex3response);
         });
         ex4button.addEventListener('click', function() {
-            submitRequest(4, 'put', ex4request, ex4response, ex4data);
+            submitRequest(4, 'get', ex4request, ex4response);
         });
         ex5button.addEventListener('click', function() {
-            submitRequest(5, 'delete', ex5request, ex5response);
+            submitRequest(5, 'get', ex5request, ex5response);
         });
         ex6button.addEventListener('click', function() {
             submitRequest(6, 'get', ex6request, ex6response);
         });
         ex7button.addEventListener('click', function() {
-            submitRequest(7, 'post', ex7request, ex7response, ex7data);
+            submitRequest(7, 'get', ex7request, ex7response);
         });
         ex8button.addEventListener('click', function() {
-            submitRequest(8, 'post', ex8request, ex8response, ex8data);
+            submitRequest(8, 'get', ex8request, ex8response);
         });
         ex9button.addEventListener('click', function() {
-            submitRequest(9, 'post', ex9request, ex9response, ex8data);
+            submitRequest(9, 'get', ex9request, ex9response);
         });
     return {};
 })(window, document);
