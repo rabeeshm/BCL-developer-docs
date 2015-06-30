@@ -49,134 +49,340 @@
         <div class="sidebar large-2 columns show-for-large-up">
             <div id="sidenav"></div>
         </div>
-        <div id="main" class="large-10 small-12 columns">
-            <div id="top" class="section">
-                <h1>Analytics API Quick Start</h1>
-                <p>In this quick start you will perform the following tasks:</p>
-                <ul>
-                  <li>Obtain credentials to use the Analytics API</li>
-                  <li>Generate reports on each of the Analytics API dimensions</li>
-                  <li>Generate an engagement report for the account</li>
-                </ul>
-                <p class="BCL-aside">For details on the API used in this document you can view the <a href="api-overview.html">Analytics API Overview</a> document and the <a href="../references/versions/v1/index.html">Analytics API reference</a>.</p>
-              </div>
-              <div id="api-tester" class="section">
-                <h2>API Tester</h2>
-                <p>The Analytics API's security is implemented using OAuth2. To permit you to get started using the Analytics API as quickly as possible, the API calls in this quick start will use a shell script called <strong>api-tester.sh</strong> to get access tokens and make the API calls. The api-tester script uses cURL to make http calls. cURL is built in on Mac OS X and all Unix/Linux systems. To get cURL on Windows, see <a href="../../concepts/curl/curl.html">Setting up cURL</a>. Then download the <a href="../../oauth-api/assets/api-tester.sh.zip">api-tester.sh script</a></p>
-                <p class="BCL-aside">You can see the full code for the shell script at <a href="../../oauth-api/guides/get-token.html#codeSamples">Getting Access Tokens</a>.</p>
-                <h3>Running the shell script</h3>
-                <p>After you download the shell script, unzip it wherever you like, and then go to a command line in the same folder. To run the script, type:</p>
-                <pre><code>bash api-tester.sh</code></pre>
-                <p>Each time you run the script, it will prompt you for 5 variables:</p>
-                <ul>
-                  <li>Client ID (see the <a href="#obtaincredentials">next section</a> on obtaining client credentials)</li>
-                  <li>Client Secret (see the <a href="#obtaincredentials">next section</a> on obtaining client credentials)</li>
-                  <li>The full API call (example: <code>https://cms.api.brightcove.com/v1/accounts/12345678/videos</code></li>
-                  <li>The HTTP request method - one of the following: g (GET - the default) | p (POST) | pa (PATCH) | pu (PUT) | d (DELETE) (note: for Analytics API requests, this will always be GET - the default</li>
-                  <li>Request data - used for POST, PATCH, and PUT; for GET and DELETE requests, you will leave this blank and just press <strong>return</strong></li>
-                </ul>
-                <p>For each part of this quick start, you will be given the values for each of these inputs to use with your account.</p>
-              </div>
-              <div class="section" id="getCredentials">
-                <h2>Get client credentials</h2>
-                <p>Although you can get client credentials (a
-                    <code>client_id</code> and
-                    <code>client_secret</code>) directly from the Brightcove OAuth Service using <a href="/en/video-cloud/oauth-api/guides/get-client-credentials.html">CURL</a> or <a href="/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">Postman</a>, the easiest way is to use the <a href="http://docs.brightcove.com/en/video-cloud/analytics-api-v0/guides/managing-api-credentials.html">OAuth Credentials UI</a>. We will use that method here.</p>
-                <ol>
-                    <li>Login to <a href="https://signin.brightcove.com/?redirect=https%3A%2F%2Fstudio.brightcove.com%2F">Video Cloud Studio</a>.</li>
-                    <li>Click the gear icon
-                        <img alt="" src="http://img.brightcove.com/node14056-gear-icon.png" /> in the header.</li>
-                    <li>Click the
-                        <strong>API Authentication</strong> link:
-                        <br />
-                        <img src="assets/oauth-account-settings.png" alt="account settings link" width="182" height="181">
-                    </li>
-                    <li>The API Authentication page will open displaying your current client registrations.
-                        <br />
-                        <img alt="current client registrations" src="assets/oauth-start-screen.png" width="757" height="329" />
-                        <br />
-                        <p class="BCL-aside">Note: Only the client registrations for the account you are logged into will display.</p>
-                    </li>
-                    <li>Click
-                        <strong>Register New Application</strong>.</li>
-                    <li>Enter a
-                        <strong>Name</strong> and
-                        <strong>Short Description</strong> for the client registration (optional).</li>
-                    <li>Select one or more of your accounts for authorization. You can select multiple accounts and click
-                        <strong>&gt;</strong> to add them or click
-                        <strong>&gt;&gt;</strong> to add all accounts. Click
-                        <strong>&lt;</strong> to remove an account or
-                        <strong>&lt;&lt;</strong> to remove all accounts.</li>
-                    <li>Select the API(s) and permission(s) to enable for this registration.
-                        <br />
-                        <img alt="register new app" src="assets/oauth-registering-new-app.png" width="714" height="817" />
-                        <p>Be sure to select <strong>both</strong> Analytics&gt;Read and Video&gt;Read permissions.</p>
-                    </li>
-                    <li>Click
-                        <strong>Save</strong>.</li>
-                    <li>A
-                        <strong>Client ID</strong> and
-                        <strong>Client secret</strong> will be returned.
-                        <br />
-                        <img alt="OAuth" src="assets/oauth-client-secret.png" width="601" height="452" />
-                        <br/>
-                        <p class="BCL-aside">Note: Copy the client secret and store it in a secure location as the client secret
-                            <strong>will not</strong> be displayed again.</p>
-                    </li>
-                </ol>
-                <p class="BCL-aside">These credentials are good for <strong>both</strong> the v1 and v0 (Limited Availability) versions of the Analytics API.</p>
-            </div>
-                <div id="assignvalues" class="section">
-                  <h2>Assign values</h2>
-                  <p>Values you just retrieved in the previous section will be used, along with your account id, to generate the data inputs for each of the tasks that follow, so that you won't have to type them.</p>
-                  <ol start="2">
-                    <li>Enter the corresponding values for each of the following. This step <strong>MUST</strong> be completed before you will see the steps that follow.</li>
-                  </ol>
-                  <div class="form-wrapper">
-                    <fieldset>
-                      <legend>Assign values for reuse</legend>
-                      <p>Submits to local JavaScript and assigns values to variables</p>
-                      <p>
-                        Client id:
-                        <input name="client_id" id="aapi_client_id" type="text" size="50">
-                      </p>
-                      <p>
-                        Client secret:
-                        <input name="client_secret" id="aapi_client_secret" type="text" size="50">
-                      </p>
-                      <p>
-                        Account ID:
-                        <input name="account_id" id="aapi_account_id" type="text" size="30">
-                      </p>
-                      <p>
-                        Video ID (for any active video in your account):
-                        <input name="video_id" id="aapi_video_id" type="text" size="30">
-                      </p>
-                      <p>
-                        Video Reference ID (for any active video in your account, if any have reference ids):
-                        <input name="reference_id" id="aapi_reference_id" type="text" size="30">
-                      </p>
-                      <p>
-                        A tag (assigned to any active video in your account, if use tags):
-                        <input name="tag" id="aapi_tag" type="text" size="30">
-                      </p>
-              <!-- <p>
-                  Video Cloud Video ID (if available):
-                  <input name="video_id" id="aapi_video_id" type="text">
-                </p> -->
-                <p>
-                  <input id="aapi_initial_values_submit" class="BCLbutton" type="submit" value="Assign Values">
-                </p>
-              </fieldset>
-            </div>
-            <div class="section" id="getReports">
-                <h2>Get reports</h2>
-                <p>Once you've entered the information needed above, you will see a series of steps below that walk you through requesting a report on each of the Analytics dimensions.</p>
-                <p>We will keep things simple here by accepting the default values for all parameters and using filters only in the last few steps. Remember, however, that the <code>api-tester.sh</code> script can make any request, so feel free to experiment with the parameters.</p>
-                <p class="BCL-aside">There are no dependencies between the steps, so feel free to skip some if you like.</p>
-                <ol id="taskList" start="3"></ol>
+        <div id="main" class="large-10 small-12 columns deck-container">
+        <!-- title slide -->
+        <div id="top" class="section title slide">
+            <h1>Quick Start: Analytics API</h1>
+            <p class="doc-only">The Analytics API allows you to retrieve various analytics reports for your Video Cloud videos. This tutorial will walk you through these operations.</p>
+            <table class="slide-only bcls-float-right bcls-small">
+                <caption>Navigation</caption>
+                <tbody>
+                    <tr>
+                        <td>↓ or → </td>
+                        <td> forward</td>
+                    </tr>
+                    <tr>
+                        <td>↑ or ← </td>
+                        <td> back</td>
+                    </tr>
+                    <tr>
+                        <td>cmd-m </td>
+                        <td>all slides</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- section slide -->
+        <div class="section slide" id="getStarted">
+            <h2>Getting Started</h2>
+        </div>
+        <!-- regular content slide -->
+        <div id="intro" class="slide">
+            <h3>Introduction</h3>
+            <p class="slide-only">The Analytics API allows you to retrieve various analytics reports for your Video Cloud videos. This tutorial will walk you through these operations.</p>
+            <p>The Analytics API allows you to:</p>
+            <ul>
+                <li class="slide">
+                    <p>Get reports on various data dimensions</p>
+                </li>
+                <li class="slide">
+                    <p>Set the time span for reports</p>
+                </li>
+                <li class="slide">
+                    <p>Determine which metrics are included in reports</p>
+                </li>
+                <li class="slide">
+                    <p>Get reports in JSON, CSV, or XLSX format</p>
+                </li>
+                <li class="slide">
+                    <p>Select videos to report on by tags and other video metadata fields</p>
+                </li>
+            </ul>
+        </div>
+        <div id="restful" class="slide">
+            <h3>A Restful API</h3>
+            <p>The Analytics API is a RESTful API. It accepts HTTPS requests and returns a JSON response.</p>
+            <p>This means that you can use the API with any language you choose - Ruby, Java, PHP, Python, JavaScript (via AJAX or nodejs), etc. All you have to be able to do is make HTTPS requests and handle a JSON response.</p>
+            <p class="BCL-aside slide">For the Analytics API, all requests are GET</p>
+        </div>
+        <div id="baseURL" class="slide">
+            <h3>The base URL</h3>
+            <p>The base URL for the Analytics API is:</p>
+<pre class="slide"><code>https://analytics.api.brightcove.com/v1</code></pre>
+        </div>
+        <div id="authorization" class="slide">
+            <h3>Authorization</h3>
+            <p>API calls are authorized using OAuth2 access tokens. The token is passed with requests in an authorization header:</p>
+<pre class="slide"><code>Authorization: Bearer {access_token}</code></pre>
+            <p class="slide">Access tokens are short-lived (5 min), so you must get one each time you make a request</p>
+            <p class="slide">In these exercises, we'll make requests via a <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-token.html#php">proxy</a> that will fetch an access token and then make the request.</p>
+        </div>
+        <div id="setupSection" class="section slide">
+            <h2>Setup for the Exercises</h2>
+        </div>
+        <div>
+            <div id="setup" class="slide" style="padding-left: 1.5em;max-width: 100%">
+                <h3>Setup</h3>
+                <p class="slide"><button class="bcls-button" id="useSampleAccount">Use Sample Account (recommended)</button> <button class="bcls-button" id="useMyAccount">Use My Account</button></p>
+                <div id="basicInfo" class="display-none" style="width:90%">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Video Cloud Account (Publisher ID):</td>
+                                <td>
+                                    <input id="account_id" type="text" size="30"></td>
+                            </tr>
+                            <tr>
+                                <td class="align-top no-wrap">Client id:</td>
+                                <td>
+                                    <input id="client_id" type="text" size="40" value="" /><p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Client secret:</td>
+                                <td>
+                                    <input id="client_secret" type="text" size="40" value="" /><p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Video ID (for some video with recent views):</td>
+                                <td>
+                                    <input id="video_id" type="text" size="30" value="" /><p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Player ID (for some player with recent views):</td>
+                                <td>
+                                    <input id="player_id" type="text" size="30" value="" /><p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Tag (for some video with recent views):</td>
+                                <td>
+                                    <input id="tags" type="text" size="30" value="" /><p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p><button class="bcls-button" id="setOptions">Set Account Options</button></p>
+                    <p>See <a href="//docs.brightcove.com/en/video-cloud/analytics-api/guides/managing-api-credentials.html">Managing API Credentials</a> for information on getting client credentials.</p>
+                </div>
             </div>
         </div>
+        <!-- end slide - no content - for slides only -->
+        <div class="slide endSlide slide-only"></div>
+        <div id="basicDimensionReport" class="section slide">
+            <h2>Dimension Report</h2>
+        </div>
+        <div id="dimensionReportSetup" class="slide">
+            <h3>Getting a dimension report</h3>
+            <p>To get all the profiles for an account, make a GET request to the endpoint:</p>
+<pre class="slide"><code>/data?accounts={account_id(s)}&amp;dimensions={dimension}</code></pre>
+            <p class="slide">Example:</p>
+<pre class="slide"><code>https://analytics.api.brightcove.com/v1/data?accounts=20318290001&amp;dimensions=video</code></pre>
+<p class="BCL-aside slide">See <a href="http://docs.brightcove.com/en/video-cloud/analytics-api/getting-started/api-overview.html#metrics">Dimensions and Fields</a> for a list of valid dimensions</p>
+        </div>
+        <div id="exercise1" class="slide">
+            <h3>Exercise 1: Get a dimension report</h3>
+            <p>Make the following GET request:</p>
+            <textarea id="ex1request"></textarea>
+            <p><button id="ex1button" class="bcls-button">Submit Request</button></p>
+            <p class="slide-only">(Response will appear on the next slide)</p>
+        </div>
+        <div id="ex1resp" class="slide">
+            <h3 class="slide-only">Exercise 1 response</h3>
+            <textarea id="ex1response" style="height:12em;">Response will appear here</textarea>
+        </div>
+        <!-- end slide - no content - for slides only -->
+        <div class="slide endSlide slide-only"></div>
+        <div id="multipleDimensionSection" class="section slide">
+            <h2>Report on multiple dimensions</h2>
+        </div>
+        <div id="multipleDimensionSetup" class="slide">
+            <h3>Reporting on multiple dimensions</h3>
+            <p>You can also combine more than one dimension:</p>
+<pre class="slide"><code>/data?accounts={account_id(s)}&amp;dimensions={dimension1,dimension2}</code></pre>
+            <p class="slide">Example:</p>
+<pre class="slide"><code>https://analytics.api.brightcove.com/v1/data?accounts=20318290001&amp;<strong>dimensions=video,country</strong></code></pre>
+            <p class="BCL-aside slide">See <a href="http://docs.brightcove.com/en/video-cloud/analytics-api/getting-started/api-overview.html#reportDimensions">Multiple Dimensions</a> to see which dimensions can be combined</p>
+        </div>
+        <div id="exercise2" class="slide">
+            <h3>Exercise 2: Report on multiple dimensions</h3>
+            <p>Make the following GET request:</p>
+            <textarea id="ex2request"></textarea>
+            <p><button id="ex2button" class="bcls-button">Submit Request</button></p>
+            <p class="slide-only">(Response will appear on the next slide)</p>
+        </div>
+        <div id="ex2resp" class="slide">
+            <h3 class="slide-only">Exercise 2 Response</h3>
+            <textarea id="ex2response" style="height:12em;">Response will appear here</textarea>
+        </div>
+        <!-- end slide - no content - for slides only -->
+        <div class="slide endSlide slide-only"></div>
+        <div id="setFields" class="section slide">
+            <h2>Fields and Sorting</h2>
+        </div>
+        <div id="setFieldsSetup" class="slide">
+            <h3>Setting the response fields</h3>
+            <p>To specify the fields you want to return, use the URL param <code>fields</code>:</p>
+<pre class="slide"><code>/data?accounts={account_id(s)}&amp;dimensions={dimension}&amp;<strong>fields={field1,field2,field3...}</strong></code></pre>
+            <p class="slide">Example:</p>
+<pre class="slide"><code>https://analytics.api.brightcove.com/v1//data?accounts=73734234876&amp;dimensions=video,country&amp;fields=video_name,video_view,video_impression,country,country_name</code></pre>
+        <p class="BCL-aside slide">See <a href="http://docs.brightcove.com/en/video-cloud/analytics-api/getting-started/api-overview.html#metrics">Dimensions and Fields</a> for a list fields available for each dimension - and note that the request will fail if you specify an invalid field for the dimension.</p>
+        </div>
+        <div id="exercise3" class="slide">
+            <h3>Exercise 3: Set item fields</h3>
+            <p>This the same request as the previous exerise, but with <code>fields</code> added::</p>
+            <textarea id="ex3request"></textarea>
+            <p><button id="ex3button" class="bcls-button">Submit Request</button></p>
+            <p class="slide-only">(Response will appear on the next slide)</p>
+        </div>
+        <div id="ex3resp" class="slide">
+            <h3 class="slide-only">Exercise 3 response</h3>
+            <textarea id="ex3response" style="height:12em;">Response will appear here</textarea>
+        </div>
+        <div id="sortOrderSetup" class="slide">
+            <h3>Set sort order</h3>
+            <p>To sort response items, set the sort paramater equal to a valid field:</p>
+<pre class="slide"><code>/data?accounts={account_id(s)}&amp;dimensions={dimension}&amp;fields={field1,field2,field3...}&amp;<strong>sort={sort_field}</strong></code></pre>
+            <p class="slide">Example:</p>
+<pre class="slide"><code>https://analytics.api.brightcove.com/v1//data?accounts=73734234876&amp;dimensions=video,country&amp;fields=video_name,video_view,video_impression,country,country_name&amp;<strong>sort=country_name</strong>
+</code></pre>
+        <p class="BCL-aside slide">You can sort on any valid field for the dimension(s) even if you are not returning that field</p>
+        </div>
+
+        <div id="exercise4" class="slide">
+            <h3>Exercise 4: Sort results</h3>
+            <p>Make the following request to sort your results by country:</p>
+            <textarea id="ex4request"></textarea>
+            <p><button id="ex4button" class="bcls-button">Submit Request</button></p>
+            <p class="slide-only">(Response will appear on the next slide)</p>
+        </div>
+        <div id="ex4resp" class="slide">
+            <h3 class="slide-only">Exercise 4 Response</h3>
+            <textarea id="ex4response" style="height:12em;">Response will appear here</textarea>
+        </div>
+        <!-- end slide - no content - for slides only -->
+        <div class="slide endSlide slide-only"></div>
+        <div id="limitOffsetSection" class="section slide">
+            <h2>Limit and Offset</h2>
+        </div>
+        <div id="limitOffsetSetup" class="slide">
+            <h3>Using limit and offset</h3>
+            <p>Specify the number of items to return using <code>limit</code> (default: 10) and the number of items to skip using <code>offset</code> (default: 0):</p>
+<pre class="slide"><code>/data?accounts={account_id(s)}&amp;dimensions={dimension}&amp;fields={field1,field2,field3...}&amp;sort={sort_field}<strong>&amp;limit={limit}&amp;offset={offset}</strong></code></pre>
+<p class="slide">Example:</p>
+<pre class="slide"><code>https://analytics.api.brightcove.com/v1//data?accounts=73734234876&amp;dimensions=video,country&amp;fields=video_name,video_view,video_impression,country,country_name&amp;sort=country_name<strong>&amp;limit=5&amp;offset=10</strong>
+</code></pre>
+            <p class="BCL-aside slide">To return all items, use <code>offset=all</code></p>
+        </div>
+        <div id="exercise5" class="slide">
+            <h3>Exercise 5: Limit and offset</h3>
+            <p>Make the following request to limit the response items to 5, with an offset of 10:</p>
+            <textarea id="ex5request"></textarea>
+            <p><button id="ex5button" class="bcls-button">Submit Request</button></p>
+            <p class="slide-only">(Response will appear on the next slide)</p>
+        </div>
+        <div id="ex5resp" class="slide">
+            <h3 class="slide-only">Exercise 5 response</h3>
+            <textarea id="ex5response" style="height:12em;">Response will appear here</textarea>
+        </div>
+        <!-- end slide - no content - for slides only -->
+        <div class="slide endSlide slide-only"></div>
+        <div id="dateRangeSection" class="section slide">
+            <h2>Set Date Range</h2>
+        </div>
+        <div id="dateRangeSetup" class="slide">
+            <h3>Set date range for a report</h3>
+            <p>Set the date range using the <code>from</code> (default: 30 days before now) and <code>to</code> (default: now) parameters. Dates are specified in ISO 8601 format (without the time part):</p>
+<pre class="slide"><code>/data?accounts={account_id(s)}&amp;dimensions={dimension}&amp;fields={field1,field2,field3...}&amp;sort={sort_field}<strong>&amp;from={date}&amp;to={date}</strong></code></pre>
+            <p class="slide">Example:</p>
+<pre class="slide"><code>https://analytics.api.brightcove.com/v1//data?accounts=73734234876&amp;dimensions=video,country&amp;fields=video_name,video_view,video_impression,country,country_name&amp;sort=country_name<strong>&amp;from=2015-01-01&amp;to=2015-01-31</strong>
+</code></pre>
+<p class="BCL-aside slide">Note: you can also specify the date in Epoch time (milliseconds) - we'll see in a later exercise where this is useful.</p>
+        </div>
+        <div id="exercise6" class="slide">
+            <h3>Exercise 6: Set the date range</h3>
+            <p>This request modifies the previous exercise by requesting analytics for the month of January, 2015:</p>
+            <textarea id="ex6request"></textarea>
+            <p><button id="ex6button" class="bcls-button">Submit Request</button></p>
+            <p class="slide-only">(Response will appear on the next slide)</p>
+        </div>
+        <div id="ex6resp" class="slide">
+            <h3 class="slide-only">Exercise 6 response</h3>
+            <textarea id="ex6response" style="height:12em;">Response will appear here</textarea>
+        </div>
+        <!-- end slide - no content - for slides only -->
+        <div class="slide endSlide slide-only"></div>
+        <div id="whereFilterSection" class="section slide">
+            <h2>where Filters</h2>
+        </div>
+        <div id="whereFilterSetup" class="slide">
+            <h3>Using where filters</h3>
+            <p><code>where</code> filters are used to limit the results based on the value of some dimension:</p>
+<pre class="slide"><code>/data?accounts={account_id(s)}&amp;dimensions={dimension}&amp;fields={field1,field2,field3...}&amp;sort={sort_field}&amp;from={date}&amp;to={date}<strong>&amp;where={dimension1}=={value1};{dimension2}=={value2}</strong></code></pre>
+            <p class="slide">Example:</p>
+<pre class="slide"><code>https://analytics.api.brightcove.com/v1//data?accounts=73734234876&amp;dimensions=video,country&amp;fields=video_name,video_view,video_impression,country,country_name&amp;sort=country_name&amp;from=2015-01-01&amp;to=2015-01-31<strong>&amp;where=video==84783749347;country==AL</strong>
+</code></pre>
+        </div>
+        <div id="exercise7" class="slide">
+            <h3>Exercise 7: Set a where filter</h3>
+            <p>Now we will filter the results from the previous exercise, returning results for a specific player:</p>
+            <textarea id="ex7request"></textarea>
+            <p><button id="ex7button" class="bcls-button">Submit Request</button></p>
+            <p class="slide-only">(Response will appear on the next slide)</p>
+        </div>
+        <div id="ex7resp" class="slide">
+            <h3 class="slide-only">Exercise 7 Response</h3>
+            <textarea id="ex7response" style="height:12em;">Response will appear here</textarea>
+        </div>
+        <div id="updateDefaultProfileSetup" class="slide">
+            <h3>Filter on video properties</h3>
+            <p>You can also use <code>where</code> filters to filter by queries on video properties such as tags or reference ids:</p>
+<pre class="slide"><code>/data?accounts={account_id(s)}&amp;dimensions={dimension}&amp;fields={field1,field2,field3...}&amp;sort={sort_field}&amp;from={date}&amp;to={date}<strong>&amp;where=video.q=={field:value}</strong></code></pre>
+            <p class="slide">Example:</p>
+<pre class="slide"><code>https://analytics.api.brightcove.com/v1//data?accounts=73734234876&amp;dimensions=video,country&amp;fields=video_name,video_view,video_impression,country,country_name&amp;sort=country_name&amp;from=2015-01-01&amp;to=2015-01-31<strong>&amp;where=video.q==tags:training</strong>
+</code></pre>
+<p class="BCL-aside slide">This filter is based on <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/search-videos.html">CMS API searches</a>. Search strings must be <a href="//docs.brightcove.com/en/video-cloud/utilities/URLencoder.html">URI-encoded</a>.</p>
+        </div>
+        <div id="exercise8" class="slide">
+            <h3>Exercise 8: Filter on video tag</h3>
+            <p>The following request includes videos based on a tag:</p>
+            <textarea id="ex8request"></textarea>
+            <p><button id="ex8button" class="bcls-button">Submit Request</button></p>
+            <p class="slide-only">(Response will appear on the next slide)</p>
+        </div>
+        <div id="ex8resp" class="slide">
+            <h3 class="slide-only">Exercise 7 Response</h3>
+            <textarea id="ex8response" style="height:12em;">Response will appear here</textarea>
+        </div>
+        <!-- end slide - no content - for slides only -->
+        <div class="slide endSlide slide-only"></div>
+        <div id="engagementSection" class="section slide">
+            <h2>Engagement Report</h2>
+        </div>
+        <div id="engagementIntro" class="slide">
+            <h3>Getting a detailed engagement report</h3>
+            <p>Detailed engagement reports are available for a video, a player, or a single account for periods within the past 32 days. (If the specified <code>from</code> value is earlier than 32 days ago, an error will be returned.) To get an engagement report for a video, make a request to this endpoint:</p>
+<pre class="slide"><code>/engagement/accounts/{account_id}/videos/{video_id}&amp;from={date-time}&amp;to={date-time}</code></pre>
+            <p class="slide">Example:</p>
+<pre class="slide"><code>https://analytics.api.brightcove.com/v1//data?accounts=73734234876&amp;dimensions=video,country&amp;fields=video_name,video_view,video_impression,country,country_name&amp;sort=country_name<strong>&amp;from=1434985080000&amp;to=1434974335089</strong>
+</code></pre>
+<p class="BCL-aside slide">Note: you can also specify the date in ISO 8601 format if you want engagement by day(s) - use Epoch time (milliseconds) as shown here if you need hourly breakdowns within a single day.</p>
+        </div>
+        <div id="exercise9" class="slide">
+            <h3>Exercise 9: Set the date range</h3>
+            <p>This request modifies the previous exercise by requesting analytics for the month of January, 2015:</p>
+            <textarea id="ex9request"></textarea>
+            <p><button id="ex9button" class="bcls-button">Submit Request</button></p>
+            <p class="slide-only">(Response will appear on the next slide)</p>
+        </div>
+        <div id="ex9resp" class="slide">
+            <h3 class="slide-only">Exercise 9 response</h3>
+            <textarea id="ex9response" style="height:12em;">Response will appear here</textarea>
+        </div>
+        <!-- end slide - no content - for slides only -->
+        <div class="slide endSlide slide-only"></div>
     </div>
     <!-- bcl scripts -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
@@ -189,78 +395,229 @@
     <script src="/en/scripts/bcls-doc-site.js"></script>
     <script src="../assets/aapi-model.js"></script>
     <script id="pageScript" type="text/javascript">
-        var BCLS = (function ($, window, document, aapi_model) {
-            var // Analytics API stuff
-                $aapi_client_id = $("#aapi_client_id"),
-                $aapi_client_secret = $("#aapi_client_secret"),
-                $aapi_account_id = $("#aapi_account_id"),
-                $aapi_video_id = $("#aapi_video_id"),
-                $aapi_reference_id = $("#aapi_reference_id"),
-                $aapi_tag = $("#aapi_tag"),
-                $aapi_initial_values_submit = $("#aapi_initial_values_submit"),
-                options = {
-                  client_id: "",
-                  client_secret: "",
-                  account_id: "",
-                  video_id: "",
-                  reference_id: "",
-                  tag: "",
-                  aapiURL: "https://analytics.api.brightcove.com/v1/"
-                },
-                today = new Date().toISOString(),
-                nowMS = new Date().valueOf(),
-                taskList = document.getElementById("taskList"),
-                // functions
-                bclslog,
-                createSteps,
-                setInitialValues;
-            /**
-             * [bclslog description]
-             * @param  {[type]} context [description]
-             * @param  {[type]} message [description]
-             * @return {[type]}         [description]
-             */
-            bclslog = function (context, message) {
-              if (console) {
-                console.log(context, message);
-              }
-            };
-            bclslog("test", aapi_model.dimensions[0].fields.join(","));
-            /**
-             * create the quick start steps
-             */
-            createSteps = function () {
-                var i,
-                    iMax = aapi_model.dimensions.length,
-                    str = "",
-                    thisDimension;
-                for (i = 0; i < iMax; i++) {
-                    thisDimension = aapi_model.dimensions[i];
-                    str += "<li>Now you will get a report on the <strong>" + thisDimension.name + "</strong> dimension. Go to the command line and enter <code>bash api-tester.sh</code>. Enter the following values for the inputs:<p><strong>Client ID: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_id + "\"></p><p><strong>Client Secret: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\"></p><p><strong>API Call: </strong><textarea>" + options.aapiURL + "data?accounts=" + options.account_id + "&amp;dimensions=" + thisDimension.name + "&ampfields=" + thisDimension.fields.join(",") + "</textarea></p><p><strong>HTTP method: </strong><input type=\"text\" size=\"50\" value=\"g\"></p><p><strong>Request data: </strong><input type=\"text\" size=\"50\" value=\"{none - just press return}\"></p></li>";
+var BCLS = (function(window, document) {
+    'use strict';
+    var proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php',
+        baseURL = 'https://analytics.api.brightcove.com/v1',
+        useMyAccount = document.getElementById('useMyAccount'),
+        basicInfo = document.getElementById('basicInfo'),
+        account_id = document.getElementById('account_id'),
+        client_id = document.getElementById('client_id'),
+        client_secret = document.getElementById('client_secret'),
+        video_id = document.getElementById('video_id'),
+        player_id = document.getElementById('player_id'),
+        tags = document.getElementById('tags'),
+        setOptions = document.getElementById('setOptions'),
+        /**
+         * defaults - Brightcove Learning account values
+         * here - change to account you want to use
+         * permissions for:
+         * Analytics API - all operations
+         */
+        defaults = {
+            account_id: '20318290001',
+            client_id: '2f3b7e79-a8e8-4a21-b2c8-6480cf5f2c8d',
+            client_secret: 'PiDmMouSDBNsNJUuEK90u8bpVn-kSw9D-BM5ADI_rnsLP2KXGN_7OxE6ng2-FAykgLnjj47aS3EeBd2N2K5kiA',
+            player_id: 'baf68072-fb1a-4461-a00c-72b8a7f4cb10',
+            video_id: '4230322585001',
+            tags: 'drupal'
+        },
+        options = {},
+        // for the exercises
+        ex1request = document.getElementById('ex1request'),
+        ex1response = document.getElementById('ex1response'),
+        ex1button = document.getElementById('ex1button'),
+        ex2request = document.getElementById('ex2request'),
+        ex2response = document.getElementById('ex2response'),
+        ex2button = document.getElementById('ex2button'),
+        ex3request = document.getElementById('ex3request'),
+        ex3response = document.getElementById('ex3response'),
+        ex3button = document.getElementById('ex3button'),
+        ex4request = document.getElementById('ex4request'),
+        ex4response = document.getElementById('ex4response'),
+        ex4button = document.getElementById('ex4button'),
+        ex5request = document.getElementById('ex5request'),
+        ex5response = document.getElementById('ex5response'),
+        ex5button = document.getElementById('ex5button'),
+        ex6request = document.getElementById('ex6request'),
+        ex6response = document.getElementById('ex6response'),
+        ex6button = document.getElementById('ex6button'),
+        ex7request = document.getElementById('ex7request'),
+        ex7response = document.getElementById('ex7response'),
+        ex7button = document.getElementById('ex7button'),
+        ex8request = document.getElementById('ex8request'),
+        ex8response = document.getElementById('ex8response'),
+        ex8button = document.getElementById('ex8button'),
+        ex9request = document.getElementById('ex9request'),
+        ex9response = document.getElementById('ex9response'),
+        ex9button = document.getElementById('ex9button'),
+        // functions
+        isDefined,
+        bclslog,
+        copyObj,
+        setAccountOptions,
+        setupExercises,
+        submitRequest;
+        /**
+         * tests for all the ways a variable might be
+         * undefined or not have a value
+         * @param {*} x the variable to test
+         * @return {Boolean} true if variable is defined and has a value
+         */
+        isDefined = function(x) {
+            if ( x === "" || x === null || x === undefined || x === NaN) {
+                return false;
+            }
+            return true;
+        };
+        /**
+         * Logging function - safe for IE
+         * @param  {string} context description of the data
+         * @param  {*} message data to be logged
+         */
+        bclslog = function(context, message) {
+            if (window['console'] && console['log']) {
+              console.log(context, message);
+            }
+        };
+        /**
+         * get a copy of (rather than reference to) an object
+         * @param  {object} obj the object you want a copy
+         * @return {object}     the copy
+         */
+        copyObj = function(obj) {
+            if (isDefined(obj)) {
+                return JSON.parse(JSON.stringify(obj));
+            }
+            bclslog("copy obj error - no object passed");
+            return {};
+        };
+        /**
+         * set up account options when you are ready
+         * to assemble the URL and make the API call
+         */
+        setAccountOptions = function() {
+            defaults.account_id = isDefined(account_id.value) ? account_id.value : defaults.account_id;
+            defaults.client_id = isDefined(client_id.value) ? client_id.value : defaults.client_id;
+            defaults.client_secret = isDefined(client_secret.value) ? client_secret.value : defaults.client_secret;
+            defaults.video_id = isDefined(video_id.value) ? video_id.value : defaults.video_id;
+            defaults.player_id = isDefined(player_id.value) ? player_id.value : defaults.player_id;
+            defaults.tags = isDefined(tags.value) ? encodeURI(tags.value) : encodeURI(defaults.tags);
+            bclslog("defaults", defaults);
+        };
+        /**
+         * set up values for exercises
+         */
+        setupExercises = function() {
+            var dataAccounts = '/data?accounts=' + defaults.account_id,
+                now = new Date(),
+                nowISO = now.toISOString().substring(0, 10),
+                weekAgo = new Date(now.valueOf() - 14 * 24 * 3600000),
+                weekAgoISO = weekAgo.toISOString().substring(0, 10);
+            bclslog("now", nowISO);
+            bclslog("week ago", weekAgoISO);
+            ex1request.value = baseURL + dataAccounts + '&dimensions=video';
+            ex2request.value = baseURL + dataAccounts + '&dimensions=video,country';
+            ex3request.value = baseURL + dataAccounts + '&dimensions=video,country&fields=video_name,video_view,video_impression,country,country_name';
+            ex4request.value = baseURL + dataAccounts + '&dimensions=video,country&fields=video_name,video_view,video_impression,country,country_name&sort=country_name';
+            ex5request.value = baseURL + dataAccounts + '&dimensions=video,country&fields=video_name,video_view,video_impression,country,country_name&sort=country_name&limit=5&offset=10';
+            ex6request.value = baseURL + dataAccounts + '&dimensions=video,country&fields=video_name,video_view,video_impression,country,country_name&sort=country_name&limit=5&offset=10&from=' + weekAgoISO + '&to=' + nowISO;
+            ex7request.value = baseURL + dataAccounts + '&dimensions=video,country&fields=video_name,video_view,video_impression,country,country_name&sort=country_name&limit=5&offset=10&from=' + weekAgoISO + '&to=' + nowISO + '&where=video==' + defaults.video_id + ';country==CH';
+            ex8request.value = baseURL + dataAccounts + '&dimensions=video,country&fields=video_name,video_view,video_impression,country,country_name&sort=country_name&limit=5&offset=10&from=' + weekAgoISO + '&to=' + nowISO + '&where=video.q==tags:' + defaults.tags;
+            ex9request.value = baseURL + '/engagement/accounts/' + defaults.account_id + '/videos/' + defaults.video_id + '&from=' + weekAgoISO + '&to=' + nowISO;
+        };
+        // listeners
+        // toggle sample/customer account
+        useMyAccount.addEventListener('click', function() {
+            if (basicInfo.className === 'display-none') {
+                basicInfo.className = 'display-block';
+                useMyAccount.innerHTML = 'Cancel';
+            } else {
+                basicInfo.className = 'display-none';
+                useMyAccount.innerHTML = 'Use My Account';
+            }
+        });
+        useSampleAccount.addEventListener('click', function() {
+            setAccountOptions();
+            useSampleAccount.innerHTML = 'Setup Complete!';
+            setupExercises();
+        });
+        /**
+         * submits the api request to the proxy and writes the response
+         * @param  {string} the request type get, post, patch, put, delete
+         * @param  {object:htmlElement} reqEl  element that holds the api request
+         * @param  {object:htmlElement} respEl element to write the response to
+         * @param  {object:htmlElement} dataEl element that holds request data (optional)
+         */
+        submitRequest = function(exNum, reqType, reqEl, respEl, dataEl) {
+            var options = {},
+                respData;
+            options.client_id = defaults.client_id;
+            options.client_secret = defaults.client_secret;
+            options.url = reqEl.value;
+            options.requestType = reqType.toUpperCase();
+            options.requestBody = (isDefined(dataEl)) ? dataEl.value : null;
+            bclslog('options', options);
+            $.ajax({
+                url: proxyURL,
+                method: 'POST',
+                data: options,
+                success : function(data) {
+
+                        bclslog('data', data);
+                    try {
+                        respData = JSON.parse(data);
+                        respEl.value = JSON.stringify(respData, null, '  ');
+                    } catch (e) {
+                         bclslog('invalid JSON - something went wrong', e);
+                         data = {'Error': e};
+                         switch (exNum) {
+                            default:
+                            respEl.value = 'There was a problem with the request';
+                            break;
+                         }
+                    }
+                    // write the response to the response element
+
                 }
-                str += "<li>Next, you will get an engagement report on the account for the past 30 days. Go to the command line and enter <code>bash api-tester.sh</code>. Enter the following values for the inputs:<p><strong>Client ID: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_id + "\"></p><p><strong>Client Secret: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\"></p><p><strong>API Call: </strong><textarea>" + options.aapiURL + "engagement/accounts/" + options.account_id + "</textarea></p><p><strong>HTTP method: </strong><input type=\"text\" size=\"50\" value=\"g\"></p><p><strong>Request data: </strong><input type=\"text\" size=\"50\" value=\"{none - just press return}\"></p></li>";
-                str += "<li>Next, you will get an engagement report on the video (that you entered an id for above) for the past 30 days. Go to the command line and enter <code>bash api-tester.sh</code>. Enter the following values for the inputs:<p><strong>Client ID: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_id + "\"></p><p><strong>Client Secret: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\"></p><p><strong>API Call: </strong><textarea>" + options.aapiURL + "engagement/accounts/" + options.account_id + "/videos/" + options.video_id + "</textarea></p><p><strong>HTTP method: </strong><input type=\"text\" size=\"50\" value=\"g\"></p><p><strong>Request data: </strong><input type=\"text\" size=\"50\" value=\"{none - just press return}\"></p></li>";
-                str += "<li>Next, you will get a report on the video with the reference id (that you entered above) for the past 30 days. Go to the command line and enter <code>bash api-tester.sh</code>. Enter the following values for the inputs:<p><strong>Client ID: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_id + "\"</p><p><strong>Client Secret: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\"></p><p><strong>API Call: </strong><textarea>" + options.aapiURL + "data?accounts=/" + options.account_id + "&amp;dimensions=video&amp;where=video.q==reference_id:" + options.reference_id + "&amp;fields=" + thisDimension.fields.join(",") +  "</textarea></p><p><strong>HTTP method: </strong><input type=\"text\" size=\"50\" value=\"g\"></p><p><strong>Request data: </strong><input type=\"text\" size=\"50\" value=\"{none - just press return}\"></p></li>";
-                str += "<li>Finally, you will get a report on the videos with the tags (that you entered above) for the past 30 days. Go to the command line and enter <code>bash api-tester.sh</code>. Enter the following values for the inputs:<p><strong>Client ID: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_id + "\"></p><p><strong>Client Secret: </strong><input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\"></p><p><strong>API Call: </strong><textarea>" + options.aapiURL + "data?accounts=/" + options.account_id + "&amp;dimensions=video&amp;where=video.q==tags:" + options.tag + "&amp;fields=" + thisDimension.fields.join(",") + "</textarea></p><p><strong>HTTP method: </strong><input type=\"text\" size=\"50\" value=\"g\"></p><p><strong>Request data: </strong><input type=\"text\" size=\"50\" value=\"{none - just press return}\"></p></li>";
-                taskList.innerHTML = str;
-            };
-            /**
-             * sets things up after user enters info
-             */
-            setInitialValues = function () {
-              options.client_id = $aapi_client_id.val();
-              options.client_secret = $aapi_client_secret.val();
-              options.account_id = $aapi_account_id.val();
-              options.video_id = $aapi_video_id.val();
-              options.reference_id = $aapi_reference_id.val();
-              options.tag = $aapi_tag.val();
-              today = today.substring(0, today.indexOf("T"));
-              $aapi_initial_values_submit.attr("value", "Values Assigned!");
-              $aapi_initial_values_submit.off("click", setInitialValues);
-              createSteps();
-            };
-            $aapi_initial_values_submit.on("click", setInitialValues);
-        })($, window, document, aapi_model);
+            });
+        };
+        // set account options
+        setOptions.addEventListener('click', function() {
+            setAccountOptions();
+            setOptions.innerHTML = 'Setup Complete!';
+            setupExercises();
+        });
+        // exercise button handlers
+        ex1button.addEventListener('click', function() {
+            submitRequest(1, 'get', ex1request, ex1response);
+        });
+        ex2button.addEventListener('click', function() {
+            submitRequest(2, 'get', ex2request, ex2response);
+        });
+        ex3button.addEventListener('click', function() {
+            submitRequest(3, 'get', ex3request, ex3response);
+        });
+        ex4button.addEventListener('click', function() {
+            submitRequest(4, 'get', ex4request, ex4response);
+        });
+        ex5button.addEventListener('click', function() {
+            submitRequest(5, 'get', ex5request, ex5response);
+        });
+        ex6button.addEventListener('click', function() {
+            submitRequest(6, 'get', ex6request, ex6response);
+        });
+        ex7button.addEventListener('click', function() {
+            submitRequest(7, 'get', ex7request, ex7response);
+        });
+        ex8button.addEventListener('click', function() {
+            submitRequest(8, 'get', ex8request, ex8response);
+        });
+        ex9button.addEventListener('click', function() {
+            submitRequest(9, 'get', ex9request, ex9response);
+        });
+    return {};
+})(window, document);
     </script>
     <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a>
     </div>
