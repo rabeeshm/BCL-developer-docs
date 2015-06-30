@@ -535,9 +535,9 @@ var BCLS = (function(window, document) {
         setupExercises = function() {
             var dataAccounts = '/data?accounts=' + defaults.account_id,
                 now = new Date(),
-                nowISO = now.toISOString().substring(0, 9),
+                nowISO = now.toISOString().substring(0, 10),
                 weekAgo = new Date(now.valueOf() - 14 * 24 * 3600 * 1000),
-                weekAgoISO = weekAgo.toISOString().substring(0, 9);
+                weekAgoISO = weekAgo.toISOString().substring(0, 10);
             bclslog("now", nowISO);
             bclslog("week ago", weekAgoISO);
             ex1request.value = baseURL + dataAccounts + '&dimensions=video';
@@ -548,7 +548,7 @@ var BCLS = (function(window, document) {
             ex6request.value = baseURL + dataAccounts + '&dimensions=video,country&fields=video_name,video_view,video_impression,country,country_name&sort=country_name&limit=5&offset=10&from=' + weekAgoISO + '&to=' + nowISO;
             ex7request.value = baseURL + dataAccounts + '&dimensions=video,country&fields=video_name,video_view,video_impression,country,country_name&sort=country_name&limit=5&offset=10&from=' + weekAgoISO + '&to=' + nowISO + '&where=video==' + defaults.video_id + 'player==' + defaults.player_id;
             ex8request.value = baseURL + dataAccounts + '&dimensions=video,country&fields=video_name,video_view,video_impression,country,country_name&sort=country_name&limit=5&offset=10&from=' + weekAgoISO + '&to=' + nowISO + '&where=video.q==tags:' + defaults.tags;
-            ex9request = baseURL;
+            ex9request = baseURL + '/engagement/accounts/' + defaults.account_id + '/videos/' + defaults.video_id + '&from=' + weekAgoISO + '&to=' + nowISO;
         };
         // listeners
         // toggle sample/customer account
@@ -591,16 +591,6 @@ var BCLS = (function(window, document) {
                         bclslog('data', data);
                         respData = JSON.parse(data);
                         respEl.value = JSON.stringify(respData, null, '  ');
-                        if (exNum === 2) {
-                            profile_id = respData.id;
-                            bclslog('profile_id', profile_id);
-                            setupExercises();
-                        }
-                        if (exNum === 6 || exNum === 7) {
-                            config_id = respData['id'];
-                            bclslog('config_id', config_id);
-                            setupExercises();
-                        }
                     } catch (e) {
                          bclslog('invalid JSON - something went wrong', e);
                          data = {'Error': e};
@@ -614,7 +604,7 @@ var BCLS = (function(window, document) {
 
                 }
             });
-        }
+        };
         // set account options
         setOptions.addEventListener('click', function() {
             setAccountOptions();
