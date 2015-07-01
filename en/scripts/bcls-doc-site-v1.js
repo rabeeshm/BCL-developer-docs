@@ -546,7 +546,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 landingPagePath = "//docs.brightcove.com/" + redirectArray.join("/") + "/index.html";
                 product = "video-cloud";
                 // hide anything perform-only
-                bclslog("performOnly", performOnly);
                 setAttributeOnNodeList(performOnly, "style", "display:none");
                 productName = "Video Cloud";
                 if (pathArray[2] === "index.html") {
@@ -567,6 +566,21 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                         sectionName = "player-management";
                     } else {
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
+                    }
+                    // if section is brightcove-player, remove 'no-perform' items from groups
+                    if (section === 'brightcove-player') {
+                        var i, iMax, j, item;
+                        iMax = bclsNavData[product].sections[section].items.length;
+                        for (i = 0; i < iMax; i++) {
+                            item = bclsNavData[product].sections[section].items[i];
+                            j = item.groups.length;
+                            while (j > 0) {
+                                j--;
+                                if (item.groups[j] === "no-perform") {
+                                    item.groups.splice(j, 1);
+                                }
+                            }
+                        }
                     }
                     // check to see if we're on the section landing page
                     if (pathArray[3] === "index.html") {
@@ -640,6 +654,17 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                         section = "perform";
                     } else {
                         sectionName = bclsNavData[product].sections[section].name;
+                    }
+                    // if section is brightcove-player check for Video Cloud only items to remove from nav
+                    if (section === 'brightcove-player') {
+                        var i = bclsNavData[product].sections[section].items.length;
+                        while (i > 0) {
+                            i--;
+                            if (isItemInArray(bclsNavData[product].sections[section].items[i].groups, 'no-perform') {
+                                bclsNavData[product].sections[section].items.slice(i, 1);
+                            }
+                        }
+
                     }
                     // check to see if we're on the section landing page
                     if (pathArray[3] === "index.html") {
