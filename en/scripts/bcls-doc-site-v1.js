@@ -227,6 +227,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         }
         // assign items to functional and alpha groups
         if (isDefined(navData.items)) {
+            bclslog('navData', navData);
             iMax = navData.items.length;
             for (i = 0; i < iMax; i++) {
                 item = navData.items[i];
@@ -660,11 +661,11 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                         var i = bclsNavData[product].sections[section].items.length;
                         while (i > 0) {
                             i--;
-                            if (isItemInArray(bclsNavData[product].sections[section].items[i].groups, 'no-perform') {
-                                bclsNavData[product].sections[section].items.slice(i, 1);
+                            if (isItemInArray(bclsNavData[product].sections[section].items[i].groups, 'no-perform')) {
+                                bclsNavData[product].sections[section].items.splice(i, 1);
                             }
                         }
-
+                        bclslog('bclsNavData[product].sections[section]', bclsNavData[product].sections[section]);
                     }
                     // check to see if we're on the section landing page
                     if (pathArray[3] === "index.html") {
