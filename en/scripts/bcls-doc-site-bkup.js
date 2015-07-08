@@ -632,12 +632,6 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                         createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
                                     }
                                     break;
-                                case "getting-started":
-                                    subsubsectionName = "Get Started";
-                                    if (pathArray[5] === "index.html") {
-                                        createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
-                                    }
-                                    break;
                                 case "samples":
                                     subsubsectionName = "Code Samples";
                                     if (pathArray[5] === "index.html") {
@@ -659,12 +653,6 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 switch (subsubsection) {
                                 case "guides":
                                     subsubsectionName = "Guides";
-                                    if (pathArray[5] === "index.html") {
-                                        createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
-                                    }
-                                    break;
-                                case "getting-started":
-                                    subsubsectionName = "Get Started";
                                     if (pathArray[5] === "index.html") {
                                         createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
                                     }
@@ -938,12 +926,6 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
                                         createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
                                     }
                                     break;
-                                case "getting-started":
-                                    subsubsectionName = "Get Started";
-                                    if (pathArray[5] === "index.html") {
-                                        createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
-                                    }
-                                    break;
                                 case "samples":
                                     subsubsectionName = "Code Samples";
                                     if (pathArray[5] === "index.html") {
@@ -966,12 +948,6 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
                                 switch (subsubsection) {
                                 case "guides":
                                     subsubsectionName = "Guides";
-                                    if (pathArray[5] === "index.html") {
-                                        createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
-                                    }
-                                    break;
-                                case "getting-started":
-                                    subsubsectionName = "Get Started";
                                     if (pathArray[5] === "index.html") {
                                         createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
                                     }
