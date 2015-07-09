@@ -101,10 +101,10 @@
              * @return {Boolean} true if variable is defined and has a value
              */
             isDefined = function(x){
-                if( x !== "" && x !== null && x !== undefined && x !== NaN && x !== {} && x !== []){
-                    return true;
-                } else{
+                if( x === '' || x === null || x === undefined || x === NaN){
                     return false;
+                } else{
+                    return true;
                 }
             };
 
@@ -216,21 +216,21 @@
                     profiletheadElem,
                     profiletbodyElem,
                     template = profileListTemplate,
-                    profileDescriptions = [
-                        {"name": "Express Standard", "description": "Does not include HLS renditions"},
-                        {"name": "Live - HD", "description": "Profile used by the Live Module - all HD renditions"},
-                        {"name": "Live - Premium HD", "description": "Used by Live Module - Larger set with Standard and HD renditions"},
-                        {"name": "Live - Standard", "description": "Use by Live Module - small set that is cost effective"},
-                        {"name": "audio-only", "description": "Audio tracks to cover all devices ***CURRENTLY NOT WORKING - DO NOT USE***"},
-                        {"name": "balanced-high-definition", "description": "A large set providing high quality renditions for all device types"},
-                        {"name": "balanced-nextgen-player", "description": "Mostly HLS renditions for the Brightcove Player"},
-                        {"name": "balanced-standard-definition", "description": "A set for general use, average quality"},
-                        {"name": "high-bandwidth-devices", "description": "For devices on good wi-fi connections"},
-                        {"name": "low-bandwidth-devices", "description": "For devices on non-wi-fi connections"},
-                        {"name": "mp4-only", "description": "A good range of MP4 renditions, no HLS"},
-                        {"name": "screencast", "description": "Limited renditions, larger frame size with lower bitrates"},
-                        {"name": "single-rendition", "description": "A single good quality MP4"}
-                    ],
+                    // profileDescriptions = [
+                    //     {"name": "Express Standard Copy", "description": "Does not include HLS renditions"},
+                    //     {"name": "Live - HD Copy", "description": "Profile used by the Live Module - all HD renditions"},
+                    //     {"name": "Live - Premium HD Copy", "description": "Used by Live Module - Larger set with Standard and HD renditions"},
+                    //     {"name": "Live - Standard Copy", "description": "Use by Live Module - small set that is cost effective"},
+                    //     {"name": "audio-only Copy", "description": "Audio tracks to cover all devices"},
+                    //     {"name": "balanced-high-definition Copy", "description": "A large set providing high quality renditions for all device types"},
+                    //     {"name": "balanced-nextgen-player Copy", "description": "Mostly HLS renditions for the Brightcove Player"},
+                    //     {"name": "balanced-standard-definition Copy", "description": "A set for general use, average quality"},
+                    //     {"name": "high-bandwidth-devices Copy", "description": "For devices on good wi-fi connections"},
+                    //     {"name": "low-bandwidth-devices Copy", "description": "For devices on non-wi-fi connections"},
+                    //     {"name": "mp4-only Copy", "description": "A good range of MP4 renditions, no HLS"},
+                    //     {"name": "screencast Copy", "description": "Limited renditions, larger frame size with lower bitrates"},
+                    //     {"name": "single-rendition Copy", "description": "A single good quality MP4"}
+                    // ],
                     i, iMax, j, jMax, k, kMax, item;
                 iMax = data.BCLSprofilesArray.length;
                 // massage data
@@ -239,16 +239,22 @@
                     item.videoRenditions = 0;
                     item.audioRenditions = 0;
                     item.imageRenditions = 0;
-                    jMax = item.renditions.length;
-                    item.numRenditions = jMax;
-                    kMax = profileDescriptions.length;
-                    for (k = 0; k < kMax; k++) {
-                        if (item.name === profileDescriptions[k].name) {
-                            item.description = profileDescriptions[k].description;
-                        }
+                    // add legacy description if none
+                    if (!isDefined(item.description)) {
+                        item.description = 'legacy profile - not recommended for use';
                     }
 
+                    jMax = item.renditions.length;
+                    item.numRenditions = jMax;
+                    // kMax = profileDescriptions.length;
+                    // for (k = 0; k < kMax; k++) {
+                    //     if (item.name === profileDescriptions[k].name) {
+                    //         item.description = profileDescriptions[k].description;
+                    //     }
+                    // }
+
                     for (j = 0; j < jMax; j++) {
+                        // count up renditions of each kind
                         if (item.renditions[j].media_type === "video") {
                             item.videoRenditions++;
                         } else if (item.renditions[j].media_type === "image") {
@@ -289,6 +295,7 @@
                     sectionHeading,
                     sectionSubHeading,
                     sectionJsonHeading,
+					sectionJsonP,
                     sectionTableHeading,
                     renditionTable,
                     renditionthead,
@@ -323,6 +330,11 @@
                     delete profile.audioRenditions;
                     delete profile.imageRenditions;
                     delete profile.numRenditions;
+                    if (!isDefined(profile.description)) {
+                        profile.description = 'legacy profile - not recommended for use';
+                    }
+					profile.name = profile.name + ' Copy';
+					profile.account_id = null;
                     if (isDefined(profile.renditions)) {
                         jMax = profile.renditions.length;
                         for (j = 0; j < jMax; j++) {
@@ -335,6 +347,9 @@
                     sectionJsonHeading = createEl("h6", {id: profile.name + "json"});
                     text = document.createTextNode("JSON data for the profile")
                     sectionJsonHeading.appendChild(text);
+					sectionJsonP = createEl('p', {class: 'BCL-aside'});
+					text = document.createTextNode('Note: if you copy and paste the JSON to make a new profile, you will need to replace the null value for "account_id" with your own account id.');
+					sectionJsonP.appendChild(text);
                     sectionTableHeading = createEl("h6");
                     profilePre = createEl("pre");
                     profileCode = createEl("code");
@@ -351,6 +366,7 @@
                     renditionTable.appendChild(renditiontbody);
 
                     section.appendChild(sectionJsonHeading);
+					section.appendChild(sectionJsonP);
                     section.appendChild(profilePre);
                     text = document.createTextNode(JSON.stringify(profile, false, "  "));
                     profileCode.appendChild(text);
