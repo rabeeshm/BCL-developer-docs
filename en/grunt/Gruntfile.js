@@ -18,6 +18,7 @@ module.exports = function (grunt) {
                         'source/mobile-sdks.json',
                         'source/mobile-sdks-v1.json',
                         'source/brightcove-player.json',
+                        'source/media-management.json',
                         'source/ingest-profiles-api.json',
                         'source/di-api.json',
                         'source/cms-api.json',
