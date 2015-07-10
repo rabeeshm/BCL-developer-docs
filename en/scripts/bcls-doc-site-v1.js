@@ -583,6 +583,10 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                             }
                         }
                     }
+                    // if section is ingest profiles api, di api or cms api, set section to media management
+                    if (section === "ingest-profiles-api" || section === "di-api" || section === "cms-api") {
+                        section = "media-management";
+                    }
                     // check to see if we're on the section landing page
                     if (pathArray[3] === "index.html") {
                         // we're on the section landing page
