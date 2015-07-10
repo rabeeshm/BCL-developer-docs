@@ -564,6 +564,9 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                         section = "smart-player-api";
                     } else if (section === "player-management") {
                         sectionName = "player-management";
+                    } else if (section === "ingest-profiles-api" || section === "di-api" || section === "cms-api") {
+                        section = "media-management";
+                        sectionName = "Media Management";
                     } else {
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
                     }
@@ -583,13 +586,10 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                         }
                     }
 
-                    // if section is ingest profiles api, di api or cms api, set section to media management
-                    if (section === "ingest-profiles-api" || section === "di-api" || section === "cms-api") {
-                        section = "media-management";
-                    }
-                    redirectArray = pathArray.slice(0, 3);
-                    bclslog("redirectArray", redirectArray);
-                    landingPagePath = "//docs.brightcove.com/en/" + product + "/" + section + "/index.html";
+                    // // if section is ingest profiles api, di api or cms api, set section to media management
+                    // if (section === "ingest-profiles-api" || section === "di-api" || section === "cms-api") {
+                    //     section = "media-management";
+                    // }
                     // check to see if we're on the section landing page
                     if (pathArray[3] === "index.html") {
                         // we're on the section landing page
@@ -598,6 +598,9 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                     } else {
                         subsection = pathArray[3];
                     }
+                    redirectArray = pathArray.slice(0, 3);
+                    bclslog("redirectArray", redirectArray);
+                    landingPagePath = "//docs.brightcove.com/en/" + product + "/" + section + "/index.html";
                     // check to see if we're on a subsection landing page
                     if (isDefined(subsection)) {
                         // all we care about is whether we accidentally got onto a
