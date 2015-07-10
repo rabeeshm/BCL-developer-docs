@@ -362,7 +362,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             navGroups = ["getting-started", "references", "learning-guides"],
             // helper function
             buildNavItem;
-        bclslog("landingPagePath", landingPagePath);
         buildNavItem = function (itemGroup) {
             navHTML += "<li class=\"has-dropdown\"><a href=\"#\">" + data[itemGroup].header + "</a><ul class=\"dropdown\">";
             jMax = data[itemGroup].items.length;
@@ -545,9 +544,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 navMenuRight.innerHTML = menuRightBase + vcSupportNav;
                 break;
             case "video-cloud": // in video cloud
-                redirectArray = pathArray.slice(0, 3);
-                bclslog("redirectArray", redirectArray);
-                landingPagePath = "//docs.brightcove.com/" + redirectArray.join("/") + "/index.html";
                 product = "video-cloud";
                 // hide anything perform-only
                 setAttributeOnNodeList(performOnly, "style", "display:none");
@@ -586,10 +582,14 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                             }
                         }
                     }
+
                     // if section is ingest profiles api, di api or cms api, set section to media management
                     if (section === "ingest-profiles-api" || section === "di-api" || section === "cms-api") {
                         section = "media-management";
                     }
+                    redirectArray = pathArray.slice(0, 3);
+                    bclslog("redirectArray", redirectArray);
+                    landingPagePath = "//docs.brightcove.com/en/" + product + "/" + section + "/index.html";
                     // check to see if we're on the section landing page
                     if (pathArray[3] === "index.html") {
                         // we're on the section landing page
