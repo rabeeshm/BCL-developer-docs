@@ -133,7 +133,10 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
      * sets document title to contents of first h1 tag
      */
     setPageTitle = function () {
-        document.title = document.getElementsByTagName("h1")[0].innerHTML;
+        var h1 = document.getElementsByTagName("h1")
+        if (isDefined(h1[0])) {
+            document.title = h1[0].innerHTML;
+        }
     };
 
     /**
@@ -359,7 +362,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             navGroups = ["getting-started", "references", "learning-guides"],
             // helper function
             buildNavItem;
-
+        bclslog("landingPagePath", landingPagePath);
         buildNavItem = function (itemGroup) {
             navHTML += "<li class=\"has-dropdown\"><a href=\"#\">" + data[itemGroup].header + "</a><ul class=\"dropdown\">";
             jMax = data[itemGroup].items.length;
