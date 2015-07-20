@@ -68,7 +68,8 @@ nomic-server.
 ### Using a policy key
 
 When an end-user tries to play a video, the following sequence occurs
-for both web and app players:
+for both web and app players. (This does not occur for pre-baked
+players that include video asset URLs.)
 
 - The player makes a request to Wedge Playback
   (`edge.api.brightcove.com`) asking for the video playback metadata
@@ -90,7 +91,7 @@ for both web and app players:
   Playback with auth info.
 
 Along with the effect, the nomic policy engine produces information
-about whata data it requested and looked at it in order to produce its
+about what data it requested and looked at it in order to produce its
 judgement. This can serve as something like an explanation for the
 judgement, but it reveals information that an attacker could use in
 order to try to bypass restrictions. Therefore, we currently do not

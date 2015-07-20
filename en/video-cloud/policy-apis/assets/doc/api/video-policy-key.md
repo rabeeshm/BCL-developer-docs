@@ -61,7 +61,8 @@ the video belongs to against a Cathy token.
 ## Short policy format
 
 This API allows the use of an alternative, shorter policy format. This
-format is the one customers should use.
+format is the one customers should use. The format is a JSON map
+containing one or more key-value pairs from the following list:
 
 * `{"always": "<effect>"}` where `<effect>` is either `allow` or `deny`.  This represents a
   trivial policy that either always allows or always denies the request, and can be interpreted

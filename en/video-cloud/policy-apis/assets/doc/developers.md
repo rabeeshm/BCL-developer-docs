@@ -47,3 +47,16 @@ policy key are limited: Many of the policies nomic deals in (such as
 georestriction) are paid features. If we allowed customer to create
 arbitrary policy keys, they would be able to use these features
 without paying for them.
+
+## Extending the policy language
+
+When writing a new primitives, be aware of the difference between *not
+matching* and *yielding false*. For example, the `!adobe-tve-valid`
+primitive treats auth credential context keys as optional so that it
+can still yield `true` (to deny the request) when credentials are
+missing. If it failed to treat them as optional, missing credentials
+would cause the match to fail and the Deny effect would be lost.
+
+In general, any time a primitive is added the inverse primitive should
+also be added. We do not have a generic `not` primitive to use in the
+policy language because the match-reasons semantics are complicated.
