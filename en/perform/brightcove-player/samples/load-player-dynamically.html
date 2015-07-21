@@ -3,7 +3,6 @@
 
 <head>
     
-  
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
   <!-- change title to match the h1 heading -->
@@ -54,46 +53,12 @@
         <h1>Brightcove Player Sample: Loading the Player Dynamically</h1>
         <p>This topic describes how to load the Brightcove player dynamically, that is, on a user event and NOT in the startup HTML. In the working example here you can click the <strong>Add Player</strong> button to dynamically load the player and play a video.</p>
       </div>
-			
-		  <div id="developmentsequence" class="section">
-			  <h2 id="expanderHead"><span id="expanderSign">+</span>Development sequence</h2>
-        <div id="expanderContent" style="display:none">	
-          <p>Here is the recommended development sequence:</p>
-          <ol>
-            <li>Use the embed_in_page player implementation to test the functionality of your player, plugin and CSS (if CSS is needed)</li>
-            <li>Put the plugin's JavaScript and CSS into separate files for local testing</li>
-            <li>Deploy the plugin code and CSS to your server once you have worked out any errors</li>
-            <li>Use the new Video Cloud Studio to add the plugin and CSS to your player</li>
-            <li>Replace the embed_in_page player implementation if you determine that the iframe implementation is a better fit (detailed in next section)</li>
-          </ol>
-          <p>For details about these steps, review the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a> guide.</p>
-          <h3>iframe or embed_in_page</h3> 
-          <p>When developing enhancements for the Brightcove player you will need to decide if the code is a best fit for the iframe or embed_in_page implementation. The best practice recommendation is to build a plugin for use with an iframe implementation. The
-            advantages of using the iframe player are:</p>
-          <ul>
-            <li>No collisions with existing JavaScript and/or CSS</li>
-            <li>Automatically responsive</li>
-            <li>The iframe eases use in social media apps (or whenever the video will need to "travel" into other apps)</li>
-          </ul>
-          <p>Although integrating the embed_in_page player can be more complex, there are times when you will plan your code around that implementation. To generalize, this approach is best when the containing page needs to communicate to the player. Specifically,
-            here are some examples:</p>
-          <ul>
-            <li>Code in the containing page needs to listen for and act on player events</li>
-            <li>The player uses styles from the containing page</li>
-            <li>The iframe will cause app logic to fail, like a redirect from the containing page</li>
-          </ul>
-          <p>Even if your final implementation does not use the iframe code, you can still use the embed_in_page code with a plugin for your JavaScript and a separate file for your CSS. This encapsulates your logic so that you can easily use it in multiple players.</p>
-        </div><!-- id="expanderContent" -->
-			</div>
-			
-      <div id="selectimplementation" class="section">
-				<h2>Select implementation</h2>
-				<p>In this sample, you will generate the embed_in_page code dynamically, given your account id and player id. Since the <code>videojs</code> object does not exist until the player script is added to the page and run, you will not be able to move the CSS and JavaScript into a plugin, but both the iframe and In-Page Embed implementations will be used.</p>
-			</div>
           
       <div id="resources" class="section">
         <h2>API resources used</h2>
-		    <p>No special calls are made to the various APIs.</p>
+        <ul>
+          <li><code>videojs()</code> method: Creates an instance of the player</li>
+        </ul>
       </div>
 			
       <div id="player" class="section">
@@ -108,7 +73,7 @@
 			
       <div id="code" class="section">
         <h2>How it works</h2>
-        <p>In the following two sections you will see how to use JavaScript and CSS to build the standard code used for in-page embed and iframe implementations of Brightcove Player.</p>
+        <p>In the following two sections you will see how to use JavaScript and CSS to dynamically build the standard code used for in-page embed and iframe implementations of Brightcove Player.</p>
         <p>It is assumed you have created a Brightcove Player using Studio.</p>
       </div>
 
@@ -122,7 +87,7 @@
         <p><code data-gist-id="06c0f61aa0c21ad924a4" data-gist-line="2" data-gist-hide-footer="true"></code></p>
      
         <h3><a name="HTMLCode"></a>The HTML code</h3>
-            <p>Add the following HTML to your page code:</p>
+            <p>The following HTML is used to target where the dynamically created player will be injected:</p>
           <ul>
             <li>Lines 23,25: Define the container where the player will by dynamically added.</li>
             <li>Line 24: Defines the button that when selected adds the player to the page.</li>
@@ -131,7 +96,7 @@
       
         <h3><a name="JSCode"></a>The JavaScript code</h3>
       
-        <p>Define the variables, create the player code and inject it into the HTML page.</p>
+        <p>The JavaScript used will define the variables, create the player code and inject it into the HTML page.</p>
         <ol>
           <li>Lines 28-34: Define the variables for the script.</li>
           <li>Line 38: The <code>accountId</code>, <code>playerId</code> and <code>videoId</code> fields are used to dynamically create the player code.</li>
@@ -155,12 +120,12 @@
         <p></p>
       <p>The following sections explain the player, JavaScript and CSS code used in the example.</p>
         <h3>The player code</h3>
-        <p>The player code will use a plugin which reads the video type and source URL as query parameters. You could make this implementation much simpler by simply assigning a video to the player in Perform Studio > Players > Video Content section, but the goal here is to allow the video content to be set programmatically. In the code below you will see the query parameters <code>videoType</code> and <code>videoURL</code>. <strong>These are NOT normal parameters you can use with the iframe implementation, but functional because of the plugin detailed in this section.</strong> Note that the values assigned to these parameters much be URL encoded to be part of the URL address.</p>
+        <p>The player code will use a plugin which reads the video type and source URL as query parameters. You could make this implementation much simpler by simply assigning a video to the player in <code>Perform Studio > Players > Video Content</code> section, but the goal in this document is to allow the video content to be set programmatically. In the code below you will see the query parameters <code>videoType</code> and <code>videoURL</code>. <strong>These are NOT normal parameters you can use with the iframe implementation, but functional because of the plugin detailed in this section.</strong> Note that the values assigned to these parameters must be URL encoded to be part of the URL address.</p>
         <p class="BCL-aside">Note: This code does not initially reside in the HTML page, but is generated dynamically when the user selects the <strong>Add Player</strong> button.</p>
         <p><code data-gist-id="06c0f61aa0c21ad924a4" data-gist-line="116" data-gist-hide-footer="true"></code></p>
      
         <h3><a name="HTMLCode"></a>The HTML code</h3>
-            <p>Add the following HTML to your page code:</p>
+            <p>The following HTML is used to target where the dynamically created player will be injected:</p>
           <ul>
             <li>Lines 165,167: Define the container where the player will by dynamically added.</li>
             <li>Line 166: Defines the button that when selected adds the player to the page.</li>
@@ -169,7 +134,7 @@
       
         <h3><a name="JSCode"></a>The JavaScript code</h3>
       
-        <p>Define the variables, create the player code and inject it into the HTML page. This JavaScript sits in the HTML page in a &lt;script&gt; block.</p>
+        <p>The JavaScript used will define the variables, create the player code and inject it into the HTML page. This JavaScript sits in the HTML page in a <code>&lt;script&gt;</code> block.</p>
         <ol>
           <li>Lines 171-178: Define the variables for the script. Note that the <code>encodedVideoURL</code> and <code>encodedVideoType</code> variables' values must be in URL encoded format.</li>
           <li>Lines 180-186: Define the function called by the button click.</li>
@@ -185,7 +150,7 @@
         </ul>
         <ol>
           <li>Lines 121,143: Standard code to define a Brightcove Player plugin. In this case the name of the plugin is <strong>dynamicLoad</strong>.</li>
-          <li>Lines 135-142: A function that retrieves the value from a URL. The parameter passed to the function is the name of the query parameter, for which the value is retrieved.</li>
+          <li>Lines 135-142: A function that retrieves the value from a URL. The parameter passed to the function is the name of the query parameter for which the value is retrieved.</li>
           <li>Line 122: Creates a variable for the player instance.</li>
           <li>Lines 123-124: Assigns variables the values of the query parameters using the aforementioned function.</li>
           <li>Lines 126-131: Assigns a video source to the player.</li>
@@ -207,11 +172,11 @@
       </div>
           
       <div id="useembedinpage" class="section video-cloud-only">
-        <h2>embed_in_page code</h2>
-        <p>It is a best practice to use the iframe player implementation as shown above. If you want to get a reference to the player to control it, you can use the embed_in_page implementation.</p>
+        <h2>in-page embed code</h2>
+        <p>It is a best practice to use the iframe player implementation as shown above. If you want to get a reference to the player to control it, you can use the in-page embed implementation.</p>
         
         <h3>The player code</h3>
-        <p>In this case, you will use the embed_in_page implementation displayed when the player is published.</p>
+        <p>In this case, you will use the in-page embed implementation displayed when the player is published.</p>
         <p class="BCL-aside">Note: This code does not initially reside in the HTML page, but is generated dynamically when the user selects the <strong>Add Player</strong> button.</p>
         <p><code data-gist-id="06c0f61aa0c21ad924a4" data-gist-line="51-57"  data-gist-hide-footer="true"></code></p>
         
@@ -243,11 +208,11 @@
       </div>
           
       <div id="useembedinpage" class="section perform-only">
-        <h2>embed_in_page code</h2>
-        <p>It is a best practice to use the iframe player implementation as shown above. If you want to get a reference to the player to control it, you can use the embed_in_page implementation.</p>
+        <h2>in-page embed code</h2>
+        <p>It is a best practice to use the iframe player implementation as shown above. If you want to get a reference to the player to control it, you can use the in-page embed implementation.</p>
         
         <h3>The player code</h3>
-        <p>In this case, you will use the embed_in_page implementation displayed when the player is published.</p>
+        <p>In this case, you will use the in-page embed implementation displayed when the player is published.</p>
         <p class="BCL-aside">Note: This code does not initially reside in the HTML page, but is generated dynamically when the user selects the <strong>Add Player</strong> button.</p>
         <p><code data-gist-id="06c0f61aa0c21ad924a4" data-gist-line="196-201"  data-gist-hide-footer="true"></code></p>
         
@@ -265,7 +230,7 @@
           <li>Lines 229-234: Define the variables for the script. The <code>accountId</code> and <code>playerId</code> fields are used to dynamically create the player code.</li>
           <li>Line 238: Build the <code>video</code> element.</li>
           <li>Lines 240: Dynamically add the player code, in this case the <code>video</code> element, to the HTML page.</li>
-          <li>Lines 242-243: Create the <code>script</code> element, and set its <code>src</code></li>
+          <li>Lines 242-243: Create the <code>script</code> element, and set its <code>src</code>.</li>
           <li>Line 244: Adds the script using the <code>appendChild()</code> method, which also runs the script.</li>
           <li>Line 245: On the load of the script, call the <code>callback</code> function.</li>
           <li>Line 249: In the function, create an instance of the player using the <code>videojs</code> method.</li>
@@ -280,7 +245,7 @@
           
       </div>
           
-      <div class="section" id="BCLreferences"  class="perform-only">
+      <div class="section perform-only" id="BCLreferences">
         <h2>Related Topics</h2>
         <ul>
           <li><a href="../../brightcove-player/guides/plugin-guide.html">Plugin Guide</a></li>
@@ -311,7 +276,7 @@
       playerData = {
         'accountId': '1752604059001',
         'playerId': '04ee9f58-9d08-43ea-803f-abda86776db2',
-        'videoId': '3851380732001'
+        'videoId': '4172255216001'
       };
 
     function addPlayer() {
