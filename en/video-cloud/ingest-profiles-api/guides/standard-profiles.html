@@ -93,8 +93,19 @@
                 dedupe,
                 isDefined,
                 createEl,
+                removeSpaces,
                 bclslog;
-
+            /**
+             * remove spaces from passed string
+             * @param  {string} str - the string to remove spaces from
+             * @return {str}   - string with spaces removed
+             */
+            removeSpaces = function (str) {
+                if (isDefined(str)) {
+                    return str.replace(" ", "");
+                }
+                return "";
+            };
             /**
              * tests for all the ways a variable might be undefined or not have a value
              * @param {*} x the variable to test
@@ -216,22 +227,7 @@
                     profiletheadElem,
                     profiletbodyElem,
                     template = profileListTemplate,
-                    // profileDescriptions = [
-                    //     {"name": "Express Standard Copy", "description": "Does not include HLS renditions"},
-                    //     {"name": "Live - HD Copy", "description": "Profile used by the Live Module - all HD renditions"},
-                    //     {"name": "Live - Premium HD Copy", "description": "Used by Live Module - Larger set with Standard and HD renditions"},
-                    //     {"name": "Live - Standard Copy", "description": "Use by Live Module - small set that is cost effective"},
-                    //     {"name": "audio-only Copy", "description": "Audio tracks to cover all devices"},
-                    //     {"name": "balanced-high-definition Copy", "description": "A large set providing high quality renditions for all device types"},
-                    //     {"name": "balanced-nextgen-player Copy", "description": "Mostly HLS renditions for the Brightcove Player"},
-                    //     {"name": "balanced-standard-definition Copy", "description": "A set for general use, average quality"},
-                    //     {"name": "high-bandwidth-devices Copy", "description": "For devices on good wi-fi connections"},
-                    //     {"name": "low-bandwidth-devices Copy", "description": "For devices on non-wi-fi connections"},
-                    //     {"name": "mp4-only Copy", "description": "A good range of MP4 renditions, no HLS"},
-                    //     {"name": "screencast Copy", "description": "Limited renditions, larger frame size with lower bitrates"},
-                    //     {"name": "single-rendition Copy", "description": "A single good quality MP4"}
-                    // ],
-                    i, iMax, j, jMax, k, kMax, item;
+                    i, iMax, j, jMax, k, kMax, item, str = "";
                 iMax = data.BCLSprofilesArray.length;
                 // massage data
                 for (i = 0; i < iMax; i++) {
@@ -246,12 +242,6 @@
 
                     jMax = item.renditions.length;
                     item.numRenditions = jMax;
-                    // kMax = profileDescriptions.length;
-                    // for (k = 0; k < kMax; k++) {
-                    //     if (item.name === profileDescriptions[k].name) {
-                    //         item.description = profileDescriptions[k].description;
-                    //     }
-                    // }
 
                     for (j = 0; j < jMax; j++) {
                         // count up renditions of each kind
@@ -286,8 +276,14 @@
                 sectionHeadingElem.innerHTML = "Standard Profiles List";
                 sectionIntroElem.innerHTML = "Click on a profile name to see details of the renditions it includes. Note that the actual renditions created will depend on the quality of the source video.";
                 profiletheadElem.innerHTML = "<tr><th>Profile Name</th><th>Video Renditions</th><th>Audio Renditions</th><th>Image Renditions</th><th>Description</th></tr>";
-                template = Handlebars.compile(profileListTemplate);
-                profiletbodyElem.innerHTML = template(data);
+                // template = Handlebars.compile(profileListTemplate);
+                // profiletbodyElem.innerHTML = template(data);
+                bclslog('BCLSprofilesArray', BCLSprofilesArray);
+                iMax = BCLSprofilesArray.length;
+                for (i = 0; i < iMax; i++) {
+                    item = BCLSprofilesArray[i];
+                    str += '<tr><td><a href="#{{name}}">{{name}}</a></td><td class="bcl-center">{{videoRenditions}}</td><td class="bcl-center">{{audioRenditions}}</td><td class="bcl-center">{{imageRenditions}}</td><td>{{description}}</td></tr>'
+                }
             };
             buildDetailTables = function () {
                 bclslog("building data tables");
