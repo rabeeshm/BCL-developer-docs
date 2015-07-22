@@ -102,7 +102,7 @@
              */
             removeSpaces = function (str) {
                 if (isDefined(str)) {
-                    return str.replace(" ", "");
+                    return str.replace(/\s/g, "");
                 }
                 return "";
             };
@@ -278,12 +278,13 @@
                 profiletheadElem.innerHTML = "<tr><th>Profile Name</th><th>Video Renditions</th><th>Audio Renditions</th><th>Image Renditions</th><th>Description</th></tr>";
                 // template = Handlebars.compile(profileListTemplate);
                 // profiletbodyElem.innerHTML = template(data);
-                bclslog('BCLSprofilesArray', BCLSprofilesArray);
-                iMax = BCLSprofilesArray.length;
+                bclslog('data.BCLSprofilesArray', data.BCLSprofilesArray);
+                iMax = data.BCLSprofilesArray.length;
                 for (i = 0; i < iMax; i++) {
-                    item = BCLSprofilesArray[i];
-                    str += '<tr><td><a href="#{{name}}">{{name}}</a></td><td class="bcl-center">{{videoRenditions}}</td><td class="bcl-center">{{audioRenditions}}</td><td class="bcl-center">{{imageRenditions}}</td><td>{{description}}</td></tr>'
+                    item = data.BCLSprofilesArray[i];
+                    str += '<tr><td><a href="#' + removeSpaces(item.name) + 'Copy">' + item.name + '</a></td><td class="bcl-center">' + item.videoRenditions + '</td><td class="bcl-center">' + item.audioRenditions + '</td><td class="bcl-center">' + item.imageRenditions + '</td><td>' + item.description + '</td></tr>';
                 }
+                profiletbodyElem.innerHTML = str;
             };
             buildDetailTables = function () {
                 bclslog("building data tables");
@@ -337,7 +338,7 @@
                             delete profile.renditions[j].id;
                         }
                     }
-                    section = createEl("div", {id: profile.name, class: "section"});
+                    section = createEl("div", {id: removeSpaces(profile.name), class: "section"});
                     sectionHeading = createEl("h2");
                     sectionSubHeading = createEl("p");
                     sectionJsonHeading = createEl("h6", {id: profile.name + "json"});
@@ -426,10 +427,11 @@
                             if (httpRequest.readyState === 4) {
                               if (httpRequest.status === 200) {
                                 // try {
-                                  bclslog(httpRequest.responseText);
+                                  bclslog('response', httpRequest.responseText);
                                   data.BCLSprofilesArray = JSON.parse(httpRequest.responseText);
                                   buildSummaryTable();
                                   buildDetailTables();
+
 
                                 // } catch (e) {
                                 //   bclslog('invalid json', e);
