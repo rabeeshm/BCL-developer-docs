@@ -11,8 +11,8 @@ var BCLSshowContentByProduct = ( function (window, document) {
      * @return {boolean} true if the element has that class, false if not
      */
     function hasClass( elem, cls ) {
-        return (" " + elem.className + " " ).indexOf( “ " + cls + " " ) > -1;
-    }
+        return (" " + elem.className + " " ).indexOf( " " + cls + " " ) > -1;
+    };
 
     /**
      * determines if one string contains another string
@@ -21,7 +21,7 @@ var BCLSshowContentByProduct = ( function (window, document) {
      * @return {boolean} - returns true if str1 contains str2
      */
     doesContain = function (str1, str2) {
-        if (srt1.indexOf(str2) === -1) {
+        if (str1.indexOf(str2) === -1) {
             return false;
         }
         return true;
@@ -47,8 +47,8 @@ var BCLSshowContentByProduct = ( function (window, document) {
     // if product = perform, hide video cloud content and vice-versa
     if (doesContain(path, 'perform')) {
         hideContent('video-cloud-only');
-    } elseif (doesContain(path, 'video-cloud')) {
-        hideContent('perform');
+    } else if (doesContain(path, 'video-cloud')) {
+        hideContent('perform-only');
     }
 
 })(window, document);
