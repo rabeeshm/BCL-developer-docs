@@ -21,6 +21,7 @@ module.exports = function (grunt) {
                         'source/media-management.json',
                         'source/forums.json',
                         'source/oauth-api.json',
+                        'source/playback-api.json',
                         'source/player-management.json',
                         'source/media.json'
                     ],

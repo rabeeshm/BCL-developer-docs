@@ -242,6 +242,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                     jMax = item.groups.length;
                     for (j = 0; j < jMax; j++) {
                         group = item.groups[j];
+                        bclslog('group', group);
                         groupObj[group].items.push(item);
                     }
                 } else {
@@ -567,6 +568,9 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                     } else if (section === "ingest-profiles-api" || section === "di-api" || section === "cms-api") {
                         section = "media-management";
                         sectionName = "Media Management";
+                    } else if (section === "policy-api") {
+                        section = "playback-api";
+                        sectionName = "Playback API";
                     } else {
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
                     }
