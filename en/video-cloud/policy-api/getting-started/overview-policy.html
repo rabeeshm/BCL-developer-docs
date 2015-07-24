@@ -76,7 +76,34 @@
         "account-id": "{account_id}"
     }
 }</code></pre>
-                <p>This is the most basic policy, which restricts access to the account, you must include this in any policy you create. The account id here must match the account id</p>
+                <p>This is the most basic policy, which restricts access to the account, you must include this in any policy you create. The account id here must match the account id in the request URL, or an error will be returned.</p>
+                <h3>Domain restriction</h3>
+                <p>In addition to limiting access to the account, you can also limit access to specific domains by adding the <code>allowed-domains</code> key:</p>
+<pre><code>{
+    "key-data": {
+        "account-id": "123456789001",
+        "allowed-domains": [
+            "http://www.abc.com",
+            "https://www.abc.com",
+            "http://www.xyz.com",
+            "https://www.xyz.com"
+        ]
+    }
+}</code></pre>
+                <p class="BCL-aside">Note: any key for your account may be used to access the account content via the Playback API, so if you are using domain restriction, you need to use for every policy key you create, and for all your players.</p>
+                <h3>Response</h3>
+                <p>The response to create requests will be JSON that includes the encrypted <code>key-string</code> that you can use to authenticate requests to the Playback API, as well as the policy associated with the key:</p>
+<pre><code>{
+  "key-string":"BCpkABErCLcF3UA6qs5qET2YO1X53fWKC6kkGZ8eB_xKW3oG7ucm83yobSTc8M47SziPQyA0LcM7AouoslfH_oXUlcs-15132jdpkII1p24pNUv-1MucSipw2iA",
+  "policy":[
+    {
+      "pattern":{
+        "!=":["[request.params.account-id]","8523"]
+      },
+      "effect":"deny"
+    }
+  ]
+}</code></pre>
             </div>
             <div class="section" id="videoRequests">
                 <h2>Video requests</h2>
