@@ -70,7 +70,7 @@
       </div>
       <div id="obtaincredentials" class="section">
         <h2>Obtain credentials</h2>
-        <p>To use the Policy API you will need proper credentials. Later in this quick start, you will use the credentials in a form when submitting requests to the API.</p>
+        <p>To use the Policy API you will need proper credentials. In this quick start, you will work on a Brightcove test account, so you will not need to complete this step, but be aware that you will need to get client credentials when you work on your own account.</p>
         <ol>
           <li>To obtain credentials follow the instructions in <a href="../guides/managing-api-credentials.html">Managing API Credentials</a>. This is the recommended way of obtaining your client credentials. The permissions you will need are <strong>Player Read</strong> and <strong>Player Read/Write</strong>:
             <div><img src="./assets/quick-start-required-permissions.png" width="412" height="140"></div>
@@ -82,71 +82,30 @@
             </li>
           </ol>
         </div>
-        <div id="assignvalues" class="section">
-          <h2>Assign values</h2>
-          <p>Values you just retrieved in the previous section will be used, along with your account ID, to generate the data inputs for each of the tasks below, so that you won't have to type them.</p>
-          <ol start="2">
-            <li>Enter the corresponding values for each of the following. This step <strong>MUST</strong> be completed before you perform the steps that follow.</li>
-          </ol>
-          <div id="setup" class="slide" style="padding-left: 1.5em;max-width: 100%">
-                <h3>Setup</h3>
-                <p class="slide"><button class="bcls-button" id="useSampleAccount">Use Sample Account (recommended)</button> <button class="bcls-button" id="useMyAccount">Use My Account</button></p>
-                <div id="basicInfo" class="display-none" style="width:90%">
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>Video Cloud Account (Publisher ID):</td>
-                                <td>
-                                    <input id="account_id" type="text" size="30"></td>
-                            </tr>
-                            <tr>
-                                <td class="align-top no-wrap">Client id:</td>
-                                <td>
-                                    <input id="client_id" type="text" size="40" value="" /><p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Client secret:</td>
-                                <td>
-                                    <input id="client_secret" type="text" size="40" value="" /><p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Video ID (for some video with recent views):</td>
-                                <td>
-                                    <input id="video_id" type="text" size="30" value="" /><p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Player ID (for some player with recent views):</td>
-                                <td>
-                                    <input id="player_id" type="text" size="30" value="" /><p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Tag (for some video with recent views):</td>
-                                <td>
-                                    <input id="tags" type="text" size="30" value="" /><p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <p><button class="bcls-button" id="setOptions">Set Account Options</button></p>
-                    <p>See <a href="//docs.brightcove.com/en/video-cloud/analytics-api/guides/managing-api-credentials.html">Managing API Credentials</a> for information on getting client credentials.</p>
-                </div>
-            </div>
-  </div>
-  <div id="retrieveallvideos" class="section">
-    <h2>Retrieve all videos</h2>
-    <p>One of the basic tasks you will want to perform is retrieve all videos in an account. The fundamental call information is:</p>
+
+  <div id="createPolicy" class="section">
+    <h2>Create a policy</h2>
+    <p>One of the basic tasks you will want to create a policy. The fundamental call information is:</p>
     <ul>
-      <li>HTTP method: <code>GET</code></li>
-      <li>Endpoint: <code>https://cms.api.brightcove.com/v1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos</code></li>
+      <li>HTTP method: <code>POST</code></li>
+      <li>Endpoint: <code>https://policy.api.brightcove.com/v1/accounts/<em>{YOUR_ACCOUNT_ID}</em>/policy_keys</code></li>
     </ul>
-    <p class="BCL-aside">Note: Before completing this task you must perform steps 1 and 2 above to retrieve and assign account and credential information. Note that since we are not specifying limit, we will get back 20 videos - you can set the limit to any integer up to 100.</p>
+    <p>You will need to pass data defining the policy in the request body. The simplest policy looks like this:</p>
+<pre><code>{
+"key-data": {
+    "account-id": "{account_id}"
+}</code></pre>
     <ol start="3">
       <li>You will now use the api-tester.sh script to retrieve all videos. Run <code>bash api-tester.sh</code> using the input values below:
-        <pre id="taskRetrieveAll"></pre>
+      <p>client_id:</p>
+        <pre><code>553d4903-4547-435d-944c-2c8e2f6abc5d</code></pre>
+      <p>client_secret:</p>
+        <pre><code>5ENBQH6pHfJQub7oR0SGCn2Pu_W2SY5QsVw24fK-frXcE6hdTRnJO-0_LBmKZh15rVliIAiECAQF1yBYP_l90gQ</code></pre>
+      <p>Request URL:</p>
+<pre><code>{
+"key-data": {
+    "account-id": "57838016001"
+}</code></pre>
       </li>
       <li>You should see an array of video objects in the response.</li>
     </ol>
@@ -156,7 +115,7 @@
     <p>The fundamental call information for creating a video is:</p>
     <ul>
       <li>HTTP method: <code>POST</code></li>
-      <li>Endpoint: <code>https://cms.api.brightcove.com/v1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos</code></li>
+      <li>Endpoint: <code>https://policy.api.brightcove.com/v1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos</code></li>
     </ul>
     <p>The video object created will eventually contain the master copy of the video, metadata, possible renditions and other information. In the call body you supply a simple JSON object specifying the <code>name</code> of the video to be created. To see the fields for which you can provide values during the <code>POST</code>, browse to the Policy API Overview document's <a href="//docs.brightcove.com/en/video-cloud/cms-api/getting-started/overview-cms.html#settingvalues">Setting values</a> section.</p>
     <p class="BCL-aside">Note: Before completing this task you must perform steps 1 and 2 above to retrieve and assign account and credential information.</p>
@@ -179,15 +138,15 @@
     <div id="usingreferenceids" class="section">
       <h2>Using reference IDs</h2>
       <p>In the Policy API calls in the rest of this quick start, the video ID is used in the endpoint URL. You can also use the video's reference ID if you wish. If you use the reference ID you must prepend that identifier with <strong>ref:</strong>. For example, the first URL uses the video ID, whereas the second uses the reference ID.</p>
-      <pre><code>https://cms.api.brightcove.com/v1/accounts/videos/123456768
-        https://cms.api.brightcove.com/v1/accounts/videos/ref:xyzzy123</code></pre>
+      <pre><code>https://policy.api.brightcove.com/v1/accounts/videos/123456768
+        https://policy.api.brightcove.com/v1/accounts/videos/ref:xyzzy123</code></pre>
       </div>
       <div class="section" id="updateVideo">
         <h2>Update a video</h2>
         <p>The call for updating a video is:</p>
         <ul>
           <li>HTTP method: <code>PATCH</code></li>
-          <li>Endpoint: <code>https://cms.api.brightcove.com/v1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos/<em>YOUR_VIDEO_ID</em></code></li>
+          <li>Endpoint: <code>https://policy.api.brightcove.com/v1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos/<em>YOUR_VIDEO_ID</em></code></li>
         </ul>
         <p>You must pass a JSON object in the request body containing only the fields/values that you want to update. See the <a href="./overview-cms.html#updateVideo">Policy API Overview</a> for details on which fields you can update.</p>
         <p class="BCL-aside">Note: Before completing this task you must perform the previous steps above to retrieve and assign account and credential information, and <a href="#addVideoID">also provide a video id</a>.</p>
@@ -203,7 +162,7 @@
         <p>The fundamental call information for retrieving a single video is:</p>
         <ul>
           <li>HTTP method: <code>GET</code></li>
-          <li>Endpoint: <code>https://cms.api.brightcove.com/v1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos/<em>VIDEO_ID</em></code></li>
+          <li>Endpoint: <code>https://policy.api.brightcove.com/v1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos/<em>VIDEO_ID</em></code></li>
         </ul>
         <p class="BCL-aside">Note: Before completing this task you must perform the previous steps above to retrieve and assign account and credential information, and <a href="#addVideoID">also provide a video id</a>.</p>
         <ol start="9">
@@ -219,7 +178,7 @@
         <p>You will now search your videos for a certain keyword. These tags can be set via API, or in Video Cloud Studio where they are referred to as <strong>tags</strong>. The fundamental call information for searching video data is:</p>
         <ul>
           <li>HTTP method: <code>GET</code></li>
-          <li>Endpoint: <code>https://cms.api.brightcove.com/v1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos<em>q=field:searchTerms</em></code></li>
+          <li>Endpoint: <code>https://policy.api.brightcove.com/v1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos<em>q=field:searchTerms</em></code></li>
         </ul>
         <p class="BCL-aside">Note: Before completing this task you must perform the previous steps above to retrieve and assign account and credential information, and <a href="#addVideoID">also provide a video id</a>.</p>
         <ol start="11">
@@ -231,14 +190,14 @@
         </ol>
 
         <p class="BCL-aside">You can also do exclusion on a value. For instance, to eliminate all videos that contain the keyword <strong>wildlife</strong> you place a minus sign (-) just after the <strong>q=</strong>, as shown here:</p>
-        <pre><code>https://cms.api.brightcove.com/v1accounts/1507807800001/videos?q=-keywords:wildlife</code></pre>
+        <pre><code>https://policy.api.brightcove.com/v1accounts/1507807800001/videos?q=-keywords:wildlife</code></pre>
       </div>
       <div id="searchbydate" class="section">
         <h2>Search by creation date</h2>
         <p>You will now search for videos created after a certain date. To do this add a query string to the endpoint, then a <code>q:</code>, and finally the syntax for a starting date, but no ending date. The fundamental call information for searching video data is:</p>
         <ul>
           <li>HTTP method: <code>GET</code></li>
-          <li>Endpoint: <code>https://cms.api.brightcove.com/v1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos<em>?q=created_at:MM-DD-YYYY</em></code>.</li>
+          <li>Endpoint: <code>https://policy.api.brightcove.com/v1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos<em>?q=created_at:MM-DD-YYYY</em></code>.</li>
         </ul>
         <p class="BCL-aside">Note: Before completing this task you must perform the previous steps above to retrieve and assign account and credential information, and <a href="#addVideoID">also provide a video id</a>.</p>
         <ol start="14">
@@ -254,7 +213,7 @@
         <p>You will now delete the video that you created earlier. The fundamental call information for searching video data is:</p>
         <ul>
           <li>HTTP method: <code>DELETE</code></li>
-          <li>Endpoint: <code>https://cms.api.brightcove.com/v1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos/<em>VIDEO_ID</em></code>.</li>
+          <li>Endpoint: <code>https://policy.api.brightcove.com/v1/accounts/<em>YOUR_ACCOUNT_ID</em>/videos/<em>VIDEO_ID</em></code>.</li>
         </ul>
         <p class="BCL-aside">Note: Before completing this task you must perform the previous steps above to retrieve and assign account and credential information, and <a href="#addVideoID">also provide a video id</a>.</p>
         <ol start="17">
@@ -311,10 +270,10 @@
           client_secret: "spF_alkXCIJydgUluDNCWKxmk0-bvy-WI6PCxT2DzPo_JlwP-yDedLGqW4qIhXYh0eJyALABE5wHNPeS0CZmUw",
           account_id: "57838016001",
           video_id_create: "",
-          cmsURL: "https://cms.api.brightcove.com/v1/accounts/"
+          cmsURL: "https://policy.api.brightcove.com/v1/accounts/"
         },
         today = new Date().toISOString(),
-        cmsBaseURL = "https://cms.api.brightcove.com/v1/accounts/",
+        cmsBaseURL = "https://policy.api.brightcove.com/v1/accounts/",
             // functions
             bclslog,
             setCMSOptionsRetrieveAll,
