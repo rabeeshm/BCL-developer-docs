@@ -42,8 +42,8 @@
           <input id="playlist_id" value="749117323001">
         </p>
         <p><button id="videoButton">Get a video</button> <button id="playlistButton">Get a playlist</button></p>
-        <h2>API call:</h2>
-        <pre><code id="apiCall"></code></pre>
+        <h2>API request:</h2>
+        <pre><code id="apiRequest"></code></pre>
         <h2>Generated content</h2>
         <div id="generatedContent"></div>
         <script>
@@ -56,6 +56,7 @@
                 playlist_id         = document.getElementById('playlist_id'),
                 videoButton         = document.getElementById('videoButton'),
                 playlistButton      = document.getElementById('playlistButton'),
+                apiRequest          = document.getElementById('apiRequest'),
                 generatedContent    = document.getElementById('generatedContent'),
                 // functions
                 makeVideoDisplay,
@@ -70,9 +71,54 @@
 
             };
 
-            getMediaData = function (mediaType) {
-
+            getMediaData = function (mediaType, requestURL, options) {
+                var httpRequest = new XMLHttpRequest(),
+                    responseData,
+                    parsedData,
+                    getResponse = function () {
+                        try {
+                            if (httpRequest.readyState === 4) {
+                              if (httpRequest.status === 200) {
+                                logResponse(type, httpRequest.responseText);
+                                responseData = httpRequest.responseText;
+                                switch (mediaType) {
+                                    case "video":
+                                        parsedData = JSON.parse(responseData);
+                                        di_url_display.value = "https://ingest.api.brightcove.com/v1/accounts/" + account_id + "/videos/" + parsedData.id + "/ingest-requests";
+                                        setDIOptions();
+                                    }
+                                    break;
+                                    case "playlist":
+                                    totalIngested++;
+                                    logResponse("totalIngested", totalIngested);
+                                    if (videoNumber < totalVideos - 1) {
+                                        videoNumber++;
+                                        logResponse("Processing video number", videoNumber);
+                                        // pause to avoid CMS API timeouts
+                                        t2 = setTimeout(setCMSOptions, 1000);
+                                    }
+                                    break;
+                                }
+                              } else {
+                                alert("There was a problem with the request. Request returned " + httpRequest.status);
+                              }
+                            }
+                          }
+                          catch(e) {
+                            alert('Caught Exception: ' + e);
+                          }
+                    };
+                // set response handler
+                httpRequest.onreadystatechange = getResponse;
+                // open the request
+                httpRequest.open("GET", proxyURL);
+                // set headers
+                httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                // open and send request
+                httpRequest.send();
             };
+
+            // event listeners
 
         })(window, document);
         </script>
