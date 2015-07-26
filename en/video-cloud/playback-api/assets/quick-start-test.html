@@ -49,7 +49,7 @@
         <script>
         var BCLS = ( function (window, document) {
             var apiBaseURL          = 'https://edge.api.brightcove.com/playback/v1',
-                // elememnt references
+                // element references
                 account_id          = document.getElementById('account_id'),
                 policy_key          = document.getElementById('policy_key'),
                 video_id            = document.getElementById('video_id'),
@@ -71,7 +71,7 @@
 
             };
 
-            getMediaData = function (mediaType, requestURL, options) {
+            getMediaData = function (mediaType, requestURL) {
                 var httpRequest = new XMLHttpRequest(),
                     responseData,
                     parsedData,
@@ -79,24 +79,15 @@
                         try {
                             if (httpRequest.readyState === 4) {
                               if (httpRequest.status === 200) {
-                                logResponse(type, httpRequest.responseText);
                                 responseData = httpRequest.responseText;
+                                parsedData = JSON.parse(responseData);
                                 switch (mediaType) {
                                     case "video":
-                                        parsedData = JSON.parse(responseData);
-                                        di_url_display.value = "https://ingest.api.brightcove.com/v1/accounts/" + account_id + "/videos/" + parsedData.id + "/ingest-requests";
-                                        setDIOptions();
+                                        makeVideoDisplay(parsedData);
                                     }
                                     break;
                                     case "playlist":
-                                    totalIngested++;
-                                    logResponse("totalIngested", totalIngested);
-                                    if (videoNumber < totalVideos - 1) {
-                                        videoNumber++;
-                                        logResponse("Processing video number", videoNumber);
-                                        // pause to avoid CMS API timeouts
-                                        t2 = setTimeout(setCMSOptions, 1000);
-                                    }
+                                        makePlaylistDisplay(parsedData);
                                     break;
                                 }
                               } else {
@@ -111,7 +102,7 @@
                 // set response handler
                 httpRequest.onreadystatechange = getResponse;
                 // open the request
-                httpRequest.open("GET", proxyURL);
+                httpRequest.open("GET", requestURL);
                 // set headers
                 httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                 // open and send request
@@ -119,6 +110,13 @@
             };
 
             // event listeners
+            videoButton.addEventListener("click", function () {
+                var mediaType = "video",
+                    requestURL = "";
+            });
+            playlistButton.addEventListener("click", function () {
+
+            });
 
         })(window, document);
         </script>
