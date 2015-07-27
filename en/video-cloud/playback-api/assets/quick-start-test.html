@@ -15,13 +15,13 @@
               border: 1px solid #999;
               float: left;
               margin-right: 1em;
-              height: 90px;
-              width: 160px;
+              height: 72px;
+              width: 122px;
             }
             button {
               padding: .5em;
             }
-            pre>code {
+            pre {
               background-color: #F1EFEE;
               border-left: .5em solid #636363;
               box-shadow: 5px 5px 10px rgba(192, 192, 192, 1.000);
@@ -32,6 +32,9 @@
                 border: 1px solid #999;
                 margin: 0;
                 padding: 0;
+                height: 74px;
+                width: 480px;
+                overflow: scroll;
             }
         </style>
     </head>
@@ -50,12 +53,13 @@
         <p>Playlist id:
           <input id="playlist_id" value="749117323001">
         </p>
-        <p>Display results as: <input id="r1" name="outputType" type="radio" value="html" checked> HTML</input> <input id="r2" name="outputType" type="radio" value="data"> Data</input></p>
         <p><button id="videoButton">Get a video</button> <button id="playlistButton">Get a playlist</button></p>
         <h2>API request:</h2>
         <pre><code id="apiRequest"></code></pre>
         <h2>Generated content</h2>
         <div id="generatedContent"></div>
+        <h2>Response data</h2>
+<pre id="responseData"></pre>
         <script>
             var BCLS = ( function (window, document) {
                 var apiBaseURL          = 'https://edge.api.brightcove.com/playback/v1',
@@ -68,22 +72,11 @@
                     playlistButton      = document.getElementById('playlistButton'),
                     apiRequest          = document.getElementById('apiRequest'),
                     generatedContent    = document.getElementById('generatedContent'),
-                    r1                  = document.getElementById('r1'),
-                    r2                  = document.getElementById('r2'),
-                    // output flag
-                    displayHTML         = true,
+                    responseData        = document.getElementById('responseData'),
                     // functions
                     makeVideoDisplay,
                     makePlaylistDisplay,
-                    getMediaData,
-                    getOutputType;
-
-                getOutputType = function() {
-                    if (r2.checked) {
-                        return false;
-                    }
-                    return true;
-                }
+                    getMediaData;
 
                 makeVideoDisplay = function(videoData) {
                     var videoEl,
@@ -91,24 +84,25 @@
                         titleEl,
                         descriptionEl,
                         dataEl;
-                    if (displayHTML) {
-                        // generate an HTML display of the video item
-                        videoEl = document.createElement('div'),
-                        imgEl = document.createElement('img'),
-                        titleEl = document.createElement('h2'),
-                        descriptionEl = document.createElement('p');
-                        videoEl.appendChild(imgEl);
-                        videoEl.appendChild(titleEl);
-                        videoEl.appendChild(descriptionEl);
-                        imgEl.addAttribute("src", videoData.thumbnail_sources[0].src);
-                        titleEl.appendChild(document.createTextNode(videoData.name));
-                        descriptionEl.appendChild(document.createTextNode(videoData.description));
-                        generatedContent.appendChild(videoEl);
+                    // generate an HTML display of the video item
+                    videoEl = document.createElement('div');
+                    imgEl = document.createElement('img');
+                    titleEl = document.createElement('h2');
+                    descriptionEl = document.createElement('p');
+                    videoEl.setAttribute('class', 'video-item');
+                    videoEl.appendChild(imgEl);
+                    videoEl.appendChild(titleEl);
+                    videoEl.appendChild(descriptionEl);
+                    if (videoData.thumbnail_sources) {
+                        imgEl.setAttribute("src", videoData.thumbnail_sources[0].src);
                     } else {
-                        // display the video data
-                        dataEl = document.createElement('pre');
-                        dataEl.appendChild(document.createTextNode(JSON.stringify(videoData, null, '  ')));
+                        imgEl.setAttribute("src", videoData.thumbnail);
                     }
+                    titleEl.appendChild(document.createTextNode(videoData.name));
+                    descriptionEl.appendChild(document.createTextNode(videoData.description));
+                    generatedContent.appendChild(videoEl);
+                    // display the video data
+                    responseData.innerHTML = JSON.stringify(videoData, null, '  ');
                 };
 
                 makePlaylistDisplay = function(playlistData) {
@@ -119,28 +113,29 @@
                         dataEl,
                         i,
                         iMax;
-                    if (displayHTML) {
-                        // generate an HTML display of the video item
-                        iMax = playlistData.items.length;
-                        for (i = 0; i < iMax; i++) {
-                            videoData = playlistData.items[i];
-                            videoEl = document.createElement('div'),
-                            imgEl = document.createElement('img'),
-                            titleEl = document.createElement('h2'),
-                            descriptionEl = document.createElement('p');
-                            videoEl.appendChild(imgEl);
-                            videoEl.appendChild(titleEl);
-                            videoEl.appendChild(descriptionEl);
-                            imgEl.addAttribute("src", videoData.thumbnail_sources[0].src);
-                            titleEl.appendChild(document.createTextNode(videoData.name));
-                            descriptionEl.appendChild(document.createTextNode(videoData.description));
-                            generatedContent.appendChild(videoEl);
+                    // generate an HTML display of the video items
+                    iMax = playlistData.videos.length;
+                    for (i = 0; i < iMax; i++) {
+                        videoData = playlistData.videos[i];
+                        videoEl = document.createElement('div');
+                        imgEl = document.createElement('img');
+                        titleEl = document.createElement('h2');
+                        descriptionEl = document.createElement('p');
+                        videoEl.setAttribute('class', 'video-item');
+                        videoEl.appendChild(imgEl);
+                        videoEl.appendChild(titleEl);
+                        videoEl.appendChild(descriptionEl);
+                        if (videoData.thumbnail_sources) {
+                            imgEl.setAttribute("src", videoData.thumbnail_sources[0].src);
+                        } else {
+                            imgEl.setAttribute("src", videoData.thumbnail);
                         }
-                    } else {
-                        // display the video data
-                        dataEl = document.createElement('pre');
-                        dataEl.appendChild(document.createTextNode(JSON.stringify(playlistData, null, '  ')));
+                        titleEl.appendChild(document.createTextNode(videoData.name));
+                        descriptionEl.appendChild(document.createTextNode(videoData.description));
+                        generatedContent.appendChild(videoEl);
                     }
+                    // display the video data
+                    responseData.innerHTML = JSON.stringify(playlistData, null, '  ');
 
                 };
 
@@ -148,6 +143,7 @@
                     var httpRequest = new XMLHttpRequest(),
                         responseData,
                         parsedData,
+                        // response handler
                         getResponse = function() {
                             try {
                                 if (httpRequest.readyState === 4) {
@@ -176,8 +172,7 @@
                     // open the request
                     httpRequest.open('GET', requestURL);
                     // set headers
-                    httpRequest.setRequestHeader('Authorization', 'BCOV-Policy ' + policy_key.value);
-                    console.log(httpRequest);
+                    httpRequest.setRequestHeader('Accept', 'application/json;pk=' + policy_key.value);
                     // open and send request
                     httpRequest.send();
                 };
@@ -185,14 +180,12 @@
                 // event listeners
                 videoButton.addEventListener('click', function() {
                     var mediaType = 'video',
-                        displayHTML = getOutputType();
                         requestURL = apiBaseURL + '/accounts/' + account_id.value + '/videos/' + video_id.value;
                         apiRequest.innerHTML = requestURL;
                         getMediaData(mediaType, requestURL);
                 });
                 playlistButton.addEventListener('click', function() {
                     var mediaType = 'playlist',
-                        displayHTML = getOutputType();
                         requestURL = apiBaseURL + '/accounts/' + account_id.value + '/playlists/' + playlist_id.value;
                         apiRequest.innerHTML = requestURL;
                         getMediaData(mediaType, requestURL);
