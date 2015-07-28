@@ -41,7 +41,7 @@ Initially only four requests are supported for the first major milestone. Others
 
 ### Policy keys
 
-See the [Nomic policy key docs](https://bithub.brightcove.com/videocloud/nomic/tree/master/doc/api/video-policy-key.md)
+See the [Nomic policy key docs](https://bithub.brightcove.com/videocloud/nomic/tree/master/doc/api/player-policy-key.md)
 for how to obtain policy keys.
 
 The policy key for a player catalog API request must be supplied in one of three ways, which
@@ -88,50 +88,86 @@ the aim to minimize the number of requests and the latency of most common
 player needs. In almost all cases the field names and structure will be identical
 to what the CMS api returns.
 
+### Video Response
+
 Here is an example of some of the fields returned for a video. The "sources" array
 is an array of ids from Roebuck, but the Playback api expands them to their fields.
 
     {
-        "id": "2069585239001",
-        "name": "live 2",
-        "account_id": "107767373001",
-        "created_at": "2013-01-03T22:28:49.087+0000",
-        "custom_fields": {
-            "moretext": "NNNname2 VVVb NNNname3 VVVd"
+      "account_id": "107767373001",
+      "ad_keys": null,
+      "created_at": "2010-07-12T22:37:34.760Z",
+      "description": "Avatar_MakingAScene_Featurette",
+      "duration": 595560,
+      "id": "111723525001",
+      "long_description": null,
+      "name": "Avatar_MakingAScene_Featurette",
+      "published_at": "2010-07-12T22:37:34.760Z",
+      "reference_id": "AvatarMakingShort",
+      "text_tracks": [],
+      "updated_at": "2010-07-12T22:54:29.666Z",
+      "cue_points": [
+        {
+          "id": "111637107001",
+          "name": "Pre-roll",
+          "type": "AD",
+          "time": 0,
+          "metadata": null,
+          "force_stop": false
+        }
+      ],
+      "custom_fields": {
+        "moretext": "this is the first video uploaded",
+        "mylist": "abc"
+      },
+      "link": {
+        "text": "Full Dvd at Amazon",
+        "url": "http://www.amazon.com/Avatar-Sam-Worthington/dp/B002VPE1AW"
+      },
+      "tags": [
+        "copied"
+      ],
+      "poster_sources": [
+        {
+          "src": "http://brightcove04.o.brightcove.com/107767373001/107767373001_111728861001_vs-111727994001.jpg?pubId=107767373001&videoId=111723525001"
+        }
+      ],
+      "thumbnail_sources": [
+        {
+          "src": "http://brightcove04.o.brightcove.com/107767373001/107767373001_111728862001_th-111727994001.jpg?pubId=107767373001&videoId=111723525001"
+        }
+      ],
+      "poster": "http://brightcove04.o.brightcove.com/107767373001/107767373001_111728861001_vs-111727994001.jpg?pubId=107767373001&videoId=111723525001",
+      "thumbnail": "http://brightcove04.o.brightcove.com/107767373001/107767373001_111728862001_th-111727994001.jpg?pubId=107767373001&videoId=111723525001",
+      "sources": [
+        {
+          "avg_bitrate": 379000,
+          "width": 320,
+          "duration": 595560,
+          "size": 28196307,
+          "stream_name": "mp4:107767373001/107767373001_111728840001_Avatar-MakingAScene-Featurette.mp4?__nn__=1497926354001&slist=107767373001/&auth=daEciavcicRbhbtdSaBdBdVbXd0aUdTcMaX-bvRrSa-hca-slyCzrux_zJAq_HFCB_EvE&aifp=bcosuds",
+          "codec": "H264",
+          "asset_id": "111728840001",
+          "container": "MP4",
+          "height": 180,
+          "app_name": "rtmp://cp150446.edgefcs.net/ondemand"
         },
-        "description": "video",
-        "tags": [
-            "live"
-        ],
-        "reference_id": "xyz",
-        "sources": [
-            {
-                "codec": "ON2",
-                "container": "FLV",
-                "duration": -1,
-                "avg_bitrate": 1100,
-                "height": 480,
-                "id": "2071274359001",
-                "size": 0,
-                "src": "http://brightcove03-f.akamaihd.net/3574342d9b8e4e6084406d8682b1d2a4_d33_1100@80273",
-                "width": 640
-            },
-            {
-                "codec": "ON2",
-                "container": "FLV",
-                "duration": -1,
-                "avg_bitrate": 600,
-                "height": 480,
-                "id": "2071274360001",
-                "size": 0,
-                "src": "http://brightcove03-f.akamaihd.net/3574342d9b8e4e6084406d8682b1d2a4_cd2_600@80273",
-                "width": 640
-            }
-        ],
-        "updated_at": "2013-11-15T21:51:40.301+0000",
+        {
+          "avg_bitrate": 379000,
+          "width": 320,
+          "src": "http://uds.ak.o.brightcove.com/107767373001/107767373001_111728840001_Avatar-MakingAScene-Featurette.mp4?pubId=107767373001&videoId=111723525001",
+          "size": 28196307,
+          "height": 180,
+          "duration": 595560,
+          "container": "MP4",
+          "codec": "H264",
+          "asset_id": "111728840001"
+        }, ... 6 more sources ...
+
+      ]
     }
 
-### Fields included
+#### Video Fields included
 
 The Roebuck response for a video is converted into a Playback api response,
 mostly by only including a white-listed set of fields at the top and secondary
@@ -143,14 +179,29 @@ The code to handle this is in this file. Check here for more details and up to d
 Here is the list of top level fields that are included in the response.
 
     account_id ad_keys created_at cue_points custom_fields
-    description duration id tags link long_description
-    name published_at reference_id sources text_tracks updated_at
+    description duration id link long_description name
+    poster_sources published_at reference_id sources tags
+    thumbnail_sources text_tracks updated_at
 
 * Both "sources" and "text_tracks" may be removed by certain source restrictions, such as TVE, see links above.
 
-With in the "sources" maps, the following fields are kept.
+The following types of image sources are returned. Within these arrays of maps,
+we currently only include "src" with the url. More fields might be returned in the future.
 
-    app_name asset_id codec container duration height
+     thumbnail_sources
+     poster_sources
+
+The following fields are **deprecated**, they return information on just a single image.
+These fields are no longer enough where there may be both https and http
+images, and perhaps more renditions of images in the future.
+
+    thumbnail poster
+
+#### Video sources fields included
+
+With in the video's "sources" maps, the following fields are kept.
+
+    avg_bitrate app_name asset_id codec container duration height
     id size src stream_name streaming_src type width
 
 * The source "src" contains the url for this rendition of the video.
@@ -161,19 +212,38 @@ This source field is renamed from what Roebuck uses internally to what the CMS a
 
     encoding_rate -> avg_bitrate
 
-The following types of image sources are returned. Within these arrays of maps,
-we currently only include "src" with the url. More fields might be returned in the future.
+### Playlist Response
 
-     thumbnail_sources
-     poster_sources
+In the case of a playlist call, you will receive some fields about the whole playlist
+and a vector of zero or more videos described above.
 
-These are **deprecated** fields that return information on a single image.
-These fields are no longer enough where there may be both https and http
-images, and perhaps more renditions of images in the future.
+    {
+      "account_id": "107767373001"
+      "created_at": "2010-07-12T22:43:30.290Z",
+      "description": null,
+      "id": "111592530001",
+      "name": "Play One",
+      "reference_id": null,
+      "type": "EXPLICIT",
+      "updated_at": "2010-07-12T22:51:25.055Z",
 
-    thumbnail poster
+      "videos": [
+        {
+          "name": "Avatar_MakingAScene_Featurette",
+          "reference_id": "AvatarMakingShort",
+          "long_description": null,
+          "duration": 595560,
+          "description": "Video",
+          ... more video fields ...
+        },
+        ... more videos ...
+      ]
+    }
 
-In the case of a playlist call, you will receive a vector of the above.
+See the CMS api documentation for playlists for a description of these fields.
+
+    account_id created_at description id name reference_id
+    type updated_at videos
 
 ## Headers
 
