@@ -100,9 +100,9 @@
                 </ul>
                 <p>To obtain client credentials, see one of the following documents:</p>
                 <ul>
-                    <li><a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html">OAuth: Get Client Credentials Using CURL</a>
+                    <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html">OAuth: Get Client Credentials Using CURL</a>
                     </li>
-                    <li><a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">OAuth: Get Client Credentials Using Postman</a>
+                    <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">OAuth: Get Client Credentials Using Postman</a>
                     </li>
                 </ul>
             </div>
@@ -119,17 +119,10 @@
                 </ul>
                 <p class="BCL-aside">Note: Dynamic Ingest currently includes limited support for Aspera and FTP, but this must be explicitly enabled on your account. If you would like to use one of these protocols, please contact support.</p>
 
-<!--                 <p>A URL for the file to be transcoded. If the remote server requires authentication, you must include your username and password in the input URL string</p>
-                <p>If the URL contains authentication with special characters, <a href="/docs/guides/getting-started/special-characters-in-usernames-and-passwords">make sure that they are properly escaped</a>. Special characters in the path should not need to be escaped.</p>
- -->                <h3>Notes on S3</h3>
+
+               <h3>Notes on S3</h3>
                 <p>If your videos are in a protected S3 bucket, see <a href="../guides/di-s3.html">Using Dynamic Ingest with S3</a> for details on how to set up permissions for Dynamic Ingest to access your files.</p>
-<!--                 <h3>Notes on GCS</h3>
-                <p>GCS access keys can be found under the "Interoperable Access" section in the <a href="https://storage.cloud.google.com/m">Google APIs console</a>. Access keys must be <a href="/docs/guides/getting-started/special-characters-in-usernames-and-passwords">properly escaped</a>.</p>
-                <h3>Notes on Aspera</h3>
-                <p>The ssh-port portion of the URL is not required, and will default to 22.</p>
-                <p>Dynamic Ingest runs an Aspera Client on the video encoding servers, which connects to your <a href="http://www.asperasoft.com/en/products/server_software_1">Aspera Enterprise or Connect Server</a>, which hosts the files.</p>
-                <p>This is a similar situation to you running an FTP server to make your files available and Dynamic Ingest using an FTP client for file transfer.</p>
- -->            </div>
+            </div>
             <div class="section" id="ingestingVideos">
                 <h2>Ingesting videos</h2>
                 <p>There are two API calls required for ingesting videos:</p>
@@ -142,7 +135,7 @@
             </div>
             <div class="section" id="replace_retranscode">
                 <h2>Replace/retranscode videos</h2>
-                <p>The Dynamic Ingest API call is exactly the same as it would be for ingesting new videos - the only difference is that you do not need to make a prior call to the CMS API to create the video object in the Video Cloud system and get an id for it. If the source video file at the specified URL is the same one originally ingested, you will simply get a new set of renditions. If the source file is new, you will be replacing the existing video. All videos will remain playable with existing renditions until retranscoding is complete.</p>
+                <p>The Dynamic Ingest API call is exactly the same as it would be for <a href="./batch-dynamic-ingest.html">ingesting new videos</a> - the only difference is that you do not need to make a prior call to the CMS API to create the video object in the Video Cloud system and get an id for it. If the source video file at the specified URL is the same one originally ingested, you will simply get a new set of renditions. If the source file is new, you will be replacing the existing video. All videos will remain playable with existing renditions until retranscoding is complete.</p>
                 <p>See the <a href="../samples/batch-dynamic-ingest-retranscode.html">working sample here</a>.</p>
             </div>
             <div class="section" id="capture_images">
@@ -205,7 +198,7 @@
             </div>
             <div class="section" id="ingest_images">
                 <h2>Ingest images</h2>
-                <p>You can include a custom poster and thumbnail for your video by referencing their URLs in the JSON you use for the video ingestion:</p>
+                <p>You can include a custom poster and thumbnail for your video (or add them later) by referencing their URLs in the JSON you use for the video ingestion:</p>
 <pre><code>{
     "master": {
         "url":"http://learning-services-media.brightcove.com/videos/mp4/Water-Droplet.mp4"
@@ -223,6 +216,17 @@
         "height": "90"
     }
 }</code></pre>
+                <div class="BCL-aside">
+                    <p>Notes:</p>
+                    <ul>
+                        <li>For images, only unprotected HTTP/HTTPS URLs or signed S3 URLs are currently supported</li>
+                        <li>If you are uploading your own poster and thumbnail images, and the ingest profile you are using includes image renditions, you should set <code>capture_images</code> to <code>false</code></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="section" id="ingest_captions">
+                <h2>Ingest captions</h2>
+                <p>You can also add WebVTT captions to your video or upload them for an existing video using Dynamic Ingest:</p>
             </div>
             <div class="section" id="drm">
                 <h2>DRM and HLSe</h2>
@@ -252,23 +256,18 @@
                             <td>
                                 <code>status</code>
                             </td>
-                            <td>will be
-                                <code>FAILED</code> if the ingest or creation of a rendition was not successful, <code>SUCCESS</code> if the request succeeded</td>
+                            <td>will be <code>FAILED</code> if the ingest or creation of a rendition was not successful, <code>SUCCESS</code> if the request succeeded</td>
                         </tr>
                         <tr>
                             <td>entity</td>
                             <td>if it exists, the Video Cloud id of the asset that was ingested or failed (if the video object was successfully created in Video Cloud)</td>
                         </tr>
                         <tr>
-                            <td>
-                                <code>errorMessage</code>
-                            </td>
+                            <td><code>errorMessage</code></td>
                             <td class="BCL-aside">an explanation of why the ingest failed if it did - note that the <code>errorMessage</code> is not returned currently - this is a known issue</td>
                         </tr>
                         <tr>
-                            <td>
-                                <code>version</code>
-                            </td>
+                            <td><code>version</code></td>
                             <td>a string always equal to
                                 <code>"1"</code>
                             </td>
