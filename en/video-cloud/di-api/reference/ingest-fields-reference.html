@@ -48,400 +48,210 @@
 
         </div>
         <div class="section" id="primaryFields">
-                <h2>Primary fields</h2>
-                <div class="BCL-aside">
-                    <p>See the following links to see which fields can be set when you are creating or updating a video:</p>
-                    <ul>
-                        <li><a href="../getting-started/overview-cms.html#createVideo">Fields that can be set when creating a video</a></li>
-                        <li><a href="../getting-started/overview-cms.html#updatevideo">Fields that can be set when updating a video</a></li>
-                    </ul>
-                </div>
-                <table>
-                <caption>Table 1: Primary Fields</caption>
-                    <thead>
-                        <tr>
-                            <th>Field</th>
-                            <th>Type</th>
-                            <th>Required</th>
-                            <th>Default</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><a href="#master">master</a></td>
-                            <td>object</td>
-                            <td>no</td>
-                            <td>none</td>
-                            <td>the video digital master</td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>text_tracks</td>
-                            <td>array of <a href="#text_track">text_track objects</a></td>
-                            <td>no</td>
-                            <td>empty array</td>
-                            <td>data for WebVTT captions associated with the video</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <h3>Notes</h3>
-                <li id="note1-1"><sup class="once-red"><strong>[1-1]</strong></sup> Note that that a scheduled video is <strong>not</strong> inactive outside the period of scheduled availability</li>
-                <li id="note1-2"><sup class="once-red"><strong>[1-2]</strong></sup> The modification may have been made by a user or the Video Cloud system</li>
-                <li id="note1-3"><sup class="once-red"><strong>[1-3]</strong></sup> Geo-restriction is a paid add-on to Video Cloud; if you want to purchase geo-restriction capability, contact your Account Manager</li>
-                <li id="note1-4"><sup class="once-red"><strong>[1-4]</strong></sup>
-                    <p>Currently the only supported image objects are "poster" and "thumbnail".</p>
-                    <p><code>images</code> will have two properties: <code>images.thumbnail</code> and <code>images.poster</code> - each of these is an <a href="#image">image object</a>.</p>
-                    <p>Note that you can <strong>not</strong> add remote images by updating the <code>src</code> attribute. Remote image files must be ingested via the <a href="//docs.brightcove.com/en/video-cloud/di-api/index.html">Dynamic Ingest API</a>. The functionality to add images does not yet exist, but will be added to the Dynamic Ingest API.</p>
+            <h2>Primary fields</h2>
+            <table>
+            <caption>Table 1: Primary Fields</caption>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="#master">master</a></td>
+                        <td>object</td>
+                        <td>no</td>
+                        <td>none</td>
+                        <td>the video digital master</td>
+                    </tr>
+                    <tr>
+                        <td>profile</td>
+                        <td>string</td>
+                        <td>no</td>
+                        <td>Video Cloud or account default profile</td>
+                        <td>The ingest profile to be used for transcoding</td>
+                    </tr>
+                    <tr>
+                        <td>capture-images<sup class="once-red"><strong><a href="#note1-1">[1-1]</a></strong></sup></td>
+                        <td>boolean</td>
+                        <td>no</td>
+                        <td>true</td>
+                        <td>Whether poster and thumbnail images should be captured from the mid-point of the video</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#poster">poster</a></td>
+                        <td>object</td>
+                        <td>no</td>
+                        <td>null</td>
+                        <td>Custom poster image to be ingested for the video</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#thumbnail">thumbnail</a></td>
+                        <td>object</td>
+                        <td>no</td>
+                        <td>null</td>
+                        <td>Custom thumbnail image to be ingested for the video</td>
+                    </tr>
+                    <tr>
+                        <td>text_tracks</td>
+                        <td>array of <a href="#text_track">text_track objects</a></td>
+                        <td>no</td>
+                        <td>empty array</td>
+                        <td>data for WebVTT captions associated with the video</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Notes</h3>
+            <ul>
+                <li id="note1-1"><sup class="once-red"><strong>[1-1]</strong></sup> <code>capture-images</code> should be set to false if:
+                <ul>
+                    <li>You are ingesting your own custom thumbnail and poster images, and the ingest profile has image renditions</li>
+                    <li>This is a replace/re-transcode request and you wish to retain the current thumbnail and poster images</li>
+                </ul>
+                <p>Also note that images will not be captured unless the profile has image renditions</p>
                 </li>
-                <li id="note1-5"><sup class="once-red"><strong>[1-5]</strong></sup> <code>state</code> can be set to <code>ACTIVE</code> or <code>INACTIVE</code>, but <strong>not</strong> to <code>PENDING</code> or <code>DELETED</code>.</li>
+            </ul>
         </div>
-        <div class="section" id="cue_point">
-            <h2>Cue point object</h2>
+        <div class="section" id="master">
+            <h2>Master object</h2>
             <table>
-            <caption>Table 2: Cue Point Object Fields</caption>
+            <caption>Table 3: Poster Object Fields</caption>
                 <thead>
                     <tr>
                         <th>Field</th>
                         <th>Type</th>
-                        <th>Read-only</th>
+                        <th>Required</th>
                         <th>Default</th>
                         <th>Description</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>id</td>
-                        <td>string</td>
-                        <td>yes</td>
-                        <td>none</td>
-                        <td>the cue point id</td>
-                    </tr>
-                    <tr>
-                        <td>name</td>
-                        <td>string</td>
-                        <td>no</td>
-                        <td>null</td>
-                        <td>optional name for the cue point (128 single-byte characters maximum)</td>
-                    </tr>
-                    <tr>
-                        <td>type</td>
-                        <td>string</td>
-                        <td>no</td>
-                        <td>AD</td>
-                        <td>AD or CODE</td>
-                    </tr>
-                    <tr>
-                        <td>time</td>
-                        <td>number</td>
-                        <td>no</td>
-                        <td>none</td>
-                        <td>time of the cue point in seconds; example: 10.527</td>
-                    </tr>
-                    <tr>
-                        <td>metadata</td>
-                        <td>string</td>
-                        <td>no</td>
-                        <td>null</td>
-                        <td>optional metadata string (128 single-byte characters maximum)</td>
-                    </tr>
-                    <tr>
-                        <td>force-stop</td>
-                        <td>boolean</td>
-                        <td>no</td>
-                        <td>false</td>
-                        <td>whether video is force-stopped at the cue point</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="section" id="geo">
-            <h2>geo object</h2>
-            <table>
-                <caption>Table 3: Geo Object Fields</caption>
-                <thead>
-                    <tr>
-                        <th>Field</th>
-                        <th>Type</th>
-                        <th>Read-only</th>
-                        <th>Default</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>countries</td>
-                        <td>array of strings</td>
-                        <td>no</td>
-                        <td>null</td>
-                        <td><a href="https://www.iso.org/obp/ui/#search">ISO 3166 list of 2-letter codes</a> for countries that will be whitelisted or blacklisted for viewing the video</td>
-                    </tr>
-                    <tr>
-                        <td>exclude_countries</td>
-                        <td>boolean</td>
-                        <td>no</td>
-                        <td>false</td>
-                        <td>if true, country array is treated as a list of countries excluded from viewing</td>
-                    </tr>
-                    <tr>
-                        <td>restricted</td>
-                        <td>boolean</td>
-                        <td>no</td>
-                        <td>false</td>
-                        <td>whether geo-restriction is enabled for thie video</td>
-                    </tr>
-                </tbody>
-
-            </table>
-        </div>
-        <div class="section" id="image">
-            <h2>image object</h2>
-            <table>
-                <caption>Table 4: Image Object Fields</caption>
-                <thead>
-                    <tr>
-                        <th>Field</th>
-                        <th>Type</th>
-                        <th>Read-only</th>
-                        <th>Default</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>asset_id</td>
-                        <td>string</td>
-                        <td>yes</td>
-                        <td>null</td>
-                        <td>System-generated id for the image</td>
-                    </tr>
-                    <tr>
-                        <td>src</td>
-                        <td>string</td>
-                        <td>yes</td>
-                        <td>null</td>
-                        <td>URL for image</td>
-                    </tr>
-                    <!-- <tr>
-                        <td>sources</td>
-                        <td>array of image sources objects</td>
-                        <td>yes</td>
-                        <td>null</td>
-                        <td>Array of <a href="#image_sources">image sources</a> objects</td>
-                    </tr> -->
-                </tbody>
-            </table>
-        </div>
-        <!-- <div class="section" id="image_sources">
-            <h2>image sources object</h2>
-            <table>
-                <caption>Table 5: Image Sources Object</caption>
-                <thead>
-                    <tr>
-                        <th>Field</th>
-                        <th>Type</th>
-                        <th>Read-only</th>
-                        <th>Default</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>asset_id</td>
-                        <td>string</td>
-                        <td>yes</td>
-                        <td>null</td>
-                        <td>system-generated id for this image source</td>
-                    </tr>
-                    <tr>
-                        <td>src</td>
-                        <td>string</td>
-                        <td>yes</td>
-                        <td>null</td>
-                        <td>URL for this image source</td>
-                    </tr>
-                    <tr>
-                        <td>height</td>
-                        <td>number</td>
-                        <td>yes</td>
-                        <td>null</td>
-                        <td>Height of the image source in pixels</td>
-                    </tr>
-                    <tr>
-                        <td>width</td>
-                        <td>number</td>
-                        <td>yes</td>
-                        <td>null</td>
-                        <td>Width of the image source in pixels</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div> -->
-        <div class="section" id="link">
-            <h2>link object</h2>
-            <table>
-            <caption>Table 6: Link Object Fields</caption>
-                <thead>
-                    <tr>
-                        <th>Field</th>
-                        <th>Type</th>
-                        <th>Read-only</th>
-                        <th>Default</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>text</td>
-                        <td>string</td>
-                        <td>no</td>
-                        <td>null</td>
-                        <td>Display text for the link</td>
-                    </tr>
                     <tr>
                         <td>url</td>
                         <td>string</td>
-                        <td>no</td>
-                        <td>null</td>
-                        <td>URL for the link</td>
+                        <td>yes</td>
+                        <td>none</td>
+                        <td>URL for the video source; required except for re-transcoding where a digital master has been archived, or you are adding images or text tracks to an existing video</td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <div class="section" id="schedule">
-            <h2>schedule object</h2>
+        <div class="section" id="poster">
+            <h2>Poster object</h2>
             <table>
-            <caption>Table 7: Schedule Object Fields</caption>
+            <caption>Table 3: Poster Object Fields</caption>
                 <thead>
                     <tr>
                         <th>Field</th>
                         <th>Type</th>
-                        <th>Read-only</th>
+                        <th>Required</th>
                         <th>Default</th>
                         <th>Description</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>ends_at</td>
-                        <td>ISO 8601 date-time string<sup class="once-red"><strong><a href="#note7-1">[7-1]</a></strong></sup></td>
-                        <td>no</td>
-                        <td>null</td>
-                        <td>date-time when video will become unavailable</td>
+                        <td>url</td>
+                        <td>string</td>
+                        <td>yes</td>
+                        <td>none</td>
+                        <td>URL where the image resides<sup class="once-red"><strong><a href="#note3-1">[3-1]</a></strong></sup></td>
                     </tr>
                     <tr>
-                        <td>starts_at</td>
-                        <td>ISO 8601 date-time string<sup class="once-red"><strong><a href="#note7-1">[7-1]</a></strong></sup></td>
+                        <td>height</td>
+                        <td>integer</td>
                         <td>no</td>
-                        <td>null</td>
-                        <td>date-time when video will become available</td>
+                        <td>height of the source image</td>
+                        <td>pixel height of the poster image</td>
                     </tr>
-                </tbody>
+                    <tr>
+                        <td>width</td>
+                        <td>integer</td>
+                        <td>no</td>
+                        <td>width of the source image</td>
+                        <td>pixel width of the poster image</td>
+                    </tr>
+               </tbody>
             </table>
             <h3>Notes</h3>
-            <li id="note7-1"><sup class="once-red"><strong>[7-1]</strong></sup> The timezone used for scheduling will be the one specified in the account settings. See <a href="http://support.brightcove.com/en/video-cloud/docs/profile-information">Profile Information</a></li>
+            <ul>
+                <li id="note3-1"><sup class="once-red"><strong>[2-1]</strong></sup> Only public HTTP or HTTPS URLs or signed S3 URLs are supported</li>
+            </ul>
         </div>
-        <div class="section" id="sharing">
-            <h2>sharing object</h2>
+        <div class="section" id="thumbnail">
+            <h2>thumbnail object</h2>
             <table>
-            <caption>Table 8: Sharing Object Fields</caption>
+                <caption>Table 4: Thumbnail Object Fields</caption>
                 <thead>
                     <tr>
                         <th>Field</th>
                         <th>Type</th>
-                        <th>Read-only</th>
+                        <th>Required</th>
                         <th>Default</th>
                         <th>Description</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>by_external_acct</td>
-                        <td>boolean</td>
-                        <td>yes</td>
-                        <td>false</td>
-                        <td>whether the video was shared from another account</td>
-                    </tr>
-                    <tr>
-                        <td>by_id</td>
+                        <td>url</td>
                         <td>string</td>
                         <td>yes</td>
-                        <td>null</td>
-                        <td>id of the account that shared the video - <strong>note that this field is populated only for the shared copy, not for the original video</strong></td>
+                        <td>none</td>
+                        <td>URL where the image resides<sup class="once-red"><strong><a href="#note4-1">[4-1]</a></strong></sup></td>
                     </tr>
                     <tr>
-                        <td>source_id</td>
-                        <td>string</td>
-                        <td>yes</td>
-                        <td>null</td>
-                        <td>id of the video in its original account - <strong>note that this field is populated only for the shared copy, not for the original video</strong></td>
+                        <td>height</td>
+                        <td>integer</td>
+                        <td>no</td>
+                        <td>height of the source image</td>
+                        <td>pixel height of the thumbnail image</td>
                     </tr>
                     <tr>
-                        <td>to_external_acct</td>
-                        <td>boolean</td>
-                        <td>yes</td>
-                        <td>false</td>
-                        <td>whether the video is shared to another account</td>
-                    </tr>
-                    <tr>
-                        <td>by_reference</td>
-                        <td>boolean</td>
-                        <td>yes</td>
-                        <td>false</td>
-                        <td>whether the video is shared by reference<sup class="once-red"><strong><a href="#8-1">[8-1]</a></strong></sup></td>
+                        <td>width</td>
+                        <td>integer</td>
+                        <td>no</td>
+                        <td>width of the source image</td>
+                        <td>pixel width of the thumbnail image</td>
                     </tr>
                 </tbody>
             </table>
             <h3>Notes</h3>
-            <li id="8-1"><sup class="once-red"><strong>[8-1]</strong></sup> When a video is shared by reference, replacing or retranscoding the video in the original account will automatically update the renditions in the shared-to account</li>
+            <ul>
+                <li id="note4-1"><sup class="once-red"><strong>[4-1]</strong></sup> Only public HTTP or HTTPS URLs or signed S3 URLs are supported</li>
+            </ul>
         </div>
-        <div class="section" id="text_track">
+
+       <div class="section" id="text_track">
             <h2>text_track object</h2>
             <table>
-            <caption>Table 9: Text Track Fields</caption>
+            <caption>Table 5: Text Track Fields</caption>
                 <thead>
                     <tr>
                         <th>Field</th>
                         <th>Type</th>
-                        <th>Read-only</th>
+                        <th>Required</th>
                         <th>Default</th>
                         <th>Description</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>src</td>
-                        <td>string (URL)</td>
-                        <td>no</td>
+                        <td>url</td>
+                        <td>string</td>
+                        <td>yes</td>
                         <td>null</td>
-                        <td>URL where the .vtt file resides</td>
+                        <td>URL where the .vtt file resides<sup class="once-red"><strong><a href="#note5-1">[5-1]</a></strong></sup></td>
                     </tr>
                     <tr>
                         <td>srclang</td>
-                        <td><a href="http://loc.gov/standards/iso639-2/php/code_list.php">ISO-639-1 language code</a></td>
-                        <td>no</td>
+                        <td><a href="http://loc.gov/standards/iso639-2/php/code_list.php">ISO-639-1 language code (en, fr, ja, etc.)</a></td>
+                        <td>yes</td>
                         <td>null</td>
-                        <td>language for the captions</td>
+                        <td>language for the file</td>
                     </tr>
                     <tr>
                         <td>label</td>
@@ -452,10 +262,10 @@
                     </tr>
                     <tr>
                         <td>kind</td>
-                        <td>string</td>
+                        <td>enum (string)</td>
                         <td>no</td>
-                        <td>null</td>
-                        <td>"captions" is the only value currently supported</td>
+                        <td>captions</td>
+                        <td>how the vtt file is meant to be used - captions </td>
                     </tr>
                     <tr>
                         <td>mime-type</td>
