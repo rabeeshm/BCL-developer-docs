@@ -74,18 +74,13 @@
           <!-- h2 contents will be in page navigation label - 28 characters (including spaces) maximum -->
           <h2><a name="player"></a>The Player</h2>
           <p>A standard Chromeless Video Player is used for this sample.</p>
-          <p class="text-warning">Note: In HTML mode, different browsers yield inconsistent functionality.</p>
-          <!-- buttons to switch between HTML and Flash Players -->
+<!--           <p class="text-warning">Note: In HTML mode, different browsers yield inconsistent functionality.</p>
+ -->          <!-- buttons to switch between HTML and Flash Players -->
           <div id="modeSwitch">
             <span class="button" id="switchToHTML5" style="margin-bottom: 20px;margin-right: 10px;">Switch to HTML5 Player</span>
             <span class="button" id="switchToFlash" style="margin-bottom: 20px;">Switch to Flash Player</span>
           </div>
           <hr/>
-          <div id="bumperControls">
-            <span id="midroll" class="button">Play Midroll</span>
-            <span id="postroll" class="button">Play Postroll</span>
-            <span id="both" class="button">Play Both</span>
-          </div>
           <div class="player-block">
             <!-- Start of Brightcove Player -->
             <script language="JavaScript" type="text/javascript" src="//sadmin.brightcove.com/js/BrightcoveExperiences.js"></script>
@@ -163,6 +158,11 @@
             bumpers,
             mainVideo,
             bumperType = "midroll",
+            // functions
+            onTemplateLoad,
+            onTemplateReady,
+            onMainProgress,
+            onBumperProgress;
         // public functions
         return {
           /**** template loaded event handler ****/
@@ -176,6 +176,8 @@
           onTemplateReady : function (evt) {
             // get references to modules
             videoPlayer = player.getModule(APIModules.VIDEO_PLAYER);
+            // add progress event listener
+            videoPlayer.addEventListener(mediaEvent.PROGRESS, BCLS.onMainProgress);
             // get current video for bumper info
             videoPlayer.getCurrentVideo( function (videoDTO) {
               // bumper info stored in longDescription as JSON
@@ -187,6 +189,7 @@
           /**** main video PROGRESS handler ****/
           onMainProgress : function (evt) {
             var randomNumber = Math.random() * 10 // random number between 1 and 10
+            console.log(randomNumber);
             // as soon as we get progress, pause the player
             videoPlayer.pause();
                 // remove this listener so we don't loop on the bumper
