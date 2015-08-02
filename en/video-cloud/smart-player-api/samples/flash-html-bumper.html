@@ -116,10 +116,7 @@
           <p>After the bumper, you need to reload the main video, and use <code>seek()</code> to get back to the restart position. Remember that <code>seek()</code> will fail silently unless the video is playing. There are different ways to determine this (see the <a href="/en/video-cloud/smart-player-api/solutions/chaptered-video.html">chaptered video sample</a> for an alterate way), but one of the most reliable is to set another PROGRESS event listener for the main video and place the seeking logic in it. Remember to remove the PROGRESS listener for the bumper when it finishes, and you must also remove the new PROGRESS listener for the main video as soon as you get an event, so that the seek won't be repeated on every event.</p>
           <p>The above generally describes the logic of this sample. The code is slightly more complex, because we decided to allow the possibility of playing a midroll or postroll bumper, or both. the bumper information is stored in a JSON array in the <code>longDescription</code> field:</p>
 <pre><code>
-{
-  "postroll" : 1844554046001,
-  "midroll" : 1844554045001
-}
+[1844554046001, 1844554045001]
 </code></pre>
           <p>A bumperType variable is also set to keep track of what kind of bumper should be played, and some conditional logic in the main PROGRESS handler determines at what point to play the bumper and which one to play.</p>
         </div>
@@ -167,8 +164,6 @@
             mainVideo,
             bumperType = "midroll",
             restartPosition,
-            $controlButtons = $("#bumperControls").children();
-        // private functions
         // public functions
         return {
           /**** template loaded event handler ****/
@@ -182,8 +177,8 @@
           onTemplateReady : function (evt) {
             // get references to modules
             videoPlayer = player.getModule(APIModules.VIDEO_PLAYER);
-          // get current video for bumper info
-          videoPlayer.getCurrentVideo( function (videoDTO) {
+            // get current video for bumper info
+            videoPlayer.getCurrentVideo( function (videoDTO) {
               // bumper info stored in longDescription as JSON
               bumpers = JSON.parse(videoDTO.longDescription);
               // save the main video ID
@@ -192,37 +187,17 @@
           },
           /**** main video PROGRESS handler ****/
           onMainProgress : function (evt) {
-            // depends on bumperType
-            if (bumperType == "midroll" || bumperType == "both") {
-              if ((evt.position / evt.duration) > .5) {
+            var randomNumber = Math.random() * 10 // random number between 1 and 10
+            // as soon as we get progress, pause the player
+            videoPlayer.pause();
                 // remove this listener so we don't loop on the bumper
                 videoPlayer.removeEventListener(mediaEvent.PROGRESS, BCLS.onMainProgress);
-                // save the position
-                restartPosition = evt.position;
                 // pause the video
                 videoPlayer.pause(true);
-                // if bumperType is midroll only, set to none
-                if (bumperType == "midroll") {
-                  bumperType = "none";
-                }
                 // add PROGRESS listener for bumper
                 videoPlayer.addEventListener(mediaEvent.PROGRESS, BCLS.onBumperProgress);
                 // load the bumper
-                videoPlayer.loadVideoByID(bumpers.midroll);
-              }
-            }
-            else if (bumperType == "postroll") {
-              if ((evt.duration - evt.position) < .5) {
-                // pause the main video
-                videoPlayer.pause(true);
-                // set bumperType to none
-                bumperType = "none";
-                // remove the listener
-                videoPlayer.removeEventListener(mediaEvent.PROGRESS, BCLS.onMainProgress);
-                // just play the postroll and we are done
-                videoPlayer.loadVideoByID(bumpers.postroll);
-              }
-            }
+                videoPlayer.loadVideoByID(bumpers[Math.ceil(randomNumber * 10)]);
           },
          /**** handler for bumper PROGRESS ****/
          onBumperProgress : function (evt) {
@@ -240,17 +215,6 @@
               // resume the main video
               videoPlayer.loadVideoByID(mainVideo);
             };
-          },
-          /**** function to seek to video restart point ****/
-          seekToRestartPoint : function(evt) {
-            // remove this listener
-            videoPlayer.removeEventListener(mediaEvent.PROGRESS, BCLS.seekToRestartPoint);
-            // if postroll scheduled, add mainProgress listener
-            if (bumperType == "postroll") {
-              videoPlayer.addEventListener(mediaEvent.PROGRESS, BCLS.onMainProgress);
-            }
-            // seek to restart point
-            videoPlayer.seek(restartPosition);
           }
         }
       }());
