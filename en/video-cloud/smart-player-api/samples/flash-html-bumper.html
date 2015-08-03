@@ -44,7 +44,7 @@
 
         <div id="top" class="section">
             <h1>Midroll Bumper</h1>
-          <p>This sample plays what looks like a midroll (or postroll) bumper clip. It is not a true bumper, because they are always played preroll. Instead, the "bumpers" here are just other video clips from the media library. Using the buttons above the player, you can choose to play the midroll or postroll bumper, or both.</p>
+          <p>This sample plays what looks like a preroll bumper clip. It is not a true bumper, because they are always played preroll. Instead, the "bumpers" here are just other video clips from the media library. This allows the "bumper" to work in both Flash and HTML players (provided the "bumper" video has HLS or at least MP4 renditions). The "bumper" is chosen randomly from an array of 2 video ids stored in the long description field of the main video.</p>
         </div>
         <!-- every div class section must have an id -->
         <div class="section" id="resources">
@@ -57,7 +57,6 @@
                 <li>getCurrentVideo()</li>
                 <li>play()</li>
                 <li>pause()</li>
-                <li>seek()</li>
                 <li>addEventListener()</li>
                 <li>removeEventListener()</li>
               </ul>
@@ -105,15 +104,14 @@
         </div>
         <div class="section" id="logic">
           <h2><a name="logic"></a>How it is done</h2>
-          <p>To play a single mid- or postroll bumper is straightforward. You need a reference to the VIDEO_PLAYER module and to set up a listener for media PROGRESS events &mdash; or you could use a cue point for more precise timing keyed to the main video contents. In the progress event handler, you would wait for the appointed time. Remember that you cannot predict the timing of the events precisely, so you need a comparison check. The PROGRESS event objects include position and duration properties in seconds, which you can use to calculate the mid, quarter, or other points. And you need the ID of the bumber video &mdash; for convenience, store in a video metadata field, so that you can retrieve it using the <code>getCurrentVideo()</code> method.</p>
-          <p>When the PROGRESS position is greater than the time to play the bumper, pause the main video, save the position as a restart point, and use <code>loadVideoByID()</code> to play the bumper. One important thing: you need to use <code>removeEventListener()</code> to remove the PROGRESS event listener, or you will loop endlessly through the bumper!</p>
-          <p>You also need to set another event listener so that you hear the end of the bumper and know when to reload the main video. You could use the media <code>COMPLETE</code> event, but there is a potential problem. By default, Video Cloud players end playback with an menu screen that shows related videos. The player is still there, but in reduced size. By the time the COMPLETE event fires, the menu will be showing, and so the next video you load will play in the smaller-sized screen. To avoid this, use PROGRESS again &mdash; with a different handler &mdash; and stop the bumper about a half-second before the end. This applies to starting a postroll bumper also.</p>
-          <p>After the bumper, you need to reload the main video, and use <code>seek()</code> to get back to the restart position. Remember that <code>seek()</code> will fail silently unless the video is playing. There are different ways to determine this (see the <a href="/en/video-cloud/smart-player-api/solutions/chaptered-video.html">chaptered video sample</a> for an alterate way), but one of the most reliable is to set another PROGRESS event listener for the main video and place the seeking logic in it. Remember to remove the PROGRESS listener for the bumper when it finishes, and you must also remove the new PROGRESS listener for the main video as soon as you get an event, so that the seek won't be repeated on every event.</p>
-          <p>The above generally describes the logic of this sample. The code is slightly more complex, because we decided to allow the possibility of playing a midroll or postroll bumper, or both. the bumper information is stored in a JSON array in the <code>longDescription</code> field:</p>
+          <p>To play a single "bumper" is straightforward. You need a reference to the VIDEO_PLAYER module and to set up a listener for media PROGRESS events. In the progress event handler, as soon as you hear an event, pause the main video, removed the event listener, and use <code>loadVideoByID()</code> to play the bumper. You need to use <code>removeEventListener()</code> to remove the PROGRESS event listener, or you will loop endlessly through the bumper!</p>
+          <p>You also need to set another event listener so that you hear the end of the bumper and know when to reload the main video. You could use the media <code>COMPLETE</code> event, but there is a potential problem. By default, Video Cloud players end playback with an menu screen that shows related videos. The player is still there, but in reduced size. By the time the COMPLETE event fires, the menu will be showing, and so the next video you load will play in the smaller-sized screen. To avoid this, use PROGRESS again &mdash; with a different handler &mdash; and stop the bumper about a two tenths of a second before the end.</p>
+          <p>After the bumper, you need to reload the main video. Remember to remove the PROGRESS listener for the bumper when it finishes.</p>
+          <p>The above generally describes the logic of this sample. The code is slightly more complex, because we decided to allow the possibility of playing different bumpers. the bumper information is stored in a JSON array in the <code>longDescription</code> field:</p>
 <pre><code>
 [1844554046001, 1844554045001]
 </code></pre>
-          <p>A bumperType variable is also set to keep track of what kind of bumper should be played, and some conditional logic in the main PROGRESS handler determines at what point to play the bumper and which one to play.</p>
+          <p>We then just generate a random number and convert it to an integer between 1 and 10 to decide which of the bumpers to play.</p>
         </div>
         <div class="section" id="code">
           <h2><a name="code"></a>The code</h2>
@@ -188,8 +186,8 @@
           },
           /**** main video PROGRESS handler ****/
           onMainProgress : function (evt) {
-            var randomNumber = Math.random() * 10 // random number between 1 and 10
-            console.log(randomNumber);
+            var randomNumber = Math.random() * 10, // random number between 1 and 10
+                idx;
             // as soon as we get progress, pause the player
             videoPlayer.pause();
                 // remove this listener so we don't loop on the bumper
@@ -199,7 +197,9 @@
                 // add PROGRESS listener for bumper
                 videoPlayer.addEventListener(mediaEvent.PROGRESS, BCLS.onBumperProgress);
                 // load the bumper
-                videoPlayer.loadVideoByID(bumpers[Math.ceil(randomNumber * 10)]);
+                idx = (Math.ceil(randomNumber * 10) < 6) ? 0 : 1;
+            console.log(idx);
+                videoPlayer.loadVideoByID(bumpers[idx]);
           },
          /**** handler for bumper PROGRESS ****/
          onBumperProgress : function (evt) {
