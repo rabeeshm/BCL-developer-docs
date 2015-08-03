@@ -67,7 +67,6 @@
             <li>templateLoad</li>
             <li>templateReady</li>
             <li>Media: PROGRESS</li>
-            <li>Media: PLAY</li>
           </ul>
         </div>
         <div class="section" id="player">
@@ -105,7 +104,7 @@
         </div>
         <div class="section" id="logic">
           <h2><a name="logic"></a>How it is done</h2>
-          <p>To play a single "bumper" is straightforward. You need a reference to the VIDEO_PLAYER module and to set up a listener for media PLAY events. In the play event handler, as soon as you hear an event, pause the main video, remove the event listener, and use <code>loadVideoByID()</code> to play the bumper. You need to use <code>removeEventListener()</code> to remove the PLAY event listener, or you will loop endlessly through the bumper!</p>
+          <p>To play a single "bumper" is straightforward. You need a reference to the VIDEO_PLAYER module and to set up a listener for media PROGRESS events. In the progress event handler, as soon as you hear an event, pause the main video, removed the event listener, and use <code>loadVideoByID()</code> to play the bumper. You need to use <code>removeEventListener()</code> to remove the PROGRESS event listener, or you will loop endlessly through the bumper!</p>
           <p>You also need to set another event listener so that you hear the end of the bumper and know when to reload the main video. You could use the media <code>COMPLETE</code> event, but there is a potential problem. By default, Video Cloud players end playback with an menu screen that shows related videos. The player is still there, but in reduced size. By the time the COMPLETE event fires, the menu will be showing, and so the next video you load will play in the smaller-sized screen. To avoid this, use PROGRESS again &mdash; with a different handler &mdash; and stop the bumper about a two tenths of a second before the end.</p>
           <p>After the bumper, you need to reload the main video. Remember to remove the PROGRESS listener for the bumper when it finishes.</p>
           <p>The above generally describes the logic of this sample. The code is slightly more complex, because we decided to allow the possibility of playing different bumpers. the bumper information is stored in a JSON array in the <code>longDescription</code> field:</p>
@@ -176,7 +175,9 @@
             // get references to modules
             videoPlayer = player.getModule(APIModules.VIDEO_PLAYER);
             // add progress event listener
-            videoPlayer.addEventListener(mediaEvent.PLAY, BCLS.onMainPlay);
+            videoPlayer.addEventListener(mediaEvent.PROGRESS, BCLS.onMainProgress);
+            videoPlayer.addEventListener(mediaEvent.BEGIN, BCLS.onBegin);
+            videoPlayer.addEventListener(mediaEvent.PLAY, BCLS.onPlay);
             // get current video for bumper info
             videoPlayer.getCurrentVideo( function (videoDTO) {
               // bumper info stored in longDescription as JSON
@@ -186,21 +187,17 @@
             });
           },
           /**** main video PROGRESS handler ****/
-          onMainPlay : function (evt) {
-            var randomNumber = Math.random() * 10, // random number between 1 and 10
-                idx;
-            // as soon as we get progress, pause the player
-            videoPlayer.pause();
-                // remove this listener so we don't loop on the bumper
-                videoPlayer.removeEventListener(mediaEvent.PLAY, BCLS.onMainPlay);
-                // pause the video
-                videoPlayer.pause(true);
-                // add PROGRESS listener for bumper
-                videoPlayer.addEventListener(mediaEvent.PROGRESS, BCLS.onBumperProgress);
-                // load the bumper
-                idx = (Math.ceil(randomNumber * 10) < 6) ? 0 : 1;
-            console.log(idx);
-                videoPlayer.loadVideoByID(bumpers[idx]);
+          onMainProgress : function (evt) {
+            console.log("progress");
+            videoPlayer.removeEventListener(mediaEvent.PROGRESS, BCLS.onMainProgress);
+          },
+          onBegin : function (evt) {
+            console.log("begin");
+            videoPlayer.removeEventListener(mediaEvent.BEGIN, BCLS.onBegin);
+          },
+          onPlay : function (evt) {
+            console.log("play");
+            videoPlayer.removeEventListener(mediaEvent.PLAY, BCLS.onPlay);
           },
          /**** handler for bumper PROGRESS ****/
          onBumperProgress : function (evt) {
