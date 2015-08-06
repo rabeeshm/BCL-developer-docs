@@ -161,6 +161,13 @@ var aapi_model = {
                 default: "video_view"
             },
             {
+                name: "reconciled",
+                required: false,
+                description: "If included, will limit results to either historical or realtime data",
+                values: "true | false",
+                default: "none"
+            },
+            {
                 name: "from",
                 required: false,
                 description: "The beginning of the date range for the request",
