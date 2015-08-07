@@ -52,8 +52,17 @@
                 <h3>Setup</h3>
                 <p>Here’s an example. For a user with pub id 1234567890123 who wants to use Dynamic Ingest to upload a source video file located at https://s3.amazonaws.com/bucket/mysourcevideo.mp4 to an existing title in the catalog with video id 99988877766655 using the balanced-high-definition profile and who, furthermore, wants to receive callbacks at two endpoints located at http://host1/path1 and http://host2/path2 respectively, the DI request would be like this:</p>
 
-<pre><code>POST https://ingest.api.brightcove.com/v1/accounts/1234567890123/videos/99988877766655/ingest-requests { "master": { "url": "https://s3.amazonaws.com/bucket/mysourcevideo.mp4" }, "profile": "high-resolution", "callbacks": ["http://host1/path1”, “http://host2/path2”] }</code></pre>
-                <p>The notification will include:</p>
+<pre><code>POST https://ingest.api.brightcove.com/v1/accounts/1234567890123/videos/99988877766655/ingest-requests { "master": { "url": "https://s3.amazonaws.com/bucket/mysourcevideo.mp4" }, "profile": "high-resolution", <strong>"callbacks": ["http://host1/path1”, “http://host2/path2”]</strong> }</code></pre>
+                <h3>Sample notification</h3>
+                <p>Notifications are sent as POST requests with the notification in the request body as JSON. Here is a sample notification:</p>
+<pre><code>{
+    "entity": "4375977109001",
+    "entityType": "TITLE",
+    "status": "SUCCESS",
+    "version": "1",
+    "action": "CREATE"
+}</code></pre>
+                <h3>Notification fields</h3>
                 <table>
                     <thead>
                         <tr>
@@ -63,14 +72,16 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>
-                                <code>status</code>
-                            </td>
+                            <td><code>status</code></td>
                             <td>will be <code>FAILED</code> if the ingest or creation of a rendition was not successful, <code>SUCCESS</code> if the request succeeded</td>
                         </tr>
                         <tr>
                             <td><code>entity</code></td>
                             <td>if it exists, the Video Cloud id of the asset that was ingested or failed (if the video object was successfully created in Video Cloud)</td>
+                        </tr>
+                        <tr>
+                            <td><code>entityType</code></td>
+                            <td>the kind of asset reported on - for example: TITLE (a video), DIGITAL_MASTER, ASSET (a rendition, captions file, or image)</td>
                         </tr>
                         <tr>
                             <td><code>errorMessage</code></td>
@@ -82,12 +93,106 @@
                                 <code>"1"</code>
                             </td>
                         </tr>
+                        <tr>
+                            <td><code>action</code></td>
+                            <td>the action that occurred - for example, CREATE
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
             <div class="section" id="cmsAPI">
                 <h2>CMS API</h2>
-                <p></p>
+                <p>You can receive notifications when <code>video_change</code> events occur in your video library. Notifications will be sent to the URL you specify, which should point to an application capable of handling HTTP POST requests.</p>
+                <h3>Setup</h3>
+                <p>You can specify up to 10 endpoints to receive notifications by making a POST request to <code>https://cms.api.brightcove.com/v1/accounts/{account_id}/subscriptions</code> and including JSON in the request body like this:</p>
+<pre><code>{
+    "endpoint":"http://solutions.brightcove.com/bcls/di-api/di-callbacks.php",
+    "events":["video-change"]
+}</code></pre>
+                    <p>Notifications are sent in JSON format. Here's an example:</p>
+<pre><code>{"timestamp":1423840514446,
+    "account_id":"775205503001",
+    "event":"video-change",
+    "video":"4020894387001",
+    "version":26}</code></pre>
+                <h3>Notification fields</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <code>timestamp</code>
+                            <td>time when the event occurred in Epoch milliseconds</td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <code>account_id</code>
+                            <td>the Video Cloud account id</td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <code>event</code>
+                            <td>the type of event - currently this will always be <code>video-change</code></td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <code>video</code>
+                            <td>the video ID</td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <code>version</code>
+                            <td>the version of the video - each set of change events increments the video version - for example, creation of a new set of renditions would constitute a set of change events</td>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <p>Requests to create a subscription will receive an HTTP 422 error response for the following conditions:</p>
+                <ul>
+                    <li>The <code>endpoint</code> or <code>events</code> field is missing from the request body</li>
+                    <li>The <code>events</code> field value is not a list (array)</li>
+                    <li>the subscription defined already exists</li>
+                    <li>you already have 10 subscriptions to this event</li>
+                </ul>
+                <h3>Notification failures</h3>
+                <p>The notification system treats any 4xx or 5xx return from the customer server as a retriable failure. Failing callbacks will be retried up to 20 times, with an exponentially increasing delay between subsequent callbacks. The first few retries will happen within minutes of the initial callback attempt. If the callback continues failing, and we get all the way out to the 20th retry, the retry delay will be a few days.</p>
+                <p class="BCL-aside">Note:
+                    <code>video_change</code> events are triggered by automated system processes as well as user actions, so these events will not always corresponds to changes you made to video properties in Studio or via the APIs.</p>
+                <h3>Firewalls</h3>
+                <p>In case your organization has a strict policy regarding sources of incoming traffic through your firewall, the following fixed IP addresses are used to send notifications:</p>
+                <ul>
+                    <li>54.84.92.184</li>
+                    <li>54.175.126.166</li>
+                    <li>54.164.120.55</li>
+                </ul>
+                <p>These values are subject to change in the future. The IPs are within the AWS ec2 us-east-1 address space and we anticipate that future IP addresses will also be, if you don't want to deal with specific IP address changes, you can configure your firewalls and routing rules to allow traffic from any of us-east-1.</p>
+                <h3>Endpoint for notification subscriptions</h3>
+                <pre><code>/accounts/{account_id}/subscriptions</code></pre>
+
+                <h3 id="createSubscription">Create a new subscription</h3>
+                <p>To create a new subscription, submit a POST request with a request body including the endpoint that you want notifications delivered to and
+                    <code>video-change</code> as the single item in an
+                    <code>events</code> array:</p>
+                <pre><code>{ "endpoint": "http://solutions.brightcove.com:9002", "events": [ "video-change" ] }
+                    </code></pre>
+
+                <h3 id="getSubscriptions">Get a list of your subscriptions</h3>
+                <p>To get a list of all your subscriptions, send a GET request to the subscriptions endpoint.</p>
+                <h3 id="getSubscription">Get or Delete a single subscription</h3>
+                <h4>Endpoint</h4>
+                <pre><code>/accounts/{account_id}/subscriptions/{subscription_id}</code></pre>
+
+                <p>A GET request will retrieve the subscription. A DELETE request will delete the subscription. You cannot update a subscription at this time. If you need to modify a subscription, you will need to delete it and create a new one.</p>
             </div>
 
 		</div>
