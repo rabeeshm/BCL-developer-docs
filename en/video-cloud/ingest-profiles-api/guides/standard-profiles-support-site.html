@@ -30,6 +30,7 @@ var BCLS = (function (window, document, Handlebars, bclsProfiles_cached) {
         buildDetailTables,
         getProfileData,
         removeExtraProfiles,
+        isItemInArray,
         dedupe,
         isDefined,
         bclslog;
@@ -65,6 +66,25 @@ var BCLS = (function (window, document, Handlebars, bclsProfiles_cached) {
         }
         return out;
     };
+
+    /**
+     * determines whether specified item is in an array
+     *
+     * @param {array} array to check
+     * @param {string} item to check for
+     * @return {boolean} true if item is in the array, else false
+     */
+    isItemInArray = function (arr, item) {
+        var i,
+            iMax = arr.length;
+        for (i = 0; i < iMax; i++) {
+            if (arr[i] === item) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     /**
      * Logging function - safe for IE
      * @param  {string} context description of the data
@@ -77,12 +97,19 @@ var BCLS = (function (window, document, Handlebars, bclsProfiles_cached) {
         }
         return;
     };
-
+    /**
+     * [removeExtraProfiles description]
+     */
     removeExtraProfiles = function () {
-        var i = data.BCLSprofilesArray.length;
+        var i = data.BCLSprofilesArray.length,
+            item;
 
         while (i > 0) {
-
+            i--;
+            item = data.BCLSprofilesArray[i];
+            if (!isItemInArray(currentProfiles, item.name)) {
+                data.BCLSprofilesArray.splice(i, 1);
+            }
         }
 
     }
@@ -257,23 +284,17 @@ var BCLS = (function (window, document, Handlebars, bclsProfiles_cached) {
                 try {
                     if (httpRequest.readyState === 4) {
                       if (httpRequest.status === 200) {
-                        // try {
                           bclslog(httpRequest.responseText);
                           data.BCLSprofilesArray = JSON.parse(httpRequest.responseText);
+                          removeExtraProfiles();
                           buildSummaryTable();
                           buildDetailTables();
 
-                        // } catch (e) {
-                        //   bclslog('invalid json', e);
-                        //   // just use cached data and build the tables
-                        //     data = bclsProfiles_cached;
-                        //     buildSummaryTable();
-                        //     buildDetailTables();
-                        // }
                       } else {
                         bclslog('There was a problem with the request. Request returned: ', httpRequest.status);
                         // just use cached data and build the tables
                         data = bclsProfiles_cached;
+                        removeExtraProfiles();
                         buildSummaryTable();
                         buildDetailTables();
 
