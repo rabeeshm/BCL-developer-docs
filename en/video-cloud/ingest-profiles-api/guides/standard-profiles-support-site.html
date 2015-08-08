@@ -4,6 +4,10 @@
     <!--break-->
 
     <div id='main'></div>
+    <hr>
+    <h2>JSON Data</h2>
+    <p>You can use the JSON data for the standard profiles as a starting point for creating custom profiles.</p>
+    <div id="jsonData"></div>
     <div class='BCL-references'>
     <h2>Related Topics</h2>
     <ul>
@@ -18,6 +22,7 @@
 var BCLS = (function (window, document, Handlebars, bclsProfiles_cached) {
     'use strict';
     var mainSection = document.getElementById('main'),
+        jsonData = document.getElementById('jsonData'),
         proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php',
         requestData = 'client_id=cca7ae2a-503d-472e-996c-3aa664d4aa95&client_secret=OE43iNQ6HluFxM2I_f6QDfGLoSSW28jnDWbX8gDgS6GIFD2P6VNWKbRHyln0I5aVyoSeil0l5ikWYQ2hUbR99g&url=' + encodeURI('https://ingestion.api.brightcove.com/v1/accounts/3921507403001/profiles') + '&requestBody=null&requestType=GET',
         data = bclsProfiles_cached,
@@ -28,6 +33,7 @@ var BCLS = (function (window, document, Handlebars, bclsProfiles_cached) {
         // functions
         buildSummaryTable,
         buildDetailTables,
+        buildJsonData,
         getProfileData,
         removeExtraProfiles,
         isItemInArray,
@@ -197,6 +203,7 @@ var BCLS = (function (window, document, Handlebars, bclsProfiles_cached) {
         bclslog('building data tables');
         var newSectionNode,
             sectionHeadingNode,
+            sectionHeadingLink,
             renditionTableNode,
             renditiontheadNode,
             renditiontbodyNode,
@@ -218,15 +225,18 @@ var BCLS = (function (window, document, Handlebars, bclsProfiles_cached) {
                 re = /_/g;
             newSectionNode = document.createElement('div');
             sectionHeadingNode = document.createElement('h2');
+            sectionHeadingLink = document.createElement('a');
+            sectionHeadingLink.setAttribute('href', '#' + data.BCLSprofilesArray[i].name + '-json');
             newSectionNode.setAttribute('id', data.BCLSprofilesArray[i].name);
             newSectionNode.setAttribute('class', 'section');
             sectionHeadingNode.setAttribute('id', data.BCLSprofilesArray[i].name + '_summaryTableHeading');
-            newSectionNode.appendChild(sectionHeadingNode);
+            sectionHeadingLink.appendChild(sectionHeadingNode);
+            newSectionNode.appendChild(sectionHeadingLink);
 
             mainSection.appendChild(newSectionNode);
             sectionHeadingElem = document.getElementById(data.BCLSprofilesArray[i].name + '_summaryTableHeading');
-            sectionSubHeadingElem = document.getElementById(data.BCLSprofilesArray[i].name + '_summarySubHeading');
-            sectionTableHeadingElem = document.getElementById(data.BCLSprofilesArray[i].id + '_profileSummaryTable');
+            // sectionSubHeadingElem = document.getElementById(data.BCLSprofilesArray[i].name + '_summarySubHeading');
+            // sectionTableHeadingElem = document.getElementById(data.BCLSprofilesArray[i].id + '_profileSummaryTable');
             sectionHeadingElem.innerHTML = data.BCLSprofilesArray[i].name;
             jMax = data.BCLSprofilesArray[i].renditions.length;
             renditionTableNode = document.createElement('table');
@@ -274,8 +284,40 @@ var BCLS = (function (window, document, Handlebars, bclsProfiles_cached) {
                 renditiontbodyElem.innerHTML += tbStr;
             }
         }
+        buildJsonData();
+    };
+
+
+    buildJsonData = function () {
+        var i,
+            iMax = data.BCLSprofilesArray.length,
+            item,
+            headingElem,
+            preElem,
+            pElem;
+        for (i = 0; i < iMax; i++) {
+            item = data.BCLSprofilesArray[i];
+            item.name += '-copy';
+            item.account_id = '{your_account_id}';
+            delete item.id;
+            delete item.reference_id;
+            delete item.version;
+            delete item.date_created;
+            delete item.date_last_modified;
+            headingElem = document.createElement('h3');
+            headingElem.appendChild(document.createTextNode(item.name.replace('-copy', ' JSON')));
+            headingElem.setAttribute('id', item.name.replace('copy', 'json'));
+            pElem = document.createElement('p');
+            pElem.appendChild(document.createTextNode('Before using the JSON, you must replace "{your_account_id}" with your own account id.'))
+            preElem = document.createElement('pre');
+            preElem.appendChild(document.createTextNode(JSON.stringify(item, null, '  ')));
+            jsonData.appendChild(headingElem);
+            jsonData.appendChild(pElem);
+            jsonData.appendChild(preElem);
+        }
         bclslog('content built');
     };
+
     getProfileData = function () {
         var httpRequest = new XMLHttpRequest(),
             proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php',
