@@ -5,7 +5,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
 	<!-- change title to match the h1 heading -->
-	<title>DRM Packages</title>
+	<title>Content Security</title>
 	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/foundation.min.css" />
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/normalize.css" />
 	<script src="//use.edgefonts.net/source-code-pro.js"></script>
@@ -40,9 +40,91 @@
 		</div>
 		<div id="main" class="large-10 small-12 columns">
 			<div id="top" class="section">
-				<h1>DRM Packages</h1>
-				<p>If your account is DRM-enabled, you can define DRM packages in your ingest profiles using the <code>packages</code> array.</p>
+				<h1>Content Security (DRM and HLSe)</h1>
+				<p>Video Cloud offers several forms of content security, some of which can be used together. This topic deals with security that can be configured in your ingest profiles:</p>
+				<ul>
+					<li><a href="#drm">DRM</a></li>
+					<li><<a href="#hlse">HLS encryption (HLSe)</a></li>
+				</ul>
+				<p>
+					For additional content security mechanisms that can be set in either the player configuration or video properties, see:
+				</p>
+				<ul>
+					<li><a href="//support.brightcove.com/en/video-cloud/docs/configuring-player-availability">Configuring Player Availability</a></li>
+					<li><a href="//support.brightcove.com/en/video-cloud/docs/configuring-video-availability">Configuring Video Availability</a></li>
+				</ul>
             </div>
+			<div class="section" id="drm">
+			    <h2>DRM</h2>
+			    <p>DRM (Digital Rights Management) protects your video content by encrypting the video data and unlocking it based on license policies. When the video content is loaded into a Brightcove player, the player calls back to a licensing server and obtains permission to play the video. This transaction is transparent to viewers.</p>
+				<p class="BCL-aside">Note: to use DRM, your account must be enabled for the DRM type(s) you want to use. Contact your account manager for more information.</p>
+				<p>
+					Video Cloud currently supports the several DRM types for different video formats:
+				</p>
+				<table>
+                    <thead>
+                        <tr class="head">
+                        	<th></th>
+							<th></th>
+                        	<th colspan="4"
+                        	>Video Format</th>
+                        </tr>
+						<tr>
+                            <th class="head"></th>
+							<th></th>
+                            <th>MPEG-DASH</th>
+                            <th>Smooth</th>
+                            <th>HLS</th>
+                            <th>Other</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th class="head" rowspan="6">DRM type</th>
+							<th><a href="#wvMod">widevine (modular)</a></th>
+                            <td><img src="//docs.brightcove.com/en/images/yes-icon.png"></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th><a href="#marlin">marlin</a></th>
+                            <td><img src="//docs.brightcove.com/en/images/yes-icon.png"></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th><a href="#playready">playready</a></th>
+                            <td><img src="//docs.brightcove.com/en/images/yes-icon.png"></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th><a href="#playreadySmooth">smooth-playready</a></th>
+                            <td></td>
+                            <td><img src="//docs.brightcove.com/en/images/yes-icon.png"></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th><a href="#hdsFaxes">hds-faxes</a></th>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>HDS, RTMP</td>
+                        </tr>
+                        <tr>
+                            <th><a href="wvClassic">widevine (classic)</a></th>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>WVC</td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
             <div class="section" id="reference_ids">
                 <h2>Reference IDs</h2>
                 <p>Renditions are assigned to DRM packages by <code>reference_id</code>, so you need to be sure that you assign a <code>reference_id</code> to each rendition defined in profiles that will have DRM packages.</p>
@@ -50,19 +132,11 @@
 <pre><code>..."renditions": [
 {
     "media_type": "video",
-    <em>"reference_id": "av0",</em>
+    <strong><em>"reference_id": "av0",</em></strong>
     "format": "mp4",
     "audio_codec": "aac",
-    "audio_bitrate": 512,
-    "video_codec": "h264",
-    "speed": 3,
-    "video_bitrate": 8192,
-    "decoder_bitrate_cap": 16384,
-    "decoder_buffer_size": 16384,
-    "keyframe_rate": 0.5,
-    "max_frame_rate": 30,
-    "width": 3840,
-    "height": 2160,
+	"width": 360,
+    "height": 270,
     "h264_profile": "baseline"
 }...</code></pre>
 				<p class="BCL-aside">Note: every reference_id must be unique across all profiles defined for your account.</p>
@@ -98,65 +172,24 @@
 ]</code></pre>
                 <p class="BCL-aside">Note: in the JSON for the profile, the <code>renditions</code> array <strong>must</strong> be defined before the <code>packages</code> array, so that the reference_ids referred to in the packages exist.</p>
 			</div>
-            <div class="section" id="supportedType">
-                <h2>Supported types</h2>
-                <p>Below are the supported DRM packages by video format:</p>
-                <table>
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>HLS</th>
-                            <th>MPEG-DASH</th>
-                            <th>Smooth</th>
-                            <th>Other</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th>hds-faxes</th>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                            <td>HDS, RTMP</td>
-                        </tr>
-                        <tr>
-                            <th>widevine (classic)</th>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                            <td>WVC</td>
-                        </tr>
-                        <tr>
-                            <th>widevine (modular)</th>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                            <td><img src="//docs.brightcove.com/en/images/yes-icon.png"></td>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                        </tr>
-                        <tr>
-                            <th>marlin</th>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                            <td><img src="//docs.brightcove.com/en/images/yes-icon.png"></td>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                        </tr>
-                        <tr>
-                            <th>playready</th>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                            <td><img src="//docs.brightcove.com/en/images/yes-icon.png"></td>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                        </tr>
-                        <tr>
-                            <th>smooth-playready</th>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                            <td><img src="//docs.brightcove.com/en/images/yes-icon.png"></td>
-                            <td><img src="//docs.brightcove.com/en/images/no-icon.png"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+			<div class="section" id="widevine">
+			    <h2>Widevine</h2>
+			    <p>Google's Widevine DRM packaging comes in two flavors: modular, for MPEG-DASH video, and classic, for WVC video. Modular is the newer type and recommended.</p>
+				<h3 id="wvMod">Widevine modular</h3>
+				<h3 id="wvClassic">Widevine classic</h3>
+			</div>
+			<div class="section" id="marlin">
+			    <h2>Marlin</h2>
+			    <p></p>
+			</div>
+			<div class="section" id="playready">
+			    <h2>Playready</h2>
+			    <p></p>
+			</div>
+			<div class="section" id="hlse">
+    <h2>HLSe</h2>
+    <p></p>
+</div>
 		</div>
 	</div>
 	<!-- bcl scripts -->
