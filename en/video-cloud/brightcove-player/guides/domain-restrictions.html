@@ -5,7 +5,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
 	<!-- change title to match the h1 heading -->
-	<title>Geo-Filtering Messaging</title>
+	<title>Domain Restrictions Messaging</title>
 	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/foundation.min.css" />
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/normalize.css" />
 	<script src="//use.edgefonts.net/source-code-pro.js"></script>
@@ -36,7 +36,7 @@
 	<!-- content -->
 	<!-- content -->
 	<div class="perform-only">
-		<h1>Geo-Filtering Messaging</h1>
+		<h1>GDomain Restrictions Messaging</h1>
 		<p>The information contained in this document is not applicable for Perform customers.</p>
 	</div>
 	<div class="row video-cloud-only">
@@ -45,18 +45,19 @@
 		</div>
 		<div id="main" class="large-10 small-12 columns">
 			<div id="top" class="section">
-				<h1>Geo-Filtering Messaging</h1>
+				<h1>Domain Restrictions Messaging</h1>
 				<!-- Place document intro sentence(s) here -->
-				<p>It is possible to restrict where a video can be viewed via geo-filtering. The <a href="http://support.brightcove.com/en/video-cloud/docs/geo-filtering-your-videos">Geo-filtering your Videos</a> document shows you how to use Video Cloud to apply geographic restrictions. The document you are now reading instructs you how to implement code to inform users that a video is geo-filtered.</p>
-				<p>By default, Brightcove Player does not inform the user that a video is geo-filtered. It simply does not play. If you view the console you will see the following.</p>
-				<p><code data-gist-id="8cf94f062cf27a9efdd7" data-gist-hide-footer="true" data-gist-line="1"></code></p>
-				<p>This is not terribly helpful as you cannot be guaranteed from this error that the reason the video is forbidden to view is geo-filtering.</p>
-				<p>This document implements a strategy to let the user know the video they are trying to watch is geo-filtered.</p>
+				<p>It is possible to restrict where a video can be viewed via domain restrictions. The <a href="//support.brightcove.com/en/video-cloud/docs/configuring-player-availability">Configuring Player Availability</a> document shows you how to use Video Cloud to apply domain restrictions. The document you are now reading instructs you how to implement code to inform users that the player is using domain restrictions.</p>
+				<p>By default, Brightcove Player does not inform the user that a video is domain restricted. It simply does not play. If you view the console you will see the following.</p>
+				<div><img src="/en/video-cloud/brightcove-player/guides/assets/domain-restrictions/domain-restrictions-error-console.png"></div>
+				<p>This is not terribly helpful, but if you check the <strong>Network</strong> tab and click a <strong>Name</strong> that corresponds to your video ID then check the <strong>Preview</strong> tab, you will see a more illuminating error.</p>
+				<div><img src="/en/video-cloud/brightcove-player/guides/assets/domain-restrictions/domain-restrictions-error-network.png"></div>
+				<p>This document implements a strategy to let the user know the video they are trying to watch is domain restricted.</p>
 			</div>
 			<div id="errorobject" class="section">
 				<h2>Player catalog's error object</h2>
-				<p>The key to creating a user friendly message is the <code>error</code> object contained in Brightcove Player's <code>catalog</code>. An example of a geo-filtering error is shown below in a screenshot from a browser's console. Notice that the object contains a <code>data</code> property, which itself contains an array. The array will hold the last error the catalog encountered loading a video. In the example you see the element in the array is reporting a geo-filtering access issue.</p>
-				<div><img src="/en/video-cloud/brightcove-player/guides/assets/error-object.png" alt="catalog error object"></div>
+				<p>The key to creating a user friendly message is the <code>error</code> object contained in Brightcove Player's <code>catalog</code>. An example of a domain restriction error is shown below in a screenshot from a browser's console. Notice that the object contains a <code>data</code> property, which itself contains an array. The array will hold the last error the catalog encountered loading a video. In the example you see the element in the array is reporting a domain restriction access issue.</p>
+				<div><img src="/en/video-cloud/brightcove-player/guides/assets/domain-restrictions/domain-restrictions-catalog-error.png"></div>
 			</div>
       <div id="bccatalogerror" class="section">
         <h2>Handle bc-catalog-error</h2>
@@ -69,21 +70,21 @@
 				    <li>Create a target element in which to display the message.</li>
 				    <li>Be sure the player is ready to act upon.</li>
 				    <li>Check to see if any error has occurred.</li>
-				    <li>If yes, check to see if the error is a geo-filtering issue.</li>
+				    <li>If yes, check to see if the error is a domain restriction issue.</li>
 				    <li>If yes, display message to user.</li>
 				</ul>
 				<p>The following code implements these steps.</p>
 				<ul>
-				    <li>Line 12: Insert an HTML element, in this case a paragraph, in which to inject text; give the element an <code>id</code> for targeting purposes.</li>
-				    <li>Line 17: Use the <code>one()</code> method add an event listener for the <code>bc-catalog-error</code> event only once.</li>
-				    <li>Line 20: Use an <code>if</code> statement to be sure some error has occurred.</li>
-				    <li>Line 21: Assign a variable the specific error information from Brightcove Player catalog's error object.</li>
-				    <li>Line 22: Use an <code>if</code> statement to be sure the specific error information exists AND the type of error is from geo-filtering.</li>
-				    <li>Line 23: Inject an appropriate text message into the HTML element created at line 12.</li>
+				    <li>Line 8: Insert an HTML element, in this case a paragraph, in which to inject text; give the element an <code>id</code> for targeting purposes.</li>
+				    <li>Line 13: Use the <code>one()</code> method add an event listener for the <code>bc-catalog-error</code> event only once.</li>
+				    <li>Line 16: Use an <code>if</code> statement to be sure some error has occurred.</li>
+				    <li>Line 17: Assign a variable the specific error information from Brightcove Player catalog's error object.</li>
+				    <li>Line 18: Use an <code>if</code> statement to be sure the specific error information exists AND the type of error is from domain restriction.</li>
+				    <li>Line 19: Inject an appropriate text message into the HTML element created at line 12.</li>
 				</ul>
-				<p><code data-gist-id="8cf94f062cf27a9efdd7" data-gist-hide-footer="true" data-gist-line="5-32" data-gist-highlight-line="12,17,20-25"></code></p>
-				<p>The following screenshot shows the message displayed below the player. (Note the image in the player is the poster, which is not geo-restricted.)</p>
-				<div><img src="/en/video-cloud/brightcove-player/guides/assets/geo-filtering-html-message.png" alt="geo filtering message"></div>
+				<p><code data-gist-id="0aa477f3608230c349a5" data-gist-hide-footer="true" data-gist-line="1-28" data-gist-highlight-line="8,13,16-21"></code></p>
+				<p>The following screenshot shows the message displayed below the player.</p>
+				<div><img src="/en/video-cloud/brightcove-player/guides/assets/domain-restrictions/domain-restrictions-html-message.png"></div>
       </div>
       <div id="errorplugin" class="section">
 				<h2>Message via errors plugin</h2>
@@ -91,26 +92,26 @@
 				<ul>
 				    <li>Line 48: Use the <code>one()</code> method add an event listener for the <code>bc-catalog-error</code> event only once.</li>
 				    <li>Lines 51-58: Call the player's <code>error()</code> method, passing in as an argument JSON that defines the <code>errors</code> information to display. Note that the choice of <code>-3</code> for the error code is arbitrary, and the only guidance is not to use a standard error code (currently 1-5).</li>
-				    <li>Line 62: Call the <code>error()</code> method to display the custom error information. The logic used to determine when the geo-filtering error has occurred is the same as above. The object passed as an argument defines which error message to display.</li>
+				    <li>Line 62: Call the <code>error()</code> method to display the custom error information. The logic used to determine when the domain restriction error has occurred is the same as above. The object passed as an argument defines which error message to display.</li>
 				</ul>
-				<p><code data-gist-id="8cf94f062cf27a9efdd7" data-gist-hide-footer="true" data-gist-line="47-70" data-gist-highlight-line="48,51-58,62"></code></p>
+				<p><code data-gist-id="0aa477f3608230c349a5" data-gist-hide-footer="true" data-gist-line="47-70" data-gist-highlight-line="48,51-58,62"></code></p>
 				<p>The following screenshot shows the error plugin's display of the defined error.</p>
-				<div><img src="/en/video-cloud/brightcove-player/guides/assets/geo-filtering-errors-plugin.png" alt="custom error message"></div>
+				<div><img src="/en/video-cloud/brightcove-player/guides/assets/domain restriction-errors-plugin.png" alt="custom error message"></div>
       </div>
       <div id="generalerror" class="section">
         <h2>General error display</h2>
-        <p>The two sections above deal specifically with displaying the error generated when a geo-restricted video is viewed from a restricted locale. Some errors do not provide the level of detail the geo-filtering restriction does. An example error object of this type is shown here. Notice that the <strong>data</strong> field is empty, whereas with the geo-filtering error it contained key error information.</p>
-				<div><img src="/en/video-cloud/brightcove-player/guides/assets/geo-filtering-general-error.png" alt="general error message"></div>
+        <p>The two sections above deal specifically with displaying the error generated when a geo-restricted video is viewed from a restricted locale. Some errors do not provide the level of detail the domain restriction restriction does. An example error object of this type is shown here. Notice that the <strong>data</strong> field is empty, whereas with the domain restriction error it contained key error information.</p>
+				<div><img src="/en/video-cloud/brightcove-player/guides/assets/domain restriction-general-error.png" alt="general error message"></div>
 				<p>The following code shows how to display information from <code>catalog.error</code> no matter the level of detail. At a high-level, the code performs the following:</p>
 				<ul>
 				    <li>Checks if a catalog error has occurred.</li>
 				    <li>Checks if in the error object the <code>data</code> field contains specific error information. If it does NOT, the general error message is injected into the HTML.</li>
-				    <li>If there is specific error information AND it is geo-filtering related an appropriate message is injected into the HTML.</li>
-				    <li>If there is specific error information, and it is not geo-filtering related, the specific error's message is injected into the HTML.</li>
+				    <li>If there is specific error information AND it is domain restriction related an appropriate message is injected into the HTML.</li>
+				    <li>If there is specific error information, and it is not domain restriction related, the specific error's message is injected into the HTML.</li>
 				</ul>
-				<p><code data-gist-id="8cf94f062cf27a9efdd7" data-gist-hide-footer="true" data-gist-line="77-96" data-gist-highlight-line="45,48-55,59"></code></p>
+				<p><code data-gist-id="0aa477f3608230c349a5" data-gist-hide-footer="true" data-gist-line="77-96" data-gist-highlight-line="45,48-55,59"></code></p>
 				<p>The following screenshot shows the general error message being displayed in HTML. Of course you could also use the errors plugin to display the message, as shown previous section of this document.</p>
-				<div><img src="/en/video-cloud/brightcove-player/guides/assets/geo-filtering-general-message.png" alt="geo filtering general message"></div>
+				<div><img src="/en/video-cloud/brightcove-player/guides/assets/domain restriction-general-message.png" alt="geo filtering general message"></div>
       </div>
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
