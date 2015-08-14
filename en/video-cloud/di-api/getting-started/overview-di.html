@@ -15,15 +15,15 @@
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
     <script>
         (function(i, s, o, g, r, a, m) {
-        	i['GoogleAnalyticsObject'] = r;
-        	i[r] = i[r] || function() {
-        		(i[r].q = i[r].q || []).push(arguments)
-        	}, i[r].l = 1 * new Date();
-        	a = s.createElement(o),
-        		m = s.getElementsByTagName(o)[0];
-        	a.async = 1;
-        	a.src = g;
-        	m.parentNode.insertBefore(a, m)
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function() {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
         })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
         ga('create', 'UA-2728311-29', 'auto');
@@ -48,7 +48,6 @@
         <div id="main" class="large-10 small-12 columns">
             <div id="top" class="section">
                 <h1>Dynamic Ingest API Overview</h1>
-                <!-- Place document intro sentence(s) here -->
                 <p>Brightcove's Dynamic Ingest (DI) API is based on functionality where video source files are downloaded from the customer's storage location and specified renditions of the source files are created. The platform is cloud-centric, globally-distributed and based on modern practices to deliver best in class consistency and speed.</p>
                 <p>Strengths of the DI API are:</p>
                 <ul>
@@ -139,120 +138,13 @@
                 <p>See the <a href="../samples/batch-dynamic-ingest-retranscode.html">working sample here</a>.</p>
             </div>
             <div class="section" id="capture-images">
-                <h2>Capture images</h2>
-                <p>During transcoding, Brightcove will capture a snapshot from the video at the midpoint and save this as poster (video still) and thumbnail images. You can change these images later in Studio or using the <a href="//docs.brightcove.com/en/video-cloud/cms-api/index.html">CMS API</a>.</p>
-                    <p class="BCL-aside">Note: for custom renditions, image capture requires that two special renditions be added to the ingest profile that you are using. You cannot currently add or update profiles directly - contact your SE or Account Manager for help in getting your ingest profiles updated. The new renditions must have the following properties:</p>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Property</th>
-                                <th>Value</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><code>media_type</code></td>
-                                <td>"image"</td>
-                            </tr>
-                            <tr>
-                                <td><code>label</code></td>
-                                <td>"poster" or "thumbnail" (you need a rendition for each)</td>
-                            </tr>
-                            <tr>
-                                <td><code>format</code></td>
-                                <td>"png" or "jpg"</td>
-                            </tr>
-                            <tr>
-                                <td><code>width</code></td>
-                                <td>number (pixels)</td>
-                            </tr>
-                            <tr>
-                                <td><code>height</code></td>
-                                <td>number (pixels)</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <p>Here is sample data for the two renditions:</p>
-<pre><code>{
-    "height": 360,
-    "label": "poster",
-    "width": 480,
-    "media_type": "image",
-    "format": "png"
-},
-{
-    "height": 90,
-    "label": "thumbnail",
-    "width": 160,
-    "media_type": "image",
-    "format": "png"
-}</code></pre>
-                    <p>It is recommended that you use <strong>exactly</strong> these values if you are still using Smart Players. If you have migrated to the new Brightcove Player, you can adjust width and height values to match your players.</p>
-                    <p>You should also set the <code>capture-images</code> flag in your request data to <code>true</code>, but this is the default value <em>if</em> the selected profile includes image renditions.</p>
-                    <h4>Sample request data:</h4>
-<pre><code>{
-  "master": { "url": "http://learning-services-media.brightcove.com/videos/mp4/Bird_Titmouse.mp4" },
-  "profile": "balanced-high-definition",
-  "capture-images": true
-}</code></pre>
-            </div>
-            <div class="section" id="ingest_images">
-                <h2>Ingest images</h2>
-                <p>You can include a custom poster and thumbnail for your video (or add them) by referencing their URLs in the JSON you use for the video ingestion:</p>
-<pre><code>{
-    "master": {
-        "url":"http://learning-services-media.brightcove.com/videos/mp4/Water-Droplet.mp4"
-    },
-    "profile": "balanced-high-definition",
-    "capture-images": false,
-    "poster": {
-        "url": "http://learning-services-media.brightcove.com/images/for_video/Water-In-Motion-poster.png"
-        "width": "640",
-        "height": "360"
-    },
-    "thumbnail": {
-        "url": "http://learning-services-media.brightcove.com/images/for_video/Water-In-Motion-thumbnail.png"
-        "width": "160",
-        "height": "90"
-    }
-}</code></pre>
-                <div class="BCL-aside">
-                    <p>Notes:</p>
-                    <ul>
-                        <li>For images, only unprotected HTTP/HTTPS URLs or signed S3 URLs are currently supported</li>
-                        <li>If you are uploading your own poster and thumbnail images, and the ingest profile you are using includes image renditions, you should set <code>capture-images</code> to <code>false</code></li>
-                    </ul>
-                </div>
+                <h2>Images</h2>
+                <p>You can use the Dyanamic Ingest API to capture poster and thumbnail images from your video, or to add your own images. For details, see <a href="../guides/images.html">Images and the Dynamic Ingest API</a>.</p>
             </div>
             <div class="section" id="ingest_captions">
                 <h2>Ingest captions</h2>
-                <p>You can also add WebVTT captions to your video or upload them for an existing video using Dynamic Ingest:</p>
-<pre><code>{
-    "master": {
-        "url":"http://learning-services-media.brightcove.com/videos/mp4/Water-Droplet.mp4"
-    },
-    "profile": "balanced-high-definition",
-    "capture-images": false,
-    "text_tracks": [
-        {
-            "url": "http://learning-services-media.brightcove.com/captions/for_video/Water-in-Motion.vtt",
-            "srclang": "en",
-            "kind": "captions",
-            "label": "EN",
-            "default": true
-        }
-    ]
-    "poster": {
-        "url": "http://learning-services-media.brightcove.com/images/for_video/Water-In-Motion-poster.png"
-        "width": "640",
-        "height": "360"
-    },
-    "thumbnail": {
-        "url": "http://learning-services-media.brightcove.com/images/for_video/Water-In-Motion-thumbnail.png"
-        "width": "160",
-        "height": "90"
-    }
-}</code></pre>
+                <p>You can also add WebVTT captions to your video or upload them for an existing video using Dynamic Ingest. For details, see <a href="../guides/webvtt.html">Ingesting WebVTT Files</a>.</p>
+
                 <div class="BCL-aside">
                     <p>Notes:</p>
                     <ol>
@@ -292,6 +184,9 @@
                     </li>
                     <li><a href="//docs.brightcove.com/en/video-cloud/ingest-profiles-api/guides/standard-profiles.html">Standard Ingest Profiles</a>
                     </li>
+                    <li><a href="../guides/images.html">Images and the Dynamic Ingest API</a></li>
+                    <li><a href="../guides/webvtt.html">Ingesting WebVTT Files</a></li>
+                    <li><a href="../../ingest-profiles-api/guides/drm.html">Content Security (DRM and HLSe)</a></li>
                 </ul>
             </div>
         </div>

@@ -46,46 +46,51 @@
             </div>
             <div class="section" id="setup">
                 <h2>Setup</h2>
-                <p>To set up your policy to allow Dynamic Ingest to access your videos, go to the <a href="http://aws.amazon.com/console/">AWS Console</a>. Select your bucket on the left side of the screen, then click "properties". On the last row click <strong>Add bucket policy</strong>. Below is our recommended policy:</p>
+                <p>The setup for Dynamic Ingest requests is the same, whether you are ingesting a video, images, a WebVTT file, or all of these:</p>
+                <dl>
+                    <dt>Request URL</dt>
+                    <dd>
+<pre><code>https://ingest.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/ingest-requests</code></pre>
+                    </dd>
+                    <dt>Authentication</dt>
+                    <dd>Authentication requires an access token passed as a <code>Bearer</code> token in an <code>Authorization</code> header:
+<pre><code>Authorization: Bearer {access_token}</code></pre>
+                    </dd>
+                </dl>
+            </div>
+            <div class="section" id="ingestWebVTT">
+                <h2>Ingest WebVTT files</h2>
+                <p>You can also add WebVTT captions to your video or upload them for an existing video using Dynamic Ingest:</p>
 <pre><code>{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Principal": {
-        "AWS": "arn:aws:iam::395540211253:root"
-      },
-      "Action": [
-        "s3:GetObject"
-      ],
-      "Sid": "Stmt1295042087538",
-        "Effect": "Allow",
-        "Principal": {
-                "AWS": "arn:aws:iam::749779118921:user/videocloud-ingestion"
-        },
-        "Action": [
-                "s3:GetObjectAcl",
-                "s3:GetObject"
-        ],
-        "Resource": "arn:aws:s3:::<em>{BUCKETNAME}</em>/*"
-    }
-  ]
+    "master": {
+        "url":"http://learning-services-media.brightcove.com/videos/mp4/Water-Droplet.mp4"
+    },
+    "profile": "balanced-high-definition",
+    "capture-images": false,
+    "text_tracks": [
+        {
+            "url": "http://learning-services-media.brightcove.com/captions/for_video/Water-in-Motion.vtt",
+            "srclang": "en",
+            "kind": "captions",
+            "label": "EN",
+            "default": true
+        }
+    ]
 }</code></pre>
-            <p>There is only <strong>one change you must make</strong> to this bucket policy before it's ready to go:</p>
-            <ol>
-                <li>Replace <strong><em>{BUCKETNAME}</em></strong> with the name of your bucket. Leave the <code>/*</code> at the end of the <code>Resource</code> line, as that will apply the policy to every file within the bucket.</li>
-                <li>Optionally, replace the Action array with the actions you want to allow. Valid actions that Video Cloud may need are:
-                  <h4>Object Permissions - first action array in the example above</h4>
-                  <h4>Bucket Permissions - second action array in the example above</h4>
-                  <ul>
-                    <li>s3:GetBucketLocation - allow Video Cloud to get the location of the bucket (US, EU, Asia, etc.)</li>
-                    <li>s3:ListBucketMultipartUploads - allow Video Cloud to view any multipart uploads currently happening on the bucket</li>
-                  </ul>
-                <p>Video Cloud does not need any write permissions.</p>
+                <div class="BCL-aside">
+                    <p>Notes:</p>
+                    <ol>
+                        <li>for images and text tracks, only public HTTP or HTTPS URLs or signed S3 URLs are supported</li>
+                        <li>for text tracks, Dynamic Ingest only adds/appends them to video’s vtt list even if it’s a reencode request. customer should use the CMS API to manage them (update/delete)</li>
+                        <li>Dynamic Ingest accepts up to 100 text tracks at a time</li>
+                        <li><code>mime_type</code> is not supported</li>
+                    </ol>
+                </div>
             </div>
             <div class="section" id="BCLreferences">
                 <h2>Related Topics</h2>
                 <ul>
-                    <li><a href="//docs.brightcove.com/en/video-cloud/di-api/guides/overview-di.html">Dynamic Ingest API Overview</a></li>
+                    <li><a href="//docs.brightcove.com/en/video-cloud/di-api/getting-started/overview-di.html">Dynamic Ingest API Overview</a></li>
                     <li><a href="//docs.brightcove.com/en/video-cloud/di-api/getting-started/quick-start-di.html">Quick Start to Dynamic Ingest</a></li>
                 </ul>
             </div>

@@ -49,6 +49,20 @@
                 </ul>
                 <p>This topic explains how to capture or ingest images.</p>
             </div>
+            <div class="section" id="setup">
+                <h2>Setup</h2>
+                <p>The setup for Dynamic Ingest requests is the same, whether you are ingesting a video, images, a WebVTT file, or all of these:</p>
+                <dl>
+                    <dt>Request URL</dt>
+                    <dd>
+<pre><code>https://ingest.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/ingest-requests</code></pre>
+                    </dd>
+                    <dt>Authentication</dt>
+                    <dd>Authentication requires an access token passed as a <code>Bearer</code> token in an <code>Authorization</code> header:
+<pre><code>Authorization: Bearer {access_token}</code></pre>
+                    </dd>
+                </dl>
+            </div>
             <div class="section" id="capture-images">
                 <h2>Capture images</h2>
                 <p>During transcoding, Video Cloud can capture a snapshot from the video at the midpoint and save this as poster (video still) and thumbnail images.</p>
@@ -99,7 +113,7 @@
     "format": "png"
 }</code></pre>
                     <p>It is recommended that you use <strong>exactly</strong> these values if you are still using Smart Players. If you have migrated to the new Brightcove Player, you can adjust width and height values to match your players.</p>
-                    <p>You should also set the <code>capture-images</code> flag in your request data to <code>true</code>, but this is the default value <em>if</em> the selected profile includes image renditions.</p>
+                    <p>You should also set the <code>capture-images</code> flag in your request data to <code>true</code>, but this is the default value <em>if</em> the selected profile includes image renditions. (If there are no image renditions in the profile, the default for <code>capture-images</code> is <code>false</code>.)</p>
                     <h4>Sample request data:</h4>
 <pre><code>{
   "master": { "url": "http://learning-services-media.brightcove.com/videos/mp4/Bird_Titmouse.mp4" },
@@ -109,13 +123,8 @@
             </div>
             <div class="section" id="ingest_images">
                 <h2>Ingest images</h2>
-                <p>You can include a custom poster and thumbnail for your video (or add them) by referencing their URLs in the JSON you use for the video ingestion:</p>
+                <p>You can also include a custom poster and thumbnail for your video (or add them) by referencing their URLs in the JSON you use for the Dynamic Ingest request body:</p>
 <pre><code>{
-    "master": {
-        "url":"http://learning-services-media.brightcove.com/videos/mp4/Water-Droplet.mp4"
-    },
-    "profile": "balanced-high-definition",
-    "capture-images": false,
     "poster": {
         "url": "http://learning-services-media.brightcove.com/images/for_video/Water-In-Motion-poster.png"
         "width": "640",
@@ -131,9 +140,23 @@
                     <p>Notes:</p>
                     <ul>
                         <li>For images, only unprotected HTTP/HTTPS URLs or signed S3 URLs are currently supported</li>
-                        <li>If you are uploading your own poster and thumbnail images, and the ingest profile you are using includes image renditions, you should set <code>capture-images</code> to <code>false</code></li>
+                        <li>The poster and thumbnail can be included with the ingestion of a <code>master</code>, or separately</li>
+                        <li>If you are uploading your own poster and thumbnail images along with a video master, and the ingest profile you are using includes image renditions, you should set <code>capture-images</code> to <code>false</code>:
+<pre><code>{
+  "master": { "url": "http://learning-services-media.brightcove.com/videos/mp4/Bird_Titmouse.mp4" },
+  "profile": "balanced-high-definition",
+  "capture-images": true
+}</code></pre>
+                        </li>
                     </ul>
                 </div>
+            </div>
+            <div class="section" id="BCLreferences">
+                <h2>Related Topics</h2>
+                <ul>
+                    <li><a href="//docs.brightcove.com/en/video-cloud/di-api/getting-started/overview-di.html">Dynamic Ingest API Overview</a></li>
+                    <li><a href="//docs.brightcove.com/en/video-cloud/di-api/getting-started/quick-start-di.html">Quick Start to Dynamic Ingest</a></li>
+                </ul>
             </div>
         </div>
     </div>
