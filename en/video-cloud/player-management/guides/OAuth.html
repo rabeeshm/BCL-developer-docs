@@ -43,31 +43,54 @@
       <div id="top" class="section">
         <h1 id="bclPageHeading">OAuth Guide</h1>
         <!-- content starts here -->
-        <p>Brightcove has created an <a href="https://oauth.net/2/">OAuth 2 system</a> that will be used across all of our new APIs for authorization. You don't need to know anything about OAuth in order to use the system, and we'll explain everything you need to do to get started below. Also see the documentation on the <a href="../../oauth-api/index.html">Brightcove OAuth API</a>.</p>
+        <p>Brightcove has created an <a href="http://oauth.net/">OAuth 2 system</a> that can be used across all of our new APIs for authorization. This topic shows you how to use OAuth to communicate with the Player Management API.</p>
+        <p>You don't need to know anything about OAuth in order to use the system, and we'll explain everything you need to do to get started below. For a detailed overview of OAuth, see the <a href="../../oauth-api/index.html">Brightcove OAuth API</a> documents.</p>
+        <p>When working with the Player Management API, you can also use basic authentication. For details, see the <a href="../../player-management/getting-started/player-mgmt-quick-start.html">Quick Start to Player Management</a> document.</p>
       </div>
-        <div class="section" id="getstarted">
-          <h2>Get started</h2>
-          <p>The authorization explained in this document allows you to use curl statements to communicate with the Player Service API. The curl tool is used at the command line to transfer data with URL syntax. More information about curl can be obtained from <a href="//curl.haxx.se/">http://curl.haxx.se</a>.</p>
-          <p>A few preliminary steps need to be taken before you can start to use the API. These are:</p>
-          <ul>
-            <li>Login to <a href="https://studio.brightcove.com">Studio</a>. If you have multiple accounts, use the drop-down to select the one in which you'd like to create your new players. For the credential system to work properly, you do need
-              to have admin rights on this account. If you are unsure if your user has admin rights, try going to the Users Settings page in Studio. If you see users listed on this page, you have admin rights.</li>
-            <li>On the home page of Studio, just below the menu, you will see your name and a <strong>Publisher ID</strong> below that. Copy your <strong>Publisher ID</strong>.</li>
-            <p class="BCL-aside">The Publisher ID from Studio is called the Account ID in the API. For this reason, in the rest of this document the ID will be referred to as the Account ID.</p>
-            <li>In Terminal enter the following to assign the account ID value to an environment variable:</li> <pre><code>export ACCOUNT_ID=<em>YourAccountID</em></code></pre>
-            <li>Authentication will be handled by supplying your Brightcove account email address as part of the curl statement, and then the API will prompt you for a password. Since the email address will be used frequently, also assign that value to an environment variable:</li> <pre><code>export EMAIL=<em>YourEmailAddress</em></code></pre>
-          </ul>
-          <p>You are now ready to start using the API.</p>
+            
+        <div class="section" id="credentials">
+          <h2>Get client credentials</h2>
+            <p>To use OAuth, you first need to get your client credentials (<code>client_id</code> and <code>client secret</code>). These credentials are valid for the account(s) and API opertion(s) that you are working with. This is a one-time operation provided that you save these credentials in a secure place for future use.</p>
+            <p>There are 2 ways to get your credentials:</p>
+            <ul>
+                <li>The preferred method is to use the Studio Admin UI as described in the <a href="../../oauth-api/guides/managing-api-credentials.html">Managing API Credentials in Studio</a> document.</li>
+<!--                <li>The preferred method is to use the Studio Admin UI as described in the <a href="//support.brightcove.com/en/video-cloud/docs/managing-api-authentication-credentials">Managing API Authentication Credentials</a> document.</li>-->
+                <li>You can also use cURL as shown in the <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html">Get Client Credentials Using cURL</a> document.</li>
+            </ul>
+            <p>Next, you will need to get an OAuth access token.</p>
         </div>
-        <div class="section" id="example">
-          <h2>Example usage</h2>
-          <p>Once you have completed the getting started steps, you can then use the authorization system. In the example below you see both the <code>ACCOUNT_ID</code> and <code>EMAIL</code> environment variables in use.</p>
-          <code data-gist-id="8759542" data-gist-hide-footer="true" data-gist-line="1-14"></code><br />
+            
+        <div class="section" id="accesstoken">
+          <h2>Get access token</h2>
+            <p>The client credentials you got in the previous step are used to request your access token (<code>access_token</code>), which then provides authorization to make an API call. Since this token is only valid for 5 mins, in most cases you will need to get one for each API call that you make.</p>
+            <p>Follow these steps to get your access token using cURL:</p>
+            <ol>
+                <li><p>In your command line, use the <code>export</code> command to set the values for your client id and client secret.</p>
+                <p><code data-gist-id="dc39e4e6a6eaab089f15" data-gist-hide-footer="true" data-gist-line="1-2"></code></p></li>
+                <li><p>Copy and paste the following cURL statement to your command line and press enter.</p>
+                <p><code data-gist-id="dc39e4e6a6eaab089f15" data-gist-hide-footer="true" data-gist-line="5-10"></code></p></li>
+                <li><p>Your response should look similar to this:</p>
+                <p><code data-gist-id="dc39e4e6a6eaab089f15" data-gist-hide-footer="true" data-gist-line="13-14"></code></p></li>
+            </ol>   
+            <p>With your access token, you are ready to communicate with the Player Management API.</p>
         </div>
-        <div class="section" id="otherusage">
-          <h2>Other API usage</h2>
-          <p>The client ID and client secret obtained in &quot;One time steps&quot; are standard client credentials that can be used with any standard OAuth 2 client. Set this up with https://oauth.brightcove.com/v3/access_token as the access token endpoint for the client credentials flow. You&#39;ll find many libraries out there for your language of choice. And while we provide one way of doing things on the command-line in the command-line section above, there&#39;s other command-line utilities for OAuth 2 for making things easier.</p>
+            
+        <div class="section" id="playermgmtapi">
+          <h2>Call Player Management API</h2>
+            <p>To use OAuth to communicate with the Player Management API, you will need the access token that you generated in the previous section. Remember, that this token expires after 5 mins, so you may need to repeat the previous section steps if your access token has expired.</p>
+            <p>Follow these steps to get player configuration information using cURL:</p>
+            <ol>
+                <li><p>In your command line, use the <code>export</code> command to set the values for your access token, account id and player id.</p>
+                <p><code data-gist-id="dc39e4e6a6eaab089f15" data-gist-hide-footer="true" data-gist-line="18-20"></code></p></li>
+                <li><p>Copy and paste the following cURL statement to your command line and press enter.</p>
+                <p><code data-gist-id="dc39e4e6a6eaab089f15" data-gist-hide-footer="true" data-gist-line="23-27"></code></p></li>
+                <li><p>Your response should look similar to this:</p>
+                <p><code data-gist-id="dc39e4e6a6eaab089f15" data-gist-hide-footer="true" data-gist-line="30-34"></code></p></li>
+            </ol> 
+            <p>To learn about all the requests you can make to the Player Management API, see the <a href="../../player-management/reference/versions/v1/index.html">Brightcove Player Management API</a> reference document.</p>
         </div>
+            
+
     </div>
   </div>
   <!-- bcl scripts============================================================-->
