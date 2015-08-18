@@ -74,6 +74,33 @@
                 <p>Passing this header will cause the response to be returned in compressed form. This may improve performance for large reports.</p>
                 <p class="BCL-aside">Note: the permanent Analytics API tokens issued during the Limited Availability program are no longer supported. Access tokens must be acquired from the Brightcove OAuth Service.</p>
             </div>
+            <div class="section" id="caching">
+                <h2>Caching</h2>
+                <p>For performance reasons, API responses are cached for varying periods of time. For any Analytics API query, you can get information about the cache from the response headers:</p>
+                <p>
+                    <img src="./assets/aapi-cach-headers.png" alt="cach control headers">
+                </p>
+                <p>
+                    The <code>Cache-Control</code> tells you the maximum time the results will be cached for in seconds (in the example above, 24 seconds). The <code>Last-Modified</code> and <code>Expires</code> headers tell you when the current cache was created and when it will expire.
+                </p>
+                <p>
+                    In most cases this is probably not an issue, but if the freshness of analytics data is of critical importance, you should know that the longer a query runs, the longer it will be cached, and reports that fetch realtime (unreconciled hourly) data only will not be cached as long as those that fetch reconciled data (only, or in addition to realtime data). Find a <a href="http://support.brightcove.com/en/video-cloud/docs/faq-analytics-module#26">full explanation of realtime and reconciled data</a> if you like; the short version is that the Analytics API relies on two data buckets:
+                </p>
+                <ul>
+                    <li>realtime, or hourly unreconciled data, which is made available immediately and stored for 32 days</li>
+                    <li>reconciled data, which is stored permanently; realtime data is reconciled to improve accuracy and stored in the reconciled data repository every 24 hours</li>
+                </ul>
+                <p>
+                    You can limit the results to reconciled or realtime data using the <a href="#reconciled">reconciled</a> parameter.
+                </p>
+                <p>
+                    To minimize caching:
+                </p>
+                <ul>
+                    <li>Use the <code><a href="#reconciled">reconciled=false</a></code> parameter to limit results to realtime data</li>
+                    <li>Use a small <a href="#dateRanges">date range</a>, and be sure that the entire range falls within the past 32 days</li>
+                </ul>
+            </div>
             <div class="section" id="concurrency">
                 <h2>Concurrent Requests</h2>
                 <p>A single account is limited to one request at a time. Multiple concurrent requests will execute in series.</p>
@@ -221,6 +248,11 @@
             <div class="section" id="limit">
                 <h2>Limit and offset</h2>
                 <p>The <code>limit</code> is the number of items to return (default: 10). To return all items, use <code>limit=all</code>. <code>offset</code> is the number of items to skip (default: 0). You can use <code>limit</code> and <code>offset</code> together to create an app that pages through the results.</p>
+            </div>
+            <div class="section" id="reconciled">
+                <h2>Reconciled data</h2>
+                <p>The <code>reconciled</code> parameter is a boolean. If it is set to <code>true</code>, the results will be limited to reconciled data. If <code>false</code>, results will be limited to realtime (hourly unreconciled) data.</p>
+                <p class="BCL-aside">Note: realtime data is only available for the previous 32 days. If you set <code>reconciled=false</code> and the <code>from</code> date earlier than 32 days ago, the API will return an error.</p>
             </div>
             <div class="section" id="geoReports">
                 <h2>Geographical reports</h2>
