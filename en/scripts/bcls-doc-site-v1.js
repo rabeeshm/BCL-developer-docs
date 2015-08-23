@@ -262,16 +262,18 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             max = navLabel.length,
             j,
             jMax;
-        for (i = 0; i < max; i++) {
-            str += "<li style=\"padding:.2em\"><a href=\"#" + navLabel[i].link + "\">" + navLabel[i].text + " </a></li>";
-        }
-        str += "</ul>";
-        sidenav.innerHTML += str;
-        sideNavElements = document.querySelectorAll("#sidenav li>a");
-        // navLinks = document.querySelectorAll("#sidenav a");
-        jMax = sideNavElements.length;
-        for (j = 0; j < jMax; j++) {
-            sideNavElements[j].addEventListener("click", highlightCurrentInPageNav);
+        if (isDefined(sidenav)) {
+            for (i = 0; i < max; i++) {
+                str += "<li style=\"padding:.2em\"><a href=\"#" + navLabel[i].link + "\">" + navLabel[i].text + " </a></li>";
+            }
+            str += "</ul>";
+            sidenav.innerHTML += str;
+            sideNavElements = document.querySelectorAll("#sidenav li>a");
+            // navLinks = document.querySelectorAll("#sidenav a");
+            jMax = sideNavElements.length;
+            for (j = 0; j < jMax; j++) {
+                sideNavElements[j].addEventListener("click", highlightCurrentInPageNav);
+            }
         }
     };
 
