@@ -48,18 +48,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         navDropdownStartTemplate = "<li class=\"has-dropdown\"><a href=\"#\">{{name}}</a><ul class=\"dropdown\">",
         navDropdownEndTemplate = "</ul></li>",
         titleAreaTemplate = "<nav class=\"top-bar\" data-topbar><ul class=\"title-area\"><li class=\"name\" id=\"siteTitle\"><a href=\"//docs.brightcove.com/en/index.html\"><img class=\"bcls-logo bcls-float-left\" src=\"//docs.brightcove.com/en/images/bc-logo-small.png\" alt=\"Brightcove\">DEVELOPER DOCS</a></li><li class=\"toggle-topbar menu-icon\"><a href=\"#\"><span>Menu</span></a></li></ul><section class=\"top-bar-section\"><ul id=\"navMenuLeft\" class=\"left\"></ul></section><section class=\"top-bar-section\"><ul id=\"navMenuRight\" class=\"right\"></ul></section></nav>",
-        searchTemplate = "<div class=\"container\"><div class=\"region region-search\"><section id=\"block-search-api-page-new\" class=\"block block-search-api-page\"><div><a class=\"close-reveal-modal\">&#215;</a></div><div id=\"searchBar\"><script>\
-          (function() {\
-            var cx = '007321107584305483635:pnl5oukzxbq';\
-            var gcse = document.createElement('script');\
-            gcse.type = 'text/javascript';\
-            gcse.async = true;\
-            gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//www.google.com/cse/cse.js?cx=' + cx;\
-            var s = document.getElementsByTagName('script')[0];\
-            s.parentNode.insertBefore(gcse, s);\
-          })();\
-        </script>\
-        <gcse:search></gcse:search></div></section>",
+        searchTemplate = "<div class=\"container\"><div class=\"region region-search\"><section id=\"block-search-api-page-new\" class=\"block block-search-api-page\"><div><a class=\"close-reveal-modal\">&#215;</a></div><div id=\"searchBar\"><script>(function() {var cx = '017969773216783359937:ziyyxkx94j4';var gcse = document.createElement('script');gcse.type = 'text/javascript';gcse.async = true;gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//cse.google.com/cse.js?cx=' + cx;var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(gcse, s);})();</script><gcse:search></gcse:search></div></section>",
         submenuBlockStart = "<div class=\"large-3 small-12 columns\" style=\"overflow-x:hidden\"><h2>{{name}}</h2>",
         submenuBlockMiddle = "<h3 class=\"index-page\">{{name}}</h3><ul>{{#items}}<li><a href=\"{{url}}\">{{name}}</a></li>{{/items}}</ul>",
         submenuBlockEnd = "</div>",
