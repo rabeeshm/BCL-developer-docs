@@ -44,16 +44,13 @@
                 <h1>Get Status of Dynamic Ingest Requests</h1>
                 <p>When you use the Dynamic Ingest API to add videos to your Video Cloud account, what you most want to know is when the video has been processed and whether or not renditions were successfully created. This document explains how you can do that using Dynamic Ingest API <a href="./notifications.html">notifications</a> and the <a href="../../cms-api/getting-started/overview-cms.html">CMS API</a>. We also provide a sample dashboard app that automates the process.</p>
             </div>
-            <div class="section" id="diAPI">
-                <h2>Dynamic Ingest API</h2>
-                <p>You can specify a one or more callback URLs to receive notifications of the results of the ingest process. The URLs you specify should be for apps than can accept POST requests. Notifications will be sent in JSON format.</p>
-                <p class="BCL-aside">Note: up to 10 subscribers for error notifications are supported. You can include more than 10 URLs to have notifications sent to, but only the first 10 will be processed.</p>
-                <h3>Setup</h3>
-                <p>Here’s an example. For a user with pub id 1234567890123 who wants to use Dynamic Ingest to upload a source video file located at https://s3.amazonaws.com/bucket/mysourcevideo.mp4 to an existing title in the catalog with video id 99988877766655 using the balanced-high-definition profile and who, furthermore, wants to receive callbacks at two endpoints located at http://host1/path1 and http://host2/path2 respectively, the DI request would be like this:</p>
-
-<pre><code>POST https://ingest.api.brightcove.com/v1/accounts/1234567890123/videos/99988877766655/ingest-requests { "master": { "url": "https://s3.amazonaws.com/bucket/mysourcevideo.mp4" }, "profile": "high-resolution", <strong>"callbacks": ["http://host1/path1”, “http://host2/path2”]</strong> }</code></pre>
-                <h3>Sample notification</h3>
-                <p>Notifications are sent as POST requests with the notification in the request body as JSON<sup class="once-red"><strong><a href="#note1">[1]</a></strong></sup>. Here is a sample notification:</p>
+            <div class="section" id="dataSources">
+                <h2>Sources of docs-nav-data</h2>
+                <p>There are two sources of data you need to determine when an ingestion job is complete and whether or not it succeeded:</p>
+                <dl>
+                    <dt>Dynamic Ingest Notification Service</dt>
+                    <dd>
+                        <p>The Dynamic Ingest notification service sends you notifications for several kinds of events. The one that is useful in this context is a notification sent when processing of a video is complete. The notification looks like this:</p>
 <pre><code>{
     "entity": "4375977109001",
     "entityType": "TITLE",
@@ -61,6 +58,14 @@
     "version": "1",
     "action": "CREATE"
 }</code></pre>
+                    </dd>
+                    <dt></dt>
+                    <dd></dd>
+                </dl>
+
+<pre><code>POST https://ingest.api.brightcove.com/v1/accounts/1234567890123/videos/99988877766655/ingest-requests { "master": { "url": "https://s3.amazonaws.com/bucket/mysourcevideo.mp4" }, "profile": "high-resolution", <strong>"callbacks": ["http://host1/path1”, “http://host2/path2”]</strong> }</code></pre>
+                <h3>Sample notification</h3>
+                <p>Notifications are sent as POST requests with the notification in the request body as JSON<sup class="once-red"><strong><a href="#note1">[1]</a></strong></sup>. Here is a sample notification:</p>
                 <h4>Notes</h4>
                 <ul>
                     <li id="note1"><sup class="once-red"><strong>[1]</strong></sup> Exception: DRM packaging errors are returned as key/value pairs. In the case the <code>Content-Type</code> header will be <code>application/x-www-form-urlencoded</code> - otherwise, the <code>Content-Type</code> will be <code>application/json</code></li>
