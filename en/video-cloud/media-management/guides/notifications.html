@@ -47,10 +47,18 @@
             </div>
             <div class="section" id="diAPI">
                 <h2>Dynamic Ingest API</h2>
-                <p>You can specify a one or more callback URLs to receive notifications of the results of the ingest process. The URLs you specify should be for apps than can accept POST requests. Notifications will be sent in JSON format.</p>
+                <p>You can specify one or more callback URLs to receive notifications for the results of the ingest process. The URLs you specify should be for apps than can accept POST requests. Notifications will be sent in JSON format.</p>
                 <p class="BCL-aside">Note: up to 10 subscribers for error notifications are supported. You can include more than 10 URLs to have notifications sent to, but only the first 10 will be processed.</p>
                 <h3>Setup</h3>
-                <p>Here’s an example. For a user with pub id 1234567890123 who wants to use Dynamic Ingest to upload a source video file located at https://s3.amazonaws.com/bucket/mysourcevideo.mp4 to an existing title in the catalog with video id 99988877766655 using the balanced-high-definition profile and who, furthermore, wants to receive callbacks at two endpoints located at http://host1/path1 and http://host2/path2 respectively, the DI request would be like this:</p>
+                <p>Here’s an example.</p>
+                <ul>
+                    <li>User with pub id 1234567890123</li>
+                    <li>Wants to use Dynamic Ingest to upload a source video file located at https://s3.amazonaws.com/bucket/mysourcevideo.mp4</li>
+                    <li>Wants to upload an existing title in the catalog with video id 99988877766655</li>
+                    <li>Using the balanced-high-definition profile</li>
+                    <li>Wants to receive callbacks at two endpoints located at http://host1/path1 and http://host2/path2 respectively</li>
+                </ul>
+                <p>The DI request would look like this:</p>
 
 <pre><code>POST https://ingest.api.brightcove.com/v1/accounts/1234567890123/videos/99988877766655/ingest-requests { "master": { "url": "https://s3.amazonaws.com/bucket/mysourcevideo.mp4" }, "profile": "high-resolution", <strong>"callbacks": ["http://host1/path1”, “http://host2/path2”]</strong> }</code></pre>
                 <h3>Sample notification</h3>
@@ -64,7 +72,7 @@
 }</code></pre>
                 <h4>Notes</h4>
                 <ul>
-                    <li id="note1"><sup class="once-red"><strong>[1]</strong></sup> Exception: DRM packaging errors are returned as key/value pairs. In the case the <code>Content-Type</code> header will be <code>application/x-www-form-urlencoded</code> - otherwise, the <code>Content-Type</code> will be <code>application/json</code></li>
+                    <li id="note1"><sup class="once-red"><strong>[1]</strong></sup> Exception: DRM packaging errors are returned as key/value pairs. In this case, the <code>Content-Type</code> header will be <code>application/x-www-form-urlencoded</code>. Otherwise, the <code>Content-Type</code> will be <code>application/json</code></li>
                 </ul>
                 <h3>Notification fields</h3>
                 <table>
@@ -105,7 +113,11 @@
                     </tbody>
                 </table>
                 <h3>Interpreting notifications</h3>
-                <p>A notification containing <code>"action": "CREATE"</code> and <code>"status": "SUCCESS"</code> indicates completion of a process. If the <code>entityType</code> is <code>TITLE</code>, then processing of an ingested video is complete. If the <code>entityType</code> is <code>ASSET</code>, then a rendition, image, or WebVTT file has been successfully added to your video.</p>
+                <p>A notification containing <code>"action": "CREATE"</code> and <code>"status": "SUCCESS"</code> indicates completion of a process.</p>
+                <ul>
+                    <li>If the <code>entityType</code> is <code>TITLE</code>, then processing of an ingested video is complete.</li>
+                    <li>If the <code>entityType</code> is <code>ASSET</code>, then a rendition, image, or WebVTT file has been successfully added to your video.</li>
+                </ul>
                 <p class="BCL-aside">Note: a <code>"status": "SUCCESS"</code> indicates that processing is complete, but does not necessarily mean that it was successful. To determine whether Dynamic Ingest of videos was successful, see <a href="./get-status-di.html">Get Status of Dynamic Ingest Requests</a>.</p>
             </div>
             <div class="section" id="cmsAPI">
@@ -168,8 +180,8 @@
                 <ul>
                     <li>The <code>endpoint</code> or <code>events</code> field is missing from the request body</li>
                     <li>The <code>events</code> field value is not a list (array)</li>
-                    <li>the subscription defined already exists</li>
-                    <li>you already have 10 subscriptions to this event</li>
+                    <li>The subscription defined already exists</li>
+                    <li>You already have 10 subscriptions to this event</li>
                 </ul>
                 <h3>Notification failures</h3>
                 <p>The notification system treats any 4xx or 5xx return from the customer server as a retriable failure. Failing callbacks will be retried up to 20 times, with an exponentially increasing delay between subsequent callbacks. The first few retries will happen within minutes of the initial callback attempt. If the callback continues failing, and we get all the way out to the 20th retry, the retry delay will be a few days.</p>
@@ -182,7 +194,7 @@
                     <li>54.175.126.166</li>
                     <li>54.164.120.55</li>
                 </ul>
-                <p>These values are subject to change in the future. The IPs are within the AWS ec2 us-east-1 address space and we anticipate that future IP addresses will also be, if you don't want to deal with specific IP address changes, you can configure your firewalls and routing rules to allow traffic from any of us-east-1.</p>
+                <p>These values are subject to change in the future. The IPs are within the AWS ec2 us-east-1 address space and we anticipate that future IP addresses will also be. If you don't want to deal with specific IP address changes, you can configure your firewalls and routing rules to allow traffic from any of us-east-1.</p>
                 <h3>Endpoint for notification subscriptions</h3>
                 <pre><code>/accounts/{account_id}/subscriptions</code></pre>
 
@@ -196,10 +208,11 @@
                 <h3 id="getSubscriptions">Get a list of your subscriptions</h3>
                 <p>To get a list of all your subscriptions, send a GET request to the subscriptions endpoint.</p>
                 <h3 id="getSubscription">Get or Delete a single subscription</h3>
+                <p>Use the following endpoint to get or delete a single subscription:</p>
                 <h4>Endpoint</h4>
                 <pre><code>/accounts/{account_id}/subscriptions/{subscription_id}</code></pre>
 
-                <p>A GET request will retrieve the subscription. A DELETE request will delete the subscription. You cannot update a subscription at this time. If you need to modify a subscription, you will need to delete it and create a new one.</p>
+                <p>A GET request will retrieve the subscription. A DELETE request will delete the subscription. You cannot update a subscription at this time. If you want to modify a subscription, you will need to delete it and create a new one.</p>
             </div>
             <div class="section" id="sampleApp">
                 <h2>Basic Sample app</h2>
