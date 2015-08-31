@@ -52,7 +52,7 @@
         <div id="main" class="large-10 small-12 columns">
       <div id="top" class="section">
         <h1>Brightcove Player Sample: Display Random Bumpers</h1>
-        <p>This topic shows you how to use a Brightcove player that displays randomly selected bumpers before each video in a playlist array.</p>
+        <p>This topic shows you how to use a Brightcove player that displays randomly selected bumpers before each video in a playlist <span class="perform-only">array</span>.</p>
       </div>
 			
 		  <div id="developmentsequence" class="section">
@@ -98,24 +98,32 @@
         <ul>
           <li><code>src()</code></li>
           <li><code>play()</code></li>
+          <li class="video-cloud-only"><code>catalog.getVideo()</code></li>
+          <li class="video-cloud-only"><code>catalog.load()</code></li>
+          <li class="video-cloud-only"><code>catalog.getPlaylist()</code></li>
+          <li class="video-cloud-only"><code>playlist.currentItem()</code></li>
         </ul>
         <h3>Brightcove player API events</h3>
         <ul>
           <li><code>ended</code></li>
         </ul>
-<!--
-        <h3>Player management API</h3>
-        <ul><li>HTTP <code>POST</code> method with the endpoint <code>https://players.api.brightcove.com/v1/accounts/$ACCOUNT_ID/players</code> to create the player and its proper configuration</li></ul>
--->
       </div>
 			
       <div id="player" class="section">
         <h2>The player</h2>
-        <p>In this sample, randomly selected bumpers are played before each video from a playlist defined as an internal array.</p>
+        <p>In this sample, randomly selected bumpers are played before each video from a playlist<span class="perform-only"> defined as an internal array</span>.</p>
         
-        <div class="player-block">
+        <div class="perform-only">
+<!--     playlist created with array of videos-->
+          <div class="player-block">
             <iframe src='//players.brightcove.net/1752604059001/f4c8d8cc-c2de-4e1f-a6ee-a30b07985355_default/index.html' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
 
+          </div>
+        </div>
+          
+        <div class="video-cloud-only">
+<!--     Video Cloud playlist-->
+            <iframe style='width: 640px;height: 360px;' src='//players.brightcove.net/1752604059001/d4ee8356-c995-4bc6-b57d-aac115b26fa5_default/index.html' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
         </div>
 		  
       </div><!-- id="player" -->
@@ -133,7 +141,8 @@
           </ol>
           <p class="BCL-aside">For details on how to get this embed code, see the <a href="../../brightcove-player/getting-started/quick-start-bc-player.html">Quick Start to Brightcove Player</a> document.</p>
           <p>The embed code should look like this:</p>
-        <p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="19-23,26"></code></p>
+          <p class="video-cloud-only"><code data-gist-id="4c2d1541917842060ef2" data-gist-hide-footer="true" data-gist-line="10-16"></code></p>
+          <p class="perform-only"><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="10-16"></code></p>
 <!--
         <p>This player was created using the following curl statement. The following configuration options are used:</p>
         <ul>
@@ -142,50 +151,97 @@
         <p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="127-144" data-gist-highlight-line="137-138"></code></p>
 -->
 		 
-        <h3><a name="HTMLCode"></a>The HTML code</h3>
+<!--
+        <div class="perform-only">
+          <h3 id="HTMLCode">The HTML code</h3>
             <p>Add the following HTML to your page code:</p>
           <ul>
             <li>Lines 18,24: Define the container around the player. </li>
           </ul> 
         <p class="BCL-aside">Note: Line 26: Make sure to move the player <code>&lt;script&gt;</code> tag below the page HTML code. The Brightcove player script must be placed after your page code. It is common practice to put your scripts just before the closing <code>&lt;/body&gt;</code> tag.</p>
         <p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="18-26"></code></p>
-		  
-        <h3><a name="JSCode"></a>The JavaScript code</h3>
-		  
+        </div>
+-->
+		 
+        <div class="video-cloud-only">
+          <h3 id="JSCode">The JavaScript code</h3>  
+        <p>Define the bumper array and load the playlist. Then, randomly play a bumper video before each playlist video.</p>
+        <ul>
+          <li>Line 29: Defines the array of bumper video Ids.</li>
+          <li>Line 33: Gets a reference to the player when it is ready.</li>
+          <li>Lines 36-46: Listen for the <code>ended</code> event and calls the method to either play a bumper video or a playlist video.</li>
+          <li>Lines 48-49: Play the fist bumper video and set the <code>playBumper</code> flag to play a playlist video next.</li>
+          <li>Lines 52-65:
+              <ul>
+                  <li>Randomly select a bumper vidoe to play.</li>
+                  <li>Get the video object from the <code>catalog</code>, using the bumper video Id.</li>
+                  <li>Load the bumper video into the player.</li>
+                  <li>Begin playback.</li>
+              </ul>
+          </li>
+          <li>Lines 67-79:
+            <ul>
+                <li>Initially, call the <code>loadPlaylist()</code> function.</li>
+                <li>After the playlist is loaded, check to see if it is at the end of the playlist.</li>
+                <li>If not, set the <code>playlist.currentItem()</code> to the next video in the playlist.</li>
+                <li>Begin playback.</li>
+                <li>Increment the <code>currentVideoIndex</code>.</li>
+            </ul>
+          </li>
+          <li>Lines 81-86: 
+              <ul>
+                  <li>Get the playlist object from the <code>catalog</code>.</li>
+                  <li>Load the playlist in the player. Note that this only has to be done one time.</li>
+                  <li>Get the number of videos in the playlist.</li>
+              </ul></li>
+        </ul>
+		<p class="BCL-aside perform-only">Note: For this sample, the playlist data is hard-coded in an array, but you could easily read this data from an external file.</p>
+		<p><code data-gist-id="4c2d1541917842060ef2" data-gist-hide-footer="true" data-gist-line="18-88"></code></p>
+        </div>
+          
+        <div class="perform-only">
+          <h3 id="JSCode1">The JavaScript code</h3>  
         <p>Define the video and bumper arrays. Randomly play a bumper video before each playlist video.</p>
         <ul>
-          <li>Line 91: Gets a reference to the player when it is ready.</li>
-          <li>Lines 93-95: Listen for the <code>ended</code> event and calls the <code>playVideo()</code>method.</li>
-          <li>Line 97: Plays the first bumper before the playing the first video in the playlist array.</li>
-          <li>Line 101: Checks to see if there are any more videos in the playlist array.</li>
-          <li>Lines 103-115: Alternate between bumpers and playlist videos and loads it using the player's <code>src()</code> method.</li>
-          <li>Line 117: Starts video playback.</li>
+          <li>Line 74: Gets a reference to the player when it is ready.</li>
+          <li>Lines 76-78: Listen for the <code>ended</code> event and calls the <code>playVideo()</code>method.</li>
+          <li>Line 80: Plays the first bumper before the playing the first video in the playlist array.</li>
+          <li>Line 84: Checks to see if there are any more videos in the playlist array.</li>
+          <li>Lines 86-98: Alternate between bumpers and playlist videos and loads it using the player's <code>src()</code> method.</li>
+          <li>Lines 100-104: Start video playback.</li>
         </ul>
 		<p class="BCL-aside">Note: For this sample, the playlist data is hard-coded in an array, but you could easily read this data from an external file.</p>
-		<p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="29-120"></code></p>
+		<p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="18-107"></code></p>
+        </div>
         
-		  <h3><a name="CSSCode"></a>The stylesheet</h3>
+<!--
+        <div class="perform-only">
+		  <h3 id="CSSCode">The stylesheet</h3>
         <p>This example uses CSS styles for the Brightcove player.</p>
 		  <ul>
 			  <li>Lines 10-13: Set the dimensions of the player.</li>
 		  </ul>
         <p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="9-14"></code></p>
+        </div>
+-->
 	  </div>
 		  
     <div id="plugin" class="section">
-				<h2>Use a plugin</h2>
+        <h2>Use a plugin</h2>
 		  <p>It is a best practice to use a plugin so that you can easily add this functionality to multiple players.</p>
+        
+      <div class="video-cloud-only">
         <h3>Create the JavaScript file</h3>
         <p>Move the plugin's JavaScript code into a file and place it in an Internet accessible URL.</p>
         <ul>
           <li>Create a new file for your plugin JavaScript code. In this case, name it <code>random-bumpers.js</code>.</li>
           <li>Cut and paste the JavaScript code from your main HTML file into this new file.</li>
-          <li>Lines 227,316: Wrap your JavaScript code using the <code>videojs.plugin()</code> function. The first argument, <code>randomBumpers</code>, is the plugin name.</li>
-          <li>Line 228: Gets a reference to your player.</li>
+          <li>Lines 98,171: Wrap your JavaScript code using the <code>videojs.plugin()</code> function. The first argument, <code>randomBumpers</code>, is the plugin name.</li>
+          <li>Line 100: Gets a reference to your player.</li>
           <li>The rest is your JavaScript code which was reviewed in a previous section.</li>
         </ul>
-        <p class="BCL-aside">Note: Line 287: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</p>
-        <p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="224-316"></code></p>
+        <p class="BCL-aside">Note: Line 171: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</p>
+        <p><code data-gist-id="4c2d1541917842060ef2" data-gist-hide-footer="true" data-gist-line="95-171"></code></p>
         <ol start="6">
           <li>In the HTML file, add the following code just below the existing <code>&lt;script&gt;</code> tags. This code includes the JavaScript file and then calls the method defined in that JavaScript.</li>
         </ol>
@@ -193,31 +249,71 @@
         <ol start="7">
           <li>Browse the HTML page. You should see that the random bumpers still work, except now your JavaScript code has been removed from the HTML page.</li>
         </ol> 
-		  
-		<h3>Create the CSS file</h3>
-      <p>If you are using CSS, move styles into a file and place it in an Internet accessible URL.</p>
-      <ol>
-          <li>Create a new file for your CSS styles. In this case, name it <code>random-bumpers.css</code>.</li>
-          <li>In the <code>&lt;head&gt;</code> section of your HTML file, add the following link to include your newly created CSS file.</li>
+      </div>
+        
+      <div class="perform-only">
+        <h3>Create the JavaScript file</h3>
+        <p>Move the plugin's JavaScript code into a file and place it in an Internet accessible URL.</p>
+        <ul>
+          <li>Create a new file for your plugin JavaScript code. In this case, name it <code>random-bumpers.js</code>.</li>
+          <li>Cut and paste the JavaScript code from your main HTML file into this new file.</li>
+          <li>Lines 212,298: Wrap your JavaScript code using the <code>videojs.plugin()</code> function. The first argument, <code>randomBumpers</code>, is the plugin name.</li>
+          <li>Line 213: Gets a reference to your player.</li>
+          <li>The rest is your JavaScript code which was reviewed in a previous section.</li>
+        </ul>
+        <p class="BCL-aside">Note: Line 298: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</p>
+        <p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="201-290"></code></p>
+        <ol start="6">
+          <li>In the HTML file, add the following code just below the existing <code>&lt;script&gt;</code> tags. This code includes the JavaScript file and then calls the method defined in that JavaScript.</li>
         </ol>
-      <p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="155" ></code></p>
-      <ol start="3">
-          <li>Browse the HTML page. You should see that the random bumpers still work, except now your styles has been removed from the HTML page.</li>
-      </ol> 
+        <p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="155-156" ></code></p>
+        <ol start="7">
+          <li>Browse the HTML page. You should see that the random bumpers still work, except now your JavaScript code has been removed from the HTML page.</li>
+        </ol> 
+      </div>
 		  
-		<h3>Deploy plugin and CSS</h3>
+<!--
+      <div class="perform-only">
+		<h3>Create the CSS file</h3>
+          <p>If you are using CSS, move styles into a file and place it in an Internet accessible URL.</p>
+          <ol>
+              <li>Create a new file for your CSS styles. In this case, name it <code>random-bumpers.css</code>.</li>
+              <li>In the <code>&lt;head&gt;</code> section of your HTML file, add the following link to include your newly created CSS file.</li>
+            </ol>
+          <p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="155" ></code></p>
+          <ol start="3">
+              <li>Browse the HTML page. You should see that the random bumpers still work, except now your styles has been removed from the HTML page.</li>
+          </ol>
+      </div>
+-->
+		  
+      <div class="video-cloud-only">
+		<h3>Deploy plugin</h3>
         <p>On your player's properties page, edit the <strong>Plugins</strong> section.</p>
-      <ol>
-          <li>Begin by specifying a <strong>JavaScript URL</strong> for the random bumpers plugin.
-          <div><img src="../../brightcove-player/samples/assets/random-bumpers-js.png" alt=""></div></li>
-          <li>Next, apply a <strong>CSS URL</strong> to define styles to the video player.
-          <div><img src="../../brightcove-player/samples/assets/random-bumpers-css.png" alt=""></div></li>
-          <li>After publishing your changes, you can copy the <strong>In-Page Embed Code</strong> and place it in a newly created HTML page. Your page should look similar to this:</li>
-      </ol>
-        <p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="320-341" ></code></p>
-      <ol start="4">
-        <li>Browse the HTML page and you should see the player with the plugin functioning correctly.</li>
-      </ol> 
+          <ol>
+              <li>Begin by specifying a <strong>JavaScript URL</strong> for the random bumpers plugin.
+              <div><img src="../../brightcove-player/samples/assets/random-bumpers-js.png" alt=""></div></li>
+              <li><p>After publishing your changes, copy the <strong>In-Page Embed Code</strong> and place it in a newly created HTML page. Your page should look similar to this:</p>
+              <p><code data-gist-id="4c2d1541917842060ef2" data-gist-hide-footer="true" data-gist-line="175-192" ></code></p></li>
+              <li>Browse the HTML page and you should see the player with the plugin functioning correctly.</li>
+          </ol> 
+      </div>
+        
+      <div class="perform-only">
+		<h3>Deploy plugin</h3>
+        <p>On your player's properties page, edit the <strong>Plugins</strong> section.</p>
+          <ol>
+              <li>Begin by specifying a <strong>JavaScript URL</strong> for the random bumpers plugin.
+              <div><img src="../../brightcove-player/samples/assets/random-bumpers-js.png" alt=""></div></li>
+<!--
+              <li>Next, apply a <strong>CSS URL</strong> to define styles to the video player.
+              <div><img src="../../brightcove-player/samples/assets/random-bumpers-css.png" alt=""></div></li>
+-->
+              <li><p>After publishing your changes, copy the <strong>In-Page Embed Code</strong> and place it in a newly created HTML page. Your page should look similar to this:</p>
+          
+        <p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="294-315" ></code></p></li>
+              <li>Browse the HTML page and you should see the player with the plugin functioning correctly.</li>
+      </div>
         
 <!--
       <p>Use the HTTP <code>PATCH</code> method to add the plugin and styles to your player.</p>
@@ -234,11 +330,19 @@
       
       </div>
           
-      <div id="useiframe" class="section">
+      <div id="useiframe" class="section video-cloud-only">
         <h2>Use iframe</h2>
         <p>It is a best practice to use the iframe player implementation. If it is possible for this example, replace the In-Page embed implementation with the iframe implementation.</p>
 				<p>Here is the complete code:</p>
-        <p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="178-202" ></code></p>
+        <p><code data-gist-id="4c2d1541917842060ef2" data-gist-hide-footer="true" data-gist-line="197-209" ></code></p>
+        <p>Browse the HTML page and you should see the player with the plugin functioning correctly.</p>
+      </div>
+            
+      <div id="useiframe" class="section perform-only">
+        <h2>Use iframe</h2>
+        <p>It is a best practice to use the iframe player implementation. If it is possible for this example, replace the In-Page embed implementation with the iframe implementation.</p>
+				<p>Here is the complete code:</p>
+        <p><code data-gist-id="42d53d5f5c819cc45539" data-gist-hide-footer="true" data-gist-line="163-179" ></code></p>
         <p>Browse the HTML page and you should see the player with the plugin functioning correctly.</p>
       </div>
 			
