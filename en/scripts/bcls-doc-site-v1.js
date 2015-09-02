@@ -427,7 +427,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             buildGetStartedGroup,
             buildPageIndexGroup,
             buildPageIndexAlpha;
-
+        bclslog('groupObj', groupObj);
         buildGetStartedGroup = function (itemGroup) {
             str += "<li><fieldset id=\"gettingStartedBlock\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em;\"><legend>" + groupObj[itemGroup].header + "</legend><ul style=\"list-style:none;\">";
             jMax = groupObj[itemGroup].items.length;
