@@ -44,14 +44,14 @@ var BCLS = (function ($, window) {
     bclslog = function (context, message) {
         if (window["console"] && console["log"]) {
           console.log(context, message);
-        };
+        }
         return;
     };
 
     // allow array forEach method in older browsers
-    if ( !Array.prototype.forEach ) {
-        Array.prototype.forEach = function(fn, scope) {
-            for(var i = 0, len = this.length; i < len; ++i) {
+    if (!Array.prototype.forEach) {
+        Array.prototype.forEach = function (fn, scope) {
+            for (var i = 0, len = this.length; i < len; ++i) {
                 fn.call(scope || this, this[i], i, this);
             }
         }
