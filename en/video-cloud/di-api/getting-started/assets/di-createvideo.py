@@ -5,7 +5,7 @@ import requests
 import json
 import argparse
 
-pub_id = "***PUB ID HERE****"
+pub_id = "***ACCOUNT ID HERE****"
 client_id = "***CLIENT ID HERE****"
 client_secret = "***CLIENT SECRET HERE****"
 access_token_url = "https://oauth.brightcove.com/v3/access_token"
@@ -24,7 +24,7 @@ def create_video():
     headers = { 'Authorization': 'Bearer ' + access_token, "Content-Type": "application/json" }
 
     url = ("https://cms.api.brightcove.com/v1/accounts/{pubid}/videos/").format(pubid=pub_id)
-    data = '{"name": "***TITLE NAME HERE***"}'
+    data = '{"name": "***VIDEO TITLE HERE***"}'
     r = requests.post(url, headers=headers, data=data)
     return r.json()
 
@@ -36,8 +36,8 @@ def submit_pbi(video_id):
    url = ("https://ingest.api.brightcove.com/v1/accounts/{pubid}/videos/{videoid}/ingest-requests").format(pubid=pub_id, videoid=video_id)
     print url
 
-    data = '''{             
-            "master": { "url": "****URL HERE***" }, 
+    data = '''{
+            "master": { "url": "****SOURCE VIDEO URL HERE***" },
          }'''
     r = requests.post(url, headers=headers, data=data)
     print r.headers
