@@ -65,13 +65,13 @@
             <p>Return videos that have <code>all</code> of these terms:<br /><input name="all" id="all" type="text" size="100" ></p>
             <p>Return videos that have <code>any</code> of these terms:<br /><input name="any" id="any" type="text" size="100" ></p>
             <p>Return videos that have <code>none</code> of these terms:<br /><input name="none" id="none" type="text" size="100" value="private"></p>
-            <p>Sort videos: 
+            <p>Sort videos:
               <select id="sortByOrder">
                 <option value="ASC">Ascending</option>
                 <option value="DESC">Descending</option>
               </select>
-            </p>  
-           
+            </p>
+
             <p>Page size: <input name="pageSize" id="pageSize" type="text" size="10" value="5">
             &nbsp; Page number:
               <select id="pageNumber">
@@ -84,7 +84,7 @@
             <br/>
             <p class="text-warning">After you select the <strong>Search for Videos</strong> button, your video list will appear in the <strong>Video to add captions to</strong> drop-down menu below.</p>
           </div>
-          
+
           <div class="section" id="addCaptioning">
             <h2>Add Captioning</h2>
             <p>Write Token: <input id="yourWriteToken" type="text" value="ZY4Ls9Hq6LCBgleGDTaFRDLWWBC8uoXQHkhGuDebKvjFPjHb3iT-4g.." size="100" /></p>
@@ -131,7 +131,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.2/handlebars.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
-    
+
     <script src="/en/scripts/docs-nav-data.min.js"></script>
     <script src="/en/scripts/bcls-doc-site.js"></script>
     <script src="/en/scripts/bc-mapi.js"></script>
@@ -147,9 +147,9 @@
 				BCL.sortByOrder = document.getElementById("sortByOrder");
 				BCL.pageNumber = document.getElementById("pageNumber");
 				BCL.videoSelector = document.getElementById("videoID");
-				
+
 				BCL.doSearchVideos = function() {
-					// call the Media API to return all the video data for the specified account  
+					// call the Media API to return all the video data for the specified account
 					if (document.getElementById("yourReadToken") == "" || document.getElementById("yourWriteToken") == "" || document.getElementById("yourAPILocation").value == "") {
 						alert("Please enter a valid read token, write token and service URL");
 					}
@@ -180,38 +180,38 @@
 					BCL.params.get_item_count = true;
 					BCMAPI.search(BCL.params);
 				}
-				
+
 				// initial call to get video list for default values
 				BCL.doSearchVideos();
-	  
+
 				// check if any data was returned from the search
 				BCL.onSearchResponse = function(jsonData) {
 					console.log("onSearchResponse");
 					console.log(jsonData);
-					
+
 					if (jsonData.items) {
 						BCL.formatSearchData(jsonData);
 					}
 				}
-			
+
 				// handle and format the video data returned from the search
 				BCL.formatSearchData = function(jsonData) {
-					
+
 					var numberOfPages = Math.ceil(jsonData.total_count/jsonData.page_size);
-				
+
 					// check if a page number was selected that no longer exists with current data
 					if (BCL.params.page_number > numberOfPages) {
 						// redo video data search and reset the selected page number to 0
 						BCL.resetPageNumber = true;
 						BCL.doSearchVideos();
 					}
-				
+
 					// remove any existing option elements for video items
 					BCL.videoSelector.length = 0;
-			
+
 					// add option elements for video item data
 					BCL.videoData = jsonData.items;
-					
+
 					for (var i = 0; i < jsonData.items.length; i++) {
 						var option = document.createElement("option");
 						var video = jsonData.items[i];
@@ -219,25 +219,25 @@
 						option.value = video.id;
 						BCL.videoSelector.add(option,null);
 					}
-					
+
 					BCL.formatPageDropdown(numberOfPages);
-					
+
 					// set the number of videos returned
 					document.getElementById("totalVideos").value = jsonData.total_count;
-					// output request 
-					document.getElementById("jsonRequest1").innerHTML = BCMAPI.request;
+					// output request
+					document.getElementById("jsonRequest1").textContent = BCMAPI.request;
 				}
-				
+
 				BCL.formatPageDropdown = function (numberOfPages){
           // remove any page option elements from previous requests
 					if(BCL.pageNumber.length > numberOfPages) {
-						for (var i = numberOfPages; i < BCL.pageNumber.length; i++) {	
+						for (var i = numberOfPages; i < BCL.pageNumber.length; i++) {
 							BCL.pageNumber.remove(i);
 							i--;
 						}
 					}
 					// add page option elements for each page in returned data
-					for (var i = 0; i < numberOfPages; i++) {	
+					for (var i = 0; i < numberOfPages; i++) {
 						if (!BCL.pageNumber[i]) {
 							var option = document.createElement("option");
 							option.text = i;
@@ -245,12 +245,12 @@
 						}
 					}
         }
-				
+
         BCL.doAddCaptioning = function (){
           var form = document.getElementById("create_video_sample");
 					if(document.getElementById('name').value == "" || form.filePath.value == "" || !(BCL.videoSelector.options[BCL.videoSelector.selectedIndex])){
             alert("Required: Selected Video, Display Name and Captions File");
-						document.getElementById("jsonRequest2").innerHTML = "";
+						document.getElementById("jsonRequest2").textContent = "";
 						document.getElementById("postFrame").src = "";
             return;
           }
@@ -279,9 +279,9 @@
 					BCL.json.params.video_id = BCL.videoSelector.options[BCL.videoSelector.selectedIndex].value;
 					json.value = JSON.stringify(BCL.json);
 					form.JSONView.value = json.value;
-					document.getElementById("jsonRequest2").innerHTML = JSON.stringify(BCL.json);
+					document.getElementById("jsonRequest2").textContent = JSON.stringify(BCL.json);
         }
-				
+
         // debugging tool - wraps console.log to avoid errors in IE 7 & 8
         BCL.log = function(message) {
           if (window["console"] && console["log"]) {
