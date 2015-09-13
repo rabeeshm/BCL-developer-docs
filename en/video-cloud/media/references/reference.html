@@ -61,8 +61,9 @@ https://www.brightcove.com/en/<!DOCTYPE html>
             <div class="section" id="apiTypes">
                 <h2>API Types</h2>
                 <p>The Media Read APIs are RESTful. All requests are GET.</p>
-                <p>The Media Write APIs requests are POST. <p>For write requests, the data submitted to the media write API should be in JSON format, encoded as a form parameter named "json". The JSON document should include a "method" field and a "params" field, and the examples you publish should show the whole body of the POST request: json=</p>
-                <pre><code>
+                <p>The Media Write APIs requests are POST.</p>
+                <p>For write requests, the data submitted to the media write API should be in JSON format, encoded as a form parameter named "json". The JSON document should include a "method" field and a "params" field, and the examples you publish should show the whole body of the POST request:</p>
+<pre><code>json=
 {"method":"update_video","params":{"video":{"id":"1969867342001","shortDescription":"A happy little bird","Name":"Bird_Titmouse","startDate":1363983574000,"endDate":null,"tags":["bird","nature","air"]},"token":"ZY4Ls9Hq6LCBgleGDTaFRDLWWBC8uoXQHkhGuDebKvjFPjHb3iT-4g.."}}
 </code></pre>
             </div>
@@ -128,6 +129,21 @@ https://www.brightcove.com/en/<!DOCTYPE html>
                     <li><code>playsTrailingWeek</code>: how many times the Video has been played within the past seven days, exclusive of today (calculated based on UTC time)</li>
                 </ul>
                 <p class="BCL-aside"><strong>NOTE</strong>: this data is derived from the <a href="../../analytics-api/index.html">Analytics API</a>, but it is <strong>not</strong> real-time data. The value returned by the Media API is updated daily and reflects daily data. In addition, these values come from the analytics historical data collection, which a processed and adjusted version of the real-time data, so in some cases you may find recent data missing from the values reported by the Media API, as that data has not be processed yet. See the <a href="//docs.brightcove.com/en/video-cloud/analytics-api/guides/faq.html#fieldsAndItems">Analytics API FAQ</a> for more information.</p>
+            </div>
+            <div class="section" id="largeDataSets">
+                <h2>Large Data Sets</h2>
+                <p>If you are retrieving all the videos in your account, or a large number of videos, there are some things you must be aware of:</p>
+                <ol>
+                    <li>You may be tempted to use the largest allowed <code>page_size</code> (100), but it's better to retrieve videos in batches of 25 or less to minimize the possibility of API requests timing out</li>
+                    <li>As you are paging through large data sets, it is possible that the video data may be updated during the operation, which could cause items to shift in responses:
+                        <ul>
+                            <li>You might see an item repeated on successive pages</li>
+                            <li>An item might be missed, as it has shifted to a previous response set</li>
+                        </ul>
+                        <p>To account for the first possibility, your app should de-dupe the complete item list after you have finished retrieving videos. To handle the second possibility, you need to compare the total number of items retrieved (after de-duping) to the number you were expecting, and then rerun the requests, sorting the results by last_modified_date (descending) - you shouldn't need to retrieve more than one batch to pick up missed items.</p>
+                    </li>
+                    <li>You can decrease the likelihood of the scenarios in the previous item by sorting the returned results appropriately. If you do not explicitly set the <code>sort_by</code> parameter, results are sorted by <strong>relavance</strong> based on a complex algorithm that looks combinations of keywords, tags, and custom field values. If you are searching for videos based on  multiple keywords, tags, and/or custom fields, sort by relavance is exactly what you want. However, if you are just trying to retrieve all or a large set of your videos, setting the <code>sort_by</code> parameter explicitly will give you more control over the order of the returned items.</li>
+                </ol>
             </div>
             <div id="Video_Read" class="section" title="Video Read Methods">
                 <h2>Video Read APIs</h2>
