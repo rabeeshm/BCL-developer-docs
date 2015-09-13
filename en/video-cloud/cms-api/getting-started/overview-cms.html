@@ -53,6 +53,7 @@
                 <div class="BCL-aside">
                     <p>Note: The CMS API is intended for integrations and publishing workflows. You should <strong>never</strong> make client-side calls to this API from a public web page, as doing so would involve exposing your client credentials for the API.</p>
                     <p>Note: The CMS API methods never return deleted videos. The <code>'state:DELETED'</code> clause will be ignored by the CMS API whether you're asking for a count or for the videos themselves. CMS API <a href="#notifications">Notifications</a> will inform you when videos are deleted (or other changes to videos are made).</p>
+                    <p>If you are going to be retrieving all your videos or large sets of videos, be sure to see the <a href="#largeDataSets">note on large data sets</a>.</p>
                 </div>
             </div>
             <div class="section" id="generalInfo">
@@ -308,6 +309,19 @@
                     <li>reference_id</li>
                 </ul>
                 <p>If you do not provide a sort value for a video search call, the results will be sorted by relevance. If you do not provide a sort value for a list call, the results will be sorted by <code>updated_at</code> descending.</p>
+                <h4 id="largeDataSets">All videos and large data sets</h4>
+                <p>If you are retrieving all the videos in your account, or a large number of videos, there are some things you must be aware of:</p>
+                <ol>
+                    <li>You may be tempted to use the largest allowed <code>page_size</code> (100), but it's better to retrieve videos in batches of 25 or less to minimize the possibility of API requests timing out</li>
+                    <li>As you are paging through large data sets, it is possible that the video data may be updated during the operation, which could cause items to shift in responses:
+                        <ul>
+                            <li>You might see an item repeated on successive pages</li>
+                            <li>An item might be missed, as it has shifted to a previous response set</li>
+                        </ul>
+                        <p>To account for the first possibility, your app should de-dupe the complete item list after you have finished retrieving videos. To handle the second possibility, you need to compare the total number of items retrieved (after de-duping) to the number you were expecting, and then rerun the requests, sorting the results by last_modified_date (descending) - you shouldn't need to retrieve more than one batch to pick up missed items.</p>
+                    </li>
+                    <li>You can decrease the likelihood of the scenarios in the previous item by sorting the returned results appropriately. The default sorting by <strong>relevance</strong> for searches is based on a complex algorithm that looks combinations of keywords, tags, and custom field values. If you are searching for videos based on  multiple keywords, tags, and/or custom fields, sort by relevance is exactly what you want. However, if you are just trying to retrieve all or a large set of your videos, setting the <code>sort_by</code> parameter explicitly will give you more control over the order of the returned items.</li>
+                </ol>
             </div>
             <div class="section" id="videoRead">
                 <h2>Video read calls</h2>
