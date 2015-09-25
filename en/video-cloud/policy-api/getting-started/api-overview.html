@@ -70,7 +70,8 @@
                 <h2>Create a policy key</h2>
                 <p>To create a new policy key, make a POST request to:</p>
 <pre><code>https://policy.api.brightcove.com/v1/accounts/{account_id}/policy_keys</code></pre>
-                <p>In the request body, include the JSON for the policy:</p>
+                <h3>Request body (concise format)</h3>
+                <p>In the request body, include the JSON for the policy - this is the concise format (see the full format below):</p>
 <pre><code>{
     "key-data": {
         "account-id": "{account_id}"
@@ -90,6 +91,34 @@
         ]
     }
 }</code></pre>
+                <h3>Request body (full format)</h3>
+                <p>You can also use the full format for the request body. In this format, you include a <code>policies</code> array of policy objects, which allow or deny access to the Playback API based on logical patterns. Here is the full format version of the second policy just above:</p>
+<pre><code>{
+    "policies": [
+        {
+            "pattern": {
+                "!=": [
+                    "123456789001"
+                ]
+            },
+            "effect": "deny"
+        },
+        {
+            "pattern": {
+                "not-contains?": [
+                    [
+                        "http://www.abc.com",
+                        "https://www.abc.com",
+                        "http://www.xyz.com",
+                        "https://www.xyz.com"
+                    ],
+                    "[request.domain]"
+                ]
+            },
+            "effect": "deny"
+        }
+    ]
+ }</code></pre>
                 <p class="BCL-aside">Note: any key for your account may be used to access the account content via the Playback API, so if you are using domain restriction, we highly recommend that you domain restrict all of your players.</p>
                 <h3>Response</h3>
                 <p>The response to create requests will be JSON that includes the encrypted <code>key-string</code> that you can use to authenticate requests to the Playback API, as well as the policy associated with the key:</p>
@@ -122,6 +151,10 @@
     }
   ]
 }</code></pre>
+            </div>
+            <div class="section" id="revokePolicy">
+                <h2>Revoke a policy</h2>
+                <p>If you need to revoke an existing policy, submit a request to <a href="http://support.brightcove.com/en/contact">Brightcove Support</a>. Include the key string for the policy you want to revoke in your request.</p>
             </div>
             <div class="section" id="relatedTopics">
                 <h2>Related Topics</h2>
