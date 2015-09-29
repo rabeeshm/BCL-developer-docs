@@ -573,6 +573,9 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                     } else if (section === "policy-api") {
                         section = "playback-api";
                         sectionName = "Playback API";
+                    } else if (section === "analytics-api") {
+                        section = "analytics-api";
+                        sectionName = "Analytics API";
                     } else {
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
                     }
