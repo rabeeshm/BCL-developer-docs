@@ -501,9 +501,15 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         //add event listeners for index type selector
         indexTypeSelectorGroup.addEventListener("change", function () {
             setPageIndexType(indexTypeSelectorGroup.options[indexTypeSelectorGroup.selectedIndex].value);
+            bclslog("g selected index", indexTypeSelectorGroup.selectedIndex);
+                indexTypeSelectorAlpha.selectedIndex = 1;
+
         });
         indexTypeSelectorAlpha.addEventListener("change", function () {
             setPageIndexType(indexTypeSelectorAlpha.options[indexTypeSelectorAlpha.selectedIndex].value);
+            bclslog("a selected index", indexTypeSelectorGroup.selectedIndex);
+                indexTypeSelectorGroup.selectedIndex = 0;
+
         });
         // if on landing page see what version of page index to show value
         if (getURLparam("show") === "alpha") {
