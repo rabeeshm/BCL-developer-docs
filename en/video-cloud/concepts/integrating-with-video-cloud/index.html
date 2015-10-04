@@ -76,7 +76,8 @@
                 <h3>Creating an access token</h3>
                 <p>Temporary access tokens are created using the <a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-token.html">OAuth API</a>. The <code>client_id</code> and <code>client_secret</code> must be BASE64-encoded and passed as a <code>Basic</code> Authorization string.</p>
                 <p>The <code>access_token</code> returned is in turned passed in an Authorization header with the API call:</p>
-<pre><code></code></pre>
+<pre><code>Authorization: Bearer <em>:your_access_token</em></code></pre>
+                <p>Access tokens are valid for 5 minutes. Unless you are performing some kind of batch operation that will be making hundreds of successive API calls, it makes sense to just request a new one for each API call rather than trying to keep track of the timeout.</p>
             </div>
             <div class="section" id="addingVideos">
                 <h2>Adding Videos</h2>
@@ -84,7 +85,15 @@
                 <h3>Adding a video object to Video Cloud</h3>
                 <p>The first step is to create a video object in the Video Cloud system by making a POST request to the CMS API:</p>
 <pre><code>https://cms.api.brightcove.com/v1/accounts/:account_id/videos</code></pre>
-                <p>The request body will include basic video properties in a JSON object - minimally, the video name.</p>
+                <p>The request body will include basic video properties in a JSON object - minimally, the video <code>name</code>, but you can also include additional metadata such as a description and tags:</p>
+<pre><code>{
+    "name": "Woodpecker",
+    "description": "A bird that hunts insects inside wood",
+    "reference_id": "Bird_Woodpecker.mp4",
+    "tags": ["bird", "air", "nature"]
+}</code></pre>
+                <h3>Ingesting the video</h3>
+                <p>When you create the video object, the CMS API will return a json object containing the video properties. You will extract the video <code>id</code> from the json, and use it to make a call to Dynamic Ingest API to request ingestion and transcoding of the video</p>
             </div>
             <div class="section" id="manangingVideos">
                 <h2>Managing Videos</h2>
