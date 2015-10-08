@@ -119,36 +119,24 @@ var BCLSVJS = (function (window, document, docData) {
      */
     addHeaderContent = function () {
         var doc_body = document.getElementsByTagName('body')[0],
-            mainContent = createEl('div', {id: 'main'}),
+            row = createEl('div', {class: 'row'}),
+            mainContent = createEl('div', {id: 'main', class:'large-12 small-12'}),
             topSection = createEl('section', {id: 'top', class: 'section'}),
-            mainLink = createEl('a', {href: '//docs.videojs.com/', style: 'float:right;font-weight:bold;margin-top:-3em;background-color:#ECEEF1;padding:2px 4px;'}),
+            //mainLink = createEl('a', {href: '//docs.videojs.com/', style: 'float:right;font-weight:bold;margin-top:-3em;background-color:#ECEEF1;padding:2px 4px;'}),
             header = createEl('h1'),
-            text = document.createTextNode('video.js API Documentation Index'),
+            text = document.createTextNode('Brightcove Player API Documentation Index'),
             topP,
             topPtext,
             topLink,
             topLinkStrong;
         // add elements
-        mainLink.appendChild(document.createTextNode('Documentation Home'));
-        topSection.appendChild(mainLink);
+        // mainLink.appendChild(document.createTextNode('Documentation Home'));
+        // topSection.appendChild(mainLink);
         header.appendChild(text);
         topSection.appendChild(header);
         // add paragraph for videojs function
         topP = createEl('p');
-        topPtext = document.createTextNode('If you are new to video.js, look first at ');
-        topP.appendChild(topPtext);
-        topLink = createEl('a', {href: 'video.html'});
-        topP.appendChild(topLink);
-        topPtext = document.createTextNode('videojs');
-        topLinkStrong = createEl('strong');
-        topLink.appendChild(topLinkStrong);
-        topLinkStrong.appendChild(topPtext);
-        topPtext = document.createTextNode(', which Doubles as the main function for users to create a player instance and also the main library object.');
-        topP.appendChild(topPtext);
-        topSection.appendChild(topP);
-        // add paragraph for the player class
-        topP = createEl('p');
-        topPtext = document.createTextNode('Next, look at the ');
+        topPtext = document.createTextNode('If you are new to the Brightcove Player API, look first at the ');
         topP.appendChild(topPtext);
         topLink = createEl('a', {href: 'player.html'});
         topP.appendChild(topLink);
@@ -156,12 +144,13 @@ var BCLSVJS = (function (window, document, docData) {
         topLinkStrong = createEl('strong');
         topLink.appendChild(topLinkStrong);
         topLinkStrong.appendChild(topPtext);
-        topPtext = document.createTextNode(' class. An instance of the Player class is created when any of the Video.js setup methods are used to initialize a video. The methods and events of the player object are the most commonly used for managing the player and playback.');
+        topPtext = document.createTextNode(' class. An instance of the Player class is created when any of the Brightcove Player setup methods are used to initialize a video. The methods and events of the player object are the most commonly used for managing the player and playback.');
         topP.appendChild(topPtext);
         topSection.appendChild(topP);
         // add the top section to the document
         mainContent.appendChild(topSection);
-        doc_body.appendChild(mainContent);
+        row.appendChild(mainContent);
+        doc_body.appendChild(row);
         main = document.getElementById('main');
     };
     /**
@@ -260,9 +249,9 @@ var BCLSVJS = (function (window, document, docData) {
         title.innerHTML = 'API Documentation Index';
         // remove any private items
         privateItems = findObjectsInArray(classes, 'access', 'private');
-        bclslog('privateItems', privateItems);
+        // bclslog('privateItems', privateItems);
         j = privateItems.length;
-        bclslog('j', j);
+        // bclslog('j', j);
         while (j > 0) {
             j--;
             classes.splice(privateItems[j], 1);
