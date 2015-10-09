@@ -134,7 +134,23 @@
             </div>
             <div class="section" id="replace_retranscode">
                 <h2>Replace/retranscode videos</h2>
-                <p>The Dynamic Ingest API call is exactly the same as it would be for <a href="../samples/batch-dynamic-ingest.html">ingesting new videos</a> - the only difference is that you do not need to make a prior call to the CMS API to create the video object in the Video Cloud system and get an id for it. If the source video file at the specified URL is the same one originally ingested, you will simply get a new set of renditions. If the source file is new, you will be replacing the existing video. All videos will remain playable with existing renditions until retranscoding is complete.</p>
+                <p>To replace a video with a new version or a new set of renditions, the Dynamic Ingest API call is exactly the same as it would be for <a href="../samples/batch-dynamic-ingest.html">ingesting new videos</a> - the only difference is that you do not need to make a prior call to the CMS API to create the video object in the Video Cloud system and get an id for it. If the source video file at the specified URL is the same one originally ingested, you will simply get a new set of renditions. If the source file is new, you will be replacing the existing video. All videos will remain playable with existing renditions until retranscoding is complete.</p>
+                <p>If you chose to archive a master when you ingested the video through the Dynamic Ingest API or the Studio Upload Module, then you can also retranscode the video from the master. Again the URL for the ingest request will be the same, but the request body will have the following:</p>
+<pre><code>// request
+POST /v1/accounts/{account_id}/videos/{video_id}/ingest-requests
+
+// request body
+{
+    "master": { <strong><em>"use_archived_master": true</em></strong> },
+    "profile": "videocloud-default-v1"
+}</code></pre>
+                <div class="BCL-aside">
+                    <p>Notes:</p>
+                    <ul>
+                        <li>If the master was not archived, or the video was <em>not</em> ingested using the Dynamic Ingest API or the Upload Module, you will receive an error</li>
+                        <li>The recommended standard ingest profiles (videocloud-default-v1, screencast-1280, high-resolution, smart-player-transition, single-bitrate-standard, and single-bitrate-high) will all archive the master. If you are using a custom ingest profile, you must <a href="http://docs.brightcove.com/en/video-cloud/ingest-profiles-api/guides/archiving-masters.html">specify that that the master</a> should be archived if you want to be able to retranscode from the master later.</li>
+                    </ul>
+                </div>
                 <p>See the <a href="../samples/batch-dynamic-ingest-retranscode.html">working sample here</a>.</p>
             </div>
             <div class="section" id="capture-images">
