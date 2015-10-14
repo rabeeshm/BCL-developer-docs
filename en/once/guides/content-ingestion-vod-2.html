@@ -54,6 +54,10 @@
             </h1>
             <p>Brightcove’s Once API Ingest service is a RESTful API that accepts HTTPS POST requests, supplying JSON as the data structure and passing the API key in the header.  When an API Ingest job is successfully submitted,  <a href="once-vod-2-0.html#coreRenditions">core renditions</a> required for delivery on the Once VOD platform are generated. Videos at your SourceURLs must be progressive formats and publicly addressable URLs. Ingesting files via S3 is also supported by the API Ingest system as a source location. If your files are publicly available, no further action is necessary. If your files require authentication, please see the <a href="#usingS3Buckets">using S3 buckets section</a> for authorizing the Once platform to access protected URLs. If the request fails, a validation error will be returned in the response body as JSON with details of the error event. Upon success the response will return a Request ID in the content body that can be used to track the job details from the Status API.</p>
             <p>As a best practice recommendation your source video should be encoded with a video bitrate between 5-10 Mbps, frame size of 1920x1080 and contain keyframes at least every 6 seconds.</p>
+            <p>Also see the <a href="../references/ingest-api/versions/v1/index.html">Ingest API Reference</a>.</p>
+            </div>
+            <div id="baseURL" class="section">
+            <h2>Base URL and Syntax</h2>
             <p>
                 API Base URL:
             </p>
@@ -72,7 +76,9 @@
             <p>
                 <code>https://api.unicornmedia.com/ingest-api/b207b479-c841-4095-8918-978be9e18dee/catalogs/bc6cb7d4-be99-471b-adf3-7c501172b317</code>
             </p>
-            <h3>Creating an SNS-based ingest job</h3>
+            </div>
+            <div id="sns" class="section">
+            <h2>SNS-based ingest job</h2>
             <p>SNS Content Ingest is the service that allows for the automated ingest of assets and metadata from an Amazon SNS Topic to the Once platform. The SNS Ingest API waits for SNS Messages from all topics to which it is subscribed. Content is passed to the API by posting a Notification message to a topic that SNS Ingest API is subscribed to.</p>
             <p>
                 The following steps will be necessary to ensure Brightcove can configure the proper mechanisms to pull content from your AWS account.
@@ -86,9 +92,9 @@
             </ul></li>
                 <li>Allow permissions to the transcoding engine when using S3 buckets with your content storage</li>
             </ol>
-            <h4>
+            <h3>
                 Example policy statement
-            </h4>
+            </h3>
 <pre><code>{
     "Sid": "console_pub",
     "Effect": "Allow",
@@ -104,13 +110,15 @@
         }
     }
 }</code></pre>
-            <h3 id="usingS3Buckets">Using S3 buckets</h3>
+            </div>
+            <div id="s3" class="section">
+            <h2 id="usingS3Buckets">Using S3 buckets</h2>
             <p>
                 If the bucket is not publicly accessible, the Brightcove transcoding engine will need to be granted access through a bucket policy or to the Brightcove AWS account.
             </p>
-            <h4>
+            <h3>
                 Option #1 - Create a bucket policy
-            </h4>
+            </h3>
             <p>
                 To set up a bucket policy, login to your AWS Console, select your bucket on the left side of the screen, then click "properties". On the last row click "Add bucket policy". We'll put a Bucket Policy together below, which you'll copy into the Bucket Policy text box.
             </p>
@@ -184,32 +192,34 @@
             <p>
                 If you'd like to build your own Bucket Policy, you can use <a href="http://awspolicygen.s3.amazonaws.com/policygen.html">Amazon's Policy Generator</a>. Use <code>arn:aws:iam::395540211253:root</code> as the AWS Principal to allow Brightcove access.
             </p>
-            <h4>
+            <h3>
                 Option #2 - grant access to Brightcove AWS
-            </h4>
+            </h3>
             <p>
                 Grant Access to the Brightcove AWS account at aws@zencoder.com. If the setup requires the canonical ID you can use:
             </p>
             <p>
                 <code>6c8583d84664a381db0c6af0e79b285ede571885fbe768e7ea50e5d3760597dd</code>
             </p>
-            <h3>Example ingest syntax</h3>
-            <h4>Request Header</h4>
+            </div>
+            <div id="ingestSyntax" class="section">
+            <h2>Example ingest syntax</h2>
+            <h3>Request Header</h3>
             <p>
                 Required HTTP Header:
             </p>
             <p>
                 <code>X-BC-ONCE-API-KEY : {yourApiKey}</code>
             </p>
-            <h5>
+            <h4>
                 Schema
-            </h5>
+            </h4>
             <p>
                 <strong>See <a href="#ingestSchema">Appendix A</a></strong>
             </p>
-            <h5>
+            <h4>
                 Example Body
-            </h5>
+            </h4>
 <pre><code>{
     "title": "brightcove-once",
     "foreignKey": "brightcove-once",
@@ -255,10 +265,10 @@
         }
     ]
 }</code></pre>
-            <h4>Response</h4>
-            <h5>
+            <h3>Response</h3>
+            <h4>
                 Body (error)
-            </h5>
+            </h4>
 <pre><code>{
     "requestId": "2796350e-2125-4f04-b33a-59488aaa76c7",
     "error": "Validation Errors",
@@ -269,13 +279,13 @@
         ]
     }
 }</code></pre>
-            <h5>
+            <h4>
                 Body (success)
-            </h5>
+            </h4>
 <pre><code>{
     "requestId": "2796350e-2125-4f04-b33a-59488aaa76c7"
 }</code></pre>
-            <h4>Brief Object Explanation</h4>
+            <h3>Brief Object Explanation</h3>
             <p>
                 The table below can be used as a quick start for the major fields required for content ingestion along with a description. Please see the <a href="#ingestSchema">ingest schema</a> for a full object mapping. If the required fields are not present in the API request; a response body will be returned with a corresponding validation error. Note: While we recommend the use of an optional field <code>title</code> for search and human readability, only the following highlighted fields are required for all ingest job requests.
             </p>
