@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <!-- change title to match the h1 heading -->
+    <title>Migrating from the Media API to the CMS API</title>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/foundation.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/normalize.css" />
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/atelier-forest.light.min.css">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
+    <script>
+        (function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function() {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+        ga('create', 'UA-2728311-29', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/js/vendor/modernizr.js"></script>
+</head>
+
+<body>
+    <!-- header navbar -->
+    <div id="navWrapper" class="fixed"></div>
+    <!-- breadcrumbs -->
+    <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+    <!-- search -->
+    <div id="searchModal" class="reveal-modal" data-reveal></div>
+    <!-- content -->
+    <!-- content -->
+    <div class="row">
+        <div class="sidebar large-2 columns show-for-large-up">
+            <div id="sidenav" class="side-nav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+            <div id="top" class="section">
+                <h1>CMS API Overview</h1>
+                <!-- Place document intro sentence(s) here -->
+
+                <p>The CMS API provides uncached read access to the data. This is important for time-sensitive publishing workflows because you make a changes to videos and playlists using the CMS API and quickly read the data to verify that is correct.</p>
+                <div class="BCL-aside">
+                    <p>Note: The CMS API is intended for integrations and publishing workflows. You should <strong>never</strong> make client-side calls to this API from a public web page, as doing so would involve exposing your client credentials for the API.</p>
+                    <p>Note: The CMS API methods never return deleted videos. The <code>'state:DELETED'</code> clause will be ignored by the CMS API whether you're asking for a count or for the videos themselves. CMS API <a href="#notifications">Notifications</a> will inform you when videos are deleted (or other changes to videos are made).</p>
+                    <p>If you are going to be retrieving all your videos or large sets of videos, be sure to see the <a href="#largeDataSets">note on large data sets</a>.</p>
+                </div>
+            </div>
+            <div class="section" id="generalInfo">
+                <h2>General Information</h2>
+                <h3>Base URL</h3>
+                <p>The base URL for the CMS API is:</p>
+                <pre><code>https://cms.api.brightcove.com/v1</code></pre>
+
+                <h4>Account path</h4>
+                <p>In all cases, requests will be made for a specific Video Cloud Account. So, you will always add the term <code>accounts</code> followed by your account id to the base URL:</p>
+<pre><code>https://cms.api.brightcove.com/v1<strong>/accounts/{account_id}</strong></code></pre>
+
+                <h3>Authentication</h3>
+                <p>Authentication for requests requires an Authorization header:</p>
+<pre><code>Authorization: Bearer {access_token}</code></pre>
+
+                <p>The
+                    <code>access_token</code> is a temporary OAuth2 access token that must be obtained from the Brightcove OAuth service. For details on how to obtain client credentials and use them to retrieve access tokens, see the <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/oauth-api-overview.html">Brightcove OAuth Overview</a>.</p>
+                <h3>Operations</h3>
+                <p>When you request client credentials, you will need to specify the type of account access or operations that you want. The following is a list of the currently supported operations for the CMS API:</p>
+                <ul>
+                    <li>Video data:
+                    <ul>
+                        <li>video-cloud/video/read</li>
+                        <li>video-cloud/video/create</li>
+                        <li>video-cloud/video/delete</li>
+                        <li>video-cloud/video/update</li>
+                        <li>video-cloud/video/all</li>
+                    </ul>
+                    </li>
+                    <li>Playlist data:
+                    <ul>
+                        <li>video-cloud/playlist/read</li>
+                        <li>video-cloud/playlist/create</li>
+                        <li>video-cloud/playlist/delete</li>
+                        <li>video-cloud/playlist/update</li>
+                        <li>video-cloud/playlist/all</li>
+                    </ul>
+                    </li>
+                    <li>Notifications:
+                    <ul>
+                        <li>video-cloud/notifications/all (for <a href="#notifications">Notifications</a>)</li>
+                    </ul>
+                    </li>
+                </ul>
+                <h3>Rate limiting</h3>
+                <p>This CMS API provides uncached read access to the data. This is important for time-sensitive publishing workflows because you make a changes to videos and playlists using the CMS API and quickly read the data to verify that is correct.</p>
+                <p>The CMS API is not appropriate for high scale runtime usage (such as accessing videos on a high traffic public web page). For high traffic applications, you must use a cached interface such as : the Media API, Gallery, Players, or the Native SDK's.</p>
+                <p>To ensure the performance of the Video Cloud system, no more than 5 concurrent calls to the CMS API are allowed per account. Access frequency should be less than 10 queries per second.</p>
+                <p>If multiple applications will be integrating to the CMS API for an account, then these applications should have back-off and retry logic to handle instances where concurrency limits or rate limits are reached.</p>
+            </div>
+            <div class="section" id="methods">
+                <h2>Methods</h2>
+                <p>Currently the API supports the following request types:</p>
+                <ul>
+                    <li>GET</li>
+                    <li>POST</li>
+                    <li>PATCH</li>
+                    <li>PUT</li>
+                    <li>DELETE</li>
+                </ul>
+            </div>
+            <div class="section" id="resources">
+                <h2>Resources</h2>
+                <p>The following resources are currently accessible via the CMS API:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Resource Endpoint</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><a href="#videosEndpoint">/videos</a></td>
+                            <td>Metadata and asset information about videos. GET will <a href="#videosEndpoint">list a page of videos</a>. Supports <a href="#search">search</a> (<code>q</code> param), <a href="#sort"><code>sort</code></a>, and <a href="#paging">paging</a> (<code>limit</code> and <code>offset</code>)
+                            <p>POST will <a href="#createVideo">create a video</a></p></td>
+                        </tr>
+                        <tr>
+                            <td><a href="#countsEndpoint">/counts/videos</a></td>
+                            <td>Returns the <code>count</code> of videos. Supports search (<code>q</code> param)</td>
+                        </tr>
+                        <tr>
+                            <td><a href="#videoEndpoint">/videos/{video_id} or /videos/ref:{reference_id}</a></td>
+                            <td>GET will return metadata and asset information about the video with the given ID
+                            <p>PATCH will <a href="#updatevideo">update the video metadata</a></p>
+                            <p>DELETE will <a href="#deletevideo">delete the video</a></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><a href="#sourcesEndpoint">/videos/{video_id}/sources or /videos/ref:{reference_id}/sources</a></td>
+                            <td>Metadata for this video's sources (renditions)</td>
+                        </tr>
+                        <tr>
+                            <td><a href="#videoImagesEndpoint">/videos/{video_id}/images or /videos/ref:{reference_id}/images</a></td>
+                            <td>Metadata for all of this video's images: poster, thumbnail, logo overlay</td>
+                        </tr>
+                        <tr>
+                            <td><a href="#digital_masterEndpoint">/videos/{video_id}/digital_master</a></td>
+                            <td>Metadata for the video's stored digital_master (if any)</td>
+                        </tr>
+                        <tr>
+                            <td><a href="#videoReferencesEndpoint">/videos/{video_id}/references or /videos/ref:{reference_id}/references</a></td>
+                            <td>GET returns an array of manual playlist IDs that the video ID is contained in. Note that this request does not look at smart playlists.
+                            <p>DELETE will remove the video from manual playlists</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><a href="#folderOperations">/folders</a></td>
+                            <td><a href="#createFolder">POST to create</a> a folder or <a href="#getFolderList">GET a list of folders</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="#getFolderInfo">/folders/{folder_id}</a></td>
+                            <td><a href="#getFolderInfo">GET information</a> about a folder, <div id="#updateFolder">PATCH to update</div> the folder name, or <a href="#deleteFolder">DELETE the folder</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="#getVideosInFolder">/folders/{folder_id}/videos</a></td>
+                            <td>GET a list of videos contained in a folder</td>
+                        </tr>
+                        <tr>
+                            <td><a href="#addVideoToFolder">/folders/{folder_id}/videos/{video_id}</a></td>
+                            <td>Used to add a video to a folder or <a href="#removeVideoFromFolder">remove it </a>from the folder</td>
+                        </tr>
+                        <tr>
+                            <td><div id="#getPlaylistCount">/counts/playlists</div></td>
+                            <td>Returns a count of playlists in the account</td>
+                        </tr>
+                        <tr>
+                            <td><a href="#playlistRead">/playlists</a></td>
+                            <td><a href="#createPlaylist">POST to create a playlist</a> or <a href="#getPlaylists">GET a list of playlists</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="#getPlaylist">/playlists/{playlist_id}</a></td>
+                            <td>Used to get, update, or delete a single playlist</td>
+                        </tr>
+                        <tr>
+                            <td><a href="#getVideosInPlaylist">/playlists/{playlist_id}/video</a></td>
+                            <td>Used to get the videos contained in a playlist</td>
+                        </tr>
+                        <tr>
+                            <td><a href="#getCustomFields">/video_fields</a></td>
+                            <td>Used to get information about custom fields defined for the account</td>
+                        </tr>
+                        <tr>
+                            <td><a href="#notifications">/subscriptions</a></td>
+                            <td>Used <a href="#createSubscription">create a notification</a> subscription or <a href="#getSubscriptions">get a list of subscriptions</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="#getSubscription">/subscriptions/{subscription_id}</a></td>
+                            <td>Used to retrieve or delete a single subscription</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="section" id="parameters">
+                <h2>Parameters</h2>
+                <p>Note that all parameters are
+                    <strong>optional</strong>. Except where noted, they apply to GET calls for videos and playlists.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <code>q</code>
+                            </td>
+                            <td>Query string for searches - see <a href="#search">Search syntax</a> for details</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <code><a href="#paging">limit</a></code>
+                            </td>
+                            <td>Number of videos to return - must be an integer between 1 and 100. <strong>Default: 20</strong></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <code><a href="#offset">offset</a>
+                                </code>
+                            </td>
+                            <td>Number of videos to skip (for paging results). Must be a positive integer. <strong>Default: 0</strong></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <code><a href="#sort">sort</a></code>
+                            </td>
+                            <td>A string that specifies the field to sort by. Start with <code>-</code> to sort descending. If a value for <code>q</code> is provided, then the default sort is by "score" (relevance of the search results to the original query). If no value for <code>q</code> is provided, then the default sort is by <code>updated_at</code> descending.</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <code>playable</code>
+                            </td>
+                            <td>Available at the <code>/videos</code> endpoint. Set <code>q=playable:true</code> to return playable videos and set <code>q=playable:false</code> to return unplayable videos. <strong>Default: true</strong>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3 id="search">Search videos</h3>
+                <p>Brightcove's CMS API provides a programmatic way to search for videos in your Video Cloud library.</p>
+                <p>To perform basic and complex searches on your video data, you will use the
+                    <code>q</code> parameter:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/921483702001/videos?q={search terms}</code></pre>
+                <p>For details on how to search for videos, see the <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/search-videos.html">Using the CMS API: Search Videos</a> document.</p>
+                <p>For playlists, the supported values for the search string are  limited. You can currently only search by tags. Here are some example valid searches:</p>
+                    <ul>
+                        <li>tags:foo</li>
+                        <li>+tags:bar</li>
+                        <li>tags:foo,bar</li>
+                        <li>+tags:&quot;foo bar&quot;,&quot;boo yah&quot;</li>
+                    </ul>
+                    <p>For specific scenarios:
+                    <ul>
+                        <li>contains all: &quot;+tags:foo,bar&quot;</li>
+                        <li>contains any: &quot;tags:foo,bar&quot;</li>
+                    </ul>
+                    </p>
+                <h3 id="paging">Paging results</h3>
+                <p>Use the <code>limit</code> parameter to specify how many items you want to return on a request - up to 100. You can then use the <code>offset</code> parameter to page through result sets that are larger than the <code>limit</code>. The <code>offset</code>is the number of items to skip. For example, for a search like this:</p>
+<pre><code>/videos?q=updated_at:2014-01-01..2014-06-30&amp;limit=25&amp;offset=50</code></pre>
+                <p>would return videos 51-75 of the total result set, assuming the total result set has at least 75 videos.</p>
+                <p><code>limit</code> and <code>offset</code> can be used for both videos and playlists.</p>
+                <h3>Sorting video results</h3>
+                <p>Use the parameter <code>sort=field_name</code> (or <code>sort=-field_name</code> for descending order)to specify how the results should be sorted - you can sort both video and playlists. You can sort on the following video fields:<li id="note1"><sup class="once-red"><strong>[1]</strong></sup> </li></p>
+                <ul>
+                    <li>name</li>
+                    <li>reference_id</li>
+                    <li>created_at</li>
+                    <li>published_at</li>
+                    <li>updated_at</li>
+                    <li>schedule_starts_at</li>
+                    <li>schedule_ends_at</li>
+                    <li>state</li>
+                    <li>plays_total<sup class="once-red"><strong><a href="#note2">[2]</a></strong></sup>
+                    </li>
+                    <li>plays_trailing_week<sup class="once-red"><strong><a href="#note2">[2]</a></strong></sup>
+                    </li>
+                </ul>
+                <p>
+                    <strong>Notes</strong>
+                </p>
+                <ul>
+                    <li id="note1"><sup class="once-red"><strong>[1]</strong></sup> If you do not provide a sort value for a video search call, the results will be sorted by relevance. If you do not provide a sort value for a list call, the results will be sorted by <code>updated_at</code> descending.</li>
+                    <li class="bcls-footnote" id="note2"><sup class="once-red"><strong>[2]</strong></sup> You can sort on <code>plays_total</code> or <code>plays_trailing_week</code>, but these fields are not included in the results</li>
+                </ul>
+                <h3>Sorting playlist results</h3>
+                <p>You can sort playlists on the following fields:</p>
+                <ul>
+                    <li>name</li>
+                    <li>created_at (default)</li>
+                    <li>updated_at</li>
+                    <li>reference_id</li>
+                </ul>
+                <h4 id="largeDataSets">All videos and large data sets</h4>
+                <p>If you are retrieving all the videos in your account, or a large number of videos, there are some things you must be aware of:</p>
+                <ol>
+                    <li>You may be tempted to use the largest allowed <code>page_size</code> (100), but it's better to retrieve videos in batches of 25 or less to minimize the possibility of API requests timing out</li>
+                    <li>As you are paging through large data sets, it is possible that the video data may be updated during the operation, which could cause items to shift in responses:
+                        <ul>
+                            <li>You might see an item repeated on successive pages</li>
+                            <li>An item might be missed, as it has shifted to a previous response set</li>
+                        </ul>
+                        <p>To account for the first possibility, your app should de-dupe the complete item list after you have finished retrieving videos. To handle the second possibility, you need to compare the total number of items retrieved (after de-duping) to the number you were expecting, and then rerun the requests, sorting the results by last_modified_date (descending) - you shouldn't need to retrieve more than one batch to pick up missed items.</p>
+                    </li>
+                    <li>You can decrease the likelihood of the scenarios in the previous item by sorting the returned results appropriately. The default sorting by <strong>relevance</strong> for searches is based on a complex algorithm that looks combinations of keywords, tags, and custom field values. If you are searching for videos based on  multiple keywords, tags, and/or custom fields, sort by relevance is exactly what you want. However, if you are just trying to retrieve all or a large set of your videos, setting the <code>sort_by</code> parameter explicitly will give you more control over the order of the returned items.</li>
+                </ol>
+            </div>
+            <div class="section" id="videoRead">
+                <h2>Video read calls</h2>
+                <p>This section explains operations for getting videos.</p>
+                <h3 id="videosEndpoint">Get a list of videos</h3>
+                <p>Brightcove's CMS API provides a programmatic way to access data for videos in your Video Cloud library. See the <a href="../references/video-fields-reference.html">Video Fields Reference</a> for information on fields returned.</p>
+                <p>To retrieve media data using the HTTP
+                    <code>GET</code> method, you will append resources to the base URL with your account id:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/{account_id}/videos</code></pre>
+                <p>For a list of resources and details on how to retrieve video data, see the <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/retrieve-video-data.html">Using the CMS API: Retrieve Video Data</a> document.</p>
+                <p>Know that you can easily combine these resources with the search criteria from the previous section.</p>
+                <h3>Get single video</h3>
+                <p>You can also get the data for a single video by issuing a GET request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/videos/<em>{video_id}</em></code></pre>
+                <h3 id="sourcesEndpoint">Get video sources (renditions)</h3>
+                <p>You can also get the sources (renditions) for a single video by issuing a GET request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/videos/<em>{video_id}</em>/sources</code></pre>
+                <h3 id="videoImagesEndpoint">Get video images</h3>
+                <p>You can also get the images for a single video by issuing a GET request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/videos/<em>{video_id}</em>/images</code></pre>
+                <h3 id="digital_masterEndpoint">Get digital_master</h3>
+                <p>You can also get the digital_master for a single video by issuing a GET request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/videos/<em>{video_id}</em>/<strong>digital_master</strong></code></pre>
+                <p>If no digital_master was archived, this call will return a 404 "resource not found" error.</p>
+                <h3 id="countsEndpoint">Get count</h3>
+                <p>Get a count of all videos in the account, or the total number of items that will be returned for a search, using the <code>/{account_id}/counts/videos{q=searchTerms}</code> endpoint. This is useful for <a href="#paging">paging results</a>.</p>
+            </div>
+            <div class="section" id="createVideo">
+                <h2>Create video</h2>
+                <p>
+                    <code>POST</code> requests will create a new video object in the account. Only the object is created - this is not a method that allows you to upload a video. See the <a href="../../di-api/index.html">Dynamic Ingest API</a> for information on how to send the video source file to Brightcove.</p>
+                <p class="BCL-aside">Note: when you create a new video, the <code>complete</code> property is automatically set to <code>false</code>. As soon as one rendition exists for the video, the <code>complete</code> property will be automatically set to <code>true</code>.</p>
+                <p>When you use
+                    <code>POST</code> to create a video you can set some property fields during the
+                    <code>POST</code> operation. Not all fields can be set during the
+                    <code>POST</code> though, for example
+                    <code>cue_points</code> and
+                    <code>sharing</code>.</p>
+                <p class="BCL-aside">Note that strings for the
+                    <code>name</code>,
+                    <code>description</code>, and other metadata
+                    <strong>must be URI-encoded</strong>.</p>
+                <p>The following table lists those fields for which you can provide values when the video is created.</p>
+                <table>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Comments</th>
+                    </tr>
+                    <tr>
+                        <td>account_id</td>
+                        <td>String</td>
+                        <td>no</td>
+                        <td>Must match account ID in the URL</td>
+                    </tr>
+                    <tr>
+                        <td>name</td>
+                        <td>String</td>
+                        <td>yes</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>reference_id</td>
+                        <td>String</td>
+                        <td>no</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>description</td>
+                        <td>String</td>
+                        <td>no</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>long_description</td>
+                        <td>String</td>
+                        <td>no</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>state</td>
+                        <td>String</td>
+                        <td>no</td>
+                        <td>Defaults to "ACTIVE" if not set explicitly</td>
+                    </tr>
+                    <tr>
+                        <td>tags</td>
+                        <td>Array of Strings</td>
+                        <td>no</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>custom_fields</td>
+                        <td>Map of field-value pairs</td>
+                        <td>no</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>geo</td>
+                        <td>Map of geo properties</td>
+                        <td>no</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>geo.countries</td>
+                        <td>Array of country code Strings</td>
+                        <td>no</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>geo.exclude_countries</td>
+                        <td>Boolean</td>
+                        <td>no</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>geo.restricted</td>
+                        <td>Boolean</td>
+                        <td>no</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>schedule</td>
+                        <td>Map of scheduling properties</td>
+                        <td>no</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>schedule.ends_at</td>
+                        <td>String in ISO-8601 date format</td>
+                        <td>no</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>schedule.starts_at</td>
+                        <td>String in ISO-8601 date format</td>
+                        <td>no</td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="section" id="updatevideo">
+                <h2>Update video</h2>
+                <p>Use the HTTP
+                    <code>PATCH</code> request to update properties for a video object in your account.</p>
+                <p>For an example of updating a video, see the <a href="//docs.brightcove.com/en/video-cloud/cms-api/getting-started/quick-start-cms.html#updatevideoinfo">Quick Start To CMS</a> document.</p>
+                <h3>Check the data type</h3>
+                <p>When updating properties, keep in mind that with arrays you need to include ALL the array values. This is because arrays are all-or-none. If you had 3 array values and try to update just 1 value, the resulting array will only contain 1 value. If you had 3 array values, you must include all 3 entries, including the updated value.</p>
+                <p>Updating properties based on data type:</p>
+                <ul>
+                    <li>
+                        <p><strong>Non-array types:</strong> With properties like <code>description</code>, <code>name</code> and <code>reference_id</code>, you can update each field without affecting the others.</p>
+
+                    <p>Example: If you have a <code>description</code> and <code>long_description</code> defined, you can update one without affecting the other.</p>
+                    </li>
+                    <li>
+                        <p><strong>Map types:</strong> With properties like <code>geo</code>, <code>schedule</code>, <code>link</code>, you can update each sub-field without affecting the other.</p>
+
+                    <p>Example: If you have a <code>link.url</code> and <code>link.text</code> defined, you can update one without affecting the other.</p>
+                    </li>
+                    <li>
+                        <p><strong>Array types:</strong> With properties like <code>cue_points</code> and <code>tags</code>, you have to include all the items in the array, and not just the one you are updating.</p>
+                    </li>
+                    <p>Example: With <code>cue_points</code>, you have to include all cue points and not just the one you are updating. If you include just the cue point you are updating, you will end up with just that one cue point.</p>
+                </ul>
+                <h3>Properties for update</h3>
+                <p>The following media properties can be updated using the <code>PATCH</code> method:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Property</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                          <td>ad_keys</td>
+                          <td>String</td>
+                          <td>no</td>
+                          <td></td>
+                      </tr>
+                      <!-- <tr>
+                          <td>allow_viral_syndication</td>
+                          <td>Boolean</td>
+                          <td>no</td>
+                          <td></td>
+                      </tr>
+                      <tr>
+                          <td>color</td>
+                          <td>Boolean</td>
+                          <td>no</td>
+                          <td></td>
+                      </tr> -->
+                        <tr>
+                            <td>complete</td>
+                            <td>Boolean</td>
+                            <td>no</td>
+                            <td></td>
+                        </tr>
+                        <!-- <tr>
+                          <td>copyright</td>
+                          <td>Map of property value pairs</td>
+                          <td>no</td>
+                          <td>copyright.data = ISO 8601 date string<br />
+                              copyright.holder = string
+                          </td>
+                      </tr> -->
+                        <tr>
+                            <td>cue_points</td>
+                            <td>Array of Maps</td>
+                            <td>no</td>
+                            <td>You must patch the entire array to update.</td>
+                        </tr>
+                        <tr>
+                            <td>cue_points.0.name</td>
+                            <td>String</td>
+                            <td>yes</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>cue_points.0.type</td>
+                            <td>String</td>
+                            <td>yes</td>
+                            <td>must be one of valid enum values</td>
+                        </tr>
+                        <tr>
+                            <td>cue_points.0.time</td>
+                            <td>Float</td>
+                            <td>yes</td>
+                            <td>time in seconds</td>
+                        </tr>
+                        <tr>
+                            <td>cue_points.0.metadata</td>
+                            <td>String</td>
+                            <td>no</td>
+                            <td>code cuepoint only</td>
+                        </tr>
+                        <tr>
+                            <td>cue_points.0.force_stop</td>
+                            <td>Boolean</td>
+                            <td>no</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>custom_fields</td>
+                            <td>Map of field-value pairs</td>
+                            <td>no</td>
+                            <td>patch to null to unset</td>
+                        </tr>
+                        <tr>
+                            <td>description</td>
+                            <td>String</td>
+                            <td>no</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>economics</td>
+                            <td>String</td>
+                            <td>no</td>
+                            <td>must be one of valid enum values</td>
+                        </tr>
+                        <tr>
+                            <td>geo</td>
+                            <td>Map of property-value pairs</td>
+                            <td>no</td>
+                            <td>to unset, you can either patch
+                                <code>geo: null</code> or
+                                <code>geo{}</code>; see <a href="../guides/geo.html">Adding Geo-Filtering</a> for details on adding geo-filtering properties</td>
+                        </tr>
+                        <tr>
+                            <td>geo.countries</td>
+                            <td>Array of country code Strings</td>
+                            <td>no</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>geo.exclude_countries</td>
+                            <td>Boolean</td>
+                            <td>no</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>geo.restricted</td>
+                            <td>Boolean</td>
+                            <td>no</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>link</td>
+                            <td>Map of property-value pairs</td>
+                            <td>no</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>link.url</td>
+                            <td>String</td>
+                            <td>no</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>link.text</td>
+                            <td>String</td>
+                            <td>no</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>long_description</td>
+                            <td>String</td>
+                            <td>no</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>name</td>
+                            <td>String</td>
+                            <td>no</td>
+                            <td>cannot be empty or null</td>
+                        </tr>
+                        <tr>
+                            <td>reference_id</td>
+                            <td>String</td>
+                            <td>no</td>
+                            <td>must be unique in the account</td>
+                        </tr>
+                        <tr>
+                            <td>schedule</td>
+                            <td>Map of property-value pairs</td>
+                            <td>no</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>schedule.ends_at</td>
+                            <td>String in ISO-8601 date format</td>
+                            <td>no</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>schedule.starts_at</td>
+                            <td>String in ISO-8601 date format</td>
+                            <td>no</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>state</td>
+                            <td>String</td>
+                            <td>no</td>
+                            <td>can be set to <code>ACTIVE</code> or <code>INACTIVE</code> - these are the only values than can be set</td>
+                        </tr>
+                        <tr>
+                            <td>tags</td>
+                            <td>Array of tags (Strings)</td>
+                            <td>no</td>
+                            <td>Strings cannot be empty or contain commas (empty array is allowed)</td>
+                        </tr>
+                        <tr>
+                            <td>text_tracks</td>
+                            <td>Array of track maps</td>
+                            <td>no</td>
+                            <td>WebVTT tracks; see <a href="../guides/webvtt.html">Adding WebVTT Captions</a> for details</td>
+                        </tr>
+                        <tr>
+                            <td>text_tracks[].src</td>
+                            <td>String</td>
+                            <td>yes</td>
+                            <td>URL for WebVTT file</td>
+                        </tr>
+                        <tr>
+                            <td>text_tracks[].kind</td>
+                            <td>String</td>
+                            <td>yes</td>
+                            <td>usually "captions"</td>
+                        </tr>
+                        <tr>
+                            <td>text_tracks[].srclang</td>
+                            <td>String</td>
+                            <td>no</td>
+                            <td>two-letter code ("en")</td>
+                        </tr>
+                        <tr>
+                            <td>text_tracks[].mime_type</td>
+                            <td>String</td>
+                            <td>no</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>text_tracks[].Label</td>
+                            <td>String</td>
+                            <td>no</td>
+                            <td>Label for language ("English")</td>
+                        </tr>
+                        <tr>
+                            <td>text_tracks[].default</td>
+                            <td>Boolean</td>
+                            <td>no</td>
+                            <td>defaults to false; must be a true boolean: "default": true (NOT "default": "true"</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="deletevideo" class="section">
+                <h2>Delete video</h2>
+                <p>You can delete a video object in your account.</p>
+                <p class="BCL-aside">Note: You will not be able to delete the sharer copy (orignal) of a shared video. You can delete shared copies.</p>
+                <p>The fundamental call information for deleting a video object is:</p>
+                <ul>
+                    <li>HTTP method: <code>DELETE</code></li>
+                    <li>Endpoint: <code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/videos/<em>{video_id}</em></code></li>
+                </ul>
+            </div>
+            <div class="section" id="videoReferencesEndpoint">
+                <h2>Video Playlist References</h2>
+                <p>The videos <code>references</code> endpoint allows you to get a list of ids for the <em>manual</em> playlists that a video belongs to (using a GET request) or remove the video from all <em>manual</em> playlists (using a DELETE request). The latter operation must be performed before the video itself can be deleted (if it is included in any manual playlists).</p>
+                <h3>Get the manual playlists that a video belongs to:</h3>
+                <ul>
+                    <li>HTTP method: <code>GET</code></li>
+                    <li>Endpoint: <code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/videos/<em>{video_id}/references</em></code></li>
+                </ul>
+                <h3>Remove the video from any manual playlists that it belongs to:</h3>
+                <ul>
+                    <li>HTTP method: <code>DELETE</code></li>
+                    <li>Endpoint: <code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/videos/<em>{video_id}/references</em></code></li>
+                </ul>
+
+            </div>
+            <div class="section" id="folderOperations">
+                <h2>Folder operations</h2>
+                <p>This section describes:</p>
+                <ul>
+                    <li>Getting a list of folders</li>
+                    <li>Creating a folder</li>
+                    <li>Updating a folder name</li>
+                    <li>Deleting a folder</li>
+                    <li>Get a list of videos in a folder</li>
+                    <li>Adding a video to a folder</li>
+                    <li>Removing a video from a folder</li>
+                </ul>
+                <h3 id="getFolderList">Get a list of folders</h3>
+                <p>To get a list of folders, make a GET request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/folders</code></pre>
+                <p>See the <a href="../references/folder-field-reference.html">Folder Field Reference </a>for the fields.</p>
+                <h3 id="createFolder">Create a folder</h3>
+                <p>To create a folder, make POST request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/folders</code></pre>
+                <p>The request body must contain the following JSON:</p>
+<pre><code>{
+    "name": "{folder_name}"
+}</code></pre>
+                <p>The folder name <strong>must</strong> be unique within the account, and can contain up to 100 characters. The folder name also cannot be blank or contain the character <code>/</code></p>
+                <h3 id="getFolderInfo">Get information for a folder</h3>
+                <p>To get information for a specific folder, make a GET request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/folders/<em>{folder_id}</em></code></pre>
+                <h3 id="updateFolder">Update folder name</h3>
+                <p>The only field you can update for a folder is the <code>name</code>. Make a PATCH request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/folders/<em>{folder_id}</em></code></pre>
+                <p>The request body should contain the following JSON:</p>
+<pre><code>{
+    "name": "{new_folder_name}"
+}</code></pre>
+                <h3 id="deleteFolder">Delete a folder</h3>
+                <p>To delete a folder, make a DELETE request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/folders/<em>{folder_id}</em></code></pre>
+                <h3 id="getVideosInFolder">Get a list of videos in a folder</h3>
+                <p>To get an array of video objects in a folder, make a GET request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/folders/<em>{folder_id}</em>/videos</code></pre>
+                <h3 id="addVideoToFolder">Add a video to a folder</h3>
+                <p>To add a video to a folder, make a PUT request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/folders/<em>{folder_id}</em>/videos/<em>video_id</em></code></pre>
+                <h3 id="removeVideoFromFolder">Remove a video from a folder</h3>
+                <p>To remove a video from a folder, make a DELETE request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/folders/<em>{folder_id}</em>/videos/<em>video_id</em></code></pre>
+            </div>
+            <div class="section" id="playlistRead">
+                <h2>Playlist read calls</h2>
+                <p>This section explains calls for getting playlists.</p>
+                <h3 id="getPlaylists">Get list of playlists</h3>
+                <p>You can retrieve an array of playlist objects for the account by issuing a GET request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/playlists</code></pre>
+                <p>See the <a href="../references/playlist-fields-reference.html">Playlist Fields Reference</a> for details of the fields returned.</p>
+                <h3 id="getPlaylist">Get playlist</h3>
+                <p>You can retrieve a one or more playlist objects for the account by issuing a GET request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/playlists/<em>{playlist1_id,playlist2_id,playlist3_id}</em></code></pre>
+                <h3 id="getVideosInPlaylist">Get videos in a playlist</h3>
+                <p>To get a list of videos contained in a playlist, use the endpoint:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/playlists/<em>{playlist_id}</em>/videos</code></pre>
+                <h3 id="getPlaylistCount">Get count</h3>
+                <p>You can also get a count of playlists for the account, or those matching a search, using the endpoint <code>/{account_id}/counts/playlists{?q=tags:foo,bar}</code>.</p>
+                <h3>Get video count</h3>
+                <p>You can get a count of videos in a playlist using the endpoint <code>/accounts/{account_id}/counts/playlists/{playlist_id}/videos</code>.</p>
+            </div>
+            <div class="section" id="createPlaylist">
+                <h2>Create playlist</h2>
+                <p>You can create a playlist by making a POST request to the endpoint:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/playlists</code></pre>
+                <p>In the request body, include JSON for the playlist properties. For example:</p>
+<pre><code>{
+  "description" : "My first bird playlist",
+  "name" : "Bird Videos",
+  "reference_id" : "bird-playlist-1",
+  "type" : "EXPLICIT,
+  "video_ids" : ["123456789" , "987654321", "999888777666"]
+}</code></pre>
+                <p>Fields for new playlists</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>description</td>
+                            <td>String</td>
+                            <td>no</td>
+                        </tr>
+                        <tr>
+                            <td>favorite</td>
+                            <td>Boolean</td>
+                            <td>not yet supported</td>
+                        </tr>
+                        <tr>
+                            <td>limit</td>
+                            <td>Number</td>
+                            <td>not yet supported</td>
+                        </tr>
+                        <tr>
+                            <td>name</td>
+                            <td>String</td>
+                            <td>yes</td>
+                        </tr>
+                        <tr>
+                            <td>reference_id</td>
+                            <td>String</td>
+                            <td>no</td>
+                        </tr>
+                        <tr>
+                            <td>search</td>
+                            <td>String, smart playlists only</td>
+                            <td>no</td>
+                        </tr>
+                        <tr>
+                            <td>type</td>
+                            <td>String value of established enum<sup class="once-red"><strong><a href="#note1">[1]</a></strong></sup></td>
+                            <td>yes</td>
+                        </tr>
+                        <tr>
+                            <td>video_ids</td>
+                            <td>Array of Strings, EXPLICIT (manual) type only</td>
+                            <td>no</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Notes</h3>
+                <ul>
+                    <li class="bcls-footnote" id="note1"><sup class="once-red"><strong>[1]</strong></sup> <p>The <code>type</code> value can only be one of: <code>EXPLICIT</code>, <code>ACTIVATED_OLDEST_TO_NEWEST</code>, <code>ACTIVATED_NEWEST_TO_OLDEST</code>, <code>ALPHABETICAL</code>, <code>PLAYS_TOTAL</code>, <code>PLAYS_TRAILING_WEEK</code>, <code>START_DATE_OLDEST_TO_NEWEST</code>, <code>START_DATE_NEWEST_TO_OLDEST</code></p>
+                    <p><code>EXPLICIT</code> means that it is a manual playlist; all the other types are smart playlists with names corresponding to their ordering scheme.</p></li>
+                </ul>
+            </div>
+            <div class="section" id="updatePlaylist">
+                <h2>Update playlist</h2>
+                <p>To update a playlist, make a PATCH request to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/playlists/<em>{playlist_id}</em></code></pre>
+                <p>In the request body, include JSON for the playlist properties you want to change. For example:</p>
+<pre><code>{
+  "description" : "My favorite bird playlist",
+  "name" : "Favorite Bird Videos",
+  "video_ids" : ["123456789" , "987654321", "999888777666", "8888777666555"]
+}</code></pre>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>description</td>
+                            <td>String</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>name</td>
+                            <td>String; cannot be empty or null</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>favorite</td>
+                            <td>Boolean</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>limit</td>
+                            <td>Number</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>reference_id</td>
+                            <td>String</td>
+                            <td>must be unique in the account, can only be updated if request is made via the ID resource (can<code>t patch ref id via the ref id resource)</td>
+                        </tr>
+                        <tr>
+                            <td>search</td>
+                            <td>String</td>
+                            <td>For Smart playlists only</td>
+                        </tr>
+                        <tr>
+                            <td>type</td>
+                            <td>String</td>
+                            <td>must be one of valid enum values<sup class="once-red"><strong><a href="#note1">[1]</a></strong></sup></td>
+                        </tr>
+                        <tr>
+                            <td>video_ids</td>
+                            <td>Array of Strings, EXPLICIT (manual) type only</td>
+                            <td>Must contain ALL video ids, not just ones you are adding</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Notes</h3>
+                <ul>
+                    <li class="bcls-footnote" id="note1"><sup class="once-red"><strong>[1]</strong></sup> <p>The <code>type</code> value can only be one of: <code>EXPLICIT</code>, <code>ACTIVATED_OLDEST_TO_NEWEST</code>, <code>ACTIVATED_NEWEST_TO_OLDEST</code>, <code>ALPHABETICAL</code>, <code>PLAYS_TOTAL</code>, <code>PLAYS_TRAILING_WEEK</code>, <code>START_DATE_OLDEST_TO_NEWEST</code>, <code>START_DATE_NEWEST_TO_OLDEST</code></p>
+                    <p><code>EXPLICIT</code> means that it is a manual playlist; all the other types are smart playlists with names corresponding to their ordering scheme.</p></li>
+                </ul>
+            </div>
+            <div class="section" id="deletePlaylist">
+                <h2>Delete playlist</h2>
+                <p>You can delete a playlist by making a DELETE call to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/playlists/<em>{playlist_id}</em></code></pre>
+                <p>For a successful deletion you will get a 204 response with no data.</p>
+            </div>
+            <div class="section" id="getCustomFields">
+                <h2>Get custom fields</h2>
+                <p>You can retrieve information about custom fields for an accounts by making a GET call to:</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/<em>{account_id}</em>/video_fields</code></pre>
+                <p>No parameters are supported for this request.</p>
+                <p>The following data for custom fields will be returned</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>description</td>
+                            <td>string</td>
+                            <td>Description of the field</td>
+                        </tr>
+                        <tr>
+                            <td>display_name</td>
+                            <td>string</td>
+                            <td>Display name of the field used in Studio</td>
+                        </tr>
+                        <tr>
+                            <td>enum_values</td>
+                            <td>array of strings</td>
+                            <td>Allowable values (for enum (list) type fields - not included for string (text) fields</td>
+                        </tr>
+                        <tr>
+                            <td>id</td>
+                            <td>string</td>
+                            <td>unique id for the field used to reference it in API calls</td>
+                        </tr>
+                        <tr>
+                            <td>required</td>
+                            <td>boolean</td>
+                            <td>Whether the field is required for a video to be active</td>
+                        </tr>
+                        <tr>
+                            <td>type</td>
+                            <td>string</td>
+                            <td>string (text) or enum (list)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="section" id="notifications">
+                <h2>Notifications</h2>
+                <p>You can receive notifications when <code>video_change</code> events occur in your video library. Notifications will be sent to the URL you specify, which should point to an application capable of handling HTTP POST requests. You can specify up to 10 endpoints to receive notifications by making a POST request to <code>https://cms.api.brightcove.com/v1/accounts/{account_id}/subscriptions</code> and including JSON in the request body like this:</p>
+<pre><code>{
+    "endpoint":"http://solutions.brightcove.com/bcls/di-api/di-callbacks.php",
+    "events":["video-change"]
+}</code></pre>
+                    <p>Notifications are sent in JSON format. Here's an example:</p>
+<pre><code>{"timestamp":1423840514446,
+    "account_id":"775205503001",
+    "event":"video-change",
+    "video":"4020894387001",
+    "version":26}</code></pre>
+                <p>Requests to create a subscription will receive an HTTP 422 error response for the following conditions:</p>
+                <ul>
+                    <li>The <code>endpoint</code> or <code>events</code> field is missing from the request body</li>
+                    <li>The <code>events</code> field value is not a list (array)</li>
+                    <li>the subscription defined already exists</li>
+                    <li>you already have 10 subscriptions to this event</li>
+                </ul>
+                <h3>Notification failures</h3>
+                <p>The notification system treats any 4xx or 5xx return from the customer server as a retriable failure. Failing callbacks will be retried up to 20 times, with an exponentially increasing delay between subsequent callbacks. The first few retries will happen within minutes of the initial callback attempt. If the callback continues failing, and we get all the way out to the 20th retry, the retry delay will be a few days.</p>
+                <p class="BCL-aside">Note:
+                    <code>video_change</code> events are triggered by automated system processes as well as user actions, so these events will not always corresponds to changes you made to video properties in Studio or via the APIs.</p>
+                <h3>Firewalls</h3>
+                <p>In case your organization has a strict policy regarding sources of incoming traffic through your firewall, the following fixed IP addresses are used to send notifications:</p>
+                <ul>
+                    <li>54.84.92.184</li>
+                    <li>54.175.126.166</li>
+                    <li>54.164.120.55</li>
+                </ul>
+                <p>These values are subject to change in the future. The IPs are within the AWS ec2 us-east-1 address space and we anticipate that future IP addresses will also be, if you don't want to deal with specific IP address changes, you can configure your firewalls and routing rules to allow traffic from any of us-east-1.</p>
+                <h3>Endpoint for notification subscriptions</h3>
+                <pre><code>/accounts/{account_id}/subscriptions</code></pre>
+
+                <h3 id="createSubscription">Create a new subscription</h3>
+                <p>To create a new subscription, submit a POST request with a request body including the endpoint that you want notifications delivered to and
+                    <code>video-change</code> as the single item in an
+                    <code>events</code> array:</p>
+                <pre><code>{ "endpoint": "http://solutions.brightcove.com:9002", "events": [ "video-change" ] }
+                    </code></pre>
+
+                <h3 id="getSubscriptions">Get a list of your subscriptions</h3>
+                <p>To get a list of all your subscriptions, send a GET request to the subscriptions endpoint.</p>
+                <h3 id="getSubscription">Get or Delete a single subscription</h3>
+                <h4>Endpoint</h4>
+                <pre><code>/accounts/{account_id}/subscriptions/{subscription_id}</code></pre>
+
+                <p>A GET request will retrieve the subscription. A DELETE request will delete the subscription. You cannot update a subscription at this time. If you need to modify a subscription, you will need to delete it and create a new one.</p>
+            </div>
+            <div class="section" id="BCLreferences">
+                <h2>Related topics</h2>
+                <ul>
+                    <li><a href="//docs.brightcove.com/en/video-cloud/di-api/getting-started/overview-di.html">Dynamic Ingest API Overview</a>
+                    </li>
+                    <li><a href="//docs.brightcove.com/en/video-cloud/cms-api/getting-started/quick-start-cms.html">Quick Start to the CMS API</a>
+                    </li>
+                    <li><a href="//docs.brightcove.com/en/video-cloud/di-api/guides/faqs-di.html">Dynamic Ingest API FAQs</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- bcl scripts -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.2/gist-embed.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/js/foundation.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.3/handlebars.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script src="//docs.brightcove.com/en/scripts/log.js"></script>
+    <script src="//docs.brightcove.com/en/scripts/docs-nav-data.min.js"></script>
+    <script src="//docs.brightcove.com/en/scripts/bcls-doc-site-v1.js"></script>
+    <script src="//docs.brightcove.com/en/scripts/bc-mapi.js"></script>
+    <script>
+        $(document).foundation();
+    </script>
+    <script type="text/javascript">
+        /******** Any scripts specific to page samples should go here *********/
+    </script>
+    <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a>
+    </div>
+    <script>
+        var feedbackMail = document.getElementById("feedbackMail");
+        feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+    </script>
+</body>
