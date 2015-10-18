@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
     <!-- change title to match the h1 heading -->
-    <title>Dynamic Ingest - Replace Multiple Videos</title>
+    <title>Dynamic Ingest - Re-transcode Multiple Videos</title>
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/foundation.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/normalize.css" />
     <script src="//use.edgefonts.net/source-code-pro.js"></script>
@@ -47,8 +47,8 @@
         </div>
         <div id="main" class="large-10 small-12 columns">
             <div id="top" class="section">
-                <h1>Dynamic Ingest - Replace Multiple Videos</h1>
-                <p>This is a sample of eplacing of videos using the Dynamic Ingest API. The Dynamic Ingest API call is exactly the same as it would be for <a href="./batch-dynamic-ingest.html">ingesting new videos</a> - the only difference is that you do not need to make a prior call to the CMS API to create the video object in the Video Cloud system and get an id for it. If the source video file at the specified URL is the same one originally ingested, you will simply get a new set of renditions. If the source file is new, you will be replacing the existing video. All videos will remain playable with existing renditions until retranscoding is complete.</p>
+                <h1>Dynamic Ingest - Re-transcode Multiple Videos</h1>
+                <p>This is a sample of retranscoding of videos using the Dynamic Ingest API. The Dynamic Ingest API call is exactly the same as it would be for <a href="./batch-dynamic-ingest.html">ingesting new videos</a> - the only difference is that you do not need to make a prior call to the CMS API to create the video object in the Video Cloud system and get an id for it, and the request body is slightly different. All videos will remain playable with existing renditions until retranscoding is complete.</p>
                 <p>To get access tokens and make the API calls, it uses proxies built by Brightcove Learning services. The proxies run at:</p>
                 <ul>
                     <li><a href="//solutions.brightcove.com/bcls/bcls-proxy/cmsapi-proxy.html">solutions.brightcove.com:8006</a> (for the CMS API)</li>
@@ -79,23 +79,19 @@
                     <textarea id="videoData">[
     {
         "name": "Woodpecker",
-        "id": "3931368189001",
-        "url": "http://learning-services-media.brightcove.com/videos/mp4/Bird_Woodpecker.mp4"
+        "id": "3931368189001"
     },
     {
         "name": "Chickadee",
-        "id": "3931294493001",
-        "url": "http://learning-services-media.brightcove.com/videos/mp4/Bird_Chickadee.mp4"
+        "id": "3931294493001"
     },
     {
         "name": "Great Blue Heron",
-        "id": "3931294494001",
-        "url": "http://learning-services-media.brightcove.com/videos/mp4/greatblueheron.mp4"
+        "id": "3931294494001"
     },
     {
         "name": "Great Horned Owl",
-        "id": "3931368155001",
-        "url": "http://learning-services-media.brightcove.com/videos/mp4/greathornedowl.mp4"
+        "id": "3931368155001"
     }
 ]</textarea>
                 <p>This is the actual data used in this sample. You could include other metadata fields, but you would need to modify the script a little to send those with the first API call. You'll also notice that these are risky values to use for reference ids, especially for a sample like this that will be run multiple times - but I am getting around the duplication issue by appending the current epoch time in milliseconds to whatever is in the data.</p>
@@ -175,7 +171,7 @@
             custom_profile_display = document.getElementById("custom_profile_display"),
             videoDataDisplay = document.getElementById("videoData"),
             // Dynamic Ingest API stuff
-            profilesArray = ['high-resolution', 'balanced-nextgen-player', 'screencast-1280', 'mp4-only', 'smart-player-transition', 'balanced-high-definition', 'low-bandwidth-devices', 'balanced-standard-definition', 'single-rendition', 'Live - Standard', 'high-bandwidth-devices', 'single-bitrate-high', 'audio-only', 'videocloud-default-v1', 'Live - Premium HD', 'Live - HD', 'single-bitrate-standard', 'screencast'],
+            profilesArray = ['high-resolution', 'balanced-nextgen-player', 'screencast-1280', 'smart-player-transition', 'single-bitrate-high', 'audio-only', 'videocloud-default-v1', 'single-bitrate-standard'],
             di_url_display = document.getElementById("di_url"),
             di_submit_display = document.getElementById("di_Submit"),
             diURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
@@ -230,7 +226,7 @@
             options.client_id = client_id;
             options.client_secret = client_secret;
             di_url_display.value = "https://ingest.api.brightcove.com/v1/accounts/" + account_id + "/videos/" + videoData[videoNumber].id + "/ingest-requests";
-            options.requestBody = '{"master":{"url":"' + videoData[videoNumber].url +'"},"profile":"' + ingest_profile + '"}';
+            options.requestBody = '{"master":{"use_archived_master": true },"profile":"' + ingest_profile + '"}';
             options.requestType = "POST";
             options.url = di_url_display.value;
             bclslog('options', options);
