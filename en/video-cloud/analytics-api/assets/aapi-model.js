@@ -212,15 +212,6 @@ var aapi_model = {
         account__video__player__device_os: {dimensions: ["account", "video", "player", "device_os"], from: "2011-01-01"},
         account__video__player__device_type: {dimensions: ["account", "video", "player", "device_type"], from: "2011-01-01"},
         account__video__player__device_os__device_type: {dimensions: ["account", "video", "player", "device_os", "device_type"], from: "2011-01-01"},
-        account__device_os__country: {dimensions: ["account", "device_os", "country"], from: "2015-10-01"},
-        account__device_os__region: {dimensions: ["account", "device_os", "region"], from: "2015-10-01"},
-        account__device_os__country__region: {dimensions: ["account", "device_os", "country", "region"], from: "2015-10-01"},
-        account__device_type__country: {dimensions: ["account", "device_type", "country"], from: "2015-10-01"},
-        account__device_type__region: {dimensions: ["account", "device_type", "region"], from: "2015-10-01"},
-        account__device_type__country__region: {dimensions: ["account", "device_type", "country", "region"], from: "2015-10-01"},
-        account__device_os__device_type__country: {dimensions: ["account", "device_os", "device_type", "country"], from: "2015-10-01"},
-        account__device_os__device_type__region: {dimensions: ["account", "device_os", "device_type", "region"], from: "2015-10-01"},
-        account__device_os__device_type__country__region: {dimensions: ["account", "device_os", "device_type", "country", "region"], from: "2015-10-01"},
         account__referrer_domain: {dimensions: ["account", "referrer_domain"], from: "2012-10-01"},
         source_type: {dimensions: ["source_type"], from: "2012-10-01"},
         search_terms: {dimensions: ["search_terms"], from: "2012-10-01"},
@@ -254,3 +245,16 @@ var aapi_model = {
         account__video__destination_domain: {dimensions: ["account", "video", "destination_domain"], from: "2014-03-03"}
     }
 };
+
+/*
+        account__device_os__country: {dimensions: ["account", "device_os", "country"], from: "2015-10-01"},
+        account__device_os__region: {dimensions: ["account", "device_os", "region"], from: "2015-10-01"},
+        account__device_os__country__region: {dimensions: ["account", "device_os", "country", "region"], from: "2015-10-01"},
+        account__device_type__country: {dimensions: ["account", "device_type", "country"], from: "2015-10-01"},
+        account__device_type__region: {dimensions: ["account", "device_type", "region"], from: "2015-10-01"},
+        account__device_type__country__region: {dimensions: ["account", "device_type", "country", "region"], from: "2015-10-01"},
+        account__device_os__device_type__country: {dimensions: ["account", "device_os", "device_type", "country"], from: "2015-10-01"},
+        account__device_os__device_type__region: {dimensions: ["account", "device_os", "device_type", "region"], from: "2015-10-01"},
+        account__device_os__device_type__country__region: {dimensions: ["account", "device_os", "device_type", "country", "region"], from: "2015-10-01"},
+*/
+
