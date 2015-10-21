@@ -125,11 +125,13 @@
                     <p>The video.js IMA3 plugin is built on top of the <a href="https://github.com/brightcove/videojs-ads">video.js ads framework</a> and accepts any options
                         that the ad framework provides. Take a look at the ad framework <a href="https://github.com/brightcove/videojs-ads/blob/master/README.md">README</a> for
                         details on the current set of overrideable settings. Both the IMA plugin specific options and ad framework options are documented here.</p>
+
                     <h3>adControlBar</h3>
                     <p>Type: <code>object</code> Default Value: identical to the player control bar options</p>
               <p>When using the Flash ad tech, a separate set of controls are created to manage interaction with the ad SWF. When those controls are created,
                       these options will be used during their initialization. If no value is specified, the configuration settings for the regular control bar
                       will be used.</p>
+
                     <h3>adSwf</h3>
                     <p>Type: <code>string</code> Default Value: <code>videojs.ima3.swf</code></p>
               <p>The path to the videojs IMA3 swf. A debugging option for development.</p>
@@ -137,6 +139,11 @@
                     <p>Type: <code>array</code> Default Value: [ &#39;flash&#39;, &#39;html5&#39;]</p>
               <p>The ad integration technologies to attempt to use, in order of descending precedence. videojs-ima3 will test each ad tech in order on initialization
                       and use the first supported one for the lifetime of the player. </p>
+                    <p>This option is part of the ad framework is configured as follows:</p>
+<pre><code>player.ima3({
+  adSwf: 'http://example.com/custom.swf'
+});</code></pre>
+
                     <h3>clickTrackingElement</h3>
               <p>Type: <code>HTMLElement</code> Default Value: undefined</p>
                     <p>If the HTML ad tech is being used in <a href="//developers.google.com/interactive-media-ads/docs/sdks/html5/v3/guides/custom_playback">custom ad playback</a> mode, this specifies an alternative HTML element to be used to track advertisement taps on devices that don't support input events over the video element. More details are available in the parameter documentation for the <a href="//developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.AdDisplayContainer">IMA AdDisplayContainer</a>. If you provide a click tracking element, it is your responsibility to show and hide it at the appropriate times on the appropriate platforms. In most cases, it's best to leave this setting undefined and allow the the plugin and IMA to manage ad interaction.</p>
@@ -147,6 +154,7 @@
                     <pre><code>player.ads({
   debug: true
 });</code></pre>
+
                     <h3>ima3SdkSettings</h3>
                     <p>Type: <code>object</code> Default Value: undefined</p>
                     <p>If provided, the properties of this object are used to set the page-level <a href="https://developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.ImaSdkSettings">Ima3SdkSettings</a> when
@@ -181,11 +189,25 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                     </ul>
               <p>The <code>prerollTimout</code> should be as short as possible so that the viewer does not have to wait unnecessarily if no preroll is scheduled for a video. Make this longer if your ad integration needs a long time to decide whether it has preroll inventory to play or not. Ideally, your ad integration should already know if it wants to play a preroll before the <code>readyforpreroll</code> event.              </p>
 
-							<h3>serverUrl</h3>
+              <h3>requestMode</h3>
+                    <p>Type: <code>string</code> Default Value: <code>onload</code></p>
+                    <p>There are three possible values for this option:</p>
+                    <ul>
+                      <li><code>onload</code>: Ads are requested immediately when the player loads</li>
+                      <li><code>onplay</code>: The first ad request is delayed until playback is initiated</li>
+                      <li><code>ondemand</code>: All ad requests will be initiated using the <code>player.ima3.adrequest()</code> method manually</li>
+                    </ul>
+                    <p>Note: All <code>requestMode</code> values make <code>ondemand</code> requests immediately.</p>
+                    <p>This option is part of the ad framework is configured as follows:</p>
+<pre><code>player.ima3({
+  requestMode: 'onplay'
+});</code></pre>
+
+              <h3>serverUrl</h3>
                     <p>Type: <code>string</code> Default Value: <code>undefined</code></p>
                     <p>This is the only option that is <strong>required</strong>. Here, you will provide the URL to your ad server. Remember, you can <a href="#testadserver">test the ad tag</a> on your server before trying to use it in the plugin.</p>
-	<p>This option is part of the <code>ima3</code> plugin and can be configured in Brightcove Studio as shown <a href="#playersmodule">above</a>, or in the embed-in-page code as follows:</p>
-										<pre><code>player.ima3({
+  <p>This option is part of the <code>ima3</code> plugin and can be configured in Brightcove Studio as shown <a href="#playersmodule">above</a>, or in the embed-in-page code as follows:</p>
+                    <pre><code>player.ima3({
 "serverUrl": "your ad server"
 });</code></pre>
 
