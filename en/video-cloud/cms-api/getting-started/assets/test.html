@@ -4,61 +4,148 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title></title>
         <style>
-      body {
-  margin: 2em;
-  font-family: sans-serif;
-  width: 600px;
-}
-
-h2 {
-  font-size: 1.1em;
-}
-
-button {
-  padding: .5em;
-}
-
-pre {
-  background-color: #F1EFEE;
-  border-left: .5em solid #636363;
-  box-shadow: 5px 5px 10px rgba(192, 192, 192, 1.000);
-  font-family: Hack, monospace;
-  font-size: .8em;
-  padding: 1em;
-}
-
-.video-item {
-  border: 1px solid #999;
-  margin: 0;
-  padding: 0;
-  height: 74px;
-  width: 480px;
-  overflow: scroll;
-}
+        body {
+        margin: 2em;
+        font-family: sans-serif;
+        width: 600px;
+        }
+        h2 {
+        font-size: 1.1em;
+        }
+        button {
+        padding: .5em;
+        }
+        pre {
+        background-color: #F1EFEE;
+        border-left: .5em solid #636363;
+        box-shadow: 5px 5px 10px rgba(192, 192, 192, 1.000);
+        font-family: Hack, monospace;
+        font-size: .8em;
+        padding: 1em;
+        }
+        .video-item {
+        border: 1px solid #999;
+        margin: 0;
+        padding: 0;
+        height: 74px;
+        width: 480px;
+        overflow: scroll;
+        }
+        textarea {
+            width: 100%;
+        }
+        #apiData {
+            height: 100px;
+        }
         </style>
     </head>
     <body>
-    <h1>CMS API Tester</h1>
-<p>Note that requests are made through a proxy similar to <a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-token.html#php" target="_blank">this one</a>.
-<h2>Operations</h2>
-<p>
-  <button id="get5videosButton">Get 5 videos</button>
-  <button id="get5moreButton">Get 5 more videos</button>
-  <button id="sortButton">Sort videos</button>
-  <button id="get1videoButton">Get 1 video</button>
-  <button id="sourcesButton">Get video sources</button>
-  <button id="searchButton">Search videos</button>
-  <button id="searchCountButton">Get search results count</button>
-  <button id="get3playlistsButton">Get 3 playlists</button>
-</p>
-<h2>API request:</h2>
-<pre><code id="apiRequest"></code></pre>
-<h2>Generated content</h2>
-<div id="generatedContent"></div>
-<h2>Response data</h2>
+        <h1>CMS API Tester</h1>
+        <p>Note that requests are made through a proxy similar to <a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-token.html#php" target="_blank">this one</a>.
+        <p><strong>Videos</strong></p>
+        <p>
+            <button id="get5videosButton">Get 5 videos</button>
+            <button id="get5moreButton">Get 5 more videos</button>
+            <button id="sortButton">Sort videos</button>
+            <button id="get1videoButton">Get 1 video</button>
+            <button id="sourcesButton">Get video sources</button>
+            <button id="searchButton">Search videos</button>
+            <button id="searchCountButton">Get search results count</button>
+            <button id="createVideoButton">Create video</button>
+            <button id="updateVideoButton">Update Video</button>
+        </p>
+        <p><strong>Playlists</strong></p>
+        <p>
+            <button id="get3playlistsButton">Get 3 playlists</button>
+            <button id="get1playlistButton">Get 1 playlist</button>
+            <button id="getPlaylistVideoCountButton">Get playlist video count</button>
+            <button id="getPlaylistVideosButton">Get playlist videos</button>
+            <button id="createPlaylistButton">Create playlist</button>
+            <button id="updatePlaylistButton">Update playlist</button>
+        </p>
+        <p><strong>Folders</strong></p>
+        <p>
+            <button id="getFolders">Get folders</button>
+            <button id="getFolderVideos">Get videos in folder</button>
+        </p>
+        <h2>API request:</h2>
+    <textarea id="apiRequest"></textarea>
+    <h2>Input data for write requests:</h2>
+    <textarea id="apiData"></textarea>
+    <h2>Generated content</h2>
+    <div id="generatedContent"></div>
+    <h2>Response data</h2>
 <pre id="responseData"></pre>
-        <script>
+<script>
+var BCLS = (function(window, document) {
+  var apiBaseURL = 'https://edge.api.brightcove.com/playback/v1',
+    // element references
+    account_id = '1752604059001',
+    video_id = '4454629913001',
+    playlist_id = '4452341376001',
+    get5videosButton = document.getElementById('get5videosButton'),
+    get5moreButton = document.getElementById('get5moreButton'),
+    sortButton = document.getElementById('sortButton'),
+    get1videoButton = document.getElementById('get1videoButton'),
+    sourcesButton = document.getElementById('sourcesButton'),
+    searchButton = document.getElementById('searchButton'),
+    searchCountButton = document.getElementById('searchCountButton'),
+    createVideoButton = document.getElementById('createVideoButton'),
+    updateVideoButton = document.getElementById('updateVideoButton'),
+    apiRequest = document.getElementById('apiRequest'),
+    generatedContent = document.getElementById('generatedContent'),
+    responseData = document.getElementById('responseData'),
+    // functions
+    makeVideoDisplay,
+    makePlaylistDisplay,
+    getMediaData;
 
-        </script>
-    </body>
+
+
+  getMediaData = function(mediaType, requestURL) {
+    var httpRequest = new XMLHttpRequest(),
+      responseData,
+      parsedData,
+      // response handler
+      getResponse = function() {
+        try {
+          if (httpRequest.readyState === 4) {
+            if (httpRequest.status === 200) {
+              responseData = httpRequest.responseText;
+              parsedData = JSON.parse(responseData);
+              responseData.textContent = JSON.stringify(parseData, null, '  ');
+            } else {
+              alert('There was a problem with the request. Request returned ' + httpRequest.status);
+            }
+          }
+        } catch (e) {
+          alert('Caught Exception: ' + e);
+        }
+      };
+    // set response handler
+    httpRequest.onreadystatechange = getResponse;
+    // open the request
+    httpRequest.open('GET', requestURL);
+    // set headers
+    httpRequest.setRequestHeader('Accept', 'application/json;pk=' + policy_key.value);
+    // open and send request
+    httpRequest.send();
+  };
+
+  // event listeners
+  videoButton.addEventListener('click', function() {
+    var mediaType = 'video',
+      requestURL = apiBaseURL + '/accounts/' + account_id.value + '/videos/' + video_id.value;
+    apiRequest.innerHTML = requestURL;
+    getMediaData(mediaType, requestURL);
+  });
+  playlistButton.addEventListener('click', function() {
+    var mediaType = 'playlist',
+      requestURL = apiBaseURL + '/accounts/' + account_id.value + '/playlists/' + playlist_id.value;
+    apiRequest.innerHTML = requestURL;
+    getMediaData(mediaType, requestURL);
+  });
+
+})(window, document);</script>
+</body>
 </html>
