@@ -7,7 +7,6 @@
         body {
         margin: 2em;
         font-family: sans-serif;
-        width: 600px;
         }
         h2 {
         font-size: 1.1em;
@@ -71,11 +70,11 @@
             <button id="removeVideoFromFolder">Remove video from folder</button>
         </p>
         <p><strong>API request:</strong></p>
-    <textarea id="apiRequest"></textarea>
+    <pre id="apiRequest"></pre>
     <p><strong>Input data for write requests:</strong></p>
-    <textarea id="apiData"></textarea>
+    <pre id="apiData"></pre>
     <p><strong>Request method:</strong></p>
-    <div id="apiMethod"></div>
+    <pre id="apiMethod"></pre>
     <p><strong>Response data</strong></p>
 <pre id="responseData"></pre>
 <script>
@@ -88,6 +87,7 @@ var BCLS = (function(window, document) {
     newVideo_id             = '1754261519001',
     playlist_id             = '4452341376001',
     newPlaylist_id          = '4571888561001',
+    folder_id               = '5628cc63e4b0e41df587bc88',
     get5videos              = document.getElementById('get5videos'),
     get5more                = document.getElementById('get5more'),
     sort                    = document.getElementById('sort'),
@@ -114,165 +114,174 @@ var BCLS = (function(window, document) {
     generatedContent        = document.getElementById('generatedContent'),
     responseData            = document.getElementById('responseData'),
     i,
-    iMax,
-    // functions
-    makeVideoDisplay,
-    makePlaylistDisplay,
-    getMediaData,
-    setRequestData;
+    iMax;
 
 
 
     function setRequestData(id) {
         var endPoint = '';
+        // initialize request body
+        requestData.requestBody = null;
         switch (id) {
             case 'get5videos':
                 endPoint = '/videos?limit=5';
                 requestData.url = baseURL + endPoint;
-                requestData.method = 'GET';
+                requestData.requestType = 'GET';
                 apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.method;
+                apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData);
                 break;
             case 'get5more':
                 endPoint = '/videos?limit=5&offset=5';
                 requestData.url = baseURL + endPoint;
-                requestData.method = 'GET';
+                requestData.requestType = 'GET';
                 apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.method;
+                apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData);
                 break;
             case 'sort':
                 endPoint = '/videos?limit=5&sort=name';
                 requestData.url = baseURL + endPoint;
-                requestData.method = 'GET';
+                requestData.requestType = 'GET';
                 apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.method;
+                apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData);
                 break;
             case 'get1video':
                 endPoint = '/videos/' + video_id;
                 requestData.url = baseURL + endPoint;
-                requestData.method = 'GET';
+                requestData.requestType = 'GET';
                 apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.method;
+                apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData);
                 break;
             case 'sources':
                 endPoint = '/videos/' + video_id + '/sources';
                 requestData.url = baseURL + endPoint;
-                requestData.method = 'GET';
+                requestData.requestType = 'GET';
                 apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.method;
+                apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData);
                 break;
             case 'search':
-                endPoint = '/videos?q=' + encodeURI(name:sea);
+                endPoint = '/videos?q=' + encodeURI('name:sea');
                 requestData.url = baseURL + endPoint;
-                requestData.method = 'GET';
+                requestData.requestType = 'GET';
                 apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.method;
+                apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData);
                 break;
             case 'searchCount':
-                endPoint = '/counts/videos?q=' + encodeURI(name:sea);
+                endPoint = '/counts/videos?q=' + encodeURI('name:sea');
                 requestData.url = baseURL + endPoint;
-                requestData.method = 'GET';
+                requestData.requestType = 'GET';
                 apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.method;
+                apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData);
                 break;
             case 'createVideo':
                 endPoint = '/videos';
                 requestData.url = baseURL + endPoint;
-                requestData.method = 'POST';
-                requestData.data = {"name":"New Video from CMS API Quick Start","description":"This is only a test"};
+                requestData.requestType = 'POST';
+                requestData.requestBody = {"name":"New Video from CMS API Quick Start","description":"This is only a test"};
                 apiRequest.textContent = requestData.url;
-                apiData.textContent = JSON.stringify(requestData.data, null, '  ');
-                apiMethod.textContent = requestData.method;
+                apiData.textContent = JSON.stringify(requestData.requestBody, null, '  ');
+                apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData);
                 break;
             case 'updateVideo':
                 endPoint = '/videos/' + newVideo_id;
                 requestData.url = baseURL + endPoint;
-                requestData.method = 'PATCH';
-                requestData.data = {"name":"Updated Video from CMS API Quick Start","description":"This is only a test","tags":["test","cms-api-quick-start"]};
+                requestData.requestType = 'PATCH';
+                requestData.requestBody = {"name":"Updated Video from CMS API Quick Start","description":"This is only a test","tags":["test","cms-api-quick-start"]};
                 apiRequest.textContent = requestData.url;
-                apiData.textContent = JSON.stringify(requestData.data, null, '  ');
-                apiMethod.textContent = requestData.method;
+                apiData.textContent = JSON.stringify(requestData.requestBody, null, '  ');
+                apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData);
                 break;
             case 'get3playlists':
                 endPoint = '/playlists?limit=3';
                 requestData.url = baseURL + endPoint;
-                requestData.method = 'GET';
+                requestData.requestType = 'GET';
                 apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.method;
+                apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData);
                 break;
             case 'get1playlist':
                 endPoint = '/playlists/' + playlist_id;
                 requestData.url = baseURL + endPoint;
-                requestData.method = 'GET';
+                requestData.requestType = 'GET';
                 apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.method;
+                apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData);
-                break
+                break;
             case 'getPlaylistVideoCount':
                 endPoint = '/counts/playlists/' + playlist_id + '/videos';
                 requestData.url = baseURL + endPoint;
-                requestData.method = 'GET';
+                requestData.requestType = 'GET';
                 apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.method;
+                apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData);
                 break;
             case 'getPlaylistVideos':
                 endPoint = '/playlists/' + playlist_id + '/videos';
                 requestData.url = baseURL + endPoint;
-                requestData.method = 'GET';
+                requestData.requestType = 'GET';
                 apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.method;
+                apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData);
                 break;
             case 'createPlaylist':
                 endPoint = '/playlists';
                 requestData.url = baseURL + endPoint;
-                requestData.method = 'POST';
-                requestData.data = {"name":"New Playlist from CMS API Quick Start","description":"This is only a test playlist","type":"ALPHABETICAL","search":"q=tags:fish"};
+                requestData.requestType = 'POST';
+                requestData.requestBody = {"name":"New Playlist from CMS API Quick Start","description":"This is only a test playlist","type":"ALPHABETICAL","search":"q=tags:fish"};
                 apiRequest.textContent = requestData.url;
-                apiData.textContent = JSON.stringify(requestData.data, null, '  ');
-                apiMethod.textContent = requestData.method;
+                apiData.textContent = JSON.stringify(requestData.requestBody, null, '  ');
+                apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData);
                 break;
             case 'updatePlaylist':
                 endPoint = '/playlists/' + newPlaylist_id;
                 requestData.url = baseURL + endPoint;
-                requestData.method = 'PATCH';
-                requestData.data = {"name":"Updated Playlist from CMS API Quick Start","description":"This is only a test playlist","type":"ACTIVATEDNEWESTTOOLDEST","search":"q=tags:fish"};
+                requestData.requestType = 'PATCH';
+                requestData.requestBody = {"name":"Updated Playlist from CMS API Quick Start","description":"This is only a test playlist","type":"ACTIVATEDNEWESTTOOLDEST","search":"q=tags:fish"};
                 apiRequest.textContent = requestData.url;
-                apiData.textContent = JSON.stringify(requestData.data, null, '  ');
-                apiMethod.textContent = requestData.method;
+                apiData.textContent = JSON.stringify(requestData.requestBody, null, '  ');
+                apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData);
                 break;
             case 'getFolders':
                 endPoint = '/folders';
                 requestData.url = baseURL + endPoint;
-                requestData.method = 'GET';
+                requestData.requestType = 'GET';
                 apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.method;
+                apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData);
                 break;
             case 'getFolderVideos':
-                endPoint = '/folders/videos';
+                endPoint = '/folders/' + folder_id + '/videos';
                 requestData.url = baseURL + endPoint;
-                requestData.method = 'GET';
+                requestData.requestType = 'GET';
                 apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.method;
+                apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData);
                 break;
             case 'addVideoToFolder':
+                endPoint = '/folders/' + folder_id + '/videos/' + video_id;
+                requestData.url = baseURL + endPoint;
+                requestData.requestType = 'PUT';
+                apiRequest.textContent = requestData.url;
+                apiMethod.textContent = requestData.requestType;
+                getMediaData(requestData);
                 break;
             case 'removeVideoFromFolder':
+                endPoint = '/folders/' + folder_id + '/videos/' + video_id;
+                requestData.url = baseURL + endPoint;
+                requestData.requestType = 'DELETE';
+                apiRequest.textContent = requestData.url;
+                apiMethod.textContent = requestData.requestType;
+                getMediaData(requestData);
                 break;
         }
     }
@@ -281,18 +290,21 @@ var BCLS = (function(window, document) {
      * send API request to the proxy
      * @param  {Object} requestData [description]
      */
-    function getMediaData(requestData) {
+    function getMediaData(options) {
         var httpRequest = new XMLHttpRequest(),
-          responseData,
+          responseRaw,
           parsedData,
+          requestParams,
           // response handler
           getResponse = function() {
             try {
               if (httpRequest.readyState === 4) {
                 if (httpRequest.status === 200) {
-                  responseData = httpRequest.responseText;
-                  parsedData = JSON.parse(responseData);
-                  responseData.textContent = JSON.stringify(parseData, null, '  ');
+                  console.log(httpRequest.responseText);
+                  responseRaw = httpRequest.responseText;
+                  responseData.textContent = responseRaw;
+                  parsedData = JSON.parse(responseRaw);
+                  responseData.textContent = JSON.stringify(parsedData, null, '  ');
                 } else {
                   alert('There was a problem with the request. Request returned ' + httpRequest.status);
                 }
@@ -301,6 +313,9 @@ var BCLS = (function(window, document) {
               alert('Caught Exception: ' + e);
             }
           };
+        console.log(options);
+        // set up request data
+        requestParams = "url=" + encodeURIComponent(options.url) + "&requestBody=" + encodeURIComponent(options.requestBody) + "&requestType=" + options.requestType;
         // set response handler
         httpRequest.onreadystatechange = getResponse;
         // open the request
@@ -308,28 +323,66 @@ var BCLS = (function(window, document) {
         // set headers
         httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         // open and send request
-        httpRequest.send(requestData);
-    };
+        httpRequest.send(requestParams);
+    }
     // event listeners
-    get5videos
-    get5more
-    sort
-    get1video
-    sources
-    search
-    searchCount
-    createVideo
-    updateVideo
-    get3playlists
-    get1playlist
-    getPlaylistVideoCount
-    getPlaylistVideos
-    createPlaylist
-    updatePlaylist
-    getFolders
-    getFolderVideos
-    addVideoToFolder
-    removeVideoFromFolder
+    get5videos.addEventListener('click', function() {
+        setRequestData('get5videos');
+    });
+    get5more.addEventListener('click', function() {
+        setRequestData('get5more');
+    });
+    sort.addEventListener('click', function() {
+        setRequestData('sort');
+    });
+    get1video.addEventListener('click', function() {
+        setRequestData('get1video');
+    });
+    sources.addEventListener('click', function() {
+        setRequestData('sources');
+    });
+    search.addEventListener('click', function() {
+        setRequestData('search');
+    });
+    searchCount.addEventListener('click', function() {
+        setRequestData('searchCount');
+    });
+    createVideo.addEventListener('click', function() {
+        setRequestData('createVideo');
+    });
+    updateVideo.addEventListener('click', function() {
+        setRequestData('updateVideo');
+    });
+    get3playlists.addEventListener('click', function() {
+        setRequestData('get3playlists');
+    });
+    get1playlist.addEventListener('click', function() {
+        setRequestData('get1playlist');
+    });
+    getPlaylistVideoCount.addEventListener('click', function() {
+        setRequestData('getPlaylistVideoCount');
+    });
+    getPlaylistVideos.addEventListener('click', function() {
+        setRequestData('getPlaylistVideos');
+    });
+    createPlaylist.addEventListener('click', function() {
+        setRequestData('createPlaylist');
+    });
+    updatePlaylist.addEventListener('click', function() {
+        setRequestData('updatePlaylist');
+    });
+    getFolders.addEventListener('click', function() {
+        setRequestData('getFolders');
+    });
+    getFolderVideos.addEventListener('click', function() {
+        setRequestData('getFolderVideos');
+    });
+    addVideoToFolder.addEventListener('click', function() {
+        setRequestData('addVideoToFolder');
+    });
+    removeVideoFromFolder.addEventListener('click', function() {
+        setRequestData('removeVideoFromFolder');
+    });
 })(window, document);
 </script>
 </body>
