@@ -88,6 +88,7 @@ var BCLS = (function(window, document) {
     playlist_id             = '4452341376001',
     newPlaylist_id          = '4571888561001',
     folder_id               = '5628cc63e4b0e41df587bc88',
+    allButtons              = document.getElementsByTagName('button'),
     get5videos              = document.getElementById('get5videos'),
     get5more                = document.getElementById('get5more'),
     sort                    = document.getElementById('sort'),
@@ -112,16 +113,40 @@ var BCLS = (function(window, document) {
     apiMethod               = document.getElementById('apiMethod'),
     requestData             = {},
     generatedContent        = document.getElementById('generatedContent'),
-    responseData            = document.getElementById('responseData'),
-    i,
-    iMax;
+    responseData            = document.getElementById('responseData');
 
+    /**
+     * disables all buttons so user can't submit new request until current one finishes
+     */
+    function disableButtons() {
+        var i,
+            iMax = allButtons.length;
+        for (i = 0; i < iMax; i++) {
+            allButtons[i].setAttribute('disabled', 'disabled');
+        }
+    }
 
+    /**
+     * re-enables all buttons
+     */
+    function enableButtons() {
+        var i,
+            iMax = allButtons.length;
+        for (i = 0; i < iMax; i++) {
+            allButtons[i].removeAttribute('disabled');
+        }
+    }
 
+    /**
+     * sets up the data for the API request
+     * @param {String} id the id of the button that was clicked
+     */
     function setRequestData(id) {
         var endPoint = '';
         // initialize request body
         requestData.requestBody = null;
+        // disable buttons to prevent a new request before current one finishes
+        disableButtons();
         switch (id) {
             case 'get5videos':
                 endPoint = '/videos?limit=5';
@@ -305,6 +330,8 @@ var BCLS = (function(window, document) {
                   responseData.textContent = responseRaw;
                   parsedData = JSON.parse(responseRaw);
                   responseData.textContent = JSON.stringify(parsedData, null, '  ');
+                  // re-enable the buttons
+                  enableButtons();
                 } else {
                   alert('There was a problem with the request. Request returned ' + httpRequest.status);
                 }
