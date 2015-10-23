@@ -143,8 +143,6 @@ var BCLS = (function(window, document) {
     function setRequestData(id) {
         var endPoint = '',
             requestData = {};
-        // initialize request body
-        requestData.requestBody = null;
         // disable buttons to prevent a new request before current one finishes
         disableButtons();
         switch (id) {
@@ -208,7 +206,7 @@ var BCLS = (function(window, document) {
                 endPoint = '/videos';
                 requestData.url = baseURL + endPoint;
                 requestData.requestType = 'POST';
-                requestData.requestBody = {name:"New Video from CMS API Quick Start"};
+                requestData.requestBody = {name:'New Video from CMS API Quick Start'};
                 apiRequest.textContent = requestData.url;
                 apiData.textContent = JSON.stringify(requestData.requestBody, null, '  ');
                 apiMethod.textContent = requestData.requestType;
@@ -218,7 +216,7 @@ var BCLS = (function(window, document) {
                 endPoint = '/videos/' + newVideo_id;
                 requestData.url = baseURL + endPoint;
                 requestData.requestType = 'PATCH';
-                requestData.requestBody = {name:"Updated Video from CMS API Quick Start",description:"This is only a test",tags:["test","quick_start"]};
+                requestData.requestBody = {name:'Updated Video from CMS API Quick Start',description:'This is only a test',tags:['test','quick_start']};
                 apiRequest.textContent = requestData.url;
                 apiData.textContent = JSON.stringify(requestData.requestBody, null, '  ');
                 apiMethod.textContent = requestData.requestType;
@@ -260,7 +258,7 @@ var BCLS = (function(window, document) {
                 endPoint = '/playlists';
                 requestData.url = baseURL + endPoint;
                 requestData.requestType = 'POST';
-                requestData.requestBody = {name:"New Playlist from CMS API Quick Start",type:"ALPHABETICAL",search:"tags:fish"};
+                requestData.requestBody = {name:'New Playlist from CMS API Quick Start',type:'ALPHABETICAL',search:'tags:fish'};
                 apiRequest.textContent = requestData.url;
                 apiData.textContent = JSON.stringify(requestData.requestBody, null, '  ');
                 apiMethod.textContent = requestData.requestType;
@@ -270,7 +268,7 @@ var BCLS = (function(window, document) {
                 endPoint = '/playlists/' + newPlaylist_id;
                 requestData.url = baseURL + endPoint;
                 requestData.requestType = 'PATCH';
-                requestData.requestBody = {name:"Updated Playlist from CMS API Quick Start",type:"ACTIVATEDNEWESTTOOLDEST",search:"tags:fish"};
+                requestData.requestBody = {name:'Updated Playlist from CMS API Quick Start',type:'ACTIVATEDNEWESTTOOLDEST',search:'tags:fish'};
                 apiRequest.textContent = requestData.url;
                 apiData.textContent = JSON.stringify(requestData.requestBody, null, '  ');
                 apiMethod.textContent = requestData.requestType;
@@ -317,32 +315,38 @@ var BCLS = (function(window, document) {
      */
     function getMediaData(options) {
         var httpRequest = new XMLHttpRequest(),
-          responseRaw,
-          parsedData,
-          requestParams,
-          // response handler
-          getResponse = function() {
-            try {
-              if (httpRequest.readyState === 4) {
-                if (httpRequest.status === 200) {
-                  console.log(httpRequest.responseText);
-                  responseRaw = httpRequest.responseText;
-                  responseData.textContent = responseRaw;
-                  parsedData = JSON.parse(responseRaw);
-                  responseData.textContent = JSON.stringify(parsedData, null, '  ');
-                  // re-enable the buttons
-                  enableButtons();
-                } else {
-                  alert('There was a problem with the request. Request returned ' + httpRequest.status);
+            responseRaw,
+            parsedData,
+            requestParams,
+            dataString,
+            // response handler
+            getResponse = function() {
+                try {
+                  if (httpRequest.readyState === 4) {
+                    if (httpRequest.status === 200) {
+                      console.log(httpRequest.responseText);
+                      responseRaw = httpRequest.responseText;
+                      responseData.textContent = responseRaw;
+                      parsedData = JSON.parse(responseRaw);
+                      responseData.textContent = JSON.stringify(parsedData, null, '  ');
+                      // re-enable the buttons
+                      enableButtons();
+                    } else {
+                      alert('There was a problem with the request. Request returned ' + httpRequest.status);
+                    }
+                  }
+                } catch (e) {
+                  alert('Caught Exception: ' + e);
                 }
-              }
-            } catch (e) {
-              alert('Caught Exception: ' + e);
-            }
-          };
-        console.log(options);
+            };
         // set up request data
-        requestParams = "url=" + encodeURIComponent(options.url) + "&requestBody=" + encodeURIComponent(options.requestBody) + "&requestType=" + options.requestType;
+        requestParams = "url=" + encodeURIComponent(options.url) + "&requestType=" + options.requestType;
+        if (options.requestBody) {
+            dataString = JSON.stringify(options.requestBody);
+            requestParams += "&requestBody=" + encodeURIComponent(dataString);
+        }
+        console.log(requestParams);
+
         // set response handler
         httpRequest.onreadystatechange = getResponse;
         // open the request
