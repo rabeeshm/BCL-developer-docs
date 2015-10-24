@@ -75,22 +75,18 @@
 <pre id="responseData"></pre>
 <script>
 var BCLS = (function(window, document) {
-  var apiBaseURL            = 'https://edge.api.brightcove.com/playback/v1',
-    // element references
-    baseURL                 = 'https://cms.api.brightcove.com/v1/accounts/1752604059001',
-    proxyURL                = 'https://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
-    video_id                = '4454629913001',
-    newVideo_id             = '1754261519001',
-    playlist_id             = '4452341376001',
-    newPlaylist_id          = '4573753146001',
-    folder_id               = '5628cc63e4b0e41df587bc88',
-    allButtons              = document.getElementsByTagName('button'),
-    createVideo             = document.getElementById('createVideo'),
-    ingestVideo             = document.getElementById('ingestVideo'),
-    retranscode             = document.getElementById('retranscode'),
-    replace                 = document.getElementById('replace'),
-    addImages               = document.getElementById('addImages'),
-    addTextTracks           = document.getElementById('addTextTracks');
+    var baseURL                 = 'https://cms.api.brightcove.com/v1/accounts/1752604059001',
+        ingestURL               = 'https://ingest.api.brightcove.com/v1/accounts/57838016001',
+        ingestURLsuffix         = '/ingest-requests',
+        proxyURL                = 'https://solutions.brightcove.com/bcls/bcls-proxy/brightcove-learning-proxy.php',
+        newVideo_id             = '',
+        allButtons              = document.getElementsByTagName('button'),
+        createVideo             = document.getElementById('createVideo'),
+        ingestVideo             = document.getElementById('ingestVideo'),
+        retranscode             = document.getElementById('retranscode'),
+        replace                 = document.getElementById('replace'),
+        addImages               = document.getElementById('addImages'),
+        addTextTracks           = document.getElementById('addTextTracks');
 
     /**
      * disables all buttons so user can't submit new request until current one finishes
@@ -128,7 +124,7 @@ var BCLS = (function(window, document) {
                 endPoint = '/videos';
                 requestData.url = baseURL + endPoint;
                 requestData.requestType = 'POST';
-                requestData.requestBody = {name:'New Video from CMS API Quick Start'};
+                requestData.requestBody = {name:'New Video from Dynamic Ingest API Quick Start'};
                 apiRequest.textContent = requestData.url;
                 apiData.textContent = JSON.stringify(requestData.requestBody, null, '  ');
                 apiMethod.textContent = requestData.requestType;
@@ -136,45 +132,49 @@ var BCLS = (function(window, document) {
                 break;
             case 'ingestVideo':
                 endPoint = '/videos/' + newVideo_id;
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'PATCH';
-                requestData.requestBody = {name:'Updated Video from CMS API Quick Start',description:'This is only a test',tags:['test','quick_start']};
+                requestData.url = ingestURL + endPoint + ingestURLsuffix;
+                requestData.requestType = 'POST';
+                requestData.requestBody = {master: {url:'http://learning-services-media.brightcove.com/videos/mp4/greatblueheron.mp4'}, profile:'videocloud-default-v1', 'capture-images': true};
                 apiRequest.textContent = requestData.url;
                 apiData.textContent = JSON.stringify(requestData.requestBody, null, '  ');
                 apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData, id);
                 break;
             case 'retranscode':
-                endPoint = '/playlists?limit=3';
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'GET';
+                endPoint = '/videos/' + newVideo_id;
+                requestData.url = ingestURL + endPoint + ingestURLsuffix;
+                requestData.requestType = 'POST';
+                requestData.requestBody = {master: {use_archived_master:true}, profile:'smart-player-transition', 'capture-images': true};
                 apiRequest.textContent = requestData.url;
+                apiData.textContent = JSON.stringify(requestData.requestBody, null, '  ');
                 apiMethod.textContent = requestData.requestType;
-                apiData.textContent = '';
                 getMediaData(requestData, id);
                 break;
             case 'replace':
-                endPoint = '/playlists/' + playlist_id;
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'GET';
+                endPoint = '/videos/' + newVideo_id;
+                requestData.url = ingestURL + endPoint + ingestURLsuffix;
+                requestData.requestType = 'POST';
+                requestData.requestBody = {master: {url:'http://learning-services-media.brightcove.com/videos/mp4/greathornedowl.mp4'}, profile:'videocloud-default-v1', 'capture-images': true};
                 apiRequest.textContent = requestData.url;
+                apiData.textContent = JSON.stringify(requestData.requestBody, null, '  ');
                 apiMethod.textContent = requestData.requestType;
-                apiData.textContent = '';
                 getMediaData(requestData, id);
                 break;
             case 'addImages':
-                endPoint = '/counts/playlists/' + playlist_id + '/videos';
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'GET';
+                endPoint = '/videos/' + newVideo_id;
+                requestData.url = ingestURL + endPoint + ingestURLsuffix;
+                requestData.requestType = 'POST';
+                requestData.requestBody = {master: {url:'http://learning-services-media.brightcove.com/videos/mp4/greathornedowl.mp4'}, profile:'videocloud-default-v1', 'capture-images': true};
                 apiRequest.textContent = requestData.url;
                 apiMethod.textContent = requestData.requestType;
                 apiData.textContent = '';
                 getMediaData(requestData, id);
                 break;
             case 'addTextTracks':
-                endPoint = '/playlists/' + playlist_id + '/videos';
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'GET';
+                endPoint = '/videos/' + newVideo_id;
+                requestData.url = ingestURL + endPoint + ingestURLsuffix;
+                requestData.requestType = 'POST';
+                requestData.requestBody = {master: {url:'http://learning-services-media.brightcove.com/videos/mp4/greathornedowl.mp4'}, profile:'videocloud-default-v1', 'capture-images': true};
                 apiRequest.textContent = requestData.url;
                 apiMethod.textContent = requestData.requestType;
                 apiData.textContent = '';
