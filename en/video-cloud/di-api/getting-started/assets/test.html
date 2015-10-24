@@ -36,35 +36,33 @@
    border-left: 1px solid #CCC;
  }
 
- textarea {
-   width: 100%;
- }
-
  #apiData {
-   height: 10
+   height: 100px;
+}
         </style>
     </head>
     <body>
         <h1>Dynamic Ingest API Tester</h1>
+        <p>Note that you must first create a video object, so other operations are disabled until you do that.</p>
         <div class="buttonBlock">
             <p><strong>Ingest Video</strong></p>
             <p>
                 <button id="createVideo">Create video object</button>
-                <button id="ingestVideo">Ingest Video</button>
+                <button id="ingestVideo" disabled="disabled">Ingest Video</button>
             </p>
         </div>
         <div class="buttonBlock">
             <p><strong>Transcode or Replace Video</strong></p>
             <p>
-                <button id="retranscode">Retranscode video</button>
-                <button id="replace">Replace</button>
+                <button id="retranscode" disabled="disabled">Retranscode video</button>
+                <button id="replace" disabled="disabled">Replace</button>
             </p>
         </div>
         <div class="buttonBlock">
             <p><strong>Ingest Media Assets</strong></p>
             <p>
-                <button id="addImages">Add images</button>
-                <button id="addTextTracks">Get videos in folder</button>
+                <button id="addImages" disabled="disabled">Add images</button>
+                <button id="addTextTracks" disabled="disabled">Get videos in folder</button>
             </p>
         </div>
         <p><strong>API request:</strong></p>
@@ -92,18 +90,7 @@ var BCLS = (function(window, document) {
     retranscode             = document.getElementById('retranscode'),
     replace                 = document.getElementById('replace'),
     addImages               = document.getElementById('addImages'),
-    addTextTracks           = document.getElementById('addTextTracks'),
-    createPlaylist          = document.getElementById('createPlaylist'),
-    updatePlaylist          = document.getElementById('updatePlaylist'),
-    getFolders              = document.getElementById('getFolders'),
-    getFolderVideos         = document.getElementById('getFolderVideos'),
-    addVideoToFolder        = document.getElementById('addVideoToFolder'),
-    removeVideoFromFolder   = document.getElementById('removeVideoFromFolder'),
-    apiRequest              = document.getElementById('apiRequest'),
-    apiData                 = document.getElementById('apiData'),
-    apiMethod               = document.getElementById('apiMethod'),
-    generatedContent        = document.getElementById('generatedContent'),
-    responseData            = document.getElementById('responseData');
+    addTextTracks           = document.getElementById('addTextTracks');
 
     /**
      * disables all buttons so user can't submit new request until current one finishes
@@ -137,69 +124,6 @@ var BCLS = (function(window, document) {
         // disable buttons to prevent a new request before current one finishes
         disableButtons();
         switch (id) {
-            case 'get5videos':
-                endPoint = '/videos?limit=5';
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'GET';
-                apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.requestType;
-                apiData.textContent = '';
-                getMediaData(requestData, id);
-                break;
-            case 'get5more':
-                endPoint = '/videos?limit=5&offset=5';
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'GET';
-                apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.requestType;
-                apiData.textContent = '';
-                getMediaData(requestData, id);
-                break;
-            case 'sort':
-                endPoint = '/videos?limit=5&sort=name';
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'GET';
-                apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.requestType;
-                apiData.textContent = '';
-                getMediaData(requestData, id);
-                break;
-            case 'get1video':
-                endPoint = '/videos/' + video_id;
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'GET';
-                apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.requestType;
-                apiData.textContent = '';
-                getMediaData(requestData, id);
-                break;
-            case 'sources':
-                endPoint = '/videos/' + video_id + '/sources';
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'GET';
-                apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.requestType;
-                apiData.textContent = '';
-                getMediaData(requestData, id);
-                break;
-            case 'search':
-                endPoint = '/videos?q=' + encodeURI('name:sea');
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'GET';
-                apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.requestType;
-                apiData.textContent = '';
-                getMediaData(requestData, id);
-                break;
-            case 'searchCount':
-                endPoint = '/counts/videos?q=' + encodeURI('name:sea');
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'GET';
-                apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.requestType;
-                apiData.textContent = '';
-                getMediaData(requestData, id);
-                break;
             case 'createVideo':
                 endPoint = '/videos';
                 requestData.url = baseURL + endPoint;
@@ -210,7 +134,7 @@ var BCLS = (function(window, document) {
                 apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData, id);
                 break;
-            case 'updateVideo':
+            case 'ingestVideo':
                 endPoint = '/videos/' + newVideo_id;
                 requestData.url = baseURL + endPoint;
                 requestData.requestType = 'PATCH';
@@ -220,7 +144,7 @@ var BCLS = (function(window, document) {
                 apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData, id);
                 break;
-            case 'get3playlists':
+            case 'retranscode':
                 endPoint = '/playlists?limit=3';
                 requestData.url = baseURL + endPoint;
                 requestData.requestType = 'GET';
@@ -229,7 +153,7 @@ var BCLS = (function(window, document) {
                 apiData.textContent = '';
                 getMediaData(requestData, id);
                 break;
-            case 'get1playlist':
+            case 'replace':
                 endPoint = '/playlists/' + playlist_id;
                 requestData.url = baseURL + endPoint;
                 requestData.requestType = 'GET';
@@ -238,7 +162,7 @@ var BCLS = (function(window, document) {
                 apiData.textContent = '';
                 getMediaData(requestData, id);
                 break;
-            case 'getPlaylistVideoCount':
+            case 'addImages':
                 endPoint = '/counts/playlists/' + playlist_id + '/videos';
                 requestData.url = baseURL + endPoint;
                 requestData.requestType = 'GET';
@@ -247,66 +171,10 @@ var BCLS = (function(window, document) {
                 apiData.textContent = '';
                 getMediaData(requestData, id);
                 break;
-            case 'getPlaylistVideos':
+            case 'addTextTracks':
                 endPoint = '/playlists/' + playlist_id + '/videos';
                 requestData.url = baseURL + endPoint;
                 requestData.requestType = 'GET';
-                apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.requestType;
-                apiData.textContent = '';
-                getMediaData(requestData, id);
-                break;
-            case 'createPlaylist':
-                endPoint = '/playlists';
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'POST';
-                requestData.requestBody = {name:'New Playlist from CMS API Quick Start',type:'ALPHABETICAL',search:'tags:sealife'};
-                apiRequest.textContent = requestData.url;
-                apiData.textContent = JSON.stringify(requestData.requestBody, null, '  ');
-                apiMethod.textContent = requestData.requestType;
-                getMediaData(requestData, id);
-                break;
-            case 'updatePlaylist':
-                endPoint = '/playlists/' + newPlaylist_id;
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'PATCH';
-                requestData.requestBody = {name:'Updated Playlist from CMS API Quick Start',type:'ACTIVATED_NEWEST_TO_OLDEST',search:'tags:sealife'};
-                apiRequest.textContent = requestData.url;
-                apiData.textContent = JSON.stringify(requestData.requestBody, null, '  ');
-                apiMethod.textContent = requestData.requestType;
-                getMediaData(requestData, id);
-                break;
-            case 'getFolders':
-                endPoint = '/folders';
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'GET';
-                apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.requestType;
-                apiData.textContent = '';
-                getMediaData(requestData, id);
-                break;
-            case 'getFolderVideos':
-                endPoint = '/folders/' + folder_id + '/videos';
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'GET';
-                apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.requestType;
-                apiData.textContent = '';
-                getMediaData(requestData, id);
-                break;
-            case 'addVideoToFolder':
-                endPoint = '/folders/' + folder_id + '/videos/' + video_id;
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'PUT';
-                apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.requestType;
-                apiData.textContent = '';
-                getMediaData(requestData, id);
-                break;
-            case 'removeVideoFromFolder':
-                endPoint = '/folders/' + folder_id + '/videos/' + video_id;
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'DELETE';
                 apiRequest.textContent = requestData.url;
                 apiMethod.textContent = requestData.requestType;
                 apiData.textContent = '';
@@ -332,18 +200,12 @@ var BCLS = (function(window, document) {
                   if (httpRequest.readyState === 4) {
                     if (httpRequest.status === 200) {
                       console.log(httpRequest.responseText);
-                      // add/remove folder video return no data
-                      if (requestID === 'addVideoToFolder' || requestID === 'removeVideoFromFolder') {
-                        responseData.textContent = 'This request returns 204 No Content';
-                      } else {
                         responseRaw = httpRequest.responseText;
                         responseData.textContent = responseRaw;
                         parsedData = JSON.parse(responseRaw);
                         // save new ids on create requests
                         if (requestID === 'createVideo') {
                             newVideo_id = parsedData.id;
-                        } else if (requestID === 'createPlaylist') {
-                            newPlaylist_id = parsedData.id;
                         }
                         responseData.textContent = JSON.stringify(parsedData, null, '  ');
                       }
