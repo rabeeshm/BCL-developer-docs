@@ -53,6 +53,7 @@
       <div id="obtaincredentials" class="section">
         <h2>Obtain credentials</h2>
         <p>Like most of Brightcove's RESTful APIs, the CMS API requires OAuth access tokens to authorize requests. In order to get access tokens, you first need to obtain client credentials with permissions for kinds of operations you want to request. This quick start makes API requests on a Brightcove Learning Services sample account, so you will not need to obtain credentials here, but you should understand what's happening. The CodePen sends the API request information to a proxy similar to <a href="../../oauth-api/guides/get-token.html#php">this one</a>. The proxy accesses client credentials from a private location and uses them to generate a temporary access token using the <a href="../../oauth-api/index.html">OAuth API</a> and then makes the API request and returns the response data.</p>
+        <p>To try requests on your own account, get your client credentials and use one of our <a href="../../concepts/api-testing-tools/api-testing-tools.html">API testing tools</a>.</p>
         <ol>
           <li>To obtain your credentials follow the instructions in <a href="../guides/managing-api-credentials.html">Managing API Credentials</a>. This is the recommended way of obtaining your client credentials. In most cases, you will likely want to get all permissions:
             <div><img src="./assets/quick-start-required-permissions.png" width="466" height="178"></div>
@@ -87,139 +88,6 @@
   <script>
     $(document).foundation();
   </script>
-  <script type="text/javascript">
-    /******** Any scripts specific to page samples should go here *********/
-    var BCLS = (function ($, window, document) {
-        var // CMS API stuff
-        $cms_client_id = $("#cms_client_id"),
-        $cms_client_secret = $("#cms_client_secret"),
-        $cms_initial_values_submit = $("#cms_initial_values_submit"),
-        $cms_create_submit = $("#cms_create_submit"),
-        $cms_account_id = $("#cms_account_id"),
-        $cms_response = $("#cms_response"),
-        $cms_video_id = $("#cms_video_id"),
-        $taskRetrieveAll = $("#taskRetrieveAll"),
-        $taskRetrieveOneById = $("#taskRetrieveOneById"),
-        $taskCreateVideo = $("#taskCreateVideo"),
-        $taskUpdateVideo = $("#taskUpdateVideo"),
-        $taskDeleteVideo = $("#taskDeleteVideo"),
-        $taskSearchByDate = $("#taskSearchByDate"),
-        $taskSearchByTags = $("#taskSearchByTags"),
-        options = {
-          client_id: "578b5b79-0883-47bb-a231-4fb5692ecd9c",
-          client_secret: "spF_alkXCIJydgUluDNCWKxmk0-bvy-WI6PCxT2DzPo_JlwP-yDedLGqW4qIhXYh0eJyALABE5wHNPeS0CZmUw",
-          account_id: "57838016001",
-          video_id_create: "",
-          cmsURL: "https://cms.api.brightcove.com/v1/accounts/"
-        },
-        today = new Date().toISOString(),
-        cmsBaseURL = "https://cms.api.brightcove.com/v1/accounts/",
-            // functions
-            bclslog,
-            setCMSOptionsRetrieveAll,
-            setCMSOptionsCreate,
-            setCMSOptionsRetrieveOne,
-            setCMSOptionsSearchByTags,
-            setCMSOptionsSearchByDate,
-            setCMSOptionsUpdateVideo,
-            setCMSOptionsDeleteVideo,
-            onAddVideo;
-        // IE safe logger
-        bclslog = function (context, message) {
-          if (console) {
-            console.log(context, message);
-          }
-        }
-        // set options for the CMS API request
-        setCMSOptionsRetrieveAll = function () {
-          $taskRetrieveAll.html(
-            " <strong>Client id:</strong> <input type=\"text\" size=\"50\" value=\"" + options.client_id + "\">\n" +
-            " <strong>Client secret:</strong> <input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\">\n" +
-            " <strong>Full API call:</strong> <input type=\"text\" size=\"50\" value=\"" + options.cmsURL + "\">\n" +
-            " <strong>Request verb:</strong> <input type=\"text\" size=\"50\" value=\"GET\"> \n" +
-            " <strong>Request data:</strong> <input type=\"text\" size=\"50\" value=\"{no data - just press return}\">"
-            );
-        };
-        setCMSOptionsCreate = function () {
-          $taskCreateVideo.html(
-            " <strong>Client id:</strong> <input type=\"text\" size=\"50\" value=\"" + options.client_id + "\">\n" +
-            " <strong>Client secret:</strong> <input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\">\n" +
-            " <strong>Full API call:</strong> <input type=\"text\" size=\"50\" value=\"" + options.cmsURL + "\">\n" +
-            " <strong>Request verb:</strong> <input type=\"text\" size=\"50\" value=\"POST\"> \n" +
-            " <strong>Request data:</strong><input type=\"text\" size=\"50\" value=\"{ &quot;name&quot;: &quot;My test Video&quot; }\">"
-            );
-        };
-        setCMSOptionsRetrieveOne = function () {
-          $taskRetrieveOneById.html(
-            " <strong>Client id:</strong> <input type=\"text\" size=\"50\" value=\"" + options.client_id + "\">\n" +
-            " <strong>Client secret:</strong> <input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\">\n" +
-            " <strong>Full API call:</strong> <input type=\"text\" size=\"50\" value=\"" + options.cmsURL + "\">\n" +
-            " <strong>Request verb:</strong> <input type=\"text\" size=\"50\" value=\"GET\"> \n" +
-            " <strong>Request data:</strong> <input type=\"text\" size=\"50\" value=\"{no data - just press return}\">"
-            );
-        };
-        setCMSOptionsSearchByTags = function () {
-          $taskSearchByTags.html(
-            " <strong>Client id:</strong> <input type=\"text\" size=\"50\" value=\"" + options.client_id + "\">\n" +
-            " <strong>Client secret:</strong> <input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\">\n" +
-            " <strong>Full API call:</strong> <input type=\"text\" size=\"50\" value=\"" + cmsBaseURL + "?q=tags:quick+tags:start\n" +
-            " <strong>Request verb:</strong> <input type=\"text\" size=\"50\" value=\"GET\"> \n" +
-            " <strong>Request data:</strong> <input type=\"text\" size=\"50\" value=\"{no data - just press return}\">"
-            );
-        };
-        setCMSOptionsSearchByDate = function () {
-          $taskSearchByDate.html(
-            " <strong>Client id:</strong> <input type=\"text\" size=\"50\" value=\"" + options.client_id + "\">\n" +
-            " <strong>Client secret:</strong> <input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\">\n" +
-            " <strong>Full API call:</strong> <input type=\"text\" size=\"50\" value=\"" + cmsBaseURL + "?q=created_at:" + today + "\">\n" +
-            " <strong>Request verb:</strong> <input type=\"text\" size=\"50\" value=\"GET\"> \n" +
-            " <strong>Request data:</strong> <input type=\"text\" size=\"50\" value=\"{no data - just press return}\">"
-            );
-        };
-        setCMSOptionsUpdateVideo = function () {
-          $taskUpdateVideo.html(
-            " <strong>Client id:</strong> <input type=\"text\" size=\"50\" value=\"" + options.client_id + "\">\n" +
-            " <strong>Client secret:</strong> <input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\">\n" +
-            " <strong>Full API call:</strong> <input type=\"text\" size=\"50\" value=\"" + options.cmsURL + "\">\n" +
-            " <strong>Request verb:</strong> <input type=\"text\" size=\"50\" value=\"PATCH\"> \n" +
-            " <strong>Request data:</strong> <input type=\"text\" size=\"50\" value=\"{&quot;description&quot;: &quot;cms api quick start video&quot;, &quot;tags&quot;: [&quot;quick&quot;, &quot;start&quot;]}\">"
-            );
-        };
-        setCMSOptionsDeleteVideo = function () {
-          $taskDeleteVideo.html(
-            " <strong>Client id:</strong> <input type=\"text\" size=\"50\" value=\"" + options.client_id + "\">\n" +
-            " <strong>Client secret:</strong> <input type=\"text\" size=\"50\" value=\"" + options.client_secret + "\">\n" +
-            " <strong>Full API call:</strong> <input type=\"text\" size=\"50\" value=\"" + options.cmsURL + "\">\n" +
-            " <strong>Request verb:</strong> <input type=\"text\" size=\"50\" value=\"DELETE\"> \n" +
-            " <strong>Request data:</strong> <input type=\"text\" size=\"50\" value=\"{no data - just press return}\">"
-            );
-        };
-        setInitialValues = function () {
-          options.cmsURL += $cms_account_id.val() + "/videos";
-          options.client_id = $cms_client_id.val();
-          options.client_secret = $cms_client_secret.val();
-          today = today.substring(0, today.indexOf("T"));
-          cmsBaseURL += $cms_account_id.val() + "/videos";
-          $cms_initial_values_submit.attr("value", "Values Assigned!");
-          $cms_initial_values_submit.off("click", setInitialValues);
-          setCMSOptionsRetrieveAll();
-          setCMSOptionsCreate();
-        };
-        onAddVideo = function () {
-          options.video_id = $cms_video_id.val();
-          options.cmsURL += "/" + options.video_id;
-          setCMSOptionsUpdateVideo();
-          setCMSOptionsRetrieveOne();
-          setCMSOptionsSearchByTags();
-          setCMSOptionsSearchByDate();
-          setCMSOptionsDeleteVideo();
-          $cms_create_submit.off("click", onAddVideo);
-          $cms_create_submit.attr("value", "Video ID submitted!")
-        };
-        $cms_initial_values_submit.on("click", setInitialValues);
-        $cms_create_submit.on("click", onAddVideo);
-      })($, window, document);
-    </script>
     <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
     <script>
       var feedbackMail = document.getElementById("feedbackMail");
