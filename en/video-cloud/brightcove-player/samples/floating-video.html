@@ -77,15 +77,8 @@
         </div>
         <div id="main" class="large-10 small-12 columns">
             <div id="top" class="section">
-                <h1>Brightcove Player Sample: Chaptered Video</h1>
-                <p>This topic shows you how to use a Brightcove player with an overlay that toggles on and off by clicking on a button.</p>
-            </div>
-            <div class="text-warning" style="padding-left:1em;padding-right:1em;">
-                <h4>Plugins used</h4>
-                <p>Note: This example uses open source video.js plugins:</p>
-                <ul>
-                    <li><a href="https://github.com/brightcove/videojs-overlay">videojs-overlay</a> : For details, refer to the <a href="../../brightcove-player/guides/overlay-plugin.html">Display Overlay Plugin</a> document.</li>
-                </ul>
+                <h1>Brightcove Player Sample: Floating Player</h1>
+                <p>This topic does not modify the Brightcove player all, but instead configures the HTML, CSS, and JavaScript in the page to allow the player to be dragged to a new position and then fix it there (until dragged again). The player position will then remain fixed even when the user scrolls up and down the page. There is a <a href="#player">working sample</a> in this page, so try it out, and then read on to see how it is done.</p>
             </div>
             <div id="developmentsequence" class="section">
                 <h2 id="expanderHead">Development sequence</h2>
@@ -191,7 +184,7 @@
     $(document).foundation();
     </script>
     <script>
-var BCLS = (function () {
+var BCLS = (function (window, document) {
     var // mouse starting positions
         _startX = 0,
         _startY = 0,
@@ -202,36 +195,25 @@ var BCLS = (function () {
         _dragElement,
         // we temporarily increase the z-index during drag
         _oldZIndex = 0,
-        // absolute positions original and new
-        absolutePosition = {top:0, left: 0},
-        absolutePositionNew = {top:0, left: 0},
         // for sample purposes, make it easier to see what's happening
         _debug = document.getElementById('debug'),
         playerWrapper = document.getElementById('playerWrapper');
+
+    // initialize
     InitDragDrop();
 
+    /**
+     * sets up mouse up and down functions
+     */
     function InitDragDrop() {
         document.onmousedown = OnMouseDown;
         document.onmouseup = OnMouseUp;
     }
 
-    function cumulativeOffset(element) {
-        var top = 0, left = 0;
-        do {
-            top += element.offsetTop  || 0;
-            left += element.offsetLeft || 0;
-            element = element.offsetParent;
-        } while(element);
-
-        return {
-            top: top,
-            left: left
-        };
-    };
-
-
-
-
+    /**
+     * handler for mousedown events
+     * @param {Object} e the element moused down on
+     */
     function OnMouseDown(e) {
         // older IE doesn't pass the event object
         if (e == null)
@@ -250,8 +232,6 @@ var BCLS = (function () {
             // grab the clicked element's position
             _offsetX = ExtractNumber(target.style.left);
             _offsetY = ExtractNumber(target.style.top);
-            absolutePosition = cumulativeOffset(target);
-            console.log('absolutePosition', absolutePosition);
             // bring the clicked element to the front while it is being dragged
             _oldZIndex = target.style.zIndex;
             target.style.zIndex = 10000;
@@ -274,27 +254,36 @@ var BCLS = (function () {
         }
     }
 
+    /**
+     * extract a number from a string like 45px
+     * @param {String} value string to extract the number from
+     */
     function ExtractNumber(value) {
         var n = parseInt(value);
         return n == null || isNaN(n) ? 0 : n;
     }
 
+    /**
+     * mouse move event handler
+     * @param {Object} e the element being moved
+     */
     function OnMouseMove(e) {
         if (e == null)
             var e = window.event;
         // this is the actual "drag code"
-        absolutePositionNew.left = e.clientX;
-        absolutePositionNew.top = e.clientY;
         _dragElement.style.left = (_offsetX + e.clientX - _startX) + 'px';
         _dragElement.style.top = (_offsetY + e.clientY - _startY) + 'px';
         _debug.innerHTML = '(' + _dragElement.style.left + ', ' + _dragElement.style.top + ')';
 
     }
 
+    /**
+     * handler for mouse up events
+     * @param {Object} e the target element
+     */
     function OnMouseUp(e) {
         if (_dragElement != null) {
             // _dragElement.style.zIndex = _oldZIndex;
-            console.log('absolutePositionNew', absolutePositionNew);
             // we're done with these events until the next OnMouseDown
             document.onmousemove = null;
             document.onselectstart = null;
@@ -306,8 +295,7 @@ var BCLS = (function () {
             playerWrapper.setAttribute('style', 'position:fixed;top:' + absolutePositionNew.top + 'px;left:' + absolutePositionNew.left + 'px;');
         }
     }
-    return {}
-})();
+})(window, document);
 
     </script>
     <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
