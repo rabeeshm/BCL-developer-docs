@@ -34,6 +34,7 @@
         table {margin: 0 0 0.4em 1.3em; border: 1px solid rgb(240, 240, 240);}
         #playerOutWrapper {
             position: relative;
+            width: 350px;
         }
         iframe {
             position: relative;
@@ -118,6 +119,7 @@
                             <iframe src='//players.brightcove.net/1752604059001/15933ac1-884c-40e0-8cae-a06c7d9e4c0a_default/index.html?videoId=4511340777001' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
                         </div>
                     </div>
+                    <p id="debug"></p>
                 </div>
                 <div id="code" class="section">
                     <h2>How it works</h2>
@@ -261,8 +263,12 @@ var BCLS = (function () {
         _dragElement,
         // we temporarily increase the z-index during drag
         _oldZIndex = 0,
+        // absolute positions original and new
+        absolutePosition = {top:0, left: 0},
+        absolutePositionNew = {top:0, left: 0},
         // for sample purposes, make it easier to see what's happening
-        _debug = document.getElementById('debug');
+        _debug = document.getElementById('debug'),
+        playerInnerWrapper = document.getElementById('playerInnerWrapper');
     InitDragDrop();
 
     function InitDragDrop() {
@@ -279,15 +285,17 @@ var BCLS = (function () {
         _debug.innerHTML = target.className == 'drag' ? 'draggable element clicked' : 'NON-draggable element clicked';
         // for older IE, left click == 1
         // for older Firefox, left click == 0
-        if ((e.button == 1 && window.event != null ||
-                e.button == 0) &&
-            target.className == 'drag') {
+        if ((e.button === 1 && window.event !== null ||
+                e.button === 0) &&
+            target.className === 'drag') {
             // grab the mouse position
             _startX = e.clientX;
             _startY = e.clientY;
             // grab the clicked element's position
             _offsetX = ExtractNumber(target.style.left);
             _offsetY = ExtractNumber(target.style.top);
+            absolutePosition = cumulativeOffset(target);
+            console.log('absolutePosition', absolutePosition);
             // bring the clicked element to the front while it is being dragged
             _oldZIndex = target.style.zIndex;
             target.style.zIndex = 10000;
@@ -310,6 +318,21 @@ var BCLS = (function () {
         }
     }
 
+    function cumulativeOffset(element) {
+        var top = 0, left = 0;
+        do {
+            top += element.offsetTop  || 0;
+            left += element.offsetLeft || 0;
+            element = element.offsetParent;
+        } while(element);
+
+        return {
+            top: top,
+            left: left
+        };
+    };
+
+
     function ExtractNumber(value) {
         var n = parseInt(value);
         return n == null || isNaN(n) ? 0 : n;
@@ -319,15 +342,20 @@ var BCLS = (function () {
         if (e == null)
             var e = window.event;
         // this is the actual "drag code"
+        absolutePositionNew.left = absolutePosition.left + e.clientX;
+        absolutePositionNew.top = absolutePosition.top + e.clientY;
         _dragElement.style.left = (_offsetX + e.clientX - _startX) + 'px';
         _dragElement.style.top = (_offsetY + e.clientY - _startY) + 'px';
         _debug.innerHTML = '(' + _dragElement.style.left + ', ' + _dragElement.style.top + ')';
+
     }
 
     function OnMouseUp(e) {
         if (_dragElement != null) {
-            _dragElement.style.zIndex = _oldZIndex;
+            // _dragElement.style.zIndex = _oldZIndex;
+            console.log('absolutePositionNew', absolutePositionNew);
             // we're done with these events until the next OnMouseDown
+            playerInnerWrapper.setAttribute('style', 'position:relative;top:' + absolutePositionNew.top + 'px;left:' + absolutePositionNew.left + 'px;z-index:10000;');
             document.onmousemove = null;
             document.onselectstart = null;
             _dragElement.ondragstart = null;
