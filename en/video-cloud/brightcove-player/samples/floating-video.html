@@ -29,7 +29,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/js/vendor/modernizr.js"></script>
         <!-- Page styles -->
         <style>
-        .drag {border: 1px solid black; background-color: rgb(240, 240, 240); position: relative; padding: 0.5em; margin: 0 0 0.5em 1.5em; cursor: move;}
+        .drag {border: 1px solid black; background-color: rgb(240, 240, 240); position: fixed; padding: 0.5em; margin: 0 0 0.5em 1.5em; cursor: move;}
         th, td {text-align: left; padding-right: 1em;}
         table {margin: 0 0 0.4em 1.3em; border: 1px solid rgb(240, 240, 240);}
         #playerOutWrapper {
@@ -276,6 +276,23 @@ var BCLS = (function () {
         document.onmouseup = OnMouseUp;
     }
 
+    function cumulativeOffset(element) {
+        var top = 0, left = 0;
+        do {
+            top += element.offsetTop  || 0;
+            left += element.offsetLeft || 0;
+            element = element.offsetParent;
+        } while(element);
+
+        return {
+            top: top,
+            left: left
+        };
+    };
+
+
+
+
     function OnMouseDown(e) {
         // older IE doesn't pass the event object
         if (e == null)
@@ -318,21 +335,6 @@ var BCLS = (function () {
         }
     }
 
-    function cumulativeOffset(element) {
-        var top = 0, left = 0;
-        do {
-            top += element.offsetTop  || 0;
-            left += element.offsetLeft || 0;
-            element = element.offsetParent;
-        } while(element);
-
-        return {
-            top: top,
-            left: left
-        };
-    };
-
-
     function ExtractNumber(value) {
         var n = parseInt(value);
         return n == null || isNaN(n) ? 0 : n;
@@ -355,13 +357,14 @@ var BCLS = (function () {
             // _dragElement.style.zIndex = _oldZIndex;
             console.log('absolutePositionNew', absolutePositionNew);
             // we're done with these events until the next OnMouseDown
-            playerInnerWrapper.setAttribute('style', 'position:relative;top:' + absolutePositionNew.top + 'px;left:' + absolutePositionNew.left + 'px;z-index:10000;');
             document.onmousemove = null;
             document.onselectstart = null;
             _dragElement.ondragstart = null;
             // this is how we know we're not dragging
             _dragElement = null;
             _debug.innerHTML = 'mouse up';
+            // playerInnerWrapper.setAttribute('style', 'position:fixed;top:' + absolutePositionNew.top + 'px;left:' + absolutePositionNew.left + 'px;z-index:10000;');
+            playerInnerWrapper.setAttribute('style', 'position:fixed;');
         }
     }
     return {}
