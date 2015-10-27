@@ -54,7 +54,7 @@
         </p>
         <div class="select">
             <p>Select countries</p>
-            <select name="countries" multiple="multiple" size="10">
+            <select id="countries" multiple="multiple" size="10">
                 <option value="AF">Afghanistan</option>
                 <option value="AL">Albania</option>
                 <option value="DZ">Algeria</option>
@@ -335,7 +335,7 @@ var BCLS = (function(window, document) {
       video_id                = '',
       video_name              = '',
       offset                  = 0,
-      excludedValue           = 'true';
+      excludedValue           = 'true',
       excluded                = true,
       countriesArray          = [],
       excludedEl              = document.getElementsByName('excluded'),
@@ -375,7 +375,9 @@ var BCLS = (function(window, document) {
         }
     }
 
-
+    /**
+     * gets the selected value for the excluded radio group and sets the var
+     */
     function getExcludedValue() {
         iMax = excludedEl.length;
         for (i = 0; i < iMax; i++) {
@@ -397,7 +399,7 @@ var BCLS = (function(window, document) {
      */
     function getSelectedOptions(sel, callback) {
         var opts = [], opt, i, len;
-
+        console.log(sel);
         // loop through options in select list
         for (i = 0, len = sel.options.length; i < len; i++) {
             opt = sel.options[i];
@@ -417,6 +419,17 @@ var BCLS = (function(window, document) {
 
         // return array containing references to selected option elements
         return opts;
+    }
+
+    function addtoCountriesArray(sel, opt) {
+        if (sel.id === 'countries') {
+            countriesArray.push(opt.value);
+            sel.removeChild(opt);
+            selectedCountries.appendChild(opt);
+        } else {
+
+        }
+
     }
 
     /**
@@ -515,6 +528,12 @@ var BCLS = (function(window, document) {
     for (i = 0; i < iMax; i++) {
         excludedEl[i].addEventListener('change', getExcludedValue);
     }
+    addCountry.addEventListener('click', function() {
+        getSelectedOptions(countries, addtoCountriesArray);
+    });
+    removeCountry.addEventListener('click', function(evt) {
+        getSelectedOptions(selectedCountries, addtoCountriesArray);
+    });
 })(window, document);
 </script>
 </body>
