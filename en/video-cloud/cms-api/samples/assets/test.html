@@ -40,9 +40,6 @@
         textarea {
             width: 100%;
         }
-        #apiData {
-            height: 100px;
-        }
         </style>
     </head>
     <body>
@@ -426,7 +423,6 @@ var BCLS = (function(window, document) {
      */
     function getSelectedOptions(sel, callback) {
         var opts = [], opt, i, len;
-        console.log(sel);
         i = sel.options.length;
         // loop through options in select list
         while (i > 0) {
@@ -450,6 +446,12 @@ var BCLS = (function(window, document) {
         return opts;
     }
 
+    /**
+     * or removes country codes to country array
+     * this is a callback for getSelectedOptions
+     * @param  {HTMLElement} sel the selector that is processing
+     * @param  {HTMLElement} opt the option to be processed
+     */
     function addtoCountriesArray(sel, opt) {
         var i, iMax;
         if (sel.id === 'countries') {
@@ -503,7 +505,7 @@ var BCLS = (function(window, document) {
                 requestData.requestType = 'PATCH';
                 requestData.requestBody = {geo: {countries: countriesArray, exclude_countries: excluded, restricted: true}};
                 apiRequest.textContent = requestData.url;
-                apiData.textContent = JSON.stringify(requestData.requestBody, null, '  ');
+                apiData.textContent = JSON.stringify(requestData.requestBody);
                 apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData, id);
                 break;
@@ -527,8 +529,6 @@ var BCLS = (function(window, document) {
                   if (httpRequest.readyState === 4) {
                     if (httpRequest.status === 200) {
                       // check for completion
-                        console.log('httpRequest.responseText', httpRequest.responseText);
-                        console.log('offset', offset);
                       if (requestID === 'getCount') {
                         if (httpRequest.responseText === '[]') {
                             // no video returned
@@ -537,6 +537,7 @@ var BCLS = (function(window, document) {
                         responseRaw = httpRequest.responseText;
                         responseData.textContent = responseRaw;
                         parsedData = JSON.parse(responseRaw);
+                        // set total videos
                         videoCount = parsedData.count;
                         count.textContent = 'Total videos: ' + videoCount;
                         setRequestData('get1video');
@@ -544,6 +545,7 @@ var BCLS = (function(window, document) {
                         responseRaw = httpRequest.responseText;
                         responseData.textContent = responseRaw;
                         parsedData = JSON.parse(responseRaw);
+                        // set the video id for the update
                         video_id = parsedData[0].id;
                         video_name = parsedData[0].name;
                         logger.textContent = 'Processing ' + video_name;
@@ -554,8 +556,10 @@ var BCLS = (function(window, document) {
                         // increment offset
                         offset++;
                         if (offset < videoCount) {
+                            // move on to next video
                             setRequestData('get1video');
                         } else {
+                            // we are done
                             logger.textContent = 'Finished... ' + offset + ' videos processed'
                         }
 
@@ -574,7 +578,6 @@ var BCLS = (function(window, document) {
             dataString = JSON.stringify(options.requestBody);
             requestParams += "&requestBody=" + encodeURIComponent(dataString);
         }
-        console.log(requestParams);
 
         // set response handler
         httpRequest.onreadystatechange = getResponse;
