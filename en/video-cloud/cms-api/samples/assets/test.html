@@ -338,6 +338,7 @@ var BCLS = (function(window, document) {
       excludedValue           = 'true',
       excluded                = true,
       countriesArray          = [],
+      allButtons              = document.getElementsByTagName('button'),
       excludedEl              = document.getElementsByName('excluded'),
       countries               = document.getElementById('countries'),
       selectedCountries       = document.getElementById('selectedCountries'),
@@ -489,7 +490,7 @@ var BCLS = (function(window, document) {
                 endPoint = '/videos/' + newVideo_id;
                 requestData.url = baseURL + endPoint;
                 requestData.requestType = 'PATCH';
-                requestData.requestBody = {geo: {}};
+                requestData.requestBody = {geo: {countries: countriesArray, exclude_countries: excluded, restricted: true}};
                 apiRequest.textContent = requestData.url;
                 apiData.textContent = JSON.stringify(requestData.requestBody, null, '  ');
                 apiMethod.textContent = requestData.requestType;
@@ -523,12 +524,14 @@ var BCLS = (function(window, document) {
                         video_id = parsedData.id;
                         video_name = parsedData.name;
                         logger.textContent = 'Processing ' + video_name;
+                        setRequestData(updateVideos);
                       } else if (requestID === 'updateVideos') {
                         responseRaw = httpRequest.responseText;
                         responseData.textContent = responseRaw;
                         parsedData = JSON.parse(responseRaw);
                         // increment offset
                         offset++;
+                        setRequestData(get1video);
                       }
                     } else {
                       alert('There was a problem with the request. Request returned ' + httpRequest.status);
@@ -557,6 +560,12 @@ var BCLS = (function(window, document) {
     }
     // event listeners
     updateVideos.addEventListener('click', function() {
+        var i, iMax;
+        // set the country codes to lower case
+        i = countriesArray.length;
+        for (i = 0; i < iMax; i++) {
+            countriesArray[i] = countriesArray[i].toLowerCase();
+        }
         setRequestData('get1video');
     });
     iMax = excludedEl.length;
@@ -564,6 +573,7 @@ var BCLS = (function(window, document) {
         excludedEl[i].addEventListener('change', getExcludedValue);
     }
     addCountry.addEventListener('click', function() {
+        updateVideos.removeAttribute('disabled');
         getSelectedOptions(countries, addtoCountriesArray);
     });
     removeCountry.addEventListener('click', function(evt) {
