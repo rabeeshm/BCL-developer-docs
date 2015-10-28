@@ -319,6 +319,7 @@
         <p>
             <button id="updateVideos" disabled="disabled">Update videos</button>
         </p>
+        <p><strong id="count"></strong></p>
         <p><strong id="logger"></strong></p>
         <p><strong>API request:</strong></p>
     <pre id="apiRequest"></pre>
@@ -338,6 +339,8 @@ var BCLS = (function(window, document) {
       excludedValue           = 'true',
       excluded                = true,
       countriesArray          = [],
+      videoCount              = 0,
+      count                   = document.getElementById('count'),
       allButtons              = document.getElementsByTagName('button'),
       excludedEl              = document.getElementsByName('excluded'),
       countries               = document.getElementById('countries'),
@@ -478,6 +481,14 @@ var BCLS = (function(window, document) {
         // disable buttons to prevent a new request before current one finishes
         disableButtons();
         switch (id) {
+            case 'getCount':
+                endPoint = '/counts/videos';
+                requestData.url = baseURL + endPoint;
+                requestData.requestType = 'GET';
+                apiRequest.textContent = requestData.url;
+                apiMethod.textContent = requestData.requestType;
+                getMediaData(requestData, id);
+                break;
             case 'get1video':
                 endPoint = '/videos?limit=1&sort=created_at&offset=' + offset;
                 requestData.url = baseURL + endPoint;
@@ -515,9 +526,16 @@ var BCLS = (function(window, document) {
                 try {
                   if (httpRequest.readyState === 4) {
                     if (httpRequest.status === 200) {
-                      // add/remove folder video return no data
+                      // check for completion
                         console.log('httpRequest.responseText', httpRequest.responseText);
-                      if (requestID === 'get1video') {
+                      if (requestID === 'getCount') {
+                        responseRaw = httpRequest.responseText;
+                        responseData.textContent = responseRaw;
+                        parsedData = JSON.parse(responseRaw);
+                        videoCount = parsedData.count;
+                        count.textContent = 'Total videos: ' + videoCount;
+                        setRequestData('get1video');
+                      } else if (requestID === 'get1video') {
                         responseRaw = httpRequest.responseText;
                         responseData.textContent = responseRaw;
                         parsedData = JSON.parse(responseRaw);
