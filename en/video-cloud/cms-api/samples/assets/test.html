@@ -486,8 +486,8 @@ var BCLS = (function(window, document) {
                 apiMethod.textContent = requestData.requestType;
                 getMediaData(requestData, id);
                 break;
-            case 'updateVideo':
-                endPoint = '/videos/' + newVideo_id;
+            case 'updateVideos':
+                endPoint = '/videos/' + video_id;
                 requestData.url = baseURL + endPoint;
                 requestData.requestType = 'PATCH';
                 requestData.requestBody = {geo: {countries: countriesArray, exclude_countries: excluded, restricted: true}};
@@ -515,23 +515,22 @@ var BCLS = (function(window, document) {
                 try {
                   if (httpRequest.readyState === 4) {
                     if (httpRequest.status === 200) {
-                      console.log(httpRequest.responseText);
                       // add/remove folder video return no data
+                        console.log('httpRequest.responseText', httpRequest.responseText);
                       if (requestID === 'get1video') {
                         responseRaw = httpRequest.responseText;
                         responseData.textContent = responseRaw;
                         parsedData = JSON.parse(responseRaw);
-                        video_id = parsedData.id;
-                        video_name = parsedData.name;
+                        video_id = parsedData[0].id;
+                        video_name = parsedData[0].name;
                         logger.textContent = 'Processing ' + video_name;
-                        setRequestData(updateVideos);
+                        setRequestData('updateVideos');
                       } else if (requestID === 'updateVideos') {
                         responseRaw = httpRequest.responseText;
                         responseData.textContent = responseRaw;
-                        parsedData = JSON.parse(responseRaw);
                         // increment offset
                         offset++;
-                        setRequestData(get1video);
+                        setRequestData('get1video');
                       }
                     } else {
                       alert('There was a problem with the request. Request returned ' + httpRequest.status);
