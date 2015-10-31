@@ -1,371 +1,182 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <title></title>
-        <style>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <style>
         body {
-        margin: 1em 2em;
-        font-family: sans-serif;
+            margin: 1em 2em;
+            font-family: sans-serif;
         }
+
         h2 {
-        font-size: 1.1em;
+            font-size: 1.1em;
         }
+
         button {
-        padding: .5em;
+            padding: .5em;
         }
+
         pre {
-        background-color: #F1EFEE;
-        border-left: .5em solid #636363;
-        box-shadow: 5px 5px 10px rgba(192, 192, 192, 1.000);
-        font-family: Hack, monospace;
-        font-size: .8em;
-        padding: 1em;
+            background-color: #F1EFEE;
+            border-left: .5em solid #636363;
+            box-shadow: 5px 5px 10px rgba(192, 192, 192, 1.000);
+            font-family: Hack, monospace;
+            font-size: .8em;
+            padding: 1em;
         }
+
         .buttonBlock {
-        display: inline-block;
-        padding: 0 .5em;
+            display: inline-block;
+            padding: 0 .5em;
         }
+
         div:nth-of-type(2) {
-        border-right: 1px solid #CCC;
-        border-left: 1px solid #CCC;
+            border-right: 1px solid #CCC;
+            border-left: 1px solid #CCC;
         }
+
         #apiData {
-        height: 170px;
+            height: 170px;
         }
-        </style>
-    </head>
-    <body>
-        <h1>Popular Videos Overlay</h1>
-        <div style="display: block; position: relative; max-width: 600px;">
-            <div style="display: block; padding-top: 56.25%;">
-                <video id="popularVideosPlayer" data-video-id="4454620113001" data-account="1752604059001" data-player="ee7ec864-097d-4d90-a544-9ef4f5e3c7a2" data-embed="default" class="video-js" controls="" style="width: 100%; height: 100%; position: absolute; top: 0px; bottom: 0px; right: 0px; left: 0px;"></video>
+    </style>
+</head>
+
+<body>
+    <h1>Popular Videos Overlay</h1>
+    <div style="display: block; position: relative; max-width: 600px;">
+        <div style="display: block; padding-top: 56.25%;">
+            <video id="popularVideosPlayer" data-video-id="4454620113001" data-account="1752604059001" data-player="ee7ec864-097d-4d90-a544-9ef4f5e3c7a2" data-embed="default" class="video-js" controls="" style="width: 100%; height: 100%; position: absolute; top: 0px; bottom: 0px; right: 0px; left: 0px;"></video>
             <script src="//players.brightcove.net/1752604059001/ee7ec864-097d-4d90-a544-9ef4f5e3c7a2_default/index.min.js"></script>
-            </div>
         </div>
-        <p><strong>API request:</strong></p>
+    </div>
+    <p>
+        <strong>API request:</strong>
+    </p>
     <pre id="apiRequest"></pre>
-    <p><strong>Request method:</strong></p>
+    <p>
+        <strong>Request method:</strong>
+    </p>
     <pre id="apiMethod"></pre>
-    <p><strong>Response data</strong></p>
+    <p>
+        <strong>Response data</strong>
+    </p>
     <pre id="responseData"></pre>
-<script>
-videojs("popularVideosPlayer").ready(function() {
-      var myPlayer = this;
-      myPlayer.catalog.getVideo(myPlayer.options()['data-video-id'], function(error, video) {
-        //deal with error
-        myPlayer.catalog.load(video);
-        myPlayer.overlay({
-          overlays: [{
-            content: myPlayer.mediainfo.name,
-            start: 'loadedmetadata',
-            end: 'play'
-          }]
+    <script>
+        videojs("popularVideosPlayer").ready(function() {
+            var myPlayer = this,
+                reportURL = 'https://analytics.api.brightcove.com/v1/data',
+                engagementURL = 'https://analytics.api.brightcove.com/v1/engagement/accounts/20318290001',
+                proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
+                videoIds = [],
+                // get the epoch time in milliseconds 24 hours ago
+                // 12 hours in milliseconds = 1000 * 24 * 60 * 60 = 86,400,000
+                yesterday = new Date().valueOf() - 86400000;
+
+                function extractVideoIds(aapiData) {
+                    var i,
+                        iMax = aapiData.items.length;
+                    for (i = 0; i < iMax; i++) {
+                        videoIds.push(aapiData.items[i].video)
+                    }
+                }
+
+                function getVideoData() {
+                    var i,
+                        iMax = videoIds.length;
+                }
+
+
+
+
+
+            myPlayer.catalog.getVideo(myPlayer.options()['data-video-id'], function(error, video) {
+                //deal with error
+                myPlayer.catalog.load(video);
+                myPlayer.overlay({
+                    overlays: [{
+                        content: myPlayer.mediainfo.name,
+                        start: 'loadedmetadata',
+                        end: 'play'
+                    }]
+                });
+
+
+            });
         });
-      });
-    });
-var BCLS = (function (window, document) {
-var reportURL = 'https://analytics.api.brightcove.com/v1/data',
-engagementURL = 'https://analytics.api.brightcove.com/v1/engagement/accounts/20318290001',
-proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
-video_ids = [],
-// get the epoch time in milliseconds 24 hours ago
-// 12 hours in milliseconds = 1000 * 24 * 60 * 60 = 86,400,000
-yesterday = new Date().valueOf() - 86400000;
-/**
-* sets up the data for the API request
-* @param {String} id the id of the button that was clicked
-*/
-function setRequestData(id) {
-var endPoint = '',
-requestData = {};
-// note that we don't have to set the to date to now or the sort to video_view
-// because those are the default values
-endPoint = '?accounts=20318290001&dimensions=video&from=' + yesterday;
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'video':
-endPoint = '?accounts=20318290001&dimensions=video';
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'player':
-endPoint = '?accounts=20318290001&dimensions=player';
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'date':
-endPoint = '?accounts=20318290001&dimensions=date';
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'destination_path':
-endPoint = '?accounts=20318290001&dimensions=destination_path';
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'country':
-endPoint = '?accounts=20318290001&dimensions=country';
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'source_type':
-endPoint = '?accounts=20318290001&dimensions=source_type';
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'device_os':
-endPoint = '?accounts=20318290001&dimensions=device_os';
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'videoCountry':
-endPoint = '?accounts=20318290001&dimensions=video,country';
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'multipleAccounts':
-endPoint = '?accounts=20318290001,57838016001&dimensions=video';
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'limitOffset':
-endPoint = '?accounts=20318290001&dimensions=video&limit=5&offset=5';
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'sort':
-endPoint = '?accounts=20318290001&dimensions=video,country&sort=country_name';
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'dateRange':
-endPoint = '?accounts=20318290001&dimensions=video&from=alltime&to=now';
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'oneDay':
-endPoint = '?accounts=20318290001&dimensions=video&from=2015-03-25&to=2015-03-25';
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'fields':
-endPoint = '?accounts=20318290001&dimensions=video&fields=video,video_duration,video_engagement_1,video_engagement_100,video_engagement_25,video_engagement_50,video_engagement_75,video_impression,video.name,video_percent_viewed,video_seconds_viewed';
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'whereDevice':
-endPoint = '?accounts=20318290001&dimensions=video&where=device_type==tablet';
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'whereTags':
-endPoint = '?accounts=20318290001&dimensions=video&where=video.q==tags:drupal';
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'formatCSV':
-endPoint = '?accounts=20318290001&dimensions=video,country&sort=country_name&format=csv';
-requestData.url = reportURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'accountEngagement':
-endPoint = '';
-requestData.url = engagementURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'videoEngagement':
-endPoint = '/videos/video_id';
-requestData.url = engagementURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-case 'playerEngagement':
-endPoint = '/players/player_id';
-requestData.url = engagementURL + endPoint;
-requestData.requestType = 'GET';
-apiRequest.textContent = requestData.url;
-apiMethod.textContent = requestData.requestType;
-getMediaData(requestData, id);
-break;
-}
-}
-/**
-* send API request to the proxy
-* @param  {Object} requestData options for the request
-* @param  {String} requestID the type of request = id of the button
-*/
-function getMediaData(options, requestID) {
-var httpRequest = new XMLHttpRequest(),
-responseRaw,
-parsedData,
-requestParams,
-dataString,
-// response handler
-getResponse = function () {
-try {
-if (httpRequest.readyState === 4) {
-if (httpRequest.status === 200) {
-if (requestID === 'formatCSV') {
-responseData.textContent = httpRequest.responseText;
-} else {
-console.log(httpRequest.responseText);
-responseRaw = httpRequest.responseText;
-responseData.textContent = responseRaw;
-parsedData = JSON.parse(responseRaw);
-responseData.textContent = JSON.stringify(parsedData, null, '  ');
-}
-// re-enable the buttons
-enableButtons();
-} else {
-alert('There was a problem with the request. Request returned ' + httpRequest.status);
-}
-}
-} catch (e) {
-alert('Caught Exception: ' + e);
-}
-};
-// set up request data
-requestParams = 'url=' + encodeURIComponent(options.url) + '&requestType=' + options.requestType;
-if (options.requestBody) {
-dataString = JSON.stringify(options.requestBody);
-requestParams += '&requestBody=' + encodeURIComponent(dataString);
-}
-console.log(requestParams);
-// set response handler
-httpRequest.onreadystatechange = getResponse;
-// open the request
-httpRequest.open('POST', proxyURL);
-// set headers
-httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-// open and send request
-httpRequest.send(requestParams);
-}
-// event listeners
-video.addEventListener('click', function () {
-setRequestData('video');
-});
-player.addEventListener('click', function () {
-setRequestData('player');
-});
-country.addEventListener('click', function () {
-setRequestData('country');
-});
-date.addEventListener('click', function () {
-setRequestData('date');
-});
-destination_path.addEventListener('click', function () {
-setRequestData('destination_path');
-});
-device_os.addEventListener('click', function () {
-setRequestData('device_os');
-});
-source_type.addEventListener('click', function () {
-setRequestData('source_type');
-});
-account.addEventListener('click', function () {
-setRequestData('account');
-});
-videoCountry.addEventListener('click', function () {
-setRequestData('videoCountry');
-});
-multipleAccounts.addEventListener('click', function () {
-setRequestData('multipleAccounts');
-});
-limitOffset.addEventListener('click', function () {
-setRequestData('limitOffset');
-});
-sort.addEventListener('click', function () {
-setRequestData('sort');
-});
-fields.addEventListener('click', function () {
-setRequestData('fields');
-});
-dateRange.addEventListener('click', function () {
-setRequestData('dateRange');
-});
-oneDay.addEventListener('click', function () {
-setRequestData('oneDay');
-});
-whereDevice.addEventListener('click', function () {
-setRequestData('whereDevice');
-});
-whereTags.addEventListener('click', function () {
-setRequestData('whereTags');
-});
-formatCSV.addEventListener('click', function () {
-setRequestData('formatCSV');
-});
-accountEngagement.addEventListener('click', function () {
-setRequestData('accountEngagement');
-});
-videoEngagement.addEventListener('click', function () {
-setRequestData('videoEngagement');
-});
-playerEngagement.addEventListener('click', function () {
-setRequestData('playerEngagement');
-});
-})(window, document);
-</script>
+        var BCLS = (function(window, document) {
+            var
+            /**
+             * sets up the data for the API request
+             * @param {String} id the id of the button that was clicked
+             */
+            function setRequestData() {
+                var endPoint = '',
+                    requestData = {};
+                // note that we don't have to set the to date to now or the sort to video_view
+                // because those are the default values
+                endPoint = '?accounts=20318290001&dimensions=video&from=' + yesterday;
+                requestData.url = reportURL + endPoint;
+                requestData.requestType = 'GET';
+                apiRequest.textContent = requestData.url;
+                apiMethod.textContent = requestData.requestType;
+                getMediaData(requestData);
+            }
+            /**
+             * send API request to the proxy
+             * @param  {Object} requestData options for the request
+             * @param  {String} requestID the type of request = id of the button
+             */
+            function getMediaData(options, requestID) {
+                var httpRequest = new XMLHttpRequest(),
+                    responseRaw,
+                    parsedData,
+                    requestParams,
+                    dataString,
+                    // response handler
+                    getResponse = function() {
+                        try {
+                            if (httpRequest.readyState === 4) {
+                                if (httpRequest.status === 200) {
+                                    if (requestID === 'formatCSV') {
+                                        responseData.textContent = httpRequest.responseText;
+                                    } else {
+                                        console.log(httpRequest.responseText);
+                                        responseRaw = httpRequest.responseText;
+                                        responseData.textContent = responseRaw;
+                                        parsedData = JSON.parse(responseRaw);
+                                        responseData.textContent = JSON.stringify(parsedData, null, '  ');
+                                    }
+                                    // re-enable the buttons
+                                    enableButtons();
+                                } else {
+                                    alert('There was a problem with the request. Request returned ' + httpRequest.status);
+                                }
+                            }
+                        } catch (e) {
+                            alert('Caught Exception: ' + e);
+                        }
+                    };
+                // set up request data
+                requestParams = 'url=' + encodeURIComponent(options.url) + '&requestType=' + options.requestType;
+                if (options.requestBody) {
+                    dataString = JSON.stringify(options.requestBody);
+                    requestParams += '&requestBody=' + encodeURIComponent(dataString);
+                }
+                console.log(requestParams);
+                // set response handler
+                httpRequest.onreadystatechange = getResponse;
+                // open the request
+                httpRequest.open('POST', proxyURL);
+                // set headers
+                httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                // open and send request
+                httpRequest.send(requestParams);
+            }
+            // event listeners
+        })(window, document);
+    </script>
 </body>
+
 </html>
