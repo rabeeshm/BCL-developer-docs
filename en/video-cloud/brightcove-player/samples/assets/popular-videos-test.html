@@ -49,6 +49,7 @@
         <div style="display: block; padding-top: 56.25%;">
             <video id="popularVideosPlayer" data-video-id="4454620113001" data-account="1752604059001" data-player="ee7ec864-097d-4d90-a544-9ef4f5e3c7a2" data-embed="default" class="video-js" controls="" style="width: 100%; height: 100%; position: absolute; top: 0px; bottom: 0px; right: 0px; left: 0px;"></video>
             <script src="//players.brightcove.net/1752604059001/ee7ec864-097d-4d90-a544-9ef4f5e3c7a2_default/index.min.js"></script>
+            <script src="//players.brightcove.net/videojs-overlay/lib/videojs-overlay.js"></script>
         </div>
     </div>
     <p>
@@ -70,6 +71,7 @@
                 engagementURL = 'https://analytics.api.brightcove.com/v1/engagement/accounts/20318290001',
                 proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
                 videoIds = [],
+                videoData = [],
                 // get the epoch time in milliseconds 24 hours ago
                 // 12 hours in milliseconds = 1000 * 24 * 60 * 60 = 86,400,000
                 yesterday = new Date().valueOf() - 86400000;
@@ -80,20 +82,87 @@
                     for (i = 0; i < iMax; i++) {
                         videoIds.push(aapiData.items[i].video)
                     }
+                    getVideoById(0);
                 }
 
                 function getVideoById(idx) {
-
-                }
-
-                function getVideoData() {
-                    var i,
-                        iMax = videoIds.length;
-                    for (i = 0, i < iMax; i++) {
-
+                    if (idx < videoIds.length) {
+                        player.catalog.getVideo(videoIds[idx], function(error, video) {
+                            videoData.push(video);
+                            getVideoById(idx++);
+                        });
                     }
+
                 }
 
+                /**
+                 * sets up the data for the API request
+                 * @param {String} id the id of the button that was clicked
+                 */
+                function setRequestData() {
+                    var endPoint = '',
+                        requestData = {};
+                    // note that we don't have to set the to date to now or the sort to video_view
+                    // because those are the default values
+                    endPoint = '?accounts=20318290001&dimensions=video&from=' + yesterday;
+                    requestData.url = reportURL + endPoint;
+                    requestData.requestType = 'GET';
+                    apiRequest.textContent = requestData.url;
+                    apiMethod.textContent = requestData.requestType;
+                    getMediaData(requestData);
+                }
+                /**
+                 * send API request to the proxy
+                 * @param  {Object} requestData options for the request
+                 * @param  {String} requestID the type of request = id of the button
+                 */
+                function getMediaData(options, requestID) {
+                    var httpRequest = new XMLHttpRequest(),
+                        responseRaw,
+                        parsedData,
+                        requestParams,
+                        dataString,
+                        // response handler
+                        getResponse = function() {
+                            try {
+                                if (httpRequest.readyState === 4) {
+                                    if (httpRequest.status === 200) {
+                                        if (requestID === 'formatCSV') {
+                                            responseData.textContent = httpRequest.responseText;
+                                        } else {
+                                            console.log(httpRequest.responseText);
+                                            responseRaw = httpRequest.responseText;
+                                            responseData.textContent = responseRaw;
+                                            parsedData = JSON.parse(responseRaw);
+                                            extractVideoIds(parsedData);
+                                            responseData.textContent = JSON.stringify(parsedData, null, '  ');
+                                        }
+                                        // re-enable the buttons
+                                        enableButtons();
+                                    } else {
+                                        alert('There was a problem with the request. Request returned ' + httpRequest.status);
+                                    }
+                                }
+                            } catch (e) {
+                                alert('Caught Exception: ' + e);
+                            }
+                        };
+                    // set up request data
+                    requestParams = 'url=' + encodeURIComponent(options.url) + '&requestType=' + options.requestType;
+                    if (options.requestBody) {
+                        dataString = JSON.stringify(options.requestBody);
+                        requestParams += '&requestBody=' + encodeURIComponent(dataString);
+                    }
+                    console.log(requestParams);
+                    // set response handler
+                    httpRequest.onreadystatechange = getResponse;
+                    // open the request
+                    httpRequest.open('POST', proxyURL);
+                    // set headers
+                    httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                    // open and send request
+                    httpRequest.send(requestParams);
+                }
 
 
 
@@ -112,77 +181,6 @@
 
             });
         });
-        var BCLS = (function(window, document) {
-            var
-            /**
-             * sets up the data for the API request
-             * @param {String} id the id of the button that was clicked
-             */
-            function setRequestData() {
-                var endPoint = '',
-                    requestData = {};
-                // note that we don't have to set the to date to now or the sort to video_view
-                // because those are the default values
-                endPoint = '?accounts=20318290001&dimensions=video&from=' + yesterday;
-                requestData.url = reportURL + endPoint;
-                requestData.requestType = 'GET';
-                apiRequest.textContent = requestData.url;
-                apiMethod.textContent = requestData.requestType;
-                getMediaData(requestData);
-            }
-            /**
-             * send API request to the proxy
-             * @param  {Object} requestData options for the request
-             * @param  {String} requestID the type of request = id of the button
-             */
-            function getMediaData(options, requestID) {
-                var httpRequest = new XMLHttpRequest(),
-                    responseRaw,
-                    parsedData,
-                    requestParams,
-                    dataString,
-                    // response handler
-                    getResponse = function() {
-                        try {
-                            if (httpRequest.readyState === 4) {
-                                if (httpRequest.status === 200) {
-                                    if (requestID === 'formatCSV') {
-                                        responseData.textContent = httpRequest.responseText;
-                                    } else {
-                                        console.log(httpRequest.responseText);
-                                        responseRaw = httpRequest.responseText;
-                                        responseData.textContent = responseRaw;
-                                        parsedData = JSON.parse(responseRaw);
-                                        responseData.textContent = JSON.stringify(parsedData, null, '  ');
-                                    }
-                                    // re-enable the buttons
-                                    enableButtons();
-                                } else {
-                                    alert('There was a problem with the request. Request returned ' + httpRequest.status);
-                                }
-                            }
-                        } catch (e) {
-                            alert('Caught Exception: ' + e);
-                        }
-                    };
-                // set up request data
-                requestParams = 'url=' + encodeURIComponent(options.url) + '&requestType=' + options.requestType;
-                if (options.requestBody) {
-                    dataString = JSON.stringify(options.requestBody);
-                    requestParams += '&requestBody=' + encodeURIComponent(dataString);
-                }
-                console.log(requestParams);
-                // set response handler
-                httpRequest.onreadystatechange = getResponse;
-                // open the request
-                httpRequest.open('POST', proxyURL);
-                // set headers
-                httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                // open and send request
-                httpRequest.send(requestParams);
-            }
-            // event listeners
-        })(window, document);
     </script>
 </body>
 
