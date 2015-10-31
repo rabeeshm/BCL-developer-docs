@@ -53,15 +53,11 @@
         </div>
     </div>
     <p>
-        <strong>API request:</strong>
+        <strong>Analytics API request:</strong>
     </p>
     <pre id="apiRequest"></pre>
     <p>
-        <strong>Request method:</strong>
-    </p>
-    <pre id="apiMethod"></pre>
-    <p>
-        <strong>Response data</strong>
+        <strong>Analytics Response data</strong>
     </p>
     <pre id="responseData"></pre>
     <script>
@@ -72,9 +68,13 @@
                 proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
                 videoIds = [],
                 videoData = [],
+                apiRequest = document.getElementById('apiRequest'),
+                responseData = document.getElementById('responseData'),
                 // get the epoch time in milliseconds 24 hours ago
                 // 12 hours in milliseconds = 1000 * 24 * 60 * 60 = 86,400,000
                 yesterday = new Date().valueOf() - 86400000;
+
+                setRequestData();
 
                 function extractVideoIds(aapiData) {
                     var i,
@@ -102,13 +102,11 @@
                 function setRequestData() {
                     var endPoint = '',
                         requestData = {};
-                    // note that we don't have to set the to date to now or the sort to video_view
-                    // because those are the default values
-                    endPoint = '?accounts=20318290001&dimensions=video&from=' + yesterday;
+                    // note that we don't have to set the to date to now because that's the default
+                    endPoint = '?accounts=1752604059001&dimensions=video&sort=-video_view&limit=6&from=' + yesterday;
                     requestData.url = reportURL + endPoint;
                     requestData.requestType = 'GET';
                     apiRequest.textContent = requestData.url;
-                    apiMethod.textContent = requestData.requestType;
                     getMediaData(requestData);
                 }
                 /**
@@ -137,8 +135,6 @@
                                             extractVideoIds(parsedData);
                                             responseData.textContent = JSON.stringify(parsedData, null, '  ');
                                         }
-                                        // re-enable the buttons
-                                        enableButtons();
                                     } else {
                                         alert('There was a problem with the request. Request returned ' + httpRequest.status);
                                     }
