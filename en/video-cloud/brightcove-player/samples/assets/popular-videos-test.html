@@ -64,7 +64,6 @@
         videojs("popularVideosPlayer").ready(function() {
             var player = this,
                 reportURL = 'https://analytics.api.brightcove.com/v1/data',
-                engagementURL = 'https://analytics.api.brightcove.com/v1/engagement/accounts/20318290001',
                 proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
                 videoIds = [],
                 videoData = [],
@@ -82,17 +81,32 @@
                     for (i = 0; i < iMax; i++) {
                         videoIds.push(aapiData.items[i].video)
                     }
-                    getVideoById(0);
+                    console.log('videoIds', videoIds);
+                    getVideoById();
                 }
 
-                function getVideoById(idx) {
-                    if (idx < videoIds.length) {
-                        player.catalog.getVideo(videoIds[idx], function(error, video) {
+                function getVideoById() {
+                    var i,
+                        iMax = videoIds.length;
+                    for (i = 0; i < iMax; i++) {
+                        player.catalog.getVideo(videoIds[i], function(error, video) {
+                            console.log('error', error)
                             videoData.push(video);
-                            getVideoById(idx++);
+                            if (i === iMax) {
+                                createVideoList();
+                            }
                         });
                     }
+                    console.log('videoData', videoData);
+                }
 
+                function createVideoList() {
+                    var i,
+                        iMax = videoData.length,
+                        videoList = '';
+                    for (i = 0; i < iMax; i++) {
+                        videoList += '<img class="video-thumbnail" data-video-id="' + videoData[i].id + '" src="' + videoData[i].thumbnailURL + '">';
+                    }
                 }
 
                 /**
