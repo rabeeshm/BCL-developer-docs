@@ -70,6 +70,28 @@
 
                 setRequestData();
 
+                /**
+                 * create an element
+                 *
+                 * @param  {string} type - the element type
+                 * @param  {object} attributes - attributes to add to the element
+                 * @return {object} the HTML element
+                 */
+                function createEl(type, attributes) {
+                    var el;
+                    if (isDefined(type)) {
+                        el = document.createElement(type);
+                        if (isDefined(attributes)) {
+                            var attr;
+                            for (attr in attributes) {
+                                el.setAttribute(attr, attributes[attr]);
+                            }
+                        }
+                        return el;
+                    }
+                };
+
+
                 function extractVideoIds(aapiData) {
                     var i,
                         iMax = aapiData.items.length;
@@ -97,23 +119,33 @@
                 }
 
                 function createVideoList() {
+                    console.log(videoData);
                     var i,
                         iMax = videoData.length,
-                        videoList = '<h3>Popular Today</h3><p>';
+                        videoList = document.createElement();
                     for (i = 0; i < iMax; i++) {
-                        videoList += '<img class="video-thumbnail" data-video-id="' + videoData[i].id + '" src="' + videoData[i].thumbnailURL + '">';
+                        videoList += '<img class="video-thumbnail" data-video-id="' + videoData[i].id + '" src="' + videoData[i].thumbnail + '">';
                     }
                     videoList += '</p>';
-                    createOverlay();
+                    createOverlay(videoList);
                 }
 
-                function createOverlay() {
+                function createOverlay(videoList) {
                     player.overlay({
-                        overlays: [{
-                            content: player.mediainfo.name,
-                            start: 'loadedmetadata',
-                            end: 'play'
-                        }]
+                        overlays: [
+                            {
+                                align: 'top',
+                                content: videoList,
+                                start: 'pause',
+                                end: 'play'
+                            },
+                            {
+                                align: 'top',
+                                content: videoList,
+                                start: 'end',
+                                end: 'play'
+                            }
+                        ]
                     });
                 }
 
