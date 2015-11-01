@@ -68,14 +68,14 @@
                 // 12 hours in milliseconds = 1000 * 24 * 60 * 60 = 86,400,000
                 yesterday = new Date().valueOf() - 86400000;
 
-                setRequestData();
+                init();
 
                 /**
                  * create an element
                  *
                  * @param  {string} type - the element type
                  * @param  {object} attributes - attributes to add to the element
-                 * @return {object} the HTML element
+                 * @return {HTMLElement} the HTML element
                  */
                 function createEl(type, attributes) {
                     var el;
@@ -91,7 +91,20 @@
                     }
                 };
 
+                /**
+                 * adds text content to an element
+                 * @param {HTMLElement} el the element
+                 * @param {string} str the text content
+                 */
+                function addText(el, str) {
+                    el.appendChild(document.createTextNode(str));
+                }
 
+                /**
+                 * extract video ids from Analytics API response
+                 * @param {array} aapiData the data from the Analytics API
+                 * @return {array} videoIds array of video ids
+                 */
                 function extractVideoIds(aapiData) {
                     var i,
                         iMax = aapiData.items.length;
@@ -101,10 +114,15 @@
                         }
                     }
                     console.log('videoIds', videoIds);
-                    getVideoById();
+                    return videoIds;
                 }
 
-                function getVideoById() {
+                /**
+                 * get video objects
+                 * @param {array} videoIds array of video ids
+                 * @return {array} videoData array of video objects
+                 */
+                function getVideoData(videoIds, callback) {
                     var i,
                         iMax = videoIds.length;
                     for (i = 0; i < iMax; i++) {
@@ -112,22 +130,33 @@
                             console.log('error', error)
                             videoData.push(video);
                             if (i === iMax) {
-                                createVideoList();
+                                callback(videoData);
                             }
                         });
                     }
                 }
 
-                function createVideoList() {
+                /**
+                 * create the html for the overlay
+                 * @param {array} videoData array of video objects
+                 * @return {HTMLElement} videoList the div element containing the overlay
+                 */
+                function createVideoList(videoData) {
                     console.log(videoData);
                     var i,
                         iMax = videoData.length,
-                        videoList = document.createElement();
+                        videoList = createEl('div'),
+                        videoHeader = createEl('h3'),
+                        videoWrapper = createEl('div'),
+                        thumbnailImage;
+                    addText(videoHeader, 'Popular Videos');
+                    videoList.appendChild(videoHeader);
+                    videoList.appendChild(videoWrapper);
                     for (i = 0; i < iMax; i++) {
-                        videoList += '<img class="video-thumbnail" data-video-id="' + videoData[i].id + '" src="' + videoData[i].thumbnail + '">';
+                        thumbnailImage = createEl('img', {class: 'video-thumbnail', 'data-video-id': videoData[i].id, src: videoData[i].thumbnail});
+                        videoWrapper.appendChild(thumbnailImage);
                     }
-                    videoList += '</p>';
-                    createOverlay(videoList);
+                    return videoList;
                 }
 
                 function createOverlay(videoList) {
@@ -161,49 +190,21 @@
                     requestData.url = reportURL + endPoint;
                     requestData.requestType = 'GET';
                     apiRequest.textContent = requestData.url;
-                    getMediaData(requestData);
+                    return requestData;
                 }
                 /**
                  * send API request to the proxy
-                 * @param  {Object} requestData options for the request
-                 * @param  {String} requestID the type of request = id of the button
+                 * @param  {object} requestData options for the request
+                 * @param  {string} requestID the type of request = id of the button
+                 * @return {object} parsedData the parsed API response
                  */
-                function getMediaData(options, requestID) {
+                function getMediaData(options, callback) {
                     var httpRequest = new XMLHttpRequest(),
                         responseRaw,
                         parsedData,
-                        requestParams,
-                        dataString,
-                        // response handler
-                        getResponse = function() {
-                            try {
-                                if (httpRequest.readyState === 4) {
-                                    if (httpRequest.status === 200) {
-                                        if (requestID === 'formatCSV') {
-                                            responseData.textContent = httpRequest.responseText;
-                                        } else {
-                                            console.log(httpRequest.responseText);
-                                            responseRaw = httpRequest.responseText;
-                                            responseData.textContent = responseRaw;
-                                            parsedData = JSON.parse(responseRaw);
-                                            extractVideoIds(parsedData);
-                                            responseData.textContent = JSON.stringify(parsedData, null, '  ');
-                                        }
-                                    } else {
-                                        alert('There was a problem with the request. Request returned ' + httpRequest.status);
-                                    }
-                                }
-                            } catch (e) {
-                                alert('Caught Exception: ' + e);
-                            }
-                        };
+                        requestParams;
                     // set up request data
                     requestParams = 'url=' + encodeURIComponent(options.url) + '&requestType=' + options.requestType;
-                    if (options.requestBody) {
-                        dataString = JSON.stringify(options.requestBody);
-                        requestParams += '&requestBody=' + encodeURIComponent(dataString);
-                    }
-                    console.log(requestParams);
                     // set response handler
                     httpRequest.onreadystatechange = getResponse;
                     // open the request
@@ -212,15 +213,54 @@
                     httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                     // open and send request
                     httpRequest.send(requestParams);
+                    // response handler
+                    function getResponse() {
+                        try {
+                            if (httpRequest.readyState === 4) {
+                                if (httpRequest.status === 200) {
+                                    responseRaw = httpRequest.responseText;
+                                    responseData.textContent = responseRaw;
+                                    parsedData = JSON.parse(responseRaw);
+                                    responseData.textContent = JSON.stringify(parsedData, null, '  ');
+                                    callback(parsedData);
+                                } else {
+                                    alert('There was a problem with the request. Request returned ' + httpRequest.status);
+                                }
+                            }
+                        } catch (e) {
+                            alert('Caught Exception: ' + e);
+                        }
+                    };
+                }
+
+                function init() {
+                    var requestData = {},
+                        analyticsData = {},
+                        videoIds = [],
+                        videoData = [],
+                        videoList;
+                    player.catalog.getVideo(player.options()['data-video-id'], function(error, video) {
+                        //deal with error
+                        // console.log('error', error);
+                        player.catalog.load(video);
+                        // set up data for Analytics API request
+                        requestData = setRequestData();
+                        // make the Analytics API request
+                        getMediaData(requestData, function(analyticsData) {
+                            // extract the video ids into an array
+                            videoIds = extractVideoIds(analyticsData);
+                            // use the catalog to get the video data
+                            getVideoData(videoIds, function(videoData) {
+                                // generate the HTML for the overlay
+                                videoList = createVideoList(videoData);
+                                // add the overlay
+                                createOverlay(videoList);
+                            });
+                        });
+                    });
                 }
 
 
-
-
-            player.catalog.getVideo(player.options()['data-video-id'], function(error, video) {
-                //deal with error
-                player.catalog.load(video);
-            });
         });
     </script>
 </body>
