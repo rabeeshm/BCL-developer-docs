@@ -125,7 +125,7 @@
                         iMax = videoIds.length;
                     for (i = 0; i < iMax; i++) {
                         player.catalog.getVideo(videoIds[i], function(error, video) {
-                            console.log('error', error)
+                            // console.log('error', error)
                             videoData.push(video);
                             if (i === iMax) {
                                 callback(videoData);
@@ -228,7 +228,7 @@
                         } catch (e) {
                             alert('Caught Exception: ' + e);
                         }
-                    };
+                    }
                 }
 
                 function init() {
@@ -236,11 +236,29 @@
                         analyticsData = {},
                         videoIds = [],
                         videoData = [],
-                        videoList;
+                        videoList,
+                        overlayDiv = createEl('div', {id: 'bclsOverlay'});
                     player.catalog.getVideo(player.options()['data-video-id'], function(error, video) {
                         //deal with error
                         // console.log('error', error);
                         player.catalog.load(video);
+                        // add the overlay
+                        player.overlay({
+                            overlays: [
+                                {
+                                    align: 'top',
+                                    content: videoList,
+                                    start: 'pause',
+                                    end: 'play'
+                                },
+                                {
+                                    align: 'top',
+                                    content: videoList,
+                                    start: 'end',
+                                    end: 'play'
+                                }
+                            ]
+                        });
                         // set up data for Analytics API request
                         requestData = setRequestData();
                         // make the Analytics API request
@@ -252,7 +270,8 @@
                                 // generate the HTML for the overlay
                                 videoList = createVideoList(videoData);
                                 // add the overlay
-                                createOverlay(videoList);
+                                overlayDiv.appendChild(videoList);
+
                             });
                         });
                     });
