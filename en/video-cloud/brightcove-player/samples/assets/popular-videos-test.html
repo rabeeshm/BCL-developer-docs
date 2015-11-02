@@ -63,6 +63,10 @@
     </p>
     <pre id="responseData"></pre>
     <script>
+        var loadAndPlay;
+
+
+
         videojs("popularVideosPlayer").ready(function () {
             'use strict';
             var player = this,
@@ -70,11 +74,19 @@
                 proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
                 apiRequest = document.getElementById('apiRequest'),
                 responseData = document.getElementById('responseData'),
+                videoData = [],
                 // get the epoch time in milliseconds 24 hours ago
                 // 12 hours in milliseconds = 1000 * 24 * 60 * 60 = 86,400,000
                 yesterday = new Date().valueOf() - 86400000;
 
             init();
+
+            loadAndPlay = function (idx) {
+                console.log('idx', idx);
+                player.catalog.load(videoData[idx]);
+                player.play();
+            }
+
 
             /**
              * create an element
@@ -128,8 +140,7 @@
              */
             function getVideoData(videoIds, callback) {
                 var i = 0,
-                    iMax = videoIds.length,
-                    videoData = [];
+                    iMax = videoIds.length;
 
                 getVideo();
                 function getVideo() {
@@ -160,16 +171,21 @@
                     videoList = createEl('div', {id: 'videoList'}),
                     videoHeader = createEl('h1', {style: 'font-size: 2em;margin-bottom:.5em'}),
                     videoWrapper = createEl('div'),
+                    thumbnailLink,
                     thumbnailImage;
                 addText(videoHeader, 'Popular Videos');
                 videoList.appendChild(videoHeader);
                 videoList.appendChild(videoWrapper);
                 for (i = 0; i < iMax; i++) {
-                    thumbnailImage = createEl('img', {class: 'video-thumbnail', 'data-video-id': videoData[i].id, src: videoData[i].thumbnail});
-                    videoWrapper.appendChild(thumbnailImage);
+                    thumbnailLink = createEl('a', {href: 'javascript:loadAndPlay(' + i + ')'})
+                    thumbnailImage = createEl('img', {class: 'video-thumbnail', src: videoData[i].thumbnail});
+                    videoWrapper.appendChild(thumbnailLink);
+                    thumbnailLink.appendChild(thumbnailImage);
                 }
                 return videoList;
             }
+
+
 
             /**
              * sets up the data for the API request
@@ -258,19 +274,18 @@
                     getMediaData(requestData, function (analyticsData) {
                         // extract the video ids into an array
                         videoIds = extractVideoIds(analyticsData);
-                        console.log('videoIds', videoIds);
                         // use the catalog to get the video data
-                        getVideoData(videoIds, function (videoData) {
-                            console.log('videoData', videoData);
+                        getVideoData(videoIds, function () {
                             // generate the HTML for the overlay
                             videoList = createVideoList(videoData);
                             // add the overlay
                             overlayDiv.appendChild(videoList);
-                             console.log('overlayDiv', overlayDiv);
                         });
                     });
                 });
             }
+
+            return loadAndPlay;
         });
     </script>
 </body>
