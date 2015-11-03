@@ -14,10 +14,6 @@
             font-size: 1.1em;
         }
 
-        button {
-            padding: .5em;
-        }
-
         pre {
             background-color: #F1EFEE;
             border-left: .5em solid #636363;
@@ -63,6 +59,11 @@
     </p>
     <pre id="responseData"></pre>
     <script>
+        /**
+         * we'll define this variable later as a function
+         * but it needs to be in the page scope so that
+         * DOM elements can access it
+         */
         var loadAndPlay;
 
 
@@ -74,13 +75,18 @@
                 proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
                 apiRequest = document.getElementById('apiRequest'),
                 responseData = document.getElementById('responseData'),
-                videoData = [],
-                // get the epoch time in milliseconds 24 hours ago
-                // 12 hours in milliseconds = 1000 * 24 * 60 * 60 = 86,400,000
-                yesterday = new Date().valueOf() - 86400000;
-
+                // this var needs to be in the function scope because
+                // multiple functions will access it
+                videoData = [];
+            // launch the controller function to kick things off
             init();
 
+            /**
+             * loads and plays a video
+             * this function called with thumbnails in
+             * the overlay are clicked
+             * @param {integer} idx the index of the video object in the videoData array
+             */
             loadAndPlay = function (idx) {
                 console.log('idx', idx);
                 player.catalog.load(videoData[idx]);
@@ -142,6 +148,9 @@
                 var i = 0,
                     iMax = videoIds.length;
 
+                /**
+                 * makes catalog calls for all video ids in the array
+                 */
                 getVideo();
                 function getVideo() {
                     if (i < iMax) {
@@ -151,7 +160,12 @@
                     }
 
                 }
-
+                /**
+                 * callback for the catalog calls
+                 * pushes the returned data object into an array
+                 * @param {string} error error returned if the call fails
+                 * @parap {object} video the video object
+                 */
                 function pushData(error, video) {
                     videoData.push(video);
                     i++;
@@ -169,7 +183,7 @@
                 var i,
                     iMax = videoData.length,
                     videoList = createEl('div', {id: 'videoList'}),
-                    videoHeader = createEl('h1', {style: 'font-size: 2em;margin-bottom:.5em'}),
+                    videoHeader = createEl('h1', {style: 'color:#666600;font-size: 2em;margin-bottom:.5em'}),
                     videoWrapper = createEl('div'),
                     thumbnailLink,
                     thumbnailImage;
@@ -185,14 +199,14 @@
                 return videoList;
             }
 
-
-
             /**
              * sets up the data for the API request
-             * @param {String} id the id of the button that was clicked
              */
             function setRequestData() {
                 var endPoint = '',
+                    // get the epoch time in milliseconds 24 hours ago
+                    // 12 hours in milliseconds = 1000 * 24 * 60 * 60 = 86,400,000
+                    yesterday = new Date().valueOf() - 86400000,
                     requestData = {};
                 // note that we don't have to set the to date to now because that's the default
                 endPoint = '?accounts=1752604059001&dimensions=video&sort=-video_view&limit=6&from=' + yesterday;
@@ -242,6 +256,9 @@
                 }
             }
 
+            /**
+             * acts as a controller for the rest of the script
+             */
             function init() {
                 var requestData = {},
                     videoIds = [],
@@ -284,8 +301,6 @@
                     });
                 });
             }
-
-            return loadAndPlay;
         });
     </script>
 </body>

@@ -9,15 +9,15 @@
   <!-- change title to match the h1 heading -->
   <title>Brightcove Player Sample: Toggling an Overlay</title>
   <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/foundation.min.css" />
-	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/normalize.css" />
   <script src="//use.edgefonts.net/source-code-pro.js"></script>
   <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
 
   <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css">
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/atelier-forest.light.min.css">
   <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
 
 
   <!-- page plugin styles -->
@@ -33,7 +33,7 @@
   ga('send', 'pageview');
 
 </script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/js/vendor/modernizr.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/js/vendor/modernizr.js"></script>
 
   <!-- Page styles -->
 
@@ -41,9 +41,9 @@
 
 <body>
     <!-- header navbar -->
-	<div id="navWrapper" class="fixed"></div>
-	<!-- breadcrumbs -->
-	<nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+    <div id="navWrapper" class="fixed"></div>
+    <!-- breadcrumbs -->
+    <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
   <!-- search -->
   <div id="searchModal" class="reveal-modal" data-reveal></div>
   <!-- content -->
@@ -53,8 +53,8 @@
         </div>
         <div id="main" class="large-10 small-12 columns">
       <div id="top" class="section">
-        <h1>Brightcove Player Sample: Toggling an Overlay</h1>
-        <p>This topic shows you how to use a Brightcove player with an overlay that toggles on and off by clicking on a button.</p>
+        <h1>Brightcove Player Sample: Popular Videos Overlay</h1>
+        <p>This topic shows you how to use the <a href="../../analytics-api/index.html">Analytics API</a> and a Brightcove player with an overlay to display a list of the most popular videos in the account today when playback is paused or ends.</p>
       </div>
 
     <div class="text-warning" style="padding-left:1em;padding-right:1em;">
@@ -63,6 +63,10 @@
           <ul>
             <li><a href="https://github.com/brightcove/videojs-overlay">videojs-overlay</a> : For details, refer to the <a href="../../brightcove-player/guides/overlay-plugin.html">Display Overlay Plugin</a> document.</li>
           </ul>
+          <h4>APIs</h4>
+          <p>
+              This sample uses the Analytics API via a <a href="#proxy">proxy</a> built in PHP.
+          </p>
     </div>
 
     <div id="developmentsequence" class="section">
@@ -85,8 +89,7 @@
             <li>Automatically responsive</li>
             <li>The iframe eases use in social media apps (or whenever the video will need to "travel" into other apps)</li>
           </ul>
-          <p>Although integrating the In-Page embed player can be more complex, there are times when you will plan your code around that implementation. To generalize, this approach is best when the containing page needs to communicate to the player. Specifically,
-            here are some examples:</p>
+          <p>Although integrating the In-Page embed player can be more complex, there are times when you will plan your code around that implementation. To generalize, this approach is best when the containing page needs to communicate to the player. Specifically, here are some examples:</p>
           <ul>
             <li>Code in the containing page needs to listen for and act on player events</li>
             <li>The player uses styles from the containing page</li>
@@ -97,80 +100,59 @@
     </div>
 
       <div id="selectimplementation" class="section">
-				<h2>Select implementation</h2>
-				<p>In this sample, you will test with the In-Page embed code and then move the CSS and JavaScript into a plugin. Since this example interacts with the button page element, the iframe implementation will not be used. </p>
-			</div>
+                <h2>Select implementation</h2>
+                <p>This sample uses the In-Page embed code. You can also move the CSS and JavaScript into a plugin. If you do that, be sure to add the <a href="../guides/overlay-plugin.html">overlay plugin</a> CSS and JavaScript before adding the custom plugin, because this code depends on the overlay. </p>
+            </div>
 
       <div id="resources" class="section">
         <h2>API resources used</h2>
-		  <p>The following sections detail resources used from various APIs.</p>
+          <p>The following sections detail resources used from various APIs.</p>
         <h3>Brightcove player API methods</h3>
         <ul>
-          <li><code>addClass()</code></li>
-          <li><code>removeClass()</code></li>
+          <li><code>catalog.getVideo()</code></li>
+          <li><code>catalog.load()</code></li>
+          <li><code>play()</code></li>
         </ul>
         <h3>Brightcove player API events</h3>
         <ul>
-          <li><code>loadedmetadata</code></li>
+          <li><code>play</code></li>
+          <li><code>ended</code></li>
         </ul>
       </div>
 
       <div id="player" class="section">
         <h2>The player</h2>
-        <p>Click the <strong>Toggle Overlay</strong> button to turn the overlay on and off.</p>
+        <p>The player is embedded in the CodePen below. The overlay will appear when you pause a video, or the video ends. The request to the Analytics API to get the 6 most viewed videos in the past 24 hours is shown, along with the API response.</p>
 
-        <video id="video_1"
-          data-account="1752604059001"
-          data-player="ef5590c1-c497-4b39-b8d3-daf4203e5cb0"
-          data-embed="default"
-          data-video-id="4029697544001"
-          class="video-js" controls></video>
+        <p data-height="800" data-theme-id="14832" data-slug-hash="GpBWmm" data-default-tab="result" data-user="bcls" class='codepen'>See the Pen <a href='http://codepen.io/team/bcls/pen/GpBWmm/'>Popular Videos Overlay/Endscreen</a> by Brightcove Learning Services (<a href='http://codepen.io/bcls'>@bcls</a>) on <a href='http://codepen.io'>CodePen</a>.</p>
+        <script async src="//assets.codepen.io/assets/embed/ei.js"></script>
 
-        <br/>
-        <input id="overlayButton" type="button" value="Toggle Overlay">
-
-        <script src="//players.brightcove.net/1752604059001/ef5590c1-c497-4b39-b8d3-daf4203e5cb0_default/index.min.js"></script>
-
-      </div><!-- id="player" -->
+      </div>
 
       <div id="code" class="section">
         <h2>How it works</h2>
 
-		    <p>The following sections explain the player, JavaScript and CSS code used in the example.</p>
+            <p>The following sections explain the player, JavaScript and CSS code used in the example. The code is all contained in the CodePen, except for the proxy used to make the Analytics API request. The proxy is required to get an access token used to authenticate the request. The code for the proxy is shown <a href="#proxy">below</a>.</p>
 
         <h3>Create the player</h3>
-          <p>To create a player and assign a video to it, follow these steps:</p>
+          <p>The player has no special attributes except that the width is set to 600px. To create a player and assign a video to it, follow these steps:</p>
           <ol>
               <li>In the <strong>Players</strong> module, create a new player or use an existing one.</li>
-              <li><p>For this example, you will need to add the Overlay plugin to the player:</p>
-                  <p class="BCL-aside">For more information about the Overlay plugin, see the <a href="../../brightcove-player/guides/overlay-plugin.html">Display Overlay Plugin</a> document.</p>
-                  <ol type="a">
-                    <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
-                    <li>The JavaScript for the Overlay plugin is provided and will not change for different plugin implementations. For the <strong>JavaScript URL</strong>, enter:
-                    <pre> http://players.brightcove.net/videojs-overlay/lib/videojs-overlay.js</pre></li>
-                    <li>The CSS for the Overlay plugin is provided and will not change for different plugin implementations. For the <strong>CSS URL</strong>, enter:<br/>
-                    <pre> http://players.brightcove.net/videojs-overlay/lib/videojs-overlay.css</pre></li>
-                    <li>For the <strong>Name</strong>, enter <strong>overlay</strong>.</li>
-                    <li><p>Enter the plugin options. The example below displays a clickable overlay image at the top of the player when the player is loaded. You'll use JavaScript in later steps to initially hide this overlay.</p>
-                        <p><code data-gist-id="d9abb17ed21e11571769" data-gist-hide-footer="true" data-gist-line="2-11"></code></p>
-                        <div><img src="../../brightcove-player/samples/assets/overlay-toggle-json.png" alt="overlay plugin"></div>
-                  </ol>
-              </li>
               <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
               <li><span class="video-cloud-only">In the <strong>Media</strong> module, select a video and publish it with this player.</span><span class="perform-only">Assign video content to the player and publish it.</span></li>
               <li>Copy the <strong>In-Page</strong> embed code and paste it into a new HTML file.</li>
           </ol>
           <p class="BCL-aside">For details on how to get this embed code, see the <a href="../../brightcove-player/getting-started/quick-start-bc-player.html">Quick Start to Brightcove Player</a> document.</p>
 
-        <p>The embed code should look like this:</p>
-        <p><code data-gist-id="d9abb17ed21e11571769" data-gist-hide-footer="true" data-gist-line="46-52,56"></code></p>
-
+        <p>See the HTML in the CodePen to see the player embed code. You also need to include the CSS and JS files:</p>
+        <ol start="5">
+            <li><link href="//players.brightcove.net/videojs-overlay/lib/videojs-overlay.css" rel='stylesheet'></li>
+            <li><script src="//players.brightcove.net/videojs-overlay/lib/videojs-overlay.js"></script></li>
+        </ol>
+        <p class="BCL-aside">Note: the script tag must be added <strong>after</strong> the script tag for the player JavaScript. The link tag for the CSS can be added anywhere, and should properly be placed in the head section of the page, but here it is added just before the overlay script tag.</p>
         <h3><a name="HTMLCode"></a>The HTML code</h3>
-          <p>Add the following HTML code to your page code.</p>
-          <ul>
-            <li>Line 54: Adds a button named <strong>Toggle Overlay</strong>. In a later step, you will add an event listener to this button.</li>
-          </ul>
-          <p><code data-gist-id="d9abb17ed21e11571769" data-gist-hide-footer="true" data-gist-line="46-56" data-gist-highlight-line="53-54"></code></p>
+          <p>No other HTML is required. The display of the Analytics API request and response in the CodePen is just there to show you what they look like.</p>
+
 
         <h3><a name="JSCode"></a>The JavaScript code</h3>
 
@@ -183,21 +165,21 @@
           <li>Lines 74-75: Hides the overlay.</li>
           <li>Lines 78-79: Shows the overlay.</li>
         </ul>
-		<p><code data-gist-id="d9abb17ed21e11571769" data-gist-hide-footer="true" data-gist-line="59-83"></code></p>
+        <p><code data-gist-id="d9abb17ed21e11571769" data-gist-hide-footer="true" data-gist-line="59-83"></code></p>
 
-		  <h3><a name="CSSCode"></a>The stylesheet</h3>
+          <h3><a name="CSSCode"></a>The stylesheet</h3>
         <p>This example uses CSS styles for the Brightcove player.</p>
-		  <ul>
+          <ul>
               <li>Lines 24-31: Center the overlay image and turns off the default background.</li>
-			  <li>Lines 33-35: Hide the overlay.</li>
+              <li>Lines 33-35: Hide the overlay.</li>
               <li>Lines 47-40: Set the dimensions of the player.</li>
-		  </ul>
+          </ul>
         <p><code data-gist-id="d9abb17ed21e11571769" data-gist-hide-footer="true" data-gist-line="22-41"></code></p>
-	  </div>
+      </div>
 
     <div id="plugin" class="section">
         <h2>Use a plugin</h2>
-		  <p>It is a best practice to use a plugin so that you can easily add this functionality to multiple players.</p>
+          <p>It is a best practice to use a plugin so that you can easily add this functionality to multiple players.</p>
         <h3>Create the JavaScript file</h3>
         <p>Move the plugin's JavaScript code into a file and place it in an Internet accessible URL.</p>
         <ul>
@@ -217,7 +199,7 @@
           <li>Browse the HTML page. You should see that the <strong>Toggle Overlay</strong> button still works, except now your JavaScript code has been removed from the HTML page.</li>
         </ol>
 
-		<h3>Create the CSS file</h3>
+        <h3>Create the CSS file</h3>
       <p>Move the CSS styles into a file and place it in an Internet accessible URL.</p>
       <ol>
           <li>Create a new file for your CSS styles. In this case, name it <code>overlay-button.css</code>.</li>
@@ -228,7 +210,7 @@
           <li>Browse the HTML page. You should see that the <strong>Toggle Overlay</strong> button still works, except now your styles has been removed from the HTML page.</li>
       </ol>
 
-		<h3>Deploy plugin and CSS</h3>
+        <h3>Deploy plugin and CSS</h3>
         <p>To deploy the overlay button Plugin using the Players module, follow these steps:</p>
         <ol>
           <li>In the new Video Cloud Studio, open the <strong>Players</strong> module and locate the player.</li>
@@ -286,9 +268,9 @@
 
     <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
     <script>
-	var feedbackMail = document.getElementById("feedbackMail");
-	feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
-	</script>
-	</body>
+    var feedbackMail = document.getElementById("feedbackMail");
+    feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+    </script>
+    </body>
 
 </html>
