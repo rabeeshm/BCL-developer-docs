@@ -72,6 +72,7 @@
                 <li><a href="#playbackmodes">Playback modes</a></li>
                 <li><a href="#issues">Known issues</a></li>
               </ul>
+              <p class="BCL-aside">Note: Initial behavior concerning the timing of loading of video advertisements is described in the <a href="#requestMode">requestMode</a> option. Be sure to check this as default behavior is undesirable for some types of ad servers/networks.</p>
            </div>
            <div id="testadserver" class="section">
             <h2>Testing the ad server</h2>
@@ -174,10 +175,28 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                     <p>Type: <code>boolean</code> Default Value: <code>false</code></p>
                     <p>When set to true, the <code>vjs-loading-spinner</code> is displayed while an ad loads.</p>
 
+                    <h3>postrollTimeout</h3>
+                    <p>Type: <code>number</code> Default Value: <code>100</code> milliseconds</p>
+                    <p>The maximum amount of time to wait for an ad implementation to initiate a postroll, in milliseconds. If <code>contentended</code> has been fired and the ad implementation does not call <code>startLinearAdMode()</code> before <code>postrollTimeout</code> expires, the content video will end playback.</p>
+                    <p>This option is part of the ad framework and is configured as follows:</p>
+                    <pre><code>player.ads({
+  postrollTimeout: 1000
+});</code></pre>
+                    <p>Once the ad dispatches the <code>contentended</code> event one of these things will happen:</p>
+              <ul>
+                      <li><code>startLinearAdMode()</code> is called within the timeout: Postroll(s) will play without the user seeing any content video first.</li>
+                      <li><code>skipLinearAdMode()</code> is called within the timeout: Content video stops.</li>
+                      <li><code>startLinearAdMode()</code> is never called: Content video stops.</li>
+                      <li><code>startLinearAdMode()</code> is called, but after the postrollTimeout expired: Content video stops.</li>
+                    </ul>
+              <p>The <code>postrollTimout</code> should be as short as possible so that the viewer does not have to wait unnecessarily if no postroll is scheduled for a video. Make this longer if your ad integration needs a long time to decide whether it has postroll inventory to play or not. Ideally, your ad integration should already know if it wants to play a postroll before the <code>contentended</code> event.
+              </p>
+
+
                     <h3>prerollTimeout</h3>
                     <p>Type: <code>number</code> Default Value: <code>1000</code> milliseconds</p>
                     <p>The maximum amount of time to wait for an ad implementation to initiate a preroll, in milliseconds. If <code>readyforpreroll</code> has been fired and the ad implementation does not call <code>startLinearAdMode()</code> before <code>prerollTimeout</code> expires, the content video will begin playback. The <code>prerollTimeout</code> option is cumulative with the standard timeout parameter.</p>
-                    <p>This option is part of the ad framework is configured as follows:</p>
+                    <p>This option is part of the ad framework and is configured as follows:</p>
                     <pre><code>player.ads({
   prerollTimeout: 1000
 });</code></pre>
@@ -187,14 +206,15 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                       <li><code>startLinearAdMode()</code> is never called: Content video plays without preroll(s).</li>
                       <li><code>startLinearAdMode()</code> is called, but after the prerollTimeout expired: Bad user experience; content video plays a bit, then preroll(s) cut in.</li>
                     </ul>
-              <p>The <code>prerollTimout</code> should be as short as possible so that the viewer does not have to wait unnecessarily if no preroll is scheduled for a video. Make this longer if your ad integration needs a long time to decide whether it has preroll inventory to play or not. Ideally, your ad integration should already know if it wants to play a preroll before the <code>readyforpreroll</code> event.              </p>
+              <p>The <code>prerollTimout</code> should be as short as possible so that the viewer does not have to wait unnecessarily if no preroll is scheduled for a video. Make this longer if your ad integration needs a long time to decide whether it has preroll inventory to play or not. Ideally, your ad integration should already know if it wants to play a preroll before the <code>readyforpreroll</code> event.
+              </p>
 
-              <h3>requestMode</h3>
+              <h3 id="requestMode">requestMode</h3>
                     <p>Type: <code>string</code> Default Value: <code>onload</code></p>
                     <p>There are three possible values for this option:</p>
                     <ul>
-                      <li><code>onload</code>: Ads are requested immediately when the player loads</li>
-                      <li><code>onplay</code>: The first ad request is delayed until playback is initiated</li>
+                      <li><code>onload</code>: Ads are requested immediately when the player loads. This is normally the best experience for DFP / VPAID.</li>
+                      <li><code>onplay</code>: The first ad request is delayed until playback is initiated. This is important for ad networks which consider ad requests made without corresponding ad plays, which can  happen on a poorly performing site. This will cause ads trafficked to eventually drop, or the customer will receive less for the ads shown.</li>
                       <li><code>ondemand</code>: All ad requests will be initiated using the <code>player.ima3.adrequest()</code> method manually</li>
                     </ul>
                     <p>Note: All <code>requestMode</code> values make <code>ondemand</code> requests immediately.</p>
@@ -410,7 +430,7 @@ Pi.I bridge3.1.33.html:121
                     <h3>Control bars</h3>
                     <p>You will see that the advertisement and video that plays after advertisement completion can have different control bars. IMA creates a separate video element under most circumstances and exposes information about the ad playback state through non-standard methods. The control bar in the Brightcove Player is associated with different playback technology, and it is non-trivial to have the same control bar for both technologies.</p>
                     <h3>Skippable ads on iPhones</h3>
-                    <p>Skippable ads are not supported by IMA3 on iPhones.</p>
+                    <p>Skippable ads are not supported by IMA3 on iPhones and such ads will not be shown at all.</p>
                     <h3>Ads Free Setting from Studio</h3>
                     <p>If you use Studio to set your video as ads free, this will no work. Brightcove Player does not respect this setting. To get the behavior you want you currently have to configure two separate players or write a plugin that updates the ad configuration dynamically.</p>
             </div>
