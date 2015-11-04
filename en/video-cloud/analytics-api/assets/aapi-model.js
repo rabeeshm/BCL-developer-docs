@@ -236,6 +236,24 @@ var aapi_model = {
         player__source_type__search_terms: {dimensions: ["player", "source_type", "search_terms"], from: "2012-10-01"},
         player__referrer_domain__source_type: {dimensions: ["player", "referrer_domain", "source_type"], from: "2012-10-01"},
         account__player__referrer_domain__source_type: {dimensions: ["account", "player", "referrer_domain", "source_type"], from: "2012-10-01"},
+        account__device_os__country: {dimensions: ["account", "device_os", "country"], from: "2015-10-19"},
+        account__device_os__region: {dimensions: ["account", "device_os", "region"], from: "2015-10-19"},
+        account__device_os__country__region: {dimensions: ["account", "device_os", "country", "region"], from: "2015-10-19"},
+        account__device_type__country: {dimensions: ["account", "device_type", "country"], from: "2015-10-19"},
+        account__device_type__region: {dimensions: ["account", "device_type", "region"], from: "2015-10-19"},
+        account__device_type__country__region: {dimensions: ["account", "device_type", "country", "region"], from: "2015-10-19"},
+        account__device_os__device_type__country: {dimensions: ["account", "device_os", "device_type", "country"], from: "2015-10-19"},
+        account__device_os__device_type__region: {dimensions: ["account", "device_os", "device_type", "region"], from: "2015-10-19"},
+        account__device_os__device_type__country__region: {dimensions: ["account", "device_os", "device_type", "country", "region"], from: "2015-10-19"},
+        device_os__country: {dimensions: ["device_os", "country"], from: "2015-10-19"},
+        device_os__region: {dimensions: ["device_os", "region"], from: "2015-10-19"},
+        device_os__country__region: {dimensions: ["device_os", "country", "region"], from: "2015-10-19"},
+        device_type__country: {dimensions: ["device_type", "country"], from: "2015-10-19"},
+        device_type__region: {dimensions: ["device_type", "region"], from: "2015-10-19"},
+        device_type__country__region: {dimensions: ["device_type", "country", "region"], from: "2015-10-19"},
+        device_os__device_type__country: {dimensions: ["device_os", "device_type", "country"], from: "2015-10-19"},
+        device_os__device_type__region: {dimensions: ["device_os", "device_type", "region"], from: "2015-10-19"},
+        device_os__device_type__country__region: {dimensions: ["device_os", "device_type", "country", "region"], from: "2015-10-19"},
         account__destination_path: {dimensions: ["account", "destination_path"], from: "2014-03-03"},
         account__destination_domain: {dimensions: ["account", "destination_domain"], from: "2014-03-03"},
         account__destination_domain__destination_path: {dimensions: ["account", "destination_domain", "destination_path"], from: "2014-03-03"},
@@ -246,15 +264,4 @@ var aapi_model = {
     }
 };
 
-/*
-        account__device_os__country: {dimensions: ["account", "device_os", "country"], from: "2015-10-01"},
-        account__device_os__region: {dimensions: ["account", "device_os", "region"], from: "2015-10-01"},
-        account__device_os__country__region: {dimensions: ["account", "device_os", "country", "region"], from: "2015-10-01"},
-        account__device_type__country: {dimensions: ["account", "device_type", "country"], from: "2015-10-01"},
-        account__device_type__region: {dimensions: ["account", "device_type", "region"], from: "2015-10-01"},
-        account__device_type__country__region: {dimensions: ["account", "device_type", "country", "region"], from: "2015-10-01"},
-        account__device_os__device_type__country: {dimensions: ["account", "device_os", "device_type", "country"], from: "2015-10-01"},
-        account__device_os__device_type__region: {dimensions: ["account", "device_os", "device_type", "region"], from: "2015-10-01"},
-        account__device_os__device_type__country__region: {dimensions: ["account", "device_os", "device_type", "country", "region"], from: "2015-10-01"},
-*/
 
