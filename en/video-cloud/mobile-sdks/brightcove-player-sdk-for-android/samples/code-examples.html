@@ -47,43 +47,60 @@
 			<div id="top" class="section">
 				<h1>Brightcove Player SDK for Android: Code Examples</h1>
                 <p>This topic contains a collection of code snippets which you may find useful as a reference while developing with the SDK. For more detailed solutions, see the <a href="https://github.com/BrightcoveOS/android-player-samples">Android player samples</a>.</p>
-                <h3>Code example categories</h3>
+                <h3>Table of contents</h3>
                 <ul>
-                    <li><a href="#fullscreen">Manage fullscreen using code</a></li>
+                    <li><a href="#fullscreen">Fullscreen mode</a></li>
                     <li><a href="#methods">Methods: synchronous or asynchronous?</a></li>
-                    <li><a href="#videoStillImage">Show/hide video still image</a></li>
-                    <li><a href="#swapVideo">Swap video in a player</a></li>
-                    <li><a href="#thumbnailImage">Use thumbnail images</a></li>
+                    <li><a href="#thumbnailImage">Thumbnail images</a></li>
+                    <li><a href="#swapVideo">Video content in the player</a></li>
+                    <li><a href="#videoStillImage">Video still images</a></li>          
                 </ul>
                 
 			</div>
             
             <div id="fullscreen" class="section">
-                <h2>Manage fullscreen using code</h2>
-                <p>You can use the following code to set fullscreen mode:</p>
-                <pre><code>brightcoveVideoView.getEventEmitter().emit(EventType.ENTER_FULL_SCREEN);</code></pre>
-                <p>Here is the code to exit fullscreen mode:</p>
-                <pre><code>brightcoveVideoView.getEventEmitter().emit(EventType.EXIT_FULL_SCREEN);</code></pre>
-                
+                <h2>Fullscreen mode</h2>
+                <p>You can manage fullscreen mode using code.</p>
+                <ul>
+                    <li>Here is the code to set fullscreen mode:
+                        <pre><code>brightcoveVideoView.getEventEmitter().emit(EventType.ENTER_FULL_SCREEN);</code></pre>
+                    </li>
+                    <li>Here is the code to exit fullscreen mode:
+                    <pre><code>brightcoveVideoView.getEventEmitter().emit(EventType.EXIT_FULL_SCREEN);</code></pre></li>
+                </ul>
             </div>
             
             <div id="methods" class="section">
                 <h2>Methods: synchronous or asynchronous?</h2>
+                <p>Here are some of the asynchronous methods found in the Native Player SDK for Android:</p>
                 <ul>
                     <li>The <code>start()</code>, <code>seekTo()</code> and <code>stopPlayback()</code> methods are asynchronous, because they emit an event for other components in the system to handle.</li>
                     <li>The <code>clear()</code> method is synchronous with respect to updating the list, but it's asynchronous with respect to loading the current video.</li>
                 </ul>
             </div>
             
-            <div id="videoStillImage" class="section">
-                <h2>Show/hide video still image</h2>
-                <p>You can show the video still at any time by emitting a <code>SET_VIDEO_STILL</code> event with a <code>VIDEO_STILL</code> property set to the URI of the video still.</p>
-                <p>Hiding should happen automatically whenever a <code>CUE_POINT</code>, <code>DID_PLAY</code>, <code>DID_SEEK_TO</code>, <code>WILL_INTERRUPT_CONTENT</code>, <code>ACTIVITY_STOPPED</code>, or <code>FRAGMENT_STOPPED</code> event occurs.</p>
-                <p>In general, we try to promote doing things via events, rather than direct method calls.</p>
+            <div id="thumbnailImage" class="section">
+                <h2>Thumbnail images</h2>
+                <p>The URL for your thumbnail images can returned as follows:</p>
+                <ul>
+                    <li>If you are using the Edge Catalog (com.brightcove.player.edge.Catalog), you should be able to get the thumbnail URL like this:
+                        <pre><code>String thumbnailUrl = video.getProperties().get("thumbnail");</code></pre>
+                    </li>
+                    <li>If you are using the legacy Media API Catalog (com.brightcove.player.media.Catalog), you should be able to do this:
+                        <pre><code>Catalog catalog = new Catalog("<your token>");
+Map<String, String> props = new HashMap<String, String>();
+props.put("video_fields", "accountId,name,shortDescription,longDescription,videoStillURL,thumbnailURL,referenceId,id,length,customFields,HLSURL,videoFullLength,cuePoints");
+  catalog.findVideoByID("3951601515001", props, new VideoListener() {
+    @Override
+    public void onVideo(Video video) {
+      String thumbnailUrl = video.getProperties().get("thumbnailURL");
+      ...</code></pre>
+                    </li>
+                </ul>
             </div>
             
             <div id="swapVideo" class="section">
-                <h2>Swap video in a player</h2>
+                <h2>Video content in the player</h2>
                 <p>This example shows one approach for swapping videos in the player.</p>
                 <h3>Using single videos</h3>
                 <p>Since the <code>clear()</code> method is asynchronous, you need to wait for the <code>DID_CHANGE_LIST</code> event before adding a new video to the player.</p>
@@ -108,19 +125,11 @@ brightcoveVideoView.stopPlayback();
 brightcoveVideoView.setCurrentIndex(0);</code></pre>  
             </div>
                 
-            <div id="thumbnailImage" class="section">
-                <h2>Use thumbnail images</h2>
-                <p>If you are using the Edge Catalog (com.brightcove.player.edge.Catalog), you should be able to do something like this:</p>
-                <pre><code>String thumbnailUrl = video.getProperties().get("thumbnail");</code></pre>
-                <p>If you are using the legacy Media API Catalog (com.brightcove.player.media.Catalog), you should be able to do something like this:</p>
-                <pre><code>Catalog catalog = new Catalog("<your token>");
-Map<String, String> props = new HashMap<String, String>();
-props.put("video_fields", "accountId,name,shortDescription,longDescription,videoStillURL,thumbnailURL,referenceId,id,length,customFields,HLSURL,videoFullLength,cuePoints");
-  catalog.findVideoByID("3951601515001", props, new VideoListener() {
-    @Override
-    public void onVideo(Video video) {
-      String thumbnailUrl = video.getProperties().get("thumbnailURL");
-      ...</code></pre>
+            <div id="videoStillImage" class="section">
+                <h2>Video still images</h2>
+                <p>You can show the video still at any time by emitting a <code>SET_VIDEO_STILL</code> event with a <code>VIDEO_STILL</code> property set to the URI of the video still.</p>
+                <p>Hiding should happen automatically whenever a <code>CUE_POINT</code>, <code>DID_PLAY</code>, <code>DID_SEEK_TO</code>, <code>WILL_INTERRUPT_CONTENT</code>, <code>ACTIVITY_STOPPED</code>, or <code>FRAGMENT_STOPPED</code> event occurs.</p>
+                <p>In general, we try to promote doing things via events, rather than direct method calls.</p>
             </div>
             
             
