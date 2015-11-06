@@ -103,9 +103,21 @@ props.put("video_fields", "accountId,name,shortDescription,longDescription,video
                 <h2>Video content in the player</h2>
                 <p>This example shows one approach for swapping videos in the player.</p>
                 <h3>Using single videos</h3>
-                <p>Since the <code>clear()</code> method is asynchronous, you need to wait for the <code>DID_CHANGE_LIST</code> event before adding a new video to the player.</p>
-                <p>Your code should look similar to this:</p>
-                <pre><code>catalog.findVideoByID("<videoId>", new VideoListener() {
+                <p>Since the <code>clear()</code> method is asynchronous when unloading the current video, you need to wait before adding a new video to the player. Here are two options.</p>
+                <ul>
+                    <li>Since the time to fetch a video from Video Cloud should dwarf the time to update the playlist, you can try something like this:
+                    <pre><code>brightcoveVideoView.clear();
+
+catalog.findVideoByID("123456789", new VideoListener() {
+  @Override
+  public void onVideo(final Video video) {
+      brightcoveVideoView.add(video);
+      brightcoveVideoView.start();
+    
+  }
+});</code></pre></li>
+                    <li>Another approach is to wait for an event:
+                        <pre><code>catalog.findVideoByID("<videoId>", new VideoListener() {
   @Override
   public void onVideo(final Video video) {
     eventEmitter.once(EventType.DID_CHANGE_LIST, new EventListener() {
@@ -117,6 +129,9 @@ props.put("video_fields", "accountId,name,shortDescription,longDescription,video
     brightcoveVideoView.clear();
   }
 });</code></pre>
+                    </li>
+                </ul>
+                
             <h3>Using a playlist</h3>
                 <p>If you are working with a playlist, keep in mind that calling the <code>clear()</code> method removes all the elements of the playlist. So, you may get an <code>IndexOutOfBounds</code> exception when trying to jump to the first video in the playlist.</p>
                 <p>Instead, you can try something like this:</p>
