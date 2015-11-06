@@ -131,15 +131,18 @@
             outputText,
             accountId = document.getElementById("account_id"),
             playerId = document.getElementById("player_id"),
+            playerIdString,
             videoId = document.getElementById("video_id"),
             playerEmbed = document.getElementById("player_embed"),
-            displayTechButton = document.getElementById("techButton");
+            displayTechButton = document.getElementById("techButton"),
+            response = document.getElementById("outputArea");;
         
         displayTechButton.onclick = function() {
             accountId.value = (accountId.value == "") ? "1752604059001" : accountId.value;
             playerId.value = (playerId.value == "") ? "01163bbc-a536-443f-9646-318d0d0694ae" : playerId.value;
             videoId.value = (videoId.value == "") ? "1754261691001" : videoId.value;
-             
+            
+            response.innerHTML = "";
              
             // dynamically build the player video element
             playerHTML = '<video id=\"video_1\" data-video-id=\"' + videoId.value + '\" data-account=\"' + accountId.value + '\" data-player=\"' + playerId.value + '\" data-embed=\"default\" class=\"video-js\" controls></video>' + '<script src=\"//players.brightcove.net/' + accountId.value + '/' + playerId.value + '_default/index.min.js\"><' + '/script>';
@@ -147,7 +150,13 @@
             // inject the player code into the DOM
             playerEmbed.innerHTML = playerHTML;
             
-            playerScriptFile = '//players.brightcove.net/' + accountId.value + '/' + playerId.value + '_default/index.min.js';
+            playerIdString = playerId.value.toString();
+            console.log("playerIdString= ", playerIdString);
+            if (playerIdString.lastIndexOf("_") >= 0) {
+                playerScriptFile = '//players.brightcove.net/' + accountId.value + '/' + playerId.value + '/index.min.js';
+            } else {
+                playerScriptFile = '//players.brightcove.net/' + accountId.value + '/' + playerId.value + '_default/index.min.js';
+            }
             
             loadJS(playerScriptFile, function() { 
                 // put code here to run after script is loaded
@@ -213,7 +222,7 @@
                 outputText += "Source type = " + sourceTypeText + "<br/>";
                 outputText += "MIME type = " + mimeType + "<br/>";
 			    outputText += "Browser technology used = " + tagTypeText;
-                document.getElementById("outputArea").innerHTML = outputText;
+                response.innerHTML = outputText;
             });   
         }
   </script>
