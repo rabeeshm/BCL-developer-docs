@@ -6,7 +6,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
 	<!-- change title to match the h1 heading -->
-	<title>Brightcove Player Sample:</title>
+	<title>Brightcove Player Sample: Call to Action in HTML Page</title>
 	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/foundation.min.css" />
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/normalize.css" />
 	<script src="//use.edgefonts.net/source-code-pro.js"></script>
@@ -53,9 +53,10 @@
 		</div>
 		<div id="main" class="large-10 small-12 columns">
 			<div id="top" class="section">
-				<h1>Brightcove Player Sample: </h1>
+				<h1>Brightcove Player Sample:  Call to Action in HTML Page</h1>
 				<!-- Place document intro sentence(s) here -->
-				<p></p>
+				<p>In this sample a link will be placed in the HTML page which, when clicked, opens a new window with a different web page visible. This link is referred to as a call to action. In this sample, the URL for the link and the text for the link is stored in the video's metadata.</p>
+        <p>If you wish the call to action to appear only at the end of the video, and be in the player, you can see this functionality in the <a href="../../brightcove-player/guides/custom-endscreen-plugin.html">Custom Endscreen Plugin</a> document. If you wish the endscreen to use the URL and text from the video metadata you can combine the endscreen information with the code shown in this document to dynamically build the link.</p>
 			</div>
 
 			<div id="developmentsequence" class="section">
@@ -89,18 +90,18 @@
 
       <div id="selectimplementation" class="section">
 				<h2>Select implementation</h2>
-				<p>In this sample, ...</p>
+				<p>In this sample, the player is going to interact with the parent page, so the in-page embed implementation will be used.</p>
 			</div>
 
 			<div id="resources" class="section">
 				<h2>API resources used</h2>
 				<p>The following sections detail resources used from various APIs.</p>
 				<h3>Brightcove Player API</h3>
-				<p></p>
-				<h3>Player Management API</h3>
-				<p></p>
-				<h3>Delivery System API</h3>
-				<p></p>
+				<ul>
+          <li><code>options()</code>: Method to retrieve basic player metadata immediately on player ready.</li>
+          <li><code>catalog.getVideo()</code>: Method to make a catalog request for the video with the specified id and invokes a callback when the request completes.</li>
+          <li><code>catalog.load()</code>: Method to load the video object into the player. Also populates the <code>mediainfo</code> property.</li>
+        </ul>
 			</div>
 
 			<div id="player" class="section">
@@ -117,8 +118,14 @@
 
 			<div id="code" class="section">
 				<h2>How it works</h2>
-        <p>The first think you need to do is for every video with which you want a call to action you will need to enter the <strong>Related Link URL</strong> and <strong>Related Link Text</strong> in <span class="video-cloud-only">Video Cloud</span><span class="perform-only">Perform</span> Studio. You do this in the <strong>MEDIA > VIDEO INFORMATION</strong> section, as shown here:</p>
+        <p>For every video with which you want use a call to action you will need to enter the <strong>Related Link URL</strong> and <strong>Related Link Text</strong> in <span class="video-cloud-only">Video Cloud</span><span class="perform-only">Perform</span> Studio. You do this in the <strong>MEDIA > VIDEO INFORMATION</strong> section, as shown here:</p>
         <div><img src="/en/video-cloud/brightcove-player/samples/assets/call-to-action/add-link-url-studio.png"></div>
+        <p>JavaScript is then used to:</p>
+        <ul>
+          <li>Populate the <code>mediainfo</code> property.</li>
+          <li>Dynamically build an HTML anchor tag with a link.</li>
+          <li>Inject the dynamically built HMTL into the page using the ID'd paragraph.</li>
+        </ul>
 				<p>The following sections explain the player, JavaScript and CSS code used in the example.</p>
         <h3>Create the player</h3>
         <div class="video-cloud-only">
@@ -129,73 +136,40 @@
               <li>Copy the In-Page embed code and paste it into a new HTML file.</li>
             </ol>
         </div>
-        <div class="perform-only">
-          <p>Login to your Perform Studio account and create a new video player. Open the player's properties page and edit the <strong>Video Content</strong> section. Here you can specify a <strong>URL</strong> for the video you wish to publish. Videos can be in HLS and MP4 formats.</p>
-          <img src="/en/video-cloud/brightcove-player/samples/assets/navigate-on-video-end-video-url.png" alt="">
-        </div>
 
 				<h3>The player code</h3>
-          <p>Your player code should look similar to the following:</p>
-          <p class="video-cloud-only"><code data-gist-id="" data-gist-hide-footer="true" data-gist-line=""></code></p>
-          <p class="perform-only"><code data-gist-id="" data-gist-hide-footer="true" data-gist-line=""></code></p>
+        <p>Your player code should look similar to the following:</p>
+        <p class="video-cloud-only"><code data-gist-id="b6b3de6baf916b7cad99" data-gist-hide-footer="true" data-gist-line="17-22"></code></p>
         <h3>The HTML code</h3>
-        <p>Add the following HTML to your page code:</p>
+        <p>Add the following HTML to your page code where you wish your call to action link to appear:</p>
+        <p class="video-cloud-only"><code data-gist-id="b6b3de6baf916b7cad99" data-gist-hide-footer="true" data-gist-line="24"></code></p>
 				<h3>The JavaScript code</h3>
 				<p>Add the following JavaScript to your page code:</p>
+        <ul>
+          <li>Lines 29, 42: Wait for the player to be ready for programmatic interaction.</li>
+          <li>Lines 30-33: Create variables to be used later.</li>
+          <li>Line 34: Populate the variable <code>videoIdInPlayer</code> with the ID of the video currently in the player. This code uses the <code>options()</code> method to provide access to basic video metadata, including the ID of the video in the player. Note that normal <code>object.property</code> notation cannot be used with the hyphenated property name, so square bracket (<code>[]</code>) notation is used.</li>
+          <li>Line : </li>
+          <li>Line : </li>
+          <li>Line : </li>
+          <li>Line : </li>
+        </ul>
+        <p><code data-gist-id="b6b3de6baf916b7cad99" data-gist-hide-footer="true" data-gist-line="28-43"></code></p>
         <h3>The stylesheet</h3>
-				<p>Add the following styles to your page code:</p>
-			</div>
-
-			<div id="plugin" class="section">
-				<h2>Use a plugin</h2>
-				<p>It is a best practice to use a plugin so that you can easily add the JavaScript code's functionality to multiple players.</p>
-				<h3>Create the JavaScript file</h3>
-				<p>Move the plugin's JavaScript code into a file and place it in an Internet accessible URL.</p>
-				<ul>
-				    <li>Lines x,y: Use the standard syntax to begin and end a Brightcove Player plugin.</li>
-				    <li>Line x: The first argument of the function call is the name of the function defined in the plugin code, in this case <code>PLUGIN NAME</code>.</li>
-				    <li>Line y: The trailing semicolon is required.</li>
-				</ul>
-				<p><code data-gist-id="" data-gist-hide-footer="true" data-gist-line=""></code></p>
-				<h3>Create the CSS file</h3>
-				<p>If you are using CSS, move styles into a file and place it in an Internet accessible URL.</p>
-				<h3>Deploy plugin and CSS</h3>
-        <p>To deploy the NAME Plugin using the Players module, follow these steps:</p>
-        <ol>
-          <li>In the new Video Cloud Studio, open the <strong>Players</strong> module and locate the player.</li>
-          <li>Click the link for the player to open the player properties.</li>
-          <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
-          <li>For the <strong>JavaScript URL</strong>, enter the URL which specifies the location of where you saved your plugin's JavaScript.</li>
-          <li>For the <strong>CSS URL</strong>, enter the URL which specifies the location of where you saved your plugin's CSS.</li>
-          <li>For the <strong>Name</strong>, enter <strong>PLUGIN NAME</strong>.</li>
-          <li>Enter the plugin options. The example below will ...<br/>
-<pre><code>{
-  "overlays": [
-    {
-      "align": "bottom",
-      "start": 2
-    }
-  ],
-  "content": "<strong>Default overlay content</strong>"
-}</code></pre>
-              <div><img src="/en/video-cloud/brightcove-player/guides/assets/overlay-plugin.png"></div>
-            </li>
-            <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
-          </ol>
+				<p>The only style used is to size the player:</p>
+        <p><code data-gist-id="b6b3de6baf916b7cad99" data-gist-hide-footer="true" data-gist-line="7-12"></code></p>
 			</div>
 
       <div id="useiframe" class="section">
         <h2>Use iframe</h2>
-        <p>It is a best practice to use the iframe player implementation. Since you can create this functionality as a plugin, replace the embed_in_page implementation with the iframe implementation.</p>
-				<p><code data-gist-id="xxxxx" data-gist-hide-footer="true" data-gist-line="" data-gist-highlight-line=""></code></p>
+        <p>The iframe implementation cannot be used in this case since the player needs to interact with the parent HTML page.</p>
       </div>
 
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
 				<ul>
-					<li> <a href="internal:node/XXXX">DOC TITLE</a></li>
-					<li> <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a></li>
-					<li> <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-guide.html">Player Plugin Overview</a></li>
+					<li> <a href="../../brightcove-player/reference/player-catalog.html">Player Catalog Reference</a></li>
+					<li> <a href="../../brightcove-player/guides/mediainfo.html">Video Metadata</a></li>
 				</ul>
 			</div>
 		</div>
