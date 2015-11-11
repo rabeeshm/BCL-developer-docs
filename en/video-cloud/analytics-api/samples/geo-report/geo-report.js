@@ -22,7 +22,7 @@ var BCLS = (function (window, document, $, Handlebars) {
         analyticsData = {},
         chartData = [],
         dataDisplayBodyTemplate = "{{#items}}<tr><td>{{country_name}}</td><td>{{region_name}}</td><td>{{city}}</td><td>{{video_view}}</td><td>{{average_seconds_viewed}}</td></tr>{{/items}}",
-        videoSelectTemplate = "<option value=\"\">Select a video</option>{{#items}}<option value=\"{{video}}\">{{video_name}}</options>{{/items}}",
+        videoSelectTemplate = '<option value="">Select a video</option>{{#items}}<option value="{{video}}">{{video_name}}</options>{{/items}}',
         callType,
         /**
          * Logging function - safe for IE
@@ -38,8 +38,11 @@ var BCLS = (function (window, document, $, Handlebars) {
         },
         // more robust test for strings "not defined"
         isDefined =  function (v) {
-            if(v !== "" && v !== null && v !== "undefined") { return true; }
-            else { return false; }
+            if(v === "" || v === null || v === "undefined") { 
+                return false; 
+            } else { 
+                return true; 
+            }
         },
         displayData = function () {
             var displayStr, template, results;
@@ -163,11 +166,11 @@ var BCLS = (function (window, document, $, Handlebars) {
 
     // set event listeners
     useMyAccount.addEventListener("click", function () {
-        if (basicInfo.className === "height-zero") {
-            basicInfo.className = "height-auto";
+        if (basicInfo.getAttribute('style') === 'display:none') {
+            basicInfo.setAttribute('style', 'display:block');
             useMyAccount.innerHTML = "Use Sample Account";
         } else {
-            basicInfo.className = "height-zero";
+            basicInfo.setAttribute('style', 'display:none');
             useMyAccount.innerHTML = "Use My Account Instead";
         }
 
