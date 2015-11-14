@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Schema Generation Tool</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="shortcut icon" href="/bcls/assets/images/favicon.ico">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/atelier-forest.light.min.css">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
+        <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" href="//docs.brightcove.com/en/styles/bcls-doc-site.css">
+        <script>
+            // force into https mode if not already there -- currently not used
+            forceSecure = function () {
+                var pageURL = window.location.href,
+                    pageProtocol = window.location.protocol;
+                if (pageProtocol === "http:") {
+                    window.location.href = pageURL.replace("http:", "https:");
+                }
+            };
+        </script>
+
+        <style>
+            /* element styles */
+            #top {
+                padding-top: 120px;
+                margin-top: -80px;
+                            }
+            fieldset {
+                /*width: 800px;
+                display: block;
+                margin-bottom: 20px;*/
+                border-radius: 5px;
+            }
+            input {
+                font-family: Hack, Monaco, monospace;
+            }
+            iframe {
+                width: 900px;
+                height: 600px;
+                border: 1px #999 solid;
+                border-radius: 5px;
+            }
+            input {
+                width: 400px;
+            }
+            /* class styles */
+            .align-right {
+                text-align: right;
+            }
+            .align-top {
+                vertical-align: top;
+            }
+            .bcls-button {
+                background-color: #666;
+                border: 1px #000 solid;
+                color: #FFF;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: small;
+                padding: 5px;
+            }
+            .red {
+                color: #F00;
+                font-weight: bold;
+                font-size: 120%;
+            }
+            .outline-red {
+                border: 2px #900 solid;
+                padding: 2px;
+            }
+            .request {
+                background-color: #FEF7E4;
+                border: 1px #999 solid;
+                border-radius: 5px;
+                font-size: .8em;
+                padding: 5px;
+            }
+        </style>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
+    </head>
+
+    <body>
+    <!-- header navbar -->
+	<div id="navWrapper" class="fixed"></div>
+	<!-- breadcrumbs -->
+	<nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+    <!-- search -->
+    <div id="searchModal" class="reveal-modal" data-reveal></div>
+    <!-- content -->
+    <div class="row">
+        <div class="sidebar large-2 columns show-for-large-up">
+            <div id="sidenav" class="side-nav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+        <div class="section" id="top">
+            <h1>Schema Builder</h1>
+            <p>This app uses the Playback API to generate a <a href="http://schema.org/VideoObject">VideoObject Schema</a> based on the <a href="http://schema.org">schema.org</a> specification. Including a schema with your video provides information to search engine indexers and enhances SEO.</p>
+            <p>You can generate the code here and use it as your publishing code if you are using a single Brightcove player for the account and a standard (iframe) embed. If you are using another player or the advanced (in-page) embed, you can just use the schema part of the generated code and insert it above your player embed code in the page.</p>
+            <div class="BCL-aside"><p>Note: this is a client-side app, and you can make requests to the Playback API from the client-side. However, you cannot simply use this script in pages with your players to generate effective schemas, because the schema code must be injected into the page on the server side, before the page is delivered to the browser, to be recognized by search engines. If you are serving your pages via a web server application, use the logic here to get the information using either the Playback or <a href="../../cms-api/getting-started/overview-cms.html">CMS API</a> and embed it in the page before it is served.</p>
+            <p>Also note that this app produces code for a single video player only, and if you are embedding the schema code manually, you should update it periodically, as URLs can change</p></div>
+        </div>
+        <div id="accountInput" class="section">
+            <h2>Account input</h2>
+            <p class="text-warning">
+                <span class="red">All fields are <strong>required</strong></span>. Default values are included from the Brightcove Learning Services demo account to allow you to test the tool &mdash; you must replace all of these to get a schema for your own video.</p>
+            <div id="inputFields" class="input-fields">
+                <fieldset>
+                    <legend>Account Information</legend>
+                    <div id="accountInfo">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>Video Cloud Account ID (Publisher ID):</td>
+                                    <td>
+                                        <input id="accountID" type="text" size="60" placeholder="1752604059001">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><a href="../../policy-api/getting-started/api-overview.html">Policy Key</a>:</td>
+                                    <td>
+                                        <input id="policy_key" type="text" size="60" placeholder="BCpkADawqM1nEgO8M2_sjxjk52dp0aEs7KYJFe5Jw1R7UHKv01RnEcvg266Zinpwma8dKHg-0fJ2WRkIOOZLwbiJt0DnixNOSC0E0cWi4pjKXTpZ5Ubc2ZCK9zbcUEwGBBTX8isJEPmWI_4L" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Video ID</td>
+                                    <td>
+                                        <input id="video_id" type="text" size="60" placeholder="4454620113001">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div id="playerInput" class="section">
+                <h2>Player input</h2>
+                <fieldset>
+                    <legend>Player Information</legend>
+                    <div id="playerInfo">
+                        <h4>Note: use a single video player</h4>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>URL for the player page:</td>
+                                    <td>
+                                        <input id="pageURL" type="text" size="60" placeholder="http://docs.brightcove.com/en/video-cloud/brightcove-player/samples/float-park-video.html" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Player ID (from Publishing Module or publishing code):</td>
+                                    <td>
+                                        <input id="playerID" size="60" placeholder="28e29e6d-bed3-4db9-8d70-8d55b8aa3091" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Player width:</td>
+                                    <td>
+                                        <input id="playerWidth" type="text" size="60" placeholder="640" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Player height:</td>
+                                    <td>
+                                        <input id="playerHeight" type="text" size="60" placeholder="360" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+            </div>
+
+            <p>
+                <span id="generateButton" class="bcls-button">Generate Schema</span>
+            </p>
+        </div>
+        <h2>The Generated Schema and Player Publishing Code</h2>
+        <!-- <fieldset>
+		<legend>Generated Results</legend>
+		<div id="generatedResults"></div>
+	</fieldset> -->
+        <div id="publishingCodeWrapper">
+            <fieldset>
+                <legend>Publishing Code</legend>
+                    <textarea id="publishingCode"></textarea>
+                </p>
+            </fieldset>
+        </div>
+    </div>
+</div>
+        <!-- scripts -->
+        <!-- jquery -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
+        <link href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" rel="stylesheet" type="text/css" />
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.3/handlebars.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
+
+        <script src="//docs.brightcove.com/en/scripts/docs-nav-data.min.js"></script>
+        <script src="//docs.brightcove.com/en/scripts/bcls-doc-site-v1.js"></script>
+        <!-- space remover -->
+        <script src="//solutions.brightcove.com/bcls/scripts/remove_spaces.js"></script>
+    <script>
+        $(document).foundation();
+    </script>
+        <script>
+            var BCLS = (function() {
+                "use strict";
+                var accountID = document.getElementById('accountID'),
+                    token = document.getElementById('token'),
+                    pageURL = document.getElementById('pageURL'),
+                    playerID = document.getElementById('playerID'),
+                    playerKey = document.getElementById('playerKey'),
+                    playerWidth = document.getElementById('playerWidth'),
+                    playerHeight = document.getElementById('playerHeight'),
+                    pageSize = document.getElementById('pageSize'),
+                    searchType = document.getElementById('searchType'),
+                    searchTerms = document.getElementById('searchTerms'),
+                    sortBy = document.getElementById('sortBy'),
+                    pageNumber = 0,
+                    $getVideosButton = document.getElementById('getVideosButton'),
+                    $videoSelector = document.getElementById('videoSelector'),
+                    $sortOrder = document.getElementById('sortOrder'),
+                    $generateButton = document.getElementById('generateButton'),
+                    $generatedResults = document.getElementById('generatedResults'),
+                    $publishingCode = document.getElementById('publishingCode'),
+                    params = {}, totalVideos = 0,
+                    totalPages = 0,
+                    videoData = null,
+                    template,
+                    data,
+                    result,
+                    selectCode = document.getElementById('selectCode'),
+                    schemaTemplates = {
+                        EntertainmentBusiness: '&lt;div id="content"&gt; &lt;div itemscope itemid=""itemtype="http://schema.org/VideoObject"&gt;&lt;link itemprop="url"href="{{pageURL}}?bctid={{id}}"&gt;&lt;meta itemprop="name" content="{{name}}"&gt;&lt;meta itemprop="description" content="{{shortDescription}}"&gt;&lt;meta itemprop="paid" content="False"&gt;&lt;meta itemprop="videoId" content="{{id}}"&gt;&lt;meta itemprop="duration" content="{{duration}}"&gt;&lt;meta itemprop="unlisted" content="False"&gt;&lt;link itemprop="thumbnailUrl" href="{{thumbnailURL}}"&gt;&lt;span itemprop="thumbnail" itemscope itemtype="http://schema.org/ImageObject"&gt;&lt;link itemprop="url" href="{{thumbnailURL}}"&gt;&lt;meta itemprop="width" content="320"&gt;&lt;meta itemprop="height" content="180"&gt;&lt;/span&gt;&lt;link itemprop="embedURL" href="http://c.brightcove.com/services/viewer/federated_f9/{{playerID}}?isVid=1&isUI=1&publisherID={{accountID}}&playerID={{playerID}}&domain=embed&videoId={{id}}"&gt;&lt;meta itemprop="width" content="640"&gt;&lt;meta itemprop="height" content="360"&gt;&lt;!-- END OF SCHEMA --&gt;&lt;script src="http://admin.brightcove.com/js/BrightcoveExperiences.js"&gt;&lt;\/script&gt;&lt;object id="myExperience{{id}}" class="BrightcoveExperience"&gt;&lt;param name="bgcolor" value="#333333" /&gt;&lt;param name="width" value="{{playerWidth}}" /&gt;&lt;param name="height" value="{{playerHeight}}" /&gt;&lt;param name="playerID" value="{{playerID}}" /&gt;&lt;param name="playerKey" value="{{playerKey}}"/&gt;&lt;param name="isVid" value="true" /&gt;&lt;param name="isUI" value="true" /&gt;&lt;param name="dynamicStreaming" value="true" /&gt;&lt;param name="@videoPlayer" value="{{id}}" /&gt;&lt;param name="linkBaseURL" value="{{pageURL}}bctid={{id}}" /&gt;&lt;/object&gt;&lt;/div&gt;&lt;/div&gt;'
+                    };
+                    // allow array forEach method in older browsers
+                    if ( !Array.prototype.forEach ) {
+                        Array.prototype.forEach = function(fn, scope) {
+                            for(var i = 0, len = this.length; i < len; ++i) {
+                                fn.call(scope || this, this[i], i, this);
+                            }
+                        }
+                    };
+                    function secondsToTime(secs) {
+                      var hours = Math.floor(secs / (60 * 60));
+                      var divisor_for_minutes = secs % (60 * 60);
+                      var minutes = Math.floor(divisor_for_minutes / 60);
+                      var divisor_for_seconds = divisor_for_minutes % 60;
+                      var seconds = Math.ceil(divisor_for_seconds);
+                      var obj = {
+                        "h": hours.toString(),
+                        "m": minutes.toString(),
+                        "s": seconds.toString()
+                      };
+                      return obj;
+                    }
+                    // in case search terms added after initial video retrieval
+                    $searchTerms.on("change", function () {
+                        // re-initialize
+                        pageNumber = 0;
+                        totalPages = 0;
+                    }),
+                    getVideos = function() {
+                        var searchTerms = $searchTerms.val(),
+                            searchTermsArray = searchTerms.split(","),
+                            searchType = $searchType.val();
+                        BCMAPI.url = $serviceURL.val();
+                        BCMAPI.callback = "BCLS.onGetVideos";
+                        BCMAPI.token = $token.val();
+                        params.page_number = pageNumber;
+                        params.page_size = $pageSize.val();
+                        params.sort_by = $sortBy.val();
+                        params.video_fields = "id,name,shortDescription,videoStillURL,thumbnailURL,length";
+                        params.get_item_count = true;
+                        if (searchTerms !== "") {
+                            if (searchType !== "") {
+                                searchTermsArray.forEach(function (element, index, array) {
+                                    element = searchType + ":" + element;
+                                });
+                            }
+                            params.any = searchTerms;
+                        }
+                        BCMAPI.search(params);
+                        pageNumber++;
+                    };
+                    onGetVideos = function(JSONdata) {
+                        var i, item, durationObj, itemsMax = JSONdata.items.length;
+                        videoData = JSONdata;
+                        for (i = 0; i < itemsMax; i++) {
+                            item = videoData.items[i];
+                            durationObj = secondsToTime(item.length / 1000);
+                            item.duration = "P" +durationObj.h + "H" + durationObj.m + "M" + durationObj.s + "S";
+                        }
+                        totalVideos += JSONdata.total_count;
+                        totalPages = Math.ceil(JSONdata.total_count / $pageSize.val());
+                        if (totalPages === pageNumber) {
+                            $getVideosButton.html("No more videos");
+                            $getVideosButton.off("click", this.getVideos);
+                        } else {
+                            $getVideosButton.html("Get the next " + $pageSize.val() + " videos");
+                        }
+                        template = Handlebars.compile(videoOptionTemplate);
+                        data = JSONdata;
+                        result = template(data);
+                        $videoSelector.html(result);
+                    };
+                    generateSchema = function() {
+                        if (videoData === null) {
+                            // clicked on generate before getting videos
+                            alert("Please retrieve videos and select one");
+                            return;
+                        }
+                        selectedVideo = videoData.items[document.getElementById("videoSelector").selectedIndex];
+                        selectedVideo.playerID = $playerID.val();
+                        selectedVideo.playerKey = $playerKey.val();
+                        selectedVideo.pageURL = $pageURL.val();
+                        selectedVideo.playerWidth = $playerWidth.val();
+                        selectedVideo.playerHeight = $playerHeight.val();
+                        template = Handlebars.compile(schemaTemplates.EntertainmentBusiness);
+                        data = selectedVideo;
+                        result = template(data);
+                        $publishingCode.html("&lt;!-- Start of Brightcove Player --&gt;\n" + result +  "\n&lt;!-- End of Brightcove Player --&gt");
+                    };
+                // set listeners for buttons
+                $getVideosButton.on("click", getVideos);
+                $generateButton.on("click", generateSchema);
+                $selectCode.on("click", function() {
+                    document.getElementById("publishingCode").select();
+                });
+                return {
+                    onGetVideos: onGetVideos
+                };
+            })();
+        </script>
+        <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+    <script>
+	var feedbackMail = document.getElementById("feedbackMail");
+	feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+	</script>
+	</body>
+</html>
