@@ -109,10 +109,10 @@
         <div id="main" class="large-10 small-12 columns">
             <div class="section" id="top">
                 <h1>Schema Builder</h1>
-                <p>This app uses the Playback API to generate a <a href="http://schema.org/VideoObject">VideoObject Schema</a> based on the <a href="http://schema.org">schema.org</a> specification. Including a schema with your video provides information to search engine indexers and enhances SEO.</p>
+                <p>This app uses the CMS API (via a proxy) to generate a <a href="http://schema.org/VideoObject">VideoObject Schema</a> based on the <a href="http://schema.org">schema.org</a> specification. Including a schema with your video provides information to search engine indexers and enhances SEO.</p>
                 <p>You can generate the code here and use it as your publishing code if you are using a single Brightcove player for the account and a standard (iframe) embed. If you are using another player or the advanced (in-page) embed, you can just use the schema part of the generated code and insert it above your player embed code in the page.</p>
                 <div class="BCL-aside">
-                    <p>Note: this is a client-side app, and you can make requests to the Playback API from the client-side. However, you cannot simply use this script in pages with your players to generate effective schemas, because the schema code must be injected into the page on the server side, before the page is delivered to the browser, to be recognized by search engines. If you are serving your pages via a web server application, use the logic here to get the information using either the Playback or <a href="../../cms-api/getting-started/overview-cms.html">CMS API</a> and embed it in the page before it is served.</p>
+                    <p>Note: this is a client-side app, and and therefore makes requests to the CMS API from the client-side. However, you cannot simply use this script in pages with your players to generate effective schemas, because the schema code must be injected into the page on the server side, before the page is delivered to the browser, to be recognized by search engines. If you are serving your pages via a web server application, use the logic here to get the information using the <a href="../../cms-api/getting-started/overview-cms.html">CMS API</a> and embed it in the page before it is served.</p>
                     <p>Also note that this app produces code for a single video player only, and if you are embedding the schema code manually, you should update it periodically, as URLs can change</p>
                 </div>
             </div>
@@ -133,15 +133,15 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><a href="../../policy-api/getting-started/api-overview.html">Policy Key</a>:</td>
+                                        <td><a href="../../oauth-api/getting-started/oauth-api-overview.html">Client id</a>:</td>
                                         <td>
-                                            <input id="policyKey" type="text" size="60" placeholder="BCpkADawqM1nEgO8M2_sjxjk52dp0aEs7KYJFe5Jw1R7UHKv01RnEcvg266Zinpwma8dKHg-0fJ2WRkIOOZLwbiJt0DnixNOSC0E0cWi4pjKXTpZ5Ubc2ZCK9zbcUEwGBBTX8isJEPmWI_4L" />
+                                            <input id="clientID" type="text" size="60" />
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Video ID</td>
+                                        <td><a href="../../oauth-api/getting-started/oauth-api-overview.html">Client secret</a>:</td>
                                         <td>
-                                            <input id="videoID" type="text" size="60" placeholder="4454620113001">
+                                            <input id="clientSecret" type="text" size="60" />
                                         </td>
                                     </tr>
                                 </tbody>
@@ -150,7 +150,7 @@
                     </fieldset>
                 </div>
                 <div id="playerInput" class="section">
-                    <h2>Player input</h2>
+                    <h2>Video/Player input</h2>
                     <fieldset>
                         <legend>Player Information</legend>
                         <div id="playerInfo">
@@ -158,9 +158,9 @@
                             <table>
                                 <tbody>
                                     <tr>
-                                        <td>URL for the player page:</td>
+                                        <td>Video ID</td>
                                         <td>
-                                            <input id="pageURL" type="text" size="60" placeholder="http://docs.brightcove.com/en/video-cloud/brightcove-player/samples/float-park-video.html" />
+                                            <input id="videoID" type="text" size="60" placeholder="4454620113001">
                                         </td>
                                     </tr>
                                     <tr>
@@ -172,13 +172,13 @@
                                     <tr>
                                         <td>Player width:</td>
                                         <td>
-                                            <input id="playerWidth" type="text" size="60" placeholder="640" />
+                                            <input id="playerWidth" type="text" size="60" placeholder="480" />
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>Player height:</td>
                                         <td>
-                                            <input id="playerHeight" type="text" size="60" placeholder="360" />
+                                            <input id="playerHeight" type="text" size="60" placeholder="270" />
                                         </td>
                                     </tr>
                                 </tbody>
@@ -219,10 +219,13 @@
     <script>
     var BCLS = (function() {
         "use strict";
-        var accountID = document.getElementById('accountID'),
+        var proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/schema-tool-proxy.php'
+            accountID = document.getElementById('accountID'),
             account_id,
-            policyKey = document.getElementById('policyKey'),
-            policy_key,
+            clientID = document.getElementById('clientID'),
+            client_id,
+            clientSecret = document.getElementById('clientSecret'),
+            client_secret,
             requestURL,
             playerID = document.getElementById('playerID'),
             playerWidth = document.getElementById('playerWidth'),
@@ -280,35 +283,64 @@
         return 'T' + hours + ':' + minutes + ':' + seconds;
     }
 
-        function getMediaData(mediaType, requestURL) {
-            var httpRequest = new XMLHttpRequest(),
-                responseData,
-                parsedData,
-                // response handler
-                getResponse = function() {
-                    try {
-                        if (httpRequest.readyState === 4) {
-                            if (httpRequest.status === 200) {
-                                responseData = httpRequest.responseText;
-                                videoData = JSON.parse(responseData);
-                                generateSchema();
-                            } else {
-                                alert('There was a problem with the request. Request returned ' + httpRequest.status);
-                            }
+    /**
+     * send API request to the proxy
+     * @param  {Object} options options for the request
+     */
+    function getMediaData(options) {
+        var httpRequest = new XMLHttpRequest(),
+            responseRaw,
+            parsedData,
+            requestParams,
+            dataString,
+            // response handler
+            getResponse = function() {
+                try {
+                  if (httpRequest.readyState === 4) {
+                    if (httpRequest.status === 200) {
+                      console.log(httpRequest.responseText);
+                      // add/remove folder video return no data
+                      if (requestID === 'addVideoToFolder' || requestID === 'removeVideoFromFolder') {
+                        responseData.textContent = 'This request returns 204 No Content';
+                      } else {
+                        responseRaw = httpRequest.responseText;
+                        responseData.textContent = responseRaw;
+                        parsedData = JSON.parse(responseRaw);
+                        // save new ids on create requests
+                        if (requestID === 'createVideo') {
+                            newVideo_id = parsedData.id;
+                        } else if (requestID === 'createPlaylist') {
+                            newPlaylist_id = parsedData.id;
                         }
-                    } catch (e) {
-                        alert('Caught Exception: ' + e);
+                        responseData.textContent = JSON.stringify(parsedData, null, '  ');
+                      }
+                      // re-enable the buttons
+                      enableButtons();
+                    } else {
+                      alert('There was a problem with the request. Request returned ' + httpRequest.status);
                     }
-                };
-            // set response handler
-            httpRequest.onreadystatechange = getResponse;
-            // open the request
-            httpRequest.open('GET', requestURL);
-            // set headers
-            httpRequest.setRequestHeader('Accept', 'application/json;pk=' + policy_key.value);
-            // open and send request
-            httpRequest.send();
+                  }
+                } catch (e) {
+                  alert('Caught Exception: ' + e);
+                }
+            };
+        // set up request data
+        requestParams = "url=" + encodeURIComponent(options.url) + "&requestType=" + options.requestType;
+        if (options.requestBody) {
+            dataString = JSON.stringify(options.requestBody);
+            requestParams += "&requestBody=" + encodeURIComponent(dataString);
         }
+        console.log(requestParams);
+
+        // set response handler
+        httpRequest.onreadystatechange = getResponse;
+        // open the request
+        httpRequest.open('POST', proxyURL);
+        // set headers
+        httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        // open and send request
+        httpRequest.send(requestParams);
+    }
 
         function generateSchema() {
             var duration;
@@ -331,10 +363,12 @@
         // set listeners for button
         generateButton.addEventListener("click", function () {
             // data setup
-            policy_key = (isDefined(policyKey.textContent)) ? policyKey.textContent : defaults.policyKey;
+            var options = {};
+            options.client_id = (isDefined(clientID.textContent)) ? clientID.textContent : defaults.client_id;
+            options.client_secret = (isDefined(clientSecret.textContent)) ? clientSecret.textContent : defaults.client_secret;
             account_id = (isDefined(accountID.textContent)) ? accountID.textContent : defaults.accountID;
             video_id = (isDefined(videoID.textContent)) ? videoID.textContent : defaults.videoID;
-            requestURL = 'https://edge.api.brightcove.com/playback/v1/accounts/'
+            options.requestURL = 'https://cms.api.brightcove.com/v1/accounts/' + account_id + '/videos/' + video_id;
         });
         publishingCode.addEventListener('click', function () {
             this.select();
@@ -343,9 +377,10 @@
         function init() {
             defaults.playerID = '28e29e6d-bed3-4db9-8d70-8d55b8aa3091';
             defaults.videoID = '4454620113001';
-            defaults.playerWidth = '640';
-            defaults.playerHeight = '360';
-            defaults.policyKey = 'BCpkADawqM1nEgO8M2_sjxjk52dp0aEs7KYJFe5Jw1R7UHKv01RnEcvg266Zinpwma8dKHg-0fJ2WRkIOOZLwbiJt0DnixNOSC0E0cWi4pjKXTpZ5Ubc2ZCK9zbcUEwGBBTX8isJEPmWI_4L';
+            defaults.playerWidth = '480';
+            defaults.playerHeight = '270';
+            defaults.client_id = 'bc90ea5e-8a66-476b-8c43-90bf28215ed1';
+            defaults.client_secret = 'hPvmIPc40FOwcS14Jg7_rZjEM-xpRk-8MJO507ZGRKe2eOXKzsdp8nnKLSgTOtbvqsn4v8ZVMT6mViyA3D7jDg';
         }
     })();
     </script>
