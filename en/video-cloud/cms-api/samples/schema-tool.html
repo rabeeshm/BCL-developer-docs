@@ -62,16 +62,6 @@
         vertical-align: top;
     }
 
-    .bcls-button {
-        background-color: #666;
-        border: 1px #000 solid;
-        color: #FFF;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: small;
-        padding: 5px;
-    }
-
     .red {
         color: #F00;
         font-weight: bold;
@@ -89,6 +79,10 @@
         border-radius: 5px;
         font-size: .8em;
         padding: 5px;
+    }
+    textarea {
+        width: 100%;
+        min-height: 22em !important;
     }
     </style>
     <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
@@ -127,7 +121,7 @@
                             <table>
                                 <tbody>
                                     <tr>
-                                        <td>Video Cloud Account ID (Publisher ID):</td>
+                                        <td>Video Cloud Account ID:</td>
                                         <td>
                                             <input id="accountID" type="text" size="60" placeholder="1752604059001">
                                         </td>
@@ -154,7 +148,7 @@
                     <fieldset>
                         <legend>Player Information</legend>
                         <div id="playerInfo">
-                            <h4>Note: use a single video player</h4>
+                            <p class="BCL-aside">Note: use a single video player</p>
                             <table>
                                 <tbody>
                                     <tr>
@@ -187,16 +181,19 @@
                     </fieldset>
                 </div>
                 <p>
-                    <span id="generateButton" class="bcls-button">Generate Schema</span>
+                    <button id="generateButton">Generate Schema</button>
                 </p>
             </div>
-            <h2>The Generated Schema and Player Publishing Code</h2>
-            <div id="publishingCodeWrapper">
-                <fieldset>
-                    <legend>Publishing Code</legend>
-                    <textarea id="publishingCode"></textarea>
-                    </p>
-                </fieldset>
+            <div id="results" class="section">
+                <h2>Results</h2>
+                <h3>The Generated Schema and Player Publishing Code</h3>
+                <div id="publishingCodeWrapper">
+                    <fieldset>
+                        <legend>Publishing Code</legend>
+<textarea id="publishingCode"></textarea>
+                        </p>
+                    </fieldset>
+                </div>
             </div>
         </div>
     </div>
@@ -216,174 +213,7 @@
     <script>
     $(document).foundation();
     </script>
-    <script>
-    var BCLS = (function() {
-        "use strict";
-        var proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/schema-tool-proxy.php'
-            accountID = document.getElementById('accountID'),
-            account_id,
-            clientID = document.getElementById('clientID'),
-            client_id,
-            clientSecret = document.getElementById('clientSecret'),
-            client_secret,
-            requestURL,
-            playerID = document.getElementById('playerID'),
-            playerWidth = document.getElementById('playerWidth'),
-            playerHeight = document.getElementById('playerHeight'),
-            videoID = document.getElementById('videoID'),
-            video_id,
-            generateButton = document.getElementById('generateButton'),
-            publishingCode = document.getElementById('publishingCode'),
-            videoData = null,
-            defaults = {},
-            template,
-            result,
-            selectCode = document.getElementById('selectCode'),
-            schemaTemplates = {
-                EntertainmentBusiness: '&lt;!-- Start Schema Code --&gt; \n &lt;div id="content"&gt; \n &lt;div itemscope itemtype="http://schema.org/VideoObject"&gt; \n &lt;meta itemprop="name" content="{{name}}"&gt; \n &lt;meta itemprop="description" content="{{description}}"&gt; \n &lt;meta itemprop="videoID" content="{{id}}"&gt; \n &lt;meta itemprop="duration" content="{{duration}}"&gt; \n &lt;link itemprop="thumbnail" href="{{thumbnailURL}}"&gt; \n &lt;link itemprop="embedURL" href="http://players.brightcove.net/{{accountID}}/{{playerID}}_default/index.html?videoID={{id}}"&gt;&lt;meta itemprop="width" content="{{width}}"&gt;&lt;meta itemprop="height" content="{{height}}"&gt; \n &lt;!-- End Schema Code --&gt; \n &lt;!-- Start Player Code --&gt; \n &lt;iframe src="//players.brightcove.net/{{accountID}}/default_default/index.html?videoID={{id}}" style="width:{{playerWidth}};height:{{playerHeight}}" allowfullscreen webkitallowfullscreen mozallowfullscreen&gt;&lt;\/iframe&gt;  height:{{playerHeight}} \n &lt;!-- End Player Code --&gt; \n &lt;\/div&gt; \n &lt;\/div&gt;'
-            };
-1752604059001/default_default/index.html?videoID=4454620113001
-        function isDefined(x) {
-            if (x === '' || x === null || x === undefined) {
-                return false;
-            }
-            return true;
-        }
-
-    /**
-     * utility to extract h/m/s from seconds
-     * @param {number} secs - seconds to convert to Thh:mm:ss
-     * @return {String} ISO 8601 time string
-     */
-    function secondsToTime(secs) {
-        var hours = Math.floor(secs / (60 * 60)),
-            divisor_for_minutes = secs % (60 * 60),
-            minutes = Math.floor(divisor_for_minutes / 60),
-            divisor_for_seconds = divisor_for_minutes % 60,
-            seconds = Math.ceil(divisor_for_seconds);
-
-        if (hours < 10) {
-            hours = '0' + hours.toString();
-        } else {
-            hours = hours.toString();
-        }
-
-        if (minutes < 10) {
-            minutes = '0' + minutes.toString();
-        } else {
-            minutes = minutes.toString();
-        }
-
-        if (seconds < 10) {
-            seconds = '0' + seconds.toString();
-        } else {
-            seconds = seconds.toString();
-        }
-
-        return 'T' + hours + ':' + minutes + ':' + seconds;
-    }
-
-    /**
-     * send API request to the proxy
-     * @param  {Object} options options for the request
-     */
-    function getMediaData(options) {
-        var httpRequest = new XMLHttpRequest(),
-            responseRaw,
-            parsedData,
-            requestParams,
-            dataString,
-            // response handler
-            getResponse = function() {
-                try {
-                  if (httpRequest.readyState === 4) {
-                    if (httpRequest.status === 200) {
-                      console.log(httpRequest.responseText);
-                      // add/remove folder video return no data
-                      if (requestID === 'addVideoToFolder' || requestID === 'removeVideoFromFolder') {
-                        responseData.textContent = 'This request returns 204 No Content';
-                      } else {
-                        responseRaw = httpRequest.responseText;
-                        responseData.textContent = responseRaw;
-                        parsedData = JSON.parse(responseRaw);
-                        // save new ids on create requests
-                        if (requestID === 'createVideo') {
-                            newVideo_id = parsedData.id;
-                        } else if (requestID === 'createPlaylist') {
-                            newPlaylist_id = parsedData.id;
-                        }
-                        responseData.textContent = JSON.stringify(parsedData, null, '  ');
-                      }
-                      // re-enable the buttons
-                      enableButtons();
-                    } else {
-                      alert('There was a problem with the request. Request returned ' + httpRequest.status);
-                    }
-                  }
-                } catch (e) {
-                  alert('Caught Exception: ' + e);
-                }
-            };
-        // set up request data
-        requestParams = "url=" + encodeURIComponent(options.url) + "&requestType=" + options.requestType;
-        if (options.requestBody) {
-            dataString = JSON.stringify(options.requestBody);
-            requestParams += "&requestBody=" + encodeURIComponent(dataString);
-        }
-        console.log(requestParams);
-
-        // set response handler
-        httpRequest.onreadystatechange = getResponse;
-        // open the request
-        httpRequest.open('POST', proxyURL);
-        // set headers
-        httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        // open and send request
-        httpRequest.send(requestParams);
-    }
-
-        function generateSchema() {
-            var duration;
-            if (videoData === null) {
-                // clicked on generate before getting videos
-                alert('There was a problem getting the video data - recheck your input data, and then try refreshing the page and re-entering it');
-                return;
-            }
-            // insert other data that the schema needs
-            videoData.accountID = account_id;
-            videoData.playerID = (isDefined(playerID.textContent)) ? playerID.textContent : defaults.playerID;
-            videoData.playerWidth = (isDefined(playerWidth.textContent)) ? playerWidth.textContent : defaults.playerWidth;
-            videoData.playerHeight = (isDefined(playerHeight.textContent)) ? playerHeight.textContent : defaults.playerHeight;
-            // convert the duration to ISO format schema needs
-            videoData.duration = secondsToTime(videoData.duration / 1000);
-            template = Handlebars.compile(schemaTemplates.EntertainmentBusiness);
-            result = template(videoData);
-            publishingCode.textContent = result;
-        };
-        // set listeners for button
-        generateButton.addEventListener("click", function () {
-            // data setup
-            var options = {};
-            options.client_id = (isDefined(clientID.textContent)) ? clientID.textContent : defaults.client_id;
-            options.client_secret = (isDefined(clientSecret.textContent)) ? clientSecret.textContent : defaults.client_secret;
-            account_id = (isDefined(accountID.textContent)) ? accountID.textContent : defaults.accountID;
-            video_id = (isDefined(videoID.textContent)) ? videoID.textContent : defaults.videoID;
-            options.requestURL = 'https://cms.api.brightcove.com/v1/accounts/' + account_id + '/videos/' + video_id;
-        });
-        publishingCode.addEventListener('click', function () {
-            this.select();
-        });
-
-        function init() {
-            defaults.playerID = '28e29e6d-bed3-4db9-8d70-8d55b8aa3091';
-            defaults.videoID = '4454620113001';
-            defaults.playerWidth = '480';
-            defaults.playerHeight = '270';
-            // proxy has credentials for the default account, so no need to send them
-            defaults.client_id = '';
-            defaults.client_secret = '';
-        }
-    })();
+    <script src="assets/schema-tool.js">
     </script>
     <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
     <script>
