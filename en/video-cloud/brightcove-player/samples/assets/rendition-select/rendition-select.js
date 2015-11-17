@@ -21,6 +21,7 @@ videojs.plugin('downloadVideoPlugin', function() {
         mp4Ara.sort(function(a, b) {
             return b.size - a.size;
         });
-        myPlayer.src(mp4Ara[0].src);
+        highestQuality = mp4Ara[0].src;
+        myPlayer.src(highestQuality);
     });
 });
