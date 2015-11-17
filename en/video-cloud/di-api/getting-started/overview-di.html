@@ -136,6 +136,17 @@
                 <p>See the <a href="quick-start-di.html">Quick Start</a> for details of the API calls, and you can also see a <a href="../samples/batch-dynamic-ingest.html">working sample</a>.</p>
                 <p>For CMS API call to create the video in the Video Cloud system, see the <a href="//docs.brightcove.com/en/video-cloud/cms-api/getting-started/overview-cms.html#settingvalues">CMS API Overview</a>. Note that the video <code>name</code> is required, and that the name and any other strings included for video metadata (such as the <code>description</code>) <strong>must be URI-encoded</strong>.</p>
             </div>
+            <div class="section" id="rateLimiting">
+                <h2>Rate Limiting</h2>
+                <p>Because Dynamic Ingest uses both the <a href="../../cms-api/getting-started/overview-cms.html">CMS API</a> and the Ingest API, there are multiple rate limits that apply to requests:</p>
+                <ul>
+                    <li>A 10 request per second (600 per minute) limit on each account for combined requests across DI and the CMS API</li>
+                    <li>A limit of 5 concurrent CMS API calls</li>
+                    <li>A limit of 100 concurrent DI jobs per account</li>
+                    <li>When a customer hits any of these limits the get an HTTP 429 Too Many Requests response</li>
+                </ul>
+                <p>If you have a high volume of videos to ingest on a regular basis, you will need to combine your ingest app with a <a href="../../media-management/guides/get-status-di.html">notification receiver</a> to know when you need to pause and resume ingest requests.</p>
+            </div>
             <div class="section" id="replaceVideo">
                 <h2>Replace a videos</h2>
                 <p>To replace a video with a new version or a new set of renditions, the Dynamic Ingest API call is exactly the same as it would be for <a href="../samples/batch-dynamic-ingest.html">ingesting new videos</a> - the only difference is that you do not need to make a prior call to the CMS API to create the video object in the Video Cloud system and get an id for it. If the source video file at the specified URL is the same one originally ingested, you will simply get a new set of renditions. If the source file is new, you will be replacing the existing video. All videos will remain playable with existing renditions until retranscoding is complete.</p>
