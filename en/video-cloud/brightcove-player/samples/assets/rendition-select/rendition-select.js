@@ -1,11 +1,9 @@
-videojs.plugin('downloadVideoPlugin', function() {
+videojs.plugin('renditionSelectPlugin', function() {
     var myPlayer = this,
         videoID,
         videoName,
         totalRenditions,
-        mp4Ara = [],
-        controlBar,
-        newElement;
+        mp4Ara = [];
 
     videoID = myPlayer.options()['data-video-id'];
     myPlayer.catalog.getVideo(videoID, function(error, video) {
