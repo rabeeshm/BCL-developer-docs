@@ -1,1 +1,0 @@
-Tacoda_AMS_DDC =  Tacoda_AMS_DDC_addPair = Tacoda_AMS_DDC_collect_vars = Tacoda_AMS_DDC_getCookie = function () {};
