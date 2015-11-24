@@ -6,7 +6,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
 	<!-- change title to match the h1 heading -->
-	<title>Brightcove Player Sample: Related Videos from Playlist</title>
+	<title>Brightcove Player Sample: Related Videos from a Playlist</title>
 	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
 	<script src="//use.edgefonts.net/source-code-pro.js"></script>
@@ -29,6 +29,13 @@
 
 </script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
+  <style>
+    /*size the player */
+    iframe {
+      height: 344px;
+      width: 610px;
+    }
+  </style>
 </head>
 
 <body>
@@ -40,15 +47,19 @@
 	<div id="searchModal" class="reveal-modal" data-reveal></div>
 	<!-- content -->
 	<!-- content -->
-	<div class="row">
+    <div class="perform-only">
+        <h1>Brightcove Player Sample: Related Videos from a Playlist</h1>
+        <p>The information contained in this document is not applicable for Perform customers.</p>
+    </div>
+  	<div class="row video-cloud-only">
 		<div class="sidebar large-2 columns show-for-large-up">
 			<div id="sidenav" class="side-nav"></div>
 		</div>
 		<div id="main" class="large-10 small-12 columns">
 			<div id="top" class="section">
-				<h1>Brightcove Player Sample: Related Videos from Playlist</h1>
+				<h1>Brightcove Player Sample: Related Videos from a Playlist</h1>
 				<!-- Place document intro sentence(s) here -->
-				<p>In this sample, a Video Cloud playlist will be used for the source of related videos. The related videos will appear when the viewer pauses the video or the video completes playing. A maximum of nine videos can be displayed.</p>
+				<p>In this sample, a Video Cloud playlist will be used for the source of related videos. The related videos will appear when the viewer pauses the video or the video completes playing. A maximum of nine videos can be displayed using the dimensions of the player and thumbnails used here, but those settings can be changed to fit your needs.</p>
 			</div>
 
 			<div id="developmentsequence" class="section">
@@ -82,12 +93,12 @@
 
       <div id="selectimplementation" class="section">
 				<h2>Select implementation</h2>
-				<p>In this sample, ...</p>
+				<p>In this sample, you will test with the In-Page embed code and then move the CSS and JavaScript into a plugin. Since this example does not interact with any page elements, an iframe implementation with a plugin will be detailed and used.</p>
 			</div>
 
 			<div id="resources" class="section">
 				<h2>API resources used</h2>
-				<p>The following sections detail resources used from various APIs.</p>
+				<p>The following sections detail resources used from various APIs/plugins.</p>
 				<h3>Brightcove Player API</h3>
 				<ul>
           <li><code>catalog.getPlaylist()</code>: Method to make a catalog request for the playlist with the specified id and invokes a callback when the request completes.</li>
@@ -102,7 +113,8 @@
 
 			<div id="player" class="section">
 				<h2>The player</h2>
-				<p></p>
+				<p>Start the video, then when you pause or when the video ends you can see thumbnails that represent the videos in the desired playlist. You can then select a new video to play.</p>
+        <iframe src='//players.brightcove.net/1752604059001/f7dac958-0743-4a48-afe1-bc3b30165a81_default/index.html?videoId=4607357817001' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
 			</div>
 
 			<div id="code" class="section">
@@ -130,7 +142,23 @@
         <p>No HTML code is added to the page.</p>
 				<h3>The JavaScript code</h3>
 				<p>Add the following JavaScript to your page code:</p>
-        <p class="video-cloud-only"><code data-gist-id="faa74cd6fdc3ff5b5387" data-gist-hide-footer="true" data-gist-line="43-153"></code></p>
+        <ul>
+          <li>Lines 48-50, 53-59: Create variables for later use. Note that lines 57-59 create an HTML <code>&lt;div&gt;</code> element and assign it an ID. This element will be assigned the thumbnails and then used as content in the overlay. Line 54 assigns the ID of the desired playlist you wish to use for the related videos to a variable.</li>
+          <li>Lines 52, 85: Wait for the player to be ready for programmatic interaction.</li>
+          <li>Lines 61, 70: Reads a playlist using the player's <code>catalog</code> object and defines the callback function.</li>
+          <li>Line 65: Reduces the number of videos to a maximum of nine.</li>
+          <li>Line 67: Calls the <code>createVideoList</code> function which creates the thumbnails and assigns an HTML anchor tag to each.</li>
+          <li>Line 69: Appends the element of thumbnails/anchors to the dynamically created <code>&lt;div&gt;</code>.</li>
+          <li>Lines 72-84: Uses standard notation to call the overlay plugins and create overlays for when the player pauses or ends.</li>
+          <li>Lines 92-100: This function is called when a viewer clicks on a thumbnail to play a new video. The function loads the correct video from the playlist then plays the video. It is VERY important that this is defined as a function expression, where a variable is assigned a function, rather than the more common function declaration notation. This is done so the function definition will be hoisted to global page scope when this code is used in a plugin. (Note the <code>try-catch</code> block is a work around for a known bug. See the note below for details.)</li>
+          <li>Lines 109-119: Creates and HTML element. This function was called to create the <code>&lt;div&gt;</code> used as part of the overlay.</li>
+          <li>
+            Lines 127-152: This function is passed the an array of videos and from the list builds the HTML for the overlay. The following screenshot shows the raw HTML dynamically created. Note that an anchor tag is created and the <code>loadAndPlay</code> function is called with the corresponding playlist item as an argument.<br />
+            <div><img src="/en/video-cloud/brightcove-player/samples/assets/related-playlist/overlay-raw-html.png"></div>
+          </li>
+        </ul>
+        <p class="BCL-aside">Note: Lines 94, 96-99 are optional. The <code>try</code> block is added to get around the player error msg of <code>Uncaught TypeError: d.off is not a function</code>. This happens when trying to load a video that only has MP4 renditions, and the player is trying to use HLS. This is a temporary solution which will eventually be fixed in the player. For details, see the <a href="../../brightcove-player/reference/known-issues.html#doffbug">Compatability and Known Issues</a> document.</p> </li>
+        <p class="video-cloud-only"><code data-gist-id="faa74cd6fdc3ff5b5387" data-gist-hide-footer="true" data-gist-line="43-154"></code></p>
         <h3>The stylesheet</h3>
 				<p>Add the following styles to your page code:</p>
         <ul>
@@ -148,33 +176,34 @@
 				<h3>Create the JavaScript file</h3>
 				<p>Move the plugin's JavaScript code into a file and place it in an Internet accessible URL.</p>
 				<ul>
-				    <li>Lines x,y: Use the standard syntax to begin and end a Brightcove Player plugin.</li>
-				    <li>Line x: The first argument of the function call is the name of the function defined in the plugin code, in this case <code>PLUGIN NAME</code>.</li>
-				    <li>Line y: The trailing semicolon is required.</li>
+				    <li>Lines 166, 271: Use the standard syntax to begin and end a Brightcove Player plugin.</li>
+				    <li>Line 166: The first argument of the function call is the name of the function defined in the plugin code, in this case <code>relatedPlaylist</code>.</li>
+				    <li>Line 271: The trailing semicolon is required.</li>
 				</ul>
-				<p><code data-gist-id="faa74cd6fdc3ff5b5387" data-gist-hide-footer="true" data-gist-line=""></code></p>
+        <p class="BCL-aside">NOTE: The variable created for <code>loadAndPlay</code> function needs to be removed when creating the plugin. When this is done the function will be global to the page, and be able to be seen when a thumbnail is clicked.</p>
+				<p><code data-gist-id="faa74cd6fdc3ff5b5387" data-gist-hide-footer="true" data-gist-line="166-271"></code></p>
 				<h3>Create the CSS file</h3>
-				<p>If you are using CSS, move styles into a file and place it in an Internet accessible URL.</p>
+				<p>Move the CSS into a file and place it in an Internet accessible URL. Note that the player size CSS is not included in this file.</p>
+        <p><code data-gist-id="faa74cd6fdc3ff5b5387" data-gist-hide-footer="true" data-gist-line="278-294"></code></p>
 				<h3>Deploy plugin and CSS</h3>
-        <p>To deploy the NAME Plugin using the Players module, follow these steps:</p>
+        <p>This related videos via playlist plugin leverages the Overlay plugin. Therefore, you must load the JavaScript and CSS files for both the custom plugin as well as the Overlay plugin.</p>
+        <p>To deploy the <strong>relatedPlaylist</strong> Plugin using the Players module, follow these steps:</p>
         <ol>
           <li>In the new Video Cloud Studio, open the <strong>Players</strong> module and locate the player.</li>
           <li>Click the link for the player to open the player properties.</li>
           <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
           <li>For the <strong>JavaScript URL</strong>, enter the URL which specifies the location of where you saved your plugin's JavaScript.</li>
+          <li>Click the <strong>+</strong> button to add another JavaScript file.</li>
+          <li>For the <strong>JavaScript URL</strong>, enter the URL which specifies the location of the Overlay plugin's Javascript:
+          <pre><code>https://players.brightcove.net/videojs-overlay/lib/videojs-overlay.js</code></pre></li>
           <li>For the <strong>CSS URL</strong>, enter the URL which specifies the location of where you saved your plugin's CSS.</li>
-          <li>For the <strong>Name</strong>, enter <strong>PLUGIN NAME</strong>.</li>
-          <li>Enter the plugin options. The example below will ...<br/>
-<pre><code>{
-  "overlays": [
-    {
-      "align": "bottom",
-      "start": 2
-    }
-  ],
-  "content": "<strong>Default overlay content</strong>"
-}</code></pre>
-              <div><img src="/en/video-cloud/brightcove-player/guides/assets/overlay-plugin.png"></div>
+          <li>Click the <strong>+</strong> button to add another CSS file.</li>
+          <li>For the <strong>CSS URL</strong>, enter the URL which specifies the location of the Overlay plugin's CSS:</li>
+          <pre><code>https://players.brightcove.net/videojs-overlay/lib/videojs-overlay.css</code></pre></li>
+          <li>For the <strong>Name</strong>, enter <strong>relatedPlaylist</strong>.</li>
+          <li>No options will be passed to the plugin, so simply enter empty braces for the options.<br/>
+          <pre><code>{}</code></pre>
+            <div><img src="/en/video-cloud/brightcove-player/samples/assets/related-playlist/studio-name-options.png"></div>
             </li>
             <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
           </ol>
@@ -183,13 +212,14 @@
       <div id="useiframe" class="section">
         <h2>Use iframe</h2>
         <p>It is a best practice to use the iframe player implementation. Since you can create this functionality as a plugin, replace the embed_in_page implementation with the iframe implementation.</p>
-				<p><code data-gist-id="xxxxx" data-gist-hide-footer="true" data-gist-line="" data-gist-highlight-line=""></code></p>
+				<p><code data-gist-id="faa74cd6fdc3ff5b5387" data-gist-hide-footer="true" data-gist-line="299"></code></p>
       </div>
 
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
 				<ul>
-					<li> <a href="internal:node/XXXX">DOC TITLE</a></li>
+          <li> <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/samples/related-overlay.html">Brightcove Player Sample: Related Videos Overlay</a></li>
+          <li> <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/samples/popular-videos-overlay.html">Brightcove Player Sample: Popular Videos Overlay</a></li>
 					<li> <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a></li>
 					<li> <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-guide.html">Player Plugin Overview</a></li>
 				</ul>
