@@ -196,10 +196,8 @@ var aapi_model = {
         account__country__region_city: {dimensions: ["account", "country", "region", "city"], from: "2011-01-01"},
         account__video__country: {dimensions: ["account", "video", "country"], from: "2011-01-01"},
         account__video__region: {dimensions: ["account", "video", "region"], from: "2011-01-01"},
-        account__video__country_region: {dimensions: ["account", "video", "country", "region"], from: "2011-01-01"},
         account__player__country: {dimensions: ["account", "player", "country"], from: "2011-01-01"},
         account__player__region: {dimensions: ["account", "player", "region"], from: "2011-01-01"},
-        account__player__country_region: {dimensions: ["account", "player", "country", "region"], from: "2011-01-01"},
         account__device_os: {dimensions: ["account", "device_os"], from: "2011-01-01"},
         account__device_type: {dimensions: ["account", "device_type"], from: "2011-01-01"},
         account__device_os__device_type: {dimensions: ["account", "device_os", "device_type"], from: "2011-01-01"},
@@ -211,7 +209,6 @@ var aapi_model = {
         account__player__device_os__device_type: {dimensions: ["account", "player", "device_os", "device_type"], from: "2011-01-01"},
         account__video__player__device_os: {dimensions: ["account", "video", "player", "device_os"], from: "2011-01-01"},
         account__video__player__device_type: {dimensions: ["account", "video", "player", "device_type"], from: "2011-01-01"},
-        account__video__player__device_os__device_type: {dimensions: ["account", "video", "player", "device_os", "device_type"], from: "2011-01-01"},
         account__referrer_domain: {dimensions: ["account", "referrer_domain"], from: "2012-10-01"},
         source_type: {dimensions: ["source_type"], from: "2012-10-01"},
         search_terms: {dimensions: ["search_terms"], from: "2012-10-01"},
@@ -263,5 +260,3 @@ var aapi_model = {
         account__video__destination_domain: {dimensions: ["account", "video", "destination_domain"], from: "2014-03-03"}
     }
 };
-
-
