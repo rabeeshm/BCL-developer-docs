@@ -77,7 +77,6 @@ var BCLS = (function (document, Handlebars) {
                 try {
                     if (httpRequest.readyState === 4) {
                         if (httpRequest.status === 200) {
-                            console.log(httpRequest.responseText);
                             // add/remove folder video return no data
                             videoData = JSON.parse(httpRequest.responseText);
                             generateSchema();
@@ -92,7 +91,6 @@ var BCLS = (function (document, Handlebars) {
             };
         // set up request data
         requestParams = "url=" + encodeURIComponent(options.url) + "&requestType=" + options.requestType;
-        console.log(requestParams);
 
         // set response handler
         httpRequest.onreadystatechange = getResponse;
@@ -105,11 +103,6 @@ var BCLS = (function (document, Handlebars) {
     }
 
     function generateSchema() {
-        if (videoData === null) {
-            // clicked on generate before getting videos
-            alert('There was a problem getting the video data - recheck your input data, and then try refreshing the page and re-entering it');
-            return;
-        }
         // insert other data that the schema needs
         videoData.playerID = isDefined(playerID.textContent) ? playerID.textContent : defaults.playerID;
         videoData.playerWidth = isDefined(playerWidth.textContent) ? playerWidth.textContent : defaults.playerWidth;
@@ -124,12 +117,11 @@ var BCLS = (function (document, Handlebars) {
     generateButton.addEventListener("click", function () {
         // data setup
         var options = {};
-        options.client_id = (isDefined(clientID.textContent)) ? clientID.textContent : defaults.client_id;
-        options.client_secret = (isDefined(clientSecret.textContent)) ? clientSecret.textContent : defaults.client_secret;
-        account_id = (isDefined(accountID.textContent)) ? accountID.textContent : defaults.account_id;
-        video_id = (isDefined(videoID.textContent)) ? videoID.textContent : defaults.videoID;
+        options.client_id = (isDefined(clientID.value)) ? clientID.value : defaults.client_id;
+        options.client_secret = (isDefined(clientSecret.value)) ? clientSecret.value : defaults.client_secret;
+        account_id = (isDefined(accountID.value)) ? accountID.value : defaults.account_id;
+        video_id = (isDefined(videoID.value)) ? videoID.value : defaults.videoID;
         options.url = 'https://cms.api.brightcove.com/v1/accounts/' + account_id + '/videos/' + video_id;
-        console.log('url', options.url);
         options.requestType = "GET";
         getMediaData(options);
     });
