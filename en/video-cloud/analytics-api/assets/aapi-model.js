@@ -219,8 +219,6 @@ var aapi_model = {
         account__referrer_domain__source_type__search_terms: {dimensions: ["account", "referrer_domain", "source_type", "search_terms"], from: "2012-10-01"},
         video__referrer_domain: {dimensions: ["video", "referrer_domain"], from: "2012-10-01"},
         video__source_type: {dimensions: ["video", "source_type"], from: "2012-10-01"},
-        video__search_terms: {dimensions: ["video", "search_terms"], from: "2012-10-01"},
-        video__video__source_type__search_terms: {dimensions: ["video", "source_type", "search_terms"], from: "2012-10-01"},
         video__referrer_domain__source_type: {dimensions: ["video", "referrer_domain", "source_type"], from: "2012-10-01"},
         account__video__referrer_domain__source_type: {dimensions: ["account", "video", "referrer_domain", "source_type"], from: "2012-10-01"},
         player__referrer_domain: {dimensions: ["player", "referrer_domain"], from: "2012-10-01"},
