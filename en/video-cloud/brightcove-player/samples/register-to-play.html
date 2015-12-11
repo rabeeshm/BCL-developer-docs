@@ -154,71 +154,60 @@
                     <pre> http://players.brightcove.net/videojs-overlay/lib/videojs-overlay.css</pre></li>
                     <li>For the <strong>Name</strong>, enter <strong>overlay</strong>.</li>
                     <li><p>Enter the plugin options. The example below displays clickable text when the video data is loaded, and hides the overlay once the video starts playing.</p>
-                        <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="252-259"></code></p>
-                        <div><img src="../../brightcove-player/samples/assets/age-gate-overlay.png" alt="age gate overlay plugin"></div>
+                        <p><script src="https://gist.github.com/7782561fb421af951e1c.js"></script></p>
+                        <p class="BCL-aside">Note: replace <code>your-domain.com</code> with the appropriate path to the registration form page that you will create below. You can host the player and the registration page on a local or remote web server, but they must be on the same domain, as explained <a href="#limitations">below</a></p>
+                        <div><img src="./assets/register-to-play/overlay-options.png" alt="overlay options"></div>
                   </ol>
               </li>
               <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
               <li><span class="video-cloud-only">In the <strong>Media</strong> module, select a video and publish it with this player.</span><span class="perform-only">Assign video content to the player and publish it.</span></li>
-              <li>Copy the In-Page embed code and paste it into a new HTML file.</li>
+              <li>Copy the In-Page embed code and paste it into a new HTML file. Give the file any name you like, but it must reside on the same local or remote domain as the registration form.</li>
+              <li>Add an id attribute to the video tag: <code>id="registerToPlay"</code></li>
           </ol>
           <p class="BCL-aside">For details on how to get this embed code, see the <a href="../../brightcove-player/getting-started/quick-start-bc-player.html">Quick Start to Brightcove Player</a> document.</p>
           <p>The embed code should look like this:</p>
-          <p class="video-cloud-only"><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="84-91"></code></p>
-          <p class="perform-only"><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="84,86-91"></code></p>
+          <p class="video-cloud-only"></p>
+          <p class="perform-only"><script src="https://gist.github.com/58d289811df637411269.js"></script></p>
 
-        <h3>The HTML code</h3>
-        <p>No extra HTML code is needed for this example, until you get to the iframe implementation.</p>
+        <h3>The Registration Form page</h3>
+        <p>
+            The registration form page will appear in the iframe in the overlay. It's just an ordinary web page with HTML, CSS, and JavaScript - we won't dwell on the details, since there are explanatory comments in the code. The one feature that might be unfamiliar to you is this line, which appears in the handlers for clicking the submit password buttons:
+        </p>
+<pre><code>parent.playVideo();</code></pre>
+        <p>
+            In an ordinary web page, parent would be the browser window. But since the page will be embedded in an iframe, the parent is the page that contains the frame. So this code is calling a function on the player page.
+        </p>
+        <div class="BCL-aside">
+            <p>Note: to call a function on the parent page, two conditions must be met:</p>
+            <ul>
+                <li>The parent and child pages must reside on the same domain</li>
+                <li>The function must be in the globle scope of the parent page</li>
+            </ul>
+            <p>Here is the full code for the registration page:</p>
+            <ol>
+                <li>Copy the code into a new HTML page.</li>
+                <li>Save the page. Make sure that the path and filename match what you entered as the iframe src in the overlay options, or edit the overlay options in Studio as necessary.</li>
+            </ol>
+            <p><script src="https://gist.github.com/6b8fbc967d56b2097b7d.js"></script></p>
+        </div>
+        <h3>The HTML code for the player page.</h3>
+        <p>No extra HTML code is needed for this example.</p>
 
-        <h3>The JavaScript code</h3>
-        <p>Add the following JavaScript to your page code.</p>
-        <p>Here you will use the player's <code>addClass()</code> and <code>removeClass()</code> methods to hide and then show the player controls. We'll look at the details of the <code>video-agelist</code> class in the next section.</p>
-        <ul>
-          <li>Line 99: Gets a reference to the player when it is ready.</li>
-          <li>Line 100: Adds the class which hides the player controls and the big play button.</li>
-          <li>Line 102: Listens for when the player has initial duration and dimension information.</li>
-          <li>Line 103: Gets a reference to the age verification text in the overlay.</li>
-          <li>Line 104: Listens for when the user clicks the age verification text.</li>
-          <li>Line 105: Removes the class which hides the player controls and the big play button.</li>
-          <li>Line 106: Starts video playback.</li>
-        </ul>
-        <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="94-110"></code></p>
+        <h3>The JavaScript code for the player page</h3>
+        <ol>
+            <li>Add the JavaScript shown below to your player page code.</li>
+        </ol>
+        <p>Here you will use the player's <code>addClass()</code> and <code>removeClass()</code> methods to hide and then show the player controls and overlay.</p>
+        <p><script src="https://gist.github.com/c7deb9ef96d90aeb9703.js"></script></p>
 
-        <h3>The stylesheet</h3>
+        <h3>The stylesheet for the player page</h3>
         <p>This example uses CSS styles for the Brightcove player and the Overlay plugin.</p>
-        <ul>
-          <li>Lines 53-65: Override the default styles for the Overlay plugin.</li>
-          <li>Lines 67-70: Hide the player controls and the big play button.</li>
-          <li>Lines 72-74: Set the cursor for the age verification text in the overlay.</li>
-          <li>Lines 76-79: Set the dimensions of the player.</li>
-        </ul>
-        <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="51-80"></code></p>
-        <h4>Hiding player controls</h4>
-        <p>Let's take a closer look at how we used CSS to hide the big play button and the control bar. For an introduction about changing the appearance of the Brightcove player, see the <a href="../../brightcove-player/guides/customize-appearance.html">Customize Player Appearance</a> guide.</p>
-        <p>First, let's change the style to hide the player's big play button.</p>
         <ol>
-          <li>In the Chrome browser, open the <strong>Developer Tools</strong>.</li>
-          <li>Right click on the player and select <strong>Inspect Element</strong>.</li>
-          <li>In the <strong>Elements</strong> section of the <strong>Developer Tools</strong>, select the HTML associated with the big play button.</li>
-          <li>In the <strong>Styles</strong> section, you can see that the original <code>display</code> property with a value of <code>block</code> is set on the <code>div</code> element.
-          <div><img src="../../brightcove-player/samples/assets/age-gate-hide-button.png" alt="hide big play button" title="hide big play button"></div></li>
-          <li>When overriding CSS values, more specific styles win over less specific ones. Since elements have the lowest specificity value, we can override the display property by simply specifying the <code>vjs-big-play-button</code> class.</li>
-          <li>Look at our CSS for the big play button below. In this example, we are saying select all elements with a class name of <code>vjs-big-play-button</code> which are decendents of the element with class name of <code>video-agelist</code>. Remember that in the JavaScript code, we added the <code>video-agelist</code> class to the player.
-          <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="67-70" data-gist-highlight-line="68,69"></code></p></li>
+            <li>Add the CSS shown below to your player page code.</li>
         </ol>
-
-        <p>Next, let's change the style to hide the player's control bar.</p>
-        <ol>
-          <li>In the <strong>Elements</strong> section of the <strong>Developer Tools</strong>, select the HTML associated with the player control bar.</li>
-          <li>In the <strong>Styles</strong> section, you can see that the original <code>display</code> property with a value of <code>flex</code> is set with three class attributes in the selector.
-          <div><img src="../../brightcove-player/samples/assets/age-gate-hide-controls.png" alt="hide control bar" title="hide control bar"></div></li>
-          <li>To override the style for the control bar, we need at least three class attributes in our selector, including the <code>vjs-control-bar</code> class.</li>
-          <li>Look at our CSS for the control bar below. In this example, we are saying select all elements with a class name of <code>vjs-control-bar</code> which are decendents of the element with both a class name of <code>video-agelist</code> and a class name of <code>video-js</code>.
-          <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="67-70" data-gist-highlight-line="67,69"></code></p>
-          <p>For more information about calculating specificity value, see the <a href="//css-tricks.com/specifics-on-css-specificity/">Specifics on CSS Specificity</a> page.</p></li>
-
-        </ol>
-
+        <p><script src="https://gist.github.com/3d94b62edfabe630a3ab.js"></script></p>
+        <h3>Test the page</h3>
+        <p>Once you save the player and registration form pages and have them running on the same local or remote domain, you can test by browsing to the player page. Note that you need to browse it on a web server, not as a local file. (i.e. http://localhost/path/player.html, <strong>not</strong> file:///somepath/player.html.) The player should behave just as the sample above does.</p>
       </div>
 
     <div id="plugin" class="section">
