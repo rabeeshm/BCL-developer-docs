@@ -137,6 +137,7 @@ var BCLSVJS = (function (window, document, docData) {
         // add elements
         // mainLink.appendChild(document.createTextNode('Documentation Home'));
         // topSection.appendChild(mainLink);
+        header.setAttribute('style', 'color:#F3951D');
         header.appendChild(text);
         topSection.appendChild(header);
         option1.appendChild(document.createTextNode('5.0.0 (Current Version)'));
