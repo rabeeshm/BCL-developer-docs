@@ -59,7 +59,7 @@
             <div class="section" id="authorization">
                 <h2>Authorization</h2>
                 <p class="BCL-aside">Requests to the CMS API require an authorization header which contain your access tokens. For details on how to obtain client credentials and use them to retrieve access tokens, see the <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/oauth-api-overview.html">Brightcove OAuth Overview</a>.</p>
-                <p>The operations you will need to manage remotes assets are:</p>
+                <p>The permissions you will need to manage remotes assets are:</p>
                 <ul>
                     <li>
                         <code>video-cloud/video/assets/read</code>
@@ -75,7 +75,7 @@
                     </li>
                 </ul>
                 <p>Instead, you can just create credentials with permissions for
-                    <code>video-cloud/video/all</code>
+                    <code>video-cloud/video/all</code>.
                 </p>
             </div>
             <div class="section" id="workflow">
@@ -178,21 +178,65 @@ https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/assets
             </div>
             <div class="section" id="addTextTracks">
                 <h2>Add text tracks</h2>
+                <p>Text tracks can be used to add captions, chapters, and other time-based metadata to your video.</p>
                 <p>There are two steps to adding text tracks (webVTT files) to your videos:</p>
                 <ol>
                     <li>
                         <p>First, make a POST request to:</p>
-                        <pre><code>https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/text_tracks</code></pre>
+                        <pre><code>https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/assets/text_tracks</code></pre>
+                        <p>In the request body JSON, include the remote URL for the .vtt file and a name (optional):</p>
+                        <pre><code>{
+    "remote_url": "http://learning-services-media.brightcove.com/captions/intro-vcs.vtt",
+    "name": "EN Captions"
+}</code></pre>
+                        <p>For additional details see the <a href="../references/cms-api/versions/v1/index.html#api-Remote_Assets-Add_Text_Track">API Reference</a>.</p>
                     </li>
-                    <li></li>
+                    <li>
+                        <p>Next, associate the text tracks with the video by making a PATCH request to:</p>
+                        <pre><code>https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}</code></pre>
+                        <p>In the request body JSON, include the information about the text tracks and how they are to be used:</p>
+                        <pre><code>{"text_tracks" : [ {
+"src" : "http://learning-services-media.brightcove.com/captions/bc_smart_fr.vtt",
+"srclang" : "fr",
+"label" : "français",
+"kind" : "captions",
+"mime_type" : null,
+"default" : false
+}, {
+"src" : "http://learning-services-media.brightcove.com/captions/bc_smart.vtt",
+"srclang" : "en",
+"label" : "English",
+"kind" : "captions",
+"mime_type" : null,
+"default" : true
+} ]}</code></pre>
+                        <p>For additional information, see the <a href="../references/cms-api/versions/v1/index.html#api-Video-Update_Video">API Reference</a> and <a href="./webvtt.html">Adding WebVTT Captions</a>.</p>
+                    </li>
                 </ol>
+                <p class="BCL-aside">Note: tracks (webVTT files) are supported in the Brightcove Player. To add captions for the old Smart Player, see <a href="#addCaptions">Add Captions</a>.</p>
+            </div>
+            <div class="section" id="addCaptions">
+                <h2>Add captions</h2>
+                <p class="BCL-aside">Captions are DFXP files used by the old Smart Player to add captions to videos. If you will be deploying your remote asset video only in the Brightcove Player, you can skip this step.</p>
+                <p>Add DFXP captions to your video by making a POST request to:</p>
+                <pre><code>https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/assets/caption</code></pre>
+                <p>In the request body JSON, include the remote URL for the DFXP file and a name (optional):</p>
+                <pre><code>{
+    "remote_url": "http://learning-services-media.brightcove.com/captions/Video-Cloud-Analytics-Performance-Report.DFXP.xml",
+    "name": "EN DFXP Captions"
+}</code></pre>
+            </div>
+            <div class="section" id="modifyAssets">
+                <h2>Modify assets</h2>
+                <p>In addition to adding remote assets for a video, there are also operations for retrieving, updating, and deleting the asset information. These operations use the endpoints described above, but with GET, PATCH, or DELETE requests. For update and delete requests, you must add the asset id (which is included in the response to POST and GET requests) to request URL:</p>
+                <pre><code>https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/assets/<strong>{asset_id}</strong></code></pre>
+                <p>See the <a href="../references/cms-api/versions/v1/index.html#api-Remote_Assets">API Reference</a> for details of the get, update, and delete operations.</p>
             </div>
             <div class="section" id="BCLreferences">
                 <h2>Related topics</h2>
                 <ul>
-                    <li><a href="//docs.brightcove.com/en/video-cloud/cms-api/getting-started/overview-cms.html">Dynamic Ingest API Overview</a></li>
-                    <li><a href="//docs.brightcove.com/en/video-cloud/cms-api/getting-started/quick-start-cms.html">Quick Start to Dynamic Ingest</a></li>
-                    <li><a href="//docs.brightcove.com/en/video-cloud/cms-api/samples/update-metadata.html">Batch Metadata Update Sample</a></li>
+                    <li><a href="../getting-started/overview-cms.html">CMS API Overview</a></li>
+                    <li><a href="../references/cms-api/versions/v1/index.html">CMS API Reference</a></li>
                 </ul>
             </div>
         </div>
