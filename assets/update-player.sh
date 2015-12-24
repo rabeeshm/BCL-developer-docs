@@ -21,11 +21,13 @@ read VERSION
 echo Version to update to: $PLAYER_ID
 echo --------------------------
 
-DATASTART='{ "player": { "template": { "version": "'
-DATAEND='" } }, "skin": "graphite", "compatibility": true }'
-DATA= '"$DATASTART""$VERSION""$DATAEND"'
+PATCHDATA='{ "player": { "template": { "version": "'
+PATCHDATA+="$VERSION"
+PATCHDATA+='" } }, "skin": "graphite", "compatibility": true }'
+# PATCHDATA= "{ \"player\": { \"template\": { \"version\": \"$VERSION$DATAEND\" } }, \"skin\": \"graphite\", \"compatibility\": true }"
+echo Data: $PATCHDATA
 
-RESPONSE=$(curl --header "Content-Type: application/json" --user "$USERNAME":"$PASSWORD" --request PATCH --data "$DATA" https://players.api.brightcove.com/v1/accounts/"$ACCOUNT_ID"/players/"$PLAYER_ID"/configuration)
+RESPONSE=$(curl --header "Content-Type: application/json" --user "$USERNAME":"$PASSWORD" --request PATCH --data "$PATCHDATA" https://players.api.brightcove.com/v1/accounts/"$ACCOUNT_ID"/players/"$PLAYER_ID"/configuration)
 echo 'Response:'
 echo $RESPONSE
 echo --------------------------
