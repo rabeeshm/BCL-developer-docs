@@ -29,6 +29,23 @@
 
 </script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
+  <style type="text/css">
+    .video-js {
+      float: left;
+      margin: 15px;
+      width: 400px;
+      height: 200px;
+    }
+    .vjs-playlist {
+      width: 250px;
+      float: left;
+      margin: 15px;
+    }
+    .hide-overlay .vjs-overlay {
+      display: none;
+    }
+  </style>
+  <link href="//players.brightcove.net/videojs-overlay/lib/videojs-overlay.css" rel='stylesheet'>
 </head>
 
 <body>
@@ -48,7 +65,7 @@
 			<div id="top" class="section">
 				<h1>Brightcove Player Sample: Display Next Video Name from Playlist</h1>
 				<!-- Place document intro sentence(s) here -->
-				<p>This sample demonstrates how to display the title of the next video in a playlist the last 5 seconds of the currently playing video. The duration for which the name should be displayed is set in a variable. The sample uses the Overlay Plugin to display the name.</p>
+				<p>This sample demonstrates how to display the title of the next video in a playlist the last 5 seconds of the currently playing video. The last video in the playlist displays a note saying so. The duration for which the name/message should be displayed is set in a variable. The sample uses the Overlay Plugin to display the name.</p>
 			</div>
 
 			<div id="developmentsequence" class="section">
@@ -82,23 +99,41 @@
 
       <div id="selectimplementation" class="section">
 				<h2>Select implementation</h2>
-				<p>In this sample, ...</p>
+				<p>In this sample, the logic can be placed in a plugin in used in that manner.</p>
 			</div>
 
 			<div id="resources" class="section">
 				<h2>API resources used</h2>
-				<p>The following sections detail resources used from various APIs.</p>
+				<p>The following sections detail resources used.</p>
 				<h3>Brightcove Player API</h3>
-				<p></p>
-				<h3>Player Management API</h3>
-				<p></p>
-				<h3>Delivery System API</h3>
-				<p></p>
+				<p>
+        <ul>
+          <li>on()</li>
+          <li>one()</li>
+          <li>play()</li>
+          <li>addClass()</li>
+          <li>paused()</li>
+          <li>playlist()</li>
+          <li>playlist.currentItem()</li>
+          <li>currentTime()</li>
+          <li>removeClass()</li>
+        </ul>
+        </p>
+				<h3>Plugins</h3>
+				<p><a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/overlay-plugin.html">Display Overlay Plugin</a></p>
 			</div>
 
 			<div id="player" class="section">
 				<h2>The player</h2>
-				<p></p>
+				<p>Start the video and with 5 seconds left in the video you will see the name of the second video appear. The last video will display a message stating it is the last video.</p>
+        <video id="myPlayerID"
+          data-playlist-id="4684620718001"
+          data-account="1752604059001"
+          data-player="7a129b53-9225-4b32-8595-906f9f4eaea9"
+          data-embed="default"
+          class="video-js" controls></video>
+
+        <ol class="vjs-playlist"></ol>
 			</div>
 
 			<div id="code" class="section">
@@ -106,38 +141,45 @@
 				<p>The following sections explain the player, JavaScript and CSS code used in the example.</p>
         <h3>Create the player</h3>
         <div class="video-cloud-only">
-          <p>To create a player and assign a video to it, follow these steps:</p>
+          <p>To create a player and assign a playlist to it, follow these steps:</p>
             <ol>
-              <li>Using Video Cloud Studio, in the <strong>Players</strong> module, create a new player or use an existing one.</li>
-              <li>In the <strong>Media</strong> module, select a video and publish it with this player.</li>
-              <li>Copy the In-Page embed code and paste it into a new HTML file.</li>
+              <li>Using Video Cloud Studio, in the <strong>Players</strong> module, create a new player. In the <strong>SETTINGS</strong> section, be sure to enable the use and auto-advance for playlists.<br />
+              <div><img src="/en/video-cloud/brightcove-player/samples/assets/coming-next-in-playlist/studio-enable-playlist.png"></div>
+              </li>
+              <li>In the <strong>Media</strong> module, select an existing playlist, or create one. Publish the playlist with the player just created.</li>
+              <li>Copy the <strong>Advanced</strong> (in-Page embed) code and paste it into a new HTML file.</li>
             </ol>
         </div>
-        <div class="perform-only">
-          <p>Login to your Perform Studio account and create a new video player. Open the player's properties page and edit the <strong>Video Content</strong> section. Here you can specify a <strong>URL</strong> for the video you wish to publish. Videos can be in HLS and MP4 formats.</p>
-          <img src="/en/video-cloud/brightcove-player/samples/assets/navigate-on-video-end-video-url.png" alt="">
-        </div>
-
 				<h3>The player code</h3>
           <p>Your player code should look similar to the following:</p>
-          <p class="video-cloud-only"><code data-gist-id="" data-gist-hide-footer="true" data-gist-line=""></code></p>
-          <p class="perform-only"><code data-gist-id="" data-gist-hide-footer="true" data-gist-line=""></code></p>
-        <h3>The HTML code</h3>
-        <p>Add the following HTML to your page code:</p>
+          <p class="video-cloud-only"><code data-gist-id="17b9c030dcb68e6229a5" data-gist-hide-footer="true" data-gist-line="28-38"></code></p>
+          <p>Note that an id is added to the code and since this code is for a playlist player. An HTML <code>&lt;ol&gt;</code> is also part of code since this is a playlist player.</p>
+        <h3>Overlay plugin</h3>
+        <p>Add the following to allow use of the Overlay plugin:</p>
         <ul>
-          <li></li>
-          <li></li>
-          <li></li>
+          <li>In the &lt;head&gt; section: <code>&lt;link href=&quot;//players.brightcove.net/videojs-overlay/lib/videojs-overlay.css&quot; rel='stylesheet'&gt;&lt;/li&gt;</code>
+          <li>Below the player's JavaScript <strong>index.min.js</strong> script: <code>&lt;script src=&quot;//players.brightcove.net/videojs-overlay/lib/videojs-overlay.js&quot;&gt;&lt;/script&gt;</code></li>
         </ul>
-        <p><code data-gist-id="" data-gist-hide-footer="true" data-gist-line=""></code></p>
 				<h3>The JavaScript code</h3>
 				<p>Add the following JavaScript to your page code:</p>
         <ul>
+          <li>Lines 42-46: Declare the script's variables. The duration of how long to display the overlay is set here.</li>
+          <li>Lines 48-57: Listen for the player to be ready and adds the overlay. The content of the overlay at this point is meaningless since before the overlay is displayed appropriate content will be dynamically added.</li>
+          <li>Lines</li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
           <li></li>
           <li></li>
           <li></li>
         </ul>
-        <p><code data-gist-id="" data-gist-hide-footer="true" data-gist-line=""></code></p>
+        <p><code data-gist-id="17b9c030dcb68e6229a5" data-gist-hide-footer="true" data-gist-line="41-110"></code></p>
         <h3>The stylesheet</h3>
 				<p>Add the following styles to your page code:</p>
         <ul>
@@ -145,7 +187,7 @@
           <li></li>
           <li></li>
         </ul>
-        <p><code data-gist-id="" data-gist-hide-footer="true" data-gist-line=""></code></p>
+        <p><code data-gist-id="17b9c030dcb68e6229a5" data-gist-hide-footer="true" data-gist-line=""></code></p>
 			</div>
 
 			<div id="plugin" class="section">
@@ -158,7 +200,7 @@
 				    <li>Line x: The first argument of the function call is the name of the function defined in the plugin code, in this case <code>PLUGIN NAME</code>.</li>
 				    <li>Line y: The trailing semicolon is required.</li>
 				</ul>
-				<p><code data-gist-id="" data-gist-hide-footer="true" data-gist-line=""></code></p>
+				<p><code data-gist-id="17b9c030dcb68e6229a5" data-gist-hide-footer="true" data-gist-line=""></code></p>
 				<h3>Create the CSS file</h3>
 				<p>If you are using CSS, move styles into a file and place it in an Internet accessible URL.</p>
 				<h3>Deploy plugin and CSS</h3>
@@ -218,8 +260,78 @@
 	<script>
 		$(document).foundation();
 	</script>
+  <script src="//players.brightcove.net/1752604059001/7a129b53-9225-4b32-8595-906f9f4eaea9_default/index.min.js"></script>
+
+  <script src="//players.brightcove.net/videojs-overlay/lib/videojs-overlay.js"></script>
 	<script type="text/javascript">
 		/******** Any scripts specific to page samples should go here *********/
+    var myPlayer,
+      intervalID,
+      playlistInfo,
+      timeToDisplayOverlay = 5,
+      lengthOfPlaylist = 0;
+
+    videojs('myPlayerID').ready(function () {
+      var myPlayer = this;
+      // Add Overlay to player, which is hidden immediately
+      myPlayer.overlay({
+        overlays: [{
+          content: '<h3>this is the overlay</h3>',
+          start: 'play'
+        }]
+      });
+    });
+
+    // Wait for loadedmetatdata to get playlist info
+    // Code in this block only performed once, hence one() method for the event listener
+    videojs('myPlayerID').one('loadedmetadata', function () {
+      myPlayer = this;
+      playlistInfo = myPlayer.playlist();
+      lengthOfPlaylist = playlistInfo.length;
+      // Set interval to call function every one second
+      intervalID = window.setInterval(checkTime, 1000);
+      // Listen for every loadedmetatdata, which means a new video has been loaded in the player
+      myPlayer.on('loadedmetadata', videoChanged);
+      // Hide overlay on initial load of player
+      myPlayer.addClass("hide-overlay");
+    });
+
+    // Function called every one second
+    function checkTime() {
+      if (!myPlayer.paused()) {
+
+        // Calculate time remaining in video
+        var currentVideoIndex = myPlayer.playlist.currentItem(),
+          nextVideoIndex = currentVideoIndex + 1,
+          currentVideoDuration = playlistInfo[currentVideoIndex].duration,
+          timeRemaining = currentVideoDuration - myPlayer.currentTime();
+
+        // Assign name of next video, or assign end of playlist note
+        if (nextVideoIndex < lengthOfPlaylist) {
+          nextVideoName = playlistInfo[nextVideoIndex].name
+        } else {
+          nextVideoName = 'Last video in playlist'
+        };
+
+        // Display overlay with name or note if near end of video
+        // Default time to display note is 5 seconds to end
+        if (timeRemaining <= timeToDisplayOverlay) {
+          var theDiv = document.getElementsByClassName("div.vjs-overlay");
+          document.getElementsByClassName("vjs-overlay")[0].innerHTML = nextVideoName;
+          myPlayer.removeClass("hide-overlay");
+          if (nextVideoIndex >= lengthOfPlaylist) {
+            window.clearInterval(intervalID);
+          };
+        };
+      } else {
+        console.log('video paused');
+      }
+    }
+
+    // If video changed, hide overlay
+    function videoChanged() {
+      myPlayer.addClass("hide-overlay");
+    }
 	</script>
 	<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
     <script>
