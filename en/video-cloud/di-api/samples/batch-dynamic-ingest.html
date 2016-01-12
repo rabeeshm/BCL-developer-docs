@@ -10,12 +10,12 @@
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
     <script src="//use.edgefonts.net/source-code-pro.js"></script>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
 
     <link rel="stylesheet" type="text/css" href="//docs.brightcove.com/en/styles/bcls-doc-site.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/atelier-forest.light.min.css">
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
 
     <style>
     input, select {
@@ -72,7 +72,10 @@
                     <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">Get Client Credentials Using Postman</a></li>
                 </ul>
             </div>
-
+            <div class="section" id="rateLimiting">
+                <h2>Rate limiting</h2>
+                <p>No more than 100 concurrent Dynamic Ingest jobs are allowed. The best way to avoid violating this rule is to create an app that receives notifications from the Dynamic Ingest system as well as submitting ingest requests, so that you can keep track of how many jobs are running and how many have completed - see <a href="../guides/fallback-retry.html#sample">Fallback / Retry Strategy</a>. This sample implements rudimentary rate limiting by pausing for 30 minutes after submitting 100 requests.</p>
+            </div>
             <div class="section" id="video_data">
                 <h2>Video data</h2>
                 <p>This script expects a data set as a JSON array of objects like this:</p>
@@ -278,40 +281,32 @@
             videoData = [],
             totalVideos,
             videoNumber = 0,
+            currentJobs = 0,
             t1,
             t2,
             totalIngested = 0,
             defaults = {account_id: 57838016001,client_id: "37cd3c5d-6f18-4702-bfb6-4fbc1cd095f1",client_secret: "gLSQANqe6A2PzJce_6xA4bTNu844up5-CSrC-jxNfur4EaOgWKRcqq_GTxKjhMpPSflMdNEhFdBmNe0qsTIZSQ"},
-            callbacks = '["http://solutions.brightcove.com/bcls/di-api/di-callbacks.php"]',
-            // functions
-            isDefined,
-            logResponse,
-            bclslog,
-            doIngest,
-            submitRequest,
-            setCMSOptions,
-            setDIOptions,
-            init;
+            callbacks = '["http://solutions.brightcove.com/bcls/di-api/di-callbacks.php"]';
 
         /*************************
         logging
         *************************/
-        bclslog = function (context, message) {
+        function bclslog(context, message) {
             if (window["console"] && console["log"]) {
               console.log(context, message);
             };
         };
 
         // is defined
-        isDefined = function(x){
-            if(x !== "" && x !== null && x !== undefined){
-                return true;
-            } else{
+        function isDefined(x){
+            if(x === "" || x === null || x === undefined){
                 return false;
+            } else{
+                return true;
             }
         };
         // set options for the CMS API request
-        setCMSOptions = function () {
+        function setCMSOptions() {
             var options = {};
             // truncate description if too long
             videoData[videoNumber].description = videoData[videoNumber].description.substr(0, 120) + "...";
@@ -325,7 +320,7 @@
             submitRequest(options, cmsURL, "cms");
         };
         // set options for the Dynamic Ingest API request
-        setDIOptions = function () {
+        function setDIOptions() {
             var options = {},
             custom_profile_display_value = custom_profile_display.value;
             // get the ingest profile
@@ -345,12 +340,12 @@
             submitRequest(options, diURL, "di");
         };
         // function to set the request
-        logResponse = function (type, data) {
+        function logResponse(type, data) {
             response.textContent += type + ": " + data + ",\n";
         };
 
         // function to submit Request
-        submitRequest = function (options, proxyURL, type) {
+        function submitRequest(options, proxyURL, type) {
             var httpRequest = new XMLHttpRequest(),
                 requestData,
                 responseData,
@@ -364,7 +359,7 @@
                             switch (type) {
                                 case "cms":
                                 if (responseData.indexOf("TIMEOUT") > 0) {
-                                    videoNumber++;
+                                    // videoNumber++;
                                     t1 = setTimeout(setCMSOptions, 1000);
                                 } else {
                                     parsedData = JSON.parse(responseData);
@@ -377,9 +372,19 @@
                                 logResponse("totalIngested", totalIngested);
                                 if (videoNumber < totalVideos - 1) {
                                     videoNumber++;
-                                    logResponse("Processing video number", videoNumber);
-                                    // pause to avoid CMS API timeouts
-                                    t2 = setTimeout(setCMSOptions, 1000);
+                                    currentJobs++;
+                                    logResponse('Processing video number', videoNumber);
+                                    logResponse('Current jobs: ', currentJobs);
+                                    // if currentJobs is > 99, need to pause
+                                    if (currentJobs > 99) {
+                                        // reset currentJobs
+                                        currentJobs = 0;
+                                        // wait 30 min before resuming
+                                        t2 = setTimeout(setCMSOptions, 1800000);
+                                    } else {
+                                        // pause to avoid CMS API timeouts
+                                        t2 = setTimeout(setCMSOptions, 1000);
+                                    }
                                 }
                                 break;
                             }
@@ -411,7 +416,6 @@
             for (i = 0; i < totalVideos; i++) {
                 videoData[i].reference_id += "_" + now.toString();
             }
-            console.log("totalVideos", totalVideos);
             // in case of stop/start, reset videoNumber to 0
             videoNumber = 0;
             // get account inputs
@@ -423,7 +427,7 @@
             setCMSOptions();
         });
         // initialize
-        init = function () {
+        function init() {
             var i,
                 iMax = profilesArray.length,
                 newOpt;

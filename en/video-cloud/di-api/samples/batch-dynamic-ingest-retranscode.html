@@ -10,12 +10,12 @@
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
     <script src="//use.edgefonts.net/source-code-pro.js"></script>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
 
     <link rel="stylesheet" type="text/css" href="//docs.brightcove.com/en/styles/bcls-doc-site.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/atelier-forest.light.min.css">
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
 
     <style>
     input, select {
@@ -73,6 +73,10 @@
                     <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html">Get Client Credentials Using CURL</a></li>
                     <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">Get Client Credentials Using Postman</a></li>
                 </ul>
+            </div>
+            <div class="section" id="rateLimiting">
+                <h2>Rate limiting</h2>
+                <p>No more than 100 concurrent Dynamic Ingest jobs are allowed. The best way to avoid violating this rule is to create an app that receives notifications from the Dynamic Ingest system as well as submitting ingest requests, so that you can keep track of how many jobs are running and how many have completed - see <a href="../guides/fallback-retry.html#sample">Fallback / Retry Strategy</a>. This sample implements rudimentary rate limiting by pausing for 30 minutes after submitting 100 requests.</p>
             </div>
 
             <div class="section" id="video_data">
@@ -187,6 +191,7 @@
             videoData = [],
             totalVideos,
             videoNumber = 0,
+            currentJobs = 0,
             t2,
             totalIngested = 0,
             defaults = {account_id: 57838016001,client_id: "37cd3c5d-6f18-4702-bfb6-4fbc1cd095f1",client_secret: "gLSQANqe6A2PzJce_6xA4bTNu844up5-CSrC-jxNfur4EaOgWKRcqq_GTxKjhMpPSflMdNEhFdBmNe0qsTIZSQ"},
@@ -264,9 +269,19 @@
                             logResponse("totalIngested", totalIngested);
                             if (videoNumber < totalVideos - 1) {
                                 videoNumber++;
-                                logResponse("Processing video number", videoNumber);
-                                // give proxy a second to rest
-                                t2 = setTimeout(setDIOptions, 1000);
+                                currentJobs++;
+                                logResponse('Processing video number', videoNumber);
+                                logResponse('Current jobs: ', currentJobs);
+                                // if currentJobs is > 99, need to pause
+                                if (currentJobs > 99) {
+                                    // reset currentJobs
+                                    currentJobs = 0;
+                                    // wait 30 min before resuming
+                                    t2 = setTimeout(setDIOptions, 1800000);
+                                } else {
+                                    // pause to avoid CMS API timeouts
+                                    t2 = setTimeout(setDIOptions, 1000);
+                                }
                             }
                         } else {
                             logResponse("DI", "Request failed; retrying video number: " + videoData[videoNumber].id);
