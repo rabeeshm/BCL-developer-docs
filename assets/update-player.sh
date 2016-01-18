@@ -37,3 +37,5 @@ RESPONSE=$(curl --header "Content-Type: application/json" --user "$USERNAME":"$P
 echo 'Response:'
 echo $RESPONSE
 echo The player has been updated
+echo Note that the player uses the graphite skin
+echo Use the skin updater to use the luna skin
