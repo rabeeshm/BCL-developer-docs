@@ -47,6 +47,7 @@
         <!-- content starts here -->
           <div class="video-cloud-only">
             <p class="BCL-objective">In this quick start you will use Android Studio and the Brightcove Player SDK for Android to create an app which plays a video from a Brightcove Video Cloud account and videos from a Brightcove Video Cloud playlist.</p>
+            <p>This example uses the <a href="../../../playback-api/index.html">Brightcove Playback API</a>. This is the latest and recommended API to retrieve content from your Video Cloud library.</p>
           </div><!--class="video-cloud-only"-->
           
           <div class="perform-only">
@@ -54,11 +55,13 @@
           </div><!--class="perform-only"-->
           
             <!--break-->
-            <div>
+            <div id="overview" class="section">
+            <h2>Overview</h2>
               <p>After completing this Quick Start you should be able to:</p>
               <ul class="BCL_objectivesList">
                 <li>Create a project and add the Brightcove Player SDK for Android using Gradle.</li>
-                <li>Alter the layout to include a <code>BrightcoveVideoView</code>.</li>
+                <li><p>Alter the layout to include a <code>BrightcoveExoPlayerVideoView</code>.</p>
+                <p class="BCL-aside">This example uses the <code>BrightcoveExoPlayerVideoView</code>, which is the recommended view to use in most cases. If you think you need to use a different view, see the <a href="../getting-started/basevideoview.html">Choosing a BaseVideoView</a> document.</p></li>
                 <li class="video-cloud-only">Add to the <code>onCreate()</code> method to play videos from different sources.</li>
                 <li class="perform-only">Add to the <code>onCreate()</code> method to play videos.</li>
               </ul>
@@ -115,7 +118,8 @@
               <li><p>Expand the <strong>Gradle Scripts</strong> section and open the second <code>build.gradle</code> file, which is associated with the current module in your PlayVideos project.</p>
               <div><img alt="playvideos project" src="../guides/assets/studioqs-gradle-file.png"></div></li>
               <li><p>At the bottom of the file, add the <code>repositories</code> section and alter the <code>dependencies</code> section as shown here:</p>
-              <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="1-14" data-gist-highlight-line="1-6,13"></code></p></li>
+              <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="1-13" data-gist-highlight-line="1-5,12"></code></p>
+              </li>
             </ol>
           </div>
 
@@ -127,7 +131,7 @@
               <li>Open the file <code>app/res/layout/content_main.xml</code>.</li>
               <li><p>Click <strong>Text</strong> at the bottom of the file's tab to see the raw XML.</p>
               <div><img alt="layout xml file" src="../guides/assets/studioqs-text-activity-main-xml.png"></div></li>
-              <li><p>Remove the existing <code>TextView</code> section and add a <code>BrightcoveVideoView</code> section so the resulting XML appears as follows. Note for later use the <code>id</code> of the view is named <code>brightcove_video_view</code>.</p>
+              <li><p>Remove the existing <code>TextView</code> section and add a <code>BrightcoveExoPlayerVideoView</code> section so the resulting XML appears as follows. Note for later use the <code>id</code> of the view is named <code>brightcove_video_view</code>.</p>
               <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="18-37" data-gist-highlight-line="32-36"></code></p></li>
             </ol>
 
@@ -143,12 +147,12 @@
               <li><p>If it is not already open (which it should be), open the <code>app/java/com.brightcove.playvideos/MainActivity.java</code> file.</p>
               <p class="BCL-aside">Of course, as is standard Android Studio functionality, as you use classes they will automatically be imported. It is suggested you take advantage of this functionality, and not add the import statements in the next step.</p></li>
               <li><p>Just below the package name, the following list of classes will be added automatically as you run through the rest of this guide. Use this list as a reference for later steps.</p>
-              <p class="video-cloud-only"><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="148-156"></code></p>
+              <p class="video-cloud-only"><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="148-154"></code></p>
               <p class="perform-only"><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="141-145"></code></p></li>
             </ol>
 
             <h4>Run the application</h4>
-              <p class="BCL-aside">You are now going to run the application. This is not so you will see any video playing, but it will force a Gradle build. Once this is done, the app will be aware of the Brightcove Player SDK for Android and you will get typing help when entering Brightcove class names.</p>
+              <p>You are now going to run the application. This is not so you will see any video playing, but it will force a Gradle build. Once this is done, the app will be aware of the Brightcove Player SDK for Android and you will get typing help when entering Brightcove class names.</p>
               <ol start="21">
                   <li>Connect an Android device, if you have one, to your computer.</li>
                   <li>You may choose one of several ways to run the app:</li>
@@ -165,26 +169,37 @@
               <li>You will now see just a blank, black rectangle representing the empty <code>BrightcoveVideoView</code>.</li>
               </ol>
 
-              <h3>Create the BrightcoveVideoView and play a video</h3>
+              <h3>Create the View and play a video</h3>
               <ol start="26">
               <li>In the <code>MainActivity.java</code> file, locate the <code>onCreate()</code> function.</li>
-              <li><p>Below any existing code in the function, create an instance of <code>BrightcoveVideoView</code> and associate it with the layout using the following:</p>
-              <p class="video-cloud-only"><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="46"></code></p>
-              <p class="perform-only"><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="132"></code></p></li>
+              <li><p>Below any existing code in the function, add the following:</p>
+                <ul>
+                  <li>Set the content view</li>
+                  <li>Create an instance of <code>BrightcoveExoPlayerVideoView</code> and associate it with the layout</li>
+                  <li><p>Enter the superclass</p></li>
+                </ul>
+              <p class="video-cloud-only"><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="213-223"></code></p>
+              <p class="perform-only"><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="317-325"></code></p>
+                <p class="BCL-aside">Note: When extending the <code>BrightcovePlayer</code>, you must assign the <code>brightcoveVideoView</code> before entering the superclass, to allow for some basic player lifecycle management. </p></li>
               
-                <li class="perform-only"><p>Next, you need to send your Perform Account ID to Brightcove using the analytics <code>setAccount()</code> method.</p></li>
-               <li class="video-cloud-only"><p><strong>Optional:</strong> If you override the <code>BrightcoveVideoView</code> class or do not use the Brightcove player and catalog, you need to send your Video Cloud Publisher ID to Video Cloud Analytics. You can do this by using the analytics <code>setAccount()</code> method. This allows you to view data for this app in Video Cloud Analytics.</p>
-                <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="133-134"></code></p>
+                <li class="perform-only"><p>Next, you need to send your Perform Account ID to Brightcove using the analytics <code>setAccount()</code> method.</p>
+                  <code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="327-328"></code>
+                </li>
+               <li class="video-cloud-only"><p><strong>Optional:</strong> If you override the <code>BrightcoveExoPlayerVideoView</code> class or do not use the Brightcove player and catalog, you need to send your Video Cloud Publisher ID to Video Cloud Analytics. You can do this by using the analytics <code>setAccount()</code> method. This allows you to view data for this app in Video Cloud Analytics.</p>
+                <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="225-226"></code></p>
                 <p class="video-cloud-only"><span class="BCL-aside">For details about sending data to Video Cloud Analytics, see the <a href="//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/analytics/analytics.html">Using Brightcove Analytics</a> guide.</span></p></li>
                 <li><p>Now, add the following lines of code to add a video to the view and play it.</p>
                 <p class="perform-only"><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="135-136"></code></p>
-              <p class="video-cloud-only"><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="47-48"></code></p></li>
+              <p class="video-cloud-only"><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="228-229"></code></p></li>
+                
+              <li class="perform-only"><p>Check to be sure your <code>onCreate()</code> method appears as follows:</p>
+              <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="283-310"></code></p></li>
           
               <li><p>Run or debug the application to see the video playing.</p>
-              <p class="BCL-aside">When running the app on a device, make sure it is connected to the internet via your cell data plan or wifi.</p>
-              <p class="BCL-aside">If you want to play HLS videos, get started with the <a href="hls-best-practices.html">Using the HLS Player</a> guide. Be aware that there are some limitations with running HLS videos on Android devices. For details, see the <a href="hls-limitations.html">Limitations of HLS on Android</a> guide.</p></li>
+              <p class="BCL-aside">When running the app on a device, make sure it is connected to the internet via your cell data plan or wifi.</p></li>
             </ol>
 
+<!--
             <h3>Add controls to the player</h3>
             <p>You should have seen the default Android player controls when you ran your app in the last section. Now, you will use the Brightcove player controls.</p>
             <ol start="31">
@@ -196,38 +211,42 @@
               <p class="perform-only"><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="160-175"></code></p></li>
               <li>Run the application and you will see the video playing, now with the controls visible. If you don't see the controls, tap the screen and they will appear.</li>
             </ol>
+-->
             
             <div id="getVideo" class="section video-cloud-only">
               <h2>Get and play video</h2>
               <p>In this section, you will use the <code>Catalog</code> class to retrieve a single video from the Video Cloud server, then play it. </p>
-              <p>The <code>Catalog</code> class provides asynchronous methods for retrieving information about videos and playlists from Brightcove's Media API services.</p>
+              <p>The <code>com.brightcove.player.edge.Catalog</code> class provides asynchronous methods for retrieving videos and playlists from the <a href="../../../playback-api/index.html">Brightcove Playback API</a>. This is the latest and recommended API to retrieve content from your Video Cloud library.</p>
 
               <h3>Remove unneeded code</h3>
-              <ol start="35">
+              <ol start="31">
                 <li>Some code from the previous app is no longer needed. Remove the two lines of code in the <code>onCreate()</code> method that add and start the video.
                 </li>
                 <li><p>Confirm your <code>onCreate()</code> method appears as follows:</p>
-                <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="52-60,64"></code></p></li>
+                <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="213-223,230-231"></code></p></li>
               </ol>
 
               <h3>Retrieve a video from the Catalog</h3>
-              <ol start="37">
-                <li><p>From Video Cloud Studio navigate to <strong>Home &gt; Account Settings &gt; API Management</strong> and copy a token that has the URL Access option.</p>
-                <p class="BCL-aside">If you are not familiar with tokens please see <a href="http://support.brightcove.com/en/video-cloud/docs/managing-media-api-tokens">Managing Media API Tokens</a>.</p></li>
-                <li><p>In your code below the creation of the <code>BrightcoveVideoView</code> instance, create an instance of the <code>Catalog</code> using the following and substituting your token:</p>
-                <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="74"></code></p>
-				<p class="BCL-aside">Since you are using the Media API token here, select the <code>Catalog</code> class associated with <code>com.brightcove.player.media</code>.</p></li>
-                <li>From the Video Cloud Studio's <strong>Media</strong> module select a video then from the right-hand side of the screen copy the <strong>Video ID</strong>.</li>
-                <li><p>In your code below the two lines that deal with the MediaController, use the Catalog's <code>findVideoByID()</code> method using your video ID and a <code>VideoListener</code> for the callback.</p>
-				<p>For this example, select the  <code>VideoListener</code> associated with <code>com.brightcove.player.media</code>.</p>
-                <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="79-81,84-87,89-90"></code></p>
+              <ol start="33">
+                <li><p>Add the following code:</p>
+                  <ul>
+                    <li>Get the event emitter from the SDK</li>
+                    <li><p>Create an instance of <code>com.brightcove.player.edge.Catalog</code> using the following and substituting your Account ID and Policy Key</p></li>
+                  </ul>
+                <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="252-255" data-gist-highlight-line="254-255"></code></p>
+                <p class="BCL-aside">To access the Playback API, you will need a Policy Key. If you are not familiar with Policy Keys, see the <a href="../../../policy-api/getting-started/api-overview.html">Policy API Overview</a>.</p>
+                </li>
+                <li>From the Video Cloud Studio's <strong>Media</strong> module select a video and copy the <strong>Video ID</strong>.</li>
+                <li><p>Use the Catalog's <code>findVideoByID()</code> method with your video ID and a <code>VideoListener</code> for the callback.</p>
+<!--				<p>For this example, select the  <code>VideoListener</code> associated with <code>com.brightcove.player.media</code>.</p>-->
+                <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="257-261,265-268,270-271"></code></p>
                 <p class="BCL-aside">The <code>VideoListener</code> identifies objects that expect to receive a Video object from an asynchronous operation. On a successful operation, an <code>onVideo()</code> method will be called. If there is an error in the operation, an <code>onError()</code> method will be  called. Android Studio inserted the signatures of the two needed methods.</p></li>
                 <li><p>In the <code>onVideo()</code> method, add the video  to <code>brightcoveVideoView</code>, then start the video.</p>
-                <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="80-84" data-gist-highlight-line="82-83"></code></p></li>
+                <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="260-265" data-gist-highlight-line="263-264"></code></p></li>
                 <li><p>In the <code>onError()</code> method throw the error string.</p>
-                <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="86-89" data-gist-highlight-line="88"></code></p></li>
-                <li><p>Check to be sure your <code>onCreate()</code> method appears as follows:</p>
-                <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="68-92"></code></p></li>
+                <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="267-270" data-gist-highlight-line="269"></code></p></li>
+                <li><p>Check to be sure your your <code>onCreate()</code> method appears as follows:</p>
+                <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="242-272"></code></p></li>
                 <li>Run the app to confirm the video plays.</li>
               </ol>
           </div><!--class="section video-cloud-only"-->
@@ -235,42 +254,32 @@
           <div id="getPlaylist" class="section video-cloud-only">
             <h2>Get and play playlist</h2>
             <p>In this section, you will use the <code>Catalog</code> class to retrieve a playlist from the Video Cloud server, then play the videos in the playlist.</p>
-            <p>The <code>Catalog</code> class provides asynchronous methods for retrieving information about videos and playlists from Brightcove's Media API services.</p>
+            <p>The <code>com.brightcove.player.edge.Catalog</code> class provides asynchronous methods for retrieving videos and playlists from the <a href="../../../playback-api/index.html">Brightcove Playback API</a>. This is the latest and recommended API to retrieve content from your Video Cloud library.</p>
             <h3>Remove unneeded code</h3>
-            <ol start="45">
+            <ol start="40">
               <li><p>Some code from the previous app is no longer needed. Remove the call to the Catalog's <code>findVideoByID()</code> method, and the associated <code>VideoListener</code> anonymous callback function.</p>
-              <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="79-90"></code></p></li>
+              <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="257-271"></code></p></li>
             </ol>
 
             <h3>Retrieve a playlist from the Catalog</h3>
-            <ol start="47">
-              <li><p>The existing catalog instance will work for retrieving a playlist, so <strong>no changes are necessary</strong> to this line of code:</p>
-              <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="74"></code></p></li>
-              <li>In Video Cloud Studio's <strong>Media</strong> module click the <strong>All Playlists</strong> option.</li>
-              <li>Double-click one of the playlists, and just ABOVE the list of videos in the playlist copy the <strong>Playlist ID</strong>.</li>
-              <li><p>In your code below the two lines that deal with the MediaController, use the Catalog's <code>findPlaylistByID()</code> method using your playlist ID and a <code>PlaylistListener</code> for the callback.</p>
-              <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="108-110,113-116,118-119"></code></p>
+            <ol start="41">
+              <li><p>The existing catalog instance will work for retrieving a playlist, so <strong>no changes are necessary</strong> to these lines of code:</p>
+              <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="254-255"></code></p></li>
+              <li>In Video Cloud Studio's <strong>Media</strong> module, select a playlist and copy the <strong>Playlist ID</strong>.</li>
+              <li><p>Use the Catalog's <code>findPlaylistByID()</code> method using your playlist ID and a <code>PlaylistListener</code> for the callback.</p>
+              <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="298-300,303-306,308-309"></code></p>
               <p class="BCL-aside">The <code>PlaylistListener</code> identifies objects that expect to receive a Playlist object from an asynchronous operation. On a successful operation, an <code>onPlaylist()</code> method will be called. If there is an error in the operation, an <code>onError()</code> method will be  called. Android Studio inserted the signatures of the two needed methods.</p></li>
               <li><p>In the <code>onPlaylist()</code> method, retrieve the videos from the playlist, add all of the videos   to <code>brightcoveVideoView</code>, then start the first video.</p>
-              <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="109-113" data-gist-highlight-line="111-112"></code></p></li>
+              <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="299-303" data-gist-highlight-line="301-302"></code></p></li>
               <li><p>In the <code>onError()</code> method throw the error string.</p>
-              <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="115-119" data-gist-highlight-line="117"></code></p></li>
+              <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="305-308" data-gist-highlight-line="307"></code></p></li>
               <li><p>Check to be sure your <code>onCreate()</code> method appears as follows:</p>
-              <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="97-121"></code></p></li>
+              <p><code data-gist-id="9b3845c46244588687f7" data-gist-hide-footer="true" data-gist-line="283-310"></code></p></li>
               <li>Run the app to confirm multiple videos from the playlist play.</li>
             </ol>
           </div><!--class="section video-cloud-only"-->
           
           <p><strong>You're done! Thanks for working through the Android SDK Quick Start.</strong></p>
-        </div>
-          
-        <div class="section" id="BCLreferences">
-          <h2>Related Topics</h2>
-          <ul>
-            <li> <a href="hls-player-for-android-sdk.html">The HLS Player for Android</a></li>
-            <li> <a href="hls-best-practices.html">Using the HLS Player</a></li>
-            <li> <a href="hls-limitations.html">Limitations of HLS on Android</a></li>
-          </ul>
         </div>
           
       </div>
