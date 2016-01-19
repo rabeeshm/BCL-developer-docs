@@ -1028,6 +1028,8 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
             }
         } else if (server === "solutions") {
             product = "video-cloud";
+            $searchModal.html(videoCloudSearchTemplate);
+
             subsection = "solutions";
             subsectionName = "Solutions";
             if (pathArray[1] === "index.html") {
@@ -1042,6 +1044,8 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
             // don't know where we are
             product = null;
             section = null;
+            $searchModal.html(videoCloudSearchTemplate);
+
             $navMenuRight.html(menuRightBase + vcSupportNav);
             bclslog("unknown server");
         }

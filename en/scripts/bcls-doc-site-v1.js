@@ -738,6 +738,13 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             }
         } else if (server === "solutions") {
             product = "video-cloud";
+            // get a reference to search block
+            searchBar = document.getElementById("searchBar");
+            // set the source for the script that generates the search field
+            searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script-video-cloud.js");
+            // append the search script to the appropriate div in the nav bar
+            searchBar.appendChild(searchScript);
+
             subsection = "solutions";
             section = pathArray[1];
             sectionName = section;
@@ -746,6 +753,13 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             // don't know where we are
             product = null;
             section = null;
+            // get a reference to search block
+            searchBar = document.getElementById("searchBar");
+            // set the source for the script that generates the search field
+            searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script-video-cloud.js");
+            // append the search script to the appropriate div in the nav bar
+            searchBar.appendChild(searchScript);
+
             navMenuRight.innerHTML = menuRightBase + vcSupportNav;
             bclslog("unknown server");
         }
