@@ -521,6 +521,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
     getSection = function () {
         var pathArray = path.split("/"),
             server,
+            searchScript = document.createElement("script"),
             redirectArray,
             headers = document.querySelectorAll("h1, h2");
         // remove the 0 element, as it will be empty
@@ -759,7 +760,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
     // initialization: set the page title, set up the header shell, get references to the parts
     init = function () {
         var headers = document.querySelectorAll("h1, h2"),
-            searchScript = document.createElement("script"),
             searchBar;
 
         // set the page title in case wrong
