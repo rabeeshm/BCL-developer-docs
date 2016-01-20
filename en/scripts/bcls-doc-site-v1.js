@@ -523,6 +523,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             server,
             searchScript = document.createElement("script"),
             redirectArray,
+            searchBar,
             headers = document.querySelectorAll("h1, h2");
         // remove the 0 element, as it will be empty
         pathArray.splice(0, 1);
