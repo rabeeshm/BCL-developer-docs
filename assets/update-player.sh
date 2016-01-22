@@ -23,7 +23,7 @@ echo --------------------------
 
 PATCHDATA='{ "player": { "template": { "version": "'
 PATCHDATA+="$VERSION"
-PATCHDATA+='" } }, "skin": "graphite", "compatibility": true }'
+PATCHDATA+='" }}}'
 # PATCHDATA= "{ \"player\": { \"template\": { \"version\": \"$VERSION$DATAEND\" } }"
 echo Data: $PATCHDATA
 
@@ -37,5 +37,4 @@ RESPONSE=$(curl --header "Content-Type: application/json" --user "$USERNAME":"$P
 echo 'Response:'
 echo $RESPONSE
 echo The player has been updated
-echo Note that the player uses the graphite skin
-echo Use the skin updater to use the luna skin
+echo Note that the player uses the luna skin
