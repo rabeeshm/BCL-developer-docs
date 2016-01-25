@@ -48,7 +48,9 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         navDropdownStartTemplate = "<li class=\"has-dropdown\"><a href=\"#\">{{name}}</a><ul class=\"dropdown\">",
         navDropdownEndTemplate = "</ul></li>",
         titleAreaTemplate = "<nav class=\"top-bar\" data-topbar><ul class=\"title-area\"><li class=\"name\" id=\"siteTitle\"><a href=\"//docs.brightcove.com/en/index.html\"><img class=\"bcls-logo bcls-float-left\" src=\"//docs.brightcove.com/en/images/bc-logo-small.png\" alt=\"Brightcove\">DEVELOPER DOCS</a></li><li class=\"toggle-topbar menu-icon\"><a href=\"#\"><span>Menu</span></a></li></ul><section class=\"top-bar-section\"><ul id=\"navMenuLeft\" class=\"left\"></ul></section><section class=\"top-bar-section\"><ul id=\"navMenuRight\" class=\"right\"></ul></section></nav>",
-        searchTemplate = "<div class=\"container\"><div class=\"region region-search\"><section id=\"block-search-api-page-new\" class=\"block block-search-api-page\"><div><a class=\"close-reveal-modal\">&#215;</a></div><div id=\"searchBar\"><script>(function() {var cx = '017969773216783359937:ziyyxkx94j4';var gcse = document.createElement('script');gcse.type = 'text/javascript';gcse.async = true;gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//cse.google.com/cse.js?cx=' + cx;var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(gcse, s);})();</script><gcse:search></gcse:search></div></section>",
+        videoCloudSearchTemplate = "<div class=\"container\"><div class=\"region region-search\"><section id=\"block-search-api-page-new\" class=\"block block-search-api-page\"><div><a class=\"close-reveal-modal\">&#215;</a></div><div id=\"searchBar\"><script> (function() { var cx = '017969773216783359937:o1ckbxwaxt4'; var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true; gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//cse.google.com/cse.js?cx=' + cx; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s); })(); </script> <gcse:search></gcse:search></div></section>",
+        performSearchTemplate = "<div class=\"container\"><div class=\"region region-search\"><section id=\"block-search-api-page-new\" class=\"block block-search-api-page\"><div><a class=\"close-reveal-modal\">&#215;</a></div><div id=\"searchBar\"><script> (function() { var cx = '017969773216783359937:r6x5xhtqr5w'; var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true; gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//cse.google.com/cse.js?cx=' + cx; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s); })(); </script> <gcse:search></gcse:search></div></section>",
+        onceSearchTemplate = "<div class=\"container\"><div class=\"region region-search\"><section id=\"block-search-api-page-new\" class=\"block block-search-api-page\"><div><a class=\"close-reveal-modal\">&#215;</a></div><div id=\"searchBar\"><script> (function() { var cx = '017969773216783359937:tzowaqv9txq'; var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true; gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//cse.google.com/cse.js?cx=' + cx; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s); })(); </script> <gcse:search></gcse:search></div></section>",
         submenuBlockStart = "<div class=\"large-3 small-12 columns\" style=\"overflow-x:hidden\"><h2>{{name}}</h2>",
         submenuBlockMiddle = "<h3 class=\"index-page\">{{name}}</h3><ul>{{#items}}<li><a href=\"{{url}}\">{{name}}</a></li>{{/items}}</ul>",
         submenuBlockEnd = "</div>",
@@ -548,9 +550,11 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                 product = "index";
                 productName = null;
                 $navMenuRight.html(menuRightBase + vcSupportNav);
+                $searchModal.html(videoCloudSearchTemplate);
                 break;
             case "video-cloud": // in video cloud
                 product = "video-cloud";
+                $searchModal.html(videoCloudSearchTemplate);
                 // hide anything perform-only
                 $(".perform-only").hide();
                 productName = "Video Cloud";
@@ -850,6 +854,7 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
             case "once": // in once
                 // there is only one section
                 product = "once";
+                $searchModal.html(onceSearchTemplate);
                 section = "index";
                 if (pathArray[2] === "index.html") {
                     // on video cloud landing page
@@ -874,6 +879,7 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
                 break;
             case "perform": // in perform
                 product = "perform";
+                $searchModal.html(performSearchTemplate);
                 // hide anything video-cloud-only
                 $(".video-cloud-only").hide();
                 productName = "Perform";
@@ -1022,6 +1028,8 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
             }
         } else if (server === "solutions") {
             product = "video-cloud";
+            $searchModal.html(videoCloudSearchTemplate);
+
             subsection = "solutions";
             subsectionName = "Solutions";
             if (pathArray[1] === "index.html") {
@@ -1036,6 +1044,8 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
             // don't know where we are
             product = null;
             section = null;
+            $searchModal.html(videoCloudSearchTemplate);
+
             $navMenuRight.html(menuRightBase + vcSupportNav);
             bclslog("unknown server");
         }
@@ -1052,7 +1062,7 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
         setPageTitle();
         // set up the header
         $navWrapper.html(titleAreaTemplate);
-        $searchModal.html(searchTemplate);
+        //$searchModal.html(searchTemplate);
         // get references to header sections
         $navMenuLeft = $("#navMenuLeft");
         $navMenuRight = $("#navMenuRight");

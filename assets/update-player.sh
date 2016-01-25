@@ -23,8 +23,8 @@ echo --------------------------
 
 PATCHDATA='{ "player": { "template": { "version": "'
 PATCHDATA+="$VERSION"
-PATCHDATA+='" } }, "skin": "graphite", "compatibility": true }'
-# PATCHDATA= "{ \"player\": { \"template\": { \"version\": \"$VERSION$DATAEND\" } }, \"skin\": \"graphite\", \"compatibility\": true }"
+PATCHDATA+='" }}}'
+# PATCHDATA= "{ \"player\": { \"template\": { \"version\": \"$VERSION$DATAEND\" } }"
 echo Data: $PATCHDATA
 
 RESPONSE=$(curl --header "Content-Type: application/json" --user "$USERNAME":"$PASSWORD" --request PATCH --data "$PATCHDATA" https://players.api.brightcove.com/v1/accounts/"$ACCOUNT_ID"/players/"$PLAYER_ID"/configuration)
@@ -37,3 +37,4 @@ RESPONSE=$(curl --header "Content-Type: application/json" --user "$USERNAME":"$P
 echo 'Response:'
 echo $RESPONSE
 echo The player has been updated
+echo Note that the player uses the luna skin
