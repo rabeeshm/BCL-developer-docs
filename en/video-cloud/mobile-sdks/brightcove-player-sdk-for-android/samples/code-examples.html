@@ -49,6 +49,7 @@
                 <p>This topic contains a collection of code snippets which you may find useful as a reference while developing with the SDK. For more detailed solutions, see the <a href="https://github.com/BrightcoveOS/android-player-samples">Android player samples</a>.</p>
                 <h3>Table of contents</h3>
                 <ul>
+                  <li><a href="#captionsthemes">Captions and themes</a></li>
                     <li><a href="#fullscreen">Fullscreen mode</a></li>
                     <li><a href="#methods">Methods: synchronous or asynchronous?</a></li>
                     <li><a href="#thumbnailImage">Thumbnail images</a></li>
@@ -58,15 +59,29 @@
                 
 			</div>
             
-            <div id="fullscreen" class="section">
+            <div id="captionsthemes" class="section">
+                <h2>Captions and themes</h2>
+                <p>Currently, the <code>BrightcoveCaptionPropertiesActivity</code> is set in the Brightcove Player SDK’s manifest file, so developers don’t need to specify it in their applications:</p>
+                <p><code data-gist-id="ac85a1305f851b406dde" data-gist-hide-footer="true" data-gist-line="59-71" data-gist-highlight-line="69"></code></p>
+      
+                <p>The <code>BrightcoveCaptionPropertiesActivity</code> will inherit the platform default theme, as long as you set themes for your app at the <code>&lt;activity&gt;</code> level in your app’s manifest.</p>
+      
+                <p>If you set a single app theme at the <code>&lt;application&gt;</code> level, then the <code>BrightcoveCaptionPropertiesActivity</code> will inherit the properties of this application-level theme. For some themes, this can cause the <code>BrightcoveCaptionPropertiesActivity</code> to look oddly styled or even illegible.</p>
+      
+                <p>In those cases, you should specify the <code>BrightcoveCaptionPropertiesActivity</code> in your own manifest and apply a theme there, like so:</p>
+                <p><code data-gist-id="ac85a1305f851b406dde" data-gist-hide-footer="true" data-gist-line="74-76" data-gist-highlight-line="75"></code></p>
+            </div>
+      
+           <div id="fullscreen" class="section">
                 <h2>Fullscreen mode</h2>
                 <p>You can manage fullscreen mode using code.</p>
                 <ul>
                     <li>Here is the code to set fullscreen mode:
-                        <pre><code>brightcoveVideoView.getEventEmitter().emit(EventType.ENTER_FULL_SCREEN);</code></pre>
+                      <p><code data-gist-id="ac85a1305f851b406dde" data-gist-hide-footer="true" data-gist-line="2"></code></p>
                     </li>
                     <li>Here is the code to exit fullscreen mode:
-                    <pre><code>brightcoveVideoView.getEventEmitter().emit(EventType.EXIT_FULL_SCREEN);</code></pre></li>
+                      <p><code data-gist-id="ac85a1305f851b406dde" data-gist-hide-footer="true" data-gist-line="3"></code></p>
+                    </li>
                 </ul>
             </div>
             
@@ -84,17 +99,10 @@
                 <p>The URL for your thumbnail images can returned as follows:</p>
                 <ul>
                     <li>If you are using the Edge Catalog (com.brightcove.player.edge.Catalog), you should be able to get the thumbnail URL like this:
-                        <pre><code>String thumbnailUrl = video.getProperties().get("thumbnail");</code></pre>
+                      <p><code data-gist-id="ac85a1305f851b406dde" data-gist-hide-footer="true" data-gist-line="8"></code></p>
                     </li>
                     <li>If you are using the legacy Media API Catalog (com.brightcove.player.media.Catalog), you should be able to do this:
-                        <pre><code>Catalog catalog = new Catalog("<your token>");
-Map<String, String> props = new HashMap<String, String>();
-props.put("video_fields", "accountId,name,shortDescription,longDescription,videoStillURL,thumbnailURL,referenceId,id,length,customFields,HLSURL,videoFullLength,cuePoints");
-  catalog.findVideoByID("3951601515001", props, new VideoListener() {
-    @Override
-    public void onVideo(Video video) {
-      String thumbnailUrl = video.getProperties().get("thumbnailURL");
-      ...</code></pre>
+                      <p><code data-gist-id="ac85a1305f851b406dde" data-gist-hide-footer="true" data-gist-line="10-17"></code></p>
                     </li>
                 </ul>
             </div>
@@ -106,38 +114,17 @@ props.put("video_fields", "accountId,name,shortDescription,longDescription,video
                 <p>Since the <code>clear()</code> method is asynchronous when unloading the current video, you need to wait before adding a new video to the player. Here are two options.</p>
                 <ul>
                     <li>Since the time to fetch a video from Video Cloud should dwarf the time to update the playlist, you can try something like this:
-                    <pre><code>brightcoveVideoView.clear();
-
-catalog.findVideoByID("123456789", new VideoListener() {
-  @Override
-  public void onVideo(final Video video) {
-      brightcoveVideoView.add(video);
-      brightcoveVideoView.start();
-    
-  }
-});</code></pre></li>
+                      <p><code data-gist-id="ac85a1305f851b406dde" data-gist-hide-footer="true" data-gist-line="23-32"></code></p>
+                    </li>
                     <li>Another approach is to wait for an event:
-                        <pre><code>catalog.findVideoByID("<videoId>", new VideoListener() {
-  @Override
-  public void onVideo(final Video video) {
-    eventEmitter.once(EventType.DID_CHANGE_LIST, new EventListener() {
-      @Override
-      public void processEvent(Event event)
-        { brightcoveVideoView.add(video); brightcoveVideoView.start(); }
-
-      });
-    brightcoveVideoView.clear();
-  }
-});</code></pre>
+                      <p><code data-gist-id="ac85a1305f851b406dde" data-gist-hide-footer="true" data-gist-line="36-47"></code></p>
                     </li>
                 </ul>
                 
             <h3>Using a playlist</h3>
                 <p>If you are working with a playlist, keep in mind that calling the <code>clear()</code> method removes all the elements of the playlist. So, you may get an <code>IndexOutOfBounds</code> exception when trying to jump to the first video in the playlist.</p>
                 <p>Instead, you can try something like this:</p>
-                <pre><code>brightcoveVideoView.pause();
-brightcoveVideoView.stopPlayback();
-brightcoveVideoView.setCurrentIndex(0);</code></pre>  
+                <p><code data-gist-id="ac85a1305f851b406dde" data-gist-hide-footer="true" data-gist-line="52-54"></code></p>  
             </div>
                 
             <div id="videoStillImage" class="section">
