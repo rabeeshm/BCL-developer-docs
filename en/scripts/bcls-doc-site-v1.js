@@ -133,7 +133,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
      * sets document title to contents of first h1 tag
      */
     setPageTitle = function () {
-        var h1 = document.getElementsByTagName("h1")
+        var h1 = document.getElementsByTagName("h1");
         if (isDefined(h1[0])) {
             document.title = h1[0].innerHTML;
         }
@@ -521,7 +521,9 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
     getSection = function () {
         var pathArray = path.split("/"),
             server,
+            searchScript = document.createElement("script"),
             redirectArray,
+            searchBar,
             headers = document.querySelectorAll("h1, h2");
         // remove the 0 element, as it will be empty
         pathArray.splice(0, 1);
@@ -554,6 +556,12 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 break;
             case "video-cloud": // in video cloud
                 product = "video-cloud";
+                // get a reference to search block
+                searchBar = document.getElementById("searchBar");
+                // set the source for the script that generates the search field
+                searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script-video-cloud.js");
+                // append the search script to the appropriate div in the nav bar
+                searchBar.appendChild(searchScript);
                 // hide anything perform-only
                 setAttributeOnNodeList(performOnly, "style", "display:none");
                 productName = "Video Cloud";
@@ -635,6 +643,12 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
 
                 // there is only one section
                 product = "once";
+                // get a reference to search block
+                searchBar = document.getElementById("searchBar");
+                // set the source for the script that generates the search field
+                searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script-once.js");
+                // append the search script to the appropriate div in the nav bar
+                searchBar.appendChild(searchScript);
                 section = "index";
                 if (pathArray[2] === "index.html") {
                     // on once landing page
@@ -658,6 +672,12 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 break;
             case "perform": // in perform
                 product = "perform";
+                // get a reference to search block
+                searchBar = document.getElementById("searchBar");
+                // set the source for the script that generates the search field
+                searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script-perform.js");
+                // append the search script to the appropriate div in the nav bar
+                searchBar.appendChild(searchScript);
                 redirectArray = pathArray.slice(0, 3);
                 landingPagePath = "//docs.brightcove.com/" + redirectArray.join("/") + "/index.html";
                 // hide anything video-cloud-only
@@ -719,6 +739,13 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             }
         } else if (server === "solutions") {
             product = "video-cloud";
+            // get a reference to search block
+            searchBar = document.getElementById("searchBar");
+            // set the source for the script that generates the search field
+            searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script-video-cloud.js");
+            // append the search script to the appropriate div in the nav bar
+            searchBar.appendChild(searchScript);
+
             subsection = "solutions";
             section = pathArray[1];
             sectionName = section;
@@ -727,6 +754,13 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             // don't know where we are
             product = null;
             section = null;
+            // get a reference to search block
+            searchBar = document.getElementById("searchBar");
+            // set the source for the script that generates the search field
+            searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script-video-cloud.js");
+            // append the search script to the appropriate div in the nav bar
+            searchBar.appendChild(searchScript);
+
             navMenuRight.innerHTML = menuRightBase + vcSupportNav;
             bclslog("unknown server");
         }
@@ -741,7 +775,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
     // initialization: set the page title, set up the header shell, get references to the parts
     init = function () {
         var headers = document.querySelectorAll("h1, h2"),
-            searchScript = document.createElement("script"),
             searchBar;
 
         // set the page title in case wrong
@@ -749,12 +782,11 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         // set up the header
         navWrapper.innerHTML = titleAreaTemplate;
         searchModal.innerHTML += searchTemplate;
-        // get a reference to search block
-        searchBar = document.getElementById("searchBar");
+        // searchBar.appendChild(searchScript);// get a reference to search block
+        // searchBar = document.getElementById("searchBar");
         // set the source for the script that generates the search field
-        searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script.js");
-        // append the search script to the appropriate div in the nav bar
-        searchBar.appendChild(searchScript);
+        // searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script.js");
+        // append the searc
         // get references to header sections
         navMenuLeft = document.getElementById("navMenuLeft");
         navMenuRight = document.getElementById("navMenuRight");

@@ -119,15 +119,55 @@
 
       <div id="controlsvisibility" class="section">
         <h2>Controls visibility</h2>
-        <p>You can dictate how long the controls are visible. You use the <code>options().inactivityTimeout</code> property to do this. You set the value equal to a number which is the seconds the controls stay visible after end of any activity on the player. To have the controls remain visible all the time set the value to 0.</p>
-        <p>The following code show setting the <code>inactivityTimeout</code> to <code>0</code>, which will cause the controls always to be visible.</p>
-        <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="183-195" data-gist-highlight-line="193"></code></p>
+        <p>You can dictate if the controlbar hides once the video starts. To do this use the  <code>transform.none</code> style. Note in the code below an <code>id</code> is assigned to the player, and that ID is used in the style.</p>
+        <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="226-257" data-gist-highlight-line="238-240,247"></code></p>
       </div>
+
       <div id="iconorder" class="section">
-        <h2>Control bar icon order</h2>
-        <p>You can control the order of icons in the control bar by using the <code>order</code> style assigned a number. For instance, <strong>5</strong> will place an icon after the progress bar but before the volume button, and <strong>9</strong> will place the icon on the far right side of the control bar. For older browsers some more styles may be required, as shown here:</p>
-        <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="210-216"></code></p>
-        <p>An example of adding an icon (for downloading a file in this case) is shown in the <a href="../samples/download-video.html">Brightcove Player Sample: Download Video Plugin</a> document.</p>
+        <h2>Controlbar icon order</h2>
+        <p>Control bar icon order determined by the order of the HTML <code>&lt;div&gt;</code>s in the parent controlbar <code>&lt;div&gt;</code>. Here you see the controlbar <code>&lt;div&gt;</code> with all of its children.</p>
+        <div><img src="/en/video-cloud/brightcove-player/guides/assets/customize-appearance/elements-controlbar-div.png"></div>
+        <p>Generally, this is the approach to take when placing in icon in the controlbar:</p>
+        <ul>
+          <li>Dynamically build the element you wish to insert into the controlbar.</li>
+          <li>Get a reference to the controlbar element.</li>
+          <li>Get a reference to the element you wish to insert your new element in front of in the controlbar.</li>
+          <li>Use the JavaScript <code>insertBefore()</code> method to place the icon.</li>
+        </ul>
+        <div class="BCL-aside">
+          <p>The syntax for <code>insertBefore()</code> is:</p>
+          <pre><code>parent.insertBefore(newElement,insertBeforeElement)</code></pre>
+          <p>This means in the detailed code below you will see JavaScript to get a reference to the controlbar (parent), a new <code>&lt;div&gt;</code> with an icon to insert into the controlbar, and lastly a reference to the element which the new icon will be inserted in from of.</p>
+        </div>
+        <p>Specifically, the following code is used to insert a download video icon in front of the volume icon:</p>
+        <ul>
+          <li>Lines 280-284: Style for the download button.</li>
+          <li>Lines 302-306: Assign variables and create HTML elements for:</li>
+          <ul>
+            <li>The <code>&lt;div&gt;</code> which will contain the icon for the download icon.</li>
+            <li>The anchor tag which make the icon clickable.</li>
+            <li>The icon image itself.</li>
+          </ul>
+          <li>Lines 309-310: Assign and id and CSS classes to the new element.</li>
+          <li>Line 313: Assign a source to the image.</li>
+          <li>Line 314: Assign an <code>href</code> to the link.</li>
+          <li>Line 315: Append the image to the link.</li>
+          <li>Line 316: Append the link to the dynamically created <code>&lt;div&gt;</code>.</li>
+          <li>Line 320: Get a reference to the controlbar to use with <code>insertBefore()</code>.</li>
+          <li>Line 323: Get a reference to the element which the new icon will be insert in front of, to use with <code>insertBefore()</code>.</li>
+          <li>Line 326: Insert the dynamically created element.</li>
+        </ul>
+        <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="270,280-285,286,299-328"></code></p>
+        <p>Here you see the result of the code, with the newly inserted icon highlighted in yellow:</p>
+        <div><img src="/en/video-cloud/brightcove-player/guides/assets/customize-appearance/download-icon-before-volume.png"></div>
+        <p>If you wish to have the icon in a different location, you need only to change the code which gets the element to insert in front of. For instance, to move the new icon in front of the fullscreen button, use this:</p>
+        <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="338"></code></p>
+        <p>The result would appear as follows:</p>
+        <div><img src="/en/video-cloud/brightcove-player/guides/assets/customize-appearance/download-icon-before-fullscreen.png"></div>
+        <h3>Icon on far right</h3>
+        <p>If you wish the icon to appear at the far right of the controlbar, you would replace the <code>insertBefore()</code> with  the <code>appendChild()</code> method, as shown here:</p>
+        <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="343"></code></p>
+        <p>An example of adding an icon (for downloading a file in this case) is shown in the <a href="../../brightcove-player/samples/download-video.html">Brightcove Player Sample: Download Video Plugin</a> document.</p>
       </div>
       <div id="specificity" class="section">
         <h2>CSS specificity</h2>
@@ -150,9 +190,9 @@
           <div><img src="assets/customize-appearance/orange-play-button.png" alt="orange-play-button"></div>
 
         <h3>Using multiple classes</h3>
-          <p>Since the <code>background</code> property for the big play button is set using two classes, you will need at least two classes in the CSS selector to overrirde this property.</p>
+          <p>Since the <code>background</code> property for the big play button is set using two classes, you will need at least two classes in the CSS selector to override this property.</p>
           <p>Add the <code>.video-js</code> class to the <code>.vjs-big-play-button</code> class selector. Remember that the <code>.video-js</code> class is set on the video container.</p>
-         <p>With these values, we are saying select all elements with a class name of <code>vjs-big-play-button</code> which are decendents of elements with a class name of <code>.video-js</code>.</p>
+         <p>With these values, we are saying select all elements with a class name of <code>vjs-big-play-button</code> which are decedents of elements with a class name of <code>.video-js</code>.</p>
           <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="126-135" data-gist-highlight-line="127"></code></p>
           <p>You should see that the big play button is now orange. Working with multiple classes can be tricky and may affect multiple elements, whereas an id is specific to one element.</p>
 
