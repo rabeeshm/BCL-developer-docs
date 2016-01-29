@@ -2,7 +2,7 @@ videojs.plugin('registerToPlay', function(options) {
     var myPlayer = this;
 
     /**
-     *  * hides the overlay, unhides the controls, and plays the video
+     * hides the overlay, unhides the controls, and plays the video
      * this function is called from the registration form in the iframe
      * and that is why it is defined in the global scope
      */
