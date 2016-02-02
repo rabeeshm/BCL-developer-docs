@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
     <title id="bclPageTitle">Choosing a BaseVideoView</title>
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
-	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
+<!--	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />-->
     <script src="//use.edgefonts.net/source-code-pro.js"></script>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
@@ -13,6 +13,7 @@
     <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/atelier-forest.light.min.css" />
     <link rel="stylesheet" type="text/css" href="/en/styles/anytime.c.css" />
+	
   <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -24,6 +25,16 @@
 
 </script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
+	
+	<!-- Page styles -->
+    <style>
+        .table-styles th{
+            background-color: #D3D3D3;
+        }
+	    .highlighted-row {
+            background-color: #D3D3D3;
+        }
+    </style>
   </head>
   <body>
 	<!-- header navbar -->
@@ -53,7 +64,74 @@
                 <h2>BaseVideoView subclasses</h2>
                 <p>The <code>BaseVideoView</code> subclasses can be used outside of a <code>BrightcovePlayer</code> or <code>BrightcovePlayerFragment</code>, but require life cycle management and full screen support to be implemented by the developer.</p>
               
-              <p>Use the following flowchart to choose a subclass for the <code>BaseVideoView</code>:</p>
+              <p>Use the following table/flowchart to choose a subclass for the <code>BaseVideoView</code>:</p>
+			  <table class="table-styles">
+                  <thead>
+                    <tr>
+                        <th style="width:25%">If You Are Using</th>
+                        <th style="width:75%">Then...</th>
+                    </tr>
+                  </thead>
+                    
+                    <tr>
+                        <td class="highlighted-row">DRM - Widevine Modular</td>
+					    <td>
+						  <p>Use <code>BrightcoveExoPlayerVideoView</code></p>
+						  <p>The BrigthcoveTextureVideoView cannot be used because Widevine requires hardware rendering, and the TextureView uses software rendering.</p>
+						  <p>A plugin is not necessary since Widevine Modular support is built into the ExoPlayer.</p>
+					    </td>
+                    </tr>
+					<tr>
+                        <td class="highlighted-row">DRM - Widevine Classic</td>
+					    <td>
+						  <p>Use <code>BrightcoveVideoView</code> with WidevinePlugin</p>
+						  <p class="BCL-aside" style="padding:1em;color:red;">NOTE: Google has stopped supporting Widevine Classic in the latest Android versions, so you should stop using it as soon as possible.</p>
+						  <p>The BrigthcoveTextureVideoView cannot be used because Widevine requires hardware rendering. The TextureView uses software rendering.</p>
+					    </td>
+                    </tr>
+				    <tr>
+                        <td class="highlighted-row">HLS</td>
+					  	<td>
+						  <p>Use <code>BrightcoveExoPlayerVideoView</code> or <code>BrightcoveExoPlayerTextureVideoView</code></p>
+						  <p>These views use the ExoPlayer as the underlying video player, which has excellent support for HLS.</p>
+						  <p>It is not recommended to use either BrightcoveVideoView or BrightcoveTextureVideoView. Both use the MediaPlayer as the underlying video player, which has poor support for HLS.</p>
+					    </td>
+                    </tr>
+					<tr>
+                        <td class="highlighted-row">DASH or Smooth Streaming</td>
+					  	<td>
+						  <p>Use <code>BrightcoveExoPlayerVideoView</code> or <code>BrightcoveExoPlayerTextureVideoView</code></p>
+						  <p>These views use the ExoPlayer as the underlying video player, which supports these formats.</p>
+						  <p>The MediaPlayer does not support these formats.</p>
+					    </td>
+                    </tr>
+					<tr>
+                        <td class="highlighted-row">effects</td>
+					  	<td>
+						  <p>Use <code>BrightcoveExoPlayerTextureVideoView</code></p>
+						  <p>The TextureView uses software rendering. Since the SurfaceView uses hardware rendering, it does not support effects.</p>
+						  <p>TextureView comes with a performance penalty due to increased CPU usage.</p>
+						  <p>The BrightcoveTextureVideoView also supports effects, but is limited by the MediaPlayer known issues.</p>
+					    </td>
+                    </tr>
+					<tr>
+                        <td class="highlighted-row">ID3 tags</td>
+					  	<td>
+						  <p>Use <code>BrightcoveExoPlayerVideoView</code> or <code>BrightcoveExoPlayerTextureVideoView</code></p>
+						  <p>These views use the ExoPlayer as the underlying video player, which supports ID3 tags.</p>
+						  <p>The MediaPlayer does not support ID3 tags.</p>
+					    </td>
+                    </tr>
+					<tr>
+                        <td class="highlighted-row">608/708 closed captions</td>
+					  	<td>
+						  <p>Use <code>BrightcoveExoPlayerVideoView</code> or <code>BrightcoveExoPlayerTextureVideoView</code></p>
+						  <p>These views use the ExoPlayer as the underlying video player, which supports 608/708 closed caption tags.</p>
+						  <p>The MediaPlayer does not support 608/708 closed captions.</p>
+					    </td>
+                    </tr>
+                </table>
+			  
 			  <div><img src="../getting-started/assets/android-video-view.png" alt="choosing a video view flowchart"></div>
 
 <!--
