@@ -45,7 +45,7 @@ var aapi_model = {
         },
         {
             name: "player",
-            fields: ["account", "account.name", "bytes_delivered", "engagement_score", "play_rate", "player", "player_load", "player_name", "video_engagement_1", "video_engagement_100", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
+            fields: ["account.name", "bytes_delivered", "engagement_score", "play_rate", "player", "player_load", "player_name", "video_engagement_1", "video_engagement_100", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
             filter_values: ["player ids as a comma-delimited list"]
         },
         {
@@ -55,57 +55,57 @@ var aapi_model = {
         },
         {
             name: "date_hour",
-            fields: ["account", "account.name", "active_media", "bytes_delivered", "daily_unique_viewers", "date_hour", "drm_bytes_packaged", "engagement_score", "licenses_served", "live_seconds_streamed", "play_rate", "player_load", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
+            fields: ["account.name", "active_media", "bytes_delivered", "daily_unique_viewers", "date_hour", "drm_bytes_packaged", "engagement_score", "licenses_served", "live_seconds_streamed", "play_rate", "player_load", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
             filter_values: ["none"]
         },
         {
             name: "destination_domain",
-            fields: ["account", "account.name", "destination_domain", "engagement_score", "play_rate", "player_load", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
+            fields: ["account.name", "destination_domain", "engagement_score", "play_rate", "player_load", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
             filter_values: ["comma-delimited list of domains - e.g. brightcove.com"]
         },
         {
             name: "destination_path",
-            fields: ["account", "account.name", "destination_path", "engagement_score", "play_rate", "player_load", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
+            fields: ["account.name", "destination_path", "engagement_score", "play_rate", "player_load", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
             filter_values: ["comma-delimited list of paths - e.g. /en/video-cloud/docs/editing-settings-players-plug-ins-tab"]
         },
         {
             name: "country",
-            fields: ["account", "account.name", "country", "country_name", "engagement_score", "play_rate", "player_load", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
+            fields: ["account.name", "country", "country_name", "engagement_score", "play_rate", "player_load", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
             filter_values: ["comma-delimited list of ISO-3611-1 country codes - e.g.: KO,US"]
         },
         {
             name: "city",
-            fields: ["account", "account.name", "city", "dma", "engagement_score", "play_rate", "player_load", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
+            fields: ["account.name", "city", "dma", "engagement_score", "play_rate", "player_load", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
             filter_values: ["comma-delimited list of city names - e.g. Seattle,Boston"]
         },
         {
             name: "region",
-            fields: ["account", "account.name", "engagement_score", "play_rate", "player_load", "region", "region_name", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
+            fields: ["account.name", "engagement_score", "play_rate", "player_load", "region", "region_name", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
             filter_values: ["comma-delimited list of the ISO-3611-2 region code - e.g. 'US-WA'"]
         },
         {
             name: "referrer_domain",
-            fields: ["account", "engagement_score", "play_rate", "player_load", "referrer_domain", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
+            fields: ["engagement_score", "play_rate", "player_load", "referrer_domain", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
             filter_values: ["comma-delimited list of domains - e.g. brightcove.net"]
         },
         {
             name: "source_type",
-            fields: ["account", "account.name", "engagement_score", "play_rate", "player_load", "source_type", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
+            fields: ["account.name", "engagement_score", "play_rate", "player_load", "source_type", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
             filter_values: ["direct", "referral", "organic_search", "paid_search", "secure_search"]
         },
         {
             name: "search_terms",
-            fields: ["account", "account.name", "engagement_score", "play_rate", "player_load", "search_terms", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
+            fields: ["account.name", "engagement_score", "play_rate", "player_load", "search_terms", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
             filter_values: ["comma-delimited list of search terms - e.g. players,videos"]
         },
         {
             name: "device_type",
-            fields: ["account", "account.name", "device_type", "engagement_score", "play_rate", "player_load", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
+            fields: ["account.name", "device_type", "engagement_score", "play_rate", "player_load", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
             filter_values: ["mobile", "tablet", "tv", "desktop", "other"]
         },
         {
             name: "device_os",
-            fields: ["account", "account.name", "device_os", "engagement_score", "play_rate", "player_load", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
+            fields: ["account.name", "device_os", "engagement_score", "play_rate", "player_load", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view"],
             filter_values: ["android", "bada", "ios", "rim", "symbian", "web_os", "windows", "os_x", "mac", "linux", "other"]
         }
     ],
@@ -184,8 +184,8 @@ var aapi_model = {
     ],
     combinations: {
         account: {dimensions: ["account"], from: "2011-01-01", fields: []},
-        account__video: {dimensions: ["account", "video"], from: "2011-01-01", fields: []},
-        account__player: {dimensions: ["account", "player"], from: "2011-01-01", fields: []},
+        account__video: {dimensions: ["account", "video"], from: "2011-01-01", fields: ["account.name", "engagement_score", "play_rate", "video_engagement_1", "video_engagement_100", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view", "video", "video_duration", "video_name", "video.reference_id"]},
+        account__player: {dimensions: ["account", "player"], from: "2011-01-01", fields: ["account.name", "engagement_score", "play_rate", "player_load", "video_engagement_1", "video_engagement_100", "video_engagement_25", "video_engagement_50", "video_engagement_75", "video_impression", "video_percent_viewed", "video_seconds_viewed", "video_view", "player", "player_name"]},
         account__video__player: {dimensions: ["account", "video", "player"], from: "2011-01-01", fields: []},
         account__country: {dimensions: ["account", "country"], from: "2011-01-01", fields: []},
         account__region: {dimensions: ["account", "region"], from: "2011-01-01", fields: []},
