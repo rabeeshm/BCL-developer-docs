@@ -13,6 +13,20 @@
 
     <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/atelier-forest.light.min.css" />
+    <style>
+    .fields-list {
+        display: inline-block;
+        padding: .5em;
+        vertical-align: top;
+    }
+    textarea#apiRequest {
+        width: 95%;
+        height: 10em;
+        max-width: 1000px;
+        font-family: hack, monospace;
+        font-size: .8em;
+    }
+    </style>
     <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -143,28 +157,35 @@
             </div>
             <div class="section" id="metrics">
                 <h2>Dimensions and fields</h2>
-                <p>Below are the dimensions you can currently report on. Click on a dimension below to see the fields that can be returned for it.</p>
-                <dl id="dimensionsList">
-                </dl>
+                <p>Select dimension(s) below to see the fields that can be returned for it. You can also click the <strong>Make a Request</strong> button to make a sample request and see the results.</p>
+                <fieldset>
+                    <legend>Input</legend>
+                    <input id="account_id" type="hidden" value="1752604059001">
+                    <h5>Select Dimension(s) to report on:</h5>
+                    <div id="dimensionsCol1" class="fields-list"></div>
+                    <div id="dimensionsCol2" class="fields-list"></div>
+
+                    <h5>Fields to return: <button id="fieldsButton" class="bcls-button">Select All</button> <button id="deselectFieldsButton" class="bcls-button">Deselect All</button></h5>
+                    <div id="fieldsCol1" class="fields-list"></div>
+                    <div id="fieldsCol2" class="fields-list"></div>
+                <p><button id="getData" class="bcls-button" style="color:#FFFFFF;font-weight:bold">Make a Request with these Options</button> (uses a sample Brightcove account)</p>
+                </fieldset>
+                <fieldset>
+                    <legend>Output</legend>
+                    <h5>Earliest <code>from</code> date for this dimension combination: <span style="color:#FF6600" id="fromDisplay"></span></h5>
+                    <h5 id="logger"></h5>
+                    <h5>Sample API request:</h5>
+                    <textarea id="apiRequest"></textarea>
+                    <h5>Response data</h5>
+                    <pre id="responseData"></pre>
+                </fieldset>
+
                 <h3>Notes</h3>
                 <ol>
                     <li>By default, <code>video_view</code> is the only field returned - other fields will be returned only if they are specified in the value of the <code>fields</code> parameter.</li>
                     <li>If you specify a field to return that is not supported for the dimension or dimension combination, an <code>UNSUPPORTED_FIELD_COMBINATION_ERROR</code> error will be returned.</li>
                     <li>The <code>bytes_delivered</code> field includes all data delivered by Video Cloud to clients, including video data, images, text tracks and other assets, as well as the player code itself. Some of this data is obtained from CDNs, and may not be available for up to 3 days.</li>
                 </ol>
-            </div>
-            <div class="section" id="reportDimensions">
-                <h2>Multiple Dimensions</h2>
-                <p>You can request reports on multiple dimensions, but some combinations are not valid. For invalid dimension combinations, no data will be returned. For valid combinations, the fields returned will be the union of the fields returned for the individual dimensions.</p>
-                <p class="BCL-aside">Note that limitations on valid dimension combinations applies both the values of the <code>dimensions</code> parameter <em>and</em> the dimensions used in <code>where</code> filters.</p>
-                <p>Below are the supported dimension combinations. Beside each combination is the earliest allowable date for the <code>from</code> parameter that is allowed for this combination - if you use an earlier date, an invalid request error will be returned.</p>
-                <div class="BCL-aside">Notes:
-                <ul>
-                    <li>If you are trying to return all analytics data, use <code>from=alltime</code> rather than setting <code>from</code> equal to a date</li>
-                    <li>You can get the available date range for any report by using the endpoint <code>/data/status</code> - see the <a href="../references/versions/v1/index.htmlapi-Report-Get_Available_Date_Range">API Reference</a> for details</li>
-                </ul>
-                </div>
-                <ul id="dimensionCombinations"></ul>
                 <h3>Example</h3>
                 <p>A typical use case for getting a report on multiple dimensions: you want a breakdown of video views between desktop and mobile devices, and also want to know how many of the mobile device views were on iOS versus Android devices, and how many of the desktop views were on Macs versus Windows machines. Currently there is no standard report in the Studio Analytics Module that provides this information, but you can obtain it via this Analytics API call:</p>
 <pre><code>https://analytics.api.brightcove.com/v1/data?accounts=57838016001&amp;dimensions=video,device_type,device_os&amp;from=2014-01-01&amp;to=2014-04-01&amp;fields=video_view</code></pre>
@@ -259,7 +280,7 @@
                 <div class="BCL-aside">Notes:
                 <ul>
                     <li>If you are trying to return all analytics data, use <code>from=alltime</code> rather than setting <code>from</code> equal to a date</li>
-                    <li>You can get the available date range for any report by using the endpoint <code>/data/status</code> - see the <a href="../references/versions/v1/index.htmlapi-Report-Get_Available_Date_Range">API Reference</a> for details</li>
+                    <li>You can get the available date range for any report by using the endpoint <code>/data/status</code> - see the <a href="../references/versions/v1/index.html#api-Report-Get_Available_Date_Range">API Reference</a> for details</li>
                 </ul>
                 </div>
             </div>
@@ -323,189 +344,58 @@ city - City name. eg: Seattle</code></pre>
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
     <script src="/en/scripts/docs-nav-data.min.js"></script>
     <script src="/en/scripts/bcls-doc-site-v1.js"></script>
-    <script src="../assets/aapi-model.js"></script>
+    <script src="../assets/aapi-model-v1.js"></script>
     <script id="pageScript" type="text/javascript">
     var BCLS = ( function ($, window, document, aapi_model) {
         var filtersTemplate = "{{#filters}}<li>{{this}}</li>{{/filters}}",
-            fieldsTemplate = "{{#fields}}<li>{{this}}</li>{{/fields}}",
-            questions,
-            answers,
-            $account = $("#account"),
-            $player = $("#player"),
-            $video = $("#video"),
-            $date = $("#date"),
-            $date_hour = $("#date_hour"),
-            $country = $("#country"),
-            $region = $("#region"),
-            $city = $("#city"),
-            $destination_domain = $("#destination_domain"),
-            $destination_path = $("#destination_path"),
-            $filtersList = $("#filtersList"),
-            $referrer_domain = $("#referrer_domain"),
-            $source_type = $("#source_type"),
-            $search_terms = $("#search_terms"),
-            $device_type = $("#device_type"),
-            $device_os = $("#device_os"),
             filterAllowableValues = document.getElementById("filterAllowableValues"),
-            dimensionCombinations = document.getElementById("dimensionCombinations"),
-            dimensionsList = document.getElementById("dimensionsList"),
             paramTable = document.getElementById("paramTable"),
             combination,
-            // functions
-            bclslog,
-            buildComboFields,
-            buildDimensions,
-            dedupe,
-            findObjectInArray,
-            copyArray,
-            showAnswer,
-            setQAinteractions,
-            buildParamTable,
-            buildFilterValueTable,
-            init;
+            proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/aapi-proxy.php',
+            dimension,
+            selectedDimensions      = [],
+            fromDate,
+            fieldsToReturn          = [],
+            fieldsCheckboxes,
+            dimensionCheckboxes,
+            accountId,
+            clientId,
+            clientSecret,
+            searchString,
+            account_id              = document.getElementById('account_id'),
+            returnFields            = document.getElementById('returnFields'),
+            fieldsButton            = document.getElementById('fieldsButton'),
+            deselectFieldsButton    = document.getElementById('deselectFieldsButton'),
+            dimensionsCol1          = document.getElementById('dimensionsCol1'),
+            dimensionsCol2          = document.getElementById('dimensionsCol2'),
+            fieldsCol1              = document.getElementById('fieldsCol1'),
+            fieldsCol2              = document.getElementById('fieldsCol2'),
+            dateSelect              = document.getElementById('dateSelect'),
+            count                   = document.getElementById('count'),
+            allButtons              = document.getElementsByTagName('button'),
+            getData                 = document.getElementById('getData'),
+            apiRequest              = document.getElementById('apiRequest'),
+            fieldsArrayDisplay,
+            generatedContent        = document.getElementById('generatedContent'),
+            responseData            = document.getElementById('responseData'),
+            dimensionsParam,
+            fromDisplay             = document.getElementById('fromDisplay'),
+            logger                  = document.getElementById('logger'),
+            i,
+            iMax;
 
         /**
          * logging
          */
-        bclslog = function (context, message) {
+        function bclslog(context, message) {
             if (window["console"] && console["log"]) {
               console.log(context, message);
-            };
-        };
-        /**
-         * dedupe a simple array of strings or numbers
-         */
-        dedupe = function (arr) {
-        var i,
-            len = arr.length,
-            out = [],
-            obj = {};
-
-        for (i = 0;i < len; i++) {
-        obj[arr[i]] = 0;
-        }
-        for (i in obj) {
-        out.push(i);
-        }
-        return out;
-        }
-        /**
-         * copy all values from one array into another
-         * arguments: a, b
-         * adds elements of a to b
-         * returns: b
-         */
-        copyArray = function (a,b) {
-            var i, imax;
-            if (a !== undefined && b !== undefined && a.constructor === Array && b.constructor === Array) {
-                imax = a.length;
-                for (i = 0; i < imax; i++) {
-                    b.push(a[i]);
-                }
-            }
-            return b;
-        };
-        /*
-        find index of an object in array of objects
-        based on some property value
-        returns index if found, otherwise returns -1
-        */
-        findObjectInArray = function (targetArray, objProperty, value) {
-            var i, totalItems = targetArray.length, objFound = false;
-            for (i = 0; i < totalItems; i++) {
-                if (targetArray[i][objProperty] === value) {
-                    objFound = true;
-                    return i;
-                }
-            }
-            if (objFound === false) {
-                return -1;
-            }
-        };
-        /**
-         * show answers
-         */
-        showAnswer = function (evt) {
-            var answerNumber = parseInt(evt.target.id.substring(1)),
-                i = 0,
-                j = answers.length;
-            // hide all answers except the one for the selected question
-            for (i = 0; i < j; i++) {
-                if (i === answerNumber) {
-                    answers[i].style.display = "block";
-                } else {
-                    answers[i].style.display = "none";
-                }
-            }
-        };
-        /**
-         * set up interactions for questions and answers
-         */
-        setQAinteractions = function () {
-            var i, iMax;
-            questions = document.getElementsByClassName("bcls-question");
-            answers = document.getElementsByClassName("bcls-answer");
-            iMax = questions.length;
-            for (i = 0; i < iMax; i++) {
-                // set ids for answers
-                answers[i].setAttribute("id", ("a" + i.toString()));
-                // hide all answers initially
-                answers[i].setAttribute("style", "display:none");
-                // set ids for questions
-                questions[i].setAttribute("id", ("q" + i.toString()));
-                // add event listeners
-                questions[i].addEventListener("click", showAnswer);
             }
         }
-        /**
-         * build dimensions/fields list
-         */
-        buildDimensions = function () {
-            var thisDimension,
-                thisFieldlist,
-                i,
-                iMax = aapi_model.dimensions.length,
-                j,
-                jMax,
-                str = "";
-            for (i = 0; i < iMax; i++) {
-                thisDimension = aapi_model.dimensions[i];
-                str += "<dt class=\"bcls-question\">" + thisDimension.name + "</dt><dd class=\"bcls-answer\"><ul id=\"" + thisDimension.name + "\">";
-                thisFieldlist = document.getElementById(thisDimension.name);
-                jMax = thisDimension.fields.length;
-                for (j = 0; j < jMax; j++) {
-                    str += "<li>" + thisDimension.fields[j] + "</li>";
-                }
-                str += "</ul></dd>";
-                dimensionsList.innerHTML = str;
-                setQAinteractions();
-            }
-        };
-
-        /**
-         * build the field for the dimension combinations
-         */
-        buildComboFields = function () {
-            var combo;
-            for (combo in aapi_model.combinations) {
-                var i,
-                    dimensionIndex,
-                    dimensions = aapi_model.combinations[combo].dimensions,
-                    imax = dimensions.length,
-                    tmpArray = [];
-                for (i = 0; i < imax; i++) {
-                    dimensionIndex = findObjectInArray(aapi_model.dimensions, "name", dimensions[i]);
-                    tmpArray = tmpArray.concat(aapi_model.dimensions[dimensionIndex].fields);
-                }
-                tmpArray = dedupe(tmpArray);
-                aapi_model.combinations[combo].fields = copyArray(tmpArray, aapi_model.combinations[combo].fields);
-                dimensionCombinations.innerHTML += "<li><strong>" + aapi_model.combinations[combo].dimensions.join(", ") + "</strong> - earliest allowed <code>from</code> date: " + aapi_model.combinations[combo].from + "</li>";
-            }
-        };
         /**
          * builds param summary table
          */
-        buildParamTable = function () {
+        function buildParamTable() {
             var thisParam,
                 str = "",
                 i,
@@ -515,11 +405,11 @@ city - City name. eg: Seattle</code></pre>
                     str += "<tr><td>" + thisParam.name + "</td><td>" + thisParam.required + "</td><td>" + thisParam.description + "</td><td>" + thisParam.values + "</td><td>" + thisParam.default + "</td></tr>";
                 }
                 paramTable.innerHTML = str;
-        };
+        }
         /**
          * built filter values
          */
-        buildFilterValueTable = function () {
+        function buildFilterValueTable() {
             var thisDimension,
                 thisValues,
                 i,
@@ -539,11 +429,400 @@ city - City name. eg: Seattle</code></pre>
             }
             filterAllowableValues.innerHTML = str;
         }
-        init = function () {
-            buildDimensions();
-            buildComboFields();
+        /**
+        * tests for all the ways a variable (string or number) might be undefined or not have a value
+        * @param {String|Numbar} x the variable to test
+        * @return {Boolean} true if variable is defined and has a value
+        **/
+        function isDefined(x) {
+            if ( x === "" || x === null || x === undefined || x === NaN) {
+               return false;
+            }
+            return true;
+        }
+
+        /**
+         * get selected value for single select element
+         * @param {htmlElement} e the select element
+         * @return {Object} object containing the `value` and selected `index`
+         */
+        function getSelectedValue(e) {
+            var val = e.options[e.selectedIndex].value,
+                idx = e.selectedIndex;
+            return {
+                value: val,
+                index: idx
+            }
+        }
+
+        /**
+         * determines whether specified item is in an array
+         *
+         * @param {array} array to check
+         * @param {string} item to check for
+         * @return {boolean} true if item is in the array, else false
+         */
+        function isItemInArray(arr, item) {
+            var i,
+                iMax = arr.length;
+            for (i = 0; i < iMax; i++) {
+                if (arr[i] === item) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        /**
+         * find index of an object in array of objects
+         * based on some property value
+         *
+         * @param {array} targetArray array to search
+         * @param {string} objProperty object property to search
+         * @param {string} value of the property to search for
+         * @return {integer} index of first instance if found, otherwise returns -1
+        */
+        function findObjectInArray(targetArray, objProperty, value) {
+            var i, totalItems = targetArray.length, objFound = false;
+            for (i = 0; i < totalItems; i++) {
+                if (targetArray[i][objProperty] === value) {
+                    objFound = true;
+                    return i;
+                }
+            }
+            if (objFound === false) {
+                return -1;
+            }
+        }
+
+        /**
+         * dedupe a simple array of strings or numbers
+         * @param {array} arr the array to be deduped
+         * @return {array} the deduped array
+         */
+        function dedupe(arr) {
+            var i,
+                len = arr.length,
+                out = [],
+                obj = {};
+
+            for (i = 0;i < len; i++) {
+                obj[arr[i]] = 0;
+            }
+            for (i in obj) {
+                out.push(i);
+            }
+            return out;
+        }
+
+        /**
+         * getSelectedCheckboxes returns an array of the values
+         * of checked checkboxes
+         * @param {htmlElementCollection} checkboxCollection a collection of the checkbox elements, usually gotten by document.getElementsByName()
+         * @param {Array} targetArray the array to store the values in
+         */
+        function getSelectedCheckboxes(checkboxCollection, targetArray) {
+            var i,
+                iMax = checkboxCollection.length;
+            for (i = 0; i < iMax; i += 1) {
+                if (checkboxCollection[i].checked) {
+                    targetArray.push(checkboxCollection[i].value);
+                }
+            }
+            return targetArray;
+        }
+
+        /**
+         * disables all buttons so user can't submit new request until current one finishes
+         */
+        function disableButtons() {
+            var i,
+                iMax = allButtons.length;
+            for (i = 0; i < iMax; i++) {
+                allButtons[i].setAttribute('disabled', 'disabled');
+            }
+            return;
+        }
+
+        /**
+         * re-enables all buttons
+         */
+        function enableButtons() {
+            var i,
+                iMax = allButtons.length;
+            for (i = 0; i < iMax; i++) {
+                allButtons[i].removeAttribute('disabled');
+            }
+            return;
+        }
+
+        /**
+         * updateRequestDisplay - gets the selected checkboxes and update the fields list display
+         */
+        function updateRequestDisplay() {
+            apiRequest.textContent = 'https://analytics.api.brightcove.com/v1/data?accounts=ACCOUNT_ID';
+            if (selectedDimensions.length > 0) {
+                apiRequest.textContent += '&dimensions=' + selectedDimensions.join(',');
+            }
+            if (fieldsToReturn.length > 0) {
+                apiRequest.textContent += '&fields=' + fieldsToReturn.join(',');
+            }
+            if (isDefined(fromDate)) {
+
+            }
+        }
+
+        /**
+         * adds dimension options from the aapi_model
+         */
+        function addDimensionOptions() {
+            var i,
+                iMax,
+                input,
+                text,
+                br,
+                half;
+            // clear existing dimension checkboxes
+            dimensionsCol1.innerHTML = '';
+            dimensionsCol2.innerHTML = '';
+            // add the return field options
+            iMax = aapi_model.dimensions.length;
+            half = Math.ceil(iMax / 2);
+            for (i = 0; i < half; i += 1) {
+                input = document.createElement('input');
+                input.setAttribute('name', 'dimensionsChk');
+                input.setAttribute('data-index', 'i');
+                input.setAttribute('type', 'checkbox');
+                input.setAttribute('value', aapi_model.dimensions[i].name);
+                text = document.createTextNode(' ' + aapi_model.dimensions[i].name);
+                br = document.createElement('br');
+                dimensionsCol1.appendChild(input);
+                dimensionsCol1.appendChild(text);
+                dimensionsCol1.appendChild(br);
+            }
+            for (i = half; i < iMax; i += 1) {
+                input = document.createElement('input');
+                input.setAttribute('name', 'dimensionsChk');
+                input.setAttribute('data-index', 'i');
+                input.setAttribute('type', 'checkbox');
+                input.setAttribute('value', aapi_model.dimensions[i].name);
+                text = document.createTextNode(' ' + aapi_model.dimensions[i].name);
+                br = document.createElement('br');
+                dimensionsCol2.appendChild(input);
+                dimensionsCol2.appendChild(text);
+                dimensionsCol2.appendChild(br);
+            }
+            // get a reference to the checkbox collection
+            dimensionCheckboxes = document.getElementsByName('dimensionsChk');
+        }
+
+        /**
+         * addFieldOptions generates checkboxes for each field
+         * available for the selected dimensions
+         */
+        function addFieldOptions() {
+            var fieldsArray = [],
+                dimensionName,
+                dimensionIndex,
+                thisDimensionFields,
+                i,
+                iMax,
+                j,
+                jMax,
+                input,
+                text,
+                br,
+                half;
+            // clear existing field checkboxes
+            fieldsCol1.innerHTML = '';
+            fieldsCol2.innerHTML = '';
+            dimensionName = selectedDimensions.join('__');
+            // dimensionIndex = findObjectInArray(aapi_model.dimensions, 'name', dimensionName);
+            fieldsArray = aapi_model.combinations[dimensionName].fields;
+            // add the return field options
+            iMax = fieldsArray.length;
+            half = Math.ceil(iMax / 2);
+            for (i = 0; i < half; i += 1) {
+                input = document.createElement('input');
+                input.setAttribute('name', 'fieldsChk');
+                input.setAttribute('type', 'checkbox');
+                input.setAttribute('value', fieldsArray[i]);
+                text = document.createTextNode(' ' + fieldsArray[i]);
+                br = document.createElement('br');
+                fieldsCol1.appendChild(input);
+                fieldsCol1.appendChild(text);
+                fieldsCol1.appendChild(br);
+            }
+            for (i = half; i < iMax; i += 1) {
+                input = document.createElement('input');
+                input.setAttribute('name', 'fieldsChk');
+                input.setAttribute('type', 'checkbox');
+                input.setAttribute('value', fieldsArray[i]);
+                text = document.createTextNode(' ' + fieldsArray[i]);
+                br = document.createElement('br');
+                fieldsCol2.appendChild(input);
+                fieldsCol2.appendChild(text);
+                fieldsCol2.appendChild(br);
+            }
+            // get a reference to the checkbox collection
+            fieldsCheckboxes = document.getElementsByName('fieldsChk');
+            // set up event listeners
+            iMax = fieldsCheckboxes.length;
+            for (i = 0; i < iMax; i += 1) {
+                fieldsCheckboxes[i].addEventListener('click', function() {
+                    fieldsToReturn = getSelectedCheckboxes(fieldsCheckboxes, fieldsToReturn);
+                    updateRequestDisplay();
+                });
+            }
+        }
+
+        /**
+         * sets up the data for the API request
+         * @param {String="getCount","getVideos","getData"} id the id for the call type
+         */
+        function setRequestData(id) {
+            var requestData = {},
+            baseURL = 'https://analytics.api.brightcove.com/v1/data';
+            // disable buttons to prevent a new request before current one finishes
+            disableButtons();
+            endPoint = '?accounts=' + accountId + '&dimensions=' + selectedDimensions.join(',') + '&fields=' + fieldsToReturn.join(',');
+            requestData.url = baseURL + endPoint;
+            requestData.requestType = 'GET';
+            apiRequest.textContent = requestData.url;
+            getMediaData(requestData, id);
+    }
+
+        /**
+         * send API request to the proxy
+         * @param  {Object} requestData options for the request
+         * @param  {String} requestID the type of request = id of the button
+         */
+        function getMediaData(options, requestID) {
+            var httpRequest = new XMLHttpRequest(),
+                responseRaw,
+                parsedData,
+                requestParams,
+                dataString,
+                i,
+                iMax,
+                // response handler
+                getResponse = function() {
+                    try {
+                      if (httpRequest.readyState === 4) {
+                        if (httpRequest.status === 200) {
+                          // check for completion
+                            responseRaw = httpRequest.responseText;
+                            responseData.textContent = responseRaw;
+                            parsedData = JSON.parse(responseRaw);
+                            responseData.textContent = JSON.stringify(parsedData, null, '  ');
+                            // re-enable buttons
+                            enableButtons();
+                        } else {
+                          alert('There was a problem with the request. Request returned ' + httpRequest.status);
+                        }
+                      }
+                    } catch (e) {
+                      alert('Caught Exception: ' + e);
+                    }
+                };
+            // set up request data
+            requestParams = 'url=' + encodeURIComponent(options.url) + '&requestType=' + options.requestType;
+            if (options.requestBody) {
+                dataString = JSON.stringify(options.requestBody);
+                requestParams += "&requestBody=" + encodeURIComponent(dataString);
+            }
+
+            // set response handler
+            httpRequest.onreadystatechange = getResponse;
+            // open the request
+            httpRequest.open('POST', proxyURL);
+            // set headers
+            httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            // open and send request
+            httpRequest.send(requestParams);
+        }
+
+
+        function init() {
             buildParamTable();
             buildFilterValueTable();
+            // set up dimensions
+            addDimensionOptions();
+            // set up fields
+            // selectedDimensions = ['video'];
+            // addFieldOptions();
+            // event listeners
+            getData.addEventListener('click', function() {
+                var i,
+                    iMax,
+                    selectedDateObj,
+                    dimensionObj,
+                    displayFields = '';
+                // make sure arrays are emptied out
+                selectedDimensions = [];
+                fieldsToReturn = [];
+                // get account values
+                accountId = account_id.value;
+                // get dimension in case it wasn't changed
+                selectedDimensions = getSelectedCheckboxes(dimensionCheckboxes, selectedDimensions);
+                // get the array of fields from the fieldsCheckboxes
+                fieldsToReturn = getSelectedCheckboxes(fieldsCheckboxes, fieldsToReturn);
+                // make the request
+                setRequestData('getAnalytics');
+            });
+
+            // dimensions
+            iMax = dimensionCheckboxes.length;
+            for (i = 0; i < iMax; i += 1) {
+                dimensionCheckboxes[i].addEventListener('click', function() {
+                    var dateArray = [],
+                    j,
+                    jMax,
+                    thisDimension,
+                    idx;
+                    // empty selected dimensions arrays
+                    selectedDimensions = [];
+                    selectedDimensions = getSelectedCheckboxes(dimensionCheckboxes, selectedDimensions);
+                    if (aapi_model.combinations.hasOwnProperty(selectedDimensions.join('__'))) {
+                        addFieldOptions();
+                        // get earliest date === latest date for selected dimensions
+                        jMax = selectedDimensions.length;
+                        for (j = 0; j < jMax; j += 1) {
+                            dateArray = dateArray.concat(aapi_model.combinations[selectedDimensions[j]].from)
+                        }
+                        dateArray.sort();
+                        fromDate = dateArray[dateArray.length - 1];
+                        // display earliest data
+                        fromDisplay.textContent = fromDate;
+                    } else {
+                        fieldsCol1.innerHTML = '<strong>The dimension combination is not valid</strong>';
+                        fieldsCol2.innerHTML = '';
+                    }
+
+                });
+            }
+
+            fieldsButton.addEventListener('click', function() {
+                var i,
+                    iMax = fieldsCheckboxes.length;
+                for (i = 0; i < iMax; i += 1) {
+                    fieldsCheckboxes[i].setAttribute('checked', 'checked');
+                }
+                fieldsToReturn = getSelectedCheckboxes(fieldsCheckboxes, fieldsToReturn);
+                // update fields display
+                updateRequestDisplay();
+            });
+
+            deselectFieldsButton.addEventListener('click', function() {
+                var i,
+                    iMax = fieldsCheckboxes.length;
+                for (i = 0; i < iMax; i += 1) {
+                    fieldsCheckboxes[i].removeAttribute('checked');
+                }
+                fieldsToReturn = [];
+                // update fields display
+                updateRequestDisplay();
+            });
         };
         init();
         return {}
