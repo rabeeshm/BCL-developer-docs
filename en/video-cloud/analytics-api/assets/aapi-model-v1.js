@@ -417,15 +417,25 @@ var aapi_model = {
             from: '2012-10-01',
             fields: ['engagement_score', 'play_rate', 'player_load', 'referrer_domain', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view', 'account.name', 'source_type']
         },
+        account__referrer_domain__source_type: {
+            dimensions: ['referrer_domain', 'source_type'],
+            from: '2012-10-01',
+            fields: ['account', 'account.name','engagement_score', 'play_rate', 'player_load', 'referrer_domain', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view', 'account.name', 'source_type']
+        },
         referrer_domain__search_terms: {
             dimensions: ['referrer_domain', 'search_terms'],
             from: '2012-10-01',
-            fields: ['engagement_score', 'play_rate', 'player_load', 'referrer_domain', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view', 'account.name', 'search_terms']
+            fields: ['account.name','engagement_score', 'play_rate', 'player_load', 'referrer_domain', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view', 'account.name', 'search_terms']
+        },
+        account__referrer_domain__search_terms: {
+            dimensions: ['account.name','referrer_domain', 'search_terms'],
+            from: '2012-10-01',
+            fields: ['account', 'account.name','engagement_score', 'play_rate', 'player_load', 'referrer_domain', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view', 'account.name', 'search_terms']
         },
         referrer_domain__search_terms__source_type: {
             dimensions: ['referrer_domain', 'source_type', 'search_terms'],
             from: '2012-10-01',
-            fields: ['engagement_score', 'play_rate', 'player_load', 'referrer_domain', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view', 'account.name', 'search_terms', 'source_type']
+            fields: ['account.name','engagement_score', 'play_rate', 'player_load', 'referrer_domain', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view', 'account.name', 'search_terms', 'source_type']
         },
         search_terms__source_type: {
             dimensions: ['source_type', 'search_terms'],
