@@ -198,6 +198,7 @@ var BCLS = (function ($, window, BCMAPI, Handlebars, BCLSformatJSON) {
         // strip trailing ? or & and replace &&s
         $request.html(requestURL);
         $request.attr("value", requestURL);
+        getData();
     }
     // submit request
     function getData() {
@@ -236,34 +237,39 @@ var BCLS = (function ($, window, BCMAPI, Handlebars, BCLSformatJSON) {
                 for (video in videoData) {
                     itemsArray.push(videoData[video]);
                 }
+                analyticsCallNumber++;
+                if (analyticsCallNumber < totalAnalyticsCalls) {
+                    buildRequest();
+                } else {
+                    itemsMax = itemsArray.length;
+                    // assume videos not returned in analytics data had 0 views
+                    for (i = 0; i < itemsMax; i++) {
+                        video = itemsArray[i];
+                        if (!video.hasOwnProperty("video_view")) {
+                            video.engagement_score = 0;
+                            video.video_view = 0;
+                            video.average_percent_viewed = 0;
+                        }
+                    }
+                    // remove videos above the views minimum
+                    i = itemsArray.length;
+                    while (i--) {
+                        video = itemsArray[i];
+                        if (video.video_view > minViews) {
+                            itemsArray.splice(i, 1);
+                        }
+                    }
+                    // remove items if the published date is too new
+                    i = itemsArray.length;
+                    while (i--) {
+                        video = itemsArray[i];
+                        if (video.publishedDate > oldestPubDate) {
+                            itemsArray.splice(i, 1);
+                        }
+                    }
+                    $responseFrame.html(BCLSformatJSON.formatJSON(itemsArray));
+                }
 
-                itemsMax = itemsArray.length;
-                // assume videos not returned in analytics data had 0 views
-                for (i = 0; i < itemsMax; i++) {
-                    video = itemsArray[i];
-                    if (!video.hasOwnProperty("video_view")) {
-                        video.engagement_score = 0;
-                        video.video_view = 0;
-                        video.average_percent_viewed = 0;
-                    }
-                }
-                // remove videos above the views minimum
-                i = itemsArray.length;
-                while (i--) {
-                    video = itemsArray[i];
-                    if (video.video_view > minViews) {
-                        itemsArray.splice(i, 1);
-                    }
-                }
-                // remove items if the published date is too new
-                i = itemsArray.length;
-                while (i--) {
-                    video = itemsArray[i];
-                    if (video.publishedDate > oldestPubDate) {
-                        itemsArray.splice(i, 1);
-                    }
-                }
-                $responseFrame.html(BCLSformatJSON.formatJSON(itemsArray));
             },
             error : function (XMLHttpRequest, textStatus, errorThrown) {
                 $responseFrame.html("Sorry, your request was not successful. Here's what the server sent back: " + errorThrown);
