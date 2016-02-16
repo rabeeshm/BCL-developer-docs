@@ -13,6 +13,8 @@ var BCLS = (function (window, document, $, Handlebars, datepickr) {
         $geoSelector = $("#geoSelector"),
         $reportTableBody = $("#reportTableBody"),
         $fromDate = $("#fromDatePicker"),
+        fromDatePickr = document.getElementById('fromDatePicker'),
+        toDatePickr = document.getElementById('toDatePicker'),
         $toDate = $("#toDatePicker"),
         $getData = $("#getData"),
         $gettingDataDisplay = $("#gettingDataDisplay"),
@@ -156,10 +158,10 @@ var BCLS = (function (window, document, $, Handlebars, datepickr) {
             makeAnalyticsCall(callURL, callType);
         };
     // add date pickers to the date input fields
-    datepickr ("fromDatePicker", {
+    datepickr (fromDatePickr, {
         'dateFormat': 'Y-m-d'
     });
-    datepickr ("toDatePicker", {
+    datepickr (toDatePickr, {
         "dateFormat": "Y-m-d"
     });
 
