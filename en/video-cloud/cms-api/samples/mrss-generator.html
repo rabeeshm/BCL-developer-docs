@@ -93,7 +93,7 @@
                     <h5>Client secret: <input id="client_secret" type="text" size="60" value="" placeholder="w7NQYu0vUloM4GYYy2SXAxrvyFpt8fwI35qAFZcS13-VIgs0itwKNsAwHOS80sOWKJ1BUwHIvSFG2IbgcxEGKg"></h5>
                     <h5>Feed title: <input type="text" id="feedTitle" value="MRSS Feed"></h5>
                     <h5>Feed description: <input type="text" id="feedDescription" value="My MRSS Feed"></h5>
-                    <h5>Number of videos to include: <select name="numberSelect" id="numberSelect">
+                    <h5>Number of videos to include: <select name="numberSelect" id="numberSelect" style="width:100px;">
                         <option value="25" selected="selected">25</option>
                         <option value="50">50</option>
                         <option value="100">100</option>
@@ -101,11 +101,11 @@
                     </select></h5>
                     <h5>Search string to select videos (optional - see <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/search-videos.html">Search for Videos</a>) <input id="searchStr" type="text" placeholder="tags:foo"></h5>
                     <h5>Sort by:
-                        <select name="sortSelect" id="sortSelect">
+                        <select name="sortSelect" id="sortSelect" style="width:150px;">
                             <option value="updated_at" selected="selected">Date last updated</option>
                             <option value="created_at">Date added</option>
                         </select>
-                        <select name="directionSelect" id="directionSelect">
+                        <select name="directionSelect" id="directionSelect" style="width:120px;">
                             <option value="-" selected="selected">descending</option>
                             <option value="">ascending</option>
                         </select>
@@ -123,6 +123,44 @@
             </div>
             <div class="section" id="javascript">
                 <h2>Code for this app</h2>
+                <p>Below is the HTML code used in this app.</p>
+<pre><code>&lt;fieldset&gt;
+    &lt;legend&gt;Input&lt;/legend&gt;
+    &lt;p&gt;
+        If you do not enter account information, a Brightcove sample account will be used.
+    &lt;/p&gt;
+    &lt;h5&gt;Account id: &lt;input id="account_id" type="text" value="" placeholder="1752604059001"&gt;&lt;/h5&gt;
+    &lt;h5&gt;Client id: &lt;input id="client_id" type="text" size="60" value="" placeholder="c5d0a622-5479-46d8-8d8a-5f034b943fab"&gt;&lt;/h5&gt;
+    &lt;h5&gt;Client secret: &lt;input id="client_secret" type="text" size="60" value="" placeholder="w7NQYu0vUloM4GYYy2SXAxrvyFpt8fwI35qAFZcS13-VIgs0itwKNsAwHOS80sOWKJ1BUwHIvSFG2IbgcxEGKg"&gt;&lt;/h5&gt;
+    &lt;h5&gt;Feed title: &lt;input type="text" id="feedTitle" value="MRSS Feed"&gt;&lt;/h5&gt;
+    &lt;h5&gt;Feed description: &lt;input type="text" id="feedDescription" value="My MRSS Feed"&gt;&lt;/h5&gt;
+    &lt;h5&gt;Number of videos to include: &lt;select name="numberSelect" id="numberSelect"&gt;
+        &lt;option value="25" selected="selected"&gt;25&lt;/option&gt;
+        &lt;option value="50"&gt;50&lt;/option&gt;
+        &lt;option value="100"&gt;100&lt;/option&gt;
+        &lt;option value="all"&gt;all&lt;/option&gt;
+    &lt;/select&gt;&lt;/h5&gt;
+    &lt;h5&gt;Search string to select videos (optional - see &lt;a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/search-videos.html"&gt;Search for Videos&lt;/a&gt;) &lt;input id="searchStr" type="text" placeholder="tags:foo"&gt;&lt;/h5&gt;
+    &lt;h5&gt;Sort by:
+        &lt;select name="sortSelect" id="sortSelect"&gt;
+            &lt;option value="updated_at" selected="selected"&gt;Date last updated&lt;/option&gt;
+            &lt;option value="created_at"&gt;Date added&lt;/option&gt;
+        &lt;/select&gt;
+        &lt;select name="directionSelect" id="directionSelect"&gt;
+            &lt;option value="-" selected="selected"&gt;descending&lt;/option&gt;
+            &lt;option value=""&gt;ascending&lt;/option&gt;
+        &lt;/select&gt;
+    &lt;/h5&gt;
+    &lt;p&gt;&lt;button class="bcls-button" id="makeFeed"&gt;Generate the Feed&lt;/button&gt;&lt;/p&gt;
+&lt;/fieldset&gt;
+&lt;fieldset&gt;
+    &lt;legend&gt;Output&lt;/legend&gt;
+    &lt;h5 id="logger" style="color:rgb(237, 104, 38)"&gt;Waiting for input...&lt;/h5&gt;
+    &lt;h5&gt;Current API request&lt;/h5&gt;
+    &lt;pre&gt;&lt;code id="apiRequest"&gt;&lt;/code&gt;&lt;/pre&gt;
+    &lt;h5&gt;Generated MRSS feed&lt;/h5&gt;
+    &lt;textarea id="feedDisplay" style="width:95%;height:30em;"&gt;&lt;/textarea&gt;
+&lt;/fieldset&gt;</code></pre>
                 <p>Below is the JavaScript code used for this app.</p>
 <pre><code id="jscode"></code></pre>
             </div>
@@ -282,16 +320,24 @@ var BCLS = ( function (window, document) {
     }
 
     function addItems() {
-        var i, iMax, video, pubdate, videoURL, thumbnailURL;
+        var i, iMax, video, pubdate, videoURL, thumbnailURL, doThumbnail = true;
         if (videosArray.length > 0) {
             iMax = videosArray.length;
             for (i = 0; i < iMax; i += 1) {
                 video = videosArray[i];
-                videoURL = encodeURI(video.source.src.replace(/&/g, '&amp;'));
-                if (isDefined(video.images)) {
-                    thumbnailURL = encodeURI(video.images.thumbnail.sources[0].src.replace(/&/g, '&amp;'));
+                // video may not have a valid source
+                if (isDefined(video.source) && isDefined(video.source.src)) {
+                    videoURL = encodeURI(video.source.src.replace(/&/g, '&amp;'));
                 } else {
+                    videoURL = "";
+                }
+                // depending on when/how the video was created, it may have different thumbnail properties or none at all
+                if (isDefined(video.images) && isDefined(video.images.thumbnail)) {
+                    thumbnailURL = encodeURI(video.images.thumbnail.sources[0].src.replace(/&/g, '&amp;'));
+                } else if (isDefined(video.thumbnail)) {
                     thumbnailURL = encodeURI(video.thumbnail.replace(/&/g, '&amp;'));
+                } else {
+                    doThumbnail = false;
                 }
 
                 pubdate = new Date(video.created_at).toGMTString();
@@ -302,13 +348,14 @@ var BCLS = ( function (window, document) {
                 mrssStr += sMediaPlayer + ' url="' + 'https://players.brightcove.net/' + accountId + '/default_default/index.html?videoId=' + video.id + '"' + eMediaPlayer;
                 mrssStr += sMediaTitle + video.name + eMediaTitle;
                 mrssStr += sMediaDescription + video.description + eMediaDescription;
-                mrssStr += sMediaThumbnail + ' url="' + thumbnailURL + '"';
-                if (isDefined(video.images)) {
-                    mrssStr += ' height="' + video.images.thumbnail.sources[0].height + '" width="' + video.images.thumbnail.sources[0].width + '"' + eMediaThumbnail;
-                } else {
-                    mrssStr += eMediaThumbnail;
+                if (doThumbnail) {
+                    mrssStr += sMediaThumbnail + ' url="' + thumbnailURL + '"';
+                    if (isDefined(video.images)) {
+                        mrssStr += ' height="' + video.images.thumbnail.sources[0].height + '" width="' + video.images.thumbnail.sources[0].width + '"' + eMediaThumbnail;
+                    } else {
+                        mrssStr += eMediaThumbnail;
+                    }
                 }
-
                 mrssStr += eMediaContent;
                 mrssStr += eItem;
             }
@@ -316,6 +363,7 @@ var BCLS = ( function (window, document) {
         mrssStr += eChannel + '</rss>';
         logger.textContent = 'Finished!'
         feedDisplay.textContent = vkbeautify.xml(mrssStr);
+        enableButtons();
     }
 
     /**
@@ -329,7 +377,6 @@ var BCLS = ( function (window, document) {
         disableButtons();
         switch (id) {
             case 'getCount':
-                console.log('in getCount');
                 endPoint = accountId + '/counts/videos?sort=' + sort;
                 if (isDefined(search)) {
                     endPoint += '&search=' + search;
@@ -369,7 +416,8 @@ var BCLS = ( function (window, document) {
                             i = videosArray.length;
                             while (i > 0) {
                                 i--;
-                                if (videosArray[i].source === null) {
+                                console.log('videosArray[i]', videosArray[i]);
+                                if (!isDefined(videosArray[i].source)) {
                                     console.log('i', i);
                                     videosArray.splice(i, 1);
                                 }
