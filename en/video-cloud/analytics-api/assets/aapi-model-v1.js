@@ -155,16 +155,16 @@ var aapi_model = {
             incompatible_dimensions: ['date', 'date_hour']
         },
         city: {
-            dimensions: ['account'],
+            dimensions: ['city'],
             from: '2011-01-01',
-            fields: ['account.name', 'city', 'dma', 'engagement_score', 'play_rate', 'player_load', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
+            fields: ['city', 'dma', 'engagement_score', 'play_rate', 'player_load', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
             filter_values: ['comma-delimited list of city names - e.g. Seattle,Boston'],
             incompatible_dimensions: ['date', 'date_hour']
         },
         country: {
             dimensions: ['country'],
             from: '2011-01-01',
-            fields: ['account.name', 'country', 'country_name', 'engagement_score', 'play_rate', 'player_load', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
+            fields: ['country', 'country_name', 'engagement_score', 'play_rate', 'player_load', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
             filter_values: ['comma-delimited list of ISO-3611-1 country codes - e.g.: KO,US'],
             incompatible_dimensions: ['date', 'date_hour']
         },
@@ -178,69 +178,69 @@ var aapi_model = {
         date_hour: {
             dimensions: ['date_hour'],
             from: '2011-01-01',
-            fields: ['account.name', 'active_media', 'bytes_delivered', 'daily_unique_viewers', 'date_hour', 'drm_bytes_packaged', 'engagement_score', 'licenses_served', 'live_seconds_streamed', 'play_rate', 'player_load', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
+            fields: ['active_media', 'bytes_delivered', 'daily_unique_viewers', 'date_hour', 'drm_bytes_packaged', 'engagement_score', 'licenses_served', 'live_seconds_streamed', 'play_rate', 'player_load', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
             filter_values: ['none'],
             incompatible_dimensions: ['account', 'city', 'country', 'destination_domain', 'destination_path', 'device_os', 'device_type', 'player', 'referrer_domain', 'region', 'search_terms', 'source_type', 'video']
         },
         destination_domain: {
             dimensions: ['destination_domain'],
             from: '2011-01-01',
-            fields: ['account.name', 'destination_domain', 'engagement_score', 'play_rate', 'player_load', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
+            fields: ['destination_domain', 'engagement_score', 'play_rate', 'player_load', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
             filter_values: ['comma-delimited list of domains - e.g. brightcove.com'],
             incompatible_dimensions: ['city', 'country','date', 'date_hour', 'device_os', 'device_type', 'referrer_domain', 'region', 'search_terms', 'source_type']
         },
         destination_path: {
             dimensions: ['destination_path'],
             from: '2011-01-01',
-            fields: ['account.name', 'destination_path', 'engagement_score', 'play_rate', 'player_load', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
+            fields: ['destination_path', 'engagement_score', 'play_rate', 'player_load', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
             filter_values: ['comma-delimited list of paths - e.g. /en/video-cloud/docs/editing-settings-players-plug-ins-tab'],
             incompatible_dimensions: ['city', 'country', 'date', 'date_hour', 'device_os', 'device_type', 'player', 'referrer_domain', 'region', 'search_terms', 'source_type', 'video']
         },
         device_os: {
             dimensions: ['device_os'],
             from: '2011-01-01',
-            fields: ['account.name', 'device_os', 'engagement_score', 'play_rate', 'player_load', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
+            fields: ['device_os', 'engagement_score', 'play_rate', 'player_load', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
             filter_values: ['android', 'bada', 'ios', 'rim', 'symbian', 'web_os', 'windows', 'os_x', 'mac', 'linux', 'other'],
             incompatible_dimensions: ['city', 'date', 'date_hour', 'destination_domain', 'destination_path', 'referrer_domain', 'search_terms', 'source_type']
         },
         device_type: {
             dimensions: ['device_type'],
             from: '2011-01-01',
-            fields: ['account.name', 'device_type', 'engagement_score', 'play_rate', 'player_load', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
+            fields: ['device_type', 'engagement_score', 'play_rate', 'player_load', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
             filter_values: ['mobile', 'tablet', 'tv', 'desktop', 'other'],
             incompatible_dimensions: ['city', 'date', 'date_hour', 'destination_domain', 'destination_path', 'referrer_domain', 'search_terms', 'source_type']
         },
         player: {
             dimensions: ['player'],
             from: '2011-01-01',
-            fields: ['account.name', 'bytes_delivered', 'engagement_score', 'play_rate', 'player', 'player_load', 'player_name', 'video_engagement_1', 'video_engagement_100', 'video_engagement_25', 'video_engagement_50', 'video_engagement_75', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
+            fields: ['bytes_delivered', 'engagement_score', 'play_rate', 'player', 'player_load', 'player_name', 'video_engagement_1', 'video_engagement_100', 'video_engagement_25', 'video_engagement_50', 'video_engagement_75', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
             filter_values: ['player ids as a comma-delimited list'],
             incompatible_dimensions: ['city', 'date', 'date_hour', 'destination_path', 'region', 'search_terms']
         },
         referrer_domain: {
             dimensions: ['referrer_domain'],
             from: '2012-10-01',
-            fields: ['account.name', 'engagement_score', 'play_rate', 'player_load', 'referrer_domain', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
+            fields: ['engagement_score', 'play_rate', 'player_load', 'referrer_domain', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
             incompatible_dimensions: ['city', 'country', 'date', 'date_hour', 'device_os', 'device_type', 'region']
         },
         region: {
             dimensions: ['region'],
             from: '2011-01-01',
-            fields: ['account.name', 'engagement_score', 'play_rate', 'player_load', 'region', 'region_name', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
+            fields: ['engagement_score', 'play_rate', 'player_load', 'region', 'region_name', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
             filter_values: ['comma-delimited list of the ISO-3611-2 region code - e.g. "US-WA"'],
             incompatible_dimensions: ['date', 'date_hour', 'destination_path', 'player', 'referrer_domain', 'search_terms']
         },
         source_type: {
             dimensions: ['source_type'],
             from: '2012-10-01',
-            fields: ['account.name', 'engagement_score', 'play_rate', 'player_load', 'source_type', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
+            fields: ['engagement_score', 'play_rate', 'player_load', 'source_type', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
             filter_values: ['direct', 'referral', 'organic_search', 'paid_search', 'secure_search'],
             incompatible_dimensions: ['date', 'date_hour', 'destination_domain', 'destination_path', 'device_os', 'device_type']
         },
         search_terms: {
             dimensions: ['search_terms'],
             from: '2012-10-01',
-            fields: ['account.name', 'engagement_score', 'play_rate', 'player_load', 'search_terms', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
+            fields: ['engagement_score', 'play_rate', 'player_load', 'search_terms', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view'],
             filter_values: ['URI-encoded, comma-delimited list of search terms - e.g. players,videos'],
             incompatible_dimensions: ['date', 'date_hour', 'destination_domain', 'destination_path', 'device_os', 'device_type', 'video']
 
