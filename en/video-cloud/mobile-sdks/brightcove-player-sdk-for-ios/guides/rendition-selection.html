@@ -53,7 +53,7 @@
                 <h1>Rendition Selection</h1>
             </div>
             <div id="top" class="section" title="Top">
-                <p>For apps using the Brightcove Native Player SDK for iOS, there is a default rendition selection process when playing a video.</p>
+                <p>For apps using the Brightcove Native Player SDK for iOS, there is a default rendition selection process when playing a video: <code>[BCOVBasicSourceSelectionPolicy sourceSelectionHLS]</code>.</p>
                 <p>When you retrieve videos from the Brightcove catalog or construct a <code>BCOVVideo</code> object with multiple <code>BCOVSource</code> elements, the player has to decide which <code>BCOVSource</code> (rendition) to play back.</p>
                 <p>Brightcove provides a default implementation as follows:</p>
               <ol>
@@ -66,6 +66,18 @@
               <p>When using the default transcode settings, the first HLS source should be the master m3u8 playlist that points to all of your individual renditions.</p>
  
             </div>
+			
+			<div id="alternateSelection" class="section">
+				<h2>Alternate rendition selection policies</h2>
+				<p> Apple introduced App Transport Security in iOS 9, and strongly encourages the use of HTTPS instead of HTTP for all web traffic. To help with source selection using HTTPS, you can use the source selection policy <code>[BCOVBasicSourceSelectionPolicy sourceSelectionHLSWithScheme:(NSString *)scheme]</code>, passing <code>kBCOVSourceURLSchemeHTTPS</code> as the desired scheme.</p>
+				<p>This policy has the following implementation: </p> 
+				<ol>
+					<li>It looks for the first source that has a <code>deliveryType</code> of <strong>HLS</strong> with the selected scheme.</li>
+					<li>If no such source is found, it looks for the first source that has a <code>deliveryType</code> of <strong>HLS</strong> with any scheme.</li>
+					<li>If no HLS sources are present, it will fall back to the first source with a <code>deliveryType</code> of <strong>MP4</strong>.</li>
+					<li>If none of the above is found, it will use the first source of any kind.</li>
+				</ol>
+			</div>
             
             <div id="overrideSource" class="section">
 				<h2>Overriding source</h2>
