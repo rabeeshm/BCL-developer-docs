@@ -317,11 +317,6 @@ var aapi_model = {
             from: '2011-01-01',
             fields: ['engagement_score', 'play_rate', 'player_load', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view', 'city', 'dma', 'region', 'region_name']
         },
-        country__region: {
-            dimensions: ['country', 'region'],
-            from: '2011-01-01',
-            fields: ['engagement_score', 'play_rate', 'player_load', 'video_impression', 'video_percent_viewed', 'video_seconds_viewed', 'video_view', 'country', 'country_name', 'region', 'region_name']
-        },
         account__city__country__region: {
             dimensions: ['account', 'country', 'region', 'city'],
             from: '2011-01-01',
