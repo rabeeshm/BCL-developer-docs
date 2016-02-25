@@ -32,7 +32,9 @@
 	
 	<style type="text/css">
     #backButton {
-		margin-top: -12px;
+		margin-top: -20px;
+		width: 40px;
+		height: 40px;
 	}
   </style>
 </head>
@@ -54,7 +56,8 @@
 			<div id="top" class="section">
 				<h1>Brightcove Player Sample: Custom Event</h1>
 				<!-- Place document intro sentence(s) here -->
-				<p>This topic shows you how to set and listen for a custom event. In this sample, you will add a back button to the control bar. When the user clicks the back button, a custom event is triggered along with a data object which tells how much time to go back in the video. The custom event listener will find the current video position, and resume playback based on the amount of time to go back in the data object.</p>
+				<p>This topic shows you how to dispatch and listen for a custom event. Even though the Brightcove player provides a number of out-of-the-box events, you may want to use your own custom events to decouple and eliminate dependencies between DOM objects and event listeners. This event-driven model is an architectural choice that you may want to consider.</p>
+				<p>This sample adds a back button to the control bar. When the user clicks the back button, a custom event is triggered along with the amount of time to rewind. The custom event listener finds the current video position and rewinds the video.</p>
 			</div>
 			<div id="developmentsequence" class="section">
         <h2 id="expanderHead">Development sequence</h2>
@@ -87,7 +90,7 @@
 
       <div id="selectimplementation" class="section">
 				<h2>Select implementation</h2>
-				<p>In this sample, the functionality has dependencies on the parent page. While a plugin is a good choice for this functionality, an iframe implementation will not work for this sample.</p>
+				<p>This sample uses In-Page embed code to interact with page elements and trigger the custom rewind event. Plugin code is used in the player to listen for the custom event and rewind the video based on the data object in the event.</p>
 			</div>
 
 			<div id="resources" class="section">
@@ -105,17 +108,31 @@
 			</div>
 			<div id="player" class="section">
 				<h2>The player</h2>
-				<p>Start video playback. Then click on the back button. You should see the video playback goes back 5 seconds. The amount of time to go back is controlled by a variable in the page code.</p>
+				<p style="float:left">Start video playback. Then click on the back button.</p><div><img style="width:40px;height:40px;margin-top:-10px;" src="http://solutions.brightcove.com/bcls/brightcove-player/custom-event/back-button.png" alt="rewind video button"></div>
+				<p style="clear:both;">You should see that video playback goes back 5 seconds. Change the rewind amount to see how it affects how far the video goes back in time.</p>
 				
-				<!--custom event player-->
+				<!--default player-->
 				<video id="video_1" style="width: 640px; height: 360px;"
 					data-video-id="4454629913001"
 					data-account="1752604059001"
-					data-player="Nk9Q8IHie"
+					data-player="default"
 					data-embed="default"
 					class="video-js"
 					controls></video>
-				<script src="//players.brightcove.net/1752604059001/Nk9Q8IHie_default/index.min.js"></script>
+				<script src="//players.brightcove.net/1752604059001/default_default/index.min.js"></script>
+				
+				<p>The following setting and message box are for demo purposes only, so that you can adjust the value:</p>
+				<p>Rewind video amount:</p>
+				<form>
+					<input id="rewindInput" type="number" value="5" size="5" min="1" max="25" style="text-align:center;width:5em;display:inline"/><span> seconds.</span>
+				</form> 
+
+				<fieldset>
+					<legend>Message Box</legend>
+					<p>Event: <span id="rewindEvent"></span></p>
+					<p>Position before rewind: <span id="beforePosition"></span></p>
+					<p>Position after rewind: <span id="afterPosition"></span></p>
+				</fieldset>
 				
 			</div>
 
@@ -136,52 +153,48 @@
           <p class="perform-only"><code data-gist-id="28c9fa63237b0a695e69" data-gist-hide-footer="true" data-gist-line="18,20-25"></code></p>
 		   
 		   <h3>Custom events</h3>
-		   <p>Custom events can be used to</p>
+		   <p>Custom events allow you to decouple and eliminate dependencies between DOM objects and event listeners, creating an event-driven architectural model.</p>
 		   <h4>Dispatch</h4>
-		   <p>To dispatch a custom event, use the <code>trigger()</code> method as follows:
+		   <p>To dispatch a custom event, use the <code>trigger()</code> method as follows:</p>
 		   <pre><code>// trigger a custom event
 myPlayer.trigger('eventName');
 or
 // trigger a custom event with data
-myPlayer.trigger('eventName', {data: 'some data'});</code></pre></p>
+myPlayer.trigger('eventName', {data: 'some data'});</code></pre>
 		   <p>For details about dispatching custom events, see the <a href="../../brightcove-player/reference/api/player.html#Methodstrigger">Player API index</a>.</p>
-			<p>In this sample, the code looks like this:</p>
+			<p>In this sample, the code does the following:</p>
 			<ul>
-				<li>Line 54: Dispatches a custom event, named <code>rewind</code>, along with a data object with a name of <code>amount</code> and a value of <code>5</code>. You'll see in the JavaScript code where this value is set.</li>
+				<li>Dispatches a custom event, named <code>rewind</code></li>
+				<li>Sends a data object with a name of <code>amount</code> and a value of <code>5</code> - You'll see in the JavaScript code where this value is set</li>
 			</ul>
 			<p><code data-gist-id="28c9fa63237b0a695e69" data-gist-hide-footer="true" data-gist-line="53-54"></code></p>
 			
 			<h4>Listen</h4>
-			<p>To listen for a custom event, you can use the <code>on()</code> method as follows:
+			<p>To listen for a custom event, you can use the <code>on()</code> method as follows:</p>
 		   <pre><code>// listen for a custom event
 player.on('eventName', function(evt){});
 or
 // listen for a custom event with data
-player.on('eventName', function(evt,data){});</code></pre></p>
+player.on('eventName', function(evt,data){});</code></pre>
 		   <p>You can also use the <code>one()</code> method if you want the event listener to be triggered only once and then removed. For details about listening for events, see the <a href="../../brightcove-player/reference/api/player.html#Methodson">Player API index</a>.</p>
 		  
-		    <p>In this sample, the code looks like this:</p>
+		    <p>In this sample, the code does the following:</p>
 		    <ul>
-				<li>Line 58: Listens a custom event, named <code>rewind</code>, and passes the event object and data object into a function.</li>
+				<li>Listens for a custom event, named <code>rewind</code></li>
+				<li>Passes the event and data objects into a function</li>
 			</ul>
 			<p><code data-gist-id="28c9fa63237b0a695e69" data-gist-hide-footer="true" data-gist-line="57-58,71"></code></p>
-			<p>When you display the event object and data object in the console, it should look like this:</p>
+			<p>When you display the event and data objects in the console, it should look similar to this:</p>
 			<div><img src="/en/video-cloud/brightcove-player/samples/assets/custom-event-data.png" alt="custom event data"></div>
 
         <h3>The JavaScript code</h3>
-        <p>The following provides an overview of the functionality of the code:</p>
+        <p>The following code shows how we started with the custom event trigger and listener in the page code for testing.</p>
             <ul>
-                <li>Line 469: Listens for the <code>loadstart</code> event.</li>
-                <li>Line 471: Assigns the <code>name</code> of the video to a variable for later use in the link tag.</li>
-                <li>Line 472: Assigns the <code>sources</code> array to a variable.</li>
-                <li>Line: 473: Assigns the length of the array to variable.</li>
-                <li>Lines 473-478: Loop over the array and assign to a second array renditions where the <code>container</code> is <strong>MP4</strong>, AND the rendition has a <code>src</code> property. The MP4 renditions appear twice in the <code>sources</code> array, once with a <code>src</code> property and once with a <code>stream_name</code> property. The first is for progressive download and the second for streaming.</li>
-                <li>Lines 480-482: Sort the array of MP4s.</li>
-                <li>Line 484: Assigns the largest rendition to a variable.</li>
-				<li>Lines 487-488: Assign the <code>id</code> and <code>className</code> attributes for the newly created <code>div</code> element for the icon.</li>
-				<li>Lines 491-493: Assign image and link element attributes.</li>
-				<li>Lines 484-495: Append child elements to parents.</li>
-				<li><p>Lines 498-502: Get the spacer element, set the style to right justify the content and places the new icon element in the spacer.</p>
+                <li>Lines 38-50: Create the back/rewind button and place it in the spacer element of the control bar. </li>
+                <li>Line 50: Gets a reference to the new back button.</li>
+                <li>Lines 52-55: Use the <code>trigger()</code> method to dispatch the custom rewind event when the back button is clicked.</li>
+                <li><p>Lines 57-71: Use the <code>on()</code> method to listen for the custom rewind event. It then sets the video position back by the rewind amount passed through the event data object.</p>
+    
 				<p class="BCL-aside">Note: For more details about control bar icons, see the <a href="../../brightcove-player/guides/customize-appearance.html#iconmanipulation">Controlbar icon manipulation</a> section of the Customize Player Appearance document.</p></li>
 				   
             </ul>
@@ -192,21 +205,22 @@ player.on('eventName', function(evt,data){});</code></pre></p>
 			<div id="plugin" class="section">
 				<h2>Use a plugin</h2>
 				<p>It is a best practice to use a plugin so that you can easily add the JavaScript code's functionality to multiple players.</p>
+				<p>This sample leaves the function that dispatches the custom event in the page code. The custom event listener is added to the player as a plugin. This allows you to have several pages using this player, but only include the event dispatcher for those players where you want the rewind functionality.</p>
 
 				<h3>Create the JavaScript file</h3>
 				<p>Move the plugin's JavaScript code into a file and place it in an Internet accessible URL.</p>
                 <ol>
-                  <li>Create a new file for your plugin JavaScript code. In this case, name it <code>download-video.js</code>.</li>
+                  <li>Create a new file for your plugin JavaScript code. In this case, name it <code>custom-event.js</code>.</li>
                   <li>Cut and paste the JavaScript code from your main HTML file into this new file.</li>
-                  <li>Lines 527,575: Wrap your JavaScript code using the <code>videojs.plugin()</code> function. The first argument, <code>downloadVideoPlugin</code>, is the plugin name.</li>
-                  <li>Line 530: Gets a reference to your player.</li>
+                  <li>Lines 147,166: Wrap your JavaScript code using the <code>videojs.plugin()</code> function. The first argument, <code>customEventPlugin</code>, is the plugin name.</li>
+                  <li>Line 149: Gets a reference to your player.</li>
                   <li><p>The rest is your JavaScript code which was reviewed in a previous section.</p>
-                <p class="BCL-aside">Note: Line 575: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</p>
-          		<p><code data-gist-id="28c9fa63237b0a695e69" data-gist-hide-footer="true" data-gist-line="147-167"></code></p></li>
+                <p class="BCL-aside">Note: Line 166: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</p>
+          		<p><code data-gist-id="28c9fa63237b0a695e69" data-gist-hide-footer="true" data-gist-line="147-166"></code></p></li>
                   <li><p>In the HTML file, add the following code just below the existing <code>&lt;script&gt;</code> tags. This code includes the JavaScript file and then calls the method defined in that JavaScript.</p>
                 <p><code data-gist-id="28c9fa63237b0a695e69" data-gist-hide-footer="true" data-gist-line="172-173" ></code></p></li>
 
-                  <li>Browse the HTML page. You should see the download video button, except now your JavaScript code has been removed from the HTML page.</li>
+                  <li>Browse the HTML page. You should see the rewind button, except now the custom event listener code has been removed from the HTML page.</li>
                 </ol>
 
         <h3>Deploy plugin</h3>
@@ -219,17 +233,20 @@ player.on('eventName', function(evt,data){});</code></pre></p>
           <li>For the <strong>CSS URL</strong>, enter the URL which specifies the location of where you saved your plugin's CSS.</li>
           <li>For the <strong>Name</strong>, enter <strong>customEventPlugin</strong>.</li>
           <li>There are no plugin options to enter.
-              <div><img src="/en/video-cloud/brightcove-player/samples/assets/download-video-studio.png" alt="download video plugin"></div>
+              <div><img src="assets/custom-event-plugin.png" alt="custom event plugin"></div>
             </li>
             <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
+			<li>Browse the HTML page. You should see the rewind button, except now the custom event listener code has been added to your player.</li>
           </ol>
 			</div>
 
       <div id="useiframe" class="section">
         <h2>Use iframe</h2>
-        <p>It is a best practice to use the iframe player implementation. Since you can create the download video functionality as a plugin, replace the In_Page embed implementation with the iframe implementation.</p>
+        <p>It is a best practice to use the iframe player implementation. To do this, move all of the JavaScript code into the plugin for the player, publish the player and use the Standard Embed Code. Then, every page that uses this player will have a rewind button.</p>
+<!--
 		  <p class="BCL-aside">You may not want to use the iframe implementation, because some browsers will open the downloaded video within the iframe instead of downloading the video.</p>
           <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="581-585"></code></p>
+-->
       </div>
 
 
@@ -263,11 +280,24 @@ player.on('eventName', function(evt,data){});</code></pre></p>
 		videojs("video_1").ready(function() {
 	  // Create variables and new div, anchor and image for download icon
       var myPlayer = this,
-        videoName,
-		rewindAmount = 5,
-        controlBar,
-		newElement = document.createElement('div'),
-		newImage = document.createElement('img');
+          videoName,
+		  // amount of time to rewind video (in seconds)
+		  rewindAmount = 5,
+          controlBar,
+		  newElement = document.createElement('div'),
+		  newImage = document.createElement('img'),
+		  eRewindInput = document.getElementById("rewindInput"),
+		  eRewindEvent = document.getElementById("rewindEvent"),
+		  eBeforePosition = document.getElementById("beforePosition"),
+		  eAfterPosition = document.getElementById("afterPosition");
+			
+	  // sample only -- update options - developer would just do this in the code
+	  updateOptions = function () {
+		rewindAmount = parseInt(eRewindInput.value); 
+	  }
+	  
+	  // sample only: add event listeners for rewind amount changes
+      eRewindInput.addEventListener("change", updateOptions);
         
 	  // Assign id and classes to div for icon
       newElement.id = 'backButton';
@@ -284,9 +314,28 @@ player.on('eventName', function(evt,data){});</code></pre></p>
 	  backButton = document.getElementById("backButton");
 		  
 	  backButton.onclick = function() {
+		  // display data
+		  eRewindEvent.textContent = "Custom rewind event triggered";
+		  eBeforePosition.textContent = myPlayer.currentTime() + " seconds";
 	      // trigger a custom event with data
 		  myPlayer.trigger('rewind', {'amount': rewindAmount});
 	  }
+	  
+	  // listen for a custom event with data
+	  myPlayer.on('rewind',function(evt,data){
+		  var newTime,
+			  rewindAmt = data.amount,
+			  videoTime = myPlayer.currentTime();
+			
+		  if (videoTime >= rewindAmt) {
+		      newTime = videoTime - rewindAmt;
+		  } else {
+			  newTime = 0;
+		  }
+			
+		  myPlayer.currentTime(newTime);
+		  eAfterPosition.textContent = newTime + " seconds";
+	  });
 	
     });
 	</script>
