@@ -86,26 +86,7 @@
                     <h5>Account id: <input id="account_id" type="text" value="" placeholder="1752604059001"></h5>
                     <h5>Client id: <input id="client_id" type="text" size="60" value="" placeholder="c5d0a622-5479-46d8-8d8a-5f034b943fab"></h5>
                     <h5>Client secret: <input id="client_secret" type="text" size="60" value="" placeholder="w7NQYu0vUloM4GYYy2SXAxrvyFpt8fwI35qAFZcS13-VIgs0itwKNsAwHOS80sOWKJ1BUwHIvSFG2IbgcxEGKg"></h5>
-                    <h5>Feed title: <input type="text" id="feedTitle" value="MRSS Feed"></h5>
-                    <h5>Feed description: <input type="text" id="feedDescription" value="My MRSS Feed"></h5>
-                    <h5>Number of videos to include: <select name="numberSelect" id="numberSelect" style="width:100px;">
-                        <option value="25" selected="selected">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                        <!-- <option value="all">all</option> -->
-                    </select></h5>
-                    <h5>Search string to select videos (optional - see <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/search-videos.html">Search for Videos</a>) <input id="searchStr" type="text" placeholder="tags:foo"></h5>
-                    <h5>Sort by:
-                        <select name="sortSelect" id="sortSelect" style="width:150px;">
-                            <option value="updated_at" selected="selected">Date last updated</option>
-                            <option value="created_at">Date added</option>
-                        </select>
-                        <select name="directionSelect" id="directionSelect" style="width:120px;">
-                            <option value="-" selected="selected">descending</option>
-                            <option value="">ascending</option>
-                        </select>
-                    </h5>
-                    <p><button class="bcls-button" id="makeFeed">Generate the Feed</button></p>
+                    <p><button class="bcls-button" id="makeReport">Generate the Report</button></p>
                 </fieldset>
                 <fieldset>
                     <legend>Output</legend>
@@ -113,7 +94,7 @@
                     <h5>Current API request</h5>
                     <pre><code id="apiRequest"></code></pre>
                     <h5>Generated MRSS feed</h5>
-                    <textarea id="feedDisplay" style="width:95%;height:30em;"></textarea>
+                    <textarea id="reportDisplay" style="width:95%;height:30em;"></textarea>
                 </fieldset>
             </div>
             <div class="section" id="javascript">
@@ -145,7 +126,7 @@
             &lt;option value=""&gt;ascending&lt;/option&gt;
         &lt;/select&gt;
     &lt;/h5&gt;
-    &lt;p&gt;&lt;button class="bcls-button" id="makeFeed"&gt;Generate the Feed&lt;/button&gt;&lt;/p&gt;
+    &lt;p&gt;&lt;button class="bcls-button" id="makeReport"&gt;Generate the Feed&lt;/button&gt;&lt;/p&gt;
 &lt;/fieldset&gt;
 &lt;fieldset&gt;
     &lt;legend&gt;Output&lt;/legend&gt;
@@ -153,7 +134,7 @@
     &lt;h5&gt;Current API request&lt;/h5&gt;
     &lt;pre&gt;&lt;code id="apiRequest"&gt;&lt;/code&gt;&lt;/pre&gt;
     &lt;h5&gt;Generated MRSS feed&lt;/h5&gt;
-    &lt;textarea id="feedDisplay" style="width:95%;height:30em;"&gt;&lt;/textarea&gt;
+    &lt;textarea id="reportDisplay" style="width:95%;height:30em;"&gt;&lt;/textarea&gt;
 &lt;/fieldset&gt;</code></pre>
                 <p>Below is the JavaScript code used for this app.</p>
 <pre><code id="jscode"></code></pre>
@@ -220,16 +201,10 @@ var BCLS = ( function (window, document) {
         account_id = document.getElementById('account_id'),
         client_id = document.getElementById('client_id'),
         client_secret = document.getElementById('client_secret'),
-        feedTitle = document.getElementById('feedTitle'),
-        feedDescription = document.getElementById('feedDescription'),
-        numberSelect = document.getElementById('numberSelect'),
-        searchStr = document.getElementById('searchStr'),
-        sortSelect = document.getElementById('sortSelect'),
-        directionSelect = document.getElementById('directionSelect'),
-        makeFeed = document.getElementById('makeFeed'),
+        makeReport = document.getElementById('makeReport'),
         logger = document.getElementById('logger'),
         apiRequest = document.getElementById('apiRequest'),
-        feedDisplay = document.getElementById('feedDisplay'),
+        reportDisplay = document.getElementById('reportDisplay'),
         allButtons = document.getElementsByName('button');
 
     /**
@@ -320,43 +295,8 @@ var BCLS = ( function (window, document) {
             for (i = 0; i < iMax; i += 1) {
                 video = videosArray[i];
                 // video may not have a valid source
-                if (isDefined(video.source) && isDefined(video.source.src)) {
-                    videoURL = encodeURI(video.source.src.replace(/&/g, '&amp;'));
-                } else {
-                    videoURL = "";
-                }
-                // depending on when/how the video was created, it may have different thumbnail properties or none at all
-                if (isDefined(video.images) && isDefined(video.images.thumbnail)) {
-                    thumbnailURL = encodeURI(video.images.thumbnail.sources[0].src.replace(/&/g, '&amp;'));
-                } else if (isDefined(video.thumbnail)) {
-                    thumbnailURL = encodeURI(video.thumbnail.replace(/&/g, '&amp;'));
-                } else {
-                    doThumbnail = false;
-                }
-
-                pubdate = new Date(video.created_at).toGMTString();
-                mrssStr += sItem;
-                mrssStr += sLink + 'https://players.brightcove.net/' + accountId + '/default_default/index.html?videoId=' + video.id + eLink;
-                mrssStr += sPubDate + pubdate + ePubDate;
-                mrssStr += sMediaContent + ' url="' + videoURL + '" fileSize="' + video.source.size + '" type="video/quicktime" medium="video" duration="' + video.duration / 1000 + '" isDefault="true" height="' + video.source.height + '" width="' + video.source.width + '">';
-                mrssStr += sMediaPlayer + ' url="' + 'https://players.brightcove.net/' + accountId + '/default_default/index.html?videoId=' + video.id + '"' + eMediaPlayer;
-                mrssStr += sMediaTitle + video.name + eMediaTitle;
-                mrssStr += sMediaDescription + video.description + eMediaDescription;
-                if (doThumbnail) {
-                    mrssStr += sMediaThumbnail + ' url="' + thumbnailURL + '"';
-                    if (isDefined(video.images)) {
-                        mrssStr += ' height="' + video.images.thumbnail.sources[0].height + '" width="' + video.images.thumbnail.sources[0].width + '"' + eMediaThumbnail;
-                    } else {
-                        mrssStr += eMediaThumbnail;
-                    }
-                }
-                mrssStr += eMediaContent;
-                mrssStr += eItem;
-            }
-        }
-        mrssStr += eChannel + '</rss>';
         logger.textContent = 'Finished!'
-        feedDisplay.textContent = vkbeautify.xml(mrssStr);
+        reportDisplay.textContent = vkbeautify.xml(mrssStr);
         enableButtons();
     }
 
@@ -371,20 +311,14 @@ var BCLS = ( function (window, document) {
         disableButtons();
         switch (id) {
             case 'getCount':
-                endPoint = accountId + '/counts/videos?sort=' + sort;
-                if (isDefined(search)) {
-                    endPoint += '&search=' + search;
-                }
+                endPoint = accountId + '/counts/videos?sort=created_at';
                 requestData.url = baseURL + endPoint;
                 requestData.requestType = 'GET';
                 apiRequest.textContent = requestData.url;
                 getMediaData(requestData, id);
                 break;
             case 'getVideos':
-            endPoint = accountId + '/videos?sort=' + sort + '&limit=' + limit + '&offset=' + limit * callNumber;
-            if (isDefined(search)) {
-                endPoint += '&search=' + search;
-            }
+            endPoint = accountId + '/videos?sort=created_at&limit=' + limit + '&offset=' + limit * callNumber;
             requestData.url = baseURL + endPoint;
             requestData.requestType = 'GET';
             apiRequest.textContent = requestData.url;
@@ -513,7 +447,7 @@ var BCLS = ( function (window, document) {
 
     function init() {
         // event handlers
-        makeFeed.addEventListener('click', function() {
+        makeReport.addEventListener('click', function() {
             var numVideos;
             // get the inputs
             clientId = client_id.value;
@@ -531,28 +465,12 @@ var BCLS = ( function (window, document) {
             } else {
                 accountId = '1752604059001';
             }
-            sort = getSelectedValue(sortSelect);
-            sortDirection = getSelectedValue(directionSelect);
-            if (isDefined(sortDirection)) {
-                sort = sortDirection + sort;
-            }
-            search = searchStr.value;
-            numVideos = getSelectedValue(numberSelect);
-            // add title and description
-            mrssStr += sChannel + sTitle + feedTitle.value + eTitle + sDescription + feedDescription.value + eDescription;
-            // if all videos wanted, get count; otherwise get videos
-            if (numVideos === 'all') {
-                // we need to get the count
-                setRequestData('getCount');
-            } else {
-                totalVideos = parseInt(numVideos);
-                totalCalls = Math.ceil(numVideos / limit);
-                logger.textContent = 'Total videos to retrieve: ' + totalVideos;
-                setRequestData('getVideos');
+            // we need to get the count
+            setRequestData('getCount');
             }
         });
-        feedDisplay.addEventListener('click', function() {
-            feedDisplay.select();
+        reportDisplay.addEventListener('click', function() {
+            reportDisplay.select();
         });
     }
 
