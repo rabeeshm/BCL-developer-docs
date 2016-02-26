@@ -50,22 +50,22 @@
         <div id="main" class="large-10 small-12 columns">
             <div id="top" class="section">
                 <h1 id="bclPageHeading">HLS Plugin Guide</h1>
-                <p class="BCL-aside">The HLS plugin is loaded in the player automatically. For information on all plugins automatically loaded see <a href="plugin-guide.html#defaultplugins">Player Plugin Overview - Default Plugins</a>.</p>
                 <!-- content starts here -->
-                <p class="BCL-objective">The HLS plugin is a Brightcove player plugin that plays HLS video on platforms that don&#39;t support it but have Flash. The HLS plugin is automatically included in the player. With the plugin you can then use HLS (m3u8) video content in the player. For instance you could create a player using this configuration for the media section:</p>
+                <p class="BCL-objective">The HLS plugin is a Brightcove player plugin that relies on W3C's Media Source Extensions (MSE) to play HLS video on platforms that do not natively support it. The HLS plugin is automatically included in the player.</p>
+                <p class="BCL-aside">Note: Wikipedia defines MSE as a W3C specification that allows JavaScript to send byte streams to media codecs within web browsers that support HTML5 video. Among other possible uses, this allows the implementation of client-side prefetching and buffering code for streaming media entirely in JavaScript.</p>
+                <p>With the plugin you can then use HLS (m3u8) video content in the player. For instance you could create a player using this configuration for the media section:</p>
                 <pre><code>"media":{
     "sources": [{
         "src": "http://example.com/video.m3u8",
         "type": "application/x-mpegURL"
     }]
 }</code></pre>
-                <p>The rest of this document deals with downloading and using the plugin on its own.</p>
+                <p>Flash will be used as a fallback to play HLS only on older browsers (mostly IE10 and IE11 on Windows 7).
                 <p class="BCL-aside">Cross-origin resource sharing (CORS) can be an issue when using HLS. For more information about using CORS, see the <a href="../../concepts/cors/cors.html">CORS guide</a>.</p>
             </div>
             <div id="overview" class="section">
                 <h2>Overview</h2>
-                    <p><a href="https://developer.apple.com/streaming/">HTTP Live Streaming</a> (HLS) has become a de-facto standard for streaming video on mobile devices
-                        thanks to its native support on iOS and Android. There are a number of reasons independent of platform to recommend the format, though:</p>
+                    <p><a href="https://developer.apple.com/streaming/">HTTP Live Streaming</a> (HLS) has become a de-facto standard for streaming video on mobile devices thanks to its native support on iOS and Android. There are a number of reasons independent of platform to recommend the format, though:</p>
                     <ul>
                         <li>Supports (client-driven) adaptive bitrate selection</li>
                         <li>Delivered over standard HTTP ports</li>
@@ -73,8 +73,8 @@
                         <li>No proprietary streaming servers required</li>
                     </ul>
                     <p>Unfortunately, all the major desktop browsers except for Safari are missing HLS support. That leaves web developers in the unfortunate position of having to maintain alternate renditions of the same video and potentially having to forego HTML-based video entirely to provide the best desktop viewing experience.</p>
-                    <p>This plugin attempts to address that situation by providing a polyfill for HLS on browsers that have Flash support. You can deploy a single HLS stream, code against the regular HTML5 video APIs, and create a fast, high-quality video experience across all the big web device categories.</p>
-                    <p>The videojs-hls plugin is still working towards a 1.0 release so it may not fit your requirements today. Specifically, there is <em>no</em> support for:</p>
+                    <p>This plugin addresses the situation by providing a polyfill for HLS on browsers that have Media Source Extensions or Flash support. You can deploy a single HLS stream, code against the regular HTML5 video APIs, and create a fast, high-quality video experience across all the big web device categories.</p>
+                    <p>Currently, at this time there is <em>no</em> support for:</p>
                     <ul>
                         <li>Alternate audio and video tracks</li>
 <!--                        <li>Subtitles</li>-->
@@ -82,6 +82,7 @@
 <!--                        <li>Live streams</li>-->
                         <li>Internet Explorer &lt; 10</li>
                     </ul>
+                    <p class="BCL-aside">Note: For maximum compatibility with all MSE implementations, Brightcove recommends setting <strong>audio_bitrate</strong> to no less than <strong>48</strong> in your ingest profiles.</p>
                 </div>
         <div id="options" class="section">
           <h2>Options</h2>
@@ -172,29 +173,33 @@
             <li>TXXX - User defined text information frame</li>
         </ul>
         <p> Cues are created for all other frame types and the data is attached to the generated cue:</p>
-        <pre><code>cue.frame.data</pre></code>
+        <pre><code>cue.frame.data</code></pre>
         <p>For more information about text tracks in general see <a href="//www.html5rocks.com/en/tutorials/track/basics/">Getting Started With the Track Element</a>. For information on Brightcove Player and cue points see <a href="cue-points-guide.html">Using Cue Points</a>.</p>
       </div>
-            <div id="hosting" class="section">
-                <h2>Hosting issues</h2>
-                <div class="BCL-concept">
-                    <p>Unlike a native HLS implementation, the HLS plugin has to comply with the browser&#39;s security policies. That means that all the files that make up the stream must be served from the same domain as the page hosting the video player or from a server that has appropriate <a href="https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS">CORS headers</a> configured. Easy <a href="http://enable-cors.org/server.html">instructions are available</a> for popular webservers and most CDNs should have no trouble turning CORS on for your account.</p> </div>
-            </div>
-            <div class="section" id="BCLreferences">
-                <h2>Related Topics</h2>
-                <ul>
-                    <li><a href="//www.html5rocks.com/en/tutorials/track/basics/">Getting Started With the Track Element</a>
-                    </li>
-                    <li><a href="ima-plugin.html">New Player Plugin: IMA</a>
-                    </li>
-                    <li><a href="../../brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a>
-                    </li>
-                    <li><a href="../../player-management/getting-started/player-mgmt-quick-start.html">Quick Start to Player Management</a>
-                    </li>
-                </ul>
-            </div>
-
+      <div id="608captions" class="section">
+        <h2>608 captions</h2>
+        <p>Brightcove's HLS plugin has support for 608 captions. 608 captions, which are commonly referred to as Line 21 captions, are a standard for closed captioning for NTSC TV analog broadcasts in the United States and Canada.</p>
+      </div>
+      <div id="hosting" class="section">
+          <h2>Hosting issues</h2>
+          <div class="BCL-concept">
+              <p>Unlike a native HLS implementation, the HLS plugin has to comply with the browser&#39;s security policies. That means that all the files that make up the stream must be served from the same domain as the page hosting the video player or from a server that has appropriate <a href="https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS">CORS headers</a> configured. Easy <a href="http://enable-cors.org/server.html">instructions are available</a> for popular webservers and most CDNs should have no trouble turning CORS on for your account.</p> </div>
+      </div>
+      <div class="section" id="BCLreferences">
+          <h2>Related Topics</h2>
+          <ul>
+              <li><a href="//www.html5rocks.com/en/tutorials/track/basics/">Getting Started With the Track Element</a>
+              </li>
+              <li><a href="ima-plugin.html">New Player Plugin: IMA</a>
+              </li>
+              <li><a href="../../brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a>
+              </li>
+              <li><a href="../../player-management/getting-started/player-mgmt-quick-start.html">Quick Start to Player Management</a>
+              </li>
+          </ul>
+      </div>
     </div>
+  </div>
     <!-- bcl scripts============================================================-->
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.2/gist-embed.min.js"></script>
@@ -212,7 +217,6 @@
     <script id="pageScript" type="text/javascript">
         /******** Any scripts specific to page samples should go here *********/
     </script>
-    </div>
     <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
     <script>
 	var feedbackMail = document.getElementById("feedbackMail");

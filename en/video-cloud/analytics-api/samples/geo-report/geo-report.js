@@ -1,4 +1,4 @@
-var BCLS = (function (window, document, $, Handlebars) {
+var BCLS = (function (window, document, $, Handlebars, datepickr) {
     "use strict";
     var proxyURL = "http://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
         useMyAccount = document.getElementById("useMyAccount"),
@@ -13,6 +13,8 @@ var BCLS = (function (window, document, $, Handlebars) {
         $geoSelector = $("#geoSelector"),
         $reportTableBody = $("#reportTableBody"),
         $fromDate = $("#fromDatePicker"),
+        fromDatePickr = document.getElementById('fromDatePicker'),
+        toDatePickr = document.getElementById('toDatePicker'),
         $toDate = $("#toDatePicker"),
         $getData = $("#getData"),
         $gettingDataDisplay = $("#gettingDataDisplay"),
@@ -38,10 +40,10 @@ var BCLS = (function (window, document, $, Handlebars) {
         },
         // more robust test for strings "not defined"
         isDefined =  function (v) {
-            if(v === "" || v === null || v === "undefined") { 
-                return false; 
-            } else { 
-                return true; 
+            if(v === "" || v === null || v === "undefined") {
+                return false;
+            } else {
+                return true;
             }
         },
         displayData = function () {
@@ -87,9 +89,9 @@ var BCLS = (function (window, document, $, Handlebars) {
                 type: "POST",
                 data: options,
                 success : function (data) {
-                    var template, i, itemsmax, item, selectedGeo = $geoSelector.val();
+                    var template, data, i, itemsmax, item, selectedGeo = $geoSelector.val();
                     try {
-                       var data = JSON.parse(data);
+                       data = JSON.parse(data);
                     } catch (e) {
                        alert('invalid json');
                     }
@@ -101,6 +103,7 @@ var BCLS = (function (window, document, $, Handlebars) {
                             $gettingDataDisplay.text("Video data retrieved");
                             break;
                         case "analytics":
+                            console.log('data', data);
                             itemsmax = data.items.length;
                             for (i = 0; i < itemsmax; i++) {
                                 item = data.items[i];
@@ -155,12 +158,10 @@ var BCLS = (function (window, document, $, Handlebars) {
             makeAnalyticsCall(callURL, callType);
         };
     // add date pickers to the date input fields
-    new datepickr ("fromDatePicker", {
-        "fullCurrentMonth": false,
-        "dateFormat": "Y-m-d"
+    datepickr (fromDatePickr, {
+        'dateFormat': 'Y-m-d'
     });
-    new datepickr ("toDatePicker", {
-        "fullCurrentMonth": false,
+    datepickr (toDatePickr, {
         "dateFormat": "Y-m-d"
     });
 
@@ -182,8 +183,8 @@ var BCLS = (function (window, document, $, Handlebars) {
     $client_secret.on("blur", function () {
         // refetch player and video data
         getVideoData();
-    })
+    });
     // get initial players and video data
     getVideoData();
     return {};
-})(window, document, $, Handlebars);
+})(window, document, $, Handlebars, datepickr);

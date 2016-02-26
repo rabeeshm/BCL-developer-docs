@@ -29,6 +29,12 @@
 
 </script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
+	
+	<style>
+	  #downloadButton {
+		margin-top: -9px;
+	  } 
+	</style>
 </head>
 
 <body>
@@ -92,7 +98,7 @@
 
       <div id="selectimplementation" class="section">
 				<h2>Select implementation</h2>
-				<p>In this sample, the functionality is contained in the code and CSS with no dependencies on the parent page, so a plugin is a good choice for this functionality.</p>
+				<p>In this sample, the functionality is contained in the code and CSS with no dependencies on the parent page, so a plugin is a good choice for this functionality. You may not choose to use the iframe implementation, because some browsers will try to open the downloaded video within the iframe instead of downloading the video.</p>
 			</div>
 
 			<div id="resources" class="section">
@@ -104,20 +110,26 @@
         </ul>
         <h3>Brightcove Player API methods</h3>
         <ul>
-            <li><code>options()</code></li>
-            <li><code>catalog.getVideo()</code></li>
-            <li><code>catalog.load()</code></li>
             <li><code>el()</code></li>
         </ul>
         <h3>Brightcove Player API events</h3>
         <ul>
-            <li>none</li>
+            <li>loadstart</li>
         </ul>
 			</div>
 			<div id="player" class="section">
 				<h2>The player</h2>
 				<p>Click the download icon located on the right side of the control bar to download the highest quality MP4 rendition of the video loaded in the player.</p>
-        <iframe width='640' height='360' src='//players.brightcove.net/1752604059001/eab91441-ce41-4c12-8322-4b70ce6ac324_default/index.html' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
+				
+				<video id="myPlayerID" style="width: 640px; height: 360px;"
+					data-video-id="4093643993001"
+					data-account="1752604059001"
+					data-player="VJuPrI3cg"
+					data-embed="default"
+					class="video-js"
+					controls></video>
+				<script src="//players.brightcove.net/1752604059001/VJuPrI3cg_default/index.min.js"></script>
+				
 			</div>
 
        <div id="code" class="section">
@@ -132,16 +144,20 @@
               <li>Copy the In-Page embed code and paste it into a new HTML file.</li>
           </ol>
           <p class="BCL-aside">For details on how to get this embed code, see the <a href="../../brightcove-player/getting-started/quick-start-bc-player.html">Quick Start to Brightcove Player</a> document.</p>
-          <p>The embed code should look like this:</p>
-          <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="27-34"></code></p>
+          <p>The embed code should look similar to this:</p>
+          <p class="video-cloud-only"><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="446-453"></code></p>
+          <p class="perform-only"><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="446,448-453"></code></p>
 
         <h3>The JavaScript code</h3>
         <p>The following provides an overview of the functionality of the code:</p>
             <ol>
+<!--
                 <li>Retrieve the video ID of video in the player. Notice that the data retrieved by the <code>options()</code> method includes <code>data-video-id</code>.
                 <div><img src="/en/video-cloud/brightcove-player/guides/assets/download-options.png" alt="download options"></div>
                 </li>
-                <li>Use the video's ID to get the video object and load the video. This may seem unnecessary as the video is already playing, but you need to load the video to populate the <code>mediainfo</code> property.</li>
+-->
+<!--                <li>Use the video's ID to get the video object and load the video. This may seem unnecessary as the video is already playing, but you need to load the video to populate the <code>mediainfo</code> property.</li>-->
+                <li>Listen for the <code>loadstart</code> event, at which time the <code>mediainfo</code> property will be populated.</li>
                 <li>Retrieve the <code>sources</code> array from the <code>mediainfo</code> property, which includes as elements all renditions of the currently loaded video.
                     <div><img src="/en/video-cloud/brightcove-player/guides/assets/download-mediainfo.png" alt="download mediainfo"></div></li>
                 <li>Create another array which contains the filtered and sorted renditions so only the MP4 renditions are in a new array, sorted from largest to smallest.</li>
@@ -151,31 +167,33 @@
 
         <p>The following code is the actual implementation of the general steps above.</p>
             <ul>
-                <li>Lines 38-45: Create variables used later in the code.</li>
-                <li>Line 47: Assign a variable the video ID, retrieved from data by calling the <code>options()</code> method.</li>
-                <li>Line 48: Use the <code>getVideo()</code> method, passing the video ID as a parameter, to get the video object of the currently playing video.</li>
-                <li>Line 49: Use the <code>load()</code> method.</li>
-                <li>Line 50: Assign the <code>name</code> of the video to a variable for later use in the link tag.</li>
-                <li>Line 51: Assign the <code>sources</code> array to a variable.</li>
-                <li>Line: 52: Assign the length of the array to variable.</li>
-                <li>Lines 53-57: Loop over the array and assign to a second array renditions where the <code>container</code> is <strong>MP4</strong>, AND the rendition has a <code>src</code> property. The MP4 renditions appear twice in the <code>sources</code> array, once with a <code>src</code> property and once with a <code>stream_name</code> property. The first is for progressive download and the second for streaming.</li>
-                <li>Lines 58-60: Sort the array of MP4s.</li>
-                <li>Line 61: Assign the largest rendition to a variable.</li>
-                <li>Lines 62-65: Define and create and a <code>div</code> tag that contains the link.</li>
-                <li>Lines 66-67: Retrieve the <code>vjs-control-bar</code> element and append the newly create <code>div</code> to it. It may seem odd that with an append the icon appears on the left side of the control bar, but this is because all the other elements on the control bar are positioned using CSS.</li>
+                <li>Line 469: Listens for the <code>loadstart</code> event.</li>
+                <li>Line 471: Assigns the <code>name</code> of the video to a variable for later use in the link tag.</li>
+                <li>Line 472: Assigns the <code>sources</code> array to a variable.</li>
+                <li>Line: 473: Assigns the length of the array to variable.</li>
+                <li>Lines 473-478: Loop over the array and assign to a second array renditions where the <code>container</code> is <strong>MP4</strong>, AND the rendition has a <code>src</code> property. The MP4 renditions appear twice in the <code>sources</code> array, once with a <code>src</code> property and once with a <code>stream_name</code> property. The first is for progressive download and the second for streaming.</li>
+                <li>Lines 480-482: Sort the array of MP4s.</li>
+                <li>Line 484: Assigns the largest rendition to a variable.</li>
+				<li>Lines 487-488: Assign the <code>id</code> and <code>className</code> attributes for the newly created <code>div</code> element for the icon.</li>
+				<li>Lines 491-493: Assign image and link element attributes.</li>
+				<li>Lines 484-495: Append child elements to parents.</li>
+				<li><p>Lines 498-502: Get the spacer element, set the style to right justify the content and places the new icon element in the spacer.</p>
+				<p class="BCL-aside">Note: For more details about control bar icons, see the <a href="../../brightcove-player/guides/customize-appearance.html#iconmanipulation">Controlbar icon manipulation</a> section of the Customize Player Appearance document.</p></li>
+				   
             </ul>
-          <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="36-70"></code></p>
+          <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="456-505"></code></p>
 
            <h3>The stylesheet</h3>
         <p>This example uses CSS styles for the Brightcove player.</p>
 		  <ul>
+<!--
               <li><p>Lines 10-14: Set the order of the download button in the control bar. This example places the download video button to the right of the fullscreen button.</p>
               <p class="BCL-aside">Note: the control bar uses a flex container to layout its elements. By default, flex items are laid out as they appear in the HTML source code. The CSS <code>order</code> property allows you to control the position of flex elements. For older browsers, you need to include additional prefixed order properties.</p>
-              <p>For more details about setting the control bar icon order, see the <a href="../../brightcove-player/guides/customize-appearance.html#iconorder">Customize Player Appearance</a> document.</p></li>
-			  <li>Line 15: Positions the download icon vertically.</li>
-              <li>Lines 17-21: Set the dimensions for the container and horizontally center the download icon within the container.</li>
+              <p></li>
+-->
+              <li>This code sets the dimensions for the container and horizontally positions the download icon within the container.</li>
 		  </ul>
-        <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="7-22"></code></p>
+        <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="435-441"></code></p>
 	  </div>
 
 			<div id="plugin" class="section">
@@ -187,11 +205,11 @@
                 <ol>
                   <li>Create a new file for your plugin JavaScript code. In this case, name it <code>download-video.js</code>.</li>
                   <li>Cut and paste the JavaScript code from your main HTML file into this new file.</li>
-                  <li>Lines 153,185: Wrap your JavaScript code using the <code>videojs.plugin()</code> function. The first argument, <code>downloadVideoPlugin</code>, is the plugin name.</li>
-                  <li>Line 154: Gets a reference to your player.</li>
+                  <li>Lines 527,575: Wrap your JavaScript code using the <code>videojs.plugin()</code> function. The first argument, <code>downloadVideoPlugin</code>, is the plugin name.</li>
+                  <li>Line 530: Gets a reference to your player.</li>
                     <li><p>The rest is your JavaScript code which was reviewed in a previous section.</p>
-                <p class="BCL-aside">Note: Line 185: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</p>
-          <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="153-185"></code></p></li>
+                <p class="BCL-aside">Note: Line 575: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</p>
+          <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="527-575"></code></p></li>
                   <li><p>In the HTML file, add the following code just below the existing <code>&lt;script&gt;</code> tags. This code includes the JavaScript file and then calls the method defined in that JavaScript.</p>
                 <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="287-288" ></code></p></li>
 
@@ -204,7 +222,7 @@
                   <li>Create a new file for your CSS styles. In this case, name it <code>download-video.css</code>.</li>
                   <li>Cut and paste the CSS code from your main HTML file into this new file.</li>
                   <li><p>Remove the opening <code>&lt;style&gt;</code> tag and the closing <code>&lt;/style&gt;</code> tag. Your code should look similar to this:</p>
-                  <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="292-308" ></code></p></li>
+                  <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="514-521" ></code></p></li>
                   <li><p>In the <code>&lt;head&gt;</code> section of your HTML file, add the following link to include your newly created CSS file.</p>
               <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="285" ></code></p></li>
                   <li>Browse the HTML page. You should see the download video button, except now your styles have been removed from the HTML page.</li>
@@ -229,16 +247,17 @@
       <div id="useiframe" class="section">
         <h2>Use iframe</h2>
         <p>It is a best practice to use the iframe player implementation. Since you can create the download video functionality as a plugin, replace the In_Page embed implementation with the iframe implementation.</p>
-          <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="255-268"></code></p>
+		  <p class="BCL-aside">You may not want to use the iframe implementation, because some browsers will open the downloaded video within the iframe instead of downloading the video.</p>
+          <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="581-585"></code></p>
       </div>
 
       <div id="overlayimplementation" class="section">
         <h2>Overlay implementation</h2>
         <p>To replace the icon in the control bar, and have an overlay on the video, you need to make a few changes.</p>
         <p>First, in the JavaScript remove all the code that creates and displays the linked icon. Replace that code with code that creates and appends an overlay.</p>
-        <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="138-142"></code></p>
+        <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="134-138"></code></p>
         <p>You will also need to use CSS to style and place the overlay, which obviously can be changed to suit your implementation.</p>
-        <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="83-99"></code></p>
+        <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="83-94"></code></p>
         <p>If you wish to use this approach for your plugin, you will need to place the CSS into a separate file, save in a Internet accessible URL, and enter that URL when associating the plugin with a player in Studio.</p>
       </div>
 

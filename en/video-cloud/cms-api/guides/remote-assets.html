@@ -81,10 +81,12 @@ https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/<strong>ref:{refe
                 <p>In the request body, include a JSON object that minimally contains the video name, but may contain additional metadata:</p>
 <pre><code>{
     "name": "My Remote Video",
+    "complete": true,
     "description": "A short description of the video",
     "tags": ["remote", "fall_campaign"],
     "reference_id": "myUniqueReferenceID"
 }</code></pre>
+                <p class="BCL-aside">Note: the <code>"complete": true</code> parameter should be included <strong>ONLY</strong> for remote asset videos, but <strong>MUST</strong> be included for remote asset videos to play. If you have already created remote asset videos without including this param, just add it in <a href="../references/cms-api/versions/v1/index.html#api-videoGroup-Update_Video">update video</a> request.</p>
                 <p>For details of the create video operation, see the <a href="../references/cms-api/versions/v1/index.html#api-Video-Create_Video">API Reference</a>.</p>
             </div>
             <div class="section" id="addRenditions">
@@ -92,7 +94,33 @@ https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/<strong>ref:{refe
                 <p>Next, add one or more full-length remote video renditions by making a POST request to:</p>
                 <pre><code>https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/assets/renditions</code></pre>
                 <p>The JSON in the request body must contain minimally the remote url, but may contain other metadata for the rendion:</p>
-                <pre><code>{
+<pre><code>{
+    "video_duration": 31487,
+    "name": "RA - Great Blue Heron",
+    "remote_url": "http://learning-services-media.brightcove.com/videos/mp4/greatblueheron.mp4",
+    "encoding_rate": 983000,
+    "frame_height": 360,
+    "size": 3887659,
+    "frame_width": 640,
+    "video_codec": "h264",
+    "video_container": "MP4",
+    "progressive_download": true;
+}</code></pre>
+                <div class="BCL-aside">Notes:
+                    <ol>
+                        <li><p>Video Cloud does not inspect the remote video files, so providing additional metadate will enable Video Cloud to display this information in Studio (or in the Brightcove player, if you configure the player to display the metadata).</p>
+                    <p>For details of the add rendition operation, see the <a href="../references/cms-api/versions/v1/index.html#api-Assets-Add_Rendition">API Reference</a>.</li>
+                        <li>For the video to play properly, you must include the field <code>complete: true</code> when you create the video asset, or update the asset to set this field.</li>
+                        <li>Renditions for remote assets must have the <code>video_codec</code> and <code>video_container</code> fields to work properly.</li>
+                    </ol>
+                    </div>
+            </div>
+            <div class="section" id="digitalMaster">
+                <h2>Add digital master</h2>
+                <p>You can add the location and other details of the digital master by making a POST request to:</p>
+                <pre><code>https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/assets/digital_master</code></pre>
+                <p>The request body fields are the same as for renditions:</p>
+<pre><code>{
     "video_duration": 31487,
     "name": "RA - Great Blue Heron",
     "remote_url": "http://learning-services-media.brightcove.com/videos/mp4/greatblueheron.mp4",
@@ -101,23 +129,6 @@ https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/<strong>ref:{refe
     "size": 3887659,
     "frame_width": 640
 }</code></pre>
-                <p class="BCL-aside">Note: Video Cloud does not inspect the remote video files, so providing additional metadate will enable Video Cloud to display this information in Studio (or in the Brightcove player, if you configure the player to display the metadata).</p>
-                <p>For details of the add rendition operation, see the <a href="../references/cms-api/versions/v1/index.html#api-Assets-Add_Rendition">API Reference</a>.</p>
-            </div>
-            <div class="section" id="digitalMaster">
-                <h2>Add digital master</h2>
-                <p>You can add the location and other details of the digital master by making a POST request to:</p>
-                <pre><code>https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/assets/digital_master</code></pre>
-                <p>The request body fields are the same as for renditions:</p>
-                <pre><code>{
-                    "video_duration": 31487,
-                    "name": "RA - Great Blue Heron",
-                    "remote_url": "http://learning-services-media.brightcove.com/videos/mp4/greatblueheron.mp4",
-                    "encoding_rate": 983000,
-                    "frame_height": 360,
-                    "size": 3887659,
-                    "frame_width": 640
-                }</code></pre>
                 <p class="BCL-aside">Note: this is an <strong>optional</strong> step. Video Cloud does not used the digital master in any way - this is just a convenience step to allow you to store the location and other details of the digital master in your video metadata.</p>
                 <p>For details of the add digital master operation, see the <a href="../references/cms-api/versions/v1/index.html#api-Assets-Add_Digital_Master">API Reference</a>.</p>
             </div>
@@ -163,26 +174,61 @@ https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/assets
             <div class="section" id="addTextTracks">
                 <h2>Add text tracks</h2>
                 <p>Text tracks can be used to add captions, chapters, and other time-based metadata to your video.</p>
-                <p>Although there are POST and PATCH operations for <code>/assets/text_tracks</code>, these only work with the asset collection. To actually add the text tracks to a video, you must use the <a href="#api-Video-Update_Video">Update Video operation</a>:</p>
-                <p>Making a PATCH request to:</p>
-                <pre><code>https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}</code></pre>
-                <p>In the request body JSON, include the information about the text tracks and how they are to be used:</p>
-                <pre><code>{"text_tracks" : [ {
-"src" : "http://learning-services-media.brightcove.com/captions/bc_smart_fr.vtt",
-"srclang" : "fr",
-"label" : "français",
-"kind" : "captions",
-"mime_type" : null,
-"default" : false
-}, {
-"src" : "http://learning-services-media.brightcove.com/captions/bc_smart.vtt",
-"srclang" : "en",
-"label" : "English",
-"kind" : "captions",
-"mime_type" : null,
-"default" : true
-} ]}</code></pre>
-                <p>For additional information, see the <a href="../references/cms-api/versions/v1/index.html#api-Video-Update_Video">API Reference</a> and <a href="./webvtt.html">Adding WebVTT Captions</a>.</p>
+                <p>Although there are POST and PATCH operations for <code>/assets/text_tracks</code>, these only work with the asset collection. To actually add the text tracks to a video, you must use the <a href="#api-Video-Update_Video">Update Video operation</a>. Here are the full steps with sample code (assuming that you have already created your remote asset video):</p>
+                <ol>
+                    <li>
+                        Add the text_track asset:
+<pre><code>// POST to
+// https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/assets/text_tracks
+
+// request body
+{
+    "remote_url": "http://solutions.brightcove.com/bcls/assets/vtt/sea-marvels-chapters.vtt"
+}</code></pre>
+<p>You'll get a response like this:</p>
+<pre><code>{
+    "account_id": null,
+    "audio_only": false,
+    "cdn_origin_id": "",
+    "complete": true,
+    "controller_type": "",
+    "current_filename": "",
+    "id": "941fea73-c900-4316-bea0-920804fc747c",
+    "name": "",
+    "progressive_download": false,
+    "reference_id": null,
+    "remote_stream_name": null,
+    "remote_url": null,
+    "size": null,
+    "type": "TEXT_TRACK",
+    "updated_at": "2016-02-22T19:11:08.994Z",
+    "uploaded_at": "2016-02-22T19:11:08.994Z"
+}</code></pre>
+                    </li>
+                    <li>
+                        Add the text_track asset to the video:
+                        <p>Make a <strong>PATCH</strong> request to</p>
+<pre><code>https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}</code></pre>
+
+<p><strong>Request body</strong></p>
+
+<pre><code>// NOTE: do NOT include the URL for text tracks here
+// NOTE: the <strong>asset_id</strong> here is the <strong>id</strong> value from the first request
+
+{
+    "text_tracks": [
+        {
+            "srclang": "en",
+            "label": "Chapters",
+            "kind": "chapters",
+            "mime_type": null,
+            "default": true,
+            "asset_id": "941fea73-c900-4316-bea0-920804fc747c"
+        }
+    ]
+}</code></pre>
+                    </li>
+                </ol>
                 <p class="BCL-aside">Note: tracks (webVTT files) are supported in the Brightcove Player. To add captions for the old Smart Player, see <a href="#addCaptions">Add Captions</a>.</p>
             </div>
             <div class="section" id="addCaptions">

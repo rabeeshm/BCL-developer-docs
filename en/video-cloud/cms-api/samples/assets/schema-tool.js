@@ -10,14 +10,17 @@ var BCLS = (function (document, Handlebars) {
         playerHeight = document.getElementById('playerHeight'),
         videoID = document.getElementById('videoID'),
         video_id,
-        generateButton = document.getElementById('generateButton'),
+        generateMicrodata = document.getElementById('generateMicrodata'),
+        generateJSON_ld = document.getElementById('generateJSON_ld'),
         publishingCode = document.getElementById('publishingCode'),
         videoData = null,
         defaults = {},
+        useTemplate,
         template,
         result,
         schemaTemplates = {
-            EntertainmentBusiness: '<!-- Start Schema Code --> \n <div id="content"> \n <div itemscope itemtype="http://schema.org/VideoObject"> \n <meta itemprop="name" content="{{name}}"> \n <meta itemprop="description" content="{{description}}"> \n <meta itemprop="videoID" content="{{id}}"> \n <meta itemprop="duration" content="{{duration}}"> \n <link itemprop="thumbnail" href="{{thumbnailURL}}"> \n <link itemprop="embedURL" href="http://players.brightcove.net/{{account_id}}/{{playerID}}_default/index.html?videoID={{id}}"><meta itemprop="width" content="{{width}}"><meta itemprop="height" content="{{height}}"> \n <!-- End Schema Code --> \n <!-- Start Player Code --> \n <iframe src="//players.brightcove.net/{{accountID}}/default_default/index.html?videoID={{id}}" style="width:{{playerWidth}};height:{{playerHeight}}" allowfullscreen webkitallowfullscreen mozallowfullscreen><\/iframe>  height:{{playerHeight}} \n <!-- End Player Code --> \n <\/div> \n <\/div>'
+            MicroData: '<!-- Start Schema Code --> \n <div id="content"> \n <div itemscope itemtype="http://schema.org/VideoObject"> \n <meta itemprop="name" content="{{name}}"> \n <meta itemprop="description" content="{{description}}"> \n <meta itemprop="videoID" content="{{id}}"> \n <meta itemprop="duration" content="{{duration}}"> \n <link itemprop="thumbnail" href="{{thumbnailURL}}"> \n <link itemprop="embedURL" href="http://players.brightcove.net/{{account_id}}/{{playerID}}_default/index.html?videoID={{id}}"><meta itemprop="width" content="{{width}}"><meta itemprop="height" content="{{height}}"> \n <!-- End Schema Code --> \n <!-- Start Player Code --> \n <iframe src="//players.brightcove.net/{{accountID}}/default_default/index.html?videoID={{id}}" style="width:{{playerWidth}};height:{{playerHeight}}" allowfullscreen webkitallowfullscreen mozallowfullscreen><\/iframe>  height:{{playerHeight}} \n <!-- End Player Code --> \n <\/div> \n <\/div>',
+            json_ld: '<!-- Start Schema Code --> \n <script type="application/ld+json"> \n {"@context": "http://schema.org/", \n "@type": "VideoObject", \n "name": "{{name}}", \n "@id": "{{url}}", \n "datePublished": "{{created_at}}", \n "interactionStatistic": [ \n {"@type": "InteractionCounter", \n "interactionType": "http://schema.org/WatchAction", \n "userInteractionCount": "{{total_plays}}" \n ]} \n </script> \n <!-- End Schema Code --> \n <!-- Start Player Code --> \n <iframe src="//players.brightcove.net/{{accountID}}/default_default/index.html?videoID={{id}}" style="width:{{playerWidth}};height:{{playerHeight}}" allowfullscreen webkitallowfullscreen mozallowfullscreen><\/iframe>  height:{{playerHeight}} \n <!-- End Player Code --> \n '
         };
 
     /**
@@ -79,6 +82,7 @@ var BCLS = (function (document, Handlebars) {
                         if (httpRequest.status === 200) {
                             // add/remove folder video return no data
                             videoData = JSON.parse(httpRequest.responseText);
+                            videoData.url = 'http://http://players.brightcove.net/' + account_id + '/default_default/index.html';
                             generateSchema();
                             // re-enable the buttons
                         } else {
@@ -103,20 +107,22 @@ var BCLS = (function (document, Handlebars) {
     }
 
     function generateSchema() {
+        console.log('videoData', videoData);
         // insert other data that the schema needs
         videoData.playerID = isDefined(playerID.textContent) ? playerID.textContent : defaults.playerID;
         videoData.playerWidth = isDefined(playerWidth.textContent) ? playerWidth.textContent : defaults.playerWidth;
         videoData.playerHeight = isDefined(playerHeight.textContent) ? playerHeight.textContent : defaults.playerHeight;
         // convert the duration to ISO format schema needs
         videoData.duration = secondsToTime(videoData.duration / 1000);
-        template = Handlebars.compile(schemaTemplates.EntertainmentBusiness);
+        template = Handlebars.compile(schemaTemplates[useTemplate]);
         result = template(videoData);
         publishingCode.textContent = result;
     }
-    // set listeners for button
-    generateButton.addEventListener("click", function () {
+    // set listeners for buttons
+    generateMicrodata.addEventListener("click", function () {
         // data setup
         var options = {};
+        useTemplate = 'MicroData';
         options.client_id = (isDefined(clientID.value)) ? clientID.value : defaults.client_id;
         options.client_secret = (isDefined(clientSecret.value)) ? clientSecret.value : defaults.client_secret;
         account_id = (isDefined(accountID.value)) ? accountID.value : defaults.account_id;
@@ -125,6 +131,21 @@ var BCLS = (function (document, Handlebars) {
         options.requestType = "GET";
         getMediaData(options);
     });
+
+    generateJSON_ld.addEventListener("click", function () {
+        // data setup
+        console.log('click');
+        var options = {};
+        useTemplate = 'json_ld';
+        options.client_id = (isDefined(clientID.value)) ? clientID.value : defaults.client_id;
+        options.client_secret = (isDefined(clientSecret.value)) ? clientSecret.value : defaults.client_secret;
+        account_id = (isDefined(accountID.value)) ? accountID.value : defaults.account_id;
+        video_id = (isDefined(videoID.value)) ? videoID.value : defaults.videoID;
+        options.url = 'https://cms.api.brightcove.com/v1/accounts/' + account_id + '/videos/' + video_id;
+        options.requestType = "GET";
+        getMediaData(options);
+    });
+
     publishingCode.addEventListener('click', function() {
         publishingCode.select();
     });
