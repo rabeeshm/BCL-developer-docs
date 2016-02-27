@@ -141,31 +141,7 @@
     <script src="//docs.brightcove.com/en/scripts/vkbeautify.0.99.00.beta.js"></script>
 <script id="pageScript">
 var BCLS = ( function (window, document) {
-        var reportStr = '<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:dcterms="http://purl.org/dc/terms/">',
-        sChannel = '<channel>',
-        eChannel = '</channel>',
-        sTitle = '<title>',
-        eTitle = '</title>',
-        sDescription = '<description>',
-        eDescription = '</description>',
-        sItem = '<item xmlns:media="http://search.yahoo.com/mrss/" xmlns:dcterms="http://purl.org/dc/terms/">',
-        eItem = '<dcterms:valid xmlns:dcterms="http://purl.org/dc/terms/">end=2020-10-15T00:00+01:00; scheme=W3C-DTF</dcterms:valid><dcterms:type>live-video</dcterms:type></item>',
-        sLink = '<link>',
-        eLink = '</link>',
-        sPubDate = '<pubDate>',
-        ePubDate = '</pubDate>',
-        sMediaContent = '<media:content',
-        eMediaContent = '</media:content>',
-        sMediaPlayer = '<media:player',
-        eMediaPlayer = '/>',
-        sMediaDescription = '<media:description>',
-        eMediaDescription = '</media:description>',
-        sMediaThumbnail = '<media:thumbnail',
-        eMediaThumbnail = '/>',
-        sMediaTitle = '<media:title>',
-        eMediaTitle = '</media:title>',
-        // account stuff
-        accountId,
+        var accountId,
         clientId,
         clientSecret,
         // api stuff
@@ -279,8 +255,8 @@ var BCLS = ( function (window, document) {
         callback(hlsRenditions, mp4HTTPRenditions, mp4RTMPRenditions, otherRenditions);
     }
 
-    function addItems() {
-        var i, iMax, video, pubdate, videoURL, thumbnailURL, doThumbnail = true;
+    function writeReport() {
+        var i, iMax, video;
         if (videosArray.length > 0) {
             iMax = videosArray.length;
             for (i = 0; i < iMax; i += 1) {
@@ -331,28 +307,16 @@ var BCLS = ( function (window, document) {
                                 videosArray[callNumber].otherRenditions = otherRenditions;
                             });
 
-                        } else {
-                            // video has no renditions
-                            videosArray[callNumber].source = null;
                         }
                         callNumber++;
                         if (callNumber < iMax) {
                             setRequestData('getVideoRenditions');
                         } else {
-                            // remove videos with no renditions
-                            i = videosArray.length;
-                            while (i > 0) {
-                                i--;
-                                console.log('videosArray[i]', videosArray[i]);
-                                if (!isDefined(videosArray[i].source)) {
-                                    console.log('i', i);
-                                    videosArray.splice(i, 1);
-                                }
-                            }
-                            addItems();
+                            // write the report
+                            writeReport();
                         }
                     };
-                endPoint = accountId + '/videos/' + videosArray[callNumber].id + '/renditions';
+                endPoint = accountId + '/videos/' + videosArray[callNumber].id + '/assets/renditions';
                 requestData.url = baseURL + endPoint;
                 requestData.requestType = 'GET';
                 apiRequest.textContent = requestData.url;
