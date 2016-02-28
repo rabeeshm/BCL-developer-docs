@@ -62,7 +62,7 @@
                 <p>Like most of Brightcove's RESTful APIs, the CMS API requires OAuth access tokens to authorize requests. In order to get access tokens, you first need to obtain client credentials with permissions for kinds of operations you want to request.</p>
                 <ol>
                   <li>To obtain your credentials follow the instructions in <a href="../guides/managing-api-credentials.html">Managing API Credentials</a>. This is the recommended way of obtaining your client credentials. This sample only requires <code>/video/read</code> permissions, but in most cases, you will likely want to get all permissions:
-                    <div><img src="../getting-started/assets/quick-start-required-permissions.png" width="466" height="178"></div>
+                    <div><img src="../getting-started/assets/quick-start-required-permissions.png" alt="required permissions" width="466" height="178"></div>
                     <p>You can also obtain credentials using the OAuth API, following the instructions in one of the guides listed below:</p></li>
                   </ol>
                   <ul>
@@ -70,11 +70,6 @@
                     <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">OAuth: Get Client Credentials Using Postman</a></li>
                   </ul>
                 </div>
-                <div class="section" id="dependencies">
-                    <h2>Dependencies</h2>
-                    <ul>
-                        <li><a href="https://github.com/vkiryukhin/vkBeautify">vkBeautify</a> (to pretty-print the XML for the MRSS feed)</li>
-                    </ul>
             <div class="section" id="workingSample">
                 <h2>Working sample</h2>
                 <p>You can use the form below to generate a sample MRSS feed either for your own account or for a sample Brightcove account.</p>
@@ -156,6 +151,8 @@ var BCLS = ( function (window, document) {
         callNumber = 0,
         videosArray = [],
         summaryData = {},
+        reportStr,
+        summaryReportStr,
         // elements
         account_id = document.getElementById('account_id'),
         client_id = document.getElementById('client_id'),
@@ -185,7 +182,6 @@ var BCLS = ( function (window, document) {
     function getSelectedValue(e) {
         return e.options[e.selectedIndex].value;
     }
-
 
     /**
      * disables all buttons so user can't submit new request until current one finishes
@@ -256,11 +252,37 @@ var BCLS = ( function (window, document) {
     }
 
     function writeReport() {
-        var i, iMax, video;
+        var i,
+            iMax,
+            video,
+            gethlsRenditions,
+            hlsRenditions,
+            getmp4HTTPRenditions,
+            mp4HTTPRenditions;
+        reportStr = '<h3>Detailed Video Report</h3><table><thead><tr><th>ID</th><th>Name</th><th>HLS Renditions</th><th>MP4 Rendition (HTTP)<br />bitrate range(kbps)</th><th>MP4 Renditions<br />(RTMP)</th><th>Other Renditions</th></tr></thead><tbody>';
+        summaryReportStr = '<h3>Summary Report</h3><table><thead><tr><th>Videos with <strong>no</strong> HLS Renditions<br /><button id="gethlsRenditions">Get the ids</button><br /><textarea id="hlsRenditions" style="width:100px;height:100px;"></textArea></th><th>Videos with no HTTP MP4 Renditions<br /><button id="getmp4HTTPRenditions">Get the ids</button><br /><textarea id="mp4HTTPRenditions" style="width:100px;height:100px;"></textArea></th><th>HLS Renditions</th><th>MP4 Rendition<br />(HTTP)</th><th>MP4 Renditions<br />(RTMP)</th><th>Other Renditions</th></tr></thead><tbody>'
+        summaryData.hlsRenditions = [];
+        summaryData.mp4HTTPRenditions = [];
+        summaryData.mp4RTMPRenditions = [];
+        summaryData.otherRenditions = [];
         if (videosArray.length > 0) {
             iMax = videosArray.length;
             for (i = 0; i < iMax; i += 1) {
                 video = videosArray[i];
+                // prepare the summary data
+                if (video.hlsRenditions.length > 0) {
+                    summaryData.hlsRenditions.push(video.id);
+                }
+                if (video.mp4HTTPRenditions.length > 0) {
+                    summaryData.mp4HTTPRenditions.push(video.id);
+                }
+                if (video.mp4RTMPRenditions.length > 0) {
+                    summaryData.mp4RTMPRenditions.push(video.id);
+                }
+                if (video.otherRenditions.length > 0) {
+                    summaryData.otherRenditions.push(video.id);
+                }
+
                 // video may not have a valid source
         logger.textContent = 'Finished!'
         reportDisplay.innerHTML = reportStr;
