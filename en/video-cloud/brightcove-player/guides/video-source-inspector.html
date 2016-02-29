@@ -70,8 +70,8 @@
                   </ul>
                 </div>
             <div class="section" id="workingSample">
-                <h2>Working sample</h2>
-                <p>You can use the form below to generate a sample MRSS feed either for your own account or for a sample Brightcove account.</p>
+                <h2>Rendition inspector</h2>
+                <p>You can use the form below to generate a report on the renditions for all videos in your account. Videos with no HLS or HTTP MP4 (progressive download) renditions will need to be retranscoded to work well in the new player. Videos with only low bitrate HLS renditions should be retranscoded as well.</p>
                 <fieldset>
                     <legend>Input</legend>
                     <p>
@@ -257,16 +257,20 @@ var BCLS = ( function (window, document) {
             gethlsRenditions,
             hlsRenditions,
             getmp4HTTPRenditions,
-            mp4HTTPRenditions;
-        reportStr = '<h3>Detailed Video Report</h3><table><thead><tr><th>ID</th><th>Name</th><th>HLS Renditions</th><th>MP4 Rendition (HTTP)<br />bitrate range(kbps)</th><th>MP4 Renditions<br />(RTMP)</th><th>Other Renditions</th></tr></thead><tbody>';
+            mp4HTTPRenditions,
+            hlsLowRate,
+            hlsHighRate,
+            mp4LowRate,
+            mp4HighRate;
+        reportStr = '<h3>Detailed Video Report</h3><table><thead><tr><th>ID</th><th>Name</th><th>HLS Renditions</th><th>MP4 Renditions (HTTP)<br />bitrate range(kbps)</th><th>MP4 Renditions (RTMP)</th><th>Other Renditions</th></tr></thead><tbody>';
         summaryReportStr = '<h3>Summary Report</h3><table><thead><tr><th>Videos with <strong>no</strong> HLS Renditions<br /><button id="gethlsRenditions">Get the ids</button><br /><textarea id="hlsRenditions" style="width:100px;height:100px;"></textArea></th><th>Videos with <strong>no</strong> HTTP MP4 Renditions<br /><button id="getmp4HTTPRenditions">Get the ids</button><br /><textarea id="mp4HTTPRenditions" style="width:100px;height:100px;"></textArea></th><th>Videos with <strong>no</strong> RTMP MP4 Renditions</th><th>Video with <strong>no</strong> Other Renditions</th></tr></thead><tbody>'
         summaryData.hlsRenditions = [];
         summaryData.mp4HTTPRenditions = [];
         summaryData.mp4RTMPRenditions = [];
         summaryData.otherRenditions = [];
         if (videosArray.length > 0) {
-            iMax = videosArray.length;
             for (i = 0; i < iMax; i += 1) {
+            iMax = videosArray.length;
                 video = videosArray[i];
                 // prepare the summary data
                 if (video.hlsRenditions.length === 0) {
@@ -281,13 +285,21 @@ var BCLS = ( function (window, document) {
                 if (video.otherRenditions.length === 0) {
                     summaryData.otherRenditions.push(video.id);
                 }
-                // finish the summary string
-                summaryReportStr += '<tr><td>' + summaryData.hlsRenditions.length + '</td><td>' + summaryData.mp4HTTPRenditions + '</td></tr>'
+                // generate the video detail row
+                hlsLowRate = (video.hlsRenditions.length > 0) ? video.hlsRenditions[0].encoding_rate : 0;
+                hlsHighRate = (video.hlsRenditions.length > 0) ? video.hlsRenditions[video.hlsRenditions.length - 1].encoding_rate : 0;
+                mp4LowRate = (video.mp4HTTPRenditions.length > 0) ? video.mp4HTTPRenditions[0].encoding_rate : 0;
+                mp4HighRate = (video.mp4HTTPRenditions.length > 0) ? video.hlsRenditions[video.mp4HTTPRenditions.length - 1].encoding_rate : 0;
+                reportStr += '<tr><td>' + video.id + '</td><td>' + video.name + '</td><td>' + video.hlsRenditions.length + '<br />' + hlsLowRate + ' - ' + hlsHighRate + '</td><td>' + video.mp4HTTPRenditions.length + '<br />' + mp4LowRate + ' - ' + mp4HighRate + '</td><td>' + video.mp4RTMPRenditions.length + '</td><td>' + video.otherRenditions.length + '</td></tr>'
+            }
+
+            summaryReportStr += '<tr><td>' + summaryData.hlsRenditions.length + '</td><td>' + summaryData.mp4HTTPRenditions.length + '</td><td>' + summaryData.mp4RTMPRenditions.length + '</td><td>' + summaryData.otherRenditions.length + '</td></tr></tbody></table>';
+            // finish video detail report
+            reportStr += '</tbody></table>';
                 // video may not have a valid source
         logger.textContent = 'Finished!'
-        reportDisplay.innerHTML = reportStr;
+        reportDisplay.innerHTML = summaryReportStr + reportStr;
         enableButtons();
-    }
 
     /**
      * sets up the data for the API request
