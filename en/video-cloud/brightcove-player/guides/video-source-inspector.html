@@ -48,7 +48,11 @@
         <div id="main" class="large-10 small-12 columns">
             <div id="top" class="section">
                 <h1>Video Source Inspector</h1>
-                <p>This is sample uses the CMS API to </p>
+                <p>This is sample uses the CMS API to inspect the renditions for all videos in an account. It generates a report showing:</p>
+                <ul>
+                    <li>Summary showing how many videos have <strong>no</strong> HLS, MP4, and other renditions</li>
+                    <li>Report for each video showing the number of HLS renditions (with the bitrate range), MP4 (HTTP) renditions (with the bitrate range), MP4 (RTMP) renditions, and other renditions</li>
+                </ul>
             </div>
             <div id="obtaincredentials" class="section">
                 <h2>Obtain credentials</h2>
@@ -231,7 +235,7 @@ var BCLS = ( function (window, document) {
             mp4LowRate,
             mp4HighRate;
         reportStr = '<h3>Detailed Video Report</h3><table><thead><tr><th>ID</th><th>Name</th><th>HLS Renditions / <br />bitrate range (mbps)</th><th>MP4 Renditions (HTTP) /<br />bitrate range (mbps)</th><th>MP4 Renditions (RTMP)</th><th>Other Renditions</th></tr></thead><tbody>';
-        summaryReportStr = '<h3>Summary Report</h3><table><thead><tr><th>Videos with <strong>no</strong> HLS Renditions<br /><button id="gethlsRenditions">Get the ids</button><br /><textarea id="hlsRenditions" style="width:100px;height:100px;"></textArea></th><th>Videos with <strong>no</strong> HTTP MP4 Renditions<br /><button id="getmp4HTTPRenditions">Get the ids</button><br /><textarea id="mp4HTTPRenditions" style="width:100px;height:100px;"></textArea></th><th>Videos with <strong>no</strong> RTMP MP4 Renditions</th><th>Video with <strong>no</strong> Other Renditions</th></tr></thead><tbody>';
+        summaryReportStr = '<h3>Summary Report</h3><table><thead><tr><th>Videos with <strong>no</strong> HLS Renditions<br /><button id="gethlsRenditions" class="bcls-button">Get the ids</button><br /><textarea id="hlsRenditions" style="width:130px;height:100px;"></textArea></th><th>Videos with <strong>no</strong> HTTP MP4 Renditions<br /><button id="getmp4HTTPRenditions" class="bcls-button">Get the ids</button><br /><textarea id="mp4HTTPRenditions" style="width:130px;height:100px;"></textArea></th><th>Videos with <strong>no</strong> RTMP MP4 Renditions</th><th>Video with <strong>no</strong> Other Renditions</th></tr></thead><tbody>';
         summaryData.hlsRenditions = [];
         summaryData.mp4HTTPRenditions = [];
         summaryData.mp4RTMPRenditions = [];
@@ -268,6 +272,23 @@ var BCLS = ( function (window, document) {
             reportStr += '</tbody></table>';
             logger.textContent = 'Finished!'
             reportDisplay.innerHTML = summaryReportStr + reportStr;
+            // get the buttons and set up event handlers
+            gethlsRenditions = document.getElementById('gethlsRenditions');
+            getmp4HTTPRenditions = document.getElementById('getmp4HTTPRenditions');
+            hlsRenditions = document.getElementById('hlsRenditions');
+            mp4HTTPRenditions = document.getElementById('mp4HTTPRenditions');
+            gethlsRenditions.addEventListener('click', function() {
+                hlsRenditions.textContent = JSON.stringify(summaryData.hlsRenditions);
+            });
+            getmp4HTTPRenditions.addEventListener('click', function() {
+                mp4HTTPRenditions.textContent = JSON.stringify(summaryData.mp4HTTPRenditions);
+            });
+            hlsRenditions.addEventListener('click', function() {
+                hlsRenditions.select();
+            });
+            mp4HTTPRenditions.addEventListener('click', function() {
+                mp4HTTPRenditions.select();
+            })
             enableButtons();
         }
     }
