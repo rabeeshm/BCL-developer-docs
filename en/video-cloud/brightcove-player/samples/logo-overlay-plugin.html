@@ -37,16 +37,15 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
     <style type="text/css">
-        iframe, video {
+        iframe,
+        video, .video-js {
             width: 600px;
             height: 338px;
         }
-        .video-js .vjs-overlay-bottom-right {
-            bottom: 3em !important;
-            right: 5px;
-            background: none !important;
-        }
+
+
     </style>
+    <link href="./assets/logo-overlay-plugin/custom-overlay.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
@@ -56,7 +55,6 @@
     <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
     <!-- search -->
     <div id="searchModal" class="reveal-modal" data-reveal></div>
-    <!-- content -->
     <!-- content -->
     <div class="row">
         <div class="sidebar large-2 columns show-for-large-up">
@@ -76,14 +74,8 @@
                 <p class="BCL-aside">Note: currently, the CMS and Playback APIs do not return information about logo overlays added to videos using the old Studio or Media API, so we will simply use an image posted to a public URL. To avoid CORS issues, the image will reside
                     on the same domain as the page.</p>
                 <iframe src="//players.brightcove.net/1752604059001/N1Asjajhx_default/index.html?videoId=4511351172001" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
-                <video data-video-id="4511351172001"
-                data-account="1752604059001"
-                data-player="default"
-                data-embed="default"
-                class="video-js"
-                controls
-                style="width: 640px; height: 360px;"></video>
-                <script src="//players.brightcove.net/1752604059001/default_default/index.min.js"></script>
+                <video id="video_1" data-video-id="4511351172001" data-account="1752604059001" data-player="N1Asjajhx" data-embed="default" class="video-js" controls></video>
+                <script src="//players.brightcove.net/1752604059001/N1Asjajhx_default/index.min.js"></script>
                 <p>This topic contains the following sections:</p>
                 <ul>
                     <li><a href="#playersmodule">Implementing using Players module</a></li>
@@ -262,7 +254,44 @@
 
     </script>
     <script type="text/javascript">
-        /******** Any scripts specific to page samples should go here *********/
+    var myPlayer,
+        overlayOptions,
+        overlayDisplayed,
+        defaultOptions = {
+            imageURL : '//docs.brightcove.com/en/video-cloud/brightcove-player/samples/assets/logo-overlay-plugin/bc-logo.png',
+            clickThruURL: '//docs.brightcove.com/en/index.html',
+            end: 5
+        };
+    videojs("video_1").ready(function(){
+        myPlayer = this;
+
+        overlayOptions = {
+          "overlays": [
+            {
+              "align": "bottom-right",
+              "start": "loadstart",
+              "end": 5,
+              "content": "<a href='//docs.brightcove.com'><img src='//docs.brightcove.com/en/video-cloud/brightcove-player/samples/assets/logo-overlay-plugin/bc-logo.png'></a>"
+            }
+          ]
+        };
+
+        // initially hide the overlay
+        overlayDisplayed = false;
+        myPlayer.addClass("hide-overlay");
+
+        eOverlayButton.addEventListener("click",function(){
+            if (overlayDisplayed) {
+                // hide the overlay
+                overlayDisplayed = false;
+                myPlayer.addClass("hide-overlay");
+            } else {
+                // show the overlay
+                overlayDisplayed = true;
+                myPlayer.removeClass("hide-overlay");
+            }
+        });
+    });
 
     </script>
     <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
