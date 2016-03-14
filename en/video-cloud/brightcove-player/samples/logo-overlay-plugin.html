@@ -256,14 +256,33 @@
     <script type="text/javascript">
     var myPlayer,
         overlayOptions,
-        overlayDisplayed,
+        overlayContent,
+        inputOptions = {
+            align: 'bottom-right',
+            imageURL : '//docs.brightcove.com/en/video-cloud/brightcove-player/samples/assets/logo-overlay-plugin/bc-logo.png',
+            clickThruURL: '',
+            start: 'loadstart',
+            end: 5
+        },
         defaultOptions = {
             align: 'bottom-right',
             imageURL : '//docs.brightcove.com/en/video-cloud/brightcove-player/samples/assets/logo-overlay-plugin/bc-logo.png',
             clickThruURL: '//docs.brightcove.com/en/index.html',
             start: 'loadstart',
-            end: 5
+            end: 'ended'
         };
+
+        /**
+         * tests for all the ways a variable might be undefined or not have a value
+         * @param {*} x the variable to test
+         * @return {Boolean} true if variable is defined and has a value
+         */
+        function isDefined(x) {
+            if ( x === '' || x === null || x === undefined || x === NaN) {
+                return false;
+            }
+            return true;
+        }
 
         /**
          * populates a settings object from inputs or default values
@@ -283,21 +302,26 @@
     videojs("video_1").ready(function(){
         myPlayer = this;
 
-        overlayOptions = {
-          "overlays": [
+        overlayOptions = setOptions(inputOptions, defaultOptions);
+
+        if (isDefined(overlayOptions.clickThruURL)) {
+            overlayContent = '<a href="' + overlayOptions.clickThruURL + '"><img src="' + overlayOptions.imageURL + '" /></a>';
+        } else {
+            overlayContent = '<img src="' + overlayOptions.imageURL + '" />'
+        }
+
+        myPlayer.overlay(
             {
-              "align": "bottom-right",
-              "start": "loadstart",
-              "end": 5,
-              "content": "<a href='//docs.brightcove.com'><img src='//docs.brightcove.com/en/video-cloud/brightcove-player/samples/assets/logo-overlay-plugin/bc-logo.png'></a>"
+            content: overlayContent,
+            overlays: [
+                {
+                    start: overlayOptions.start,
+                    end: overlayOptions.end,
+                }
+            ]
+
             }
-          ]
-        };
-
-        // initially hide the overlay
-        overlayDisplayed = false;
-        myPlayer.addClass("hide-overlay");
-
+        )
         eOverlayButton.addEventListener("click",function(){
             if (overlayDisplayed) {
                 // hide the overlay
@@ -308,6 +332,10 @@
                 overlayDisplayed = true;
                 myPlayer.removeClass("hide-overlay");
             }
+        });
+
+        myPlayer.on('timeupdate' function(evt) {
+            console.log(evt);
         });
     });
 
