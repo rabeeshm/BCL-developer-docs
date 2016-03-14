@@ -272,6 +272,34 @@
             end: 'ended'
         };
 
+        function showOverlay(startValue) {
+            document.getElementsByClassName('vjs-overlay')[0].className.replace(/vjs-hidden/i, '');
+
+            myPlayer.overlay(
+                {
+                    content: overlayContent,
+                    overlays: [
+                        {
+                            start: startValue,
+                            align: overlayOptions.align,
+                            end: 'ended'
+                        },
+                        {
+                            start: 'ended',
+                            align: overlayOptions.align
+                        }
+                    ]
+                }
+            )
+
+            myPlayer.on('timeupdate', function(evt) {
+                if (isDefined(parseInt(overlayOptions.end)) && myPlayer.currentTime() >= overlayOptions.end) {
+                    myPlayer.off('timeupdate');
+                    document.getElementsByClassName('vjs-overlay')[0].className += ' bcls-hide-overlay';
+                }
+            });
+        }
+
         /**
          * tests for all the ways a variable might be undefined or not have a value
          * @param {*} x the variable to test
@@ -310,33 +338,15 @@
             overlayContent = '<img src="' + overlayOptions.imageURL + '" />'
         }
 
-        myPlayer.overlay(
-            {
-            content: overlayContent,
-            overlays: [
-                {
-                    start: overlayOptions.start,
-                    end: overlayOptions.end,
-                }
-            ]
+        showOverlay(overlayOptions.start);
 
-            }
-        )
-        eOverlayButton.addEventListener("click",function(){
-            if (overlayDisplayed) {
-                // hide the overlay
-                overlayDisplayed = false;
-                myPlayer.addClass("hide-overlay");
-            } else {
-                // show the overlay
-                overlayDisplayed = true;
-                myPlayer.removeClass("hide-overlay");
-            }
+        myPlayer.on('ended', function() {
+            console.log('ended');
+            console.log(document.getElementsByClassName('vjs-overlay')[0].className);
+            document.getElementsByClassName('vjs-overlay')[0].className.replace(/bcls-hide-overlay/i, '');
+            showOverlay(myPlayer.currentTime());
         });
 
-        myPlayer.on('timeupdate' function(evt) {
-            console.log(evt);
-        });
     });
 
     </script>
