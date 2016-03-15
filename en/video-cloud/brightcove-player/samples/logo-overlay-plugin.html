@@ -33,19 +33,17 @@
 
         ga('create', 'UA-2728311-29', 'auto');
         ga('send', 'pageview');
-
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
     <style type="text/css">
         iframe,
-        video, .video-js {
+        video,
+        .video-js {
             width: 600px;
             height: 338px;
         }
-
-
     </style>
-    <link href="./assets/logo-overlay-plugin/custom-overlay.css" rel="stylesheet" type="text/css" />
+    <!-- <link rel="stylesheet" href="./assets/logo-overlay-plugin/logo-overlay.css"> -->
 </head>
 
 <body>
@@ -95,7 +93,7 @@
                     <li>For the <strong>Name</strong>, enter <strong>overlay</strong>.</li>
                     <li>Enter the plugin options. The example below will display a clickable image at the bottom of the player when the player loads and disappear at the 10 second mark.
                         <br/>
-<pre><code>{
+                        <pre><code>{
   "overlays": [
     {
       "align": "bottom",
@@ -248,96 +246,99 @@
     <script src="/en/scripts/bc-mapi.js"></script>
     <script>
         $(document).foundation();
-
     </script>
     <!-- <script type="text/javascript">
-    var myPlayer,
-        overlayOptions,
-        overlayContent,
-        inputOptions = {
-            align: 'bottom-right',
-            imageURL : '//docs.brightcove.com/en/video-cloud/brightcove-player/samples/assets/logo-overlay-plugin/bc-logo.png',
-            clickThruURL: '',
-            start: 'loadstart',
-            end: 5
-        },
-        defaultOptions = {
+    var inputOptions = {
             align: 'bottom-right',
             imageURL : '//docs.brightcove.com/en/video-cloud/brightcove-player/samples/assets/logo-overlay-plugin/bc-logo.png',
             clickThruURL: '//docs.brightcove.com/en/index.html',
             start: 'loadstart',
-            end: 'ended'
+            end: 5
         };
 
-        function showOverlay(startValue) {
-            myPlayer.overlay(
-                {
-                    content: overlayContent,
-                    overlays: [
-                        {
-                            start: startValue,
-                            align: overlayOptions.align
-                        }
-                    ]
-                }
-            )
-
-            myPlayer.on('timeupdate', function(evt) {
-                if (isDefined(parseInt(overlayOptions.end)) && myPlayer.currentTime() >= overlayOptions.end) {
-                    myPlayer.off('timeupdate');
+        videojs.plugin('logoOverlay', function(options) {
+            var player = this,
+                overlayOptions,
+                overlayContent,
+                defaultOptions = {
+                    align: 'bottom-right',
+                    imageURL : '//docs.brightcove.com/en/video-cloud/brightcove-player/samples/assets/logo-overlay-plugin/bc-logo.png',
+                    clickThruURL: '',
+                    start: 'loadstart',
+                    end: 'ended'
+                };
+            console.log('options', options);
+            function endOverlay() {
+                if (isDefined(parseInt(overlayOptions.end)) && player.currentTime() >= overlayOptions.end) {
+                    player.off('timeupdate', endOverlay);
                     document.getElementsByClassName('vjs-overlay')[0].className += ' bcls-hide-overlay';
                 }
-            });
-        }
-
-        /**
-         * tests for all the ways a variable might be undefined or not have a value
-         * @param {*} x the variable to test
-         * @return {Boolean} true if variable is defined and has a value
-         */
-        function isDefined(x) {
-            if ( x === '' || x === null || x === undefined || x === NaN) {
-                return false;
             }
-            return true;
-        }
 
-        /**
-         * populates a settings object from inputs or default values
-         * @param {Object} inputOptions the input values
-         * @param {Object} defaultOptions the default values
-         * @return {Object} the settings object
-         */
-        function setOptions (inputOptions, defaultOptions) {
-            var prop, settings = {};
-            for (prop in defaultOptions) {
-                if (defaultOptions.hasOwnProperty(prop)) {
-                    settings[prop] = (inputOptions.hasOwnProperty(prop)) ? inputOptions[prop] : defaultOptions[prop];
+            function showOverlay(startValue) {
+                // console.log('in show overlay');
+                // add the overlay
+                player.overlay(
+                    {
+                        content: overlayContent,
+                        overlays: [
+                            {
+                                start: startValue,
+                                align: overlayOptions.align
+                            }
+                        ]
+                    }
+                );
+                // handler for timeupdate events
+                player.on('timeupdate', endOverlay);
+            }
+
+            /**
+             * tests for all the ways a variable might be undefined or not have a value
+             * @param {*} x the variable to test
+             * @return {Boolean} true if variable is defined and has a value
+             */
+            function isDefined(x) {
+                if ( x === '' || x === null || x === undefined || x === NaN) {
+                    return false;
                 }
+                return true;
             }
-            return settings;
-        }
-    videojs("video_1").ready(function(){
-        myPlayer = this;
 
-        overlayOptions = setOptions(inputOptions, defaultOptions);
+            /**
+             * populates a settings object from inputs or default values
+             * @param {Object} inputOptions the input values
+             * @param {Object} defaultOptions the default values
+             * @return {Object} the settings object
+             */
+            function setOptions (inputOptions, defaultOptions) {
+                var prop, settings = {};
+                for (prop in defaultOptions) {
+                    if (defaultOptions.hasOwnProperty(prop)) {
+                        settings[prop] = (inputOptions.hasOwnProperty(prop)) ? inputOptions[prop] : defaultOptions[prop];
+                    }
+                }
+                return settings;
+            }
+            // override default settings with optoins
+            overlayOptions = setOptions(options, defaultOptions);
+            // console.log('overlayOptions', overlayOptions);
+            // set the content
+            if (isDefined(overlayOptions.clickThruURL)) {
+                overlayContent = '<a href="' + overlayOptions.clickThruURL + '"><img src="' + overlayOptions.imageURL + '" /></a>';
+            } else {
+                overlayContent = '<img src="' + overlayOptions.imageURL + '" />';
+            }
+            // show the overlay
+            showOverlay(overlayOptions.start);
 
-        if (isDefined(overlayOptions.clickThruURL)) {
-            overlayContent = '<a href="' + overlayOptions.clickThruURL + '"><img src="' + overlayOptions.imageURL + '" /></a>';
-        } else {
-            overlayContent = '<img src="' + overlayOptions.imageURL + '" />'
-        }
-
-        showOverlay(overlayOptions.start);
-
-    });
-
+        });
+        videojs('video_1').logoOverlay(inputOptions);
     </script> -->
     <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
     <script>
         var feedbackMail = document.getElementById("feedbackMail");
         feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
-
     </script>
 </body>
 

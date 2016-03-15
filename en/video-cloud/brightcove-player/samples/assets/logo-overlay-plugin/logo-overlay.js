@@ -1,23 +1,24 @@
-videojs.plugin('logo-overlay', function(options) {
+videojs.plugin('logoOverlay', function(options) {
     var player = this,
         overlayOptions,
         overlayContent,
         defaultOptions = {
             align: 'bottom-right',
             imageURL : '//docs.brightcove.com/en/video-cloud/brightcove-player/samples/assets/logo-overlay-plugin/bc-logo.png',
-            clickThruURL: '//docs.brightcove.com/en/index.html',
+            clickThruURL: '',
             start: 'loadstart',
             end: 'ended'
         };
-
+    console.log('options', options);
     function endOverlay() {
-        if (isDefined(parseInt(overlayOptions.end)) && myPlayer.currentTime() >= overlayOptions.end) {
+        if (isDefined(parseInt(overlayOptions.end)) && player.currentTime() >= overlayOptions.end) {
             player.off('timeupdate', endOverlay);
             document.getElementsByClassName('vjs-overlay')[0].className += ' bcls-hide-overlay';
         }
     }
 
     function showOverlay(startValue) {
+        // console.log('in show overlay');
         // add the overlay
         player.overlay(
             {
@@ -63,7 +64,7 @@ videojs.plugin('logo-overlay', function(options) {
     }
     // override default settings with optoins
     overlayOptions = setOptions(options, defaultOptions);
-
+    // console.log('overlayOptions', overlayOptions);
     // set the content
     if (isDefined(overlayOptions.clickThruURL)) {
         overlayContent = '<a href="' + overlayOptions.clickThruURL + '"><img src="' + overlayOptions.imageURL + '" /></a>';
