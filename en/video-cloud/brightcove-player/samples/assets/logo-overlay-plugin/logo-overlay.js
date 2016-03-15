@@ -9,7 +9,7 @@ videojs.plugin('logoOverlay', function(options) {
             start: 'loadstart',
             end: 'ended'
         };
-    console.log('options', options);
+    // console.log('options', options);
     function endOverlay() {
         if (isDefined(parseInt(overlayOptions.end)) && player.currentTime() >= overlayOptions.end) {
             player.off('timeupdate', endOverlay);
@@ -62,7 +62,7 @@ videojs.plugin('logoOverlay', function(options) {
         }
         return settings;
     }
-    // override default settings with optoins
+    // override default settings with options
     overlayOptions = setOptions(options, defaultOptions);
     // console.log('overlayOptions', overlayOptions);
     // set the content
