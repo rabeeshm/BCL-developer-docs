@@ -1,4 +1,4 @@
-videojs.plugin('pluginDev', function(options) {
+videojs.plugin('logo-overlay', function(options) {
     var player = this,
         overlayOptions,
         overlayContent,
