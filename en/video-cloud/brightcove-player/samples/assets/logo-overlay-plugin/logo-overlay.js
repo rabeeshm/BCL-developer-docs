@@ -9,7 +9,6 @@ videojs.plugin('logoOverlay', function(options) {
             start: 'loadstart',
             end: 'ended'
         };
-    // console.log('options', options);
     function endOverlay() {
         if (isDefined(parseInt(overlayOptions.end)) && player.currentTime() >= overlayOptions.end) {
             player.off('timeupdate', endOverlay);
@@ -18,7 +17,6 @@ videojs.plugin('logoOverlay', function(options) {
     }
 
     function showOverlay(startValue) {
-        // console.log('in show overlay');
         // add the overlay
         player.overlay(
             {
@@ -48,7 +46,7 @@ videojs.plugin('logoOverlay', function(options) {
     }
 
     /**
-     * populates a settings object from inputs or default values
+     * merges inputs or default values into a new settings object
      * @param {Object} inputOptions the input values
      * @param {Object} defaultOptions the default values
      * @return {Object} the settings object
@@ -64,7 +62,6 @@ videojs.plugin('logoOverlay', function(options) {
     }
     // override default settings with options
     overlayOptions = setOptions(options, defaultOptions);
-    // console.log('overlayOptions', overlayOptions);
     // set the content
     if (isDefined(overlayOptions.clickThruURL)) {
         overlayContent = '<a href="' + overlayOptions.clickThruURL + '"><img src="' + overlayOptions.imageURL + '" /></a>';
