@@ -1,10 +1,23 @@
+<<<<<<< HEAD
+videojs.plugin('logo-overlay', function(options) {
+=======
 videojs.plugin('logoOverlay', function(options) {
+>>>>>>> origin/master
     var player = this,
         overlayOptions,
         overlayContent,
         defaultOptions = {
             align: 'bottom-right',
             imageURL : '//docs.brightcove.com/en/video-cloud/brightcove-player/samples/assets/logo-overlay-plugin/bc-logo.png',
+<<<<<<< HEAD
+            clickThruURL: '//docs.brightcove.com/en/index.html',
+            start: 'loadstart',
+            end: 'ended'
+        };
+
+    function endOverlay() {
+        if (isDefined(parseInt(overlayOptions.end)) && myPlayer.currentTime() >= overlayOptions.end) {
+=======
             clickThruURL: '',
             start: 'loadstart',
             end: 'ended'
@@ -12,13 +25,17 @@ videojs.plugin('logoOverlay', function(options) {
     // console.log('options', options);
     function endOverlay() {
         if (isDefined(parseInt(overlayOptions.end)) && player.currentTime() >= overlayOptions.end) {
+>>>>>>> origin/master
             player.off('timeupdate', endOverlay);
             document.getElementsByClassName('vjs-overlay')[0].className += ' bcls-hide-overlay';
         }
     }
 
     function showOverlay(startValue) {
+<<<<<<< HEAD
+=======
         // console.log('in show overlay');
+>>>>>>> origin/master
         // add the overlay
         player.overlay(
             {
@@ -62,9 +79,15 @@ videojs.plugin('logoOverlay', function(options) {
         }
         return settings;
     }
+<<<<<<< HEAD
+    // override default settings with optoins
+    overlayOptions = setOptions(options, defaultOptions);
+
+=======
     // override default settings with options
     overlayOptions = setOptions(options, defaultOptions);
     // console.log('overlayOptions', overlayOptions);
+>>>>>>> origin/master
     // set the content
     if (isDefined(overlayOptions.clickThruURL)) {
         overlayContent = '<a href="' + overlayOptions.clickThruURL + '"><img src="' + overlayOptions.imageURL + '" /></a>';
