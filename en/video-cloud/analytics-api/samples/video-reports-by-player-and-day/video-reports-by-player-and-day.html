@@ -96,7 +96,7 @@
                         Start: <input id="fromDatePicker" size="30" />
                     </p>
                     <p>
-                        End: &nbsp;<input id="toDatePicker" size="30" />
+                        End: <input id="toDatePicker" size="30" />
                     </p>
                     <p>
                         <span class="BCL-btn" id="getData">Get Data</span>
@@ -127,6 +127,11 @@
                 <h4>Plays by Day</h4>
                 <div id="chartView" width="700" height="400" style="width:700px;height:400px"></div>
                 <div id="chartViewLegend" style="padding:10px 20px;"></div>
+            </div>
+            <div class="section" id="csvData">
+                <h2>CSV Data</h2>
+                <p>Below is the CSV data corresponding to the table above:</p>
+                <textarea name="csvDisplay" id="csvDisplay" style="width:100%;height:4em;"></textarea>
             </div>
             <div class="section" id="code">
               <h2>Code for the sample</h2>
@@ -164,6 +169,7 @@ var BCLS = (function (window, document, datepickr) {
         playerSelector = document.getElementById("playerSelector"),
         videoSelector = document.getElementById("videoSelector"),
         reportTableBody = document.getElementById("reportTableBody"),
+        csvDisplay = document.getElementById('csvDisplay'),
         proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
         currentPlayerIndex = 0,
         currentVideoIndex = 0,
@@ -193,6 +199,7 @@ var BCLS = (function (window, document, datepickr) {
         today = new Date(),
         monthAgo = new Date(today - (30 * 24 * 60 * 60 * 1000)),
         dataDisplayBodyTemplate = "<td>{{video_name}}</td><td>Totals</td><td>{{totalPlays}}</td><td>{{totalAvgSecondsViewed}}</td><td>{{totalSecondsViewed}}</td></tr>{{#items}}<tr><td></td><td></td><td>{{date}}</td><td>{{video_view}}</td><td>{{avgSecondsViewed}}</td><td>{{totalSecondsViewed}}</td></tr>{{/items}}",
+        dataCSVTemplate = '"{{video_name}}","Totals","{{totalPlays}}","{{totalAvgSecondsViewed}}","{{totalSecondsViewed}}" \n {{#items}}","{{date}}","{{video_view}}","{{avgSecondsViewed}}","{{totalSecondsViewed}}" \n {{/items}}',
         playerSelectTemplate = "{{#items}}<option value=\"{{player}}\">{{player_name}}</options>{{/items}}",
         videoSelectTemplate = "{{#items}}<option value=\"{{video}}\">{{video_name}}</options>{{/items}}",
         callType;
@@ -258,7 +265,7 @@ var BCLS = (function (window, document, datepickr) {
             return name;
         }
         function displayData() {
-            var displayStr, playerObject, videoObject, template, barChartData, chart;
+            var displayStr, csvDisplayString, playerObject, videoObject, template, barChartData, chart;
             currentPlayer = playerSelector.options[playerSelector.selectedIndex].value;
             currentVideoIndex = videoSelector.selectedIndex;
             playerObject = analyticsData[currentPlayer];
@@ -268,7 +275,10 @@ var BCLS = (function (window, document, datepickr) {
             bclslog('videoObject', videoObject);
             displayStr = "<tr style=\"background-color:#64AAB2;color:#FFF;\"><th>" + playerObject.player_name + "</th>";
             template = Handlebars.compile(dataDisplayBodyTemplate);
+            csvTemplate = Handlebars.compile(dataCSVTemplate);
             displayStr += template(videoObject);
+            csvDisplayString = csvTemplate(videoObject);
+            csvDisplay.value = csvDisplayString;
             reportTableBody.innerHTML = displayStr;
             // chart
             bclslog("videoObject.chartData", videoObject.chartData);
@@ -521,6 +531,9 @@ var BCLS = (function (window, document, datepickr) {
             useMyAccount.innerHTML = "Use My Account Instead";
         }
     });
+    csvDisplay.addEventListener('click', function() {
+        this.select();
+    })
     return {
     }
 })(window, document, datepickr);
