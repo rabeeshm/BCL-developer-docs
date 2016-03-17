@@ -73,7 +73,7 @@ videojs.plugin('logoOverlay', function(options) {
         aTag = document.createElement('a');
         aTag.setAttribute('href', overlayOptions.clickThruURL);
         aTag.appendChild(imgTag);
-        overlayContent = atag.outerHTML;
+        overlayContent = aTag.outerHTML;
     } else {
         overlayContent = imgTag.outerHTML;
     }
