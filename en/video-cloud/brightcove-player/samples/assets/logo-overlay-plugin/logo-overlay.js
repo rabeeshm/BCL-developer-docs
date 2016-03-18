@@ -16,14 +16,14 @@ videojs.plugin('logoOverlay', function(options) {
         }
     }
 
-    function showOverlay(startValue) {
+    function showOverlay() {
         // add the overlay
         player.overlay(
             {
                 content: overlayContent,
                 overlays: [
                     {
-                        start: startValue,
+                        start: overlayOptions.start,
                         align: overlayOptions.align
                     }
                 ]
@@ -52,7 +52,7 @@ videojs.plugin('logoOverlay', function(options) {
      * @return {Object} the settings object
      */
     function setOptions (inputOptions, defaultOptions) {
-        var prop, settings = {};
+        var prop, settings = {}, aTag, imgTag;
         for (prop in defaultOptions) {
             if (defaultOptions.hasOwnProperty(prop)) {
                 settings[prop] = (inputOptions.hasOwnProperty(prop)) ? inputOptions[prop] : defaultOptions[prop];
@@ -60,15 +60,24 @@ videojs.plugin('logoOverlay', function(options) {
         }
         return settings;
     }
-    // override default settings with options
+    // merge default settings with options
     overlayOptions = setOptions(options, defaultOptions);
     // set the content
+    imgTag = new Image();
+    imgTag.onLoad = function () {
+        imgTag.setAttribute('width', this.width);
+        imgTag.setAttribute('height'. this.height);
+    };
+    imgTag.src = overlayOptions.imageURL;
     if (isDefined(overlayOptions.clickThruURL)) {
-        overlayContent = '<a href="' + overlayOptions.clickThruURL + '"><img src="' + overlayOptions.imageURL + '" /></a>';
+        aTag = document.createElement('a');
+        aTag.setAttribute('href', overlayOptions.clickThruURL);
+        aTag.appendChild(imgTag);
+        overlayContent = aTag.outerHTML;
     } else {
-        overlayContent = '<img src="' + overlayOptions.imageURL + '" />';
+        overlayContent = imgTag.outerHTML;
     }
     // show the overlay
-    showOverlay(overlayOptions.start);
+    showOverlay();
 
 });
