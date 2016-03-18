@@ -1,48 +1,29 @@
-<<<<<<< HEAD
-videojs.plugin('logo-overlay', function(options) {
-=======
 videojs.plugin('logoOverlay', function(options) {
->>>>>>> origin/master
     var player = this,
         overlayOptions,
         overlayContent,
         defaultOptions = {
             align: 'bottom-right',
             imageURL : '//docs.brightcove.com/en/video-cloud/brightcove-player/samples/assets/logo-overlay-plugin/bc-logo.png',
-<<<<<<< HEAD
-            clickThruURL: '//docs.brightcove.com/en/index.html',
-            start: 'loadstart',
-            end: 'ended'
-        };
-
-    function endOverlay() {
-        if (isDefined(parseInt(overlayOptions.end)) && myPlayer.currentTime() >= overlayOptions.end) {
-=======
             clickThruURL: '',
             start: 'loadstart',
             end: 'ended'
         };
-    // console.log('options', options);
     function endOverlay() {
         if (isDefined(parseInt(overlayOptions.end)) && player.currentTime() >= overlayOptions.end) {
->>>>>>> origin/master
             player.off('timeupdate', endOverlay);
             document.getElementsByClassName('vjs-overlay')[0].className += ' bcls-hide-overlay';
         }
     }
 
-    function showOverlay(startValue) {
-<<<<<<< HEAD
-=======
-        // console.log('in show overlay');
->>>>>>> origin/master
+    function showOverlay() {
         // add the overlay
         player.overlay(
             {
                 content: overlayContent,
                 overlays: [
                     {
-                        start: startValue,
+                        start: overlayOptions.start,
                         align: overlayOptions.align
                     }
                 ]
@@ -65,13 +46,13 @@ videojs.plugin('logoOverlay', function(options) {
     }
 
     /**
-     * populates a settings object from inputs or default values
+     * merges inputs or default values into a new settings object
      * @param {Object} inputOptions the input values
      * @param {Object} defaultOptions the default values
      * @return {Object} the settings object
      */
     function setOptions (inputOptions, defaultOptions) {
-        var prop, settings = {};
+        var prop, settings = {}, aTag, imgTag;
         for (prop in defaultOptions) {
             if (defaultOptions.hasOwnProperty(prop)) {
                 settings[prop] = (inputOptions.hasOwnProperty(prop)) ? inputOptions[prop] : defaultOptions[prop];
@@ -79,22 +60,24 @@ videojs.plugin('logoOverlay', function(options) {
         }
         return settings;
     }
-<<<<<<< HEAD
-    // override default settings with optoins
+    // merge default settings with options
     overlayOptions = setOptions(options, defaultOptions);
-
-=======
-    // override default settings with options
-    overlayOptions = setOptions(options, defaultOptions);
-    // console.log('overlayOptions', overlayOptions);
->>>>>>> origin/master
     // set the content
+    imgTag = new Image();
+    imgTag.onLoad = function () {
+        imgTag.setAttribute('width', this.width);
+        imgTag.setAttribute('height'. this.height);
+    };
+    imgTag.src = overlayOptions.imageURL;
     if (isDefined(overlayOptions.clickThruURL)) {
-        overlayContent = '<a href="' + overlayOptions.clickThruURL + '"><img src="' + overlayOptions.imageURL + '" /></a>';
+        aTag = document.createElement('a');
+        aTag.setAttribute('href', overlayOptions.clickThruURL);
+        aTag.appendChild(imgTag);
+        overlayContent = aTag.outerHTML;
     } else {
-        overlayContent = '<img src="' + overlayOptions.imageURL + '" />';
+        overlayContent = imgTag.outerHTML;
     }
     // show the overlay
-    showOverlay(overlayOptions.start);
+    showOverlay();
 
 });
