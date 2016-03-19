@@ -53,205 +53,537 @@
                 </h1>
                 <p>The Media Management API is a RESTful API for accessing and configuring the components of the domain for an authorized user. The multi-faceted and cascading configuration hierarchy gives the domain owner the ability to set-up <code>domain</code>, <code>application</code>, <code>catalog</code> and <code>mediaitem</code> level settings. An API keyholder has the ability to create, read, update and delete anything from ad configurations to metadata on independent media items. This API provides easy to use methods for fronting UI components in an existing CMS or through a programmatic function.</p>
                 <p>You will receive your <code>domainId</code> and API Key from your account management team, all other Ids may be retrieved using the API methods below.</p>
-                <p>Also see the <a href="../references/media-management-api/versions/v1/index.html">Media Management API Reference</a>.</p>
             </div>
             <div id="baseurl" class="section">
                 <h2>
                     API Base URL:
                 </h2>
-                <p>
-                    https://api.unicornmedia.com/media-management-api/
-                </p>
+                <p>All Media Management API methods utilize the following base URL:</p>
+                <pre>
+                    <code>https://api.unicornmedia.com/media-management-api/domains/{domainId}</code>
+                </pre>
+                <h3>API URL Variables</h3>
+                <p>Within this guide, any example URL value in {singleBrackets} must be replaced (without brackets).</p>
                 <h3>Request header</h3>
                 <p>Required HTTP Header</p>
                 <p>
                     <code>X-BC-ONCE-API-KEY : {yourApiKey}</code>
                 </p>
             </div>
-            <div id="domainOperations" class="section">
-                <h2>Domain Operations</h2>
+            <div class="section" id="errorGuide">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Error Code</th>
+                            <th>Error Cause</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>400 Bad Request</td>
+                            <td>Incorrect or invalid request body</td>
+                        </tr>
+                        <tr>
+                            <td>403 Forbidden</td>
+                            <td>Missing or incorrect API Key</td>
+                        </tr>
+                        <tr>
+                            <td>404 Not Found</td>
+                            <td>Incorrect or invalid URL path</td>
+                        </tr>
+                    </tbody>
+                </table>
+            <div id="domainMethods" class="section">
+                <h2>Domain Methods</h2>
                 <h3 id="getDomain">Get Domain details</h3>
-                <p>Returns the essential information of the domain</p>
-                <h4>Endpoint: GET
-                    <code>/domains/{domainId}</code>
-                </h4>
-                <h5>
-                    Example: GET
-                </h5>
-                <p>
-                    <code>https://api.unicornmedia.com/media-management-api/domains/{DomainId}</code>
-                </p>
-                <p>or</p>
-                <p>
-                    <code>https://api.unicornmedia.com/media-management-api/{DomainName}</code>
-                </p>
-                <p>Response:</p>
+                <p>Retrieves domain <code>name</code> and <code>domainId</code>.</p>
+                <pre><code>GET https://api.unicornmedia.com/media-management-api/domains/{domainId}</code></pre>
+                <h4>Request Body</h4>
+                <p>(none)</p>
+                <h4>Response Body:</h4˜>
                 <pre>
-                    <code>{ "id": "4eca7ac5-3954-416d-bb23-e65aa511b85a", "name": "BrightcoveOnce" }
-                    </code>
+<code>{
+    "id": "1234abcd-1234-abcd-56ef-098765fedcba",
+    "name": "ExampleDomain"
+}</code>
                 </pre>
-                <h3 id="getRenditions">Get Domain renditions</h3>
-                <p>Returns a collection of the transcode renditions available to the domain.</p>
-                <h4>Endpoint: GET
-                    <code>/domains/{domainId}/renditions</code>
-                </h4>
-                <h5>
-                    Example: GET
-                </h5>
-                <p>
-                    <code>https://api.unicornmedia.com/media-management-api/domains/{DomainId}/renditions</code>
-                </p>
-                <p>Response:</p>
-                <pre>
-                    <code>{ "results": [ { "id": "076ea1a2-a35b-11e4-bfdb-005056837bc7", "name": "OV2 Once 1200 ZC 640x360 1104.96 29.97 B31", "default": true }, { "id": "468fb310-a585-11e4-bfdb-005056837bc7", "name": "OV2 Once 4400 ZC 1280x720 4144.256 29.97
-                        H40", "default": true }, ] }
-                    </code>
-                </pre>
-                <h3 id="getRenditionDetails">Get Domain rendition details</h3>
-                <p>Returns the settings of the selected transcode rendition indicated by the
-                    <code>renditionId</code>.</p>
-                <h4>Endpoint: GET
-                    <code>/domains/{domainId}/renditions/{reditionId}</code>
-                </h4>
-                <h5>
-                    Example: GET
-                </h5>
-                <p>
-                    <code>https://api.unicornmedia.com/media-management-api/domains/{DomainId}/renditions/{reditionId}</code>
-                </p>
-                <p>Response:</p>
-                <pre>
-                    <code>{ "id": "076ea1a2-a35b-11e4-bfdb-005056837bc7", "name": "OV2 Once 1200 ZC 640x360 1104.96 29.97 B31", "width": 640, "height": 360, "videoBitRate": 1104, "audioBitRate": 96, "codecsValue": "mp4a.40.2,avc1.42001f" }
-                    </code>
-                </pre>
-                <!--             <h3 id="replaceRendition">Replace Domain renditions</h3>
-            <p>Replaces the currently configured domain transcode renditions with the set defined in the request body.</p>
-            <p class="BCL-aside">Note: This method is for replacing. For adding individual renditions please see <a href="#addUpdateRenditions">add or update domain renditions</a>.</p>
-            <h4>Endpoint: PUT <code>/domains/{domainId}/renditions</code></h4>
-            <h5>
-                Example: PUT
-            </h5>
-            <p><code>https://api.unicornmedia.com/media-management-api/domains/{DomainId}/renditions</code></p>
-            <p>Input:</p>
-<pre><code>[
-    {
-        "id": "076ea1a2-a35b-11e4-bfdb-005056837bc7",
-        "default": true
-    },
-    {
-        "id": "468fb310-a585-11e4-bfdb-005056837bc7",
-        "default": true
-    }
-]</code></pre>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Object</th>
-                        <th>Sub-Object</th>
-                        <th>Required</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>id</td>
-                        <td></td>
-                        <td>Yes</td>
-                        <td>The <code>renditionId</code> of the desired rendition</td>
-                    </tr>
-                    <tr>
-                        <td>default</td>
-                        <td></td>
-                        <td>Yes</td>
-                        <td>A boolean value of True or False. The value of True will ensure all catalogs acquire this <code>renditionId</code></td>
-                    </tr>
-                </tbody>
-            </table>
-            <p>Response:</p>
-<pre><code>[
-    {
-        "id": "076ea1a2-a35b-11e4-bfdb-005056837bc7",
-        "default": true
-    },
-    {
-        "id": "468fb310-a585-11e4-bfdb-005056837bc7",
-        "default": true
-    }
-]</code></pre>
-            <h3 id="addUpdateRenditions">Add or Update Domain rendition</h3>
-            <p>Adds or updates the domain configured renditions. If the input rendition exists in the current domain, its default flag will be updated. If the input rendition does not exist in the domain rendition set, it will be added to the domain renditions.</p>
-            <h4>Endpoint: POST <code>/domains/{domainId}/renditions</code></h4>
-            <h5>
-                Example: POST
-            </h5>
-            <p></p>
-            <p><code>https://api.unicornmedia.com/media-management-api/domains/{DomainId}/renditions</code></p>
-            <p>Input:</p>
+                <h4>Response Fields:</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>String</td>
+                            <td>The domainId</td>
+                        </tr>
+                        <tr>
+                            <td><code>name</code></td>
+                            <td>String</td>
+                            <td>The domain name</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3 id="getRenditions">Get All Domain renditions</h3>
+                <p>Retrieves all Transcoding Renditions available in your domain (note, new videos will be assigned renditions based on the configured Catalog Renditions).</p>
+<pre><code>GET https://api.unicornmedia.com/media-management-api/domains/{domainId}/renditions</code></pre>
+                <h4>Request Body:</h4>
+                <p>(none)</p>
+                <h4>Response Body:</h4>
 <pre><code>{
-    "id": "5ff484d6-a33d-11e4-bfdb-005056837bc7",
-    "default": false
+    "results": [
+        {
+            "id": "ac2e7f0b-a345-11e4-bfdb-005056837bc7",
+            "name": "OV2 Once 512 ZC 384x216 448.64 29.97 B30",
+            "default": true
+        },
+        {
+            "id": "5ff484d6-a33d-11e4-bfdb-005056837bc7",
+            "name": "OV2 Once 264 ZC 256x144 200.64 29.97 B30",
+            "default": true
+        }
+    ]
 }</code></pre>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Object</th>
-                        <th>Sub-Object</th>
-                        <th>Required</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>id</td>
-                        <td></td>
-                        <td>Yes</td>
-                        <td>The <code>renditionId</code> of the desired rendition</td>
-                    </tr>
-                    <tr>
-                        <td>default</td>
-                        <td></td>
-                        <td>Yes</td>
-                        <td>A boolean value of True or False. The value of True will ensure all catalogs acquire this <code>renditionId</code></td>
-                    </tr>
-                </tbody>
-            </table>
-            <p>Response:</p>
-<pre><code>[
-    {
-        "id": "8efbb9ca-a586-11e4-bfdb-005056837bc7",
-        "name": "OV2 Once 6500 ZC 1920x1080 6244.256 29.97 H40",
-        "default": true
-    },
-    {
-        "id": "74ba4d0b-a347-11e4-bfdb-005056837bc7",
-        "name": "OV2 Once 764 ZC 480x270 700.64 29.97 B30",
-        "default": true
-    },
-    {
-        "id": "5ff484d6-a33d-11e4-bfdb-005056837bc7",
-        "name": "OV2 Once 264 ZC 256x144 200.64 29.97 B30",
-        "default": false
-    }
-]</code></pre>
-            <h3 id="deleteRendition">Delete Domain Rendition</h3>
-            <p>Deletes the selected rendition indicated by the renditionId from the domain rendition set.</p>
-            <p class="BCL-aside">Note: This delete does not cascade persist through the domain and does not remove the rendition from existing catalogs or media items. It only prevents future catalogs from acquiring this rendition.</p>
-            <h4>Endpoint: DELETE <code>/domains/{domainId}/renditions/{renditionId}</code></h4>
-            <h5>
-                Example: DELETE
-            </h5>
-            <p><code>https://api.unicornmedia.com/media-management-api/domains/{DomainId}/renditions/{renditionId}</code></p>
-            <p>Response:</p>
+                <h4>Response Fields:</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>String</td>
+                            <td>Each renditionId</td>
+                        </tr>
+                        <tr>
+                            <td><code>name</code></td>
+                            <td>String</td>
+                            <td>Each rendition name</td>
+                        </tr>
+                        <tr>
+                            <td><code>default</code></td>
+                            <td>Boolean</td>
+                            <td>If true, will be assigned to new catalogs by default</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3 id="getRenditionDetails">Get Domain Rendition Details</h3>
+                <p>Retrieves video and audio encoding settings for the specified <code>renditionId</code>..</p>
+<pre><code>GET https://api.unicornmedia.com/media-management-api/domains/{domainId}/renditions/{renditionId}</code></pre>
+                <h4>Request Body:</h4>
+                <p>(none)</p>
+                <h4>Response Body:</h4>
 <pre><code>{
-    "id": "5ff484d6-a33d-11e4-bfdb-005056837bc7"
-}</code></pre> -->
+    "id": "076ea1a2-a35b-11e4-bfdb-005056837bc7",
+    "name": "OV2 Once 1200 ZC 640x360 1104.96 29.97 B31",
+    "width": 640,
+    "height": 360,
+    "videoBitRate": 1104,
+    "audioBitRate": 96,
+    "codecsValue": "mp4a.40.2,avc1.42001f"
+}</code></pre>
+                <h4>Response Fields:</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>String</td>
+                            <td>The renditionId</td>
+                        </tr>
+                        <tr>
+                            <td><code>name</code></td>
+                            <td>String</td>
+                            <td>The rendition name</td>
+                        </tr>
+                        <tr>
+                            <td><code>width</code></td>
+                            <td>Number</td>
+                            <td>The frame width in pixels</td>
+                        </tr>
+                        <tr>
+                            <td><code>height</code></td>
+                            <td>Number</td>
+                            <td>The frame height in pixels</td>
+                        </tr>
+                        <tr>
+                            <td><code>videoBitRate</code></td>
+                            <td>Number</td>
+                            <td>The video bitrate in kbps</td>
+                        </tr>
+                        <tr>
+                            <td><code>audioBitRate</code></td>
+                            <td>Number</td>
+                            <td>The audio bitrate in kbps</td>
+                        </tr>
+                        <tr>
+                            <td><code>codecsValue</code></td>
+                            <td>String</td>
+                            <td>The audio and video codecs</td>
+                        </tr>
+                    </tbody>
+                </table>
+                    <h3>Get All Domain Publication Rules</h3>
+                    <p>Retrieves all <code>publicationRuleIds</code> configured on the Domain level.</p>
+    <pre><code>GET https://api.unicornmedia.com/media-management-api/domains/{domainId}/publicationRules</code></pre>
+                    <h4>Request Body:</h4>
+                    <p>(none)</p>
+                    <h4>Response Body:</h4>
+    <pre><code>[
+        "602de576-68c3-403a-87f6-56108c6b1d1c"
+    ]</code></pre>
+                <h4>Response Fields:</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>publicationRuleIds</code></td>
+                            <td>String[]</td>
+                            <td>A comma-separated array of publicationRuleIds configured at the Domain level (will be inherited by new catalogs)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                    <h3>Get All Domain Publication Rule Details</h3>
+                    <p>Retrieves configuration of a domain-level publication rule.</p>
+    <pre><code>GET https://api.unicornmedia.com/media-management-api/domains/{domainId}/publicationRules/{publicationRuleId}</code></pre>
+                    <h4>Request Body:</h4>
+                    <p>(none)</p>
+                    <h4>Response Body:</h4>
+    <pre><code>{
+    "channel": "5fba5bb0-5fba-5bb0-06ed-8768600306ed",
+    "startDate": 1436384287,
+    "endDate": 1752003487,
+    "clientFilters": [
+        {
+            "variableName": "IpAddress",
+            "value": "127.0.0.1",
+            "filterType": "Equals",
+            "isDenied": true
+        }
+    ],
+    "countryRules": [
+        {
+            "countryCode": "FI",
+            "isDenied": true
+        }
+    ],
+    "id": "602de576-68c3-403a-87f6-56108c6b1d1c",
+    "domain": "1234abcd-1234-abcd-56ef-098765fedcba"
+}</code></pre>
+                <h4>Response Fields:</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>channel</code></td>
+                            <td>String</td>
+                            <td>(Internal Use Only)</td>
+                        </tr>
+                        <tr>
+                            <td><code>startDate</code></td>
+                            <td>Number</td>
+                            <td>Epoch time (in seconds) when publication rule becomes effective</td>
+                        </tr>
+                        <tr>
+                            <td><code>startDate</code></td>
+                            <td>Number</td>
+                            <td>Epoch time (in seconds) when publication rule expires</td>
+                        </tr>
+                        <tr>
+                            <td><code>clientFilters</code></td>
+                            <td>Array</td>
+                            <td>Array of client-based filters</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;variableName</code></td>
+                            <td>String</td>
+                            <td>The type of client variable being filtered: (IpAddress, UserAgent, ReferringHost)</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;value</code></td>
+                            <td>String</td>
+                            <td>A string against which requests will be filtered</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;filterType</code></td>
+                            <td>String</td>
+                            <td>The method of filtering against the value string: (Equals, NotEquals, In, NotIn, Contains, NotContains, StartsWith, NotStartsWith, EndsWith, NotEndsWith)</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;isDenied</code></td>
+                            <td>Boolean</td>
+                            <td>True: All other values will be permitted<br />
+                            False: Only this value will be permitted</td>
+                        </tr>
+                        <tr>
+                            <td><code>countryRules</code></td>
+                            <td>Array</td>
+                            <td>Array of country-based filters</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;countryCode</code></td>
+                            <td>String</td>
+                            <td><a href="//en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a> country code being filtered</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;isDenied</code></td>
+                            <td>Boolean</td>
+                            <td>True: All other values will be permitted<br />
+                            False: Only this value will be permitted</td>
+                        </tr>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>String</td>
+                            <td>The publicationRuleId</td>
+                        </tr>
+                        <tr>
+                            <td><code>domain</code></td>
+                            <td>String</td>
+                            <td>The publication rule’s parent domainId</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Create Domain Publication Rule</h3>
+                <p>Create new domain-level Publication Rule. New rule will be inherited by new catalogs, but not existing catalogs. See below for details on adding publication rules to existing catalogs.</p>
+<pre><code>POST https://api.unicornmedia.com/media-management-api/domains/{domainId}/publicationRules</code></pre>
+                <h4>Request Body:</h4>
+<pre><code>{
+    "startDate": 1436384287,
+    "endDate": 1952003487,
+    "clientFilters": [
+        {
+            "variableName": "IpAddress",
+            "value": "127.0.0.1",
+            "filterType": "Equals",
+            "isDenied": true
+        }
+    ],
+    "countryRules": [
+        {
+            "countryCode": "FI",
+            "isDenied": true
+        }
+    ]
+}</code></pre>
+                <h5>Request Fields</h5>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Required?</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>startDate</code></td>
+                            <td>Number</td>
+                            <td>Yes</td>
+                            <td>Epoch time (in seconds) when publication rule becomes effective</td>
+                        </tr>
+                        <tr>
+                            <td><code>startDate</code></td>
+                            <td>Number</td>
+                            <td>Yes</td>
+                            <td>Epoch time (in seconds) when publication rule expires</td>
+                        </tr>
+                        <tr>
+                            <td><code>clientFilters</code></td>
+                            <td>Array</td>
+                            <td>No</td>
+                            <td>Array of client-based filters</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;variableName</code></td>
+                            <td>String</td>
+                            <td>If clientFilters are specified</td>
+                            <td>The type of client variable being filtered: (IpAddress, UserAgent, ReferringHost)</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;value</code></td>
+                            <td>String</td>
+                            <td>If clientFilters are specified</td>
+                            <td>A string against which requests will be filtered</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;filterType</code></td>
+                            <td>String</td>
+                            <td>If clientFilters are specified</td>
+                            <td>The method of filtering against the value string: (Equals, NotEquals, In, NotIn, Contains, NotContains, StartsWith, NotStartsWith, EndsWith, NotEndsWith)</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;isDenied</code></td>
+                            <td>Boolean</td>
+                            <td>If clientFilters are specified</td>
+                            <td>True: All other values will be permitted<br />
+                            False: Only this value will be permitted</td>
+                        </tr>
+                        <tr>
+                            <td><code>countryRules</code></td>
+                            <td>Array</td>
+                            <td>No</td>
+                            <td>Array of country-based filters</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;countryCode</code></td>
+                            <td>String</td>
+                            <td>If countryRules are specified</td>
+                            <td><a href="//en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a> country code being filtered</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;isDenied</code></td>
+                            <td>Boolean</td>
+                            <td>If countryRules are specified</td>
+                            <td>True: All other values will be permitted<br />
+                            False: Only this value will be permitted</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h4>Response Body:</h4>
+    <pre><code>{
+    "channel": "5fba5bb0-5fba-5bb0-06ed-8768600306ed",
+    "startDate": 1436384287,
+    "endDate": 1752003487,
+    "clientFilters": [
+        {
+            "variableName": "IpAddress",
+            "value": "127.0.0.1",
+            "filterType": "Equals",
+            "isDenied": true
+        }
+    ],
+    "countryRules": [
+        {
+            "countryCode": "FI",
+            "isDenied": true
+        }
+    ],
+    "id": "602de576-68c3-403a-87f6-56108c6b1d1c",
+    "domain": "1234abcd-1234-abcd-56ef-098765fedcba"
+}</code></pre>
+                <h4>Response Fields:</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>channel</code></td>
+                            <td>String</td>
+                            <td>(Internal Use Only)</td>
+                        </tr>
+                        <tr>
+                            <td><code>startDate</code></td>
+                            <td>Number</td>
+                            <td>Epoch time (in seconds) when publication rule becomes effective</td>
+                        </tr>
+                        <tr>
+                            <td><code>startDate</code></td>
+                            <td>Number</td>
+                            <td>Epoch time (in seconds) when publication rule expires</td>
+                        </tr>
+                        <tr>
+                            <td><code>clientFilters</code></td>
+                            <td>Array</td>
+                            <td>Array of client-based filters</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;variableName</code></td>
+                            <td>String</td>
+                            <td>The type of client variable being filtered: (IpAddress, UserAgent, ReferringHost)</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;value</code></td>
+                            <td>String</td>
+                            <td>A string against which requests will be filtered</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;filterType</code></td>
+                            <td>String</td>
+                            <td>The method of filtering against the value string: (Equals, NotEquals, In, NotIn, Contains, NotContains, StartsWith, NotStartsWith, EndsWith, NotEndsWith)</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;isDenied</code></td>
+                            <td>Boolean</td>
+                            <td>True: All other values will be permitted<br />
+                            False: Only this value will be permitted</td>
+                        </tr>
+                        <tr>
+                            <td><code>countryRules</code></td>
+                            <td>Array</td>
+                            <td>Array of country-based filters</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;countryCode</code></td>
+                            <td>String</td>
+                            <td><a href="//en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a> country code being filtered</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;isDenied</code></td>
+                            <td>Boolean</td>
+                            <td>True: All other values will be permitted<br />
+                            False: Only this value will be permitted</td>
+                        </tr>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>String</td>
+                            <td>The publicationRuleId</td>
+                        </tr>
+                        <tr>
+                            <td><code>domain</code></td>
+                            <td>String</td>
+                            <td>The publication rule’s parent domainId</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Delete Domain Publication Rule</h3>
+                <p>Deletes the specified domain publication rule. <strong>NOTE</strong>: Deleting a domain publication rule will prevent it from being added to new catalogs, but will not delete publication rules of existing catalogs or mediaItems within. Please see below for methods to delete publication rules assigned to catalogs or mediaItems.</p>
+<pre><code>DELETE https://api.unicornmedia.com/media-management-api/domains/{domainId}/publicationRules/{publicationRuleId}</code></pre>
+                <h4>Request Body:</h4>
+                <p>(none)</p>
+                <h4>Response Body:</h4>
+    <pre><code>{
+"id": "8c9cdb48-90ac-450f-bc5d-0bb2cbe3a206"
+}</code></pre>
             </div>
             <div id="catalogOperations" class="section">
-                <h2 id="catalog">Catalog Operations</h2>
-                <h3 id="getCatalogs">Get Catalogs</h3>
-                <p>Returns a collection of all catalogs within the domain. This method fetches 20 catalogs per page, returns the
-                    <code>totalResult</code> to indicate the total number of catalogs and provides previous or next page requests within the body.</p>
-                <h4>Optional URL parameters</h4>
+                <h2 id="catalog">Catalog Methods</h2>
+                <h3 id="getCatalogs">Get All Catalogs</h3>
+                <p>Retrieves all catalogs in a domain. This method returns 20 results by default, totalResults indicates the total number of catalogs, previous and/or next page request URLs will be included within the response if necessary. URL Parameters may be appended to modify result sets.</p>
+<pre><code>GET https://api.unicornmedia.com/media-management-api/domains/{domainId}/catalogs</code></pre>
+                <h4>URL Parameters</h4>
                 <table>
                     <thead>
                         <tr>
@@ -337,19 +669,74 @@
                         </tr>
                     </tbody>
                 </table>
-                <p>Endpoint: GET
-                    <code>/domains/{domainId}/catalogs</code>
-                </p>
-                <p>Example: GET</p>
-                <p>
-                    <code>/domains/{domainId}/catalogs</code>
-                </p>
+<pre><code>GET https://api.unicornmedia.com/media-management-api/domains/{domainId}/catalogs</code></pre>
+                <h3>Request Body</h3>
+                <p>(none)</p>
                 <p>Response:</p>
-                <pre>
-                    <code>{ "results": [ { "id": "9482da98-4ad2-490d-983b-42c17fe06b81", "name": "1-2-8", "domainId": "4eca7ac5-3954-416d-bb23-e65aa511b85a" }, { "id": "1cd8a599-13b6-45e4-8a94-7bad7a5c457e", "name": "New catalog", "domainId": "4eca7ac5-3954-416d-bb23-e65aa511b85a"
-                        } ], "prev": null, "next": "https://api.unicornmedia.com/media-management-api/domains/4eca7ac5-3954-416d-bb23-e65aa511b85a/catalogs?page=2", "totalResults": 27 }
-                    </code>
-                </pre>
+<pre><code>{
+    "results": [
+        {
+            "id": "4321abcd-4321-dcba-fe65-567890fedcba",
+            "name": "ExampleCatalog01",
+            "domainId": "1234abcd-1234-abcd-56ef-098765fedcba"
+        },
+        {
+            "id": "4422abcd-4321-dcba-fe65-567890fedcba",
+            "name": "ExampleCatalog02",
+            "domainId": "1234abcd-1234-abcd-56ef-098765fedcba"
+        }
+    ],
+    "prev": null,
+    "next": null,
+    "totalResults": 2
+}</code></pre>
+                <h3>Response Fields</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>results</code></td>
+                            <td>Object[]</td>
+                            <td>Array of catalogs in result set</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;id</code></td>
+                            <td>String</td>
+                            <td>Each catalogId</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;name</code></td>
+                            <td>String</td>
+                            <td>Each catalog's name</td>
+                        </tr>
+                        <tr>
+                            <td><code>&nbsp;&nbsp;domainId</code></td>
+                            <td>String</td>
+                            <td>Each catalog’s parent domainId</td>
+                        </tr>
+                        <tr>
+                            <td><code>prev</code></td>
+                            <td>URL</td>
+                            <td>URL to GET the previous catalog result set (if necessary)</td>
+                        </tr>
+                        <tr>
+                            <td><code>next</code></td>
+                            <td>URL</td>
+                            <td>URL to GET the next catalog result set (if necessary)</td>
+                        </tr>
+                        <tr>
+                            <td><code>totalResults</code></td>
+                            <td>Number</td>
+                            <td>The total number of catalogs in the domain</td>
+                        </tr>
+                    </tbody>
+                </table>
                 <h3 id="getCatalogDetails">Get Catalog Details</h3>
                 <p>Returns the essential information of the catalog.</p>
                 <p>Endpoint: GET
