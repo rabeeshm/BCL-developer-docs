@@ -10,14 +10,10 @@
 	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
 	<script src="//use.edgefonts.net/source-code-pro.js"></script>
-	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
-
+	<link href="//files.brightcove.com/proxima-nova/font-faces.css" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" type="text/css" href="http://docs.brightcove.com/en/styles/bcls-doc-site.css">
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/atelier-forest.light.min.css">
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/styles/github.min.css">
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
-
 	<script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -35,28 +31,165 @@
 	<!-- content -->
 	<!-- content -->
 	<div class="row">
-		<div class="sidebar large-2 columns show-for-large-up">
+		<div class="large-2 columns show-for-large-up">
 			<div id="sidenav" class="side-nav"></div>
 		</div>
 		<div id="main" class="large-10 small-12 columns">
 			<div id="top" class="section">
 				<h1>Google Analytics Plugin</h1>
 				<!-- Place document intro sentence(s) here -->
-				<p>The Google Analytics plugin is an open source project and not officially supported by Brightcove. Information on the plugin can be found on the <a href="//docs.brightcove.com/en/video-cloud/open-source/">Brightcove Open Source Projects</a> page.</p>
+			<p class="BCL-aside">The Google Analytics plugin is an open source project and not officially supported by Brightcove. This document is furnished as a convenience only and not necessarily maintained.</p>
+            <p>The Google Analytics plugin sends player and video event data to your Google Analytics account. While Brightcove Analytics provides key metrics about user engagement, you may also want to integrate your player with Google Analytics. One advantage is that you can generate an AdWords remarketing list.</p>
+<!--        <p class="BCL-aside">The Google Analytics plugin only works with a Brightcove player that is created with a Video Cloud account. It will not work with players created with a Perform account.</p>-->
+        <p>Event names tracked are those used by the Brightcove player where applicable. Event names can be customized or localized using plugin options.</p>
+        <p>The Video Id and name are read from the player and tracked as the event label.</p>
+        <div><img src="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/assets/google-analytics-plugin/event-list.png" alt="event-list" title="event-list"></div>
+      </div>
+
+      <div id="implementation" class="section">
+        <h2>Implementation</h2>
+	    <p>First, decide which implementation you will be using for your Brightcove player. Choose between the <a href="//support.brightcove.com/en/video-cloud/docs/generating-player-publishing-code#types">Standard or Advanced</a> implementations.</p>
+        <ul>
+		  <li><strong>Standard (iframe)</strong></li>
+          <ul>
+            <li>With the iframe implementation or the direct player URL, you will provide a <code>tracker</code> code. Here, the <code>analytics.js</code> library is loaded.</li>
+            <li>The Google universal analytics script will be loaded by the plugin.</li>
+          </ul>
+          <li><strong>Advanced (In-Page embed)</strong></li>
+          <ul>
+            <li>With the In_Page embed implementation, this plugin supports both the Google Analytics <code>ga.js</code> library and the newer <code>analytics.js</code> library. The plugin detects which library you are using.</li>
+            <li>Google Analytics must be separately loaded on the page before the player.</li>
+          </ul>
+        </ul>
+	  </div>
+			
+	  <div id="prepare" class="section">
+        <h2>Prepare</h2>
+		  <p>Next, you will need to do the following in preparation to integrate Google Analytics with the Brightcove Player:</p>
+		  <ol>
+			  <li>Get the Tracking ID for your Google Analytics account where you want to receive information. This can be found in your Google Account (<strong>Admin</strong> > <strong>Property Settings</strong> > <strong>Tracking Id</strong>). This is typically in the format of <code>UA-XXXXX-Y</code>.</li>
+			  <li>Host the <a href="https://github.com/BrightcoveOS/videojs-ga-videocloud/blob/master/dist/videojs.ga.videocloud.min.js">Google Analytics for Brightcove Player JavaScript file</a> on an internet accessible URL.</li>
+			  <li><strong>Optional</strong>: Install the <a href="https://chrome.google.com/webstore/detail/tag-assistant-by-google/kejbdjndbnbjgmefkgdddjlbokphdefk?hl=en">Google Tag Assistant</a> to help with debugging.</li>
+		  </ol>
+	  </div>
+			
+	  <div id="createplayer" class="section">
+        <h2>Create the player</h2>
+		<p class="BCL-aside">Note: The example below uses Video Cloud media assets. If you are a Perform customer you will need to make appropriate modifications.</p>
+        <p>To create a player and assign a video to it, follow these steps:</p>
+          <ol>
+              <li>In the <strong>Players</strong> module, create a new player or use an existing one.</li>
+              <li>In the <strong>Media</strong> module, select a video and publish it with this player.</li>
+              <li>Copy either the Standard (iframe) or Advanced (In-Page embed) code and paste it into a new HTML file.</li>
+          </ol>
+          <p class="BCL-aside">For details on how to get this embed code, see the <a href="../../brightcove-player/getting-started/quick-start-bc-player.html">Quick Start to Brightcove Player</a> document.</p>
+		  
+          
+      </div>
+			
+	  <div id="iframe" class="section">
+        <h2>Use Standard (iframe) code</h2>
+        <p>With the iframe implementation, you will use Video Cloud Studio to add the plugin and options to your player instead of doing it in the page code. Follow these steps to add the plugin:</p>
+		  <p class="BCL-aside">Note: If you are using the iframe implementation, and also have the GA tracking code on your web page, you will get double counts. This is because the iframe implementation loads the player as a separate domain from your web page. Google Analytics then registers 1 event for your website and 1 event for the player. It will look like two users are loading the page and watching the video.<br/><br/>
+		  If you need to include the GA tracking code on your web page, use the <a href="#inpageembed">Advanced (In-Page embed) code</a> solution.</p>
+        <ol>
+          <li><p>Return to the Brightcove player that you created earlier using Video Cloud Studio.</p></li>
+          <li><p>Scroll down to the <strong>Plugins</strong> section and select the edit button for this section.</p></li>
+          <li><p>Expand the <strong>JavaScript</strong> section and enter the URL for the Google Analytics JavaScript file which you placed in an internet accessible URL earlier.</p></li>
+          <div><img src="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/assets/google-analytics-plugin/plugin-javascript.png" alt="plugin-javascript" title="plugin-javascript"></div>
+          <li><p>Expand the <strong>Name, Options (JSON)</strong> section.</p></li>
+          <li><p>In the <strong>Name</strong> input field, enter the value <code>ga</code> for the name of the Google Analytics plugin.</p></li>
+          <li><p>In the <strong>Options (JSON)</strong> input field, enter the <code>tracker</code> option with your Tracker Id value for Google Analytics. You can add other options here as well.</p></li>
+          <div><img src="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/assets/google-analytics-plugin/plugin-name.png" alt="plugin-name" title="plugin-name"></div>
+          <li><p>Select the <strong>Save</strong> button for the <strong>Plugins</strong> section.</p></li>
+          <li><p>Select the <strong>Publish</strong> button.</p></li>
+          <li><p>If you haven't already done so, navigate to the <strong>Media</strong> module, select a video and publish it with this player.</p></li>
+          <li><p>Paste the Advanced (iframe) code into your page code and run it in the browser. You should be able to see the player and video events in your Google Analytics Reporting page.</p></li>
+        </ol>
+        <p>Your page code should look something like this:</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="131-149"></code></p>
+	  </div>
+
+      <div id="inpageembed" class="section">
+        <h2>Use Advanced (In-Page embed) code</h2>
+        <p>For the In-Page embed implementation, Google Analytics must be separately loaded on the page before the player. Follow these steps:</p>
+        <ol>
+			<li><p>Before the <code>video</code> element in the player code, add tracking code to load Google Analytics. You can get this tracking code from your Google Analytics <strong>Admin</strong> page.</p>
+				<p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="10-19"></code></p></li>
+			<li><p>After your player code, add a <code>script</code> tag. For the <code>src</code> attribute, use the URL for the Google Analytics JavaScript file which you placed in an internet accessible URL earlier.</p>
+				<p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="32"></code></p></li>
+			<li><p>Add custom script code:</p>
+				<ul>
+					<li>Line 38: Listens for the <code>loadstart</code> event for your player. Notice that the <code>video_1</code> value is taken from the <code>id</code> attribute that we added to the <code>video</code> element.</li>
+					<li>Line 39: Gets a reference to the player.</li>
+					<li>Line 40: Optional - writes the player's <code>mediinfo</code> object to the console. This is for informational purposes only. The Google Analytics plugin uses the <code>id</code> property found in this object.</li>
+					<li><p>Line 42: Initializes the Google Analytics plugin.</p></li>
+				</ul>
+				<p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="35-44"></code></p></li>
+        </ol>
+        <p>Your embed-in-page code should look something like this:</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="1-47"></code></p>
+		  
+      </div>
+
+      <div id="options" class="section">
+        <h2>Options</h2>
+        <p>You can provide options to the plugin to override default values. Here is an example of how to add options to your embed-in-page code:</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="57-62"></code></p>
+        <p>This plugin supports the following options:</p>
+        <h3>tracker</h3>
+        <p>If set, this tracker code will be used for the iframe implementation and the direct player URL. This is not used for the embed-in-page implementation.</p>
+        <p>Default: Not set</p>
+        <p>Example:</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="66-68"></code></p>
+        <h3>eventNames</h3>
+        <p>You can override or localize the names for the player events.</p>
+        <p>Default:</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="72-87"></code></p>
+        <p>Example:</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="89-93"></code></p>
+        <h3>eventCategory</h3>
+        <p>This is the category sent to Google Analytics. For details about using categories, see the <a href="https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide">Google Analytics Event Tracking</a> guide.</p>
+        <p>Default: <code>'Brightcove Player'</code></p>
+        <p>Example:</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="98-100"></code></p>
+        <h3>eventLabel</h3>
+        <p>This is the label sent to Google Analytics. For details about using labels, see the <a href="https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide">Google Analytics Event Tracking</a> guide.</p>
+        <p>Default: <code>VIDEO_ID</code> or <code>VIDEO_NAME</code>. If either of these values is not available, then the plugin will use the base name of the video path. If the path is <code>http://s3.amazonaws.com/tiger.mp4</code>, then the label would be <code>tiger</code>.</p>
+        <p>Example:</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="105-107"></code></p>
+        <h3>eventsToTrack</h3>
+        <p>These are the events you would like to track. They include the following:</p>
+        <ul>
+				  <li><code>player_load</code> : The player has loaded.</li>
+          <li><code>video_load</code> : The video has loaded. This event will fire again when another video is loaded.</li>
+          <li><code>percent_played</code> : Every x% of the video played, with the percentage as a value, where x is defined by the <code>percentsPlayedInterval</code> option. The default is 10.</li>
+          <li><code>start</code> : Video playback has started. Triggered once per video load.</li>
+          <li><code>end</code> : Video playback has completed. Triggered once per video load.</li>
+        </ul>
+        <p>Default:</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="112-113"></code></p>
+        <p>Example:</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="116-120"></code></p>
+        <h3>percentsPlayedInterval</h3>
+        <p>This option goes with the <code>percent_played</code> event. Every x% of the video played will be sent to Google Analytics, where x is defined by the the <code>percentsPlayedInterval</code> value.</p>
+        <p>Default: 10</p>
+        <p>Example:</p>
+        <p><code data-gist-id="b0571390f12559cd265d" data-gist-hide-footer="true" data-gist-line="125-127"></code></p>
       </div>
 		</div>
 	</div>
 	<!-- bcl scripts -->
-	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.2/gist-embed.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.2/gist-embed.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.0/fastclick.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.3/handlebars.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/highlight.min.js"></script>
 	<script src="//docs.brightcove.com/en/scripts/log.js"></script>
 	<script src="//docs.brightcove.com/en/scripts/docs-nav-data.min.js"></script>
-	<script src="//docs.brightcove.com/en/scripts/bcls-doc-site-v1.js"></script>
+	<script src="//docs.brightcove.com/en/scripts/bcls-doc-site.js"></script>
 	<script src="//docs.brightcove.com/en/scripts/bc-mapi.js"></script>
 	<script>
 		$(document).foundation();
@@ -64,17 +197,11 @@
 	<script type="text/javascript">
 		/******** Any scripts specific to page samples should go here *********/
 	</script>
-	
-    
-<iframe width="550" height="475" frameborder="0" src="
-http://survey.clicktools.com/app/survey/go.jsp?iv=3poon3e7e9spn&q1=
-[articleURL]" style="margin-left:25%; padding-bottom:20px;"></iframe>
-<br><br>
-<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
-<script>
-var feedbackMail = document.getElementById("feedbackMail");
-feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
-</script>
+	<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+    <script>
+	var feedbackMail = document.getElementById("feedbackMail");
+	feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+	</script>
 </body>
 
 </html>
