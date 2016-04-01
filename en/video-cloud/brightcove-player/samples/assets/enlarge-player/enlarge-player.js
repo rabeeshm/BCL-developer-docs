@@ -13,4 +13,17 @@ videojs.plugin('enlargePlayer', function() {
     function makePlayerSmall() {
         player.dimensions(smallWidth, smallHeight);
     }
+
+    function mouseoutOn() {
+        player.on('mouseout', makePlayerSmall);
+    }
+
+    function mouseoutOff() {
+        player.off('mouseout', makePlayerSmall);
+    }
+
+    player.on('mouseover', makePlayerLarge);
+    player.on('play', mouseoutOff);
+    player.on('ended', mouseoutOn);
+    mouseoutOn();
 });
