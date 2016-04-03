@@ -4,32 +4,29 @@ videojs.plugin('enlargePlayer', function() {
         largeHeight = 360,
         smallWidth = 272,
         smallHeight = 153,
-        inpagePlayerWrapper = document.getElementById('inpagePlayerWrapper');
+        playerWrapper = document.getElementById('playerWrapper');
 
 
     function makePlayerLarge() {
-        console.log('make large');
-        inpagePlayerWrapper.setAttribute('style', 'width:' + largeWidth + 'px;height:' + largeHeight + 'px');
+        playerWrapper.setAttribute('style', 'width:' + largeWidth + 'px;height:' + largeHeight + 'px;transition: width .3s ease-in-out, height .3s ease-in-out;');
     }
 
     function makePlayerSmall() {
-        console.log('make small');
-        inpagePlayerWrapper.setAttribute('style', 'width:' + smallWidth + 'px;height:' + smallHeight + 'px;');
+        playerWrapper.setAttribute('style', 'width:' + smallWidth + 'px;height:' + smallHeight + 'px;transition: width .3s ease-in-out, height .3s ease-in-out;');
     }
 
     function mouseoutOn() {
-        player.on('mouseout', makePlayerSmall);
+        playerWrapper.addEventListener('mouseout', makePlayerSmall);
         makePlayerSmall();
     }
 
     function mouseoutOff() {
-        player.off('mouseout', makePlayerSmall);
+        playerWrapper.removeEventListener('mouseout', makePlayerSmall);
     }
 
     makePlayerSmall();
-    inpagePlayerWrapper.addEventListener('mouseover', makePlayerLarge);
-    inpagePlayerWrapper.addEventListener('mouseout', makePlayerSmall);
+    playerWrapper.addEventListener('mouseover', makePlayerLarge);
+    mouseoutOn();
     player.on('play', mouseoutOff);
     player.on('ended', mouseoutOn);
-    mouseoutOn();
 });
