@@ -53,7 +53,7 @@ videojs.plugin('enlargePlayer', function() {
         // on play, keep the player large
         player.on('play', mouseoutOff);
         // on pause or video end, make the player small
-        player.on('pause', mouseoutOff);
+        player.on('pause', mouseoutOn);
         player.on('ended', mouseoutOn);
     }
 
