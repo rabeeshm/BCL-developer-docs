@@ -41,15 +41,20 @@ videojs.plugin('enlargePlayer', function() {
         // remove the mouseout event listener
         playerWrapper.removeEventListener('mouseout', makePlayerSmall);
     }
-    // initially, make sure the player is small
-    makePlayerSmall();
-    // on mouseover make the player large
-    playerWrapper.addEventListener('mouseover', makePlayerLarge);
-    // on mouseout, make the player small
-    mouseoutOn();
-    // on play, keep the player large
-    player.on('play', mouseoutOff);
-    // on pause or video end, make the player small
-    player.on('pause', mouseoutOff);
-    player.on('ended', mouseoutOn);
+
+    // make sure the player wrapper exists - otherwise, do nothing
+    if (playerWrapper !== null) {
+        // initially, make sure the player is small
+        makePlayerSmall();
+        // on mouseover make the player large
+        playerWrapper.addEventListener('mouseover', makePlayerLarge);
+        // on mouseout, make the player small
+        mouseoutOn();
+        // on play, keep the player large
+        player.on('play', mouseoutOff);
+        // on pause or video end, make the player small
+        player.on('pause', mouseoutOff);
+        player.on('ended', mouseoutOn);
+    }
+
 });
