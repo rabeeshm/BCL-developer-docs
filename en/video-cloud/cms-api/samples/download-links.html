@@ -98,7 +98,7 @@
                             <option value="">ascending</option>
                         </select>
                     </p>
-                    <p><button class="bcls-button" id="makeFeed">Generate the Download Links</button></p>
+                    <p><button class="bcls-button" id="makeLinks">Generate the Download Links</button></p>
                 </fieldset>
                 <fieldset>
                     <legend>Output</legend>
@@ -106,7 +106,7 @@
                     <p>Current API request</p>
                     <pre><code id="apiRequest"></code></pre>
                     <p>Download links</p>
-                    <textarea id="feedDisplay" style="width:95%;height:30em;"></textarea>
+                    <textarea id="linksDisplay" style="width:95%;height:30em;"></textarea>
                 </fieldset>
             </div>
             <div class="section" id="javascript">
@@ -138,7 +138,7 @@
             &lt;option value=""&gt;ascending&lt;/option&gt;
         &lt;/select&gt;
     &lt;/h5&gt;
-    &lt;p&gt;&lt;button class="bcls-button" id="makeFeed"&gt;Generate the Feed&lt;/button&gt;&lt;/p&gt;
+    &lt;p&gt;&lt;button class="bcls-button" id="makeLinks"&gt;Generate the Feed&lt;/button&gt;&lt;/p&gt;
 &lt;/fieldset&gt;
 &lt;fieldset&gt;
     &lt;legend&gt;Output&lt;/legend&gt;
@@ -146,7 +146,7 @@
     &lt;h5&gt;Current API request&lt;/h5&gt;
     &lt;pre&gt;&lt;code id="apiRequest"&gt;&lt;/code&gt;&lt;/pre&gt;
     &lt;h5&gt;Generated MRSS feed&lt;/h5&gt;
-    &lt;textarea id="feedDisplay" style="width:95%;height:30em;"&gt;&lt;/textarea&gt;
+    &lt;textarea id="linksDisplay" style="width:95%;height:30em;"&gt;&lt;/textarea&gt;
 &lt;/fieldset&gt;</code></pre>
                 <p>Below is the JavaScript code used for this app.</p>
 <pre><code id="jscode"></code></pre>
@@ -171,29 +171,7 @@
     <script src="//docs.brightcove.com/en/scripts/vkbeautify.0.99.00.beta.js"></script>
 <script id="pageScript">
 var BCLS = ( function (window, document) {
-        var mrssStr = '<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:dcterms="http://purl.org/dc/terms/">',
-        sChannel = '<channel>',
-        eChannel = '</channel>',
-        sTitle = '<title>',
-        eTitle = '</title>',
-        sDescription = '<description>',
-        eDescription = '</description>',
-        sItem = '<item xmlns:media="http://search.yahoo.com/mrss/" xmlns:dcterms="http://purl.org/dc/terms/">',
-        eItem = '<dcterms:valid xmlns:dcterms="http://purl.org/dc/terms/">end=2020-10-15T00:00+01:00; scheme=W3C-DTF</dcterms:valid><dcterms:type>live-video</dcterms:type></item>',
-        sLink = '<link>',
-        eLink = '</link>',
-        sPubDate = '<pubDate>',
-        ePubDate = '</pubDate>',
-        sMediaContent = '<media:content',
-        eMediaContent = '</media:content>',
-        sMediaPlayer = '<media:player',
-        eMediaPlayer = '/>',
-        sMediaDescription = '<media:description>',
-        eMediaDescription = '</media:description>',
-        sMediaThumbnail = '<media:thumbnail',
-        eMediaThumbnail = '/>',
-        sMediaTitle = '<media:title>',
-        eMediaTitle = '</media:title>',
+        var fragment = document.createDocumentFragment(),
         // account stuff
         accountId,
         clientId,
@@ -213,16 +191,14 @@ var BCLS = ( function (window, document) {
         account_id = document.getElementById('account_id'),
         client_id = document.getElementById('client_id'),
         client_secret = document.getElementById('client_secret'),
-        feedTitle = document.getElementById('feedTitle'),
-        feedDescription = document.getElementById('feedDescription'),
         numberSelect = document.getElementById('numberSelect'),
         searchStr = document.getElementById('searchStr'),
         sortSelect = document.getElementById('sortSelect'),
         directionSelect = document.getElementById('directionSelect'),
-        makeFeed = document.getElementById('makeFeed'),
+        makeLinks = document.getElementById('makeLinks'),
         logger = document.getElementById('logger'),
         apiRequest = document.getElementById('apiRequest'),
-        feedDisplay = document.getElementById('feedDisplay'),
+        linksDisplay = document.getElementById('linksDisplay'),
         allButtons = document.getElementsByName('button');
 
     /**
@@ -307,7 +283,22 @@ var BCLS = ( function (window, document) {
     }
 
     function addItems() {
-        var i, iMax, video, pubdate, videoURL, thumbnailURL, doThumbnail = true;
+        var i,
+            iMax,
+            video,
+            pubdate,
+            videoURL,
+            linkTable = document.createElement('table'),
+            linkHead = document.createElement('thead'),
+            linkBody = document.createElement('tbody'),
+            linkTh,
+            linkTd,
+            linkTr;
+        fragment.appendChild(linkTable);
+        linkTable.appendChild(linkHead);
+        linkTable.appendChild(linkBody);
+        linkTr = document.createElement('tr');
+        
         if (videosArray.length > 0) {
             iMax = videosArray.length;
             for (i = 0; i < iMax; i += 1) {
@@ -349,7 +340,7 @@ var BCLS = ( function (window, document) {
         }
         mrssStr += eChannel + '</rss>';
         logger.textContent = 'Finished!'
-        feedDisplay.textContent = vkbeautify.xml(mrssStr);
+        linksDisplay.textContent = vkbeautify.xml(mrssStr);
         enableButtons();
     }
 
@@ -506,7 +497,7 @@ var BCLS = ( function (window, document) {
 
     function init() {
         // event handlers
-        makeFeed.addEventListener('click', function() {
+        makeLinks.addEventListener('click', function() {
             var numVideos;
             // get the inputs
             clientId = client_id.value;
@@ -544,8 +535,8 @@ var BCLS = ( function (window, document) {
                 setRequestData('getVideos');
             }
         });
-        feedDisplay.addEventListener('click', function() {
-            feedDisplay.select();
+        linksDisplay.addEventListener('click', function() {
+            linksDisplay.select();
         });
     }
 
