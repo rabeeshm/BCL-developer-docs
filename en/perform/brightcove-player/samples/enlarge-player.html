@@ -26,7 +26,7 @@
         </script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
         <!-- Page styles -->
-
+        <!-- <link rel="stylesheet" href="./assets/enlarge-player/enlarge-player.css"> -->
     </head>
     <body>
         <!-- header navbar -->
@@ -43,25 +43,26 @@
         <div id="main" class="large-10 small-12 columns">
             <div id="top" class="section">
                 <h1>Enlarge Player on Mouseover</h1>
-                <p>This uses JavaScript to enlarge a small player .</p>
+                <p>This uses JavaScript to enlarge a small player when you mouse over it, and then shrink it to small size when you mouse off. There is additional logic using the <a href="../reference/api/player.html">Player API</a> to remove the shrink behavior while the video is playing, and then restore it again when the video is paused or ends.</p>
+                <p>As created here, this sample must use the <code>Advanced</code> (in-page) player embed. You could create this functionality using the <code>iframe</code> embed code also, but the logic would be a little different and would not lend itself to being turned into a plugin.</p>
             </div>
                 <div id="player" class="section">
-                    <h2>The iframe players</h2>
-                    <h3>iframe player</h3>
-                    <iframe id="iframePlayer" src="//players.brightcove.net/1752604059001/4kHAiDICl_default/index.html?videoId=4825279542001" allowfullscreen webkitallowfullscreen mozallowfullscreen style="width: 272px; height: 153px;"></iframe>
-                    <h3>In-page player</h3>
-                    <video id="inpagePlayer" data-video-id="4825279542001"
-                    data-account="1752604059001"
-                    data-player="4kHAiDICl"
-                    data-embed="default"
-                    class="video-js"
-                    controls
-                    style="width: 272px; height: 153px;"></video>
-                    <script src="//players.brightcove.net/1752604059001/4kHAiDICl_default/index.min.js"></script>
+                    <h2>The player</h2>
+                    <p>Mouse over and off the player below to see the functionality.</p>
+                    <div id="playerWrapper">
+                        <video id="inpagePlayer" data-video-id="4825279542001"
+                        data-account="1752604059001"
+                        data-player="4kHAiDICl"
+                        data-embed="default"
+                        class="video-js"
+                        controls
+                        style="width: 100%; height: 100%;"></video>
+                        <script src="//players.brightcove.net/1752604059001/4kHAiDICl_default/index.min.js"></script>
+                    </div>
                 </div>
                 <div id="code" class="section">
                     <h2>How it works</h2>
-                    <p>The following sections explain the player, JavaScript and CSS code used in the example.</p>
+                    <p>The following sections explain the player, JavaScript and CSS code used in the example. We will build the code to all work in the page initially for testing, but we're create it in a way that we can add it to the player as a plugin once we know it's working correctly.</p>
                     <h3><a name="HTMLCode"></a>The HTML code</h3>
                     <ol>
                         <li>Add the following HTML code to your page code wherever you want the player to appear initially:</li>
@@ -72,28 +73,137 @@
                     <ol start="2">
                         <li>In the <strong>Players</strong> module, duplicate the Brightcove Default Player.</li>
                         <li><strong>Publish</strong> the player.</li>
-                        <li><span class="video-cloud-only">In the <strong>Media</strong> module, select a video and publish it with this player.</span><span class="perform-only">Assign video content to the player and publish it.</span></li>
-                        <li>Copy the <strong>iframe</strong> embed code and paste it inside the <strong>playerWrapper</strong> div tag.</li>
+                        <li><span class="video-cloud-only">In the <strong>Media</strong> module, select a video and publish it with this player.</span><span class="perform-only">Assign video content to the player and publish it.</span> Set the <code>width</code> and <code>height</code> of the player to <code>100%</code>.</li>
+                        <li>Copy the <strong>advanced</strong> embed code and paste it into the page.</li>
+                        <li>Add the <code>id</code> <code>inpagePlayer</code> to the <code>video</code> tag.</li>
+                        <li>Wrap the entire player embed code inside a <code>div</code> tag that has the <code>id</code> <code>playerWrapper</code>.</li>
+                        <li>The whole HTML for the player and wrapper should look like this:
+<pre><code><span class="bcls-highlight">&lt;div id="playerWrapper"&gt;</span>
+    &lt;video id="inpagePlayer" data-video-id="4825279542001"
+    data-account="1752604059001"
+    data-player="4kHAiDICl"
+    data-embed="default"
+    class="video-js"
+    controls
+    style="width: 100%; height: 100%;"&gt;&lt;/video&gt;
+    &lt;script src="//players.brightcove.net/1752604059001/4kHAiDICl_default/index.min.js"&gt;&lt;/script&gt;
+<span class="bcls-highlight">&lt;/div&gt;</span></code></pre>
+                        </li>
                 </ol>
-                <p class="BCL-aside">For details on how to get this embed code, see the <a href="../../brightcove-player/getting-started/quick-start-bc-player.html">Quick Start to Brightcove Player</a> document.</p>
-                <p>The player wrapper with the embed code should look like this:</p>
-                <p><script src="https://gist.github.com/0e4e148e4e89b53c6aa2.js"></script></p>
+                <h3>The CSS code</h3>
+                <p>Next we'll add a little bit of CSS code to provide initial styles for the player wrapper. This code could go in the HTML page, but we'll create it as a separate CSS file so that we can add it to the player later.</p>
+                <ol start="9">
+                    <li>Create a new file called enlarge-player.css - you will need to put this file on a public web server later so that Video Cloud can see it.</li>
+                    <li>Add the following code to the CSS file:
+<pre><code>/* initial styles for the player wrapper */
+#playerWrapper {
+    width: 272px;
+    height: 153px;
+    transition: width .4s ease-in-out, height .4s ease-in-out;
+}</code></pre>
+                    </li>
+                    <li>Now add a <code>link</code> tag to the <code>head</code> section of the HTML page to include the CSS file:
+<pre><code>&lt;link rel="stylesheet" href="path-to-the-css-file/enlarge-player.css"&gt;</code></pre>
+                    </li>
+                    <li>Note that the style rule simply sets the height and width of the wrapper element, and adds a simple transition for the width adn height to provide a little animation when we resize it.</li>
+                </ol>
                 <h3><a name="JSCode"></a>The JavaScript code</h3>
-                <ol start="6">
-                    <li>Add the following JavaScript, which handles the drag and drop actions, to your page code.</li>
+                <p>Now we'll add JavaScript to handle the resizing of the player wrapper. Like the CSS code, this could go in the HTML page, but we'll create it as a separate file to add to player as a plugin later.</p>
+                <ol start="13">
+                    <li>Create a new file and save it as enlargePlayer.js - like the CSS file, you will need to put this on a public web server later.</li>
+                    <li>Add the following code to the file:
+<pre><code>videojs.plugin('enlargePlayer', function() {
+    var player = this,
+        // set the large and small sizes
+        // you could also all options to be passed in to set these sizes
+        largeWidth = 640,
+        largeHeight = 360,
+        smallWidth = 272,
+        smallHeight = 153,
+        // get a reference to the player wrapper
+        // if that element doesn't exist in the HTML, this plugin will fail
+        playerWrapper = document.getElementById('playerWrapper');
+
+    /**
+     * make the player large
+     */
+    function makePlayerLarge() {
+        playerWrapper.setAttribute('style', 'width:' + largeWidth + 'px;height:' + largeHeight + 'px;transition: width .4s ease-in-out, height .4s ease-in-out;');
+    }
+
+    /**
+     * make the player small
+     */
+    function makePlayerSmall() {
+        playerWrapper.setAttribute('style', 'width:' + smallWidth + 'px;height:' + smallHeight + 'px;transition: width .4s ease-in-out, height .4s ease-in-out;');
+    }
+
+    /**
+     * add the mouseout event listener
+     */
+    function mouseoutOn() {
+        // add the event listener to make the player small on mouseout
+        playerWrapper.addEventListener('mouseout', makePlayerSmall);
+        // make the player small now
+        makePlayerSmall();
+    }
+
+    /**
+     * remove the mouseout event listener
+     */
+    function mouseoutOff() {
+        // remove the mouseout event listener
+        playerWrapper.removeEventListener('mouseout', makePlayerSmall);
+    }
+
+    // make sure the player wrapper exists - otherwise, do nothing
+    if (playerWrapper !== null) {
+        // initially, make sure the player is small
+        makePlayerSmall();
+        // on mouseover make the player large
+        playerWrapper.addEventListener('mouseover', makePlayerLarge);
+        // on mouseout, make the player small
+        mouseoutOn();
+        // on play, keep the player large
+        player.on('play', mouseoutOff);
+        // on pause or video end, make the player small
+        player.on('pause', mouseoutOn);
+        player.on('ended', mouseoutOn);
+    }
+
+});
+</code></pre>
+                    </li>
+                    <li>Add the following code to your page, somewhere after the player code, to include the JavaScript file and activate the plugin:
+<pre><code>&lt;script src="./assets/enlarge-player/enlarge-player.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+    videojs('inpagePlayer').enlargePlayer();
+&lt;/script&gt;</code></pre>
+                    </li>
+                    <li>Save changes and browse the page through your local or remote web server - it should function like the sample above. The comments in the JavaScript explain how it works.</li>
                 </ol>
-                <p><script src="https://gist.github.com/687636920799a9387ff4.js"></script></p>
-                <p>You can place the JavaScript inside a <code>script</code> tag in the page, or include it from an external <code>.js</code> file.</p>
-                <h3><a name="CSSCode"></a>The stylesheet</h3>
-                <ol start="7">
-                    <li>Add the following CSS to your page:</li>
-                </ol>
-                <p><script src="https://gist.github.com/24fde17a987c864137a3.js"></script></p>
-                <p class="BCL-aside">The width of the player wrapper <code>div</code> is based on the default size of the player - if you are using a different size, you will need to adjust it.</p>
             </div>
-                <ol start="8">
-                    <li>Browse the HTML page. You should be able to click and drag the <span class="drag-icon">+</span> icon beside the player to reposition it.</li>
-                </ol>
+            <div class="section" id="Make_a_plugin">
+                <h2>Make a plugin</h2>
+                <p>If your code is working correctly, you can now add it to the player as a plugin.</p>
+                <ol start="16">
+                  <li>Move your plugin JavaScript and CSS files to an Internet accessible location of your choice.</li>
+                  <li>Go back to Studio and locate your player.</li>
+                  <li>Locate the <strong>PLUGINS</strong> section, and click the <strong>Edit</strong> button.</li>
+                  <li>In the <strong>JavaScript</strong> area, enter the path to your Internet accessible JavaScript file.</li>
+                  <li>In the <strong>CSS</strong> area, enter the path to your Internet accessible CSS file.</li>
+                  <li>In the <strong>Name, Options (JSON)</strong> area, enter the plugin name (enlargePlayer) and an emptry JSON object <code>{}</code> since there are no options.</li>
+                  <li>Save and publish your player.</li>
+                <li>You can now removed the link tag you added to your HTML page in step 11, and the script tags you added in step 14, as they are no longer needed.</li>
+                <li>Save and test your page again - it should work as before.</li>
+            </div>
+            <div class="section" id="Implementation_notes">
+                <h2>Implementation notes</h2>
+                <ul>
+                    <li>If you want to be able to specify the small and large sizes of the player for each instance, you could pass those in as options to the plugin, and then modify the plugin code to read the values from the options object. See the <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-dev-quick-start.html#passdatatoplugin">Quick Start to Plugin Development</a> for more detail on how to do this.</li>
+                    <li>If you want to use the iframe player instead of the inpage player. The player wrapper div would surround the iframe tag, and the Javascript to manage the size of the player would be very similar to what you see here. It would need to be in the HTML page, however, rather than a player plugin.</li>
+                </ul>
+            </div>
             <div class="section" id="BCLreferences">
                 <h2>Related Topics</h2>
                 <ul>
@@ -114,10 +224,13 @@
     <script src="/en/scripts/bcls-doc-site-v1.js"></script>
     <script src="/en/scripts/bc-mapi.js"></script>
     <script src="/en/scripts/expander.js"></script>
+    <!-- <script src="./assets/enlarge-player/enlarge-player.js"></script>
+    <script>
+        videojs('inpagePlayer').enlargePlayer();
+    </script> -->
     <script>
     $(document).foundation();
     </script>
-
 
 <iframe id="CSAT" src="
 http://survey.clicktools.com/app/survey/go.jsp?iv=3poon3e7e9spn&q1=
