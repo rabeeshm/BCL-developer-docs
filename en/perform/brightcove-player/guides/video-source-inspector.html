@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
     <!-- change title to match the h1 heading -->
-    <title>Video Source Inspector</title>
+    <title>Video Renditions Inspector</title>
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
     <script src="//use.edgefonts.net/source-code-pro.js"></script>
@@ -47,11 +47,11 @@
         </div>
         <div id="main" class="large-10 small-12 columns">
             <div id="top" class="section">
-                <h1>Video Source Inspector</h1>
+                <h1>Video Renditions Inspector</h1>
                 <p>This is sample uses the CMS API to inspect the renditions for all videos in an account. It generates a report showing:</p>
                 <ul>
-                    <li>Summary showing how many videos have <strong>no</strong> HLS, MP4, and other renditions</li>
-                    <li>Report for each video showing the number of HLS renditions (with the bitrate range), MP4 (HTTP) renditions (with the bitrate range), MP4 (RTMP) renditions, and other renditions</li>
+                    <li>Summary showing how many videos have <strong>no</strong> HLS or MP4 renditions available over HTTP(S) </li>
+                    <li>Report for each video showing the number of HLS and MP4 (HTTP) renditions (with the bitrate range)</li>
                 </ul>
             </div>
             <div id="obtaincredentials" class="section">
@@ -82,7 +82,7 @@
                 </fieldset>
                 <fieldset>
                     <legend>Output</legend>
-                    <p id="logger" style="color:rgb(237, 104, 38)">Waiting for input...</p>
+                    <div id="logger" style="color:rgb(237, 104, 38)"><p id="logText">Waiting for input...</p></div>
                     <p>Current API request</p>
                     <pre><code id="apiRequest"></code></pre>
                     <p>Rendition report</p>
@@ -129,6 +129,15 @@ var BCLS = ( function (window, document) {
         client_secret = document.getElementById('client_secret'),
         makeReport = document.getElementById('makeReport'),
         logger = document.getElementById('logger'),
+        logText = document.getElementById('logText'),
+        pLog2 = document.createElement('p'),
+        pLog3 = document.createElement('p'),
+        pLog4 = document.createElement('p'),
+        pLog5 = document.createElement('p'),
+        spanIntro = document.createElement('span'),
+        spanOf = document.createElement('span').
+        spanTotal = document.createElement('span'),
+        spanCount = document.createElement('span'),
         apiRequest = document.getElementById('apiRequest'),
         reportDisplay = document.getElementById('reportDisplay'),
         allButtons = document.getElementsByName('button');
@@ -200,9 +209,7 @@ var BCLS = ( function (window, document) {
         var i,
             iMax = renditions.length,
             hlsRenditions = [],
-            mp4HTTPRenditions = [],
-            mp4RTMPRenditions = [],
-            otherRenditions = [];
+            mp4HTTPRenditions = [];
         // console.log('renditions', renditions);
         // separate renditions by type
         for (i = 0; i < iMax; i += 1) {
@@ -211,15 +218,11 @@ var BCLS = ( function (window, document) {
             } else if (renditions[i].video_container === 'MP4') {
                 if (renditions[i].progressive_download) {
                     mp4HTTPRenditions.push(renditions[i]);
-                } else {
-                    mp4RTMPRenditions.push(renditions[i]);
                 }
-            } else {
-                otherRenditions.push(renditions[i]);
             }
         }
         // sort renditions by encoding rate
-        callback(hlsRenditions, mp4HTTPRenditions, mp4RTMPRenditions, otherRenditions);
+        callback(hlsRenditions, mp4HTTPRenditions);
     }
 
     function writeReport() {
@@ -234,12 +237,10 @@ var BCLS = ( function (window, document) {
             hlsHighRate,
             mp4LowRate,
             mp4HighRate;
-        reportStr = '<h3>Detailed Video Report</h3><table><thead><tr><th>ID</th><th>Name</th><th>HLS Renditions / <br />bitrate range (mbps)</th><th>MP4 Renditions (HTTP) /<br />bitrate range (mbps)</th><th>MP4 Renditions (RTMP)</th><th>Other Renditions</th></tr></thead><tbody>';
-        summaryReportStr = '<h3>Summary Report</h3><table><thead><tr><th>Videos with <strong>no</strong> HLS Renditions<br /><button id="gethlsRenditions" class="bcls-button">Get the ids</button><br /><textarea id="hlsRenditions" style="width:130px;height:100px;"></textArea></th><th>Videos with <strong>no</strong> HTTP MP4 Renditions<br /><button id="getmp4HTTPRenditions" class="bcls-button">Get the ids</button><br /><textarea id="mp4HTTPRenditions" style="width:130px;height:100px;"></textArea></th><th>Videos with <strong>no</strong> RTMP MP4 Renditions</th><th>Video with <strong>no</strong> Other Renditions</th></tr></thead><tbody>';
+        reportStr = '<h3>Detailed Video Report</h3><table><thead><tr><th>ID</th><th>Name</th><th>HLS Renditions / <br />bitrate range (mbps)</th><th>MP4 Renditions (HTTP) /<br />bitrate range (mbps)</th></tr></thead><tbody>';
+        summaryReportStr = '<h3>Summary Report</h3><table><thead><tr><th>Videos with <strong>no</strong> HLS Renditions<br /><button id="gethlsRenditions" class="bcls-button">Get the ids</button><br /><textarea id="hlsRenditions" style="width:130px;height:100px;"></textArea></th><th>Videos with <strong>no</strong> HTTP MP4 Renditions<br /><button id="getmp4HTTPRenditions" class="bcls-button">Get the ids</button><br /><textarea id="mp4HTTPRenditions" style="width:130px;height:100px;"></textArea></th></tr></thead><tbody>';
         summaryData.hlsRenditions = [];
         summaryData.mp4HTTPRenditions = [];
-        summaryData.mp4RTMPRenditions = [];
-        summaryData.otherRenditions = [];
 
         if (videosArray.length > 0) {
             iMax = videosArray.length;
@@ -253,21 +254,15 @@ var BCLS = ( function (window, document) {
                 if (video.mp4HTTPRenditions.length === 0) {
                     summaryData.mp4HTTPRenditions.push(video.id);
                 }
-                if (video.mp4RTMPRenditions.length === 0) {
-                    summaryData.mp4RTMPRenditions.push(video.id);
-                }
-                if (video.otherRenditions.length === 0) {
-                    summaryData.otherRenditions.push(video.id);
-                }
                 // generate the video detail row
                 hlsLowRate = (video.hlsRenditions.length > 0) ? video.hlsRenditions[0].encoding_rate / 1000 : 0;
                 hlsHighRate = (video.hlsRenditions.length > 0) ? video.hlsRenditions[video.hlsRenditions.length - 1].encoding_rate / 1000 : 0;
                 mp4LowRate = (video.mp4HTTPRenditions.length > 0) ? video.mp4HTTPRenditions[0].encoding_rate / 1000 : 0;
                 mp4HighRate = (video.mp4HTTPRenditions.length > 0) ? video.mp4HTTPRenditions[video.mp4HTTPRenditions.length - 1].encoding_rate / 1000 : 0;
-                reportStr += '<tr><td>' + video.id + '</td><td>' + video.name + '</td><td style="text-align:center">' + video.hlsRenditions.length + '<br />' + hlsLowRate + ' - ' + hlsHighRate + '</td><td style="text-align:center">' + video.mp4HTTPRenditions.length + '<br />' + mp4LowRate + ' - ' + mp4HighRate + '</td><td style="text-align:center">' + video.mp4RTMPRenditions.length + '</td><td style="text-align:center">' + video.otherRenditions.length + '</td></tr>'
+                reportStr += '<tr><td>' + video.id + '</td><td>' + video.name + '</td><td style="text-align:center">' + video.hlsRenditions.length + '<br />Bitrate range: ' + hlsLowRate + ' - ' + hlsHighRate + '</td><td style="text-align:center">' + video.mp4HTTPRenditions.length + '<br />Bitrate range: ' + mp4LowRate + ' - ' + mp4HighRate + '</td></tr>'
             }
 
-            summaryReportStr += '<tr><td>' + summaryData.hlsRenditions.length + '</td><td>' + summaryData.mp4HTTPRenditions.length + '</td><td>' + summaryData.mp4RTMPRenditions.length + '</td><td>' + summaryData.otherRenditions.length + '</td></tr></tbody></table>';
+            summaryReportStr += '<tr><td>' + summaryData.hlsRenditions.length + '</td><td>' + summaryData.mp4HTTPRenditions.length + '</td></tr></tbody></table>';
             // finish video detail report
             reportStr += '</tbody></table>';
             logger.textContent = 'Finished!'
@@ -323,7 +318,7 @@ var BCLS = ( function (window, document) {
                     callback = function(renditions) {
                         if (renditions.length > 0) {
                             // get the best MP4 rendition
-                            processRenditions(renditions, function(hlsRenditions, mp4HTTPRenditions, mp4RTMPRenditions, otherRenditions) {
+                            processRenditions(renditions, function(hlsRenditions, mp4HTTPRenditions) {
                                 // console.log('hlsRenditions', hlsRenditions);
                                 if (hlsRenditions.length > 0) {
                                     sortArray(hlsRenditions, 'encoding_rate');
@@ -333,11 +328,6 @@ var BCLS = ( function (window, document) {
                                     sortArray(mp4HTTPRenditions, 'encoding_rate');
                                 }
                                 videosArray[callNumber].mp4HTTPRenditions = mp4HTTPRenditions;
-                                if (mp4RTMPRenditions.length > 0) {
-                                    sortArray(mp4RTMPRenditions, 'encoding_rate');
-                                }
-                                videosArray[callNumber].mp4RTMPRenditions = mp4RTMPRenditions;
-                                videosArray[callNumber].otherRenditions = otherRenditions;
                             });
 
                         }
@@ -351,13 +341,11 @@ var BCLS = ( function (window, document) {
                     };
                 videosArray[callNumber].hlsRenditions = [];
                 videosArray[callNumber].mp4HTTPRenditions = [];
-                videosArray[callNumber].mp4RTMPRenditions = [];
-                videosArray[callNumber].otherRenditions = [];
                 endPoint = accountId + '/videos/' + videosArray[callNumber].id + '/assets/renditions';
                 requestData.url = baseURL + endPoint;
                 requestData.requestType = 'GET';
                 apiRequest.textContent = requestData.url;
-                logger.textContent = 'Getting renditions for video ' + videosArray[callNumber].name;
+                logger.textContent = 'Getting renditions for video ' + callNumber + ' of ' + totalVideos;
                 getMediaData(requestData, id, callback);
                 break;
         }
@@ -480,12 +468,12 @@ var BCLS = ( function (window, document) {
 http://survey.clicktools.com/app/survey/go.jsp?iv=3poon3e7e9spn&q1=
 [articleURL]" style="margin-left:25%; padding-bottom:20px;width:550px;height:475px;border:none"></iframe>
 <script>
-    
+
     var cSat = document.getElementById('CSAT'),
         cSatSrc = cSat.getAttribute('src'),
         pageurl = window.location.href;
     cSat.setAttribute('src', cSatSrc.replace('[articleURL]', pageurl));
-    
+
 </script>
 <br><br>
 <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
