@@ -109,7 +109,10 @@
             <div id="csvDisplay" class="section">
                 <h2>CSV Data</h2>
                 <p>Copy and paste the data below into a .csv file to view it in your spreadsheet application.</p>
-                <textarea name="csvData" id="csvData" cols="30" rows="10"></textarea>
+                <h3>Summary data</h3>
+                <textarea name="csvSummaryData" id="csvSummaryData" style="width:95%;height:10em;"></textarea>
+                <h3>Detailed data</h3>
+                <textarea name="csvData" id="csvData" style="width:95%;height:10em;"></textarea>
             </div>
         </div>
     </div>
@@ -141,10 +144,6 @@
                 callNumber = 0,
                 videosArray = [],
                 summaryData = {},
-                noHLSnoMP4 = [],
-                yesHLSnoMP4 = [],
-                noHLSyesMP4 = [],
-                yesHLSyesMP4 = [],
                 reportStr,
                 csvStr,
                 summaryReportStr,
@@ -156,6 +155,7 @@
                 content,
                 logger = document.getElementById('logger'),
                 logText = document.getElementById('logText'),
+                csvSummaryData = document.getElementById('csvSummaryData'),
                 csvData = document.getElementById('csvData'),
                 reportDisplay = document.getElementById('reportDisplay'),
                 apiRequest = document.getElementById('apiRequest'),
@@ -271,12 +271,29 @@
                     hlsLowRate,
                     hlsHighRate,
                     mp4LowRate,
-                    mp4HighRate;
+                    mp4HighRate,
+                    reportTable = document.createElement('table'),
+                    summaryReportTable = document.createElement('table'),
+                    reportTableHead = document.createElement('thead'),
+                    summaryTableHead = document.createElement('thead'),
+                    reportTableBody = document.createElement('tbody'),
+                    summaryTableBody = document.createElement('tbody'),
+                    tr,
+                    th,
+                    td,
+                    content;
+                reportTable.appendChild(reportTableHead);
+                reportTable.appendChild(reportTableBody);
+                summaryReportTable.appendChild(summaryTableHead);
+                summaryReportTable.appendChild(summaryTableBody);
                 reportStr = '<h3>Detailed Video Report</h3><table><thead><tr><th>ID</th><th>Name</th><th>HLS Renditions / <br />bitrate range (mbps)</th><th>MP4 Renditions (HTTP) /<br />bitrate range (mbps)</th></tr></thead><tbody>';
                 summaryReportStr =
                     '<h3>Summary Report</h3><table><thead><tr><th>Videos with <strong>no</strong> HLS Renditions<br /><button id="gethlsRenditions" class="bcls-button">Get the ids</button><br /><textarea id="hlsRenditions" style="width:130px;height:100px;"></textArea></th><th>Videos with <strong>no</strong> HTTP MP4 Renditions<br /><button id="getmp4HTTPRenditions" class="bcls-button">Get the ids</button><br /><textarea id="mp4HTTPRenditions" style="width:130px;height:100px;"></textArea></th></tr></thead><tbody>';
-                summaryData.hlsRenditions = [];
-                summaryData.mp4HTTPRenditions = [];
+
+                summaryData.noHLSnoMP4 = [],
+                summaryData.yesHLSnoMP4 = [],
+                summaryData.noHLSyesMP4 = [],
+                summaryData.yesHLSyesMP4 = [],
 
                 if (videosArray.length > 0) {
                     iMax = videosArray.length;
