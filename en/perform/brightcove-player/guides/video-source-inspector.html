@@ -23,12 +23,12 @@
             max-width: 60%;
             font-size: .8rem;
         }
-        
+
         fieldset {
             border: 1px #366 solid;
             border-radius: 5px;
         }
-        
+
         .bcls-button {
             font-weight: bold;
         }
@@ -94,18 +94,29 @@
                     </p>
                 </fieldset>
                 <fieldset>
-                    <legend>Output</legend>
+                    <legend>Log</legend>
                     <div id="logger" style="color:rgb(237, 104, 38)">
                         <p id="logText">Waiting for input...</p>
                     </div>
                     <p>Current API request</p>
                     <pre><code id="apiRequest"></code></pre>
-                    <p>Rendition report</p>
-                    <div id="reportDisplay"></div>
                 </fieldset>
             </div>
-
-
+            <div class="section" id="renditionReport">
+                <h2>Rendition report</h2>
+                <h3>Summary report</h3>
+                <div id="summaryReport"></div>
+                <h3>Detailed report</h3>
+                <div id="detailedReport"></div>
+            </div>
+            <div id="csvDisplay" class="section">
+                <h2>CSV Data</h2>
+                <p>Copy and paste the data below into a .csv file to view it in your spreadsheet application.</p>
+                <h3>Summary data</h3>
+                <textarea name="csvSummaryData" id="csvSummaryData" style="width:95%;height:10em;"></textarea>
+                <h3>Detailed data</h3>
+                <textarea name="csvData" id="csvData" style="width:95%;height:10em;"></textarea>
+            </div>
         </div>
     </div>
     <!-- bcl scripts -->
@@ -137,31 +148,37 @@
                 videosArray = [],
                 summaryData = {},
                 reportStr,
+                csvStr,
                 summaryReportStr,
                 // elements
                 account_id = document.getElementById('account_id'),
                 client_id = document.getElementById('client_id'),
                 client_secret = document.getElementById('client_secret'),
                 makeReport = document.getElementById('makeReport'),
+                content,
                 logger = document.getElementById('logger'),
                 logText = document.getElementById('logText'),
-                pLog2 = document.createElement('p'),
-                pLog3 = document.createElement('p'),
-                pLog4 = document.createElement('p'),
-                pLog5 = document.createElement('p'),
-                plog2El,
-                plog3El,
-                pLog4El,
-                Plog5El,
-                spanIntro = document.createElement('span'),
-                spanOf = document.createElement('span').
-            spanTotal = document.createElement('span'),
-                spanCount = document.createElement('span'),
-                spanTotalEl,
-                spanCountEl,
+                csvSummaryData = document.getElementById('csvSummaryData'),
+                csvData = document.getElementById('csvData'),
+                summaryReport = document.getElementById('summaryReport'),
+                detailedReport = document.getElementById('detailedReport'),
                 apiRequest = document.getElementById('apiRequest'),
-                reportDisplay = document.getElementById('reportDisplay'),
-                allButtons = document.getElementsByName('button');
+                allButtons = document.getElementsByName('button'),
+                pLogGettingVideoSets = document.createElement('p'),
+                pLogGettingRenditions = document.createElement('p'),
+                pLogFinish = document.createElement('p'),
+                spanIntro1 = document.createElement('span'),
+                spanOf1 = document.createElement('span'),
+                spanIntro2 = document.createElement('span'),
+                spanOf2 = document.createElement('span'),
+                spanSetsTotal = document.createElement('span'),
+                spanSetsCount = document.createElement('span'),
+                spanVideosTotal = document.createElement('span'),
+                spanVideosCount = document.createElement('span'),
+                spanSetsTotalEl,
+                spanSetsCountEl,
+                spanVideosTotalEl,
+                spanVideosCountEl;
 
             /**
              * tests for all the ways a variable might be undefined or not have a value
@@ -169,7 +186,7 @@
              * @return {Boolean} true if variable is defined and has a value
              */
             function isDefined(x) {
-                if (x === "" || x === null || x === undefined || x === NaN) {
+                if (x === '' || x === null || x === undefined || x === NaN) {
                     return false;
                 }
                 return true;
@@ -258,12 +275,39 @@
                     hlsLowRate,
                     hlsHighRate,
                     mp4LowRate,
-                    mp4HighRate;
+                    mp4HighRate,
+                    reportTable = document.createElement('table'),
+                    summaryReportTable = document.createElement('table'),
+                    reportTableHead = document.createElement('thead'),
+                    summaryTableHead = document.createElement('thead'),
+                    reportTableBody = document.createElement('tbody'),
+                    summaryTableBody = document.createElement('tbody'),
+                    tr,
+                    th,
+                    td,
+                    content;
+                reportTable.appendChild(reportTableHead);
+                reportTable.appendChild(reportTableBody);
+                summaryReportTable.appendChild(summaryTableHead);
+                summaryReportTable.appendChild(summaryTableBody);
+                tr = document.createElement('tr');
+                reportTableHead.appendChild('tr');
+                th = document.createElement('th');
+                content = document.createTextNode('ID');
+                th.appendChild(content);
+                tr.appendChild(th);
+                th = document.createElement('th');
+                content = document.createTextNode('Name');
+                th.appendChild(content);
+                tr.appendChild(th);
                 reportStr = '<h3>Detailed Video Report</h3><table><thead><tr><th>ID</th><th>Name</th><th>HLS Renditions / <br />bitrate range (mbps)</th><th>MP4 Renditions (HTTP) /<br />bitrate range (mbps)</th></tr></thead><tbody>';
                 summaryReportStr =
                     '<h3>Summary Report</h3><table><thead><tr><th>Videos with <strong>no</strong> HLS Renditions<br /><button id="gethlsRenditions" class="bcls-button">Get the ids</button><br /><textarea id="hlsRenditions" style="width:130px;height:100px;"></textArea></th><th>Videos with <strong>no</strong> HTTP MP4 Renditions<br /><button id="getmp4HTTPRenditions" class="bcls-button">Get the ids</button><br /><textarea id="mp4HTTPRenditions" style="width:130px;height:100px;"></textArea></th></tr></thead><tbody>';
-                summaryData.hlsRenditions = [];
-                summaryData.mp4HTTPRenditions = [];
+
+                summaryData.noHLSnoMP4 = [],
+                summaryData.yesHLSnoMP4 = [],
+                summaryData.noHLSyesMP4 = [],
+                summaryData.yesHLSyesMP4 = [],
 
                 if (videosArray.length > 0) {
                     iMax = videosArray.length;
@@ -289,8 +333,10 @@
                     summaryReportStr += '<tr><td>' + summaryData.hlsRenditions.length + '</td><td>' + summaryData.mp4HTTPRenditions.length + '</td></tr></tbody></table>';
                     // finish video detail report
                     reportStr += '</tbody></table>';
-                    logger.textContent = 'Finished!'
-                    reportDisplay.innerHTML = summaryReportStr + reportStr;
+                    content = document.createTextNode('Finished!');
+                    pLogFinish.appendChild(content);
+                    logger.appendChild(pLogFinish);
+                    // reportDisplay.innerHTML = summaryReportStr + reportStr;
                     // get the buttons and set up event handlers
                     gethlsRenditions = document.getElementById('gethlsRenditions');
                     getmp4HTTPRenditions = document.getElementById('getmp4HTTPRenditions');
@@ -357,6 +403,11 @@
                             }
                             callNumber++;
                             if (callNumber < iMax) {
+                                if (callNumber === 1) {
+                                    logger.appendChild(pLogGettingRenditions);
+                                    spanVideosCountEl = document.getElementById('spanVideosCount');
+                                    spanVideosTotalEl = document.getElementById('spanVideosTotal');
+                                }
                                 setRequestData('getVideoRenditions');
                             } else {
                                 // write the report
@@ -369,7 +420,8 @@
                         requestData.url = baseURL + endPoint;
                         requestData.requestType = 'GET';
                         apiRequest.textContent = requestData.url;
-                        logger.textContent = 'Getting renditions for video ' + callNumber + ' of ' + totalVideos;
+                        spanVideosCountEl.textContent = callNumber;
+                        spanVideosTotalEl.textContent = totalVideos;
                         getMediaData(requestData, id, callback);
                         break;
                 }
@@ -400,7 +452,11 @@
                                         // set total videos
                                         totalVideos = parsedData.count;
                                         totalCalls = Math.ceil(totalVideos / limit);
-                                        logger.textContent = 'Total videos: ' + totalVideos;
+                                        logger.appendChild(pLogGettingVideoSets);
+                                        spanVideosCountEl = document.getElementById('spanVideosCount');
+                                        spanVideosTotalEl = document.getElementById('spanVideosTotal');
+                                        spanVideosCountEl.textContent = callNumber;
+                                        spanVideosTotalEl.textContent = totalVideos;
                                         setRequestData('getVideos');
                                     } else if (requestID === 'getVideos') {
                                         if (httpRequest.responseText === '[]') {
@@ -412,10 +468,10 @@
                                         videosArray = videosArray.concat(parsedData);
                                         callNumber++;
                                         if (callNumber < totalCalls) {
-                                            logger.textContent = 'Getting video set ' + callNumber;
+                                            spanVideosCountEl.textContent = callNumber;
+                                            spanVideosTotalEl.textContent = totalVideos;
                                             setRequestData('getVideos');
                                         } else {
-                                            logger.textContent = 'Video data for ' + totalVideos + ' retrieved; getting renditions...';
                                             callNumber = 0;
                                             setRequestData('getVideoRenditions');
                                         }
@@ -459,9 +515,26 @@
 
             function init() {
                 // set up the log elements
-                logger.appendChild(pLog2);
-                pLog2.setAttribute('id', 'pLog2');
-
+                content = document.createTextNode('Getting video set ');
+                spanIntro1.appendChild(content);
+                content = document.createTextNode('Getting renditions for video ');
+                spanIntro2.appendChild(content);
+                content = document.createTextNode(' of ');
+                spanOf1.appendChild(content);
+                content = document.createTextNode(' of ');
+                spanOf2.appendChild(content);
+                spanSetsCount.setAttribute('id', 'spanSetsCount');
+                spanSetsTotal.setAttribute('id', 'spanSetsTotal');
+                spanVideosCount.setAttribute('id', 'spanVideosCount');
+                spanVideosTotal.setAttribute('id', 'spanVideosTotal');
+                pLogGettingVideoSets.appendChild(spanIntro1);
+                pLogGettingVideoSets.appendChild(spanSetsCount);
+                pLogGettingVideoSets.appendChild(spanOf1);
+                pLogGettingVideoSets.appendChild(spanSetsTotal);
+                pLogGettingRenditions.appendChild(spanIntro2);
+                pLogGettingRenditions.appendChild(spanVideosCount);
+                pLogGettingRenditions.appendChild(spanOf2);
+                pLogGettingRenditions.appendChild(spanVideosTotal);
                 // event handlers
                 makeReport.addEventListener('click', function() {
                     // get the inputs
