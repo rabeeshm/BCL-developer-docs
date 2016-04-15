@@ -147,9 +147,8 @@
                 callNumber = 0,
                 videosArray = [],
                 summaryData = {},
-                reportStr,
                 csvStr,
-                summaryReportStr,
+                summaryCsvStr,
                 // elements
                 account_id = document.getElementById('account_id'),
                 client_id = document.getElementById('client_id'),
@@ -300,10 +299,36 @@
                 content = document.createTextNode('Name');
                 th.appendChild(content);
                 tr.appendChild(th);
-                reportStr = '<h3>Detailed Video Report</h3><table><thead><tr><th>ID</th><th>Name</th><th>HLS Renditions / <br />bitrate range (mbps)</th><th>MP4 Renditions (HTTP) /<br />bitrate range (mbps)</th></tr></thead><tbody>';
-                summaryReportStr =
-                    '<h3>Summary Report</h3><table><thead><tr><th>Videos with <strong>no</strong> HLS Renditions<br /><button id="gethlsRenditions" class="bcls-button">Get the ids</button><br /><textarea id="hlsRenditions" style="width:130px;height:100px;"></textArea></th><th>Videos with <strong>no</strong> HTTP MP4 Renditions<br /><button id="getmp4HTTPRenditions" class="bcls-button">Get the ids</button><br /><textarea id="mp4HTTPRenditions" style="width:130px;height:100px;"></textArea></th></tr></thead><tbody>';
-
+                th = document.createElement('th');
+                content = document.createTextNode('HLS Renditions (bitrate range)');
+                th.appendChild(content);
+                tr.appendChild(th);
+                th = document.createElement('th');
+                content = document.createTextNode('MP4 Renditions (bitrate range)');
+                th.appendChild(content);
+                tr.appendChild(th);
+                tr = document.createElement('tr');
+                summaryTableHead.appendChild('tr');
+                th = document.createElement('th');
+                content = document.createTextNode('No HLS or MP4 Renditions');
+                th.appendChild(content);
+                tr.appendChild(th);
+                th = document.createElement('th');
+                content = document.createTextNode('HLS but no MP4 Renditions');
+                th.appendChild(content);
+                tr.appendChild(th);
+                th = document.createElement('th');
+                content = document.createTextNode('MP4 but no HLS Renditions');
+                th.appendChild(content);
+                tr.appendChild(th);
+                th = document.createElement('th');
+                content = document.createTextNode('Both HLS and MP4 Renditions');
+                th.appendChild(content);
+                tr.appendChild(th);
+                // start csv strings
+                csvStr = '"ID","Name","HLS Renditions (bitrate range MBPS)","MP4 Renditions (bitrate range MBPS)"\n';
+                summaryCsvStr = '"No HLS or MP4 Renditions","HLS but no MP4 Renditions","MP4 but no HLS Renditions","Both HLS and MP4 Renditions"\n'
+                // arrays to hold summary groups
                 summaryData.noHLSnoMP4 = [],
                 summaryData.yesHLSnoMP4 = [],
                 summaryData.noHLSyesMP4 = [],
@@ -316,44 +341,88 @@
                         // console.log('video', video);
                         // prepare the summary data
                         if (video.hlsRenditions.length === 0) {
-                            summaryData.hlsRenditions.push(video.id);
+                            if (video.mp4Rendtions.length === 0) {
+                                summaryData.noHLSnoMP4.push(video.id);
+                            } else {
+                                summaryData.noHLSyesMP4.push(video.id);
+                            }
+                        } else if (video.mp4Renditions.length === 0) {
+                            summaryData.yesHLSnoMP4.push(video.id);
                         }
-                        if (video.mp4HTTPRenditions.length === 0) {
+                        if (video.mp4Renditions.length === 0) {
                             summaryData.mp4HTTPRenditions.push(video.id);
                         }
+
                         // generate the video detail row
                         hlsLowRate = (video.hlsRenditions.length > 0) ? video.hlsRenditions[0].encoding_rate / 1000 : 0;
                         hlsHighRate = (video.hlsRenditions.length > 0) ? video.hlsRenditions[video.hlsRenditions.length - 1].encoding_rate / 1000 : 0;
-                        mp4LowRate = (video.mp4HTTPRenditions.length > 0) ? video.mp4HTTPRenditions[0].encoding_rate / 1000 : 0;
-                        mp4HighRate = (video.mp4HTTPRenditions.length > 0) ? video.mp4HTTPRenditions[video.mp4HTTPRenditions.length - 1].encoding_rate / 1000 : 0;
-                        reportStr += '<tr><td>' + video.id + '</td><td>' + video.name + '</td><td style="text-align:center">' + video.hlsRenditions.length + '<br />Bitrate range: ' + hlsLowRate + ' - ' + hlsHighRate +
-                            '</td><td style="text-align:center">' + video.mp4HTTPRenditions.length + '<br />Bitrate range: ' + mp4LowRate + ' - ' + mp4HighRate + '</td></tr>'
+                        mp4LowRate = (video.mp4Renditions.length > 0) ? video.mp4Renditions[0].encoding_rate / 1000 : 0;
+                        mp4HighRate = (video.mp4Renditions.length > 0) ? video.mp4Renditions[video.mp4Renditions.length - 1].encoding_rate / 1000 : 0;
+                        tr = document.createElement('tr');
+                        // add report row
+                        reportTableBody.appendChild(tr);
+                        td = document.createElement('td');
+                        content = document.createTextNode(video.id);
+                        td.appendChild(text);
+                        tr.appendChild(td);
+                        td = document.createElement('td');
+                        content = document.createTextNode(video.name);
+                        td.appendChild(text);
+                        tr.appendChild(td);
+                        td = document.createElement('td');
+                        content = document.createTextNode(video.hlsRenditions.length + ' (' + hlsLowRate + '-' + hlsHighRate + ')');
+                        td.appendChild(text);
+                        tr.appendChild(td);
+                        td = document.createElement('td');
+                        content = document.createTextNode(video.mp4Renditions.length + ' (' + mp4LowRate + '-' + mp4HighRate + ')');
+                        td.appendChild(text);
+                        tr.appendChild(td);
+                        // add csv row
+                        csvStr += '"video.id","video.name","' + video.hlsRenditions.length + ' (' + hlsLowRate + '-' + hlsHighRate + ')","' + video.mp4Renditions.length + ' (' + mp4LowRate + '-' + mp4HighRate + ')"\n'
                     }
 
-                    summaryReportStr += '<tr><td>' + summaryData.hlsRenditions.length + '</td><td>' + summaryData.mp4HTTPRenditions.length + '</td></tr></tbody></table>';
-                    // finish video detail report
-                    reportStr += '</tbody></table>';
+                    tr = document.createElement('tr');
+                    summaryTableBody.appendChild(tr);
+                    td = document.createElement('td');
+                    content = document.createTextNode(summaryData.noHLSnoMP4.length);
+                    td.appendChild(content);
+                    tr.appendChild(td);
+                    td = document.createElement('td');
+                    content = document.createTextNode(summaryData.yesHLSnoMP4.length);
+                    td.appendChild(content);
+                    tr.appendChild(td);
+                    td = document.createElement('td');
+                    content = document.createTextNode(summaryData.noHLSyesMP4.length);
+                    td.appendChild(content);
+                    tr.appendChild(td);
+                    td = document.createElement('td');
+                    content = document.createTextNode(summaryData.yesHLSyesMP4.length);
+                    td.appendChild(content);
+                    tr.appendChild(td);
+                    tr = document.createElement('tr');
+                    summaryTableBody.appendChild(tr);
+                    td = document.createElement('td');
+                    content = document.createTextNode(JSON.stringify(summaryData.noHLSnoMP4));
+                    td.appendChild(content);
+                    tr.appendChild(td);
+                    td = document.createElement('td');
+                    content = document.createTextNode(JSON.stringify(summaryData.yesHLSnoMP4));
+                    td.appendChild(content);
+                    tr.appendChild(td);
+                    td = document.createElement('td');
+                    content = document.createTextNode(summaryData.noHLSyesMP4.length);
+                    td.appendChild(content);
+                    tr.appendChild(td);
+                    td = document.createElement('td');
+                    content = document.createTextNode(summaryData.yesHLSyesMP4.length);
+                    td.appendChild(content);
+                    tr.appendChild(td);
+                    summaryReport.appendChild(summaryReportTable);
+                    detailedReport.appendChild(reportTable);
                     content = document.createTextNode('Finished!');
                     pLogFinish.appendChild(content);
                     logger.appendChild(pLogFinish);
                     // reportDisplay.innerHTML = summaryReportStr + reportStr;
-                    // get the buttons and set up event handlers
-                    gethlsRenditions = document.getElementById('gethlsRenditions');
-                    getmp4HTTPRenditions = document.getElementById('getmp4HTTPRenditions');
-                    hlsRenditions = document.getElementById('hlsRenditions');
-                    mp4HTTPRenditions = document.getElementById('mp4HTTPRenditions');
-                    gethlsRenditions.addEventListener('click', function() {
-                        hlsRenditions.textContent = JSON.stringify(summaryData.hlsRenditions);
-                    });
-                    getmp4HTTPRenditions.addEventListener('click', function() {
-                        mp4HTTPRenditions.textContent = JSON.stringify(summaryData.mp4HTTPRenditions);
-                    });
-                    hlsRenditions.addEventListener('click', function() {
-                        hlsRenditions.select();
-                    });
-                    mp4HTTPRenditions.addEventListener('click', function() {
-                        mp4HTTPRenditions.select();
-                    })
                     enableButtons();
                 }
             }
