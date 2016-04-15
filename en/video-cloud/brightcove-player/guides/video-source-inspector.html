@@ -363,7 +363,8 @@
                             if (callNumber < iMax) {
                                 if (callNumber === 1) {
                                     logger.appendChild(pLogGettingRenditions);
-                                    spanV
+                                    spanVideosCountEl = document.getElementById('spanVideosCount');
+                                    spanVideosTotalEl = document.getElementById('spanVideosTotal');
                                 }
                                 setRequestData('getVideoRenditions');
                             } else {
@@ -377,7 +378,8 @@
                         requestData.url = baseURL + endPoint;
                         requestData.requestType = 'GET';
                         apiRequest.textContent = requestData.url;
-                        logger.textContent = 'Getting renditions for video ' + callNumber + ' of ' + totalVideos;
+                        spanVideosCountEl.textContent = callNumber;
+                        spanVideosTotalEl.textContent = totalVideos;
                         getMediaData(requestData, id, callback);
                         break;
                 }
@@ -408,7 +410,11 @@
                                         // set total videos
                                         totalVideos = parsedData.count;
                                         totalCalls = Math.ceil(totalVideos / limit);
-                                        logger.textContent = 'Total videos: ' + totalVideos;
+                                        logger.appendChild(pLogGettingVideoSets);
+                                        spanVideosCountEl = document.getElementById('spanVideosCount');
+                                        spanVideosTotalEl = document.getElementById('spanVideosTotal');
+                                        spanVideosCountEl.textContent = callNumber;
+                                        spanVideosTotalEl.textContent = totalVideos;
                                         setRequestData('getVideos');
                                     } else if (requestID === 'getVideos') {
                                         if (httpRequest.responseText === '[]') {
@@ -420,10 +426,10 @@
                                         videosArray = videosArray.concat(parsedData);
                                         callNumber++;
                                         if (callNumber < totalCalls) {
-                                            logger.textContent = 'Getting video set ' + callNumber;
+                                            spanVideosCountEl.textContent = callNumber;
+                                            spanVideosTotalEl.textContent = totalVideos;
                                             setRequestData('getVideos');
                                         } else {
-                                            logger.textContent = 'Video data for ' + totalVideos + ' retrieved; getting renditions...';
                                             callNumber = 0;
                                             setRequestData('getVideoRenditions');
                                         }
