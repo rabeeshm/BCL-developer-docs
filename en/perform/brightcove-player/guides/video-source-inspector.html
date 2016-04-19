@@ -53,9 +53,10 @@
                 <h1>Video Renditions Inspector</h1>
                 <p>This is sample uses the CMS API to inspect the renditions for all videos in an account. It generates a report showing:</p>
                 <ul>
-                    <li>Summary showing how many videos have <strong>no</strong> HLS or MP4 renditions available over HTTP(S) </li>
+                    <li>Summary showing how many videos have <strong>no</strong> HLS or MP4 renditions or both</li>
                     <li>Report for each video showing the number of HLS and MP4 (HTTP) renditions (with the bitrate range)</li>
                 </ul>
+                <p>The aim is to help you get ready to migrate from the Smart Player to the Brightcove Player by identifying videos that need to be transcoded to create HLS and/or MP4 renditions.</p>
             </div>
             <div id="obtaincredentials" class="section">
                 <h2>Obtain credentials</h2>
@@ -247,30 +248,25 @@
                 var i,
                     iMax = renditions.length,
                     hlsRenditions = [],
-                    mp4HTTPRenditions = [];
-                // console.log('renditions', renditions);
+                    mp4Renditions = [];
                 // separate renditions by type
                 for (i = 0; i < iMax; i += 1) {
                     if (renditions[i].video_container === 'M2TS') {
                         hlsRenditions.push(renditions[i]);
                     } else if (renditions[i].video_container === 'MP4') {
-                        if (renditions[i].progressive_download) {
-                            mp4HTTPRenditions.push(renditions[i]);
-                        }
+                        mp4Renditions.push(renditions[i]);
                     }
                 }
                 // sort renditions by encoding rate
-                callback(hlsRenditions, mp4HTTPRenditions);
+                callback(hlsRenditions, mp4Renditions);
             }
 
             function writeReport() {
                 var i,
                     iMax,
                     video,
-                    gethlsRenditions,
                     hlsRenditions,
-                    getmp4HTTPRenditions,
-                    mp4HTTPRenditions,
+                    mp4Renditions,
                     hlsLowRate,
                     hlsHighRate,
                     mp4LowRate,
@@ -290,7 +286,7 @@
                 summaryReportTable.appendChild(summaryTableHead);
                 summaryReportTable.appendChild(summaryTableBody);
                 tr = document.createElement('tr');
-                reportTableHead.appendChild('tr');
+                reportTableHead.appendChild(tr);
                 th = document.createElement('th');
                 content = document.createTextNode('ID');
                 th.appendChild(content);
@@ -300,15 +296,15 @@
                 th.appendChild(content);
                 tr.appendChild(th);
                 th = document.createElement('th');
-                content = document.createTextNode('HLS Renditions (bitrate range)');
+                content = document.createTextNode('HLS Renditions (bitrate range KBPS)');
                 th.appendChild(content);
                 tr.appendChild(th);
                 th = document.createElement('th');
-                content = document.createTextNode('MP4 Renditions (bitrate range)');
+                content = document.createTextNode('MP4 Renditions (bitrate range KBPS)');
                 th.appendChild(content);
                 tr.appendChild(th);
                 tr = document.createElement('tr');
-                summaryTableHead.appendChild('tr');
+                summaryTableHead.appendChild(tr);
                 th = document.createElement('th');
                 content = document.createTextNode('No HLS or MP4 Renditions');
                 th.appendChild(content);
@@ -326,31 +322,29 @@
                 th.appendChild(content);
                 tr.appendChild(th);
                 // start csv strings
-                csvStr = '"ID","Name","HLS Renditions (bitrate range MBPS)","MP4 Renditions (bitrate range MBPS)"\n';
-                summaryCsvStr = '"No HLS or MP4 Renditions","HLS but no MP4 Renditions","MP4 but no HLS Renditions","Both HLS and MP4 Renditions"\n'
+                csvStr = '"ID","Name","HLS Renditions (bitrate range KBPS)","MP4 Renditions (bitrate range KBPS)"\n';
+                summaryCsvStr = '"No HLS or MP4 Renditions","HLS but no MP4 Renditions","MP4 but no HLS Renditions","Both HLS and MP4 Renditions"\n';
                 // arrays to hold summary groups
-                summaryData.noHLSnoMP4 = [],
-                summaryData.yesHLSnoMP4 = [],
-                summaryData.noHLSyesMP4 = [],
-                summaryData.yesHLSyesMP4 = [],
+                summaryData.noHLSnoMP4 = [];
+                summaryData.yesHLSnoMP4 = [];
+                summaryData.noHLSyesMP4 = [];
+                summaryData.yesHLSyesMP4 = [];
 
                 if (videosArray.length > 0) {
                     iMax = videosArray.length;
                     for (i = 0; i < iMax; i += 1) {
                         video = videosArray[i];
-                        // console.log('video', video);
                         // prepare the summary data
                         if (video.hlsRenditions.length === 0) {
-                            if (video.mp4Rendtions.length === 0) {
+                            if (video.mp4Renditions.length === 0) {
                                 summaryData.noHLSnoMP4.push(video.id);
                             } else {
                                 summaryData.noHLSyesMP4.push(video.id);
                             }
                         } else if (video.mp4Renditions.length === 0) {
                             summaryData.yesHLSnoMP4.push(video.id);
-                        }
-                        if (video.mp4Renditions.length === 0) {
-                            summaryData.mp4HTTPRenditions.push(video.id);
+                        } else {
+                            summaryData.yesHLSyesMP4.push(video.id);
                         }
 
                         // generate the video detail row
@@ -363,24 +357,23 @@
                         reportTableBody.appendChild(tr);
                         td = document.createElement('td');
                         content = document.createTextNode(video.id);
-                        td.appendChild(text);
+                        td.appendChild(content);
                         tr.appendChild(td);
                         td = document.createElement('td');
                         content = document.createTextNode(video.name);
-                        td.appendChild(text);
+                        td.appendChild(content);
                         tr.appendChild(td);
                         td = document.createElement('td');
                         content = document.createTextNode(video.hlsRenditions.length + ' (' + hlsLowRate + '-' + hlsHighRate + ')');
-                        td.appendChild(text);
+                        td.appendChild(content);
                         tr.appendChild(td);
                         td = document.createElement('td');
                         content = document.createTextNode(video.mp4Renditions.length + ' (' + mp4LowRate + '-' + mp4HighRate + ')');
-                        td.appendChild(text);
+                        td.appendChild(content);
                         tr.appendChild(td);
                         // add csv row
                         csvStr += '"video.id","video.name","' + video.hlsRenditions.length + ' (' + hlsLowRate + '-' + hlsHighRate + ')","' + video.mp4Renditions.length + ' (' + mp4LowRate + '-' + mp4HighRate + ')"\n'
                     }
-
                     tr = document.createElement('tr');
                     summaryTableBody.appendChild(tr);
                     td = document.createElement('td');
@@ -398,28 +391,36 @@
                     td = document.createElement('td');
                     content = document.createTextNode(summaryData.yesHLSyesMP4.length);
                     td.appendChild(content);
+                    summaryCsvStr += '"' + summaryData.yesHLSnoMP4.length+ '","' + summaryData.yesHLSnoMP4.length + '","' + summaryData.noHLSyesMP4.length + '","' + summaryData.yesHLSyesMP4.length + '"';
                     tr.appendChild(td);
                     tr = document.createElement('tr');
                     summaryTableBody.appendChild(tr);
                     td = document.createElement('td');
-                    content = document.createTextNode(JSON.stringify(summaryData.noHLSnoMP4));
+                    td.setAttribute('style', 'vertical-align:top;');
+                    content = document.createTextNode(JSON.stringify(summaryData.noHLSnoMP4, null, " "));
                     td.appendChild(content);
                     tr.appendChild(td);
                     td = document.createElement('td');
-                    content = document.createTextNode(JSON.stringify(summaryData.yesHLSnoMP4));
+                    td.setAttribute('style', 'vertical-align:top;');
+                    content = document.createTextNode(JSON.stringify(summaryData.yesHLSnoMP4, null, " "));
                     td.appendChild(content);
                     tr.appendChild(td);
                     td = document.createElement('td');
-                    content = document.createTextNode(summaryData.noHLSyesMP4.length);
+                    td.setAttribute('style', 'vertical-align:top;');
+                    content = document.createTextNode(JSON.stringify(summaryData.noHLSyesMP4, null, " "));
                     td.appendChild(content);
                     tr.appendChild(td);
                     td = document.createElement('td');
-                    content = document.createTextNode(summaryData.yesHLSyesMP4.length);
+                    td.setAttribute('style', 'vertical-align:top;');
+                    content = document.createTextNode(JSON.stringify(summaryData.yesHLSyesMP4, null, " "));
                     td.appendChild(content);
                     tr.appendChild(td);
+                    summaryCsvStr += '"' + JSON.stringify(summaryData.noHLSnoMP4) + '","' + JSON.stringify(summaryData.yesHLSnoMP4) + '","' + JSON.stringify(summaryData.yesHLSnoMP4) + '","' + JSON.stringify(summaryData.yesHLSyesMP4) + '"';
                     summaryReport.appendChild(summaryReportTable);
                     detailedReport.appendChild(reportTable);
-                    content = document.createTextNode('Finished!');
+                    csvSummaryData.textContent = summaryCsvStr;
+                    csvData.textContent = csvStr;
+                    content = document.createTextNode('Finished! See the results or get the CSV data below.');
                     pLogFinish.appendChild(content);
                     logger.appendChild(pLogFinish);
                     // reportDisplay.innerHTML = summaryReportStr + reportStr;
@@ -457,39 +458,37 @@
                         callback = function(renditions) {
                             if (renditions.length > 0) {
                                 // get the best MP4 rendition
-                                processRenditions(renditions, function(hlsRenditions, mp4HTTPRenditions) {
-                                    // console.log('hlsRenditions', hlsRenditions);
+                                processRenditions(renditions, function(hlsRenditions, mp4Renditions) {
                                     if (hlsRenditions.length > 0) {
                                         sortArray(hlsRenditions, 'encoding_rate');
                                     }
                                     videosArray[callNumber].hlsRenditions = hlsRenditions;
-                                    if (mp4HTTPRenditions.lengh > 0) {
-                                        sortArray(mp4HTTPRenditions, 'encoding_rate');
+                                    if (mp4Renditions.lengh > 0) {
+                                        sortArray(mp4Renditions, 'encoding_rate');
                                     }
-                                    videosArray[callNumber].mp4HTTPRenditions = mp4HTTPRenditions;
+                                    videosArray[callNumber].mp4Renditions = mp4Renditions;
                                 });
-
                             }
                             callNumber++;
                             if (callNumber < iMax) {
-                                if (callNumber === 1) {
-                                    logger.appendChild(pLogGettingRenditions);
-                                    spanVideosCountEl = document.getElementById('spanVideosCount');
-                                    spanVideosTotalEl = document.getElementById('spanVideosTotal');
-                                }
                                 setRequestData('getVideoRenditions');
                             } else {
                                 // write the report
                                 writeReport();
                             }
                         };
+                        if (callNumber === 0) {
+                            logger.appendChild(pLogGettingRenditions);
+                            spanVideosCountEl = document.getElementById('spanVideosCount');
+                            spanVideosTotalEl = document.getElementById('spanVideosTotal');
+                        }
                         videosArray[callNumber].hlsRenditions = [];
-                        videosArray[callNumber].mp4HTTPRenditions = [];
+                        videosArray[callNumber].mp4Renditions = [];
                         endPoint = accountId + '/videos/' + videosArray[callNumber].id + '/assets/renditions';
                         requestData.url = baseURL + endPoint;
                         requestData.requestType = 'GET';
                         apiRequest.textContent = requestData.url;
-                        spanVideosCountEl.textContent = callNumber;
+                        spanVideosCountEl.textContent = callNumber + 1;
                         spanVideosTotalEl.textContent = totalVideos;
                         getMediaData(requestData, id, callback);
                         break;
@@ -522,10 +521,10 @@
                                         totalVideos = parsedData.count;
                                         totalCalls = Math.ceil(totalVideos / limit);
                                         logger.appendChild(pLogGettingVideoSets);
-                                        spanVideosCountEl = document.getElementById('spanVideosCount');
-                                        spanVideosTotalEl = document.getElementById('spanVideosTotal');
-                                        spanVideosCountEl.textContent = callNumber;
-                                        spanVideosTotalEl.textContent = totalVideos;
+                                        spanSetsCountEl = document.getElementById('spanSetsCount');
+                                        spanSetsTotalEl = document.getElementById('spanSetsTotal');
+                                        spanSetsCountEl.textContent = callNumber + 1;
+                                        spanSetsTotalEl.textContent = totalCalls;
                                         setRequestData('getVideos');
                                     } else if (requestID === 'getVideos') {
                                         if (httpRequest.responseText === '[]') {
@@ -537,8 +536,7 @@
                                         videosArray = videosArray.concat(parsedData);
                                         callNumber++;
                                         if (callNumber < totalCalls) {
-                                            spanVideosCountEl.textContent = callNumber;
-                                            spanVideosTotalEl.textContent = totalVideos;
+                                            spanSetsCountEl.textContent = callNumber + 1;
                                             setRequestData('getVideos');
                                         } else {
                                             callNumber = 0;
@@ -583,6 +581,21 @@
             }
 
             function init() {
+                // event listeners
+                window.addEventListener('error', function(e) {
+                    var stack = e.error.stack;
+                    var message = e.error.toString();
+                    if (stack) {
+                        message += '\n' + stack;
+                    }
+                    console.log('error', message);
+                });
+                csvData.addEventListener('click', function() {
+                    this.select();
+                });
+                csvSummaryData.addEventListener('click', function() {
+                    this.select();
+                })
                 // set up the log elements
                 content = document.createTextNode('Getting video set ');
                 spanIntro1.appendChild(content);
