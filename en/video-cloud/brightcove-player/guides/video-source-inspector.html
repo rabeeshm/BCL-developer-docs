@@ -437,7 +437,8 @@
                     pLogFinish.appendChild(content);
                     // reportDisplay.innerHTML = summaryReportStr + reportStr;
                     makeReport.textContent = 'Get next 100 videos';
-                    warning.textContent = 'NOTE: if you want to save the CSV data below, do that BEFORE getting the next set of videos!'
+                    warning.textContent = 'NOTE: if you want to save the CSV data below, do that BEFORE getting the next set of videos!';
+                    superSet++;
                     enableButtons();
                 }
             }
@@ -460,7 +461,9 @@
                         getMediaData(requestData, id);
                         break;
                     case 'getVideos':
-                        endPoint = accountId + '/videos?sort=created_at&limit=' + limit + '&offset=' + superSet * 100 + limit * callNumber;
+                        var offset = (superSet * 100) + (limit * callNumber);
+                        endPoint = accountId + '/videos?sort=created_at&limit=' + limit + '&offset=' + offset;
+                        console.log('endpoint', endPoint);
                         requestData.url = baseURL + endPoint;
                         requestData.requestType = 'GET';
                         apiRequest.textContent = requestData.url;
@@ -530,6 +533,7 @@
                                         parsedData = JSON.parse(responseRaw);
                                         // set total videos
                                         totalVideos = parsedData.count;
+                                        superSetVideos = (totalVideos < 100) ? totalVideos : 100;
                                         totalCalls = Math.ceil(superSetVideos / limit);
                                         logText.textContent = totalVideos + ' videos found; videos retrieved: ' + videosCompleted;
                                         spanSetsCountEl.textContent = callNumber + 1;
@@ -548,6 +552,7 @@
                                             spanSetsCountEl.textContent = callNumber + 1;
                                             setRequestData('getVideos');
                                         } else {
+                                            console.log('videosArray', videosArray);
                                             callNumber = 0;
                                             setRequestData('getVideoRenditions');
                                         }
@@ -663,7 +668,6 @@
                     if (superSet === 0) {
                         setRequestData('getCount');
                     } else {
-                        superSet++;
                         if ((totalVideos - videosCompleted) < 100) {
                             superSetVideos = totalVideos - videosCompleted;
                         }
@@ -673,11 +677,14 @@
                         summaryData = {};
                         totalCalls = superSetVideos / limit;
                         callNumber = 0;
-                        spanSetsCountEl.textContent = 1;
+                        totalCalls = Math.ceil(superSetVideos / limit);
+                        spanSetsTotalEl.textContent = totalCalls;
+                        spanSetsCountEl.textContent = callNumber + 1;
+                        spanVideosTotalEl.textContent = superSetVideos;
+                        spanVideosCountEl.textContent = 1;
                         summaryTableBody.innerHTML = "";
                         reportTableBody.innerHTML = "";
                         startCSVStrings();
-                        totalCalls = Math.ceil(superSetVideos / limit);
                         setRequestData('getVideos');
                     }
 
