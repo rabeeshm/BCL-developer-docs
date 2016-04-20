@@ -51,7 +51,7 @@
         <div id="main" class="large-10 small-12 columns">
             <div id="top" class="section">
                 <h1>Video Renditions Inspector</h1>
-                <p>This is sample uses the CMS API to inspect the renditions for all videos in an account. It generates a report showing:</p>
+                <p>This sample uses the CMS API to inspect the renditions for all videos in an account. It generates a report showing:</p>
                 <ul>
                     <li>Summary showing how many videos have <strong>no</strong> HLS or MP4 renditions or both</li>
                     <li>Report for each video showing the number of HLS and MP4 (HTTP) renditions (with the bitrate range)</li>
@@ -62,7 +62,7 @@
                 <h2>Obtain credentials</h2>
                 <p>Like most of Brightcove's RESTful APIs, the CMS API requires OAuth access tokens to authorize requests. In order to get access tokens, you first need to obtain client credentials with permissions for kinds of operations you want to request.</p>
                 <ol>
-                    <li>To obtain your credentials follow the instructions in <a href="../guides/managing-api-credentials.html">Managing API Credentials</a>. This is the recommended way of obtaining your client credentials. This sample only requires <code>/video/read</code>                        permissions, but in most cases, you will likely want to get all permissions:
+                    <li>To obtain your credentials follow the instructions in <a href="../guides/managing-api-credentials.html">Managing API Credentials</a>. This is the recommended way of obtaining your client credentials. This sample only requires <code>/video/read</code> permissions, but in most cases, you will likely want to get all permissions:
                         <div><img src="../../cms-api/getting-started/assets/quick-start-required-permissions.png" alt="required permissions" width="466" height="178"></div>
                         <p>You can also obtain credentials using the OAuth API, following the instructions in one of the guides listed below:</p>
                     </li>
@@ -93,6 +93,7 @@
                     <p>
                         <button class="bcls-button" id="makeReport">Generate the Report</button>
                     </p>
+                    <p id="warning" style="color:#CC0000;"></p>
                 </fieldset>
                 <fieldset>
                     <legend>Log</legend>
@@ -146,6 +147,9 @@
                 totalVideos = 0,
                 totalCalls = 0,
                 callNumber = 0,
+                superSet = 0,
+                superSetVideos = 100,
+                videosCompleted = 0,
                 videosArray = [],
                 summaryData = {},
                 csvStr,
@@ -155,6 +159,7 @@
                 client_id = document.getElementById('client_id'),
                 client_secret = document.getElementById('client_secret'),
                 makeReport = document.getElementById('makeReport'),
+                warning = document.getElementById('warning'),
                 content,
                 logger = document.getElementById('logger'),
                 logText = document.getElementById('logText'),
@@ -175,6 +180,12 @@
                 spanSetsCount = document.createElement('span'),
                 spanVideosTotal = document.createElement('span'),
                 spanVideosCount = document.createElement('span'),
+                reportTable = document.createElement('table'),
+                summaryReportTable = document.createElement('table'),
+                reportTableHead = document.createElement('thead'),
+                summaryTableHead = document.createElement('thead'),
+                reportTableBody = document.createElement('tbody'),
+                summaryTableBody = document.createElement('tbody'),
                 spanSetsTotalEl,
                 spanSetsCountEl,
                 spanVideosTotalEl,
@@ -261,25 +272,9 @@
                 callback(hlsRenditions, mp4Renditions);
             }
 
-            function writeReport() {
-                var i,
-                    iMax,
-                    video,
-                    hlsRenditions,
-                    mp4Renditions,
-                    hlsLowRate,
-                    hlsHighRate,
-                    mp4LowRate,
-                    mp4HighRate,
-                    reportTable = document.createElement('table'),
-                    summaryReportTable = document.createElement('table'),
-                    reportTableHead = document.createElement('thead'),
-                    summaryTableHead = document.createElement('thead'),
-                    reportTableBody = document.createElement('tbody'),
-                    summaryTableBody = document.createElement('tbody'),
-                    tr,
+            function createHeadings() {
+                var tr,
                     th,
-                    td,
                     content;
                 reportTable.appendChild(reportTableHead);
                 reportTable.appendChild(reportTableBody);
@@ -321,9 +316,27 @@
                 content = document.createTextNode('Both HLS and MP4 Renditions');
                 th.appendChild(content);
                 tr.appendChild(th);
-                // start csv strings
+            }
+
+            function startCSVStrings() {
                 csvStr = '"ID","Name","HLS Renditions (bitrate range KBPS)","MP4 Renditions (bitrate range KBPS)"\n';
                 summaryCsvStr = '"No HLS or MP4 Renditions","HLS but no MP4 Renditions","MP4 but no HLS Renditions","Both HLS and MP4 Renditions"\n';
+            }
+
+            function writeReport() {
+                var i,
+                    iMax,
+                    video,
+                    hlsRenditions,
+                    mp4Renditions,
+                    hlsLowRate,
+                    hlsHighRate,
+                    mp4LowRate,
+                    mp4HighRate,
+                    tr,
+                    th,
+                    td,
+                    content;
                 // arrays to hold summary groups
                 summaryData.noHLSnoMP4 = [];
                 summaryData.yesHLSnoMP4 = [];
@@ -422,8 +435,10 @@
                     csvData.textContent = csvStr;
                     content = document.createTextNode('Finished! See the results or get the CSV data below.');
                     pLogFinish.appendChild(content);
-                    logger.appendChild(pLogFinish);
                     // reportDisplay.innerHTML = summaryReportStr + reportStr;
+                    makeReport.textContent = 'Get next 100 videos';
+                    warning.textContent = 'NOTE: if you want to save the CSV data below, do that BEFORE getting the next set of videos!';
+                    superSet++;
                     enableButtons();
                 }
             }
@@ -446,7 +461,8 @@
                         getMediaData(requestData, id);
                         break;
                     case 'getVideos':
-                        endPoint = accountId + '/videos?sort=created_at&limit=' + limit + '&offset=' + limit * callNumber;
+                        var offset = (superSet * 100) + (limit * callNumber);
+                        endPoint = accountId + '/videos?sort=created_at&limit=' + limit + '&offset=' + offset;
                         requestData.url = baseURL + endPoint;
                         requestData.requestType = 'GET';
                         apiRequest.textContent = requestData.url;
@@ -469,6 +485,8 @@
                                     videosArray[callNumber].mp4Renditions = mp4Renditions;
                                 });
                             }
+                            videosCompleted++;
+                            logText.textContent = totalVideos + ' videos found; videos retrieved: ' + videosCompleted;
                             callNumber++;
                             if (callNumber < iMax) {
                                 setRequestData('getVideoRenditions');
@@ -477,11 +495,6 @@
                                 writeReport();
                             }
                         };
-                        if (callNumber === 0) {
-                            logger.appendChild(pLogGettingRenditions);
-                            spanVideosCountEl = document.getElementById('spanVideosCount');
-                            spanVideosTotalEl = document.getElementById('spanVideosTotal');
-                        }
                         videosArray[callNumber].hlsRenditions = [];
                         videosArray[callNumber].mp4Renditions = [];
                         endPoint = accountId + '/videos/' + videosArray[callNumber].id + '/assets/renditions';
@@ -489,7 +502,7 @@
                         requestData.requestType = 'GET';
                         apiRequest.textContent = requestData.url;
                         spanVideosCountEl.textContent = callNumber + 1;
-                        spanVideosTotalEl.textContent = totalVideos;
+                        spanVideosTotalEl.textContent = superSetVideos;
                         getMediaData(requestData, id, callback);
                         break;
                 }
@@ -519,10 +532,9 @@
                                         parsedData = JSON.parse(responseRaw);
                                         // set total videos
                                         totalVideos = parsedData.count;
-                                        totalCalls = Math.ceil(totalVideos / limit);
-                                        logger.appendChild(pLogGettingVideoSets);
-                                        spanSetsCountEl = document.getElementById('spanSetsCount');
-                                        spanSetsTotalEl = document.getElementById('spanSetsTotal');
+                                        superSetVideos = (totalVideos < 100) ? totalVideos : 100;
+                                        totalCalls = Math.ceil(superSetVideos / limit);
+                                        logText.textContent = totalVideos + ' videos found; videos retrieved: ' + videosCompleted;
                                         spanSetsCountEl.textContent = callNumber + 1;
                                         spanSetsTotalEl.textContent = totalCalls;
                                         setRequestData('getVideos');
@@ -617,7 +629,22 @@
                 pLogGettingRenditions.appendChild(spanVideosCount);
                 pLogGettingRenditions.appendChild(spanOf2);
                 pLogGettingRenditions.appendChild(spanVideosTotal);
-                // event handlers
+                logger.appendChild(pLogGettingVideoSets);
+                spanSetsCountEl = document.getElementById('spanSetsCount');
+                spanSetsTotalEl = document.getElementById('spanSetsTotal');
+                spanSetsCountEl.textContent = callNumber + 1;
+                spanSetsTotalEl.textContent = totalCalls;
+                logger.appendChild(pLogGettingRenditions);
+                spanVideosCountEl = document.getElementById('spanVideosCount');
+                spanVideosTotalEl = document.getElementById('spanVideosTotal');
+                spanVideosCountEl.textContent = callNumber + 1;
+                spanVideosTotalEl.textContent = superSetVideos;
+                logger.appendChild(pLogFinish);
+                // create table and csv headings
+                createHeadings();
+                startCSVStrings();
+
+                // button event handlers
                 makeReport.addEventListener('click', function() {
                     // get the inputs
                     clientId = client_id.value;
@@ -635,8 +662,29 @@
                     } else {
                         accountId = '1752604059001';
                     }
-                    // we need to get the count
-                    setRequestData('getCount');
+                    // if first set, we need to get the count
+                    if (superSet === 0) {
+                        setRequestData('getCount');
+                    } else {
+                        if ((totalVideos - videosCompleted) < 100) {
+                            superSetVideos = totalVideos - videosCompleted;
+                        }
+                        // resets
+                        videosArray = [];
+                        summaryData = {};
+                        totalCalls = superSetVideos / limit;
+                        callNumber = 0;
+                        totalCalls = Math.ceil(superSetVideos / limit);
+                        spanSetsTotalEl.textContent = totalCalls;
+                        spanSetsCountEl.textContent = callNumber + 1;
+                        spanVideosTotalEl.textContent = superSetVideos;
+                        spanVideosCountEl.textContent = 1;
+                        summaryTableBody.innerHTML = "";
+                        reportTableBody.innerHTML = "";
+                        startCSVStrings();
+                        setRequestData('getVideos');
+                    }
+
                 });
             }
 
