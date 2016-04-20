@@ -229,17 +229,23 @@
                 var i,
                     iMax = renditions.length,
                     hlsRenditions = [],
-                    mp4Renditions = [];
+                    mp4Renditions = [],
+                    flvRenditions = [],
+                    otherRenditions = [];
                 // separate renditions by type
                 for (i = 0; i < iMax; i += 1) {
                     if (renditions[i].video_container === 'M2TS') {
                         hlsRenditions.push(renditions[i]);
                     } else if (renditions[i].video_container === 'MP4') {
                         mp4Renditions.push(renditions[i]);
+                    } else if (renditions[i].video_container === 'FLV') {
+                        flvRenditions.push(renditions[i]);
+                    } else {
+                        otherRenditions.push(renditions[i]);
                     }
                 }
                 // sort renditions by encoding rate
-                callback(hlsRenditions, mp4Renditions);
+                callback(hlsRenditions, mp4Renditions, flvRenditions, otherRenditions);
             }
 
 
@@ -252,8 +258,6 @@
                 var i,
                     iMax,
                     video,
-                    hlsRenditions,
-                    mp4Renditions,
                     hlsLowRate,
                     hlsHighRate,
                     mp4LowRate,
@@ -262,28 +266,11 @@
                     th,
                     td,
                     content;
-                // arrays to hold summary groups
-                summaryData.noHLSnoMP4 = [];
-                summaryData.yesHLSnoMP4 = [];
-                summaryData.noHLSyesMP4 = [];
-                summaryData.yesHLSyesMP4 = [];
 
                 if (videosArray.length > 0) {
                     iMax = videosArray.length;
                     for (i = 0; i < iMax; i += 1) {
                         video = videosArray[i];
-                        // prepare the summary data
-                        if (video.hlsRenditions.length === 0) {
-                            if (video.mp4Renditions.length === 0) {
-                                summaryData.noHLSnoMP4.push(video.id);
-                            } else {
-                                summaryData.noHLSyesMP4.push(video.id);
-                            }
-                        } else if (video.mp4Renditions.length === 0) {
-                            summaryData.yesHLSnoMP4.push(video.id);
-                        } else {
-                            summaryData.yesHLSyesMP4.push(video.id);
-                        }
 
                         // generate the video detail row
                         hlsLowRate = (video.hlsRenditions.length > 0) ? video.hlsRenditions[0].encoding_rate / 1000 : 0;
@@ -321,7 +308,8 @@
                         getMediaData(requestData, id);
                         break;
                     case 'getVideos':
-                        endPoint = accountId + '/videos?sort=created_at&limit=' + limit + '&offset=' + parseInt(superSet * 100) + parseInt(limit * callNumber);
+                        var offset = (superSet * 100) + (limit * callNumber);
+                        endPoint = accountId + '/videos?sort=created_at&limit=' + limit + '&offset=' + offset);
                         requestData.url = baseURL + endPoint;
                         requestData.requestType = 'GET';
                         apiRequest.textContent = requestData.url;
