@@ -250,8 +250,7 @@
 
 
             function startCSVStrings() {
-                csvStr = '"ID","Name","HLS Renditions (bitrate range KBPS)","MP4 Renditions (bitrate range KBPS)"\n';
-                summaryCsvStr = '"No HLS or MP4 Renditions","HLS but no MP4 Renditions","MP4 but no HLS Renditions","Both HLS and MP4 Renditions"\n';
+                csvStr = '"ID","Name","Description","Date Added","Date Last Modified","HLS Renditions (bitrate range KBPS)","MP4 Renditions (bitrate range KBPS)","FLV Renditions (bitrate range KBPS)"\n';
             }
 
             function writeReport() {
@@ -261,11 +260,7 @@
                     hlsLowRate,
                     hlsHighRate,
                     mp4LowRate,
-                    mp4HighRate,
-                    tr,
-                    th,
-                    td,
-                    content;
+                    mp4HighRate;
 
                 if (videosArray.length > 0) {
                     iMax = videosArray.length;
@@ -321,7 +316,7 @@
                         callback = function(renditions) {
                             if (renditions.length > 0) {
                                 // get the best MP4 rendition
-                                processRenditions(renditions, function(hlsRenditions, mp4Renditions) {
+                                processRenditions(renditions, function(hlsRenditions, mp4Renditions, flvRenditions, otherRenditions) {
                                     if (hlsRenditions.length > 0) {
                                         sortArray(hlsRenditions, 'encoding_rate');
                                     }
@@ -330,6 +325,14 @@
                                         sortArray(mp4Renditions, 'encoding_rate');
                                     }
                                     videosArray[callNumber].mp4Renditions = mp4Renditions;
+                                    if (flvRenditions.length > 0) {
+                                        sortArray(flvRenditions, 'encoding_rate');
+                                    }
+                                    videosArray[callNumber].flvRenditions = flvRenditions;
+                                    if (otherRenditions.length > 0) {
+                                        sortArray(otherRenditions, 'encoding_rate');
+                                    }
+                                    videosArray[callNumber].otherRenditions = otherRenditions;
                                 });
                             }
                             videosCompleted++;
