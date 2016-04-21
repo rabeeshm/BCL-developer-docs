@@ -250,7 +250,7 @@
 
 
             function startCSVStrings() {
-                csvStr = '"ID","Name","Description","Date Added","Date Last Modified","HLS Renditions (bitrate range KBPS)","MP4 Renditions (bitrate range KBPS)","FLV Renditions (bitrate range KBPS)"\n';
+                csvStr = '"ID","Name","Description","Date Added","Date Last Modified","Resolution","HLS Renditions (bitrate range KBPS)","MP4 Renditions (bitrate range KBPS)","FLV Renditions (bitrate range KBPS)"\n';
             }
 
             function writeReport() {
@@ -260,7 +260,9 @@
                     hlsLowRate,
                     hlsHighRate,
                     mp4LowRate,
-                    mp4HighRate;
+                    mp4HighRate,
+                    flvLowRate,
+                    flvHighRate;
 
                 if (videosArray.length > 0) {
                     iMax = videosArray.length;
@@ -272,6 +274,8 @@
                         hlsHighRate = (video.hlsRenditions.length > 0) ? video.hlsRenditions[video.hlsRenditions.length - 1].encoding_rate / 1000 : 0;
                         mp4LowRate = (video.mp4Renditions.length > 0) ? video.mp4Renditions[0].encoding_rate / 1000 : 0;
                         mp4HighRate = (video.mp4Renditions.length > 0) ? video.mp4Renditions[video.mp4Renditions.length - 1].encoding_rate / 1000 : 0;
+                        flvLowRate = (video.flvRenditions.length > 0) ? video.flvRenditions[0].encoding_rate / 1000 : 0;
+                        flvHighRate = (video.flvRenditions.length > 0) ? video.flvRenditions[video.flvRenditions.length - 1].encoding_rate / 1000 : 0;
                         // add csv row
                         csvStr += '"video.id","video.name","' + video.hlsRenditions.length + ' (' + hlsLowRate + '-' + hlsHighRate + ')","' + video.mp4Renditions.length + ' (' + mp4LowRate + '-' + mp4HighRate + ')"\n'
                     }
@@ -304,7 +308,7 @@
                         break;
                     case 'getVideos':
                         var offset = (superSet * 100) + (limit * callNumber);
-                        endPoint = accountId + '/videos?sort=created_at&limit=' + limit + '&offset=' + offset);
+                        endPoint = accountId + '/videos?sort=created_at&limit=' + limit + '&offset=' + offset;
                         requestData.url = baseURL + endPoint;
                         requestData.requestType = 'GET';
                         apiRequest.textContent = requestData.url;
@@ -520,11 +524,11 @@
                         totalCalls = 0;
                         callNumber = 0;
                         totalCalls = Math.ceil(superSetVideos / limit);
-(                        spanSetsTotalEl.textContent = totalCalls;
+                        spanSetsTotalEl.textContent = totalCalls;
                         spanSetsCountEl.textContent = callNumber + 1;
                         spanVideosTotalEl.textContent = superSetVideos;
                         spanVideosCountEl.textContent = 1;
-)                        setRequestData('getVideos');
+                        setRequestData('getVideos');
                     }
 
                 });
