@@ -51,14 +51,18 @@
         <div id="main" class="large-10 small-12 columns">
             <div id="top" class="section">
                 <h1>Daily Analytics Report Generator</h1>
-                <p>This sample uses the CMS API to generate a report on all the videos in your account in CSV format. It fetches the video data in batches of 100, so if there is an API timeout or some other error, you will still have some of the data.</p>
+                <p>This sample uses the Analytics API to generate a daily analytics report on all the videos in your account for the earliest date that data is available to the current date. The report is generated in CSV format. A report for each video is generated, and then you must copy and save the data to a CSV file before proceeding to the next video.</p>
+                <p class="BCL-aside">Note: only dates for which at least one video impression was recorded will be included in the report.</p>
             </div>
             <div id="obtaincredentials" class="section">
                 <h2>Obtain credentials</h2>
-                <p>Like most of Brightcove's RESTful APIs, the CMS API requires OAuth access tokens to authorize requests. In order to get access tokens, you first need to obtain client credentials with permissions for kinds of operations you want to request.</p>
+                <p>Like most of Brightcove's RESTful APIs, the Analytics API requires OAuth access tokens to authorize requests. In order to get access tokens, you first need to obtain client credentials with permissions for kinds of operations you want to request.</p>
                 <ol>
-                    <li>To obtain your credentials follow the instructions in <a href="../guides/managing-api-credentials.html">Managing API Credentials</a>. This is the recommended way of obtaining your client credentials. This sample only requires <code>/video/read</code> permissions, but in most cases, you will likely want to get all permissions:
-                        <div><img src="../../cms-api/getting-started/assets/quick-start-required-permissions.png" alt="required permissions" width="466" height="178"></div>
+                    <li>To obtain your credentials follow the instructions in <a href="../guides/managing-api-credentials.html">Managing API Credentials</a>. This is the recommended way of obtaining your client credentials. This sample requires <code>analytics/read</code> and <code>/video/read</code> permissions:
+                        <figure>
+                            <img src="./assets/daily-analytics-report/required-permissions.png" alt="required permissions">
+                            <figcaption>Required API Permissions</figcaption>
+                        </figure>
                         <p>You can also obtain credentials using the OAuth API, following the instructions in one of the guides listed below:</p>
                     </li>
                 </ol>
@@ -114,22 +118,30 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
     <script src="//docs.brightcove.com/en/scripts/docs-nav-data.min.js"></script>
     <script src="//docs.brightcove.com/en/scripts/bcls-doc-site-v1.js"></script>
-    <script src="//docs.brightcove.com/en/scripts/vkbeautify.0.99.00.beta.js"></script>
     <script id="pageScript">
         var BCLS = (function(window, document) {
             var accountId,
                 clientId,
                 clientSecret,
+                //dates
+                today = new Date().valueOf(),
+                oneDay = 1000 * 60 * 60 * 24,
+                startDateISO,
+                startDate,
+                startDateMS,
+                currentDate,
+                currentDateMS,
+                currentDateISO,
                 // api stuff
                 proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/mrss-proxy.php',
-                baseURL = 'https://cms.api.brightcove.com/v1/accounts/',
-                limit = 25,
+                baseURL = 'https://analytics.api.brightcove.com/v1/data',
                 totalVideos = 0,
                 totalCalls = 0,
                 callNumber = 0,
                 superSet = 0,
-                superSetVideos = 100,
                 videosCompleted = 0,
+                daysTotal,
+                daysCompleted,
                 videosArray = [],
                 summaryData = {},
                 csvStr,
@@ -225,46 +237,40 @@
                 return targetArray;
             }
 
-            function processRenditions(renditions, callback) {
-                var i,
-                    iMax = renditions.length,
-                    hlsRenditions = [],
-                    mp4Renditions = [],
-                    flvRenditions = [],
-                    otherRenditions = [];
-                // separate renditions by type
-                for (i = 0; i < iMax; i += 1) {
-                    if (renditions[i].video_container === 'M2TS') {
-                        hlsRenditions.push(renditions[i]);
-                    } else if (renditions[i].video_container === 'MP4') {
-                        mp4Renditions.push(renditions[i]);
-                    } else if (renditions[i].video_container === 'FLV') {
-                        flvRenditions.push(renditions[i]);
-                    } else {
-                        otherRenditions.push(renditions[i]);
+
+            function getDateFromIsoString(isoString) {
+                var arr,
+                    i,
+                    iMax,
+                    d;
+                if (isDefined(isoString)) {
+                    arr = isoString.split('-');
+                    iMax = arr.length;
+                    for (i = 0; i < iMax; i++) {
+                        arr[i] = parseInt(arr[i]);
+                        if (i === 1) {
+                            if (arr[i] === 0) {
+                                arr[i] = 12;
+                            } else {
+                                arr[i]--;
+                            }
+                        }
+
                     }
                 }
-                // sort renditions by encoding rate
-                callback(hlsRenditions, mp4Renditions, flvRenditions, otherRenditions);
+                d = new Date(arr[0], arr[1], arr[2]);
+                return d;
             }
 
 
             function startCSVStrings() {
-                csvStr = '"ID","Name","Description","Date Added","Date Last Modified","Filename","Resolution","Duration(sec)","HLS Renditions (bitrate range KBPS)","MP4 Renditions (bitrate range KBPS)","FLV Renditions (bitrate range KBPS)"\n';
+                csvStr = '"Video id","Name","Reference id","Duration","Video Impressions","Video Views","Play Rate","Average Percent Viewed","Average Seconds Viewed","Engagement Score","Views at 1%","Views at 25%","Views at 50%","Views at 75%","Views at 100%"\n';
             }
 
             function writeReport() {
                 var i,
                     iMax,
                     video,
-                    hlsLowRate,
-                    hlsHighRate,
-                    mp4LowRate,
-                    mp4HighRate,
-                    flvLowRate,
-                    flvHighRate,
-                    resWidth,
-                    resHeight,
                     rendition = {};
                 if (videosArray.length > 0) {
                     iMax = videosArray.length;
@@ -272,26 +278,7 @@
                         video = videosArray[i];
 
                         // generate the video detail row
-                        hlsLowRate = (video.hlsRenditions.length > 0) ? video.hlsRenditions[0].encoding_rate / 1000 : 0;
-                        hlsHighRate = (video.hlsRenditions.length > 0) ? video.hlsRenditions[video.hlsRenditions.length - 1].encoding_rate / 1000 : 0;
-                        mp4LowRate = (video.mp4Renditions.length > 0) ? video.mp4Renditions[0].encoding_rate / 1000 : 0;
-                        mp4HighRate = (video.mp4Renditions.length > 0) ? video.mp4Renditions[video.mp4Renditions.length - 1].encoding_rate / 1000 : 0;
-                        flvLowRate = (video.flvRenditions.length > 0) ? video.flvRenditions[0].encoding_rate / 1000 : 0;
-                        flvHighRate = (video.flvRenditions.length > 0) ? video.flvRenditions[video.flvRenditions.length - 1].encoding_rate / 1000 : 0;
-                        if (video.flvRenditions.length > 0) {
-                            rendition = video.flvRenditions[video.flvRenditions.length - 1];
-                        } else if (video.mp4Renditions.length > 0) {
-                            rendition = video.mp4Renditions[video.mp4Renditions.length - 1];
-                        } else if (video.hlsRenditions.length > 0) {
-                            rendition = video.hlsRenditions[video.hlsRenditions.length - 1];
-                        } else {
-                            rendition.frame_width = "unknown";
-                            rendition.frame_height = "unknown";
-                        }
-                        resWidth = rendition.frame_width;
-                        resHeight = rendition.frame_height;
-                        // add csv row
-                        csvStr += '"' + video.id + '","' + video.name + '","' + video.description + '","' + video.created_at + '","' + video.updated_at + '","' + video.original_filename + '","' + resWidth + 'x' + resHeight + '","' + video.duration / 1000 + '","' + video.hlsRenditions.length + ' (' + hlsLowRate + '-' + hlsHighRate + ')","' + video.mp4Renditions.length + ' (' + mp4LowRate + '-' + mp4HighRate + ')","' + video.flvRenditions.length + ' (' + flvLowRate + '-' + flvHighRate + ')"\n';
+                        csvStr += '"' + item.video + '","' + item.video.name + '","' + item.video.reference_id + '","' + item.video_duration + '","' + item.video_impression + '","' + item.video_view + '","' + item.play_rate + '","' + item.video_percent_viewed / item.video_view + '","' + item.video_seconds_viewed / item.video_view + '","' + item.engagement_score + '","' + item.video_engagement_1 + '","' + item.video_engagement_25 + '","' + item.video_engagement_50 + '","' + item.video_engagement_75 + '","' + item.video_engagement_100 + '"\n';
                     }
                     csvData.textContent += csvStr;
                     // content = document.createTextNode('Finished! See the results or get the CSV data below.');
@@ -308,13 +295,12 @@
              * @param {String} id the id of the button that was clicked
              */
             function setRequestData(id) {
-                var endPoint = '',
-                    requestData = {};
+                var endPoint = '';
                 // disable buttons to prevent a new request before current one finishes
                 disableButtons();
                 switch (id) {
-                    case 'getCount':
-                        endPoint = accountId + '/counts/videos?sort=created_at';
+                    case 'getStartDate':
+                        endPoint = '/status?accounts=' + accountId + '&dimensions=video&fields=video,video.name,video.reference_id,video_duration,video_impression,video_view,play_rate,video_percent_viewed,video_seconds_viewed,engagement_score,video_engagement_1,video_engagement_25,video_engagement_50,video_engagement_75,video_engagement_100';
                         requestData.url = baseURL + endPoint;
                         requestData.requestType = 'GET';
                         apiRequest.textContent = requestData.url;
@@ -328,7 +314,7 @@
                         apiRequest.textContent = requestData.url;
                         getMediaData(requestData, id);
                         break;
-                    case 'getVideoRenditions':
+                    case 'getVideoDays':
                         var i,
                             iMax = videosArray.length
                         callback = function(renditions) {
@@ -399,11 +385,13 @@
                             if (httpRequest.readyState === 4) {
                                 if (httpRequest.status === 200) {
                                     // check for completion
-                                    if (requestID === 'getCount') {
+                                    if (requestID === 'getStartDate') {
                                         responseRaw = httpRequest.responseText;
                                         parsedData = JSON.parse(responseRaw);
                                         // set total videos
-                                        totalVideos = parsedData.count;
+                                        startDateISO = parsedData.reconciled_from;
+                                        startDate = getDateFromIsoString(startDateISO);
+                                        currentDate = startDate;
                                         totalCalls = Math.ceil(superSetVideos / limit);
                                         logText.textContent = totalVideos + ' videos found; videos retrieved: ' + videosCompleted;
                                         spanSetsCountEl.textContent = callNumber + 1;
