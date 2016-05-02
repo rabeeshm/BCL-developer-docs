@@ -138,12 +138,12 @@
                 totalVideos = 0,
                 totalCalls = 0,
                 callNumber = 0,
-                superSet = 0,
+                videoNumber = 0,
                 videosCompleted = 0,
                 daysTotal,
                 daysCompleted,
                 videosArray = [],
-                summaryData = {},
+                dailyAnalyticsItems,
                 csvStr,
                 summaryCsvStr,
                 // elements
@@ -164,12 +164,8 @@
                 spanOf1 = document.createElement('span'),
                 spanIntro2 = document.createElement('span'),
                 spanOf2 = document.createElement('span'),
-                spanSetsTotal = document.createElement('span'),
-                spanSetsCount = document.createElement('span'),
                 spanVideosTotal = document.createElement('span'),
                 spanVideosCount = document.createElement('span'),
-                spanSetsTotalEl,
-                spanSetsCountEl,
                 spanVideosTotalEl,
                 spanVideosCountEl;
 
@@ -237,7 +233,11 @@
                 return targetArray;
             }
 
-
+            /**
+             * converts an ISO date string into a date object
+             * @param {String} isoString date string to convert
+             * @return {Date} the equivalent date object
+             */
             function getDateFromIsoString(isoString) {
                 var arr,
                     i,
@@ -262,9 +262,26 @@
                 return d;
             }
 
+            /**
+             * add one day to a date and return the iso date string for it
+             * @param {Date} the date object
+             * @return {String} an ISO date string for one day after the date
+             */
+            function addOneDay(date) {
+                var dateMS,
+                    newDate;
+                if (isDefined(date)) {
+                    dateMS = date.valueOf();
+                    newDate = new Date(dateMS + oneDay);
+                    return newDate.toISOString().substring(0,10);
+                }
+            }
 
+            /**
+             * starts a new CSV string with the header row
+             */
             function startCSVStrings() {
-                csvStr = '"Video id","Name","Reference id","Duration","Video Impressions","Video Views","Play Rate","Average Percent Viewed","Average Seconds Viewed","Engagement Score","Views at 1%","Views at 25%","Views at 50%","Views at 75%","Views at 100%"\n';
+                csvStr = '"Date","Video id","Name","Reference id","Duration","Video Impressions","Video Views","Play Rate","Average Percent Viewed","Average Seconds Viewed","Engagement Score","Views at 1%","Views at 25%","Views at 50%","Views at 75%","Views at 100%"\n';
             }
 
             function writeReport() {
@@ -278,14 +295,14 @@
                         video = videosArray[i];
 
                         // generate the video detail row
-                        csvStr += '"' + item.video + '","' + item.video.name + '","' + item.video.reference_id + '","' + item.video_duration + '","' + item.video_impression + '","' + item.video_view + '","' + item.play_rate + '","' + item.video_percent_viewed / item.video_view + '","' + item.video_seconds_viewed / item.video_view + '","' + item.engagement_score + '","' + item.video_engagement_1 + '","' + item.video_engagement_25 + '","' + item.video_engagement_50 + '","' + item.video_engagement_75 + '","' + item.video_engagement_100 + '"\n';
+                        csvStr += '"' + item.date + '","' + item.video + '","' + item.video.name + '","' + item.video.reference_id + '","' + item.video_duration + '","' + item.video_impression + '","' + item.video_view + '","' + item.play_rate + '","' + item.video_percent_viewed / item.video_view + '","' + item.video_seconds_viewed / item.video_view + '","' + item.engagement_score + '","' + item.video_engagement_1 + '","' + item.video_engagement_25 + '","' + item.video_engagement_50 + '","' + item.video_engagement_75 + '","' + item.video_engagement_100 + '"\n';
                     }
                     csvData.textContent += csvStr;
                     // content = document.createTextNode('Finished! See the results or get the CSV data below.');
                     pLogFinish.textContent = 'Finished! See the results or get the CSV data below.';
                     // reportDisplay.innerHTML = summaryReportStr + reportStr;
-                    makeReport.textContent = 'Get next 100 videos';
-                    superSet++;
+                    makeReport.textContent = 'Do the next video';
+                    videoNumber++;
                     enableButtons();
                 }
             }
@@ -306,9 +323,8 @@
                         apiRequest.textContent = requestData.url;
                         getMediaData(requestData, id);
                         break;
-                    case 'getVideos':
-                        var offset = (superSet * 100) + (limit * callNumber);
-                        endPoint = accountId + '/videos?sort=created_at&limit=' + limit + '&offset=' + offset;
+                    case 'getVideoIds':
+                        endPoint = accountId + 'videos?sort=created_at&limit=' + limit + '&offset=' + offset;
                         requestData.url = baseURL + endPoint;
                         requestData.requestType = 'GET';
                         apiRequest.textContent = requestData.url;
@@ -457,16 +473,14 @@
                     this.select();
                 });
                 // set up the log elements
-                content = document.createTextNode('Getting video set ');
+                content = document.createTextNode('Getting video ids ');
                 spanIntro1.appendChild(content);
-                content = document.createTextNode('Getting renditions for video ');
+                content = document.createTextNode('Getting daily analytics for video ');
                 spanIntro2.appendChild(content);
                 content = document.createTextNode(' of ');
                 spanOf1.appendChild(content);
                 content = document.createTextNode(' of ');
                 spanOf2.appendChild(content);
-                spanSetsCount.setAttribute('id', 'spanSetsCount');
-                spanSetsTotal.setAttribute('id', 'spanSetsTotal');
                 spanVideosCount.setAttribute('id', 'spanVideosCount');
                 spanVideosTotal.setAttribute('id', 'spanVideosTotal');
                 pLogGettingVideoSets.appendChild(spanIntro1);
@@ -478,8 +492,6 @@
                 pLogGettingRenditions.appendChild(spanOf2);
                 pLogGettingRenditions.appendChild(spanVideosTotal);
                 logger.appendChild(pLogGettingVideoSets);
-                spanSetsCountEl = document.getElementById('spanSetsCount');
-                spanSetsTotalEl = document.getElementById('spanSetsTotal');
                 spanSetsCountEl.textContent = callNumber + 1;
                 spanSetsTotalEl.textContent = totalCalls;
                 logger.appendChild(pLogGettingRenditions);
@@ -510,23 +522,19 @@
                         accountId = '1752604059001';
                     }
                     // if first set, we need to get the count
-                    if (superSet === 0) {
-                        setRequestData('getCount');
-                    } else {
-                        if ((totalVideos - videosCompleted) < 100) {
-                            superSetVideos = totalVideos - videosCompleted;
-                        }
-                        // resets
-                        videosArray = [];
-                        summaryData = {};
-                        totalCalls = 0;
-                        callNumber = 0;
-                        totalCalls = Math.ceil(superSetVideos / limit);
-                        spanSetsTotalEl.textContent = totalCalls;
-                        spanSetsCountEl.textContent = callNumber + 1;
-                        spanVideosTotalEl.textContent = superSetVideos;
-                        spanVideosCountEl.textContent = 1;
-                        setRequestData('getVideos');
+                    setRequestData('getStartDate');
+                    // resets
+                    videosArray = [];
+                    dailyAnalyticsItems = [];
+                    summaryData = {};
+                    totalCalls = 0;
+                    callNumber = 0;
+                    totalCalls = Math.ceil(superSetVideos / limit);
+                    spanSetsTotalEl.textContent = totalCalls;
+                    spanSetsCountEl.textContent = callNumber + 1;
+                    spanVideosTotalEl.textContent = superSetVideos;
+                    spanVideosCountEl.textContent = 1;
+                    setRequestData('getVideos');
                     }
 
                 });
