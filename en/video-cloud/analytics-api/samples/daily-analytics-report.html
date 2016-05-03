@@ -88,17 +88,17 @@
                         <input id="client_secret" type="text" size="60" value="" placeholder="w7NQYu0vUloM4GYYy2SXAxrvyFpt8fwI35qAFZcS13-VIgs0itwKNsAwHOS80sOWK">
                     </p>
                     <p>
-                        <button class="bcls-button" id="makeReport">Generate the Report</button>
+                        <button class="bcls-button" id="makeReport">Generate the Report</button> <span id="warning" style="color:#CC0000;"></span>
                     </p>
-                    <p id="warning" style="color:#CC0000;">Before processing the next video, be sure to copy and save the CSV data.</p>
+
                 </fieldset>
                 <fieldset>
                     <legend>Log</legend>
-                    <div id="logger">
+                    <div id="logger" style="font-size:.8em;">
                         <p id="logText"></p>
                     </div>
                     <p>Current API request</p>
-                    <textarea id="apiRequest" style="width:98%"></textarea>
+                    <textarea id="apiRequest" style="width:99%;height:5em;"></textarea>
                 </fieldset>
             </div>
             <div id="csvDisplay" class="section">
@@ -153,6 +153,7 @@
                 client_id = document.getElementById('client_id'),
                 client_secret = document.getElementById('client_secret'),
                 makeReport = document.getElementById('makeReport'),
+                warning = document.getElementById('warning'),
                 content,
                 logger = document.getElementById('logger'),
                 logText = document.getElementById('logText'),
@@ -293,14 +294,22 @@
                         item = videosArray[videoNumber].items[i];
                         console.log('item', item);
                         // generate the video detail row
-                        csvStr += '"' + item.date + '","' + item.video + '","' + item[video.name] + '","' + item[video.reference_id] + '","' + item.video_duration + '","' + item.video_impression + '","' + item.video_view + '","' + item.play_rate + '","' + parseInt(item.video_percent_viewed) / parseInt(item.video_view) + '","' + parseInt(item.video_seconds_viewed) / parseInt(item.video_view) + '","' + item.engagement_score + '","' + item.video_engagement_1 + '","' + item.video_engagement_25 + '","' + item.video_engagement_50 + '","' + item.video_engagement_75 + '","' + item.video_engagement_100 + '"\n';
+                        csvStr += '"' + item.date + '","' + item.video + '","' + item['video.name'] + '","' + item['video.reference_id'] + '","' + item.video_duration + '","' + item.video_impression + '","' + item.video_view + '","' + item.play_rate + '","' + Math.fround(parseInt(item.video_percent_viewed) / parseInt(item.video_view)) + '","' + Math.fround(parseInt(item.video_seconds_viewed) / parseInt(item.video_view)) + '","' + item.engagement_score + '","' + item.video_engagement_1 + '","' + item.video_engagement_25 + '","' + item.video_engagement_50 + '","' + item.video_engagement_75 + '","' + item.video_engagement_100 + '"\n';
                     }
                     csvData.textContent += csvStr;
                     pLogFinish.textContent = 'Finished! Get the CSV data below.';
+                    spanCompletedVideos.textContent = videosCompleted;
                     videosCompleted++;
-                    makeReport.textContent = 'Process the next video';
-                    videoNumber++;
-                    enableButtons();
+                    spanCompletedVideos.textContent = videosCompleted;
+                    if (videosCompleted < totalVideos) {
+                        makeReport.textContent = 'Process the next video';
+                        warning.textContent = 'Before processing the next video, be sure to copy and save the CSV data!';
+                        videoNumber++;
+                        enableButtons();
+                    } else {
+                        makeReport.textContent = 'No more videos to process';
+                    }
+
                 }
             }
 
@@ -402,6 +411,7 @@
                                         spanCompletedVideos.textContent = videosCompleted;
                                         spanVideosCount.textContent = videoNumber + 1;
                                         spanVideosTotal.textContent = totalVideos;
+                                        spanTotalVideos.textContent = totalVideos;
                                         logText.appendChild(spanTotalVideos);
                                         logText.appendChild(spanLogMessage);
                                         logText.appendChild(spanCompletedVideos);
@@ -521,15 +531,17 @@
                     if (videosArray.length === 0) {
                         setRequestData('getStartDate');
                     } else {
-                        window.confirm('Before proceeding, make sure you have copied and saved the current CSV data - it will be lost when the next video is processed!')
-                        // resets
-                        videoNumber = 0;
-                        dayNumber = 0;
-                        spanDaysTotal.textContent = totalDays;
-                        spanDaysCount.textContent = dayNumber + 1;
-                        spanVideosTotal.textContent = totalVideos;
-                        spanVideosCount.textContent = videoNumber + 1;
-                        setRequestData('getVideoDays');
+                        if (window.confirm('Before proceeding, make sure you have copied and saved the current CSV data - it will be lost when the next video is processed!')) {
+                            // resets
+                            dayNumber = 0;
+                            csvData.textContent = ''
+                            spanDaysTotal.textContent = totalDays;
+                            spanDaysCount.textContent = dayNumber + 1;
+                            spanVideosTotal.textContent = totalVideos;
+                            spanVideosCount.textContent = videoNumber + 1;
+                            setRequestData('getVideoDays');
+                        }
+
                     }
 
                 });
