@@ -142,7 +142,35 @@
               <p>When  the changes to the advertising properties are saved, the IMA plugin will be configured as part of the Plugin settings.</p>
               <div><img alt="" src="assets/studio-ima-plugin-props.png" /></div>
               <p>The IMA plugin does support additional properties that are not available in the UI. If needed, modify the IMA plugin JSON to include any other options you may need.</p>
-              <p class="BCL-aside">Note: You may want to dynamically build the <code>serverURL</code> at the client (which means the IMA3 plugin would already be initialized), for example after a user login. You can do this by setting that value to an empty string in the <strong>options</strong> <code>{ serverUrl: '' }</code>, then later assign the value programmatically.</p>
+              <p class="BCL-aside">Note: You may want to dynamically build the <code>serverURL</code> at the client (which means the IMA3 plugin would already be initialized), for example after a user login. You can do this by setting that value to an empty string in the <strong>options</strong> <code>{ "serverUrl": "" }</code>, then later assign the value programmatically.</p>
+            </div>
+            <div id="JSON_vs_JavaScript_notation" class="section">
+              <h2>JSON vs JavaScript notation</h2>
+              <p>If you examine the <strong>Options</strong> section above, you see the configuration information is supplied in JSON format. If you are using code to implement your IMA3 plugin, the notation for setting options with JavaScript is slightly different.</p>
+              <p>Here you see options in JSON format you could use in Studio:</p>
+              <pre><code>{
+  "adTechOrder": [
+    "flash",
+    "html5"
+  ],
+  "postrollTimeout": 2000,
+  "prerollTimeout": 1000,
+  "requestMode": "onload",
+  "serverUrl": "http://solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vmap.xml?cust_params={mediainfo.ad_keys}",
+  "timeout": 5000
+}</code></pre>
+              <p>If you are using JavaScript to configure your options, it would appear as follows:</p>
+              <pre><code>player.ima3({
+  adTechOrder: [
+    'flash',
+    'html5'
+  ],
+  postrollTimeout: 2000,
+  prerollTimeout: 1000,
+  requestMode: 'onload',
+  serverUrl: 'http://solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vmap',
+  timeout: 5000
+});</code></pre>
             </div>
             <div id="options" class="section">
                 <h2>Options</h2>
@@ -151,7 +179,7 @@
                         details on the current set of overrideable settings. Both the IMA plugin specific options and ad framework options are documented here.</p>
 
                     <h3>adControlBar</h3>
-                    <p>Type: <code>object</code> Default Value: identical to the player control bar options</p>
+                    <p>Type: <code>object</code> Default Value: Identical to the player control bar options</p>
               <p>When using the Flash ad tech, a separate set of controls are created to manage interaction with the ad SWF. When those controls are created,
                       these options will be used during their initialization. If no value is specified, the configuration settings for the regular control bar
                       will be used.</p>
@@ -161,7 +189,7 @@
               <p>The path to the videojs IMA3 swf. A debugging option for development.</p>
               <p>This option is part of the ad framework is configured as follows:</p>
 <pre><code>player.ima3({
-adSwf: 'http://example.com/custom.swf'
+  adSwf: 'http://example.com/custom.swf'
 });</code></pre>
 
                     <h3>adTechOrder</h3>
@@ -176,23 +204,27 @@ adSwf: 'http://example.com/custom.swf'
                     <h3>debug</h3>
                     <p>Type: <code>boolean</code> Default Value: <code>false</code></p>
                     <p>If debug is set to true, the ads framework will output additional information about its current state during playback. This can be handy for diagnosing issues or unexpected behavior in an ad integration.</p>
-                    <p>This option is part of the ad framework is configured as follows:</p>
-                    <pre><code>player.ads({
+                    <p>This option is part of the ad framework and is configured as follows:</p>
+                    <pre><code>player.ima3({
   debug: true
 });</code></pre>
 
                   <h3>hardTimeouts</h3>
                   <p>Type: <code>boolean</code> Default Value: <code>true</code></p>
-                  <p>Abandon ads that finish loading after they have timed out. This will prevent slow preroll ads from interrupting after the content video has begun playing.</p>
-
+                  <p>Abandon ads that finish loading after they have timed out. This will prevent slow preroll ads from interrupting after the content video has begun playing. Either the <code>prerollTimeout</code>, <code>postrollTimeout</code> or <code>timeout</code> value for the timeout will be used, depending on the type of ad trying to be played.</p>
+                  <p>This option is part of the ad framework and is configured as follows:</p>
+                  <pre><code>player.ima3({
+  hardTimouts: true
+});</code></pre>
                     <h3>ima3SdkSettings</h3>
                     <p>Type: <code>object</code> Default Value: undefined</p>
                     <p>If provided, the properties of this object are used to set the page-level <a href="https://developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.ImaSdkSettings">Ima3SdkSettings</a> when
                         the IMA SDK has finished loading. The properties of this object are expected to be the camel-cased equivalent of setter methods on the SDK
                         settings object, minus the &#39;set&#39; prefix. For example, if you provided this object when initializing the plugin:</p>
-<pre><code class="js">{
-  &#39;numRedirects&#39;: 3,
-  &#39;ppid&#39;: &#39;publisher-id&#39;,
+<pre><code class="js">player.ima3({
+  ima3SdkSettings: {&#39;numRedirects&#39;: 3,
+    &#39;ppid&#39;: &#39;publisher-id&#39;
+  }
 }
 </code></pre>
                     <p class="BCL-aside">Note: When using the Flash playback technology, the <code>numRedirects</code> value is not settable, and defaults to Google's default value of 4 permissible redirects.</p>
@@ -204,12 +236,16 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                     <h3>loadingSpinner</h3>
                     <p>Type: <code>boolean</code> Default Value: <code>false</code></p>
                     <p>When set to true, the <code>vjs-loading-spinner</code> is displayed while an ad loads.</p>
+                    <p>This option is part of the ad framework and is configured as follows:</p>
+                    <pre><code>player.ima3({
+  loadingSpinner: true
+});</code></pre>
 
                     <h3>postrollTimeout</h3>
                     <p>Type: <code>number</code> Default Value: <code>100</code> milliseconds</p>
                     <p>The maximum amount of time to wait for an ad implementation to initiate a postroll, in milliseconds. If <code>contentended</code> has been fired and the ad implementation does not call <code>startLinearAdMode()</code> before <code>postrollTimeout</code> expires, the content video will end playback.</p>
                     <p>This option is part of the ad framework and is configured as follows:</p>
-                    <pre><code>player.ads({
+                    <pre><code>player.ima3({
   postrollTimeout: 1000
 });</code></pre>
                     <p>Once the ad dispatches the <code>contentended</code> event one of these things will happen:</p>
@@ -227,7 +263,7 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                     <p>Type: <code>number</code> Default Value: <code>1000</code> milliseconds</p>
                     <p>The maximum amount of time to wait for an ad implementation to initiate a preroll, in milliseconds. If <code>readyforpreroll</code> has been fired and the ad implementation does not call <code>startLinearAdMode()</code> before <code>prerollTimeout</code> expires, the content video will begin playback. The <code>prerollTimeout</code> option is cumulative with the standard timeout parameter.</p>
                     <p>This option is part of the ad framework and is configured as follows:</p>
-                    <pre><code>player.ads({
+                    <pre><code>player.ima3({
   prerollTimeout: 1000
 });</code></pre>
                     <p>Once the ad dispatches the <code>readyforpreroll</code> event one of these things will happen:</p>
@@ -241,13 +277,24 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
 
               <h3 id="requestMode">requestMode</h3>
                     <p>Type: <code>string</code> Default Value: <code>onload</code></p>
-                    <p>There are three possible values for this option:</p>
+                    <p>There are four possible values for this option:</p>
                     <ul>
                       <li><code>onload</code>: Ads are requested immediately when the player loads. This is normally the best experience for DFP / VPAID.</li>
                       <li><code>onplay</code>: The first ad request is delayed until playback is initiated. This is important for ad networks which consider ad requests made without corresponding ad plays, which can  happen on a poorly performing site. This will cause ads trafficked to eventually drop, or the customer will receive less for the ads shown.</li>
                       <li><code>ondemand</code>: All ad requests will be initiated using the <code>player.ima3.adrequest()</code> method manually</li>
+                      <li>
+                        <code>oncue</code>: Ads are requested based on ID3 cue points in a live stream. For this type of request to function correctly, the ID3 TXXX frame received must contain JSON data with the following fields:
+                          <ul>
+                            <li><code>name</code>: Required; must be the string value <code>adCue</code></li>
+                            <li><code>id</code>: Required; A unique value to identify the ad given that times are relative in live streams</li>
+                            <li><code>serverUrl</code>: Optional; Appended as a breaklength parameter to the server url</li>
+                            <li><code>duration</code>: Optional; ad duration</li>
+                          </ul>
+                          <p>Example: <code>{"name": "adCue", "id": 123}</code></p>
+                        <p>You can also cancel an <code>oncue</code> ad using the following format for the object sent: <code>{"name": "adCancel"}</code></p>
+                      </li>
                     </ul>
-                    <p>Note: All <code>requestMode</code> values make <code>ondemand</code> requests immediately.</p>
+                    <p class="BCL-aside">Note: All <code>requestMode</code> values make <code>ondemand</code> requests immediately.</p>
                     <p>This option is part of the ad framework is configured as follows:</p>
 <pre><code>player.ima3({
   requestMode: 'onplay'
@@ -258,8 +305,24 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                     <p>This is the only option that is <strong>required</strong>. Here, you will provide the URL to your ad server. Remember, you can <a href="#testadserver">test the ad tag</a> on your server before trying to use it in the plugin.</p>
   <p>This option is part of the <code>ima3</code> plugin and can be configured in Brightcove Studio as shown <a href="#playersmodule">above</a>, or in the embed-in-page code as follows:</p>
                     <pre><code>player.ima3({
-"serverUrl": "your ad server"
+  serverUrl: 'your ad server'
 });</code></pre>
+<h3>timeout</h3>
+      <p>Type: <code>number</code> Default Value: <code>5000</code></p>
+      <p>The maximum amount of time to wait, in milliseconds, for an ad implementation to initialize before playback. If the viewer has requested playback and the ad implementation does not dispatch the <code>adsready</code> event before this timeout expires the content video will begin playback. It's still possible for an ad implementation to play ads after this waiting period has finished, but video playback will already be in progress.</p>
+      <p>This option is part of the ad framework is configured as follows:</p>
+<pre><code>player.ima3({
+  timeout: 5000
+});</code></pre>
+      <p>Once the ad plugin starts waiting for the <code>adsready</code> event, one of these things will happen:</p>
+      <ul>
+          <li>Integration ready within the timeout: This is the best case, preroll(s) will play without the user seeing any content video first.</li>
+          <li>Integration ready, but after timeout has expired: Preroll(s) still play, but the user will see a bit of content video.</li>
+          <li>Integration never becomes ready: Content video starts playing after timeout.</li>
+      </ul>
+      <p>This timeout is necessary to ensure a good viewer experience in cases where the ad implementation suffers an unexpected or irreparable error and never fires an <code>adsready</code> event. Without this timeout, the ads plugin would wait forever, and neither the content video nor ads would ever play.</p>
+      <p>If the ad implementation takes a long time to initialize and this timeout is too short, then the content video will begin playing before the first preroll opportunity. This has the jarring effect that the viewer would see a little content before the preroll cuts in.</p>
+      <p>In internal Brightcove testing it was found that five seconds seemed to be long enough to accommodate slow initialization in most cases, but still short enough that failures to initialize didn't look like failures of the player or content video.            </p>
 
                   <h3 id="vpaidMode">vpaidMode</h3>
                   <p>Type: <code>string</code> Default Value: <code>ENABLED</code></p>
@@ -270,6 +333,10 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                     <li><code>INSECURE</code>: Play VPAID ads in an iframe with the same domain.</li>
                     <li><code>DISABLED</code>:  VPAID ads throw an error.</li>
                   </ul>
+                  <p>This option is part of the ad framework is configured as follows:</p>
+            <pre><code>player.ima3({
+  vpaidMode: 'DISABLED'
+});</code></pre>
                   <p class="BCL-aside">Note: This will only take effect with the HTML5 ad tech. Flash ads are not affected.</p>
 
                 </div>
@@ -344,23 +411,6 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
                         </tr>
                       </tbody>
                     </table>
-
-              <h3>timeout</h3>
-                    <p>Type: <code>number</code> Default Value: <code>5000</code></p>
-                    <p>The maximum amount of time to wait, in milliseconds, for an ad implementation to initialize before playback. If the viewer has requested playback and the ad implementation does not dispatch the <code>adsready</code> event before this timeout expires the content video will begin playback. It's still possible for an ad implementation to play ads after this waiting period has finished, but video playback will already be in progress.</p>
-                    <p>This option is part of the ad framework is configured as follows:</p>
-<pre><code>player.ads({
-  timeout: 5000
-});</code></pre>
-                    <p>Once the ad plugin starts waiting for the <code>adsready</code> event, one of these things will happen:</p>
-                    <ul>
-                        <li>Integration ready within the timeout: This is the best case, preroll(s) will play without the user seeing any content video first.</li>
-                        <li>Integration ready, but after timeout has expired: Preroll(s) still play, but the user will see a bit of content video.</li>
-                        <li>Integration never becomes ready: Content video starts playing after timeout.</li>
-                    </ul>
-                    <p>This timeout is necessary to ensure a good viewer experience in cases where the ad implementation suffers an unexpected or irreparable error and never fires an <code>adsready</code> event. Without this timeout, the ads plugin would wait forever, and neither the content video nor ads would ever play.</p>
-                    <p>If the ad implementation takes a long time to initialize and this timeout is too short, then the content video will begin playing before the first preroll opportunity. This has the jarring effect that the viewer would see a little content before the preroll cuts in.</p>
-                    <p>In internal Brightcove testing it was found that five seconds seemed to be long enough to accommodate slow initialization in most cases, but still short enough that failures to initialize didn't look like failures of the player or content video.            </p>
             </div>
           <div id="methods" class="section">
             <h2>Methods</h2>
@@ -390,7 +440,7 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
           </div>
           <div id="runtimesettings" class="section">
               <h2>Runtime settings</h2>
-              <p>The following methods are available for both the HTML5 and Flash ad playback technologies.</p>
+              <p>The following methods are available for both the HTML5 and Flash ad playback technologies. Only a few of the most used methods from the adsManager are displayed below. See Google's <a href="https://developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.AdsManager"> Interface google.ima.AdsManager</a> documentation for all available functionality.</p>
               <h3>AdsManager.destroy</h3>
               <p>Type: <code>google.ima.AdsManager.destroy</code></p>
               <p>Usage: <code>myPlayer.ima3.adsManager.destroy()</code></p>
