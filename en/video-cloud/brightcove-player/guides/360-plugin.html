@@ -58,13 +58,13 @@
 				<h1>360º Video Plugin</h1>
 				<!-- Place document intro sentence(s) here -->
         <p class="BCL-aside">Note: The 360º Video Plugin is in beta development.</p>
-				<p>This plugin turns a properly recorded video element into a HTML5 panoramic, 360º video played in Brightcove Player.</p>
-				<p>The sample video below demonstrates the use of the 360º Video Plugin. At this time only Chrome and Firefox support the plugin. You can use either your mouse or the arrow keys to control the view. (If using the arrow keys in Firefox, tab once for operation.)</p>
+				<p>This plugin turns a properly recorded video element into a HTML5, panoramic, 360º video that can be played in Brightcove Player.</p>
+				<p>The sample video below demonstrates the use of the 360º Video Plugin. At this time only Chrome and Firefox support the plugin. Once you click on the video to play it, you can use either your mouse or the arrow keys to control the view. (If using the arrow keys in Firefox, tab once for operation.) The 360 video logo play button fades on play.</p>
         <iframe src="//players.brightcove.net/1752604059001/Sy6GVYJz_default/index.html?videoId=4886999280001"
           allowfullscreen
           webkitallowfullscreen
           mozallowfullscreen></iframe>
-        <p>Implementing thet plugin is straightforward, just complete this two steps:</p>
+        <p>Implementing the plugin is straightforward, just complete these two steps:</p>
         <ul>
           <li>Properly ingest the video.</li>
           <li>Add the plugin to the player.</li>
@@ -72,39 +72,59 @@
 			</div>
       <div id="Ingest_the_360_video" class="section">
         <h2>Ingest the 360 video</h2>
-        <p>Once you have the video you need to ingest it into Video Cloud. A little understanding of how 360 video works will help you understand some reasons for the ingestion profile to choose. The 360 video is filmed to be projected on the interior of a sphere. This means that the visible area of the video in the player is only a fraction of the entire video. The following screenshot gives you a rough idea of this concept. The area inside the red rectangle is what is visible in the player, but only a small part of the entire video.</p>
-        <figure><img src="../../brightcove-player/guides/assets/360video/show-display.png"></figure>
-        <p>Since only a small part of the video will be in the player at any one time you want a very high quality rendition to be playing, with no chance of stepping down to a lower quality rendition. For this reason, during the ingestion process you should use a Ingest Profile of high-quality, and few renditions. Brightcove recommends the <strong>single-bitrate-high (2 renditions)</strong> for the Ingest Profile for 360 videos.</p>
+        <p>Once you have the 360 video recorded, you need to ingest it into Video Cloud. A little understanding of how 360 video works will help you understand some reasons for the Ingest Profile to choose. The 360 video is filmed to be projected on the interior of a sphere. This means that the visible area of the video in the player is only a fraction of the entire video. The following screenshot gives you a rough idea of this concept. The area inside the red rectangle is what is visible in the player, but only a small part of the entire video.</p>
+        <figure><img src="../../brightcove-player/guides/assets/360video/show-display.png" alt="show part of video"></figure>
+        <p>Since only a small part of the video will be in the player at any one time, you want a very high quality rendition to be playing, with no chance of stepping down to a lower quality rendition. In essence, you are "zooming in" on part of the video and a poor quality rendition would yield a very poor quality viewing experience. For this reason, during the ingestion process you should use a Ingest Profile of high-quality, and few renditions. Brightcove recommends using the <strong>single-bitrate-high (2 renditions)</strong> Ingest Profile for 360 videos.</p>
       </div>
-			<div id="implementplayersmodule" class="section">
+			<div id="Implement_using_Players_module" class="section">
 				<h2>Implement using Players module</h2>
-			  <p>To implement the NAME Plugin using the Players module, follow these steps:</p>
+        <p>To implement the 360º Video Plugin you will add a JavaScript link and a CSS link. You will then add three plugins that use those files, and one plugin that relies on the <strong>Errors</strong> plugin, which is automatically loaded into Brightcove Player. Follow these steps:</p>
 			  <ol>
-			    <li>Open the Players module and locate the player.</li>
-			    <li>Click the link for the player to open the player properties.</li>
-			    <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
+			    <li>Open the PLAYERS module and either create a new player or locate the player to which you wish to add the plugin.</li>
+			    <li>Click the link for the player to open the player's properties.</li>
+			    <li>Locate the <strong>PLUGINS</strong> section and click <strong>Edit</strong>.</li>
 			    <li>The JavaScript for the plugin is provided and will not change for different player implementations. For the <strong>JavaScript URL</strong>, enter:
-                <pre><code> http:</code></pre>
+                <pre><code> http://brightcove360.s3-website-us-east-1.amazonaws.com/dist/player.js</code></pre>
           </li>
 			    <li>The CSS for the plugin is provided and will not change for different player implementations. For the <strong>CSS URL</strong>, enter:<br/>
-                <pre><code> http:</code></pre></li>
-          <li>For the <strong>Name</strong>, enter <strong>PLUGIN NAME</strong>.</li>
-          <li>Enter the plugin options. The example below will ...<br/>
-<pre><code>{
-  "overlays": [
-    {
-      "align": "bottom",
-      "start": 2
-    }
-  ],
-  "content": "<strong>Default overlay content</strong>"
+            <pre><code> http://brightcove360.s3-website-us-east-1.amazonaws.com/dist/360-skin.css</code></pre></li>
+          <li>For the first plugin function, enter <strong>vr</strong> for the name.</li>
+          <li>Enter the corresponding plugin options.<br/>
+          <pre><code>{
+  "projection": "Sphere"
 }</code></pre>
-	         <div><img src="/en/video-cloud/brightcove-player/guides/assets/overlay-plugin.png" alt="change this"></div>
+          </li>
+          <li>For the second plugin function, enter <strong>listenForChange</strong> for the name.</li>
+          <li>There are no options for this plugin function.</li>
+          <li>For the third plugin function, enter <strong>excludeBrowsers</strong> for the name. Note that this plugin function and the one that follows in these instructions are only needed if you wish to display an error message to users who try to use the plugin with non-supported browsers.</li>
+          <li>Enter the corresponding plugin options.<br/>
+          <pre><code>{
+  "browsers": [
+    "ie",
+    "safari"
+  ]
+}</code></pre>
+          </li>
+          <li>For the last plugin function, enter <strong>errors</strong> for the name. Again, this is only needed to display errors for non-supported browsers.</li>
+          <li>Enter the corresponding plugin options.<br/>
+          <pre><code>{
+  "errors": {
+    "4": {
+      "headline": "360 video is not supported on this browser",
+      "message": "To view this video, upgrade to the latest version of Desktop Chrome, Firefox, or Edge.",
+      "type": "PLAYER_ERR_BROWSER"
+    }
+  }
+}</code></pre>
+            <p>The error generated by using non-supported browsers will appear as follows:</p>
+            <figure><img src="../../brightcove-player/guides/assets/360video/error.png" alt="error generated"></figure>
           </li>
           <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
+          <li>Select the <strong>MEDIA</strong> module.</li>
+          <li>Publish your 360 video using your newly altered player that uses the 360º Video Plugin.</li>      
 		    </ol>
 			</div>
-			<div id="implementcode" class="section">
+			<!-- <div id="implementcode" class="section">
         <h2>Implement using code</h2>
           <p>To implement a plugin the player needs to know the location of the plugin code, a stylesheet if needed, the plugin name and plugin configuration options. The location of the plugin code and stylesheet are as follows:</p>
             <ul>
@@ -147,13 +167,11 @@
             </ul>
           </li>
         </ul>
-      </div>
+      </div> -->
 			<div class="section" id="BCLreferences">
 				<h2>Related Topics</h2>
 				<ul>
-          <li><a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a>
-          </li>
-          <li><a href="http://docs.brightcove.com/en/video-cloud/player-management/getting-started/player-mgmt-quick-start.html">Quick Start to Player Management</a>
+          <li><a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/errors-plugin.html">Display Error Messages Plugin</a>
           </li>
 				</ul>
 			</div>
