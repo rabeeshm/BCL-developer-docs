@@ -248,7 +248,7 @@ var aapi_model = {
         video: {
             dimensions: ['video'],
             from: '2011-01-01',
-            fields: ['account.name', 'bytes_delivered', 'engagement_score', 'play_rate', 'video', 'video_duration', 'video_engagement_1', 'video_engagement_100', 'video_engagement_25', 'video_engagement_50', 'video_engagement_75', 'video_impression', 'video_name', 'video_percent_viewed', 'video_seconds_viewed', 'video_view', 'video.reference_id', 'video.name'],
+            fields: ['bytes_delivered', 'engagement_score', 'play_rate', 'video', 'video_duration', 'video_engagement_1', 'video_engagement_100', 'video_engagement_25', 'video_engagement_50', 'video_engagement_75', 'video_impression', 'video_name', 'video_percent_viewed', 'video_seconds_viewed', 'video_view', 'video.reference_id', 'video.name'],
             filter_values: ['video ids as a comma-delimited list or video.q=={video field}:{value}'],
             incompatible_dimensions: ['city', 'date', 'date_hour', 'destination_path', 'region', 'search_terms']
         },
