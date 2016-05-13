@@ -60,7 +60,6 @@
                 <h2>Obtain credentials</h2>
                 <p>Like most of Brightcove's RESTful APIs, the Ingest Profiles API requires OAuth access tokens to authorize requests. In order to get access tokens, you first need to obtain client credentials with permissions for kinds of operations you want to request. For the Ingest Profiles API, credentials currently have to be obtained using the <a href="../../oauth-api/getting-started/oauth-api-overview.html">OAuth API</a>.</p>
                 <p>If you already have client credentials with permissions for profile operations, you can skip directly to the <a href="#Set_default_profile_app">app below</a>. If you need credentials, the following steps walk you through the process.</p>
-                <h3>Get your <code>BCToken</code> from Studio</h3>
                 <ol>
                   <li>Login in to Studio.</li>
                   <li>Open the Developer Tools in your browser, and go to the Console.</li>
@@ -73,49 +72,32 @@ for (i = 0; i < cookiesArray.length; i++) {
 }
 window.prompt("BC_TOKEN:", cookiesObj.BC_TOKEN);</code></pre>
                   </li>
+                  <li>
+                      Copy and paste you BC_TOKEN and a comma-separated list of the accounts that you want to set default profiles for into the form below. Then click the <strong>Get Credentials</strong> button:
+                      <fieldset>
+                          <legend>Get Client Credentials</legend>
+                          <p>BC_TOKEN: <input type="text" id="bc_token"></p>
+                          <p>Account id: <input type="text" id="account_ids_creds" placeholder="123456789,987654321,56473829"></p>
+                          <p><button id="getCredentials" class="bcls-button">Get Credentials</button></p>
+                      </fieldset>
+                  </li>
+                  <li>Your client id and client secret should now appear in the <a href="#Set_default_profile_app">app below</a>. If you wish to save them for other purposes, copy and save them somewhere secure before leaving this page.</li>
                   </ol>
-                  <ul>
-                    <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html">OAuth: Get Client Credentials Using CURL</a></li>
-                    <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">OAuth: Get Client Credentials Using Postman</a></li>
-                  </ul>
                 </div>
-                <div class="section" id="dependencies">
-                    <h2>Dependencies</h2>
-                    <ul>
-                        <li><a href="https://github.com/vkiryukhin/vkBeautify">vkBeautify</a> (to pretty-print the XML for the MRSS feed)</li>
-                    </ul>
-                </div>
-            <div class="section" id="workingSample">
-                <h2>Working sample</h2>
+
+            <div class="section" id="Set_default_profile_app">
+                <h2>Set default profile app</h2>
                 <p>You can use the form below to generate a sample MRSS feed either for your own account or for a sample Brightcove account.</p>
                 <fieldset>
                     <legend>Input</legend>
                     <p>
                         If you do not enter account information, a Brightcove sample account will be used.
                     </p>
-                    <p>Account id: <input id="account_id" type="text" value="" placeholder="1752604059001"></p>
+                    <p>Account id: <input id="account_ids" type="text" value="" placeholder="1752604059001"></p>
                     <p>Client id: <input id="client_id" type="text" size="60" value="" placeholder="c5d0a622-5479-46d8-8d8a-5f034b943fab"></p>
                     <p>Client secret: <input id="client_secret" type="text" size="60" value="" placeholder="w7NQYu0vUloM4GYYy2SXAxrvyFpt8fwI35qAFZcS13-VIgs0itwKNsAwHOS80sOWKJ1BUwHIvSFG2I"></p>
-                    <p>Feed title: <input type="text" id="feedTitle" value="MRSS Feed"></p>
-                    <p>Feed description: <input type="text" id="feedDescription" value="My MRSS Feed"></p>
-                    <p>Number of videos to include: <select name="numberSelect" id="numberSelect" style="width:100px;">
-                        <option value="25" selected="selected">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                        <!-- <option value="all">all</option> -->
-                    </select></p>
-                    <p>Search string to select videos (optional - see <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/search-videos.html">Search for Videos</a>) <input id="searchStr" type="text" placeholder="tags:foo"></p>
-                    <p>Sort by:
-                        <select name="sortSelect" id="sortSelect" style="width:150px;">
-                            <option value="updated_at" selected="selected">Date last updated</option>
-                            <option value="created_at">Date added</option>
-                        </select>
-                        <select name="directionSelect" id="directionSelect" style="width:120px;">
-                            <option value="-" selected="selected">descending</option>
-                            <option value="">ascending</option>
-                        </select>
-                    </p>
-                    <p><button class="bcls-button" id="makeFeed">Generate the Feed</button></p>
+                    <p>Profile to set as default: <select name="profileSelect" id="profileSelect" style="width:100px;"></select></p>
+                    <p><button class="bcls-button" id="setDefaults">Generate the Feed</button></p>
                 </fieldset>
                 <fieldset>
                     <legend>Output</legend>
@@ -123,55 +105,8 @@ window.prompt("BC_TOKEN:", cookiesObj.BC_TOKEN);</code></pre>
                     <p>Current API request</p>
                     <pre><code id="apiRequest"></code></pre>
                     <p>Generated MRSS feed</p>
-                    <textarea id="feedDisplay" style="width:95%;height:30em;"></textarea>
+                    <textarea id="apiResponse" style="width:95%;height:30em;"></textarea>
                 </fieldset>
-            </div>
-            <div class="section" id="javascript">
-                <h2>Code for this app</h2>
-                <p>Below is the HTML code used in this app.</p>
-<pre><code>&lt;fieldset&gt;
-    &lt;legend&gt;Input&lt;/legend&gt;
-    &lt;p&gt;
-        If you do not enter account information, a Brightcove sample account will be used.
-    &lt;/p&gt;
-    &lt;h5&gt;Account id: &lt;input id="account_id" type="text" value="" placeholder="1752604059001"&gt;&lt;/h5&gt;
-    &lt;h5&gt;Client id: &lt;input id="client_id" type="text" size="60" value="" placeholder="c5d0a622-5479-46d8-8d8a-5f034b943fab"&gt;&lt;/h5&gt;
-    &lt;h5&gt;Client secret: &lt;input id="client_secret" type="text" size="60" value="" placeholder="w7NQYu0vUloM4GYYy2SXAxrvyFpt8fwI35qAFZcS13-VIgs0itwKNsAwHOS80sOWKJ1BUwHIvSFG2IbgcxEGKg"&gt;&lt;/h5&gt;
-    &lt;h5&gt;Feed title: &lt;input type="text" id="feedTitle" value="MRSS Feed"&gt;&lt;/h5&gt;
-    &lt;h5&gt;Feed description: &lt;input type="text" id="feedDescription" value="My MRSS Feed"&gt;&lt;/h5&gt;
-    &lt;h5&gt;Number of videos to include: &lt;select name="numberSelect" id="numberSelect"&gt;
-        &lt;option value="25" selected="selected"&gt;25&lt;/option&gt;
-        &lt;option value="50"&gt;50&lt;/option&gt;
-        &lt;option value="100"&gt;100&lt;/option&gt;
-    &lt;/select&gt;&lt;/h5&gt;
-    &lt;h5&gt;Search string to select videos (optional - see &lt;a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/search-videos.html"&gt;Search for Videos&lt;/a&gt;) &lt;input id="searchStr" type="text" placeholder="tags:foo"&gt;&lt;/h5&gt;
-    &lt;h5&gt;Sort by:
-        &lt;select name="sortSelect" id="sortSelect"&gt;
-            &lt;option value="updated_at" selected="selected"&gt;Date last updated&lt;/option&gt;
-            &lt;option value="created_at"&gt;Date added&lt;/option&gt;
-        &lt;/select&gt;
-        &lt;select name="directionSelect" id="directionSelect"&gt;
-            &lt;option value="-" selected="selected"&gt;descending&lt;/option&gt;
-            &lt;option value=""&gt;ascending&lt;/option&gt;
-        &lt;/select&gt;
-    &lt;/h5&gt;
-    &lt;p&gt;&lt;button class="bcls-button" id="makeFeed"&gt;Generate the Feed&lt;/button&gt;&lt;/p&gt;
-&lt;/fieldset&gt;
-&lt;fieldset&gt;
-    &lt;legend&gt;Output&lt;/legend&gt;
-    &lt;h5 id="logger" style="color:rgb(237, 104, 38)"&gt;Waiting for input...&lt;/h5&gt;
-    &lt;h5&gt;Current API request&lt;/h5&gt;
-    &lt;pre&gt;&lt;code id="apiRequest"&gt;&lt;/code&gt;&lt;/pre&gt;
-    &lt;h5&gt;Generated MRSS feed&lt;/h5&gt;
-    &lt;textarea id="feedDisplay" style="width:95%;height:30em;"&gt;&lt;/textarea&gt;
-&lt;/fieldset&gt;</code></pre>
-                <p>Below is the JavaScript code used for this app.</p>
-<pre><code id="jscode"></code></pre>
-            </div>
-            <div class="section" id="proxy">
-                <h2>Proxy code</h2>
-                <p>Below is the code for the proxy used with this sample. You can use it as is if you insert your <code>client_id</code> and <code>client_secret</code> values on lines 22-23, and deploy the file to a server where PHP is running. Or you can use this as a model for building a proxy in whatever language you like. If you are creating a server-side app, you can simply build the logic to get <a href="../../oauth-api/guides/get-token.html">access tokens</a> into your app.</p>
-                <p><script src="https://gist.github.com/8b18129a418cf0a080c0.js"></script></p>
             </div>
         </div>
     </div>
@@ -188,59 +123,33 @@ window.prompt("BC_TOKEN:", cookiesObj.BC_TOKEN);</code></pre>
     <script src="//docs.brightcove.com/en/scripts/vkbeautify.0.99.00.beta.js"></script>
 <script id="pageScript">
 var BCLS = ( function (window, document) {
-        var mrssStr = '<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:dcterms="http://purl.org/dc/terms/">',
-        sChannel = '<channel>',
-        eChannel = '</channel>',
-        sTitle = '<title>',
-        eTitle = '</title>',
-        sDescription = '<description>',
-        eDescription = '</description>',
-        sItem = '<item xmlns:media="http://search.yahoo.com/mrss/" xmlns:dcterms="http://purl.org/dc/terms/">',
-        eItem = '<dcterms:valid xmlns:dcterms="http://purl.org/dc/terms/">end=2020-10-15T00:00+01:00; scheme=W3C-DTF</dcterms:valid><dcterms:type>live-video</dcterms:type></item>',
-        sLink = '<link>',
-        eLink = '</link>',
-        sPubDate = '<pubDate>',
-        ePubDate = '</pubDate>',
-        sMediaContent = '<media:content',
-        eMediaContent = '</media:content>',
-        sMediaPlayer = '<media:player',
-        eMediaPlayer = '/>',
-        sMediaDescription = '<media:description>',
-        eMediaDescription = '</media:description>',
-        sMediaThumbnail = '<media:thumbnail',
-        eMediaThumbnail = '/>',
-        sMediaTitle = '<media:title>',
-        eMediaTitle = '</media:title>',
-        // account stuff
+        var // account stuff
         accountId,
+        bcToken,
         clientId,
         clientSecret,
         // api stuff
         proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/mrss-proxy.php',
-        baseURL = 'https://cms.api.brightcove.com/v1/accounts/',
-        sort,
-        sortDirection = "",
-        search,
-        limit = 25,
-        totalVideos = 0,
+        oauthURL = 'https://oauth.brightcove.com/v4/client_credentials',
+        baseURL = 'https://ingestion.api.brightcove.com/v1/accounts/',
         totalCalls = 0,
         callNumber = 0,
-        videosArray = [],
+        accountsArray = [],
+        profilesArray = ['smart-player-transition', 'videocloud-default-v1', 'high-resolution', 'screencast-1280', 'single-bitrate-high', 'single-bitrate-standard'],
+        operationsArray = ['video-cloud/ingest-profiles/profile/read', 'video-cloud/ingest-profiles/profile/write', 'video-cloud/ingest-profiles/account/read', 'video-cloud/ingest-profiles/account/write'],
         // elements
-        account_id = document.getElementById('account_id'),
+        bc_token = document.getElementById('bc_token'),
+        getCredentials = document.getElementById('getCredentials'),
+        account_ids = document.getElementById('account_ids'),
+        bc_token = document.getElementById('bc_token'),
+        account_ids_cred = document.getElementById('account_ids_cred'),
         client_id = document.getElementById('client_id'),
         client_secret = document.getElementById('client_secret'),
-        feedTitle = document.getElementById('feedTitle'),
-        feedDescription = document.getElementById('feedDescription'),
-        numberSelect = document.getElementById('numberSelect'),
-        searchStr = document.getElementById('searchStr'),
-        sortSelect = document.getElementById('sortSelect'),
-        directionSelect = document.getElementById('directionSelect'),
-        makeFeed = document.getElementById('makeFeed'),
+        profileSelect = document.getElementById('profileSelect'),
+        setDefaults = document.getElementById('setDefaults'),
         logger = document.getElementById('logger'),
         apiRequest = document.getElementById('apiRequest'),
-        feedDisplay = document.getElementById('feedDisplay'),
-        allButtons = document.getElementsByName('button');
+        apiResponse = document.getElementById('apiResponse');
 
     /**
      * tests for all the ways a variable might be undefined or not have a value
@@ -264,110 +173,20 @@ var BCLS = ( function (window, document) {
 
 
     /**
-     * disables all buttons so user can't submit new request until current one finishes
+     * disables a button so user can't submit new request until current one finishes
      */
-    function disableButtons() {
-        var i,
-            iMax = allButtons.length;
-        for (i = 0; i < iMax; i++) {
-            allButtons[i].setAttribute('disabled', 'disabled');
-        }
+    function disableButton(button) {
+        button.setAttribute('disabled', 'disabled');
+        button.setAttribute('style', 'opacity:.5,cursor:not-allowed;');
     }
 
     /**
-    * re-enables all buttons
+    * enables a button
+    * @param {htmlElement} button - the button to enable
     */
-    function enableButtons() {
-        var i,
-        iMax = allButtons.length;
-        for (i = 0; i < iMax; i++) {
-            allButtons[i].removeAttribute('disabled');
-        }
-    }
-
-    /**
-     * sort an array of objects based on an object property
-     * @param {array} targetArray - array to be sorted
-     * @param {string|number} objProperty - object property to sort on
-     * @return sorted array
-     */
-    function sortArray(targetArray, objProperty) {
-        targetArray.sort(function (b, a) {
-            var propA = a[objProperty], propB = b[objProperty];
-            // sort ascending; reverse propA and propB to sort descending
-            if (propA < propB) {
-                 return -1;
-            } else if (propA > propB) {
-                 return 1;
-            } else {
-                 return 0;
-            }
-        });
-        return targetArray;
-    }
-
-    function processSources(sources) {
-        var i = sources.length;
-        // remove non-MP4 sources
-        while (i > 0) {
-            i--;
-            if (sources[i].container !== 'MP4') {
-                sources.splice(i, 1);
-            } else if (sources[i].hasOwnProperty('stream_name')) {
-                sources.splice(i, 1);
-            }
-        }
-        // sort sources by encoding rate
-        sortArray(sources, 'encoding_rate');
-        // return the first item (highest bitrate)
-        return sources[0];
-    }
-
-    function addItems() {
-        var i, iMax, video, pubdate, videoURL, thumbnailURL, doThumbnail = true;
-        if (videosArray.length > 0) {
-            iMax = videosArray.length;
-            for (i = 0; i < iMax; i += 1) {
-                video = videosArray[i];
-                // video may not have a valid source
-                if (isDefined(video.source) && isDefined(video.source.src)) {
-                    videoURL = encodeURI(video.source.src.replace(/&/g, '&amp;'));
-                } else {
-                    videoURL = "";
-                }
-                // depending on when/how the video was created, it may have different thumbnail properties or none at all
-                if (isDefined(video.images) && isDefined(video.images.thumbnail)) {
-                    thumbnailURL = encodeURI(video.images.thumbnail.sources[0].src.replace(/&/g, '&amp;'));
-                } else if (isDefined(video.thumbnail)) {
-                    thumbnailURL = encodeURI(video.thumbnail.replace(/&/g, '&amp;'));
-                } else {
-                    doThumbnail = false;
-                }
-
-                pubdate = new Date(video.created_at).toGMTString();
-                mrssStr += sItem;
-                mrssStr += sLink + 'https://players.brightcove.net/' + accountId + '/default_default/index.html?videoId=' + video.id + eLink;
-                mrssStr += sPubDate + pubdate + ePubDate;
-                mrssStr += sMediaContent + ' url="' + videoURL + '" fileSize="' + video.source.size + '" type="video/quicktime" medium="video" duration="' + video.duration / 1000 + '" isDefault="true" height="' + video.source.height + '" width="' + video.source.width + '">';
-                mrssStr += sMediaPlayer + ' url="' + 'https://players.brightcove.net/' + accountId + '/default_default/index.html?videoId=' + video.id + '"' + eMediaPlayer;
-                mrssStr += sMediaTitle + video.name + eMediaTitle;
-                mrssStr += sMediaDescription + video.description + eMediaDescription;
-                if (doThumbnail) {
-                    mrssStr += sMediaThumbnail + ' url="' + thumbnailURL + '"';
-                    if (isDefined(video.images)) {
-                        mrssStr += ' height="' + video.images.thumbnail.sources[0].height + '" width="' + video.images.thumbnail.sources[0].width + '"' + eMediaThumbnail;
-                    } else {
-                        mrssStr += eMediaThumbnail;
-                    }
-                }
-                mrssStr += eMediaContent;
-                mrssStr += eItem;
-            }
-        }
-        mrssStr += eChannel + '</rss>';
-        logger.textContent = 'Finished!'
-        feedDisplay.textContent = vkbeautify.xml(mrssStr);
-        enableButtons();
+    function enableButton(button) {
+        button.removeAttribute('disabled');
+        button.setAttribute('style', 'opacity:1;cursor:pointer;');
     }
 
     /**
@@ -380,7 +199,12 @@ var BCLS = ( function (window, document) {
         // disable buttons to prevent a new request before current one finishes
         disableButtons();
         switch (id) {
-            case 'getCount':
+            case 'getCredentials':
+                var callback = function (credentials) {
+                    client_id.value = credentials.client_id;
+                    client_secret.value = credentials.client_secret;
+                    account_ids.value = account_ids_cred.value;
+                }
                 endPoint = accountId + '/counts/videos?sort=' + sort;
                 if (isDefined(search)) {
                     endPoint += '&search=' + search;
@@ -388,9 +212,9 @@ var BCLS = ( function (window, document) {
                 requestData.url = baseURL + endPoint;
                 requestData.requestType = 'GET';
                 apiRequest.textContent = requestData.url;
-                getMediaData(requestData, id);
+                sendRequest(requestData, id, callback);
                 break;
-            case 'getVideos':
+            case 'setDefaults':
             endPoint = accountId + '/videos?sort=' + sort + '&limit=' + limit + '&offset=' + limit * callNumber;
             if (isDefined(search)) {
                 endPoint += '&search=' + search;
@@ -398,44 +222,8 @@ var BCLS = ( function (window, document) {
             requestData.url = baseURL + endPoint;
             requestData.requestType = 'GET';
             apiRequest.textContent = requestData.url;
-            getMediaData(requestData, id);
+            sendRequest(requestData, id);
             break;
-            case 'getVideoSources':
-                var i,
-                    iMax = videosArray.length
-                    callback = function(sources) {
-                        if (sources.length > 0) {
-                            // get the best MP4 rendition
-                            var source = processSources(sources);
-                            videosArray[callNumber].source = source;
-                        } else {
-                            // video has no sources
-                            videosArray[callNumber].source = null;
-                        }
-                        callNumber++;
-                        if (callNumber < iMax) {
-                            setRequestData('getVideoSources');
-                        } else {
-                            // remove videos with no sources
-                            i = videosArray.length;
-                            while (i > 0) {
-                                i--;
-                                console.log('videosArray[i]', videosArray[i]);
-                                if (!isDefined(videosArray[i].source)) {
-                                    console.log('i', i);
-                                    videosArray.splice(i, 1);
-                                }
-                            }
-                            addItems();
-                        }
-                    };
-                endPoint = accountId + '/videos/' + videosArray[callNumber].id + '/sources';
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'GET';
-                apiRequest.textContent = requestData.url;
-                logger.textContent = 'Getting sources for video ' + videosArray[callNumber].name;
-                getMediaData(requestData, id, callback);
-                break;
         }
     }
 
@@ -445,7 +233,7 @@ var BCLS = ( function (window, document) {
      * @param  {String} requestID the type of request = id of the button
      * @param  {Function} [callback] callback function
      */
-    function getMediaData(options, requestID, callback) {
+    function sendRequest(options, requestID, callback) {
         var httpRequest = new XMLHttpRequest(),
             responseRaw,
             parsedData,
@@ -522,16 +310,20 @@ var BCLS = ( function (window, document) {
     }
 
     function init() {
+        var i,
+            iMax,
+            fragment = document.createDocumentFragment();
+        // set up profiles selector
+
         // event handlers
-        makeFeed.addEventListener('click', function() {
-            var numVideos;
+        setDefaults.addEventListener('click', function() {
             // get the inputs
             clientId = client_id.value;
             clientSecret = client_secret.value;
             // only use entered account id if client id and secret are entered also
             if (isDefined(clientId) && isDefined(clientSecret)) {
-                if (isDefined(account_id.value)) {
-                    accountId = account_id.value;
+                if (isDefined(account_ids.value)) {
+                    accountId = account_ids.value;
                 } else {
                     window.alert('To use your own account, you must specify an account id, and client id, and a client secret - since at least one of these is missing, a sample account will be used');
                     clientId = '';
@@ -541,40 +333,16 @@ var BCLS = ( function (window, document) {
             } else {
                 accountId = '1752604059001';
             }
-            sort = getSelectedValue(sortSelect);
-            sortDirection = getSelectedValue(directionSelect);
-            if (isDefined(sortDirection)) {
-                sort = sortDirection + sort;
-            }
-            search = searchStr.value;
-            numVideos = getSelectedValue(numberSelect);
-            // add title and description
-            mrssStr += sChannel + sTitle + feedTitle.value + eTitle + sDescription + feedDescription.value + eDescription;
-            // if all videos wanted, get count; otherwise get videos
-            if (numVideos === 'all') {
-                // we need to get the count
-                setRequestData('getCount');
-            } else {
-                totalVideos = parseInt(numVideos);
-                totalCalls = Math.ceil(numVideos / limit);
-                logger.textContent = 'Total videos to retrieve: ' + totalVideos;
-                setRequestData('getVideos');
-            }
+            setRequestData('setDefaultProfiles');
         });
-        feedDisplay.addEventListener('click', function() {
-            feedDisplay.select();
+        apiResponse.addEventListener('click', function() {
+            apiResponse.select();
         });
     }
 
     init();
 })(window, document);
 </script>
-<script>
-    var jscode = document.getElementById('jscode'),
-        pageScript = document.getElementById('pageScript');
-        jscode.textContent = pageScript.textContent;
-</script>
-
     <script>
         $(document).foundation();
     </script>
