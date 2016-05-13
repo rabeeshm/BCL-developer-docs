@@ -132,9 +132,11 @@ var BCLS = ( function (window, document) {
         proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/mrss-proxy.php',
         oauthURL = 'https://oauth.brightcove.com/v4/client_credentials',
         baseURL = 'https://ingestion.api.brightcove.com/v1/accounts/',
+        baseURLsuffix = '/configuration',
         totalCalls = 0,
         callNumber = 0,
         accountsArray = [],
+        defaultAccounts = ['921483702001', '1937897674001', '47509719001'],
         profilesArray = ['smart-player-transition', 'videocloud-default-v1', 'high-resolution', 'screencast-1280', 'single-bitrate-high', 'single-bitrate-standard'],
         operationsArray = ['video-cloud/ingest-profiles/profile/read', 'video-cloud/ingest-profiles/profile/write', 'video-cloud/ingest-profiles/account/read', 'video-cloud/ingest-profiles/account/write'],
         // elements
@@ -194,25 +196,35 @@ var BCLS = ( function (window, document) {
      * @param {String} id the id of the button that was clicked
      */
     function setRequestData(id) {
-        var endPoint = '',
+        var i,
+            iMax,
             requestData = {};
-        // disable buttons to prevent a new request before current one finishes
-        disableButtons();
         switch (id) {
             case 'getCredentials':
-                var callback = function (credentials) {
-                    client_id.value = credentials.client_id;
-                    client_secret.value = credentials.client_secret;
-                    account_ids.value = account_ids_cred.value;
+                var i,
+                    iMax,
+                    dataStr1 = 'name=Set_Default_Profiles_App&maximum_scope=[',
+                    dataStr2 = '{"identity": {"type": "video-cloud-account","account-id":',
+                    dataStrEnd = ']}]',
+                    dataStrs = [],
+                    callback = function (credentials) {
+                        client_id.value = credentials.client_id;
+                        client_secret.value = credentials.client_secret;
+                        account_ids.value = account_ids_cred.value;
+                        disableButton(getCredentials);
+                        enableButton(setDefaults);
+                    };
+                accountsArray = account_ids_cred.join(',');
+                // set up data
+                iMax = accountsArray.length;
+                for (i = 0; i < iMax; i++) {
+                    dataStrs[i] = dataStr2 + accountsArray[1] + '},"operations:"' + JSON.stringify(operationsArray) + '}';
                 }
-                endPoint = accountId + '/counts/videos?sort=' + sort;
-                if (isDefined(search)) {
-                    endPoint += '&search=' + search;
-                }
-                requestData.url = baseURL + endPoint;
-                requestData.requestType = 'GET';
+                console.log(JSON.stringify(dataStrs));
+                requestData.url = oauthURL;
+                requestData.requestType = 'POST';
                 apiRequest.textContent = requestData.url;
-                sendRequest(requestData, id, callback);
+                // sendRequest(requestData, id, callback);
                 break;
             case 'setDefaults':
             endPoint = accountId + '/videos?sort=' + sort + '&limit=' + limit + '&offset=' + limit * callNumber;
@@ -246,7 +258,7 @@ var BCLS = ( function (window, document) {
                     if (httpRequest.readyState === 4) {
                         if (httpRequest.status === 200) {
                             // check for completion
-                            if (requestID === 'getCount') {
+                            if (requestID === 'getCredentials') {
                                 responseRaw = httpRequest.responseText;
                                 parsedData = JSON.parse(responseRaw);
                                 // set total videos
@@ -254,7 +266,7 @@ var BCLS = ( function (window, document) {
                                 totalCalls = Math.ceil(totalVideos / limit);
                                 logger.textContent = 'Total videos: ' + totalVideos;
                                 setRequestData('getVideos');
-                            } else if (requestID === 'getVideos') {
+                            } else if (requestID === 'setDefaults') {
                                 if (httpRequest.responseText === '[]') {
                                     // no video returned
                                     alert('no video returned');
@@ -289,7 +301,7 @@ var BCLS = ( function (window, document) {
                         }
                     }
                 } catch (e) {
-                  alert('Caught Exception: ' + e);
+                    alert('Caught Exception: ' + e);
                 }
             };
         // set up request data
@@ -312,9 +324,15 @@ var BCLS = ( function (window, document) {
     function init() {
         var i,
             iMax,
-            fragment = document.createDocumentFragment();
+            opt;
         // set up profiles selector
-
+        iMax = profilesArray.length;
+        for (i = 0; i < iMax; i++) {
+            opt = document.createElement('option');
+            opt.value = profilesArray[i];
+            opt.text = profilesArray[i];
+            profileSelect.add(opt, null)
+        }
         // event handlers
         setDefaults.addEventListener('click', function() {
             // get the inputs
@@ -328,18 +346,31 @@ var BCLS = ( function (window, document) {
                     window.alert('To use your own account, you must specify an account id, and client id, and a client secret - since at least one of these is missing, a sample account will be used');
                     clientId = '';
                     clientSecret = '';
-                    accountId = '1752604059001';
+                    accountsArray = '1752604059001';
                 }
             } else {
                 accountId = '1752604059001';
             }
-            setRequestData('setDefaultProfiles');
+            setRequestData('setDefaults');
+        });
+
+        getCredentials.addEventListener('click', function() {
+            if (isDefined(account_ids_cred.value) && isDefined(bc_token.value)) {
+                disableButton(setDefaults);
+                account_ids_cred.value = account_ids_cred.value.replace(/\s/g, '');
+                account_ids.value = account_ids_cred.value;
+                accountsArray = account_ids_cred.value.split(',');
+                bcToken = bc_token.value;
+                setRequestData('getCredentials');
+            } else {
+                window.alert('You must include a BC_TOKEN and an account id to get your credentials - if you already have credentials for ingest profiles, just enter the client id and secret in the form below');
+            }
         });
         apiResponse.addEventListener('click', function() {
             apiResponse.select();
         });
     }
-
+    // kick things off
     init();
 })(window, document);
 </script>
