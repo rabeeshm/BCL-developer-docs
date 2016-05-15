@@ -73,15 +73,38 @@ for (i = 0; i &lt; cookiesArray.length; i++) {
 window.prompt("BC_TOKEN:", cookiesObj.BC_TOKEN);</code></pre>
                   </li>
                   <li>
-                      Copy and paste you BC_TOKEN and a comma-separated list of the accounts that you want to set default profiles for into the form below. Then click the <strong>Get Credentials</strong> button:
-                      <fieldset>
-                          <legend>Get Client Credentials</legend>
-                          <p>BC_TOKEN: <input type="text" id="bc_token"></p>
-                          <p>Account id: <input type="text" id="account_ids_creds" placeholder="123456789,987654321,56473829"></p>
-                          <p><button id="getCredentials" class="bcls-button">Get Credentials</button></p>
-                      </fieldset>
+                      You now need to make an API call to the Brightcove OAuth API to get credentials. Here is a skeleton of a <a href="../../concepts/curl/curl.html">cURL</a> request to do this:
+<pre><code>curl \
+  --include \
+  --header 'Authorization: BC_TOKEN <strong>your BC_TOKEN</strong>' \
+  --data 'name=Set_Defaults_App&maximum_scope=[
+      {
+          "identity":{
+              "type":"video-cloud-account","account-id":<strong>account_id#1</strong>
+          },
+          "operations":[
+              "video-cloud/ingest-profiles/profile/read","video-cloud/ingest-profiles/profile/write","video-cloud/ingest-profiles/account/read","video-cloud/ingest-profiles/account/write"
+          ]
+      },
+      {
+          "identity":{
+              "type":"video-cloud-account","account-id":<strong>account_id#2</strong>
+          },
+          "operations":[
+              "video-cloud/ingest-profiles/profile/read","video-cloud/ingest-profiles/profile/write","video-cloud/ingest-profiles/account/read","video-cloud/ingest-profiles/account/write"
+          ]
+      }
+  ]' \
+  https://oauth.brightcove.com/v3/client_credentials</code></pre>
+                      <div class="BCL-aside">Notes:
+                        <ul>
+                            <li>the BC_TOKEN is followed by a single quote <code>'</code></li>
+                            <li>the account ids are <strong>not</strong> in double-quotes</li>
+                            <li>include a maximum scope map in the same form for each account in the maximum_scope array</li>
+                            <li>this cURL command has been tested on up to 3 accounts - limitations in the data string length may cause it to fail if you include too many accounts - if that happens, you will need to generate separate credentials for batches of accounts, and then process the accounts in those batches in the app below</li>
+                        </ul>
+                      </div>
                   </li>
-                  <li>Your client id and client secret should now appear in the <a href="#Set_default_profile_app">app below</a>. If you wish to save them for other purposes, copy and save them somewhere secure before leaving this page.</li>
                   </ol>
                 </div>
 
@@ -93,19 +116,19 @@ window.prompt("BC_TOKEN:", cookiesObj.BC_TOKEN);</code></pre>
                     <p>
                         If you do not enter account information, a Brightcove sample account will be used.
                     </p>
-                    <p>Account id: <input id="account_ids" type="text" placeholder="1752604059001"></p>
+                    <p>Account ids (comma-delimited list): <input id="account_ids" type="text" placeholder="1752604059001,921483702001,57838016001"></p>
                     <p>Client id: <input id="client_id" type="text" size="60" placeholder="c5d0a622-5479-46d8-8d8a-5f034b943fab"></p>
-                    <p>Client secret: <input id="client_secret" type="text" size="60" placeholder="w7NQYu0vUloM4GYYy2SXAxrvyFpt8fwI35qAFZcS13-VIgs0itwKNsAwHOS80sOWKJ1BUwHIvSFG2I"></p>
-                    <p>Profile to set as default: <select name="profileSelect" id="profileSelect" style="width:100px;"></select></p>
-                    <p><button class="bcls-button" id="setDefaults">Generate the Feed</button></p>
+                    <p>Client secret: <input id="client_secret" type="text" size="60" placeholder="w7NQYu0vUloM4GYYy2SXAxrvyFpt8fwI35qAFZcS13-VIgs0itwKNsAwHOS80sOWKJ1BUwHIvSFG"></p>
+                    <p>Profile to set as default: <select name="profileSelect" id="profileSelect" style="width:200px;"></select></p>
+                    <p><button class="bcls-button" id="setDefaults">Set the Selected Profile as Default for these Accounts</button></p>
                 </fieldset>
                 <fieldset>
                     <legend>Output</legend>
                     <p id="logger" style="color:rgb(237, 104, 38)">Waiting for input...</p>
-                    <p>Current API request</p>
+                    <h4>Current API request</h4>
                     <pre><code id="apiRequest"></code></pre>
-                    <p>Generated MRSS feed</p>
-                    <textarea id="apiResponse" style="width:95%;height:30em;"></textarea>
+                    <h4>Response data</h4>
+                    <pre><code id="apiResponse" style="width:95%;height:30em;"></code></pre>
                 </fieldset>
             </div>
         </div>
@@ -128,20 +151,23 @@ var BCLS = ( function (window, document) {
         bcToken,
         clientId,
         clientSecret,
+        newProfile,
         // api stuff
-        proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/mrss-proxy.php',
+        oauthProxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/oauth-proxy.php',
+        ipProxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/ip-proxy.php',
         oauthURL = 'https://oauth.brightcove.com/v4/client_credentials',
-        baseURL = 'https://ingestion.api.brightcove.com/v1/accounts/',
-        baseURLsuffix = '/configuration',
+        ipURL = 'https://ingestion.api.brightcove.com/v1/accounts/',
+        ipURLsuffix = '/configuration',
         totalCalls = 0,
         callNumber = 0,
+        responseArray = [],
         accountsArray = [],
-        defaultAccounts = ['921483702001', '1937897674001', '47509719001'],
+        defaultAccounts = ['57838016001', '921483702001', '1937897674001'],
         profilesArray = ['smart-player-transition', 'videocloud-default-v1', 'high-resolution', 'screencast-1280', 'single-bitrate-high', 'single-bitrate-standard'],
         operationsArray = ['video-cloud/ingest-profiles/profile/read', 'video-cloud/ingest-profiles/profile/write', 'video-cloud/ingest-profiles/account/read', 'video-cloud/ingest-profiles/account/write'],
         // elements
         bc_token = document.getElementById('bc_token'),
-        getCredentials = document.getElementById('getCredentials'),
+        // getCredentials = document.getElementById('getCredentials'),
         account_ids = document.getElementById('account_ids'),
         bc_token = document.getElementById('bc_token'),
         account_ids_cred = document.getElementById('account_ids_cred'),
@@ -152,6 +178,29 @@ var BCLS = ( function (window, document) {
         logger = document.getElementById('logger'),
         apiRequest = document.getElementById('apiRequest'),
         apiResponse = document.getElementById('apiResponse');
+
+    /**
+     * Logging function - safe for IE
+     * @param  {string} context - description of the data
+     * @param  {*} message - the data to be logged by the console
+     * @return {}
+     */
+    bclslog = function (context, message) {
+        if (window["console"] && console["log"]) {
+          console.log(context, message);
+        }
+        return;
+    };
+
+
+    /**
+     * remove spaces from a string
+     * @param {String} str string to process
+     */
+    function removeSpaces(str) {
+        tstr= str.replace(/\s/g, '');
+        return str;
+    }
 
     /**
      * tests for all the ways a variable might be undefined or not have a value
@@ -195,47 +244,61 @@ var BCLS = ( function (window, document) {
      * sets up the data for the API request
      * @param {String} id the id of the button that was clicked
      */
-    function setRequestData(id) {
+    function setRequestData(id, type, configId) {
         var i,
             iMax,
             requestData = {};
         switch (id) {
             case 'getCredentials':
-                var i,
-                    iMax,
-                    dataStr1 = 'name=Set_Default_Profiles_App&maximum_scope=[',
-                    dataStr2 = '{"identity": {"type": "video-cloud-account","account-id":',
-                    dataStrEnd = ']}]',
-                    dataStrs = [],
+                var dataStr2 = '{"identity": {"type": "video-cloud-account","account-id":',
+                    maxScope = [],
                     callback = function (credentials) {
                         client_id.value = credentials.client_id;
                         client_secret.value = credentials.client_secret;
                         account_ids.value = account_ids_cred.value;
                         disableButton(getCredentials);
-                        enableButton(setDefaults);
                     };
-                accountsArray = account_ids_cred.join(',');
+                // proxy url
+                proxyURL = oauthProxyURL;
                 // set up data
+                requestData.requestType = type;
+                requestData.name = 'Set_Defaults_App';
+                requestData.bc_token = bcToken;
+                requestData.maximum_scope = '[';
                 iMax = accountsArray.length;
                 for (i = 0; i < iMax; i++) {
-                    dataStrs[i] = dataStr2 + accountsArray[1] + '},"operations:"' + JSON.stringify(operationsArray) + '}';
+                    maxScope[i] = {};
+                    maxScope[i].identity = {};
+                    maxScope[i].identity.type = 'video-cloud-account';
+                    maxScope[i].identity['account-id'] = parseInt(accountsArray[i]);
+                    maxScope[i].operations = operationsArray;
                 }
-                console.log(JSON.stringify(dataStrs));
+                requestData.maximum_scope = JSON.stringify(maxScope);
                 requestData.url = oauthURL;
-                requestData.requestType = 'POST';
-                apiRequest.textContent = requestData.url;
-                // sendRequest(requestData, id, callback);
+                sendRequest(requestData, proxyURL, id, callback);
                 break;
             case 'setDefaults':
-            endPoint = accountId + '/videos?sort=' + sort + '&limit=' + limit + '&offset=' + limit * callNumber;
-            if (isDefined(search)) {
-                endPoint += '&search=' + search;
-            }
-            requestData.url = baseURL + endPoint;
-            requestData.requestType = 'GET';
-            apiRequest.textContent = requestData.url;
-            sendRequest(requestData, id);
-            break;
+                var reqBody = {},
+                    callback = function(response) {
+                    logger.textContent = 'Finished!';
+                    apiResponse.textContent = JSON.stringify(response, null, '  ');
+                }
+                logger.textContent = 'Processing account: ' + accountsArray[callNumber];
+                endPoint = accountsArray[callNumber];
+                proxyURL = ipProxyURL;
+                requestData.url = ipURL + endPoint + ipURLsuffix;
+                requestData.requestType = type;
+                reqBody.account_id = parseInt(accountsArray[callNumber]);
+                reqBody.default_profile_id = newProfile;
+                if (isDefined(configId)) {
+                    bclslog('configId', configId);
+                    reqBody.id = configId;
+                }
+                requestData.requestBody = JSON.stringify(reqBody);
+                bclslog('requestBody', requestData.requestBody);
+                apiRequest.textContent = requestData.url;
+                sendRequest(requestData, proxyURL, id, callback);
+                break;
         }
     }
 
@@ -245,13 +308,13 @@ var BCLS = ( function (window, document) {
      * @param  {String} requestID the type of request = id of the button
      * @param  {Function} [callback] callback function
      */
-    function sendRequest(options, requestID, callback) {
+    function sendRequest(options, proxyURL, requestID, callback) {
         var httpRequest = new XMLHttpRequest(),
             responseRaw,
             parsedData,
             requestParams,
             dataString,
-            sources,
+            configId,
             // response handler
             getResponse = function() {
                 try {
@@ -261,40 +324,24 @@ var BCLS = ( function (window, document) {
                             if (requestID === 'getCredentials') {
                                 responseRaw = httpRequest.responseText;
                                 parsedData = JSON.parse(responseRaw);
-                                // set total videos
-                                totalVideos = parsedData.count;
-                                totalCalls = Math.ceil(totalVideos / limit);
-                                logger.textContent = 'Total videos: ' + totalVideos;
-                                setRequestData('getVideos');
+                                callback(parsedData);
                             } else if (requestID === 'setDefaults') {
-                                if (httpRequest.responseText === '[]') {
-                                    // no video returned
-                                    alert('no video returned');
-                                }
                                 responseRaw = httpRequest.responseText;
+                                bclslog('responseRaw', responseRaw);
                                 parsedData = JSON.parse(responseRaw);
-                                videosArray = videosArray.concat(parsedData);
-                                callNumber++;
-                                if (callNumber < totalCalls) {
-                                    logger.textContent = 'Getting video set ' + callNumber;
-                                    setRequestData('getVideos');
-                                } else {
-                                    logger.textContent = 'Video data for ' + totalVideos + ' retrieved; getting sources...';
-                                    callNumber = 0;
-                                    setRequestData('getVideoSources');
+                                bclslog('parsedData', parsedData);
+                                if (options.requestType === 'POST') {
+                                    configId = parsedData.id;
+                                    setRequestData('setDefaults', 'PUT', configId);
+                                } else if (options.requestType === 'PUT') {
+                                    responseArray.push(parsedData);
+                                    callNumber++;
+                                    if (callNumber < totalCalls) {
+                                        setRequestData('setDefaults', 'POST');
+                                    } else {
+                                        callback(responseArray);
+                                    }
                                 }
-                            } else if (requestID === 'getVideoSources') {
-                                if (httpRequest.responseText === '[]') {
-                                    // no video returned
-                                    sources = [];
-                                    callback(sources);
-                                } else {
-                                    responseRaw = httpRequest.responseText;
-                                    sources = JSON.parse(responseRaw);
-                                    // increment offset
-                                    callback(sources);
-                                }
-
                             } else {
                               alert('There was a problem with the request. Request returned ' + httpRequest.status);
                             }
@@ -305,10 +352,19 @@ var BCLS = ( function (window, document) {
                 }
             };
         // set up request data
-        requestParams = "url=" + encodeURIComponent(options.url) + "&requestType=" + options.requestType;
+        requestParams = "url=" + encodeURIComponent(options.url) + "?requestType=" + options.requestType;
+        // for the IP API call
+        // add request body if any
+        if (isDefined(options.requestBody)) {
+            requestParams += '&requestBody=' + options.requestBody;
+        }
         // only add client id and secret if both were submitted
         if (isDefined(clientId) && isDefined(clientSecret)) {
             requestParams += '&client_id=' + clientId + '&client_secret=' + clientSecret;
+        }
+        // for the OAuth API call
+        if (isDefined(options.name) && isDefined(options.maximum_scope) && isDefined(options.bc_token)) {
+            requestParams += '&name=' + options.name + '&maximum_scope=' + options.maximum_scope.replace(reSlash, '') + '&bc_token=' + options.bc_token;
         }
 
         // set response handler
@@ -318,6 +374,7 @@ var BCLS = ( function (window, document) {
         // set headers
         httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         // open and send request
+        bclslog('requestParams', requestParams);
         httpRequest.send(requestParams);
     }
 
@@ -335,37 +392,43 @@ var BCLS = ( function (window, document) {
         }
         // event handlers
         setDefaults.addEventListener('click', function() {
+            var accountIds;
             // get the inputs
             clientId = client_id.value;
             clientSecret = client_secret.value;
+            newProfile = getSelectedValue(profileSelect);
             // only use entered account id if client id and secret are entered also
             if (isDefined(clientId) && isDefined(clientSecret)) {
                 if (isDefined(account_ids.value)) {
-                    accountId = account_ids.value;
+                    accountIds = removeSpaces(account_ids.value);
+                    accountsArray = accountIds.split(',');
                 } else {
                     window.alert('To use your own account, you must specify an account id, and client id, and a client secret - since at least one of these is missing, a sample account will be used');
                     clientId = '';
                     clientSecret = '';
-                    accountsArray = '1752604059001';
+                    accountsArray = defaultAccounts;
                 }
             } else {
-                accountId = '1752604059001';
+                accountsArray = defaultAccounts;;
             }
-            setRequestData('setDefaults');
+            totalCalls = accountsArray.length;
+            setRequestData('setDefaults', 'POST');
         });
 
-        getCredentials.addEventListener('click', function() {
-            if (isDefined(account_ids_cred.value) && isDefined(bc_token.value)) {
-                disableButton(setDefaults);
-                account_ids_cred.value = account_ids_cred.value.replace(/\s/g, '');
-                account_ids.value = account_ids_cred.value;
-                accountsArray = account_ids_cred.value.split(',');
-                bcToken = bc_token.value;
-                setRequestData('getCredentials');
-            } else {
-                window.alert('You must include a BC_TOKEN and an account id to get your credentials - if you already have credentials for ingest profiles, just enter the client id and secret in the form below');
-            }
-        });
+        // getCredentials.addEventListener('click', function() {
+        //     var accountIds;
+        //     if (isDefined(account_ids_cred.value) && isDefined(bc_token.value)) {
+        //         disableButton(setDefaults);
+        //         account_ids_cred.value = removeSpaces(account_ids_cred.value);
+        //         account_ids.value = account_ids_cred.value;
+        //         accountsArray = account_ids_cred.value.split(',');
+        //         bcToken = bc_token.value;
+        //         logger.textContent = 'Got the inputs, setting default profile...'
+        //         setRequestData('getCredentials', 'POST');
+        //     } else {
+        //         window.alert('You must include a BC_TOKEN and an account id to get your credentials - if you already have credentials for ingest profiles, just enter the client id and secret in the form below');
+        //     }
+        // });
         apiResponse.addEventListener('click', function() {
             apiResponse.select();
         });
