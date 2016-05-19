@@ -5,11 +5,12 @@ var BCLS = (function(window, document) {
     iMax = expanderHeads.length;
 
     function toggleBody(evt) {
-        var expanderBody = this.firstChild;
-        if (expanderBody.getAttribute('style') === 'height:none;') {
-            expanderBody.setAttribute('style', 'height:auto;');
+        console.log(evt);
+        var expanderBody = this.nextElementSibling;
+        if (expanderBody.getAttribute('style') === 'height:0;display:none;') {
+            expanderBody.setAttribute('style', 'height:auto;display:block;');
         } else {
-            expanderBody.setAttribute('style', 'height:0;');
+            expanderBody.setAttribute('style', 'height:0;display:none;');
         }
     }
 
