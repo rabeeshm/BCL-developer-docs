@@ -100,7 +100,7 @@
 -->
 					<h3 class="bcls-question">Cue points</h3>
 						<ul class="bcls-answer">
-						  <li><a href="#Programmatically_add_cue_points">Programmatically add cue points</a></li>
+						  <li><a href="#Programmatically_adding_cue_points">Programmatically adding cue points</a></li>
 						</ul>
         
 <!--
@@ -123,10 +123,11 @@
         
 						<h3 class="bcls-question">Media content</h3>
 						<ul class="bcls-answer">
-						  <li><a href="#Limit_the_bitrate">Limit the bitrate</a></li>
-							<li><a href="#Loop_a_video">Loop a video</a></li>
+						  <li><a href="#Limiting_the_bitrate">Limiting the bitrate</a></li>
+							<li><a href="#Looping_a_video">Looping a video</a></li>
 							<li><a href="#Media_progress_values">Media progress values</a></li>
-							<li><a href="#Set_the_playback_rate">Set the playback rate</a></li>
+							<li><a href="#Setting_the_buffer_size">Setting the buffer size</a></li>
+							<li><a href="#Setting_the_playback_rate">Setting the playback rate</a></li>
 						</ul>
                 
 			</div>
@@ -147,15 +148,15 @@
 				  <p>For detailed steps, see Google's document to <a href="https://developers.google.com/analytics/devguides/collection/ios/v3/#get-config">Add Analytics to Your iOS App</a>.</p>
       </div>
 			
-			<div id="Limit_the_bitrate" class="section">
-        <h2>Limit the bitrate</h2>
+			<div id="Limiting_the_bitrate" class="section">
+        <h2>Limiting the bitrate</h2>
 					<p>You can't control which rendition in the HLS manifest gets selected by the <code>AVPlayer</code>, but you can put a bitrate cap on playback. This prevents the player from using renditions with a bitrate over the specified bitrate.</p>
 					<p>Set the <code>preferredPeakBitRate</code> to the desired limit, in bits per second, of the network bandwidth consumption for the given <code>AVPlayerItem</code>.</p>
 					<p>Use one of the following declarations:</p>
 					<p><a href="https://developer.apple.com/library/prerelease/mac/documentation/AVFoundation/Reference/AVPlayerItem_Class/index.html#//apple_ref/occ/instp/AVPlayerItem/preferredPeakBitRate"><code data-gist-id="e31445438f3a98f54a67" data-gist-hide-footer="true" data-gist-line="18-22"></code></a></p>
 				
-			<div id="Loop_a_video" class="section">
-				<h2>Loop a video</h2>
+			<div id="Looping_a_video" class="section">
+				<h2>Looping a video</h2>
 					<p>In some cases, you may want a video to automatically replay. To do this, you can get the "end of video" lifecycle event, seek to the beginning and play again.</p>
 					<p>This code assumes that you have set the delegate of the playbackController to the object with this method:</p>
 					<p><a href="../reference/current/Classes/BCOVPlaybackSessionLifecycleEvent.html"><code data-gist-id="e31445438f3a98f54a67" data-gist-line="1-12" data-gist-hide-line-numbers="true"></code></a></p>       
@@ -169,8 +170,8 @@
 					<p></p>
       </div>
 				
-			<div id="Programmatically_add_cue_points" class="section">
-        <h2>Programmatically add cue points</h2>
+			<div id="Programmatically_adding_cue_points" class="section">
+        <h2>Programmatically adding cue points</h2>
 					<p class="video-cloud-only">You can add cue points to your video using Video Cloud Studio as shown in the <a href="//support.brightcove.com/en/video-cloud/docs/adding-cue-points-videos">Adding Cue Points to Videos</a> document.</p>
 					<p><span class="video-cloud-only">You can also add</span><span class="perform-only">You can add</span> cue points to your video programmatically. The code below adds quarterly interval cue points to the video returned from the Playback API:</p>
 					<p><a href="../reference/current/Protocols/BCOVVideo.html#//api/name/update:"><code data-gist-id="e31445438f3a98f54a67" data-gist-line="58-93" data-gist-hide-footer="true" data-gist-highlight-line="65-83" data-gist-hide-line-numbers="true"></code></a></p>
@@ -179,9 +180,16 @@
 					<p><a href="../reference/current/Protocols/BCOVCuePoint.html"><code data-gist-id="e31445438f3a98f54a67" data-gist-line="95-104" data-gist-hide-line-numbers="true" ></code></a></p>
 					<p></p>
       </div>
+				
+			<div id="Setting_the_buffer_size" class="section">
+				<h2>Setting the buffer size</h2>
+				<p>You may consider increasing the buffer length to eliminate buffering in the player if the delivery of the next segment is delayed from the CDN. But, you may not be able to do anything better manually that HLS already does.</p>
+<!--				<p>The <code>AVPlayer</code> contains the <code>AVPlayerItem</code>, essentially the video being played, that contains the <code>loadedTimeRanges</code> property. This tells you how much is buffered.</p>-->
+				<p>HLS is designed to play right away and drop quality if it can't keep up. This way, it does not need to preload a buffer. If it can't keep up, it will load as much of the video as it can at the best quality to prevent interruption.</p>     
+      </div>
 			
-			<div id="Set_the_playback_rate" class="section">
-				<h2>Set the playback rate</h2>
+			<div id="Setting_the_playback_rate" class="section">
+				<h2>Setting the playback rate</h2>
 				<p>To control the playback rate, you can set the <code>rate</code> property on the <code>AVPlayer</code> class exposed on the session. For a <code>BCOVPlaybackSession</code>, you could do something like this:</p>
 				<p><a href="../reference/current/Protocols/BCOVPlaybackSession.html"><code data-gist-id="e31445438f3a98f54a67" data-gist-line="55" data-gist-hide-footer="true" data-gist-hide-line-numbers="true" ></code></a></p>
 				<p>Note the following:</p>
@@ -189,8 +197,7 @@
 					<li>For iOS6, a stream can only play at 2X if <code>session.player.currentItem.canPlayFastForward</code> returns <strong>YES</strong>.</li>
 					<li>For iOS7, you can play up to 2X always, but it won't go higher unless <code>session.player.currentItem.canPlayFastForward</code> returns <strong>Yes</strong>.</li>
 				</ul>
-				<p class="BCL-aside">For more information about managing playback, see Apple's <a href="https://developer.apple.com/library/ios/documentation/AVFoundation/Reference/AVPlayer_Class/index.html#//apple_ref/occ/instp/AVPlayer/rate">AVPlayer Class Reference</a>.</p>
-					     
+				<p class="BCL-aside">For more information about managing playback, see Apple's <a href="https://developer.apple.com/library/ios/documentation/AVFoundation/Reference/AVPlayer_Class/index.html#//apple_ref/occ/instp/AVPlayer/rate">AVPlayer Class Reference</a>.</p>	     
       </div>
       
 		</div>
