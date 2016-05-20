@@ -4,13 +4,14 @@ var BCLS = (function(window, document) {
         iMax;
     iMax = expanderHeads.length;
 
-    function toggleBody(evt) {
-        console.log(evt);
+    function toggleBody() {
         var expanderBody = this.nextElementSibling;
-        if (expanderBody.getAttribute('style') === 'height:0;display:none;') {
-            expanderBody.setAttribute('style', 'height:auto;display:block;');
+        if (expanderBody.getAttribute('style') === 'height:0;visibility:hidden;display:none;') {
+            expanderBody.setAttribute('style', 'height:auto;visibility:visible;display:block;');
+            this.setAttribute('class', 'bcls-expander-head changed');
         } else {
-            expanderBody.setAttribute('style', 'height:0;display:none;');
+            expanderBody.setAttribute('style', 'height:0;visibility:hidden;display:none;');
+            this.setAttribute('class', 'bcls-expander-head');
         }
     }
 
