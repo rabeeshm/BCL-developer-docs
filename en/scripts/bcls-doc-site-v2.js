@@ -27,7 +27,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         siteTitle,
         searchModal = document.getElementById("searchModal"),
         // all the content sections
-        divsections = document.querySelectorAll("div.section"),
+        sectionElements = document.querySelectorAll(".bcls-section"),
         // the in-page nav
         sidenav = document.getElementById("sidenav"),
         sideNavElements,
@@ -45,48 +45,33 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         vcSupportNav = "<li class=\"smaller show-for-large-up\"><a href=\"//support.brightcove.com\">Support</a></li>",
         onceSupportNav = "<li class=\"smaller show-for-large-up\"><a href=\"mailto:oncesupport@brightcove.com\">Support</a></li>",
         titleAreaTemplate = "<nav class=\"top-bar\" data-topbar><ul class=\"title-area\"><li class=\"name\" id=\"siteTitle\"><a href=\"//docs.brightcove.com/en/index.html\"><img class=\"bcls-logo bcls-float-left\" src=\"//docs.brightcove.com/en/images/bc-logo-small.png\" alt=\"Brightcove\">DEVELOPER DOCS</a></li><li class=\"toggle-topbar menu-icon\"><a href=\"#\"><span>Menu</span></a></li></ul><section class=\"top-bar-section\"><ul id=\"navMenuLeft\" class=\"left\"></ul></section><section class=\"top-bar-section\"><ul id=\"navMenuRight\" class=\"right\"></ul></section></nav>",
-        searchTemplate = "<div class=\"container\"><div class=\"region region-search\"><section id=\"block-search-api-page-new\" class=\"block block-search-api-page\"><div><a class=\"close-reveal-modal\">&#215;</a></div><div id=\"searchBar\"><gcse:search></gcse:search></div></section>",
-        // functions
-        bclslog,
-        isDefined,
-        hasClass,
-        isItemInArray,
-        getURLparam,
-        setPageTitle,
-        setPageIndexType,
-        setAttributeOnNodeList,
-        highlightCurrentInPageNav,
-        createInPageNavMenu,
-        createInPageNav,
-        buildBreadCrumbs,
-        createNavigation,
-        buildPageArrays,
-        createLandingPageSections,
-        getSection,
-        init,
-        BCLhighlight;
+        searchTemplate = "<div class=\"container\"><div class=\"region region-search\"><section id=\"block-search-api-page-new\" class=\"block block-search-api-page\"><div><a class=\"close-reveal-modal\">&#215;</a></div><div id=\"searchBar\"><gcse:search></gcse:search></div></section>";
 
     /**
      * Logging function - safe for IE
-     * @param  {string} context description of the data
-     * @param  {*} message the data to be logged by the console
+     * @param  {string} context - description of the data
+     * @param  {*} message - the data to be logged by the console
      * @return {}
      */
-    bclslog = function (context, message) {
+    function bclslog(context, message) {
         if (window["console"] && console["log"]) {
           console.log(context, message);
         }
         return;
-    };
+    }
+
 
     /**
      * tests for all the ways a variable might be undefined or not have a value
      * @param {*} x the variable to test
      * @return {Boolean} true if variable is defined and has a value
      */
-    isDefined = function (x) {
-        return (x !== "" && x !== null && x !== undefined) ? true : false;
-    };
+    function isDefined(x) {
+        if ( x === '' || x === null || x === undefined || x === NaN) {
+            return false;
+        }
+        return true;
+    }
 
     /**
      * determines whether specified item is in an array
@@ -94,7 +79,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
      * @param {string} item to check for
      * @return {boolean} true if item is in the array, else false
      */
-    isItemInArray = function (arr, item) {
+    function isItemInArray(arr, item) {
         var i,
             iMax = arr.length;
         for (i = 0; i < iMax; i++) {
@@ -103,7 +88,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             }
         }
         return false;
-    };
+    }
 
     /**
      * determines whether element has a class
@@ -111,39 +96,39 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
      * @param {string} cls the name of the class you’re looking for
      * @return {boolean} true if the element has that class, false if not
      */
-    hasClass = function (elem, cls) {
+    function hasClass(elem, cls) {
         return (" " + elem.className + " ").indexOf(" " + cls + " ") > -1;
-    };
+    }
 
     /**
      * get value of a URL param if exists
      * @param {string} name name of the param you want the value fo
      * @return {string} result value of param if exists or “"
      */
-    getURLparam = function (name) {
+    function getURLparam(name) {
         var regex,
             results;
         name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
         regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
         results = regex.exec(window.location.search);
         return (results === null) ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-    };
+    }
 
     /**
      * sets document title to contents of first h1 tag
      */
-    setPageTitle = function () {
+    function setPageTitle() {
         var h1 = document.getElementsByTagName("h1");
         if (isDefined(h1[0])) {
             document.title = h1[0].innerHTML;
         }
-    };
+    }
 
     /**
      * sets visibility of the group/alpha indexes for landing page
      * @param {string} indexType index to show "group" | "alpha"
      */
-    setPageIndexType = function (indexType) {
+    function setPageIndexType(indexType) {
         if (indexType === "alpha") {
             groupIndexBlock.className = "display-none";
             alphaIndexBlock.className = "display-block";
@@ -151,7 +136,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             alphaIndexBlock.className = "display-none";
             groupIndexBlock.className = "display-block";
         }
-    };
+    }
 
     /**
      * sets an attribute for each item in a node list
@@ -159,7 +144,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
      * @param {string} attr  the attribute to set
      * @param {string} value the value for the attribute
      */
-    setAttributeOnNodeList = function (list, attr, value) {
+    function setAttributeOnNodeList(list, attr, value) {
         var i,
             iMax = list.length;
         if (isDefined(list)) {
@@ -169,35 +154,35 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 }
             }
         }
-    };
+    }
 
     /**
      * highlights the selected item in the in-page navigation
      */
-    highlightCurrentInPageNav = function () {
+    function highlightCurrentInPageNav() {
         var sideNavListItems = document.querySelectorAll("#sidenav li");
         setAttributeOnNodeList(sideNavListItems, "style", "padding:.2em;");
         setAttributeOnNodeList(sideNavElements, "style", "");
         this.setAttribute("style", "color:#ffffff");
         this.parentElement.setAttribute("style", "background-color:" + productColors[product] + ";padding:.2em;");
-    };
+    }
 
     /**
      * syntax highlighting - dependent on highlight.pack.js
      */
-    BCLhighlight = function () {
+    function BCLhighlight() {
         var i,
             iMax = precode.length;
         for (i = 0; i < iMax; i++) {
             hljs.highlightBlock(precode[i]);
         }
-    };
+    }
 
     /**
      * buildPageArrays build arrays of pages from the nav data
      * works off the section determined in getSection()
      */
-    buildPageArrays = function () {
+    function buildPageArrays() {
         var navData = bclsNavData[product].sections[section],
             i,
             iMax,
@@ -252,11 +237,11 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         }
         createNavigation();
 
-    };
+    }
     /**
      * create navigation for page sections
      */
-    createInPageNavMenu = function () {
+    function createInPageNavMenu() {
         var str = "<ul class=\"side-nav show-for-large-up\">",
             i,
             max = navLabel.length,
@@ -275,20 +260,20 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 sideNavElements[j].addEventListener("click", highlightCurrentInPageNav);
             }
         }
-    };
+    }
 
     /**
      * creates the in-page navigation on the side
      */
-    createInPageNav = function () {
+    function createInPageNav() {
         var navObj = {},
-            numSections = divsections.length,
+            numSections = sectionElements.length,
             i,
             sectionEl;
         // set initial visibilities
         for (i = 0; i < numSections; i++) {
             if (i > 0) {
-                sectionEl = divsections.item(i);
+                sectionEl = sectionElements.item(i);
                 switch (product) {
                 case "video-cloud":
                     if (!hasClass(sectionEl, "perform-only")) {
@@ -320,12 +305,12 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             // create in-page nav menu
             createInPageNavMenu();
         }
-    };
+    }
 
     /**
      * builds the breadcrumbs
      */
-    buildBreadCrumbs = function () {
+    function buildBreadCrumbs() {
         var str = "<li><a href=\"//docs.brightcove.com/en/index.html\">Developer Docs</li>";
         bclslog("product: ", product);
         bclslog("section: ", section);
@@ -348,12 +333,12 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         }
         str += "<li class=\"current\">" + document.getElementsByTagName("title")[0].innerHTML + "</li>";
         breadCrumbWrapper.innerHTML = str;
-    };
+    }
 
     /**
      * create the global navigation
      */
-    createNavigation = function () {
+    function createNavigation() {
         var data = groupObj,
             item,
             i,
@@ -410,12 +395,12 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         } else {
             createInPageNav();
         }
-    };
+    }
 
     /**
      * create the index of section pages for the landing page
      */
-    createLandingPageSections = function () {
+    function createLandingPageSections() {
         var i, j,
             iMax, jMax,
             item,
@@ -516,15 +501,19 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             setPageIndexType("alpha");
         }
 
-    };
+    }
     // figure out what section we're in
-    getSection = function () {
+    function getSection() {
         var pathArray = path.split("/"),
             server,
             searchScript = document.createElement("script"),
             redirectArray,
             searchBar,
-            headers = document.querySelectorAll("h1, h2");
+            headers = document.querySelectorAll("h1, h2"),
+            i,
+            iMax,
+            j,
+            item;
         // remove the 0 element, as it will be empty
         pathArray.splice(0, 1);
         // if path ends in a /, add index.html
@@ -595,7 +584,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                     }
                     // if section is brightcove-player, remove 'no-perform' items from groups
                     if (section === 'brightcove-player') {
-                        var i, iMax, j, item;
                         iMax = bclsNavData[product].sections[section].items.length;
                         for (i = 0; i < iMax; i++) {
                             item = bclsNavData[product].sections[section].items[i];
@@ -703,7 +691,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                     }
                     // if section is brightcove-player check for Video Cloud only items to remove from nav
                     if (section === 'brightcove-player') {
-                        var i = bclsNavData[product].sections[section].items.length;
+                        i = bclsNavData[product].sections[section].items.length;
                         while (i > 0) {
                             i--;
                             if (isItemInArray(bclsNavData[product].sections[section].items[i].groups, 'no-perform')) {
@@ -771,9 +759,9 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         if (isDefined(section)) {
             buildPageArrays();
         }
-    };
+    }
     // initialization: set the page title, set up the header shell, get references to the parts
-    init = function () {
+    function init() {
         var headers = document.querySelectorAll("h1, h2"),
             searchBar;
 
@@ -799,7 +787,8 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
          */
         hljs.tabReplace = "  ";
         hljs.initHighlightingOnLoad();
-    };
+    }
+
     init();
     // making these public in case you're generating page
     // content dynamically and need to run things after
