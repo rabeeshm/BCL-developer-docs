@@ -27,7 +27,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         siteTitle,
         searchModal = document.getElementById("searchModal"),
         // all the content sections
-        sectionElements = document.querySelectorAll(".section"),
+        sectionElements = document.querySelectorAll(".bcls-section"),
         // the in-page nav
         sidenav = document.getElementById("sidenav"),
         sideNavElements,
