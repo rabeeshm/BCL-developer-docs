@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+	<!-- change title to match the h1 heading -->
+	<title>Directed Migration</title>
+	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
+	<script src="//use.edgefonts.net/source-code-pro.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
+
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/atelier-forest.light.min.css" />
+    <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css" />
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
+
+	<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2728311-29', 'auto');
+  ga('send', 'pageview');
+
+</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
+</head>
+
+<body>
+	<!-- header navbar -->
+	<div id="navWrapper" class="fixed"></div>
+	<!-- breadcrumbs -->
+	<nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+	<!-- search -->
+	<div id="searchModal" class="reveal-modal" data-reveal></div>
+	<!-- content -->
+	<!-- content -->
+	<div class="row">
+		<div class="sidebar large-2 columns show-for-large-up">
+			<div id="sidenav" class="side-nav"></div>
+		</div>
+		<div id="main" class="large-10 small-12 columns">
+			<div id="top" class="section">
+				<h1>Directed Migration</h1>
+				<!-- Place document intro sentence(s) here -->
+
+
+        <p>The Directed Migration Framework is a way to specify a Brightcove Player to be loaded instead of one or more Smart Players. To use Directed Migration, you still must create a new Brightcove Player that has the customizations and plugins that match the behavior you want using the new APIs and plugins of the Brightcove Player. Directed Migration then allows you to load that new player in place of a Smart Player without making changes to the existing HTML page. </p>
+        <p>Using Directed Migration still requires careful consideration of the following topics:</p>
+        <ul>
+          <li>Making sure appropriate renditions are available</li>
+          <li>Specifying and including 3rd-party and custom plugins</li>
+          <li>Testing with custom layouts</li>
+        </ul>
+        <p>These issues are described in more detail in the <a href="../../brightcove-player/guides/migration-guide.html">Smart Player to Brightcove Player Migration Guide</a>.</p>
+        <p>Directed Migration does not yet work with playlists. Also any interaction with the Smart Player API in your page will no longer function once the player is replaced.</p>
+        <p>Make sure to set the <a href="#enable_mapping">enable_mapping</a> flag to false by default initially so you can test all your new customizations and plugins and make sure the new player behaves correctly in your site. Once you are satisfied that the mapped player works appropriately, you can set <code>enable_mapping</code> to true in the Directed Migration configuration file (named <code>mappings.json</code>) so all viewers will see it without a query parameter.</p>
+        <p>At a high level, to setup directed migration you will need to perform the following tasks:</p>
+        <ul>
+          <li><a href="#Get_prepared">Get prepared</a>: There may be some technologies you need to understand, like <strong>cURL</strong> and <strong>JSON</strong>, before starting the process.</li>
+          <li><a href="#Gather_required_information">Gather required information</a>: You will need identifiers for both the Smart Player and Brightcove Player used in the mapping.</li>
+          <li><a href="#Create_mappings_file">Create mappings file</a>: This is a specially formatted file that contains the information Brightcove will use to substitute a Brightcove Player for a Smart Player.</li>
+          <li><a href="#Publish_mapping_file">Publish mapping file</a>: Places the file in a specific location on a Brightcove server.</li>
+          <li><a href="Test">Test</a>: Of course, you will want to be sure that the mapping file is working correctly.</li>
+        </ul>
+        <p>The steps in this document show a standard mapping. More options for mappings are shown in the <a href="#Mapping_options">Mapping options</a> section of the document.</p>
+      </div>
+      <div id="Get_prepared" class="section">
+        <h2>Get prepared</h2>
+        <p>Setting up directed migration uses <strong>cURL</strong> statements in the terminal/command prompt. You will also work with files in <strong>JSON</strong> format. The following documents provide introductions to these technologies if you are not familiar with them (note that the links will open in new tabs/windows):</p>
+        <ul>
+          <li><a href="../../concepts/curl/curl.html" target="_blank" rel="noopener noreferrer">Set up cURL</a></li>
+          <li><a href="../../concepts/intro-to-JSON/intro-to-JSON.html" target="_blank" rel="noopener noreferrer">Introducing JSON</a></li>
+				</ul>
+			</div>
+			<div id="Gather_required_information" class="section">
+				<h2>Gather required information</h2>
+				<p>You will need the Smart Player <strong>playerKey</strong> and the Brightcove Player <strong>ID</strong>.</p>
+        <p>To get the Smart Player information, examine the player code on your HTML page and copy the <strong>value</strong> for the <strong>playerKey</strong>. From the example shown below, the value to copy is <strong>AQ~~,AAABXxBZKsE~,AdU2xXeQoKBP-8tgJnkJv-czgxbjn_aR</strong>.</p>
+        <p><code data-gist-id="1eb2201bf0f98e5315cc612651a8812f" data-gist-hide-footer="true" data-gist-line="2-29" data-gist-highlight-line="14"></code></p>
+        <p>Next you need the <strong>ID</strong> for the Brightcove Player you are going to substitute for the Smart Player. After you create the player you can get the ID from Studio. The player's ID is highlighted in the red box in the screenshot. From the example shown below, the value to copy is <strong>B13X2Aix</strong>.</p>
+        <div><img src="/en/video-cloud/brightcove-player/guides/assets/directed-migration/Brightcove-Player-id-studio.png" alt="get ID"></div>
+			</div>
+			<div id="Create_mappings_file" class="section">
+				<h2>Create mappings</h2>
+        <p>You will create a file that sets up mappings between the Smart Player and Brightcove Player. The format of the file is JSON. The general format of the file is as follows:</p>
+        <p><code data-gist-id="1eb2201bf0f98e5315cc612651a8812f" data-gist-hide-footer="true" data-gist-line="36-41"></code></p>
+        <p>An actual mapping file, using the data gathered above, is as follows:</p>
+        <p><code data-gist-id="1eb2201bf0f98e5315cc612651a8812f" data-gist-hide-footer="true" data-gist-line="44-49"></code></p>
+        <p>If you have multiple mappings, the JSON would be formatted as follows:</p>
+        <p><code data-gist-id="1eb2201bf0f98e5315cc612651a8812f" data-gist-hide-footer="true" data-gist-line="52-61"></code></p>
+        <p>Now that you know the format, go ahead and use an editor to create your JSON mappings. Although not required, it is probably a good idea and save the file as <code>mappings.json</code> for later reference. The location of where you save the file does not matter.</p>
+			</div>
+      <div id="Publish_mapping_file" class="section">
+        <h2>Publish mapping file</h2>
+        <p>Now you will use <strong>cURL</strong> to publish the mappings you created. When you publish the mappings, they are saved in a location that Brightcove can use to do the appropriate substitutions. The following steps guide you through the process.</p>
+        <ol>
+          <li>Open Terminal (or a command prompt).</li>
+          <li>Create environment variables for your email and account number. Follow the examples:
+            <p><code data-gist-id="1eb2201bf0f98e5315cc612651a8812f" data-gist-hide-footer="true" data-gist-line="65-67"></code></p>
+          </li>
+          <li>Update your account's repository to contain a <strong>migration</strong> repo. You will be prompted for your Brightcove password when running this cURL command.
+            <p><code data-gist-id="1eb2201bf0f98e5315cc612651a8812f" data-gist-hide-footer="true" data-gist-line="195-198"></code></p>
+          </li>
+          <li>Check to be sure your response is similar to the following (of course your account number will be used):
+            <p><code data-gist-id="1eb2201bf0f98e5315cc612651a8812f" data-gist-hide-footer="true" data-gist-line="200-204"></code></p>
+          </li>
+          <li>Create a cURL statement similar to the following that places the contents of your <code>mappings.json</code> file in the <strong>migration</strong> repo. The JSON that defines your mappings is placed inside the single quotes in the <code>--form contents=''</code> line of your cURL statement. Note that the path for the file is <code>files/mappings.json</code>.
+            <p><code data-gist-id="1eb2201bf0f98e5315cc612651a8812f" data-gist-hide-footer="true" data-gist-line="226-239" data-gist-highlight-line="228-237"></code></p>
+            <p class="BCL-aside">Note: If you need to add to or change the <code>mappings.json</code> file, simply use this cURL statement again to overwrite the existing file.</p>
+          </li>
+          <li>Check to be sure your response is similar to the following:
+            <p><code data-gist-id="1eb2201bf0f98e5315cc612651a8812f" data-gist-hide-footer="true" data-gist-line="216-219"></code></p>
+          </li>
+          <li>Confirm the file was moved correctly.
+            <p><code data-gist-id="1eb2201bf0f98e5315cc612651a8812f" data-gist-hide-footer="true" data-gist-line="81"></code></p>
+          </li>
+          <li>You should see the content of your <code>mappings.json</code> file displayed. If this is not your initial upload, caching issues may delay seeing your change. See the <strong>NOTE</strong> under the <strong>Test</strong> section below for details.</li>
+        </ol>
+        <p class="BCL-aside">Note: You can also see the contents of the <code>mappings.json</code> file by browsing the <strong>public_url</strong> returned in step 6.</p>
+      </div>
+      <div id="Test" class="section">
+        <h2>Test</h2>
+        <p class="BCL-aside">NOTE: If you are making changes to your <code>mappings.json</code> file there may be a delay in seeing the substitution work as all files hosted via the Delivery System API are subject to five minute caching. This means it may be up to five minutes before your mapping file is read and used. If this is your initial test, there will be no delay.</p>
+        <p>Testing is simple because you don't have to change anything, which is the whole reason behind directed migration. Simply browse your page page that contains a Smart Player which you have mapped to a Brightcove Player and see the new player.</p>
+        <p><strong>Smart Player</strong></p>
+        <div><img src="/en/video-cloud/brightcove-player/guides/assets/directed-migration/smart-player.png" alt="smart player"></div>
+        <p><strong>Brightcove Player</strong></p>
+        <div><img src="/en/video-cloud/brightcove-player/guides/assets/directed-migration/Brightcove-Player.png" alt="Brightcove Player"></div>
+      </div>
+      <div id="Mapping_options" class="section">
+        <h2>Mapping options</h2>
+        <p>There are some situations where a more complex mappings must be created. They are detailed here.</p>
+        <h3 id="enable_mapping">enable_mapping</h3>
+        <p>You can set up your mapping(s) in disabled mode. This allows the directed migration to be in place, but the Smart Player to be displayed unless you include <code>enableMapping=true</code> in your page URL request.  This way you can test in place before all users see the change.</p>
+        <p><code data-gist-id="1eb2201bf0f98e5315cc612651a8812f" data-gist-hide-footer="true" data-gist-line="138-144"></code></p>
+        <h3>smart_player_id</h3>
+        <p>In early years of the Smart Player, the Javascript embed did not include a player key. For this reason we also allow you to specify a player ID in the mapping.</p>
+        <p><code data-gist-id="1eb2201bf0f98e5315cc612651a8812f" data-gist-hide-footer="true" data-gist-line="149-155"></code></p>
+      </div>
+			<div class="section" id="BCLreferences">
+				<h2>Related Topics</h2>
+				<ul>
+          <li><a href="../../brightcove-player/guides/migration-guide.html">Smart Player to Brightcove Player Migration Guide</a></li>
+          <li><a href="../../concepts/curl/curl.html">Set up cURL</a></li>
+          <li><a href="../../concepts/delivery-system-api/guides/git-overview.html">Git Overview</a></li>
+          <li><a href="../../concepts/intro-to-JSON/intro-to-JSON.html">Introducing JSON</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!-- bcl scripts -->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.2/gist-embed.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.3/handlebars.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
+	<script src="/en/scripts/log.js"></script>
+	<script src="/en/scripts/docs-nav-data.min.js"></script>
+	<script src="/en/scripts/bcls-doc-site-v1.js"></script>
+	<script src="/en/scripts/bc-mapi.js"></script>
+	<script>
+		$(document).foundation();
+	</script>
+	<script type="text/javascript">
+		/******** Any scripts specific to page samples should go here *********/
+	</script>
+
+
+<iframe id="CSAT" src="http://survey.clicktools.com/app/survey/go.jsp?iv=3poon3e7e9spn&q1=[articleURL]" style="margin-left:25%; padding-bottom:20px;width:550px;height:475px;border:none"></iframe>
+<script>
+
+    var cSat = document.getElementById('CSAT'),
+        cSatSrc = cSat.getAttribute('src'),
+        pageurl = window.location.href;
+    cSat.setAttribute('src', cSatSrc.replace('[articleURL]', pageurl));
+
+</script>
+<br><br>
+<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+<script>
+var feedbackMail = document.getElementById("feedbackMail");
+feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+</script>
+</body>
+
+</html>

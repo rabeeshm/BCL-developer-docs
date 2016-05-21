@@ -89,20 +89,10 @@
 
 			<div id="resources" class="section">
 				<h2>API resources used</h2>
-				<p>The following sections detail resources used from various APIs.</p>
-        <h3>Brightcove Player API properties</h3>
+				<p>The following sections detail resources used.</p>
         <ul>
-            <li><code>mediainfo</code></li>
-        </ul>
-        <h3>Brightcove Player API methods</h3>
-        <ul>
-            <li><code>options()</code></li>
-            <li><code>catalog.getVideo()</code></li>
-            <li><code>catalog.load()</code></li>
-        </ul>
-        <h3>Brightcove Player API events</h3>
-        <ul>
-            <li>none</li>
+          <li><code>one()</code>: Method to associate an event handler with an event, in this case <code>loadstart</code>, one time only. </li>
+          <li><code>mediainfo</code>: Object containing video information.</li>
         </ul>
 			</div>
 			<div id="player" class="section">
@@ -128,14 +118,12 @@
           </ol>
           <p class="BCL-aside">For details on how to get this embed code, see the <a href="../../brightcove-player/getting-started/quick-start-bc-player.html">Quick Start to Brightcove Player</a> document.</p>
           <p>The embed code should look like this:</p>
-          <p><script src="https://gist.github.com/ac0505516870685e9caf.js"></script></p>
+          <p><code data-gist-id="ac4d8e525e99a2cbca47" data-gist-hide-footer="false" data-gist-line="1-7"></code></p>
 
         <h3>The JavaScript code</h3>
         <p>The following provides an overview of the functionality of the code:</p>
             <ol>
-                <li>Retrieve the video ID of video in the player. Notice that the data retrieved by the <code>options()</code> method includes <code>data-video-id</code>.
-                </li>
-                <li>Use the video's ID to get the video object and load the video. This may seem unnecessary as the video is already playing, but you need to load the video to populate the <code>mediainfo</code> property.</li>
+                <li>Use the <code>one()</code> method to set an event listener for the <code>loadstart</code> method. You do this so in the anonymous event handler function you can access data from the <code>mediainfo</code> object.</li>
                 <li>Retrieve the <code>sources</code> array from the <code>mediainfo</code> property, which includes as elements all renditions of the currently loaded video.</li>
                 <li>Create another array which contains the filtered and sorted renditions so only the MP4 renditions are in a new array, sorted from largest to smallest.</li>
                 <li>Assign the zeroth element of the new array to a variable. The zeroth element contains the rendition with the largest size, hence the best quality.</li>
@@ -144,20 +132,18 @@
 
         <p>The following code is the actual implementation of the general steps above.</p>
             <ul>
-                <li>Line 1: Note that the id must match the id you set in the video tag.</li>
-                <li>Lines 2-6: Create variables used later in the code.</li>
-                <li>Line 8: Assign a variable the video ID, retrieved from data by calling the <code>options()</code> method.</li>
-                <li>Line 9: Use the <code>getVideo()</code> method, passing the video ID as a parameter, to get the video object of the currently playing video.</li>
-                <li>Line 10: Use the <code>load()</code> method.</li>
-                <li>Line 11: Assign the <code>name</code> of the video to a variable for later use in the link tag.</li>
-                <li>Line 12: Assign the <code>sources</code> array to a variable.</li>
-                <li>Line: 13: Assign the length of the array to variable.</li>
-                <li>Lines 14-18: Loop over the array and assign to a second array renditions where the <code>container</code> is <strong>MP4</strong>, AND the rendition has a <code>src</code> property. The MP4 renditions appear twice in the <code>sources</code> array, once with a <code>src</code> property and once with a <code>stream_name</code> property. The first is for progressive download and the second for streaming.</li>
-                <li>Lines 19-21: Sort the array of MP4s.</li>
-                <li>Line 22: Assign the largest rendition to a variable.</li>
-                <li>Lines 23: Set the <code>src</code> to the largest rendition.</li>
+                <li>Line 13: Note that the id must match the id you set in the video tag.</li>
+                <li>Lines 14-18: Create variables used later in the code.</li>
+                <li>Lines 20, 34: Use the <code>one()</code> method to only once listen for the <code>loadstart</code>event and define an anonymous event handler function. The reason you use <code>one()</code> and not <code>on()</code> is that later in the code you change the source, which would trigger the event handler to be called again, which would then create an infinite loop.</li>
+                <li>Line 21: Assign the <code>name</code> of the video to a variable for later use in the link tag.</li>
+                <li>Line 22: Assign the <code>sources</code> array to a variable.</li>
+                <li>Line: 23: Assign the length of the array to variable.</li>
+                <li>Lines 24-28: Loop over the array and assign to a second array renditions where the <code>container</code> is <strong>MP4</strong>, AND the rendition has a <code>src</code> property. The MP4 renditions appear twice in the <code>sources</code> array, once with a <code>src</code> property and once with a <code>stream_name</code> property. The first is for progressive download and the second for streaming.</li>
+                <li>Lines 29-31: Sort the array of MP4s.</li>
+                <li>Line 32: Assign the largest rendition to a variable.</li>
+                <li>Lines 33: Set the <code>src</code> to the largest rendition.</li>
             </ul>
-          <p><script src="https://gist.github.com/18d896134c8423ec6f44.js"></script></p>
+            <p><code data-gist-id="ac4d8e525e99a2cbca47" data-gist-hide-footer="false" data-gist-line="13-35"></code></p>
 
 	  </div>
 
@@ -174,7 +160,8 @@
 <pre><code>videojs.plugin('renditionSelectPlugin', function() {</code></pre>
                    to wrap the <code>videojs.plugin()</code> function. The first argument, <code>renditionSelectPlugin</code>, is the plugin name.</li>
                   <li>The rest of the code remains exactly the same:
-                <p><script src="https://gist.github.com/8090be153804685eb653.js"></script></p></li>
+                    <p><code data-gist-id="ac4d8e525e99a2cbca47" data-gist-hide-footer="false" data-gist-line="41-63"></code></p>
+              </li>
                 </ol>
 
 
@@ -234,9 +221,7 @@
             nowPlaying = document.getElementById('nowPlaying'),
             allRenditions = document.getElementById('allRenditions');
 
-        videoID = myPlayer.options()['data-video-id'];
-        myPlayer.catalog.getVideo(videoID, function(error, video) {
-            myPlayer.catalog.load(video);
+        myPlayer.one('loadstart', function(evt) {
             videoName = myPlayer.mediainfo['name'];
             rendtionsAra = myPlayer.mediainfo.sources;
             allRenditions.textContent = JSON.stringify(rendtionsAra, null, '  ');
@@ -251,17 +236,27 @@
             });
             highestQuality = mp4Ara[0].src;
             myPlayer.src(highestQuality);
-            myPlayer.one('play', function () {
-                nowPlaying.textContent = myPlayer.currentSrc();
-            });
+            nowPlaying.textContent = myPlayer.currentSrc();
         });
     });
 	</script>
-	<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
-    <script>
-	var feedbackMail = document.getElementById("feedbackMail");
-	feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
-	</script>
+	
+    
+<iframe id="CSAT" src="http://survey.clicktools.com/app/survey/go.jsp?iv=3poon3e7e9spn&q1=[articleURL]" style="margin-left:25%; padding-bottom:20px;width:550px;height:475px;border:none"></iframe>
+<script>
+    
+    var cSat = document.getElementById('CSAT'),
+        cSatSrc = cSat.getAttribute('src'),
+        pageurl = window.location.href;
+    cSat.setAttribute('src', cSatSrc.replace('[articleURL]', pageurl));
+    
+</script>
+<br><br>
+<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+<script>
+var feedbackMail = document.getElementById("feedbackMail");
+feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+</script>
 </body>
 
 </html>

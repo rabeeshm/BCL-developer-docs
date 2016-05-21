@@ -34,14 +34,9 @@
       height: 344px;
       width: 610px;
     }
-    .vjs-endscreen-overlay-content {
-      position: absolute;
-      bottom: 80px;
-      left: 170px;
-    }
   </style>
-  <link href="//players.brightcove.net/videojs-overlay/lib/videojs-overlay.css" rel='stylesheet'>
-  <link href="//players.brightcove.net/videojs-custom-endscreen/dist/videojs-custom-endscreen.css" rel='stylesheet'>
+  <link href="//players.brightcove.net/videojs-overlay/1/videojs-overlay.css" rel='stylesheet'>
+  <link href="//players.brightcove.net/videojs-custom-endscreen/2/videojs-custom-endscreen.css" rel='stylesheet'>
 </head>
 
 <body>
@@ -113,9 +108,8 @@
 				<p>The following sections detail resources used from various APIs.</p>
 				<h3>Brightcove Player API</h3>
 				<ul>
-          <li><code>options()</code>: Method to retrieve basic player metadata immediately on player ready.</li>
-          <li><code>catalog.getVideo()</code>: Method to make a catalog request for the video with the specified id and invokes a callback when the request completes.</li>
-          <li><code>catalog.load()</code>: Method to load the video object into the player. Also populates the <code>mediainfo</code> property.</li>
+          <li><code>on()</code>: Method to associate an event handler with an event, in this case <code>loadstart</code>.</li>
+          <li><code>mediainfo</code>: Object containing video information.</li>
         </ul>
         <h3>Plugins</h3>
         <ul>
@@ -138,13 +132,13 @@
           data-player="7bf38d3b-968a-4dec-855c-3f98e08604df"
           data-embed="default"
           class="video-js" controls></video>
-        <p id="cta" id="cta" style='color:red; font-weight: bold; font-size: 20px'></p>
+        <p id="cta" style='color:red; font-weight: bold; font-size: 20px'></p>
 			</div>
 
 			<div id="code" class="section">
 				<h2>How it works</h2>
         <p>For every video with which you want use a call to action you will need to enter the <strong>Related Link URL</strong> and <strong>Related Link Text</strong> in <span class="video-cloud-only">Video Cloud</span><span class="perform-only">Perform</span> Studio. You do this in the <strong>MEDIA > VIDEO INFORMATION</strong> section, as shown here:</p>
-        <div><img src="/en/video-cloud/brightcove-player/samples/assets/call-to-action/add-link-url-studio.png"></div>
+        <div><img src="/en/video-cloud/brightcove-player/samples/assets/call-to-action/add-link-url-studio.png" alt="link in studio"></div>
         <p>JavaScript is then used to:</p>
         <ul>
           <li>Populate the <code>mediainfo</code> property.</li>
@@ -164,39 +158,37 @@
 
 				<h3>The player code</h3>
         <p>Your player code should look similar to the following:</p>
-        <p class="video-cloud-only"><code data-gist-id="b6b3de6baf916b7cad99" data-gist-hide-footer="true" data-gist-line="25-30"></code></p>
+        <p class="video-cloud-only"><code data-gist-id="b6b3de6baf916b7cad99" data-gist-hide-footer="true" data-gist-line="20-25"></code></p>
         <p>Note that an <code>id</code> has been added to the code.</p>
         <h3>The HTML code</h3>
         <p>Add the following HTML to your page code where you wish your call to action link to appear:</p>
-        <p class="video-cloud-only"><code data-gist-id="b6b3de6baf916b7cad99" data-gist-hide-footer="true" data-gist-line="32"></code></p>
+        <p class="video-cloud-only"><code data-gist-id="b6b3de6baf916b7cad99" data-gist-hide-footer="true" data-gist-line="27"></code></p>
 				<h3>The JavaScript code</h3>
 				<p>Add the following JavaScript to your page code:</p>
         <ul>
-          <li>Lines 34-36: Link to the JavaScript files for the player, overlay plugin and custom endscreen .</li>
-          <li>Lines 39, 62: Wait for the player to be ready for programmatic interaction.</li>
-          <li>Lines 40-43: Create variables to be used later.</li>
-          <li>Line 44: Populate the variable <code>videoIdInPlayer</code> with the ID of the video currently in the player. This code uses the <code>options()</code> method to provide access to basic video metadata, including the ID of the video in the player. Note that normal <code>object.property</code> notation cannot be used with the hyphenated property name, so square bracket (<code>[]</code>) notation is used.</li>
-          <li>Lines 45, 61 : Retrieve the video object using the catalog and define the callback function.</li>
-          <li>Line 46: Load the video into the player. This may seem repetitive since the video is already in the player, but this step must be done to populate the <code>mediainfo</code> property.</li>
-          <li>Lines 47, 48: Extract the link text and link URL from the metadata and store in variables. Of course, this would not have to be done, but it makes the next line of code that dynamically builds the anchor tag much neater.</li>
-          <li>Line 49: Build an HTML anchor tag using the variables just created. Note a <code>target</code> is used to open the linked page in a new window or tab.</li>
-          <li>Line 50: Inject the dynamically built anchor tag into the HTML page.</li>
-          <li>Lines 51-57: Configure the overlay plugin to display the call to action whenever the video is paused.</li>
-          <li>Lines 58-60: Configure the custom endscreen plugin to display the call to action when the video ends.</li>
+          <li>Lines 29-31: Link to the JavaScript files for the player, overlay plugin and custom endscreen .</li>
+          <li>Lines 34, 57: Wait for the player to be ready for programmatic interaction.</li>
+          <li>Line 35: Create a variable to hold a reference to the player.</li>
+          <li>Line 36, 56: Add an event listener for the <code>loadstart</code> event. In the anonymous event handler function you can access video information stored in the <code>mediainfo</code> object.</li>
+          <li>Lines 37, 38: Extract the link text and link URL from the metadata and store in variables. Of course, this would not have to be done, but it makes the next line of code that dynamically builds the anchor tag much neater.</li>
+          <li>Line 39: Build an HTML anchor tag using the variables just created. Note a <code>target</code> is used to open the linked page in a new window or tab.</li>
+          <li>Line 40: Inject the dynamically built anchor tag into the HTML page.</li>
+          <li>Lines 41-48: Configure the overlay plugin to display the call to action whenever the video is paused.</li>
+          <li>Lines 49-51: Configure the custom endscreen plugin to display the call to action when the video ends.</li>
+          <li>Lines 52-55: Add a style so the overlay is not showing when the video ends. If is not needed to have both the endscreen and overlay displaying the same link.</li>
         </ul>
-        <p><code data-gist-id="b6b3de6baf916b7cad99" data-gist-hide-footer="true" data-gist-line="34-63"></code></p>
+        <p><code data-gist-id="b6b3de6baf916b7cad99" data-gist-hide-footer="true" data-gist-line="29-58"></code></p>
         <h3>The stylesheet</h3>
 				<p>The styles used:</p>
         <ul>
-          <li>Lines 8-11: Set the size of the player.</li>
-          <li>Lines 12-16: Position the call to action in the custom endscreen</li>
-          <li>Line 18: Link to the CSS for the overlay plugin.</li>
-          <li>Line 19: Link to the CSS for the custom endscreen plugin.</li>
+          <li>Lines 7-12: Set the size of the player.</li>
+          <li>Line 13: Link to the CSS for the overlay plugin.</li>
+          <li>Line 14: Link to the CSS for the custom endscreen plugin.</li>
         </ul>
-        <p><code data-gist-id="b6b3de6baf916b7cad99" data-gist-hide-footer="true" data-gist-line="7-19"></code></p>
+        <p><code data-gist-id="b6b3de6baf916b7cad99" data-gist-hide-footer="true" data-gist-line="7-14"></code></p>
         <h3>Full code</h3>
         <p>Here is the full code for the sample:</p>
-        <p><code data-gist-id="b6b3de6baf916b7cad99" data-gist-hide-footer="true" data-gist-line="1-67"></code></p>
+        <p><code data-gist-id="b6b3de6baf916b7cad99" data-gist-hide-footer="true" data-gist-line="1-62"></code></p>
 			</div>
 
       <div id="useiframe" class="section">
@@ -232,42 +224,52 @@
 		$(document).foundation();
 	</script>
   <script src="//players.brightcove.net/1752604059001/7bf38d3b-968a-4dec-855c-3f98e08604df_default/index.min.js"></script>
-   <script src="//players.brightcove.net/videojs-overlay/lib/videojs-overlay.js"></script>
-   <script src="//players.brightcove.net/videojs-custom-endscreen/dist/videojs-custom-endscreen.min.js"></script>
+  <script src="//players.brightcove.net/videojs-overlay/1/videojs-overlay.min.js"></script>
+  <script src="//players.brightcove.net/videojs-custom-endscreen/2/videojs-custom-endscreen.min.js"></script>
 	<script type="text/javascript">
 		/******** Any scripts specific to page samples should go here *********/
     videojs('myPlayerID').ready(function(){
-      var myPlayer = this,
-      hrefString='',
-      linkText='',
-      linkURL='',
-      videoIdInPlayer=myPlayer.options()['data-video-id'];
-      console.log('options',myPlayer.options());
-      myPlayer.catalog.getVideo(videoIdInPlayer, function(error, video) {
-        myPlayer.catalog.load(video);
-        linkText = myPlayer.mediainfo.link.text;
-        linkURL = myPlayer.mediainfo.link.url;
-        hrefString = '<a href = "' + linkURL + '" target="_blank">' +  linkText + '</a>';
-        console.log(hrefString);
+      var myPlayer = this;
+      myPlayer.on('loadstart', function(evt) {
+        var linkText = myPlayer.mediainfo.link.text,
+          linkURL = myPlayer.mediainfo.link.url,
+          hrefString = '<a href = "' + linkURL + '" target="_blank" rel="noopener noreferrer">' +  linkText + '</a>';
         document.getElementById("cta").innerHTML = hrefString;
         myPlayer.overlay({
           overlays: [{
+            "align": "bottom",
             "content": "<p style='color:red; background-color: black; font-weight: bold; font-size: 20px'>" + hrefString + "</p>",
             "start": "pause",
             "end": "play"
           }]
         });
         myPlayer.customEndscreen({
-          "content": "<p style='color:red; background-color: white; font-weight: bold; font-size: 20px'>" + hrefString + "</p>"
+          "content": "<p style='font-weight: bold; font-size: 20px'>" + hrefString + "</p>"
         });
+        myPlayer.on('ended',function(){
+          var overlayElement = document.getElementsByClassName('vjs-overlay')[0];
+          overlayElement.setAttribute('style', 'display: none;');
+        })
       });
     });
 	</script>
-	<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
-    <script>
-	var feedbackMail = document.getElementById("feedbackMail");
-	feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
-	</script>
+	
+    
+<iframe id="CSAT" src="http://survey.clicktools.com/app/survey/go.jsp?iv=3poon3e7e9spn&q1=[articleURL]" style="margin-left:25%; padding-bottom:20px;width:550px;height:475px;border:none"></iframe>
+<script>
+    
+    var cSat = document.getElementById('CSAT'),
+        cSatSrc = cSat.getAttribute('src'),
+        pageurl = window.location.href;
+    cSat.setAttribute('src', cSatSrc.replace('[articleURL]', pageurl));
+    
+</script>
+<br><br>
+<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+<script>
+var feedbackMail = document.getElementById("feedbackMail");
+feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+</script>
 </body>
 
 </html>

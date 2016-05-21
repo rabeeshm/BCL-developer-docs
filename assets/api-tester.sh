@@ -1,3 +1,7 @@
+txtrst=$(tput sgr0) # Text reset
+txtyel=$(tput setaf 7) # Yellow
+txtgrn=$(tput setaf 6) # Green
+txtred=$(tput setaf 9) # red
 bold=`tput bold`
 normal=`tput sgr0`
 echo 'Enter your client id:'

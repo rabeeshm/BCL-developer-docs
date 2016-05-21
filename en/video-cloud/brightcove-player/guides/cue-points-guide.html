@@ -138,11 +138,12 @@
             <li>Line 96: Play the video.</li>
         </ul>
         <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="69-99"></code></p>
-        <a name="allvcinfo"></a><h3>Retrieve all Video Cloud cue point info</h3>
+				
+        <h3 id="allvcinfo">Retrieve all Video Cloud cue point info</h3>
         <p>As you may have noticed not all Video Cloud cue point information is directly available to you from the <code>activecues</code> array. This is easily remedied by retrieving the desired info from the <code>mediainfo</code> property.</p>
         <p>The basic approach of this solution is:</p>
         <ol>
-          <li>Once the player is ready, use the <code>getVideo()</code> method, then in the callback function for the method use the <code>load()</code> method. This is done to populate the <code>mediainfo</code> property.</li>
+          <li>Wait for the <code>loadstart</code> event for the <code>mediainfo</code> property to be populated.</li>
           <li>Assign the <code>cue_points</code> array from the <code>mediainfo</code> property to a variable. This variable contains complete Video Cloud cue point information.</li>
           <li>On a cue point event, retrieve the corresponding cue point data based on the <code>time</code> property value. This will be done using a helper function that grabs an object out of an array based on a property value in the object.</li>
           <li>Use the data from the cue point.</li>
@@ -151,20 +152,19 @@
         <div><img src="/en/video-cloud/brightcove-player/guides/assets/cue-point-all-vc-data.png" alt="cue point data"></div>
         <p>In the snippet below only the new/changed code from examples above will be explained.</p>
         <ul>
-          <li>Lines 406-418: Include the function that will be used to extract a single cue point data collection from the array of all cue points. Note that you pass it the array of all cue points, the property in which you are searching for a specific value, and lastly the the value you are searching for.</li>
-          <li>Line 385: Use the <code>catalog.getVideo()</code> method to retrieve the video. Note that the expression <code>myPlayer.options()['data-video-id']</code> is used to get the video ID from the video tag.</li>
-          <li>Line 387: In the callback function, use the <code>catalog.load()</code> method to load the video. This populates the <code>mediainfo</code> property.</li>
-          <li>Line 388: Assign the array of all Video Cloud cue points to a variable.</li>
-          <li>Line 397: In the cue point dispatch event handler, assign the specific cue point's data collection to a variable. This is where the function mentioned in the first bullet point is called. The arguments used are:
+          <li>Lines 452-463: Include the function that will be used to extract a single cue point data collection from the array of all cue points. Note that you pass it the array of all cue points, the property in which you are searching for a specific value, and lastly the the value you are searching for.</li>
+          <li>Line 432: Listens for the <code>loadstart</code> event. When your video starts to load, then the <code>mediainfo</code> property is populated.</li>
+          <li>Line 434: Assign the array of all Video Cloud cue points to a variable.</li>
+          <li>Line 443: In the cue point dispatch event handler, assign the specific cue point's data collection to a variable. This is where the function mentioned in the first bullet point is called. The arguments used are:
           <ul>
             <li><code>cuePointAra</code>: The entire collection of Video Cloud cue points.</li>
             <li><code>'time'</code>: The property in which to search for a value.</li>
             <li><code>tt.activeCues[0].startTime</code>: The start time of the cue point currently being handled in the cue point dispatch event handler.</li>
           </ul>
           </li>
-          <li>Lines 398-399: Debugging <code>console.log()</code> method calls, which should be removed in production code.</li>
+          <li>Lines 444-445: Debugging <code>console.log()</code> method calls, which should be removed in production code.</li>
         </ul>
-        <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="380-419"></code></p>
+        <p><code data-gist-id="24bb251b7b370b3013a5" data-gist-hide-footer="true" data-gist-line="426-465"></code></p>
       </div>
       <div id="standardcuepoints" class="section">
 				<h2>HTML5 standard cue points</h2>
@@ -309,7 +309,7 @@
 		</div>
 	</div>
 
-  <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+  
 
 
   <script src="//players.brightcove.net/1752604059001/VkIrj2aFx_default/index.min.js"></script>
@@ -383,7 +383,7 @@
     var myPlayer3,
       textTrack;
 
-    videojs("myPlayerID3").ready(function(){
+    videojs("myPlayerID3").on('loadstart',function(){
       var myPlayer3 = this;
       myPlayer3.src({
         "type": "video/mp4",
@@ -409,10 +409,22 @@
     }); //end ready
 </script>
 
-    <script>
-	var feedbackMail = document.getElementById("feedbackMail");
-	feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
-	</script>
+    
+<iframe id="CSAT" src="http://survey.clicktools.com/app/survey/go.jsp?iv=3poon3e7e9spn&q1=[articleURL]" style="margin-left:25%; padding-bottom:20px;width:550px;height:475px;border:none"></iframe>
+<script>
+    
+    var cSat = document.getElementById('CSAT'),
+        cSatSrc = cSat.getAttribute('src'),
+        pageurl = window.location.href;
+    cSat.setAttribute('src', cSatSrc.replace('[articleURL]', pageurl));
+    
+</script>
+<br><br>
+<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+<script>
+var feedbackMail = document.getElementById("feedbackMail");
+feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+</script>
 </body>
 
 </html>

@@ -144,21 +144,20 @@
 				<p>Add the following JavaScript to your page code:</p>
         <ul>
           <li>Lines 48-50, 53-59: Create variables for later use. Note that lines 57-59 create an HTML <code>&lt;div&gt;</code> element and assign it an ID. This element will be assigned the thumbnails and then used as content in the overlay. Line 54 assigns the ID of the desired playlist you wish to use for the related videos to a variable.</li>
-          <li>Lines 52, 85: Wait for the player to be ready for programmatic interaction.</li>
+          <li>Lines 52, 81: Wait for the player to be ready for programmatic interaction.</li>
           <li>Lines 61, 70: Reads a playlist using the player's <code>catalog</code> object and defines the callback function.</li>
           <li>Line 65: Reduces the number of videos to a maximum of nine.</li>
           <li>Line 67: Calls the <code>createVideoList</code> function which creates the thumbnails and assigns an HTML anchor tag to each.</li>
           <li>Line 69: Appends the element of thumbnails/anchors to the dynamically created <code>&lt;div&gt;</code>.</li>
-          <li>Lines 72-84: Uses standard notation to call the overlay plugins and create overlays for when the player pauses or ends.</li>
-          <li>Lines 92-100: This function is called when a viewer clicks on a thumbnail to play a new video. The function loads the correct video from the playlist then plays the video. It is VERY important that this is defined as a function expression, where a variable is assigned a function, rather than the more common function declaration notation. This is done so the function definition will be hoisted to global page scope when this code is used in a plugin. (Note the <code>try-catch</code> block is a work around for a known bug. See the note below for details.)</li>
-          <li>Lines 109-119: Creates and HTML element. This function was called to create the <code>&lt;div&gt;</code> used as part of the overlay.</li>
+          <li>Lines 72-81: Uses standard notation to call the Overlay Plugin and create an overlay for when the player pauses or ends. Even though the overlay will be displayed on pause and end, you will need to only listen for the <code>pause</code> event as this event is also dispatched when <code>ended</code> is dispatched.</li>
+          <li>Lines 89-92: This function is called when a viewer clicks on a thumbnail to play a new video. The function loads the correct video from the playlist then plays the video. It is VERY important that this is defined as a function expression, where a variable is assigned a function, rather than the more common function declaration notation. This is done so the function definition will be hoisted to global page scope when this code is used in a plugin.</li>
+          <li>Lines 101-111: Creates and HTML element. This function was called to create the <code>&lt;div&gt;</code> used as part of the overlay.</li>
           <li>
-            Lines 127-152: This function is passed the an array of videos and from the list builds the HTML for the overlay. The following screenshot shows the raw HTML dynamically created. Note that an anchor tag is created and the <code>loadAndPlay</code> function is called with the corresponding playlist item as an argument.<br />
-            <div><img src="/en/video-cloud/brightcove-player/samples/assets/related-playlist/overlay-raw-html.png"></div>
+            Lines 119-144: This function is passed the an array of videos and from the list builds the HTML for the overlay. The following screenshot shows the raw HTML dynamically created. Note that an anchor tag is created and the <code>loadAndPlay</code> function is called with the corresponding playlist item as an argument.<br />
+            <div><img src="/en/video-cloud/brightcove-player/samples/assets/related-playlist/overlay-raw-html.png" alt="overlay details"></div>
           </li>
         </ul>
-        <p class="BCL-aside">Note: Lines 94, 96-99 are optional. The <code>try</code> block is added to get around the player error msg of <code>Uncaught TypeError: d.off is not a function</code>. This happens when trying to load a video that only has MP4 renditions, and the player is trying to use HLS. This is a temporary solution which will eventually be fixed in the player. For details, see the <a href="../../brightcove-player/reference/known-issues.html#doffbug">Compatability and Known Issues</a> document.</p> </li>
-        <p class="video-cloud-only"><code data-gist-id="faa74cd6fdc3ff5b5387" data-gist-hide-footer="true" data-gist-line="43-154"></code></p>
+        <p class="video-cloud-only"><code data-gist-id="faa74cd6fdc3ff5b5387" data-gist-hide-footer="true" data-gist-line="43-146"></code></p>
         <h3>The stylesheet</h3>
 				<p>Add the following styles to your page code:</p>
         <ul>
@@ -181,10 +180,10 @@
 				    <li>Line 271: The trailing semicolon is required.</li>
 				</ul>
         <p class="BCL-aside">NOTE: The variable created for <code>loadAndPlay</code> function needs to be removed when creating the plugin. When this is done the function will be global to the page, and be able to be seen when a thumbnail is clicked.</p>
-				<p><code data-gist-id="faa74cd6fdc3ff5b5387" data-gist-hide-footer="true" data-gist-line="166-271"></code></p>
+				<p><code data-gist-id="faa74cd6fdc3ff5b5387" data-gist-hide-footer="true" data-gist-line="158-253"></code></p>
 				<h3>Create the CSS file</h3>
 				<p>Move the CSS into a file and place it in an Internet accessible URL. Note that the player size CSS is not included in this file.</p>
-        <p><code data-gist-id="faa74cd6fdc3ff5b5387" data-gist-hide-footer="true" data-gist-line="278-294"></code></p>
+        <p><code data-gist-id="faa74cd6fdc3ff5b5387" data-gist-hide-footer="true" data-gist-line="260-276"></code></p>
 				<h3>Deploy plugin and CSS</h3>
         <p>This related videos via playlist plugin leverages the Overlay plugin. Therefore, you must load the JavaScript and CSS files for both the custom plugin as well as the Overlay plugin.</p>
         <p>To deploy the <strong>relatedPlaylist</strong> Plugin using the Players module, follow these steps:</p>
@@ -195,11 +194,11 @@
           <li>For the <strong>JavaScript URL</strong>, enter the URL which specifies the location of where you saved your plugin's JavaScript.</li>
           <li>Click the <strong>+</strong> button to add another JavaScript file.</li>
           <li>For the <strong>JavaScript URL</strong>, enter the URL which specifies the location of the Overlay plugin's Javascript:
-          <pre><code>https://players.brightcove.net/videojs-overlay/lib/videojs-overlay.js</code></pre></li>
+          <pre><code>//players.brightcove.net/videojs-overlay/1/videojs-overlay.min.js</code></pre></li>
           <li>For the <strong>CSS URL</strong>, enter the URL which specifies the location of where you saved your plugin's CSS.</li>
           <li>Click the <strong>+</strong> button to add another CSS file.</li>
           <li>For the <strong>CSS URL</strong>, enter the URL which specifies the location of the Overlay plugin's CSS:</li>
-          <pre><code>https://players.brightcove.net/videojs-overlay/lib/videojs-overlay.css</code></pre></li>
+          <pre><code>//players.brightcove.net/videojs-overlay/1/videojs-overlay.css</code></pre></li>
           <li>For the <strong>Name</strong>, enter <strong>relatedPlaylist</strong>.</li>
           <li>No options will be passed to the plugin, so simply enter empty braces for the options.<br/>
           <pre><code>{}</code></pre>
@@ -212,7 +211,7 @@
       <div id="useiframe" class="section">
         <h2>Use iframe</h2>
         <p>It is a best practice to use the iframe player implementation. Since you can create this functionality as a plugin, replace the embed_in_page implementation with the iframe implementation.</p>
-				<p><code data-gist-id="faa74cd6fdc3ff5b5387" data-gist-hide-footer="true" data-gist-line="299"></code></p>
+				<p><code data-gist-id="faa74cd6fdc3ff5b5387" data-gist-hide-footer="true" data-gist-line="281"></code></p>
       </div>
 
 			<div class="section" id="BCLreferences">
@@ -245,11 +244,23 @@
 	<script type="text/javascript">
 		/******** Any scripts specific to page samples should go here *********/
 	</script>
-	<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
-    <script>
-	var feedbackMail = document.getElementById("feedbackMail");
-	feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
-	</script>
+
+
+<iframe id="CSAT" src="http://survey.clicktools.com/app/survey/go.jsp?iv=3poon3e7e9spn&q1=[articleURL]" style="margin-left:25%; padding-bottom:20px;width:550px;height:475px;border:none"></iframe>
+<script>
+
+    var cSat = document.getElementById('CSAT'),
+        cSatSrc = cSat.getAttribute('src'),
+        pageurl = window.location.href;
+    cSat.setAttribute('src', cSatSrc.replace('[articleURL]', pageurl));
+
+</script>
+<br><br>
+<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+<script>
+var feedbackMail = document.getElementById("feedbackMail");
+feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+</script>
 </body>
 
 </html>

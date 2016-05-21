@@ -81,12 +81,10 @@ https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/<strong>ref:{refe
                 <p>In the request body, include a JSON object that minimally contains the video name, but may contain additional metadata:</p>
 <pre><code>{
     "name": "My Remote Video",
-    "complete": true,
     "description": "A short description of the video",
     "tags": ["remote", "fall_campaign"],
     "reference_id": "myUniqueReferenceID"
 }</code></pre>
-                <p class="BCL-aside">Note: the <code>"complete": true</code> parameter should be included <strong>ONLY</strong> for remote asset videos, but <strong>MUST</strong> be included for remote asset videos to play. If you have already created remote asset videos without including this param, just add it in <a href="../references/cms-api/versions/v1/index.html#api-videoGroup-Update_Video">update video</a> request.</p>
                 <p>For details of the create video operation, see the <a href="../references/cms-api/versions/v1/index.html#api-Video-Create_Video">API Reference</a>.</p>
             </div>
             <div class="section" id="addRenditions">
@@ -110,7 +108,6 @@ https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/<strong>ref:{refe
                     <ol>
                         <li><p>Video Cloud does not inspect the remote video files, so providing additional metadate will enable Video Cloud to display this information in Studio (or in the Brightcove player, if you configure the player to display the metadata).</p>
                     <p>For details of the add rendition operation, see the <a href="../references/cms-api/versions/v1/index.html#api-Assets-Add_Rendition">API Reference</a>.</li>
-                        <li>For the video to play properly, you must include the field <code>complete: true</code> when you create the video asset, or update the asset to set this field.</li>
                         <li>Renditions for remote assets must have the <code>video_codec</code> and <code>video_container</code> fields to work properly.</li>
                     </ol>
                     </div>
@@ -174,61 +171,8 @@ https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/assets
             <div class="section" id="addTextTracks">
                 <h2>Add text tracks</h2>
                 <p>Text tracks can be used to add captions, chapters, and other time-based metadata to your video.</p>
-                <p>Although there are POST and PATCH operations for <code>/assets/text_tracks</code>, these only work with the asset collection. To actually add the text tracks to a video, you must use the <a href="#api-Video-Update_Video">Update Video operation</a>. Here are the full steps with sample code (assuming that you have already created your remote asset video):</p>
-                <ol>
-                    <li>
-                        Add the text_track asset:
-<pre><code>// POST to
-// https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/assets/text_tracks
+                <p><strong>Unlike renditions and images, text tracks are treated the same for remote asset videos as for videos ingested into the Video Cloud system.</strong> To actually add the text tracks to a video, you must use the Media module in Studio or the CMS API <a href="#api-Video-Update_Video">Update Video operation</a>.</p>
 
-// request body
-{
-    "remote_url": "http://solutions.brightcove.com/bcls/assets/vtt/sea-marvels-chapters.vtt"
-}</code></pre>
-<p>You'll get a response like this:</p>
-<pre><code>{
-    "account_id": null,
-    "audio_only": false,
-    "cdn_origin_id": "",
-    "complete": true,
-    "controller_type": "",
-    "current_filename": "",
-    "id": "941fea73-c900-4316-bea0-920804fc747c",
-    "name": "",
-    "progressive_download": false,
-    "reference_id": null,
-    "remote_stream_name": null,
-    "remote_url": null,
-    "size": null,
-    "type": "TEXT_TRACK",
-    "updated_at": "2016-02-22T19:11:08.994Z",
-    "uploaded_at": "2016-02-22T19:11:08.994Z"
-}</code></pre>
-                    </li>
-                    <li>
-                        Add the text_track asset to the video:
-                        <p>Make a <strong>PATCH</strong> request to</p>
-<pre><code>https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}</code></pre>
-
-<p><strong>Request body</strong></p>
-
-<pre><code>// NOTE: do NOT include the URL for text tracks here
-// NOTE: the <strong>asset_id</strong> here is the <strong>id</strong> value from the first request
-
-{
-    "text_tracks": [
-        {
-            "srclang": "en",
-            "label": "Chapters",
-            "kind": "chapters",
-            "mime_type": null,
-            "default": true,
-            "asset_id": "941fea73-c900-4316-bea0-920804fc747c"
-        }
-    ]
-}</code></pre>
-                    </li>
-                </ol>
                 <p class="BCL-aside">Note: tracks (webVTT files) are supported in the Brightcove Player. To add captions for the old Smart Player, see <a href="#addCaptions">Add Captions</a>.</p>
             </div>
             <div class="section" id="addCaptions">
@@ -275,11 +219,23 @@ https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/assets
     <script type="text/javascript">
         /******** Any scripts specific to page samples should go here *********/
     </script>
-    <div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
-    <script>
-        var feedbackMail = document.getElementById("feedbackMail");
-        feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
-    </script>
+
+
+<iframe id="CSAT" src="http://survey.clicktools.com/app/survey/go.jsp?iv=3poon3e7e9spn&q1=[articleURL]" style="margin-left:25%; padding-bottom:20px;width:550px;height:475px;border:none"></iframe>
+<script>
+    
+    var cSat = document.getElementById('CSAT'),
+        cSatSrc = cSat.getAttribute('src'),
+        pageurl = window.location.href;
+    cSat.setAttribute('src', cSatSrc.replace('[articleURL]', pageurl));
+    
+</script>
+<br><br>
+<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+<script>
+var feedbackMail = document.getElementById("feedbackMail");
+feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+</script>
 </body>
 
 </html>

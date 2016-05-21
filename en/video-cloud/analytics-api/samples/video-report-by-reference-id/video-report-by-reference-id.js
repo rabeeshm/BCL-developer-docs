@@ -1,4 +1,4 @@
-var BCLS = (function ($, window, Pikaday, BCLSformatJSON) {
+var BCLS = (function ($, window, datepickr, BCLSformatJSON) {
     "use strict";
     var proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
         useMyAccount = document.getElementById("useMyAccount"),
@@ -10,8 +10,6 @@ var BCLS = (function ($, window, Pikaday, BCLSformatJSON) {
         $client_secret = $("#client_secret"),
         client_secret = "xs3vuzzKPz5fWHInsON26SXOL54X1GObFW70KylVqdVuIHdkqwqlCs9yVSCRF3i5u_0NcNb7MrzntCLaveZmeQ",
         $requestType = $("#requestType"),
-        fromPicker,
-        toPicker,
         to = document.getElementById("to"),
         from = document.getElementById("from"),
         now = new Date(),
@@ -48,7 +46,7 @@ var BCLS = (function ($, window, Pikaday, BCLSformatJSON) {
     bclslog = function (context, message) {
         if (window["console"] && console["log"]) {
             console.log(context, message);
-        };
+        }
         return;
     };
 
@@ -120,16 +118,15 @@ var BCLS = (function ($, window, Pikaday, BCLSformatJSON) {
         });
     };
     // add date pickers to the date input fields
-    fromPicker = new Pikaday({
-        field: from,
-        format: 'YYYY-MM-DD',
-        onSelect: buildRequest
+    datepickr(to, {
+        'dateFormat': 'Y-m-d'
     });
-    toPicker = new Pikaday({
-        field: to,
-        format: 'YYYY-MM-DD',
-        onSelect: buildRequest
+    datepickr(from, {
+        'dateFormat': 'Y-m-d'
     });
+
+    to.addEventListener('change', buildRequest);
+    from.addEventListener('change', buildRequest);
     // populate to/from fields with default values
     nowISO = nowISO.substring(0, nowISO.indexOf("T"));
     fromISO = fromISO.substring(0, fromISO.indexOf("T"));
@@ -159,4 +156,4 @@ var BCLS = (function ($, window, Pikaday, BCLSformatJSON) {
     return {
         buildRequest: buildRequest
     };
-})($, window, Pikaday, BCLSformatJSON);
+})($, window, datepickr, BCLSformatJSON);
