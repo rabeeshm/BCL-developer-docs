@@ -1,4 +1,4 @@
-var BCLS = (function(window, document) {
+var BCLS_expander = (function(window, document) {
     var expanderHeads = document.getElementsByClassName('bcls-expander-head'),
         i,
         iMax;
