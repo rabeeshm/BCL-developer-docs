@@ -37,7 +37,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         subsubsectionName,
         topObj = {
             "text": "Top",
-            "link": "top"
+            "link": "bcls_header"
         },
         navLabel = [topObj],
         menuRightBase = "<li class=\"search\"><a href=\"#\" data-reveal-id=\"searchModal\"><img src=\"//docs.brightcove.com/en/images/search-white.png\" alt=\"search_icon_small_white\" width=\"18\" height=\"18\"></a></li><li class=\"show-for-xlarge-up\"><a href=\"http://docs.brightcove.com/en/DeveloperDocumentationUpdates.xml\"><img src=\"//docs.brightcove.com/en/images/rss-feed-sm.png\" alt=\"rss-feed-sm\" width=\"14\" height=\"14\"></a></li>",

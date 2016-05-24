@@ -39,7 +39,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         groupObj = {},
         alphaArr = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
         alphaObj = {},
-        topObj = {"text": "Top", "link": "top"},
+        topObj = {"text": "Top", "link": "bcls_header"},
         navLabel = [topObj],
         menuRightBase = "<li class=\"search\"><a href=\"#\" data-reveal-id=\"searchModal\"><img src=\"//docs.brightcove.com/en/images/search-white.png\" alt=\"search_icon_small_white\" width=\"18\" height=\"18\"></a></li><li class=\"show-for-xlarge-up\"><a href=\"http://docs.brightcove.com/en/DeveloperDocumentationUpdates.xml\"><img src=\"//docs.brightcove.com/en/images/rss-feed-sm.png\" alt=\"rss-feed-sm\" width=\"14\" height=\"14\"></a></li>",
         vcSupportNav = "<li class=\"smaller show-for-large-up\"><a href=\"//support.brightcove.com\">Support</a></li>",
