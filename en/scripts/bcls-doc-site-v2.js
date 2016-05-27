@@ -247,6 +247,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             max = navLabel.length,
             j,
             jMax;
+        bclslog('navLabel', navLabel);
         if (isDefined(sidenav)) {
             for (i = 0; i < max; i++) {
                 str += "<li style=\"padding:.2em\"><a href=\"#" + navLabel[i].link + "\">" + navLabel[i].text + " </a></li>";
@@ -271,6 +272,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             i,
             sectionEl;
         // set initial visibilities
+        bclslog('creating inpage nav', numSections);
         for (i = 0; i < numSections; i++) {
             if (i > 0) {
                 sectionEl = sectionElements.item(i);
