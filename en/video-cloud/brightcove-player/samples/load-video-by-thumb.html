@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
     <!-- change title to match the h1 heading -->
-    <title>Player Sample: Age Gate</title>
+    <title>Player Sample: Load Video by Thumbnail</title>
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
@@ -31,6 +31,21 @@
         ga('send', 'pageview');
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
+    <style>
+        figure.bcls-thumbnail {
+            display: inline-block;
+            cursor: pointer;
+            margin-left: 0;
+            margin-right: 1em;
+        }
+        figure.bcls-thumbnail figcaption {
+            font-size: .7em;
+            text-align: center;
+        }
+        figure.bcls-thumbnail img {
+            border: #333 1px solid;
+        }
+    </style>
 </head>
 
 <body>
@@ -48,15 +63,8 @@
         <div id="main" class="large-10 small-12 columns">
             <article class="bcls-article">
                 <header class="bcls-header" id="bcls_header">
-                    <h1>Player Sample: Age Gate</h1>
-                    <p>This topic shows you how to use a Brightcove player with a simple age gate overlay. The user must certify their age by clicking on the overlay text before the video will play.</p>
-                    <div class="bcls-aside bcls-aside--information">
-                        <h4>Plugins used</h4>
-                        <p>This example uses open source video.js plugins:</p>
-                        <ul>
-                            <li><a href="https://github.com/brightcove/videojs-overlay">videojs-overlay</a> : For details, refer to the <a href="../../brightcove-player/guides/overlay-plugin.html">Display Overlay Plugin</a> document.</li>
-                        </ul>
-                    </div>
+                    <h1>Player Sample: Load Video by Thumbnail</h1>
+                    <p>This topic shows you how to fetch information for additional videos using the player catalog. The thumbnail images for the videos are shown below the player, and clicking on one will load and play that video.</p>
                 </header>
 
                 <section id="Development_sequence" class="bcls-section">
@@ -72,30 +80,26 @@
                         </ol>
                         <p>For details about these steps, review the <a href="../../brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a> guide.</p>
                         <h3>iframe or embed_in_page</h3>
-                        <p>When developing enhancements for the Brightcove player you will need to decide if the code is a best fit for the iframe or embed_in_page implementation. The best practice recommendation is to build a plugin for use with an iframe
-                            implementation. The advantages of using the iframe player are:</p>
+                        <p>When developing enhancements for the Brightcove player you will need to decide if the code is a best fit for the iframe or embed_in_page implementation. The best practice recommendation is to build a plugin for use with an iframe implementation. The advantages of using the iframe player are:</p>
                         <ul>
                             <li>No collisions with existing JavaScript and/or CSS</li>
                             <li>Automatically responsive</li>
                             <li>The iframe eases use in social media apps (or whenever the video will need to "travel" into other apps)</li>
                         </ul>
-                        <p>Although integrating the embed_in_page player can be more complex, there are times when you will plan your code around that implementation. To generalize, this approach is best when the containing page needs to communicate to the
-                            player. Specifically, here are some examples:</p>
+                        <p>Although integrating the embed_in_page player can be more complex, there are times when you will plan your code around that implementation. To generalize, this approach is best when the containing page needs to communicate to the player. Specifically, here are some examples:</p>
                         <ul>
                             <li>Code in the containing page needs to listen for and act on player events</li>
                             <li>The player uses styles from the containing page</li>
                             <li>The iframe will cause app logic to fail, like a redirect from the containing page</li>
                         </ul>
-                        <p>Even if your final implementation does not use the iframe code, you can still use the embed_in_page code with a plugin for your JavaScript and a separate file for your CSS. This encapsulates your logic so that you can easily use
-                            it in multiple players.</p>
+                        <p>Even if your final implementation does not use the iframe code, you can still use the embed_in_page code with a plugin for your JavaScript and a separate file for your CSS. This encapsulates your logic so that you can easily use it in multiple players.</p>
                     </div>
                     <!-- id="expanderContent" -->
                 </section>
 
                 <section id="Select_implementation" class="bcls-section">
                     <h2>Select implementation</h2>
-                    <p>In this example, you will test with the embed_in_page code and then move the styles and scripts into separate files to test locally. Then, you will use the Embed API to append the age gate styles, script and plugin to a child player
-                        based on the properties of the parent. With this player, you can run this example as an iframe implementation.</p>
+                    <p>Although you can make the sample work with an iframe embed, because it manipulates the DOM around the player (to inject the thumnails for additonal videos), it is easier to use the in-page embed, as we do in this sample</p>
                 </section>
 
                 <section id="API_resources_used" class="bcls-section">
@@ -116,11 +120,17 @@
                     <h2>The player</h2>
                     <p>This example displays an overlay and hides the player controls and play button. When the user confirms their age by clicking on the overlay text, the controls are displayed and the video plays. Test the functionality by <strong>clicking on the text</strong>.</p>
 
-                    <video id="video_1" style="width: 640px; height: 360px;" data-video-id="4172255216001" data-account="1752604059001" data-player="NkBaWlzKl" data-embed="default" class="video-js" controls=""></video>
-                    <script src="//players.brightcove.net/1752604059001/NkBaWlzKl_default/index.min.js"></script>
-
+                    <video id="myPlayerID"
+                    data-video-id="4845798282001"
+                    data-account="1752604059001"
+                    data-player="HJHx0gc7"
+                    data-embed="default"
+                    class="video-js"
+                    controls
+                    style="width: 640px; height: 360px;"></video>
+                    <script src="//players.brightcove.net/1752604059001/HJHx0gc7_default/index.min.js"></script>
+                    <div id="videoList"></div>
                 </section>
-                <!-- id="player" -->
 
                 <section id="How_it_works" class="bcls-section">
                     <h2>How it works</h2>
@@ -135,12 +145,10 @@
                             <ol type="a">
                                 <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
                                 <li>The JavaScript for the plugin is provided and will not change for different plugin implementations. For the <strong>JavaScript URL</strong>, enter:
-                                    <textarea class="bcls-code">//players.brightcove.net/videojs-overlay/1/videojs-overlay.min.js</textarea>
-                                </li>
+                                    <textarea class="bcls-code">//players.brightcove.net/videojs-overlay/1/videojs-overlay.min.js</textarea></li>
                                 <li>The CSS for the plugin is provided and will not change for different plugin implementations. For the <strong>CSS URL</strong>, enter:
                                     <br/>
-                                    <textarea class="bcls-code">//players.brightcove.net/videojs-overlay/1/videojs-overlay.css</textarea>
-                                </li>
+                                    <textarea class="bcls-code">//players.brightcove.net/videojs-overlay/1/videojs-overlay.css</textarea></li>
                                 <li>For the <strong>Name</strong>, enter <strong>overlay</strong>.</li>
                                 <li>
                                     <p>Enter the plugin options. The example below displays clickable text when the video data is loaded, and hides the overlay once the video starts playing.</p>
@@ -287,14 +295,6 @@
                     <p>Browse the HTML page and you should see the player with the custom age gate overlay functioning correctly.</p>
                 </section>
 
-                <section id="Use_iframe" class="bcls-section">
-                    <h2>Use iframe</h2>
-                    <p>It is a best practice to use the iframe player implementation. If it is possible for this example, replace the embed_in_page implementation with the iframe implementation.</p>
-                    <p>Here is the complete code:</p>
-                    <aside class="bcls-aside bcls-aside--information">Here we added a <code>div</code> container around the <code>iframe</code> element to make it easier to reference the player code.</aside>
-                    <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="224-239"></code></p>
-                    <p>Browse the HTML page and you should see the player with the plugin functioning correctly.</p>
-                </section>
             </article>
             <section class="bcls-section" id="Related_topics">
                 <h2>Related Topics</h2>
@@ -320,6 +320,86 @@
     <script src="/en/scripts/select-code.js"></script>
     <script>
         $(document).foundation();
+    </script>
+    <script>
+        videojs("myPlayerID").ready(function() {
+            // videoIds are the ids for the videos to display
+            // videos is an array to hold the retrieved video objects
+            // player is a var we'll use to hold a reference to the player
+            // figures is a placeholder we'll use to store the collection of injected figure elements later
+            // videoList is a reference to the div element added to hold the thumbnails
+            // fragment is document fragment we'll store the elements for the thumbnail display in until we're ready to add them to the DOM
+            var videoIds = ['4825296720001', '4825279519001', '4825279542001'],
+                videos = [],
+                player = this,
+                i,
+                counter = 0,
+                figures,
+                videoList = document.getElementById('videoList'),
+                fragment = document.createDocumentFragment();
+
+            /**
+             * adds a retrieved video to an array so that it can loaded later
+             * and creates a figure/img/caption element block that to be injected
+             * into the DOM
+             *
+             * @param {Object} video video object to be added
+             * @param {Number} index
+             */
+            function addVideoToList(video, callback) {
+                // add elements for the thumbnail display
+                var figure = document.createElement('figure'),
+                    caption = document.createElement('figcaption'),
+                    thumbnail = document.createElement('img'),
+                    videoName;
+                // save the returned video object in the videos array
+                videos.push(video);
+                // attach the index of this video object to the figure element
+                figure.setAttribute('data-video-index', (videos.length - 1));
+                figure.setAttribute('class', 'bcls-thumbnail');
+                // set properties for the thumbnail and caption elements and put the figure together
+                thumbnail.setAttribute('src', video.thumbnail);
+                videoName = document.createTextNode(video.name);
+                caption.appendChild(videoName);
+                figure.appendChild(thumbnail);
+                figure.appendChild(caption);
+                // add the figure to the document fragment
+                fragment.appendChild(figure);
+                // increment the counter
+                counter++;
+                // if we've done all the videos in the id array, execute the callback
+                if (counter === videoIds.length) {
+                    callback();
+                }
+            }
+
+            function playVideo() {
+                var videoIndex = parseInt(this.getAttribute('data-video-index'));
+                    player.catalog.load(videos[videoIndex]);
+                    player.play();
+            }
+
+            function setUpVideoList() {
+                var i;
+                // now that the thumbnail display is complete, add it to the DOM
+                videoList.appendChild(fragment);
+                // get the figures collection
+                figures = document.getElementsByClassName('bcls-thumbnail');
+                // add event listener to the figures
+                for (i = 0; i < figures.length; i++) {
+                    figures[i].addEventListener('click', playVideo);
+                }
+            }
+
+            // retrieve the video objects
+            for (i = 0; i < videoIds.length; i++) {
+                player.catalog.getVideo(videoIds[i], function(error, video){
+                    // handle error here
+                    addVideoToList(video, setUpVideoList);
+                });
+            }
+
+        });
     </script>
     <!-- CSAT form -->
     <section class="bcls-section bcls-section--csat">
