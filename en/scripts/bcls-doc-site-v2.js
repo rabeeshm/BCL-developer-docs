@@ -272,34 +272,32 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             i,
             sectionEl;
         // set initial visibilities
-        bclslog('creating inpage nav', numSections);
+        bclslog('creating inpage nav', sectionElements);
         for (i = 0; i < numSections; i++) {
-            if (i > 0) {
-                sectionEl = sectionElements.item(i);
-                switch (product) {
-                case "video-cloud":
-                    if (!hasClass(sectionEl, "perform-only")) {
-                        navObj = {};
-                        navObj.link = sectionEl.getAttribute("id");
-                        navObj.text = sectionEl.children[0].innerHTML;
-                        navLabel.push(navObj);
-                    }
-                    break;
-                case "perform":
-                    if (!hasClass(sectionEl, "video-cloud-only")) {
-                        navObj = {};
-                        navObj.link = sectionEl.getAttribute("id");
-                        navObj.text = sectionEl.children[0].innerHTML;
-                        navLabel.push(navObj);
-                    }
-                    break;
-                default:
+            sectionEl = sectionElements[i];
+            switch (product) {
+            case "video-cloud":
+                if (!hasClass(sectionEl, "perform-only")) {
                     navObj = {};
                     navObj.link = sectionEl.getAttribute("id");
                     navObj.text = sectionEl.children[0].innerHTML;
                     navLabel.push(navObj);
-                    break;
                 }
+                break;
+            case "perform":
+                if (!hasClass(sectionEl, "video-cloud-only")) {
+                    navObj = {};
+                    navObj.link = sectionEl.getAttribute("id");
+                    navObj.text = sectionEl.children[0].innerHTML;
+                    navLabel.push(navObj);
+                }
+                break;
+            default:
+                navObj = {};
+                navObj.link = sectionEl.getAttribute("id");
+                navObj.text = sectionEl.children[0].innerHTML;
+                navLabel.push(navObj);
+                break;
             }
         }
         // only create the nav widget if there is more than one item
