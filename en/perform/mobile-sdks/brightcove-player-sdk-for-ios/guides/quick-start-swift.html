@@ -109,13 +109,15 @@
 					</ol>
 					
 					<h3 id="dependencies">Add the SDK and its dependencies to your project</h3>
-					<p>The easiest way to add the SDK and its dependencies to your project is to use CocoaPods. If you do not have CocoaPods installed, see the installation instructions on the <a href="//cocoapods.org">CocoaPods</a> site.</p>
+          <p>The easiest way to add the SDK and its dependencies to your project is to use CocoaPods.</p>
+          <p>CocoaPods is a dependency manager that adds libraries to your project. It is not required, but makes installation easier. To install CocoaPods, see the instructions on the <a href="//cocoapods.org">CocoaPods</a> site.</p>
           <p class="BCL-aside" style="padding:1em;">Note: CocoaPods version 0.39 or newer is required.</p>
 					<p class="text-warning">Using CocoaPods (the <code>pod</code> tool) on an existing Xcode project will modify the project file. You may want to make a backup before doing this.</p>
 						<ol start="6">
 							<li><p>In your project folder, create a plain text file called <strong>Podfile</strong> (no file extension).</p></li>
 							<li><p>Using a text editor, add the following lines of code to the Podfile and save it. This code does the following:</p></li>
 								<ul>
+                  <li>Points to the GitHub location for the Brightcove pod specs.</li>
 									<li>Defines the iOS platform version.</li>
 									<li>Installs the current version of the Brightcove player SDK.</li>
 								</ul>
@@ -138,8 +140,10 @@ pod 'Brightcove-Player-SDK'</code></pre></p>
 				</div>
       
         <div class="section" id="bridgingHeader">
-						<h2>Add a bridging header</h2>
-							<p>Since the Brightcove Player SDK for iOS is currently written in Obj-C, we can use a bridging header file to add Obj-C libraries to our Swift project.</p>
+						<h2>Import the Native SDK for iOS</h2>
+							<p>Swift is compatible with Obj-C, and you can have both in the same project. Since the Brightcove Player SDK for iOS is currently written in Obj-C, we can use a bridging header file to add these libraries to our Swift project.</p>
+            <h3>Create a bridging header</h3>
+            <p>You will create a bridging header to import the Native SDK for iOS.</p>
             <ol>
               <li>In Xcode, open the <strong>Simple-Video-Playback.xcworkspace</strong> file.</li>
               <li>In the left project navigation, select the <strong>Simple-Video-Playback</strong> folder.
@@ -164,8 +168,10 @@ pod 'Brightcove-Player-SDK'</code></pre></p>
 					<h2>Code the video app</h2>
 					<p>Create the code for a simple video playback app.</p>
           
-					<h3 id="appdelegate">Define the audio session category</h3>
-					<p>To ensure that the audio plays back when we expect it to, set the audio session category when the app finishes launching. To keep it simple, put the code for this in the App Delegate.</p>
+					<h3 id="appdelegate">Set the audio behavior for the app</h3>
+          <p>The audio session handles audio behavior at the app level. Learn more about the <a href="https://developer.apple.com/library/ios/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/Introduction/Introduction.html">AVAudioSession</a> class.</p>
+          <p>You can choose from several audio session categories and settings to customize your app's audio behavior. <a href="https://developer.apple.com/library/ios/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/AudioSessionBasics/AudioSessionBasics.html#//apple_ref/doc/uid/TP40007875-CH3-SW1">Choose the best audio session category</a> for your app.</p>
+          <p>For this sample, we will use <code>AVAudioSessionCategoryPlayback</code>. This plays audio even when the screen is locked and with the Ring/Silent switch set to silent. To keep it simple, we will put the code for this in the App Delegate.</p>
 					<ol>
 						<li><p>In your project, open the App Delegate file (<strong>AppDelegate.swift</strong>).</p></li>
 						<li><p>In the <code>didFinishLaunchingWithOptions</code> function, add code to set the audio session category. Make sure you import the <code>AVFoundation</code> framework.</p></li>
@@ -177,6 +183,7 @@ pod 'Brightcove-Player-SDK'</code></pre></p>
 					
 					<div class="video-cloud-only">
             <h4>Set the playback controller delegate</h4>
+            <p>This allows your app to listen and respond to video playback events.</p>
             <ol start="3">
               <li><p>Update the View Controller class to include the Brightcove playback controller delegate.</p></li>
               <p><code data-gist-id="ffab3777678c48c7212d" data-gist-line="158" data-gist-hide-footer="true"></code></p>
@@ -203,11 +210,11 @@ pod 'Brightcove-Player-SDK'</code></pre></p>
             <ol start="5">
               <li><p>In the <code>ViewController</code> class, add the following :</p>
               <ul>
-                <li>Line 160: defines a constant, which initializes the Brightcove playback service with your Account ID and Policy Key.</li>
-                <li>Line 161: defines a constant for the playback controller.</li>
+                <li>Line 160: defines a constant, which initializes the Brightcove playback service with your Account ID and Policy Key. The <a href="//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/reference/current/Classes/BCOVPlaybackService.html"><code>BCOVPlaybackService</code></a> class provides asynchronous methods for retrieving data from the Playback API.</li>
+                <li>Line 161: defines a constant for the playback controller. The <a href="//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/reference/current/Protocols/BCOVPlaybackController.html"><code>BCOVPlaybackController</code></a> has methods to control playback functionality.</li>
                 <li><p>Line 162: defines a variable for the view.</p></li>
-                </ul></li>
-                <p><code data-gist-id="ffab3777678c48c7212d" data-gist-line="158-162" data-gist-highlight-line="160-162"></code></p>
+              </ul></li>
+              <p><code data-gist-id="ffab3777678c48c7212d" data-gist-line="158-162" data-gist-highlight-line="160-162"></code></p>
             </ol>
             
             <h4>Create an init function</h4>
@@ -264,6 +271,7 @@ pod 'Brightcove-Player-SDK'</code></pre></p>
 
           <div class="perform-only">
             <h4>Set the playback controller delegate</h4>
+            <p>This allows your app to listen and respond to video playback events.</p>
             <ol start="3">
               <li><p>Update the View Controller class to include the Brightcove playback controller delegate.</p></li>
               <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="77" data-gist-hide-footer="true"></code></p>
@@ -280,7 +288,7 @@ pod 'Brightcove-Player-SDK'</code></pre></p>
             <ol start="5">
               <li><p>In the <code>ViewController</code> class, add the following :</p>
               <ul>
-                <li>Line 79: defines a constant for the playback controller.</li>
+                <li>Line 79: defines a constant for the playback controller. The <a href="//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/reference/current/Protocols/BCOVPlaybackController.html"><code>BCOVPlaybackController</code></a> has methods to control playback functionality.</li>
                 <li><p>Line 80: defines a variable for the view.</p></li>
                 </ul></li>
                 <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="77-80" data-gist-hide-footer="true" data-gist-highlight-line="79-80"></code></p>
