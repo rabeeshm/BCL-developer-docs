@@ -32,8 +32,11 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
     <style>
+        /*figure elements for thumbnails*/
         figure.bcls-thumbnail {
+            /*display as horizontal list*/
             display: inline-block;
+            /*change the cursor to show they're clickable*/
             cursor: pointer;
             margin-left: 0;
             margin-right: 1em;
@@ -107,18 +110,19 @@
                     <p>The following sections detail resources used from various APIs.</p>
                     <h3>Brightcove player API methods</h3>
                     <ul>
-                        <li><code>removeClass()</code></li>
-                        <li><code>play()</code></li>
+                        <li><code>player.catalog.getVideo()</code></li>
+                        <li><code>player.catalog.load()</code></li>
+                        <li><code>player.play()</code></li>
                     </ul>
                     <h3>Brightcove player API events</h3>
                     <ul>
-                        <li><code>loadedmetadata</code></li>
+                        <li><code>player.ready</code></li>
                     </ul>
                 </section>
 
                 <section id="The_player" class="bcls-section">
                     <h2>The player</h2>
-                    <p>This example displays an overlay and hides the player controls and play button. When the user confirms their age by clicking on the overlay text, the controls are displayed and the video plays. Test the functionality by <strong>clicking on the text</strong>.</p>
+                    <p>This example displays displays thumbnails of additional videos below the player. Test the functionality by <strong>clicking on a thumbnail</strong>.</p>
 
                     <video id="myPlayerID"
                     data-video-id="4845798282001"
@@ -139,168 +143,58 @@
                     <p>To create a player and assign a video to it, follow these steps:</p>
                     <ol>
                         <li>In the <strong>Players</strong> module, create a new player or use an existing one.</li>
-                        <li>
-                            <p>For this example, you will need to add the Overlay plugin to the player:</p>
-                            <p class="bcls-aside bcls-aside--information">For more information about the Overlay plugin, see the <a href="../../brightcove-player/guides/overlay-plugin.html">Display Overlay Plugin</a> document. To review the plugin versions, see the <a href="../../brightcove-player/reference/plugin-version-reference.html">Plugin Version Reference</a>                                document.</p>
-                            <ol type="a">
-                                <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
-                                <li>The JavaScript for the plugin is provided and will not change for different plugin implementations. For the <strong>JavaScript URL</strong>, enter:
-                                    <textarea class="bcls-code">//players.brightcove.net/videojs-overlay/1/videojs-overlay.min.js</textarea></li>
-                                <li>The CSS for the plugin is provided and will not change for different plugin implementations. For the <strong>CSS URL</strong>, enter:
-                                    <br/>
-                                    <textarea class="bcls-code">//players.brightcove.net/videojs-overlay/1/videojs-overlay.css</textarea></li>
-                                <li>For the <strong>Name</strong>, enter <strong>overlay</strong>.</li>
-                                <li>
-                                    <p>Enter the plugin options. The example below displays clickable text when the video data is loaded, and hides the overlay once the video starts playing.</p>
-                                    <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="252-259"></code></p>
-                                    <figure class="bcls-figure">
-                                        <img class="bcls-image" src="../../brightcove-player/samples/assets/age-gate-overlay.png" alt="Age Gate Overlay Plugin">
-                                        <figcaption class="bcls-caption--image">Age Gate Overlay Plugin</figcaption>
-                                    </figure>
-                            </ol>
-                            </li>
-                            <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
-                            <li><span class="video-cloud-only">In the <strong>Media</strong> module, select a video and publish it with this player.</span><span class="perform-only">Assign video content to the player and publish it.</span></li>
-                            <li>Copy the In-Page embed code and paste it into a new HTML file.</li>
+                        <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
+                        <li>You can assign dimensions to the player and <strong>Publish</strong> it to save the changes, or you can set the dimensions when you add the embed code to the page.</li>
+                        <li>In the <strong>Media</strong> module, select a video and publish it with this player.</li>
+                        <li>Copy the Advanced (In-Page) embed code and paste it into a new HTML file.</li>
                     </ol>
                     <p class="bcls-aside bcls-aside--information">For details on how to get this embed code, see the <a href="../../brightcove-player/getting-started/quick-start-bc-player.html">Quick Start to Brightcove Player</a> document.</p>
-
-                    <p>The embed code should look like this:</p>
-                    <p class="video-cloud-only"><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="84-91"></code></p>
-                    <p class="perform-only"><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="84,86-91"></code></p>
-
+                    <ol start="6">
+                        <li>Add an <code>id</code> attribute to the video tag, and give it the value <code>myPlayerID</code></li>
+                        <li>The embed code should look like this:
+<pre><code>&lt;video <span style="background-color:#FFFF00">id="myPlayerID"</span>
+data-video-id="4845798282001"
+data-account="1752604059001"
+data-player="HJHx0gc7"
+data-embed="default"
+class="video-js"
+controls
+style="width: 640px; height: 360px;"&gt;&lt;/video&gt;
+&lt;script src="//players.brightcove.net/1752604059001/HJHx0gc7_default/index.min.js"&gt;&lt;/script&gt;</code></pre>
+                        </li>
+                    </ol>
                     <h3>The HTML code</h3>
-                    <p>No extra HTML code is needed for this example, until you get to the iframe implementation.</p>
+                    <ol start="8">
+                        <li>After the player embed code, add a <code>&lt;div&gt;</code> tag with the id <strong>videoList</strong>:
+<pre><code><div id="videoList"></div></code></pre>
+                        </li>
+                    </ol>
 
                     <h3>The JavaScript code</h3>
-                    <p>Add the following JavaScript to your page code.</p>
-                    <p>Here you will use the player's <code>addClass()</code> and <code>removeClass()</code> methods to hide and then show the player controls. We'll look at the details of the <code>video-agelist</code> class in the next section.</p>
-                    <ul>
-                        <li>Line 99: Gets a reference to the player when it is ready.</li>
-                        <li>Line 100: Adds the class which hides the player controls and the big play button.</li>
-                        <li>Line 102: Listens for when the player has initial duration and dimension information.</li>
-                        <li>Line 103: Gets a reference to the age verification text in the overlay.</li>
-                        <li>Line 104: Listens for when the user clicks the age verification text.</li>
-                        <li>Line 105: Removes the class which hides the player controls and the big play button.</li>
-                        <li>Line 106: Starts video playback.</li>
-                    </ul>
-                    <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="94-110"></code></p>
-
+                    <ol start="9">
+                        <li>Copy and include the code below and include it as a script in your page:
+                        <script src="https://gist.github.com/ca3555f4a127ce9e986f4679950f2294.js"></script>
+                        </li>
+                        <li>See the comments in the code for an explanation of how it works. Here are a few additional notes:
+                            <ul>
+                                <li>Everything happens inside a listener for the player <code>ready</code> event, meaning that we are waiting for player to be ready before doing anything</li>
+                                <li>Lines 13 and 46: the counter is needed because the <code>catalog.getVideo()</code> call is asynchronous and there is no way to know what order the videos will come back in. If the order they come back is important to you, instead of making the <code>getVideo()</code> calls in a <code>for</code> loop, wait for one result before make the next request. (The performance will be slightly slower, but the difference shouldn't be noticeable.)</li>
+                            </ul>
+                        </li>
+                    </ol>
                     <h3>The stylesheet</h3>
-                    <p>This example uses CSS styles for the Brightcove player and the Overlay plugin.</p>
-                    <ul>
-                        <li>Lines 53-65: Override the default styles for the Overlay plugin.</li>
-                        <li>Lines 67-70: Hide the player controls and the big play button.</li>
-                        <li>Lines 72-74: Set the cursor for the age verification text in the overlay.</li>
-                        <li>Lines 76-79: Set the dimensions of the player.</li>
-                    </ul>
-                    <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="51-80"></code></p>
-                    <h4>Hiding player controls</h4>
-                    <p>Let's take a closer look at how we used CSS to hide the big play button and the control bar. For an introduction about changing the appearance of the Brightcove player, see the <a href="../../brightcove-player/guides/customize-appearance.html">Customize Player Appearance</a>                        guide.</p>
-                    <p>First, let's change the style to hide the player's big play button.</p>
-                    <ol>
-                        <li>In the Chrome browser, open the <strong>Developer Tools</strong>.</li>
-                        <li>Right click on the player and select <strong>Inspect Element</strong>.</li>
-                        <li>In the <strong>Elements</strong> section of the <strong>Developer Tools</strong>, select the HTML associated with the big play button.</li>
-                        <li>In the <strong>Styles</strong> section, you can see that the original <code>display</code> property with a value of <code>block</code> is set on the <code>div</code> element.
-                            <figure class="bcls-figure">
-                                <img class="bcls-image" src="../../brightcove-player/samples/assets/age-gate-hide-button.png" alt="Hide Big Play Button">
-                                <figcaption class="bcls-caption--image">Hide Big Play Button</figcaption>
-                            </figure>
-                        </li>
-                        <li>When overriding CSS values, more specific styles win over less specific ones. Since elements have the lowest specificity value, we can override the display property by simply specifying the <code>vjs-big-play-button</code> class.</li>
-                        <li>Look at our CSS for the big play button below. In this example, we are saying select all elements with a class name of <code>vjs-big-play-button</code> which are decendents of the element with class name of <code>video-agelist</code>.
-                            Remember that in the JavaScript code, we added the <code>video-agelist</code> class to the player.
-                            <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="67-70" data-gist-highlight-line="68,69"></code></p>
+                    <ol start="11">
+                        <li>Add the following CSS code to your page:
+                        <script src="https://gist.github.com/06f7c3899c51225602ce0a8c2958311f.js"></script>
                         </li>
                     </ol>
-
-                    <p>Next, let's change the style to hide the player's control bar.</p>
-                    <ol>
-                        <li>In the <strong>Elements</strong> section of the <strong>Developer Tools</strong>, select the HTML associated with the player control bar.</li>
-                        <li>In the <strong>Styles</strong> section, you can see that the original <code>display</code> property with a value of <code>flex</code> is set with three class attributes in the selector.
-                            <figure class="bcls-figure">
-                                <img class="bcls-image" src="../../brightcove-player/samples/assets/age-gate-hide-controls.png" alt="Hide Control Bar">
-                                <figcaption class="bcls-caption--image">Hide Control Bar</figcaption>
-                            </figure>
-                        </li>
-                        <li>To override the style for the control bar, we need at least three class attributes in our selector, including the <code>vjs-control-bar</code> class.</li>
-                        <li>Look at our CSS for the control bar below. In this example, we are saying select all elements with a class name of <code>vjs-control-bar</code> which are decendents of the element with both a class name of <code>video-agelist</code>                            and a class name of <code>video-js</code>.
-                            <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="67-70" data-gist-highlight-line="67,69"></code></p>
-                            <p>For more information about calculating specificity value, see the <a href="//css-tricks.com/specifics-on-css-specificity/">Specifics on CSS Specificity</a> page.</p>
-                        </li>
-
-                    </ol>
-
+                    <aside class="bcls-aside bcls-aside--information">The CSS used here is for the thumbnail list only - the player styles are not modified. To display the thumbnails differently, you simply need to modify the CSS.</aside>
                 </section>
-
-                <section id="Use_a_plugin" class="bcls-section">
-                    <h2>Use a plugin</h2>
-                    <p>It is a best practice to use a plugin so that you can easily add this functionality to multiple players. </p>
-
-                    <h3>Create the JavaScript file</h3>
-                    <p>Move the plugin's JavaScript code to a file located on your machine for easy testing.</p>
-                    <ul>
-                        <li>Create a new file for your plugin JavaScript code. In this case, name it <code>age-gate.js</code>.</li>
-                        <li>Cut and paste the JavaScript code from your main HTML file into this new file.</li>
-                        <li>Lines 122,135: Wrap your JavaScript code using the <code>videojs.plugin()</code> function. The first argument, <code>ageGate</code>, is the plugin name.</li>
-                        <li>Line 123: Gets a reference to your player.</li>
-                        <li>The rest is your JavaScript code which was reviewed in a previous section.</li>
-                    </ul>
-                    <p class="bcls-aside bcls-aside--warning">Line 135: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</p>
-                    <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="119-135"></code></p>
-                    <ol start="6">
-                        <li>In the HTML file, add the following code just below the existing <code>&lt;script&gt;</code> tags. This code includes the JavaScript file and then calls the method defined in that JavaScript.</li>
-                    </ol>
-                    <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="160-161"></code></p>
-                    <ol start="7">
-                        <li>Browse the HTML page. You should see that the age gate overlay still works, except now your JavaScript code has been removed from the HTML page.</li>
-                    </ol>
-
-                    <h3>Create the CSS file</h3>
-                    <p>If you are using CSS, move styles to a file located on your machine for easy testing.</p>
-                    <ol>
-                        <li>Create a new file for your CSS styles. In this case, name it <code>age-gate.css</code>.</li>
-                        <li>In the <code>&lt;head&gt;</code> section of your HTML file, add the following link to include your newly created CSS file.</li>
-                    </ol>
-                    <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="146"></code></p>
-                    <ol start="3">
-                        <li>Browse the HTML page. You should see that the navigate on end link still works, except now your styles have been removed from the HTML page.</li>
-                    </ol>
-                    <p>When you have finished testing the functionality of your plugin code, you are ready to implement the plugin in the player as described in the next step.</p>
-
-                    <h3>Implement using Players module</h3>
-                    <p>To implement your plugin using the Players module, follow these steps:</p>
-                    <ol>
-                        <li>Copy the plugin's JavaScript file and place it in an Internet accessible URL.</li>
-                        <li>Copy the styles file and place it in an Internet accessible URL.</li>
-                        <li>Open the <strong>Players</strong> module and locate the player.</li>
-                        <li>Click the link for the player to open the player properties.</li>
-                        <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
-                        <li>For the <strong>JavaScript URL</strong>, enter the URL for the file you created in step 1.</li>
-                        <li>For the <strong>CSS URL</strong>, enter the URL for the file you created in step 2.</li>
-                        <li>For the <strong>Name</strong>, enter your plugin name. In this example, we are using <strong>ageGate</strong>.
-                            <figure class="bcls-figure">
-                                <img class="bcls-image" src="../../brightcove-player/samples/assets/age-gate-plugin.png" alt="Age Gate Plugin">
-                                <figcaption class="bcls-caption--image">Age Gate Plugin</figcaption>
-                            </figure>
-                        </li>
-                        <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
-                        <li class="video-cloud-only">In the <strong>Media</strong> module, select a video and publish it with this player.</li>
-                        <li>Copy the In-Page embed code and paste it into a new HTML file. Your page should look similar to this:</li>
-                    </ol>
-
-                    <p class="video-cloud-only"><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="198-217"></code></p>
-                    <p class="perform-only"><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="198-207,209-217"></code></p>
-                    <p>Browse the HTML page and you should see the player with the custom age gate overlay functioning correctly.</p>
-                </section>
-
             </article>
             <section class="bcls-section" id="Related_topics">
                 <h2>Related Topics</h2>
                 <ul>
                     <li><a href="../../player-management/guides/player-configuration.html">Player Configuration Guide</a></li>
-                    <li><a href="../../brightcove-player/guides/plugin-guide.html">Plugin Guide</a></li>
                 </ul>
             </section>
         </div>
@@ -329,7 +223,8 @@
             // figures is a placeholder we'll use to store the collection of injected figure elements later
             // videoList is a reference to the div element added to hold the thumbnails
             // fragment is document fragment we'll store the elements for the thumbnail display in until we're ready to add them to the DOM
-            var videoIds = ['4825296720001', '4825279519001', '4825279542001'],
+            var // note that you need to substitute your own video ids for the ones below
+                videoIds = ['4825296720001', '4825279519001', '4825279542001'],
                 videos = [],
                 player = this,
                 i,
@@ -344,7 +239,7 @@
              * into the DOM
              *
              * @param {Object} video video object to be added
-             * @param {Number} index
+             * @param {Function} callback function to call when all videos are retrieved
              */
             function addVideoToList(video, callback) {
                 // add elements for the thumbnail display
@@ -373,12 +268,22 @@
                 }
             }
 
+            /**
+             * event handler for click events on the thumbnails - loads and plays the associated video
+             */
             function playVideo() {
                 var videoIndex = parseInt(this.getAttribute('data-video-index'));
                     player.catalog.load(videos[videoIndex]);
                     player.play();
             }
 
+            /**
+             * callback function passed to addVideoToList
+             * appends the doc fragment holding the figure blocks
+             * to the DOM, gets a collection of the figure elements,
+             * and adds an event listener to each figure to play
+             * the associated video
+             */
             function setUpVideoList() {
                 var i;
                 // now that the thumbnail display is complete, add it to the DOM
@@ -398,7 +303,6 @@
                     addVideoToList(video, setUpVideoList);
                 });
             }
-
         });
     </script>
     <!-- CSAT form -->
