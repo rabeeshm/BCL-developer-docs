@@ -111,7 +111,8 @@
 					</ol>
 					
 					<h3 id="dependencies">Add the SDK and its dependencies to your project</h3>
-					<p>The easiest way to add the SDK and its dependencies to your project is to use CocoaPods. If you do not have CocoaPods installed, see the installation instructions on the <a href="//cocoapods.org">CocoaPods</a> site.</p>
+					<p>The easiest way to add the SDK and its dependencies to your project is to use CocoaPods.</p>
+          <p>CocoaPods is a dependency manager that adds libraries to your project. It is not required, but makes installation easier. To install CocoaPods, see the instructions on the <a href="//cocoapods.org">CocoaPods</a> site.</p>
           <p class="BCL-aside" style="padding:1em;">Note: CocoaPods version 0.39 or newer is required.</p>
 					<p class="text-warning">Using CocoaPods (the <code>pod</code> tool) on an existing Xcode project will modify the project file. You may want to make a backup before doing this.</p>
 						<ol start="6">
@@ -138,8 +139,10 @@
 				</div>
       
         <div class="section" id="bridgingHeader">
-						<h2>Add a bridging header</h2>
-							<p>Since the Brightcove Player SDK for tvOS is currently written in Obj-C, we can use a bridging header file to add Obj-C libraries to our Swift project.</p>
+						<h2>Import the Native SDK</h2>
+							<p>Swift is compatible with Obj-C, and you can have both in the same project. Since the Brightcove Player SDK for iOS is currently written in Obj-C, we can use a bridging header file to add these libraries to our Swift project.</p>
+            <h3>Create a bridging header</h3>
+            <p>You will create a bridging header to import the Native SDK for iOS.</p>
             <ol>
               <li>In Xcode, open the <strong>Simple-Video-Playback.xcworkspace</strong> file.</li>
               <li>In the left project navigation, select the <strong>Simple-Video-Playback</strong> folder.
@@ -164,8 +167,10 @@
 					<h2>Code the video app</h2>
 					<p>Create the code for a simple video playback app.</p>
           
-					<h3 id="appdelegate">Define the audio session category</h3>
-					<p>To ensure that the audio plays back when we expect it to, set the audio session category when the app finishes launching. To keep it simple, put the code for this in the App Delegate.</p>
+					<h3 id="appdelegate">Set the audio behavior for the app</h3>
+					<p>The audio session handles audio behavior at the app level. Learn more about the <a href="https://developer.apple.com/library/ios/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/Introduction/Introduction.html">AVAudioSession</a> class.</p>
+          <p>You can choose from several audio session categories and settings to customize your app's audio behavior. <a href="https://developer.apple.com/library/ios/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/AudioSessionBasics/AudioSessionBasics.html#//apple_ref/doc/uid/TP40007875-CH3-SW1">Choose the best audio session category</a> for your app.</p>
+          <p>For this sample, we will use <code>AVAudioSessionCategoryPlayback</code>. This plays audio even when the screen is locked and with the Ring/Silent switch set to silent. To keep it simple, we will put the code for this in the App Delegate.</p>
 					<ol>
 						<li><p>In your project, open the App Delegate file (<strong>AppDelegate.swift</strong>).</p></li>
 						<li><p>In the <code>didFinishLaunchingWithOptions</code> function, add code to set the audio session category. Make sure you import the <code>AVFoundation</code> framework.</p></li>
@@ -179,15 +184,17 @@
 						<h4>Customize the project with your values</h4>
             <p>Add values to access your Video Cloud account.</p>
             <ol start="3">
-              <li><p>Below the <code>import</code> directives, add your own values for the following:</p></li>
+              <li><p>Below the <code>import</code> directives, add your own values for the following:</p>
                   <ul>
 										<li><p>Your Brightcove Playback API Policy Key</p>
 										<p class="BCL-aside">Note: This sample calls the Playback API to get a video from a Video Cloud account. For this, you will need a Policy Key. Learn how to get a Policy Key in the <a href="../../../player-management/guides/OAuth.html">OAuth Guide</a>.</p></li>
                     <li>Your Video Cloud Account ID</li>
                     <li>Your Video Cloud Video ID</li>
                   </ul>
-                <p><code data-gist-id="d1e5b16b1a6f14dd686a132c2e75ef34" data-gist-line="12-14"></code></p>
+                <p><code data-gist-id="d1e5b16b1a6f14dd686a132c2e75ef34" data-gist-line="12-14"></code></p></li>
+            </ol>
             <h4>Set the playback controller delegate</h4>
+            <p>This allows your app to listen and respond to video playback events.</p>
             <ol start="4">
               <li><p>Update the View Controller class to include the Brightcove playback controller delegate.</p></li>
               <p><code data-gist-id="d1e5b16b1a6f14dd686a132c2e75ef34" data-gist-line="16"></code></p>
@@ -276,6 +283,7 @@
               <p><code data-gist-id="c70e9cbd0f609bc473dd5e2e2ee4bbba" data-gist-line="11" data-gist-hide-footer="true"></code></p>
             </ol>
             <h4>Set the playback controller delegate</h4>
+            <p>This allows your app to listen and respond to video playback events.</p>
             <ol start="4">
               <li><p>Update the View Controller class to include the Brightcove playback controller delegate.</p></li>
               <p><code data-gist-id="c70e9cbd0f609bc473dd5e2e2ee4bbba" data-gist-line="13" data-gist-hide-footer="true"></code></p>
@@ -355,15 +363,28 @@
 -->
 
       <div id="ats" class="section">
-				<h2>Configure App Transport Security (ATS)</h2>
-          <p>With Apple's release of the iOS 9 SDK, a new feature called <a href="https://developer.apple.com/library/prerelease/ios/technotes/App-Transport-Security-Technote/">App Transport Security (ATS)</a> enforces secure connections between an app and web services.</p>
+        <h2>Manage Media Security</h2>
+        <p>App Transport Security (ATS) enforces secure connections between your app and web services.</p>
+				<h3>Configure App Transport Security (ATS)</h3>
+        <p>With Apple's release of the iOS 9 SDK, a new feature called <a href="https://developer.apple.com/library/prerelease/ios/technotes/App-Transport-Security-Technote/">App Transport Security (ATS)</a> was added.</p>
         <p class="text-warning">Note: This is only an issue if you are building applications that target the iOS 9 SDK or later. Since ATS restrictions do not apply to previous versions of the iOS SDK, you can skip this section if you are working with a previous version.</p>
+        <p>You can do either:</p>
+        <ul>
+          <li>Build your app with ATS enabled
+          <ul>
+            <li>You must use https to deliver your media content</li>
+            </ul></li>
+          <li>Disable ATS requirements
+          <ul>
+            <li>You can use http to deliver your media content</li>
+            </ul></li>
+        </ul>
+        <p>To learn more, see the <a href="../../brightcove-player-sdk-for-ios/guides/ats.html">Working with App Transport Security (ATS)</a> document.</p>
         
         <p>If you try to build and run the app that you created by following the steps in this guide, you may encounter this error message:</p>
         <pre><code>App Transport Security has blocked a cleartext HTTP (http://) resource load since it is insecure. 
 Temporary exceptions can be configured via your app's Info.plist file.</code></pre>
 				<p>This means that ATS is enabled, but your system is not configured to meet the ATS requirements.</p>
-				<p>Support for ATS within the Brightcove ecosystem is now available. You can either build your application with ATS enabled or you can disable the ATS requirements. To learn more, see the <a href="../../brightcove-player-sdk-for-ios/guides/ats.html">Working with App Transport Security (ATS)</a> document.</p>
       </div>
 
 			<div id="runApp" class="section">
