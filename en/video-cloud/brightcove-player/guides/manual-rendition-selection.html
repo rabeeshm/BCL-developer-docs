@@ -54,33 +54,33 @@
             <article class="bcls-article">
                 <header class="bcls-header" id="bcls_header">
                     <h1>Manual Rendition Selection</h1>
-                    <p>This topic shows you how to use the <code>representations()</code> method from the Manual Rendition API to provide an HTML <code>&lt;select&gt;</code> control in Brightcove Player's controlbar, from which a viewer of the video can then select either low or high quality renditions to view, as shown in the following screenshot.</p>
+                    <p>This topic shows you how to use the <code>representations()</code> method from the Manual Rendition API to provide an HTML <code>&lt;select&gt;</code> element in Brightcove Player's controlbar, from which a viewer of the video can then select either low or high quality renditions to view, as shown in the following screenshot.</p>
                     <figure class="bcls-figure">
                         <img class="bcls-image" src="../../brightcove-player/guides/assets/manual-rendition-selection/show-select.png" alt="select in controlbar">
                     </figure>
                     <p> In this example, high and low quality are defined by the top two and bottom two quality renditions.</p>
                     <div class="bcls-aside bcls-aside--information">
-                        <p>At this time the Manual Rendition API ONLY works with DASH videos. Support for other playback technologies is planned.</p>
+                        <p>At this time the Manual Rendition API ONLY works with DRM-protected content via DASH videos. Support for other playback technologies is planned.</p>
                     </div>
                 </header>
                 <section id="Implementation_considerations" class="bcls-section">
                     <h2>Implementation considerations</h2>
                     <p>There are a number of considerations and technical concepts to understand before using the Manual Rendition API, some are listed here:</p>
                     <ul>
-                      <li>As mentioned earlier, currently the Manual Rendition Selection API is only available for DASH encoded videos and is implemented as part of the DASH plugin.</li>
+                      <li>As mentioned earlier, currently the Manual Rendition Selection API is only available for DRM-protected content via DASH encoded videos and is implemented as part of the DASH plugin.</li>
                       <li>In Video Cloud different versions of a video are generally referred to as <em>renditions</em>. In DASH speak, the term for the different versions is <em>representations</em>.</li>
-                      <li>Each representation is an object made up of the following properties:</li>
+                      <li>Each representation is an object made up of the four properties and one method:</li>
                       <ul>
-                        <li>ID</li>
-                        <li>Width</li>
-                        <li>Height</li>
-                        <li>Bandwidth</li>
-                        <li>Enabled</li>
+                        <li>id</li>
+                        <li>width</li>
+                        <li>height</li>
+                        <li>bandwidth</li>
+                        <li>enabled() method</li>
                       </ul>
-                      <li>The player examines an array for possible representations for playback. Only those with the <code>enabled</code> property set to <code>true</code> are eligible for playback.</li>
+                      <li>The player examines an array for possible representations for playback. Only those with the <code>enabled</code> method set to <code>true</code> are eligible for playback.</li>
                       <li>The <code>representations()</code> method returns an array of representations.</li>
-                      <li>The value of the <code>enabled</code> property is set by calling the particular representation's <code>enabled(boolean)</code> method.</li>
-                      <li>When lower quality representations are the only ones with an <code>enabled</code> property marked true, the player will play all downloaded higher quality segments before the poorer quality segments begin to play. No specific length of time can be stated, but in testing this can be up to one minute.</li>
+                      <li>The value of <code>enabled</code> is set by calling the particular representation's <code>enabled(boolean)</code> method.</li>
+                      <li>When lower quality representations are the only ones with <code>enabled</code> set to true, the player will play all downloaded higher quality segments before the poorer quality segments begin to play. No specific length of time can be stated, but in testing this can be up to one minute.</li>
                       <li>In Safari, IE and Firefox, if you do not have Silverlight installed in the browser you will be prompted to do so. You will see the following badge:
                         <figure class="bcls-figure">
                             <img class="bcls-image"  width="307" height="166" src="../../brightcove-player/guides/assets/manual-rendition-selection/install-silverlight.png" alt="silverlight badge">
@@ -104,11 +104,11 @@
                       <li>A Brightcove Player using the in-page embed code</li>
                       <li>An event handler listening for the <code>loadedmetadata</code> event that performs the following:</li>
                       <ul>
-                        <li>Calls a function to dynamically create an HTML <code>select</code> statement</li>
+                        <li>Calls a function to dynamically create an HTML <code>select</code> element</li>
                         <li>Retrieves the created element and assigns a <code>change</code> event listener to it</li>
                       </ul>
-                      <li>A function to dynamically create, and then place an HTML <code>select</code> statement in the controlbar</li>
-                      <li>A function to enable only the wanted representations to true, based on application logic</li>
+                      <li>A function to dynamically create, and then place an HTML <code>select</code> element in the controlbar</li>
+                      <li>A function to enable only the wanted representations, based on application logic</li>
                     </ol>
                 </section>
                 <section id="Implement_using_code" class="bcls-section">
@@ -116,12 +116,12 @@
                     <p>The code is well commented, but the major sections and a few key points are worth pointing out.</p>
                     <ul>
                       <li>Line 8: Import the DASH plugin's CSS.</li>
-                      <li>Lines 9-18: Style the player and the <code>select</code> statement in the controlbar.</li>
-                      <li>Line 32: Import the DASH plugin's JavaScript.</li>
-                      <li>Lines 51-76: Dynamically create a <code>select</code> statement, and associated <code>option</code> statements, and place in the controlbar.</li>
-                      <li>Lines 89-98: Sort a copy of the array of representations on the <code>bandwidth</code> property. You cannot be guaranteed the array will be sorted in any specific order.</li>
+                      <li>Lines 9-18: Style the player and the <code>select</code> element in the controlbar.</li>
+                      <li>Line 32: Import the plugin's JavaScript.</li>
+                      <li>Lines 51-76: Dynamically create a <code>select</code> element, and associated <code>option</code> elements, and place in the controlbar.</li>
+                      <li>Lines 89-98: Sort a copy of the array of representations on the <code>bandwidth</code> property. You cannot guarantee the array will be sorted in any specific order.</li>
                       <li>Lines 102-103: Assign the two lowest bandwidths and the two highest bandwidths to respective arrays.</li>
-                      <li>Line 105: Retrieve into the <code>selectedQuality</code> variable the user's selected preference from the HTML <code>select</code> statement.</li>
+                      <li>Line 105: Retrieve into the <code>selectedQuality</code> variable the user's selected preference from the HTML <code>select</code> element.</li>
                       <li>Lines 107-111: Retrieve into the <code>enabledBandwidths</code> variable the desired array of bandwidths.</li>
                       <li>Lines 115-121: Loop over each representation and check to see if its bandwidth is in the matching array of bandwidths (using JavaScript's <code>indexOf</code> method). If true, enable that representation.</li>
                       <li>Lines 129-189: This is a debugging tool for displaying the array of representaions. DO NOT put this in your production code. There is a section later in this document discussing this function.</li>
@@ -141,11 +141,11 @@
                       <li>Add the DASH plugin's CSS in the <strong>PLUGINS</strong> section of the <strong>PLAYERS</strong> module.
                         <pre><code> //players.brightcove.net/videojs-dash/2/videojs-dash.css</code></pre>
                       </li>
-                      <li>Place the CSS for the <code>select</code> statement, as shown here, in a Internet accessible location and add the URL to the <strong>PLUGINS</strong> section.
+                      <li>Place the CSS for the <code>select</code> element, as shown here, in a Internet accessible location and add the URL to the <strong>PLUGINS</strong> section.
                         <p><code data-gist-id="3e0466d4337c5e8f4c41686d5e3285c5" data-gist-hide-footer="true" data-gist-line="297-300"></code></p>
                       </li>
                       <li>In the <strong>Name, Options (JSON)</strong> section, simply enter the name of the plugin, <code>manualRenditionSelection</code>. No options are needed.</li>
-                      <li>You can now publish a DASH video using the newly configured player.</li>
+                      <li>You can now publish DRM-protected content via DASH video using the newly configured player.</li>
                     </ol>
 
                 </section>
