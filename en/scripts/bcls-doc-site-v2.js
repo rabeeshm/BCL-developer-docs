@@ -1,4 +1,4 @@
-var BCLSmain = (function (window, document, bclsNavData, hljs) {
+var BCLSmain = (function (window, document, bclsNavData) {
     "use strict";
     var precode = document.querySelectorAll("pre>code"),
         // navigation vars
@@ -165,17 +165,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         setAttributeOnNodeList(sideNavElements, "style", "");
         this.setAttribute("style", "color:#ffffff");
         this.parentElement.setAttribute("style", "background-color:" + productColors[product] + ";padding:.2em;");
-    }
-
-    /**
-     * syntax highlighting - dependent on highlight.pack.js
-     */
-    function BCLhighlight() {
-        var i,
-            iMax = precode.length;
-        for (i = 0; i < iMax; i++) {
-            hljs.highlightBlock(precode[i]);
-        }
     }
 
     /**
@@ -782,11 +771,6 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
         siteTitle = document.getElementById("siteTitle");
         // get the section name
         getSection();
-        /*
-         * syntax highlighting - dependent on highlight.pack.js
-         */
-        hljs.tabReplace = "  ";
-        hljs.initHighlightingOnLoad();
     }
 
     init();
@@ -794,8 +778,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
     // content dynamically and need to run things after
     // or want to use the product var for some purpose
     return {
-        "BCLhighlight": BCLhighlight,
         "createInPageNav": createInPageNav,
         "product": product
     };
-})(window, document, bclsNavData, hljs);
+})(window, document, bclsNavData);
