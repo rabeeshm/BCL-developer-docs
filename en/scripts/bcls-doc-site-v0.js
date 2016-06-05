@@ -1,4 +1,4 @@
-var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData, hljs) {
+var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData) {
     "use strict";
     var $precode = $("pre code"),
         // for handlebars
@@ -1070,25 +1070,11 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
         $siteTitle = $("#siteTitle");
         // get the section name
         getSection();
-        /*
-         * syntax highlighting - dependent on highlight.pack.js
-         */
-        hljs.tabReplace = "  ";
-        hljs.initHighlightingOnLoad();
-    };
-    /***************************************************
-        syntax highlighting - dependent on highlight.pack.js
-        ***************************************************/
-    BCLhighlight = function () {
-        $precode.each(function (i, e) {
-            hljs.highlightBlock(e);
-        });
     };
     init();
     return {
-        "BCLhighlight": BCLhighlight,
         "createInPageNav": createInPageNav,
         "product": product,
         "$divsection": $divsection
     };
-})($, window, console, document, Handlebars, bclsNavData, hljs);
+})($, window, console, document, Handlebars, bclsNavData);
