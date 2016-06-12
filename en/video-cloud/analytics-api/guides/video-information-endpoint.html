@@ -8,12 +8,12 @@
     <title id="bclPageTitle">Video Information Endpoints</title>
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
-    <script src="//use.edgefonts.net/source-code-pro.js"></script>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link rel="stylesheet" href="/en/scripts/prism/prism.css">
+    <link rel="stylesheet" href="/en/styles/template/css/bcls-doc.css">
+    <link rel="stylesheet" href="/en/styles/foundation-fixes.css">
 
-    <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css" />
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/atelier-forest.light.min.css" />
     <script>
         (function(i, s, o, g, r, a, m) {
             i['GoogleAnalyticsObject'] = r;
@@ -21,7 +21,7 @@
                 (i[r].q = i[r].q || []).push(arguments)
             }, i[r].l = 1 * new Date();
             a = s.createElement(o),
-            m = s.getElementsByTagName(o)[0];
+                m = s.getElementsByTagName(o)[0];
             a.async = 1;
             a.src = g;
             m.parentNode.insertBefore(a, m)
@@ -41,81 +41,89 @@
     <!-- search -->
     <div id="searchModal" class="reveal-modal" data-reveal></div>
     <!-- content -->
-    <!-- content -->
     <div class="row">
         <div class="sidebar large-2 columns show-for-large-up">
             <div id="sidenav" class="side-nav"></div>
         </div>
         <div id="main" class="large-10 small-12 columns">
-            <header id="bcls_header" class="bcls-header">
-                <h1>Video Data Endpoint</h1>
-                <p>The video data endpoint provides a quick way of getting specific data for a particular video. Current requests will return the alltime views for the video. In the future, additional data may be returned. The primary use case for this end point would be delivering alltime views information to players on high-traffic pages, where making large volumes of regular requests to the Analytics API would be too slow.</p>
-            </div>
-            <div class="section" id="endpoint">
-                <h2>Endpoint</h2>
-                <p>The endpoint for video data requests is:</p>
-<pre><code>https://analytics.api.brightcove.com/v1/alltime/accounts/{$account_id}/videos/{$video_id}</code></pre>
-                <p>All requests are GET.</p>
-            </div>
-            <div class="section" id="authentication">
-                <h2>Authentication</h2>
-                <p>All requests to the Analytics API are authenticated via Brightcove's OAuth service.</p>
-                <p>Authentication is based on an access token passed in an Authorization header:</p>
-                <pre><code>Authorization: Bearer {your token}</code></pre>
-                <p>You can get client credentials for the Analytics API and use those to retrieve temporary access tokens - see the <a href="../../oauth-api/guides/oauth-api-overview.html">OAuth Overview</a> for an explanation of different approaches you can use to obtain client credentials and access tokens, and <a href="./managing-api-credentials.html">Managing API Credentials</a> for information on obtaining client credentials through Studio.</p>
-            </div>
-            <div class="section" id="response">
-                <h2>Response</h2>
-                <p>The response to a request will be JSON in the form:</p>
-                <pre><code>{
+            <h1>Video Data Endpoint</h1>
+            <!-- begin drupal content -->
+            <article class="bcls-article">
+                <header id="bcls_header" class="bcls-header">
+                    <p>The video data endpoint provides a quick way of getting specific data for a particular video. Current requests will return the alltime views for the video. In the future, additional data may be returned. The primary use case for this
+                        end point would be delivering alltime views information to players on high-traffic pages, where making large volumes of regular requests to the Analytics API would be too slow.</p>
+                </header>
+                <section class="bcls-section" id="endpoint">
+                    <h2>Endpoint</h2>
+                    <p>The endpoint for video data requests is:</p>
+                    <pre class="line-numbers"><code class="language-http">https://analytics.api.brightcove.com/v1/alltime/accounts/{$account_id}/videos/{$video_id}</code></pre>
+                    <p>All requests are GET.</p>
+                </section>
+                <div class="bcls-section" id="authentication">
+                    <h2>Authentication</h2>
+                    <p>All requests to the Analytics API are authenticated via Brightcove's OAuth service.</p>
+                    <p>Authentication is based on an access token passed in an Authorization header:</p>
+                    <pre class="line-numbers"><code class="language-bash">Authorization: Bearer {your token}</code></pre>
+                    <p>You can get client credentials for the Analytics API and use those to retrieve temporary access tokens - see the <a href="../../oauth-api/guides/oauth-api-overview.html">OAuth Overview</a> for an explanation of different approaches
+                        you can use to obtain client credentials and access tokens, and <a href="./managing-api-credentials.html">Managing API Credentials</a> for information on obtaining client credentials through Studio.</p>
+                </div>
+                <div class="bcls-section" id="response">
+                    <h2>Response</h2>
+                    <p>The response to a request will be JSON in the form:</p>
+                    <pre class="line-numbers"><code class="language-json">{
     "alltime_video_views": 103123
 }
 </code></pre>
-            </div>
-            <div class="section" id="implementation">
-                <h2>Possible Implementation</h2>
-                <p>Here is how you might use the video data endpoint to display alltime views for a video when it loads in a player:</p>
-                <ol>
-                    <li>Set up caching to store views by video id for 5-10 minutes.</li>
-                    <li>Create logic on your server or in your pages to first check the cache to see if the alltime video views data for the current video is already there, and if so, use it.</li>
-                    <li>If the value is not already cached, make a request to the video information endpoint to retrieve it, and store the value in the cache along with displaying it in the page.</li>
-                    <li>Be sure to set up exception handling in case the request to the video information endpoint times out or is unsuccessful - you might simply not display the alltime video views, or you might use the last value you have.</li>
-                </ol>
-                <p>
-                    <img src="./assets/videodataendpoint.png" width="500" height="498" alt="implementation diagram">
-                </p>
-            </div>
+                </div>
+                <div class="bcls-section" id="implementation">
+                    <h2>Possible Implementation</h2>
+                    <p>Here is how you might use the video data endpoint to display alltime views for a video when it loads in a player:</p>
+                    <ol class="bcls-tasklist">
+                        <li>Set up caching to store views by video id for 5-10 minutes.</li>
+                        <li>Create logic on your server or in your pages to first check the cache to see if the alltime video views data for the current video is already there, and if so, use it.</li>
+                        <li>If the value is not already cached, make a request to the video information endpoint to retrieve it, and store the value in the cache along with displaying it in the page.</li>
+                        <li>Be sure to set up exception handling in case the request to the video information endpoint times out or is unsuccessful - you might simply not display the alltime video views, or you might use the last value you have.</li>
+                    </ol>
+                    <p>
+                        <figure class="bcls-figure">
+                            <img class="bcls-image" src="./assets/videodataendpoint.png" alt="Implementation Diagram">
+                            <figcaption class="bcls-caption--image">Implementation Diagram</figcaption>
+                        </figure>
+                    </p>
+                </div>
+            </article>
+            <!-- end drupal content -->
         </div>
     </div>
     <!-- bcl scripts -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.3/handlebars.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
     <script src="/en/scripts/docs-nav-data.min.js"></script>
-    <script src="/en/scripts/bcls-doc-site-v1.js"></script>
+    <script src="/en/scripts/bcls-doc-site-v2.js"></script>
+    <script src="/en/scripts/bcls-utils.js"></script>
+    <script src="/en/scripts/prism/prism.js"></script>
     <script>
         $(document).foundation();
     </script>
-    
-    </div>
-<iframe id="CSAT" src="http://survey.clicktools.com/app/survey/go.jsp?iv=3poon3e7e9spn&q1=articleURL" style="margin-left:25%; padding-bottom:20px;width:550px;height:475px;border:none"></iframe>
-<script>
-    
-    var cSat = document.getElementById('CSAT'),
-        cSatSrc = cSat.getAttribute('src'),
-        pageurl = window.location.href;
-    cSat.setAttribute('src', cSatSrc.replace('articleURL', pageurl));
-    
-</script>
-<br><br>
-<div class="bcls-footer"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
-<script>
-var feedbackMail = document.getElementById("feedbackMail");
-feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
-</script>
+
+    <iframe id="CSAT" src="http://survey.clicktools.com/app/survey/go.jsp?iv=3poon3e7e9spn&q1=articleURL" style="margin-left:25%; padding-bottom:20px;width:550px;height:475px;border:none"></iframe>
+    <script>
+        var cSat = document.getElementById('CSAT'),
+            cSatSrc = cSat.getAttribute('src'),
+            pageurl = window.location.href;
+        cSat.setAttribute('src', cSatSrc.replace('articleURL', pageurl));
+    </script>
+    <br>
+    <br>
+    <div class="bcls-footer"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+    <script>
+        var feedbackMail = document.getElementById("feedbackMail");
+        feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+    </script>
 </body>
 
 </html>
