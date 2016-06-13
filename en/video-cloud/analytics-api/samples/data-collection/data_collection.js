@@ -77,11 +77,11 @@
      */
     videojs.plugin("collectData", function (options) {
         var player,
-            videoDiv,
-            nextNode,
-            nextNodeParent,
-            playerWrapper,
-            eventLog,
+            // videoDiv,
+            // nextNode,
+            // nextNodeParent,
+            // playerWrapper,
+            eventLog = document.getElementById('eventLog'),
             changeVideoBtn,
             currentVideoIndex = 0,
             lastVideoIndex = 0,
@@ -112,9 +112,7 @@
             player.one("play", function (evt) {
                 var dateTime = new Date();
                 evt.timeStamp = dateTime.valueOf();
-                if (settings.showLog) {
-                    logEvent("player-event", "play", "", dateTime.toISOString());
-                }
+                logEvent("player-event", "play", "", dateTime.toISOString());
                 sendAnalyticsEvent("video_view", evt);
             });
             // reset firstTimeUpdate
@@ -202,55 +200,6 @@
             eventLog.innerHTML += str;
             return;
         };
-        /**
-         * wrapPlayer
-         * wraps player in a new div
-         * arguments: videoDiv: div that contains the video tag
-         */
-        wrapPlayer = function (videoDiv) {
-            var btnWrapper;
-            // create a new div to wrap the player div
-            playerWrapper = document.createElement("div");
-            playerWrapper.setAttribute("id", "playerWrapper");
-            playerWrapper.setAttribute("class", "player-wrapper");
-            /**
-             * get the next sibling of the videoDiv and its parent (if any)
-             * to put the new div in the right place
-             */
-            nextNode = videoDiv.nextElementSibling;
-            if (nextNode === null) {
-                nextNodeParent = videoDiv.parentNode;
-                playerWrapper = nextNodeParent.insertBefore(playerWrapper, null);
-            } else {
-                nextNodeParent = nextNode.parentNode;
-                playerWrapper = nextNodeParent.insertBefore(playerWrapper, nextNode);
-            }
-            // append the video div to the new wrapper div
-            playerWrapper.appendChild(videoDiv);
-            // add control button to change video
-            btnWrapper = document.createElement("div");
-            changeVideoBtn = document.createElement("span");
-            changeVideoBtn.setAttribute("class", "bcls-btn");
-            changeVideoBtn.setAttribute("id", "changeVideoBtn");
-            changeVideoBtn.innerHTML = "Change Video";
-            // add buttons to button div
-            btnWrapper.appendChild(changeVideoBtn);
-            // add button wrapper to player wrapper
-            playerWrapper.appendChild(btnWrapper);
-            // add button event listener
-            changeVideoBtn.addEventListener("click", loadVideo);
-        };
-        addEventLog = function () {
-            // create a new divs and buttons for event log and buttons
-            var eventLogHeader = document.createElement("h2");
-            eventLogHeader.innerHTML = "Event log";
-            eventLog = document.createElement("div");
-            eventLog.setAttribute("id", "eventLog");
-            eventLog.setAttribute("class", "event-log");
-            // add log and header after the player
-            playerWrapper.appendChild(eventLogHeader);
-            playerWrapper.appendChild(eventLog);
-        };
         init = function () {
             // add player event listeners
             player.on("loadstart", function (evt) {
@@ -279,13 +228,13 @@
             // add listener for time updates events
             player.on("timeupdate", onTimeUpdate);
             // get a reference to the div that wraps the video tag
-            videoDiv = document.getElementById(player.id());
+            // videoDiv = document.getElementById(player.id());
             // wrap the player in a new div
-            wrapPlayer(videoDiv);
+            // wrapPlayer(videoDiv);
             // add log if wanted
-            if (settings.showLog) {
-                addEventLog();
-            }
+            // if (settings.showLog) {
+            //     addEventLog();
+            // }
             // load the first video in the collection
             loadVideo();
         };

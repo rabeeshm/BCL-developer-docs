@@ -1,4 +1,4 @@
-var BCLS = (function ($, window, BCMAPI, Handlebars, BCLSformatJSON) {
+var BCLS = (function ($, window, BCMAPI, Handlebars) {
     "use strict";
     var // media api stuff
         $mapitoken = $("#mapitoken"),
@@ -267,7 +267,7 @@ var BCLS = (function ($, window, BCMAPI, Handlebars, BCLSformatJSON) {
                             itemsArray.splice(i, 1);
                         }
                     }
-                    $responseFrame.html(BCLSformatJSON.formatJSON(itemsArray));
+                    $responseFrame.html(JSON.stringify(itemsArray, null, '  '));
                 }
 
             },
@@ -297,11 +297,11 @@ var BCLS = (function ($, window, BCMAPI, Handlebars, BCLSformatJSON) {
 
     // set event listeners
     useMyAccount.addEventListener("click", function () {
-        if (basicInfo.className === "height-zero") {
-            basicInfo.className = "height-auto";
+        if (basicInfo.getAttribute('style') === "display:none;") {
+            basicInfo.setAttribute('style', 'display:block;');
             useMyAccount.innerHTML = "Use Sample Account";
         } else {
-            basicInfo.className = "height-zero";
+            basicInfo.setAttribute('style', 'display:none;');
             useMyAccount.innerHTML = "Use My Account Instead";
         }
     });
@@ -349,4 +349,4 @@ var BCLS = (function ($, window, BCMAPI, Handlebars, BCLSformatJSON) {
         buildRequest: buildRequest,
         onGetVideos: onGetVideos
     };
-})($, window, BCMAPI, Handlebars, BCLSformatJSON);
+})($, window, BCMAPI, Handlebars);
