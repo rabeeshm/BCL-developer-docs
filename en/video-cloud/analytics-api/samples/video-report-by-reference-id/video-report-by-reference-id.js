@@ -1,4 +1,4 @@
-var BCLS = (function ($, window, datepickr, BCLSformatJSON) {
+var BCLS = (function ($, window, datepickr) {
     "use strict";
     var proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
         useMyAccount = document.getElementById("useMyAccount"),
@@ -110,7 +110,7 @@ var BCLS = (function ($, window, datepickr, BCLSformatJSON) {
                 } catch (e) {
                    alert('invalid json');
                 }
-                $responseFrame.html(BCLSformatJSON.formatJSON(data));
+                $responseFrame.html(JSON.stringify(data, null, '  '));
             },
             error : function (XMLHttpRequest, textStatus, errorThrown) {
                 $responseFrame.html("Sorry, your request was not successful. Here's what the server sent back: " + errorThrown);
@@ -135,11 +135,11 @@ var BCLS = (function ($, window, datepickr, BCLSformatJSON) {
 
     // set event listeners
     useMyAccount.addEventListener("click", function () {
-        if (basicInfo.className === "height-zero") {
-            basicInfo.className = "height-auto";
+        if (basicInfo.getAttribute('style') === 'display:none;') {
+            basicInfo.setAttribute('style', 'display:block;');
             useMyAccount.innerHTML = "Use Sample Account";
         } else {
-            basicInfo.className = "height-zero";
+            basicInfo.setAttribute('style', 'display:none;');
             useMyAccount.innerHTML = "Use My Account Instead";
         }
     });
@@ -156,4 +156,4 @@ var BCLS = (function ($, window, datepickr, BCLSformatJSON) {
     return {
         buildRequest: buildRequest
     };
-})($, window, datepickr, BCLSformatJSON);
+})($, window, datepickr);
