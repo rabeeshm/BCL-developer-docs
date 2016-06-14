@@ -85,7 +85,7 @@
 
                 <section id="Select_implementation" class="bcls-section">
                     <h2>Select implementation</h2>
-                    <p>In this example, you will test with the Advanced (In_Page) embed code. You will then move the styles and scripts into separate files to test locally. Next, you will use Studio to add the CSS and JavaScript to your player as a plugin. You will now be able to run this example using the Standard (iframe) embed code.</p>
+                    <p>In this example, you will use the Advanced (In_Page) embed code. You will not create a plugin for the player, since the code interacts with the pause/play button on the page.</p>
                 </section>
 
                 <section id="API_resources_used" class="bcls-section">
@@ -143,7 +143,7 @@
 
                     <p>The embed code should look like this:</p>
 
-                    <pre class="bcls-pre line-numbers"><code class="language-html">
+<pre class="bcls-pre line-numbers"><code class="language-html">
  &lt;div id="videoContainer" style="display: block; position: relative; max-width: 100%;"&gt;
    &lt;div style="padding-top: 56.25%;"&gt;
      &lt;video id="video_1"
@@ -155,95 +155,160 @@
         class="video-js"
         controls&gt;&lt;/video&gt;
       &lt;script src="//players.brightcove.net/1752604059001/H16Hzc27_default/index.min.js"&gt;
-    &lt;/script&gt;
+      &lt;/script&gt;
+    &lt;/div&gt;
   &lt;/div&gt;
-&lt;/div&gt;</code></pre>
-
-                    <!-- <p class="video-cloud-only"><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="84-91"></code></p>
-                    <p class="perform-only"><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="84,86-91"></code></p> -->
-
+</code></pre>
+<br/>
                     <h3>The HTML code</h3>
-                    <p>Add the following HTML to your page code.</p>
+                    <p>
+                      Here, you will create a text block that will display above the background video. There is a link to the company website, and a pause/play button to control playback of the background video. This is needed since we are hiding the player controls.
+                    </p>
+                    <ol class="bcls-tasklist">
+                      <li>Add the following HTML to your page code, just below the player embed code:</li>
+                    </ol>
 
-                    <h3>The JavaScript code</h3>
-                    <p>Add the following JavaScript to your page code.</p>
-                    <p>Here you will use the player's <code class="language-javascript">addClass()</code> and <code class="language-javascript">removeClass()</code> methods to hide and then show the player controls. We'll look at the details of the <code class="language-css">video-agelist</code> class in the next section.</p>
                     <ul>
-                        <li>Line 99: Gets a reference to the player when it is ready.</li>
-                        <li>Line 100: Adds the class which hides the player controls and the big play button.</li>
-                        <li>Line 102: Listens for when the player has initial duration and dimension information.</li>
-                        <li>Line 103: Gets a reference to the age verification text in the overlay.</li>
-                        <li>Line 104: Listens for when the user clicks the age verification text.</li>
-                        <li>Line 105: Removes the class which hides the player controls and the big play button.</li>
-                        <li>Line 106: Starts video playback.</li>
+                        <li>Line 4: Creates a link back to the company website.</li>
+                        <li>Line 10: Defines a pause/play button to control video playback. You will add the button functionality in the JavaScript section.</li>
                     </ul>
-                    <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="94-110"></code></p>
+
+<pre class="bcls-pre line-numbers"><code class="language-html">
+  &lt;div id="article"&gt;
+    &lt;h1&gt;Flamingos&lt;/h1&gt;
+    &lt;p&gt;filmed in 2011&lt;/p&gt;
+    &lt;p&gt;&lt;a href="//brightcove.com"&gt;original article&lt;/a&gt;
+    &lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur porta dictum turpis, eu mollis justo gravida ac. Proin non eros blandit, rutrum est a, cursus quam.&lt;/p&gt;
+    &lt;p&gt;Aenean pharetra convallis pellentesque. Vestibulum et metus lectus. Nunc consectetur, ipsum in viverra eleifend, erat erat ultricies felis, at ultricies mi massa eu ligula.&lt;/p&gt;
+    &lt;button&gt;Pause&lt;/button&gt;
+  &lt;/div&gt;
+  </code></pre>
+<br/>
+                    <h3>The JavaScript code</h3>
+                    <p>
+                      Here, you will add code to control the functionality of the pause/play button.
+                    </p>
+                    <ol class="bcls-tasklist">
+                      <li>Add the following JavaScript to your page code:</li>
+                    </ol>
+                    <ul>
+                        <li>Line 3: Gets a reference to the player when it is ready.</li>
+                        <li>Line 4: Gets a reference to the pause/play button.</li>
+                        <li>Line 5: Turns off the audio for the player.</li>
+                        <li>Lines 8-10: Sets the button name to <strong>Play</strong> when the video ends.</li>
+                        <li>Lines 13-21: Listens for a click event on the play/pause button and either resumes playback or pauses the video based on the current playback state.</li>
+                    </ul>
+
+<pre class="bcls-pre line-numbers"><code class="language-html">
+  &lt;script type="text/javascript"&gt;
+    videojs("video_1").ready(function() {
+      var myPlayer = this,
+          pauseButton = document.querySelector("#article button");
+      myPlayer.muted(true);
+
+      // listen for the "ended" event and dislay play button
+      myPlayer.on("ended", function() {
+          pauseButton.innerHTML = "Play";
+      });
+
+      // listen for a click event on the pause/play button
+      pauseButton.addEventListener("click", function() {
+        if (myPlayer.paused()) {
+          myPlayer.play();
+          pauseButton.innerHTML = "Pause";
+        } else {
+          myPlayer.pause();
+          pauseButton.innerHTML = "Play";
+        }
+      });
+    });
+  &lt;/script&gt;
+  </code></pre>
+<br/>
+
 
                     <h3>The stylesheet</h3>
-                    <p>This example uses CSS styles for the Brightcove player and the Overlay plugin.</p>
+                    <p>This example uses CSS styles for the Brightcove player and the text content.</p>
+                    <ol class="bcls-tasklist">
+                      <li>Add the following CSS styles to your page code:</li>
+                    </ol>
                     <ul>
-                        <li>Lines 53-65: Override the default styles for the Overlay plugin.</li>
-                        <li>Lines 67-70: Hide the player controls and the big play button.</li>
-                        <li>Lines 72-74: Set the cursor for the age verification text in the overlay.</li>
-                        <li>Lines 76-79: Set the dimensions of the player.</li>
+                        <li>Lines 1-4: Set the styles for the page.</li>
+                        <li>Lines 5-7: Hide the player controls.</li>
+                        <li>Lines 8-10: Disable click events on the video. Instead, the pause/play functionality will be handled by a button in the text content area.</li>
+                        <li>Lines 11-30: Set the styes for the text block.</li>
+                        <li>Lines 31-41: Set the styes for the <strong>original article</strong> link.</li>
+                        <li>Lines 42-57: Set the styes for the pause/play button.</li>
                     </ul>
-                    <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="51-80"></code></p>
-                    <h4>Hiding player controls</h4>
-                    <p>Let's take a closer look at how we used CSS to hide the big play button and the control bar. For an introduction about changing the appearance of the Brightcove player, see the <a href="../../brightcove-player/guides/customize-appearance.html">Customize Player Appearance</a>                        guide.</p>
-                    <p>First, let's change the style to hide the player's big play button.</p>
-                    <ol class="bcls-tasklist">
-                        <li>In the Chrome browser, open the <strong>Developer Tools</strong>.</li>
-                        <li>Right click on the player and select <strong>Inspect Element</strong>.</li>
-                        <li>In the <strong>Elements</strong> section of the <strong>Developer Tools</strong>, select the HTML associated with the big play button.</li>
-                        <li>In the <strong>Styles</strong> section, you can see that the original <code class="language-css">display</code> property with a value of <code class="language-css">block</code> is set on the <code class="language-html">&lt;div&gt;</code> element.
-                            <figure class="bcls-figure">
-                                <img class="bcls-image" src="../../brightcove-player/samples/assets/age-gate-hide-button.png" alt="Hide Big Play Button">
-                                <figcaption class="bcls-caption--image">Hide Big Play Button</figcaption>
-                            </figure>
-                        </li>
-                        <li>When overriding CSS values, more specific styles win over less specific ones. Since elements have the lowest specificity value, we can override the display property by simply specifying the <code class="language-css">vjs-big-play-button</code> class.</li>
-                        <li>Look at our CSS for the big play button below. In this example, we are saying select all elements with a class name of <code class="language-css">vjs-big-play-button</code> which are decendents of the element with class name of <code class="language-css">video-agelist</code>.
-                            Remember that in the JavaScript code, we added the <code class="language-css">video-agelist</code> class to the player.
-                            <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="67-70" data-gist-highlight-line="68,69"></code></p>
-                        </li>
-                    </ol>
-
-                    <p>Next, let's change the style to hide the player's control bar.</p>
-                    <ol class="bcls-tasklist">
-                        <li>In the <strong>Elements</strong> section of the <strong>Developer Tools</strong>, select the HTML associated with the player control bar.</li>
-                        <li>In the <strong>Styles</strong> section, you can see that the original <code class="language-css">display</code> property with a value of <code class="language-css">flex</code> is set with three class attributes in the selector.
-                            <figure class="bcls-figure">
-                                <img class="bcls-image" src="../../brightcove-player/samples/assets/age-gate-hide-controls.png" alt="Hide Control Bar">
-                                <figcaption class="bcls-caption--image">Hide Control Bar</figcaption>
-                            </figure>
-                        </li>
-                        <li>To override the style for the control bar, we need at least three class attributes in our selector, including the <code class="language-css">vjs-control-bar</code> class.</li>
-                        <li>Look at our CSS for the control bar below. In this example, we are saying select all elements with a class name of <code class="language-css">vjs-control-bar</code> which are decendents of the element with both a class name of <code class="language-css">video-agelist</code>                            and a class name of <code class="language-css">video-js</code>.
-                            <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="67-70" data-gist-highlight-line="67,69"></code></p>
-                            <p>For more information about calculating specificity value, see the <a href="//css-tricks.com/specifics-on-css-specificity/">Specifics on CSS Specificity</a> page.</p>
-                        </li>
-
-                    </ol>
-
+                    <pre class="bcls-pre line-numbers"><code class="language-html">
+body {
+  margin: 0;
+  background-color: black;
+}
+.video-js .vjs-control-bar {
+  display: none;
+}
+.video-js {
+  pointer-events: none;
+}
+#article {
+  font-family: Agenda-Light, Agenda Light, Agenda, Arial Narrow, sans-serif;
+  background: rgba(0,0,0,0.3);
+  color: white;
+  padding: 2rem;
+  width: 33%;
+  margin:2rem;
+  float: right;
+  font-size: 1.2rem;
+  position: absolute;
+  top: .25em;
+  right: .25em;
+}
+h1 {
+  font-size: 2rem;
+  text-transform: uppercase;
+  margin-top: 0;
+  letter-spacing: .3rem;
+}
+a {
+  display: inline-block;
+  color: #fff;
+  text-decoration: none;
+  background:rgba(0,0,0,0.5);
+  padding: .5rem;
+  transition: .6s background;
+}
+a:hover{
+  background:rgba(0,0,0,0.9);
+}
+#article button {
+  display: block;
+  width: 80%;
+  padding: .4rem;
+  border: none;
+  margin: 1rem auto;
+  font-size: 1.3rem;
+  background: rgba(255,255,255,0.23);
+  color: #fff;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: .3s background;
+}
+#article button:hover {
+  background: rgba(0,0,0,0.5);
+}
+  </code></pre>
+<br/>
                 </section>
 
-                <section class="bcls-section" id="Task_section">
-                    <h2>Task_section</h2>
-                    <p>Here's a sample task section.</p>
-                    <h3>First task</h3>
-                    <ol class="bcls-tasklist">
-                        <li>A step</li>
-                        <li>Another step</li>
-                    </ol>
-                </section>
             </article>
             <!-- any page-specific scripts here -->
             <!-- end drupal content -->
             <section class="bcls-section" id="Related_topics">
                 <h2>Related Topics</h2>
                 <ul>
-                    <li><a href="">Doc 1</a></li>
-                    <li><a href="">Doc 2</a></li>
+                    <li><a href="../../brightcove-player/guides/customize-appearance.html">Customize Player Appearance</a></li>
+                    <li><a href="../../brightcove-player/reference/api/player.html">Player Methods and Events</a></li>
                 </ul>
             </section>
         </div>
