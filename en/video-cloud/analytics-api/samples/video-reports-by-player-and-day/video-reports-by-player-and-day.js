@@ -105,7 +105,7 @@ var BCLS = (function (window, document, datepickr) {
             return name;
         }
         function displayData() {
-            var displayStr, csvDisplayString = '', playerObject, videoObject, template, barChartData, chart;
+            var displayStr, csvDisplayString = '', playerObject, videoObject, template;
             currentPlayer = playerSelector.options[playerSelector.selectedIndex].value;
             currentVideoIndex = videoSelector.selectedIndex;
             playerObject = analyticsData[currentPlayer];
@@ -121,22 +121,6 @@ var BCLS = (function (window, document, datepickr) {
             csvDisplayString += csvTemplate(videoObject);
             csvDisplay.value = csvDisplayString;
             reportTableBody.innerHTML = displayStr;
-            // chart
-            bclslog("videoObject.chartData", videoObject.chartData);
-            barChartData = videoObject.chartData;
-            $.plot("#chartView", [ barChartData ], {
-                series: {
-                    bars: {
-                        show: true,
-                        barWidth: 0.6,
-                        align: "center"
-                    }
-                },
-                xaxis: {
-                    mode: "categories",
-                    tickLength: 0
-                }
-            });
         }
         function getTotals() {
             var player, video, i, iMax, j, jMax, item, date, thisVideo;
@@ -149,7 +133,6 @@ var BCLS = (function (window, document, datepickr) {
                     thisVideo.totalPlays = 0;
                     thisVideo.totalSecondsViewed = 0;
                     thisVideo.totalCompletedViews = 0;
-                    thisVideo.chartData = [];
                     for (i = 0; i < iMax; i++) {
                         item = thisVideo.items[i];
                         bclslog('item.date', item.date);
@@ -159,7 +142,6 @@ var BCLS = (function (window, document, datepickr) {
                             item.date = dateToISO(date);
                             thisVideo.totalPlays += item.video_view;
                             thisVideo.totalSecondsViewed += item.totalSecondsViewed;
-                            thisVideo.chartData.push([getMonthName(date.getMonth()) + " " + date.getDate(), item.video_view]);
                         } else {
                             bclslog('item with no date', item);
                         }
@@ -170,7 +152,6 @@ var BCLS = (function (window, document, datepickr) {
                     if (thisVideo.totalPlays > 0) {
                         thisVideo.totalCompletedViews = thisVideo.totalCompletedViews / thisVideo.totalPlays;
                     }
-                    bclslog('chartdata', thisVideo.chartData);
                     gettingDataDisplay.textContent = 'Data processing complete';
                 }
             }
@@ -366,11 +347,11 @@ var BCLS = (function (window, document, datepickr) {
     videoSelector.addEventListener("change", displayData);
     playerSelector.addEventListener("change", displayData);
     useMyAccount.addEventListener("click", function () {
-        if (basicInfo.className === "height-zero") {
-            basicInfo.className = "height-auto";
+        if (basicInfo.getAttribute('style') === "display:none;") {
+            basicInfo.setAttribute('style', 'display:block;');
             useMyAccount.innerHTML = "Use Sample Account";
         } else {
-            basicInfo.className = "height-zero";
+            basicInfo.setAttribute('style', 'display:none;');
             useMyAccount.innerHTML = "Use My Account Instead";
         }
     });
