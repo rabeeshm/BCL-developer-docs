@@ -102,15 +102,15 @@ var BCLS = (function ($, window, Pikaday) {
     };
     // reset everything
     reset = function () {
-	    firstRun = true;
-	    $playlistSelectWrapper.attr("class", "bcls-hidden");
-	    $playlistSelector.html("");
-	    $getPlaylists.html("Get playlists");
-	    $getPlaylists.attr("class", "run-button");
-	    $getPlaylists.on("click", getPlaylists);
+        firstRun = true;
+        $playlistSelectWrapper.attr("class", "bcls-hidden");
+        $playlistSelector.html("");
+        $getPlaylists.html("Get playlists");
+        $getPlaylists.attr("class", "run-button");
+        $getPlaylists.on("click", getPlaylists);
         to.value = nowISO;
         from.value = fromISO;
-	    page_number = 0;
+        page_number = 0;
     };
     onMAPIresponse = function(jsonData) {
         bclslog("jsonData", jsonData);
@@ -146,7 +146,7 @@ var BCLS = (function ($, window, Pikaday) {
                 // check to see if there are more playlists to fetch
                 if (page_number === (total_pages - 1)) {
                     $getPlaylists.html("No more playlists");
-                    $getPlaylists.attr("class", "bcls-hidden");
+                    $getPlaylists.attr("style", "opacity:.5;cursor:not-allowed;");
                     dataObj.items = playlistData;
                     // bclslog("dataObj", dataObj);
                     // populate the playlist selector
@@ -175,8 +175,8 @@ var BCLS = (function ($, window, Pikaday) {
         totalVideos = videoIds.length - 1;
         bclslog("totalVideos", totalVideos);
         // undim param input fields
-        $aapiParams.attr("class", "bcls-shown");
-        $requestSubmitter.attr("class", "bcls-shown");
+        $aapiParams.attr("style", "opacity:1;cursor:pointer;");
+        $requestSubmitter.attr("style", "opacity:1;cursor:pointer;");
         buildRequest();
     };
     removeSpaces = function (str) {
@@ -258,7 +258,7 @@ var BCLS = (function ($, window, Pikaday) {
                 } catch (e) {
                    alert('invalid json');
                 }
-                $responseFrame.html(BCLSformatJSON.formatJSON(data));
+                $responseFrame.html(JSON.stringify(data, null, '  '));
             },
             error : function (XMLHttpRequest, textStatus, errorThrown) {
                 $responseFrame.html("Sorry, your request was not successful. Here is what the server sent back: " + errorThrown);
