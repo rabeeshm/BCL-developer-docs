@@ -1,4 +1,4 @@
-var BCLS = (function($, window, Pikaday, BCLSformatJSON) {
+var BCLS = (function($, window, Pikaday) {
   "use strict";
   var proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
     basicInfo = document.getElementById("basicInfo"),
@@ -79,16 +79,13 @@ var BCLS = (function($, window, Pikaday, BCLSformatJSON) {
     requestURL = "https://analytics.api.brightcove.com/v1";
     requestURL += "/data?accounts=" + account_id + "&dimensions=video";
     // check for time filters
-    startDate = from.value;
-    if (startDate !== " ") {
-      startDate = fromPicker.toString("YYYY-MM-DD");
+    startDate = from.value || fromISO;
+      // startDate = fromPicker.toString("YYYY-MM-DD");
       requestURL += "&from=" + startDate;
-    }
-    endDate = to.value;
-    if (endDate !== " ") {
-      endDate = toPicker.toString("YYYY-MM-DD");
+    endDate = to.value || nowISO;
+      // endDate = toPicker.toString("YYYY-MM-DD");
       requestURL += "&to=" + endDate;
-    }
+
     // add limit and fields
     requestURL += "&limit=all&fields=engagement_score,play_rate,video,video_duration,video_engagement_1,video_engagement_100,video_engagement_25,video_engagement_50,video_engagement_75,video_impression,video_name,video_percent_viewed,video_seconds_viewed,video_view,video.tags";
     // add ref id filter
@@ -113,11 +110,11 @@ var BCLS = (function($, window, Pikaday, BCLSformatJSON) {
       data: options,
       success: function(data) {
         try {
-          var data = JSON.parse(data);
+          data = JSON.parse(data);
         } catch (e) {
           alert('invalid json');
         }
-        $responseFrame.html(BCLSformatJSON.formatJSON(data));
+        $responseFrame.html(JSON.stringify(data, null, '  '));
       },
       error: function(XMLHttpRequest, textStatus, errorThrown) {
         $responseFrame.html("Sorry, your request was not successful. Here's what the server sent back: " + errorThrown);
@@ -142,16 +139,17 @@ var BCLS = (function($, window, Pikaday, BCLSformatJSON) {
   from.value = fromISO;
 
   // set event listeners
-  //
-  useMyAccount.addEventListener("click", function (){
-    if (basicInfo.className === "height-zero") {
-        basicInfo.className = "height-auto";
-        useMyAccount.innerHTML = "Use Sample Account";
-    } else {
-        basicInfo.className = "height-zero";
-        useMyAccount.innerHTML = "Use My Account Instead";
-    }
+  useMyAccount.addEventListener("click", function () {
+      if (basicInfo.getAttribute('style') === "display:none;") {
+          basicInfo.setAttribute('style', 'display:block;');
+          useMyAccount.innerHTML = "Use Sample Account";
+      } else {
+          basicInfo.setAttribute('style', 'display:none;');
+          useMyAccount.innerHTML = "Use My Account Instead";
+      }
   });
+
+
   // set listener for form fields
   $requestInputs.on("change", buildRequest);
   // send request
@@ -165,4 +163,4 @@ var BCLS = (function($, window, Pikaday, BCLSformatJSON) {
   return {
     buildRequest: buildRequest
   };
-})($, window, Pikaday, BCLSformatJSON);
+})($, window, Pikaday);

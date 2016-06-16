@@ -310,14 +310,15 @@ var BCLS = (function ($, window, Pikaday) {
 
     // set event listeners
     useMyAccount.addEventListener("click", function () {
-        if (basicInfo.className === "height-zero") {
-            basicInfo.className = "height-auto";
+        if (basicInfo.getAttribute('style') === "display:none;") {
+            basicInfo.setAttribute('style', 'display:block;');
             useMyAccount.innerHTML = "Use Sample Account";
         } else {
-            basicInfo.className = "height-zero";
+            basicInfo.setAttribute('style', 'display:none;');
             useMyAccount.innerHTML = "Use My Account Instead";
         }
     });
+
     $getPlaylists.on("click", getPlaylists);
     // set listener for form fields
     $requestInputs.on("change", function () {
