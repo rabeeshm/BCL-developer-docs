@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <!-- change title to match the h1 heading -->
+    <title>Manual Rendition Selection</title>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link rel="stylesheet" href="/en/scripts/prism/prism.css">
+    <link rel="stylesheet" href="/en/styles/template/css/bcls-doc.css">
+    <link rel="stylesheet" href="/en/styles/foundation-fixes.css">
+
+    <script>
+        (function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function() {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-2728311-29', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
+    <style>
+      iframe {
+        height: 344px;
+        width: 610px;
+      }
+    </style>
+</head>
+
+<body>
+    <!-- header navbar -->
+    <div id="navWrapper" class="fixed"></div>
+    <!-- breadcrumbs -->
+    <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+    <!-- search -->
+    <div id="searchModal" class="reveal-modal" data-reveal></div>
+    <!-- content -->
+    <div class="row">
+        <div class="sidebar large-2 columns show-for-large-up">
+            <div id="sidenav" class="side-nav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+            <article class="bcls-article">
+                <header class="bcls-header" id="bcls_header">
+                    <h1>Manual Rendition Selection</h1>
+                    <p>This topic shows you how to use the <code class="language-javascript">representations()</code> method from the Manual Rendition API to provide an HTML <code class="language-html">&lt;select&gt;</code> element in Brightcove Player's controlbar, from which a viewer of the video can then select either low or high quality renditions to view, as shown in the following screenshot.</p>
+                    <figure class="bcls-figure">
+                        <img class="bcls-image" src="../../brightcove-player/guides/assets/manual-rendition-selection/show-select.png" alt="select in controlbar">
+                    </figure>
+                    <p> In this example, high and low quality are defined by the top two and bottom two quality renditions.</p>
+                    <div class="bcls-aside bcls-aside--information">
+                        <p>At this time the Manual Rendition API ONLY works with DRM-protected content via DASH videos. Support for other playback technologies is planned.</p>
+                    </div>
+                </header>
+                <section id="Implementation_considerations" class="bcls-section">
+                    <h2>Implementation considerations</h2>
+                    <p>There are a number of considerations and technical concepts to understand before using the Manual Rendition API, some are listed here:</p>
+                    <ul>
+                      <li>As mentioned earlier, currently the Manual Rendition Selection API is only available for DRM-protected content via DASH encoded videos and is implemented as part of the DASH plugin.</li>
+                      <li>In Video Cloud different versions of a video are generally referred to as <em>renditions</em>. In DASH speak, the term for the different versions is <em>representations</em>.</li>
+                      <li>Each representation is an object made up of the four properties and one method:
+                          <ul>
+                            <li>id</li>
+                            <li>width</li>
+                            <li>height</li>
+                            <li>bandwidth</li>
+                            <li>enabled() method</li>
+                          </ul>
+                      </li>
+                      <li>The player examines an array for possible representations for playback. Only those with the <code>enabled</code> method set to <code>true</code> are eligible for playback.</li>
+                      <li>The <code class="language-javascript">representations()</code> method returns an array of representations.</li>
+                      <li>The value of <code>enabled</code> is set by calling the particular representation's <code class="language-javascript">enabled(boolean)</code> method.</li>
+                      <li>When lower quality representations are the only ones with <code>enabled</code> set to true, the player will play all downloaded higher quality segments before the poorer quality segments begin to play. No specific length of time can be stated, but in testing this can be up to one minute.</li>
+                      <li>In Safari, IE and Firefox, if you do not have Silverlight installed in the browser you will be prompted to do so. You will see the following badge:
+                        <figure class="bcls-figure">
+                            <img class="bcls-image"  width="307" height="166" src="../../brightcove-player/guides/assets/manual-rendition-selection/install-silverlight.png" alt="silverlight badge">
+                        </figure>
+                      </li>
+                    </ul>
+                    <p class="bcls-aside bcls-aside--tip">The Silverlight playback technology is prepended to the tech order and has priority. The Dash.js source handler is part of the HTML5 tech and therefore shares it's tech order.</p>
+                </section>
+                <section id="Example" class="bcls-section">
+                    <h2>Example</h2>
+                    <p>In this example, once you start to play the video you will be able to make a rendition change. You most likely will want to make the video fullscreen, then change the quality. Remember, you may have to wait a minute or more to see the quality change. In the following example, and in the code shown in this document, the two highest quality representations will be enabled when <strong>High</strong> is selected and the two lowest quality representations will be enabled when <strong>Low</strong> is selected.</p>
+                    <iframe src="//players.brightcove.net/1485884786001/ryXp3zJV_default/index.html?videoId=4929126622001"
+                      allowfullscreen
+                      webkitallowfullscreen
+                      mozallowfullscreen></iframe>
+                </section>
+                <section id="Code_overview" class="bcls-section">
+                    <h2>Code overview</h2>
+                    <p>The code in broken into these four main sections:</p>
+                    <ol>
+                      <li>A Brightcove Player using the in-page embed code</li>
+                      <li>An event handler listening for the <code class="language-javascript">loadedmetadata</code> event that performs the following:
+                          <ul>
+                            <li>Calls a function to dynamically create an HTML <code class="language-html">&lt;select&gt;</code> element</li>
+                            <li>Retrieves the created element and assigns a <code class="language-javascript">change</code> event listener to it</li>
+                          </ul>
+                      </li>
+                      <li>A function to dynamically create, and then place an HTML <code class="language-html">&lt;select&gt;</code> element in the controlbar</li>
+                      <li>A function to enable only the wanted representations, based on application logic</li>
+                    </ol>
+                </section>
+                <section id="Implement_using_code" class="bcls-section">
+                    <h2>Implement using code</h2>
+                    <p>The code is well commented, but the major sections and a few key points are worth pointing out.</p>
+                    <ul>
+                      <li>Line 8: Import the DASH plugin's CSS.</li>
+                      <li>Lines 9-18: Style the player and the <code class="language-html">&lt;select&gt;</code> element in the controlbar.</li>
+                      <li>Line 32: Import the plugin's JavaScript.</li>
+                      <li>Lines 51-76: Dynamically create a <code>select</code> element, and associated <code class="language-html">&lt;option&gt;</code> elements, and place in the controlbar.</li>
+                      <li>Lines 89-98: Sort a copy of the array of representations on the <code>bandwidth</code> property. You cannot guarantee the array will be sorted in any specific order.</li>
+                      <li>Lines 102-103: Assign the two lowest bandwidths and the two highest bandwidths to respective arrays.</li>
+                      <li>Line 105: Retrieve into the <code class="language-javascript">selectedQuality</code> variable the user's selected preference from the HTML <code class="language-html">&lt;select&gt;</code> element.</li>
+                      <li>Lines 107-111: Retrieve into the <code class="language-javascript">enabledBandwidths</code> variable the desired array of bandwidths.</li>
+                      <li>Lines 115-121: Loop over each representation and check to see if its bandwidth is in the matching array of bandwidths (using JavaScript's <code class="language-javascript">indexOf()</code> method). If true, enable that representation.</li>
+                      <li>Lines 129-189: This is a debugging tool for displaying the array of representaions. DO NOT put this in your production code. There is a section later in this document discussing this function.</li>
+                    </ul>
+                    <p><code data-gist-id="3e0466d4337c5e8f4c41686d5e3285c5" data-gist-hide-footer="true" data-gist-line="1-193"></code></p>
+                </section>
+                <section id="Implement_in_Studio" class="bcls-section">
+                    <h2>Implement in Studio</h2>
+                    <p>To implement the manual rendition selector in Studio, you will need to slightly modify the JavaScript code shown above so it meets the requirements of a plugin. This is shown below. Follow these steps to use the API in a plugin:</p>
+                    <ol class="bcls-tasklist">
+                      <li>Add the DASH plugin's JavaScript in the <strong>PLUGINS</strong> section of the <strong>PLAYERS</strong> module.
+                        <textarea class="bcls-code">//players.brightcove.net/videojs-dash/2/videojs-dash.min.js
+                        </textarea>
+                      </li>
+                      <li>Alter the JavaScript code so it meets the requirements of a plugin, as shown here. Save the plugin in a Internet accessible location and add the URL to the <strong>PLUGINS</strong> section.
+                        <p><code data-gist-id="3e0466d4337c5e8f4c41686d5e3285c5" data-gist-hide-footer="true" data-gist-line="198-288"></code></p>
+                      </li>
+                      <li>Add the DASH plugin's CSS in the <strong>PLUGINS</strong> section of the <strong>PLAYERS</strong> module.
+                          <textarea class="bcls-code">//players.brightcove.net/videojs-dash/2/videojs-dash.css
+                          </textarea>
+                      </li>
+                      <li>Place the CSS for the <code class="language-html">&lt;select&gt;</code> element, as shown here, in a Internet accessible location and add the URL to the <strong>PLUGINS</strong> section.
+                        <p><code data-gist-id="3e0466d4337c5e8f4c41686d5e3285c5" data-gist-hide-footer="true" data-gist-line="297-300"></code></p>
+                      </li>
+                      <li>In the <strong>Name, Options (JSON)</strong> section, simply enter the name of the plugin, <code>manualRenditionSelection</code>. No options are needed.</li>
+                      <li>You can now publish DRM-protected content via DASH video using the newly configured player.</li>
+                    </ol>
+
+                </section>
+                <section id="Debugging_help" class="bcls-section">
+                    <h2>Debugging help</h2>
+                    <p>If you wish to change the application logic for which representations are enabled, it might be useful to be able to view the changed array. To display the array you can use a function to which you pass the array, as shown here:</p>
+                    <p><code data-gist-id="3e0466d4337c5e8f4c41686d5e3285c5" data-gist-hide-footer="true" data-gist-line="42"></code></p>
+                    <p>The actual function code is shown here:</p>
+                    <p><code data-gist-id="3e0466d4337c5e8f4c41686d5e3285c5" data-gist-hide-footer="true" data-gist-line="129-189"></code></p>
+                    <p>The display in the HTML page appears as follows:</p>
+                    <figure class="bcls-figure">
+                        <img class="bcls-image" src="../../brightcove-player/guides/assets/manual-rendition-selection/debugging-tables.png" alt="debugging tables">
+                    </figure>
+                    <p>Of course, you would NOT want to include this extra code in your production environment.</p>
+                </section>
+            </article>
+            <section class="bcls-section" id="Related_topics">
+                <h2>Related Topics</h2>
+                <ul>
+                    <li><a href="../../brightcove-player/guides/customize-appearance.html#iconmanipulation">Placing elements in the controlbar</a></li>
+                    <li><a href="../../brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a></li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <!-- bcl scripts -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script src="/en/scripts/docs-nav-data.min.js"></script>
+    <script src="/en/scripts/bcls-doc-site-v2.js"></script>
+    <script src="/en/scripts/expander-v2.js"></script>
+    <script src="/en/scripts/prism/prism.js"></script>
+    <script>
+        $(document).foundation();
+    </script>
+    <!-- CSAT form -->
+    <section class="bcls-section bcls-section--csat">
+        <iframe id="CSAT" src="
+            http://survey.clicktools.com/app/survey/go.jsp?iv=3poon3e7e9spn&q1=articleURL" style="margin-left:25%; padding-bottom:20px;width:550px;height:475px;border:none"></iframe>
+    </section>
+    <!-- CSAT script -->
+    <script>
+        var cSat = document.getElementById('CSAT'),
+            cSatSrc = cSat.getAttribute('src'),
+            pageurl = window.location.href;
+        cSat.setAttribute('src', cSatSrc.replace('articleURL', pageurl));
+    </script>
+    <!-- doc footer -->
+    <footer class="bcls-footer"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></footer>
+    <!-- footer script -->
+    <script>
+        var feedbackMail = document.getElementById("feedbackMail");
+        feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+    </script>
+</body>
+
+</html>
