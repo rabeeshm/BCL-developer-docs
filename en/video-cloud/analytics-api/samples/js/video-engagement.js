@@ -54,13 +54,13 @@ var BCLS = (function ($, window) {
             for (var i = 0, len = this.length; i < len; ++i) {
                 fn.call(scope || this, this[i], i, this);
             }
-        }
+        };
     }
     // more robust test for strings "not defined"
     isDefined =  function (v) {
         if(v !== "" && v !== null && v !== "undefined") { return true; }
         else { return false; }
-    }
+    };
 
     // create graph
     makeEngagementGraph = function(jsonObject) {
@@ -72,7 +72,6 @@ var BCLS = (function ($, window) {
             video_duration = 100,
             series = {},
             video_name = jsonObject.video_name,
-            options = {pointDot : false},
             ctx,
             myNewChart;
         // process response data
@@ -97,11 +96,11 @@ var BCLS = (function ($, window) {
                     data : data
                 }
             ]
-        }
+        };
         //Get the context of the canvas element we want to select
         ctx = document.getElementById("chartEngagement").getContext("2d");
         myNewChart = new Chart(ctx).Line(chartData, options);
-    }
+    };
 
     buildRequest = function () {
         var account = (isDefined($accountID.val())) ? $accountID.val() : account_id,
@@ -118,7 +117,7 @@ var BCLS = (function ($, window) {
         }
         $request.html(requestURL);
         $request.attr("value", requestURL);
-    }
+    };
     // submit request
     getData = function () {
         var options = {};
@@ -134,23 +133,23 @@ var BCLS = (function ($, window) {
             data: options,
             success : function (data) {
                 try {
-                   var data = JSON.parse(data);
+                   data = JSON.parse(data);
                 } catch (e) {
                    alert('invalid json');
                 }
 
-                $responseFrame.html(BCLSformatJSON.formatJSON(data));
+                $responseFrame.html(JSON.stringify(data, null, '  '));
                 makeEngagementGraph(data);
             }
-        })
-    }
+        });
+    };
     // set event listeners
     useMyAccount.addEventListener("click", function () {
-        if (basicInfo.className === "height-zero") {
-            basicInfo.className = "height-auto";
+        if (basicInfo.getAttribute('style') === "display:none;") {
+            basicInfo.setAttribute('style', 'display:block;');
             useMyAccount.innerHTML = "Use Sample Account";
         } else {
-            basicInfo.className = "height-zero";
+            basicInfo.setAttribute('style', 'display:none;');
             useMyAccount.innerHTML = "Use My Account Instead";
         }
     });
@@ -176,5 +175,5 @@ var BCLS = (function ($, window) {
     buildRequest();
     return {
         buildRequest: buildRequest
-    }
+    };
 })($, window);
