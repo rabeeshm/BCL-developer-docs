@@ -9,9 +9,10 @@
     <title>Player Sample: Limited Plays</title>
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
     <script src="//use.edgefonts.net/source-code-pro.js"></script>
-    <link rel="stylesheet" href="/en/scripts/prism/prism.css">
-    <link rel="stylesheet" href="/en/styles/template/css/bcls-doc.css">
+    <link rel="stylesheet" href="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/js/prism/prism.css">
+    <link rel="stylesheet" href="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/css/template/css/bcls-doc.css">
     <link rel="stylesheet" href="/en/styles/foundation-fixes.css">
 
     <script>
@@ -154,7 +155,7 @@
 
                     <p>The embed code should look like this:</p>
 
-<pre class="bcls-pre line-numbers"><code class="language-html">&lt;video id=&quot;video_1&quot;
+<pre class="line-numbers"><code class="language-html">&lt;video id=&quot;video_1&quot;
   style=&quot;width: 640px; height: 360px;&quot;
   data-video-id=&quot;4845798282001&quot;
   data-account=&quot;1752604059001&quot;
@@ -177,7 +178,7 @@
                         <li>Line 1: Defines an element that will be used to display the number of video views the user has watched. </li>
                     </ul>
 
-<pre class="bcls-pre line-numbers"><code class="language-html">&lt;p&gt;Number of views = &lt;span id=&quot;cookieDisplay1&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+<pre class="line-numbers"><code class="language-html">&lt;p&gt;Number of views = &lt;span id=&quot;cookieDisplay1&quot;&gt;&lt;/span&gt;&lt;/p&gt;
 </code></pre>
 <br/>
                     <h3>The JavaScript code</h3>
@@ -198,7 +199,7 @@
                       <li>Lines 39-44: Hide the <strong>ok</strong> and <strong>close</strong> buttons in our custom error message when it is displayed. This keeps the user from closing the error message and playing the video.</li>
                     </ul>
 
-<pre class="bcls-pre line-numbers"><code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
+<pre class="line-numbers"><code class="language-javascript">&lt;script type=&quot;text/javascript&quot;&gt;
 videojs(&quot;video_1&quot;).ready(function () {
 	var read_cookie = function (key) {
 		var result;
@@ -247,6 +248,113 @@ videojs(&quot;video_1&quot;).ready(function () {
 &lt;/script&gt;
 </code></pre>
 <br/>
+                </section>
+
+                <section id="Use_a_plugin" class="bcls-section">
+                    <h2>Use a plugin</h2>
+                    <p>It is a best practice to use a plugin so that you can easily add this functionality to multiple players.</p>
+
+                    <h3>Create the JavaScript file</h3>
+                    <p>Move the plugin's JavaScript code to a file located on your machine for easy testing.</p>
+                    <ol class="bcls-tasklist">
+                      <li>Create a new file for your plugin JavaScript code. In this case, name it <code>limited-plays.js</code>.</li>
+                      <li>Cut and paste the JavaScript code from your main HTML file into this new file.</li>
+                    </ol>
+                    <p>
+                      Your JavaScript code should look similar to this:
+                    </p>
+                    <ul>
+                        <li>Lines 1,42: Wrap your JavaScript code using the <code class="language-javascript">videojs.plugin()</code> function. The first argument, <code class="language-javascript">limitedPlays</code>, is the plugin name.</li>
+                        <li>Line 2: Gets a reference to your player.</li>
+                        <li>The rest is your JavaScript code which was reviewed in a previous section, except we have removed the page element to display the number of views.</li>
+                    </ul>
+                    <p class="bcls-aside bcls-aside--information">Line 42: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</p>
+
+    <pre class="line-numbers"><code class="language-html">videojs.plugin('limitedPlays', function() {
+    var myPlayer = this,
+      read_cookie = function (key) {
+        var result;
+        return (result = new RegExp('(^|; )' + encodeURIComponent(key) + '=([^;]*)').exec(document.cookie)) ? result[2] : null;
+      },
+      videoStart = 0,
+      currentPosition,
+      cookie = read_cookie("BC_views");
+
+    myPlayer.errors({
+      "errors": {
+        "-3": {
+          "headline": "You've reached your maximum views.",
+          "type": "USER_MAX_VIEWS",
+          "message": "Please come back tomorrow."
+        }
+      }
+    });
+
+    if (cookie != null && cookie >= 2) {
+      myPlayer.on("loadstart", function () {
+        myPlayer.error({
+          code: '-3'
+        });
+      })
+    };
+
+    myPlayer.one("play", function () {
+      var d = new Date();
+      d.setTime(d.getTime() + (1 * 24 * 60 * 60 * 1000));
+      cookie++;
+      document.cookie = "BC_views=" + cookie + ";expires=" + d.toUTCString();
+		});
+
+    myPlayer.on("error", function () {
+      setTimeout(function () {
+        myPlayer.errorDisplay.el().querySelector('.vjs-errors-ok-button').classList.add('vjs-hidden');
+        myPlayer.errorDisplay.el().querySelector('.vjs-errors-close-button').classList.add('vjs-hidden');
+      }, 50)
+    });
+  });</code></pre>
+    <br/>
+
+                    <ol class="bcls-tasklist">
+                        <li>In the HTML file, add the following code just below the existing <code class="language-html">&lt;script&gt;</code> tags. This code includes the JavaScript file and then calls the method defined in that JavaScript.</li>
+                    </ol>
+    <pre class="line-numbers"><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;limited-plays.js&quot;&gt;&lt;/script&gt;
+    &lt;script&gt;videojs('video_1').limitedPlays();&lt;/script&gt;</code></pre>
+    <br/>
+
+                    <ol class="bcls-tasklist">
+                        <li>Browse the HTML page. You should see that the limited plays video still works, except now your JavaScript code has been removed from the HTML page.</li>
+                    </ol>
+
+                    <h3>Implement using Players module</h3>
+                        <p>To implement your plugin using the Players module, follow these steps:</p>
+                        <ol class="bcls-tasklist">
+                          <li>Copy the plugin's JavaScript file and place it in an Internet accessible URL.</li>
+                        <li>Copy the styles file and place it in an Internet accessible URL.</li>
+                        <li>Open the <strong>Players</strong> module and locate the player.</li>
+                        <li>Click the link for the player to open the player properties.</li>
+                        <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
+                        <li>For the <strong>JavaScript URL</strong>, enter the URL for the file you created in step 16.
+                            <figure class="bcls-figure">
+                                <img class="bcls-image" src="../../brightcove-player/samples/assets/background-video/background-video-js.png" alt="Background Video Plugin: JavaScript">
+                                <figcaption class="bcls-caption--image">Background Video Plugin: JavaScript</figcaption>
+                            </figure>
+                        </li>
+                        <li>For the <strong>CSS URL</strong>, enter the URL for the file you created in step 17.
+                            <figure class="bcls-figure">
+                                <img class="bcls-image" src="../../brightcove-player/samples/assets/background-video/background-video-css.png" alt="Background Video Plugin: CSS">
+                                <figcaption class="bcls-caption--image">Background Video Plugin: CSS</figcaption>
+                            </figure>
+                        </li>
+                        <li>For the <strong>Name</strong>, enter your plugin name. In this example, we are using <strong>backgroundVideo</strong>.
+                            <figure class="bcls-figure">
+                                <img class="bcls-image" src="../../brightcove-player/samples/assets/background-video/background-video-name.png" alt="Background Video Plugin Name">
+                                <figcaption class="bcls-caption--image">Background Video Plugin Name</figcaption>
+                            </figure>
+                        </li>
+                        <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
+                        <li class="video-cloud-only">In the <strong>Media</strong> module, select a video and publish it with this player.</li>
+                        <li>Copy the Advanced (In-Page) embed code and paste it into a new HTML file. Your page should look similar to this:</li>
+                        </ol>
                 </section>
 
             </article>
