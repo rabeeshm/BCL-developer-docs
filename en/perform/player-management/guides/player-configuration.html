@@ -62,6 +62,7 @@
           <li><a href="#css">CSS color overrides</a></li>
           <li><a href="#compatibility">compatibility</a></li>
           <li><a href="#skin">skin</a></li>
+          <li><a href="#iprestrictions">base_url (for IP restriction issues)</a></li>
         </ul>
         <p class="BCL-aside">Note: You should NOT use <code>data-setup</code> with Brightcove Player. You may see use of <code>data-setup</code> in the API documentation, but this is because that documentation is generated directly from the Video.js player source code, and you MAY use that attribute with the <code>video</code> tag with pure Video.js. The attribute sends configuration information to the player, but Brightcove Player uses a different method to perform this task, which makes <code>data-setup</code> unreliable.</p>
       </div>
@@ -338,6 +339,35 @@
           <li>Only valid value is <code>graphite</code>.</li>
         </ul>
         <p><code data-gist-id="9629223" data-gist-hide-footer="true" data-gist-line="282-290" data-gist-highlight-line="287-288"></code></p>
+      </div>
+      <div id="iprestrictions" class="section">
+        <h2>base_url (for IP restriction issues)</h2>
+        <p>Problems can occur when using IP restrictions with Brightcove Players used outside North America. When a Brightcove Player is asked to load a video from a Video Cloud account, it connects to the catalog at this address<strong>https://edge.api.brightcove.com/playback/v1/</strong>.</p>
+
+        <p>That Edge endpoint behaves in a way that can cause problems for IP restriction:</p>
+        <ul>
+          <li>When hitting Edge from WITHIN North America, it hits Edge directly, and Edge sees the user's IP address. It can either allow or deny access to the catalog as per the IP Restriction whitelist. This is desired functionality.</li>
+          <li>When hitting Edge from OUTSIDE North America, it goes via Cloudfront for load-balancing/local caching CDN reasons. That's important, because as a result of this, Edge sees the Cloudfront IP instead of the user's IP, and denies everyone, because Cloudfront isn't on the whitelist (and never should it be, because then anyone using Cloudfront would have access).</li>
+        </ul>
+        <p>To resolve this issue, you can configure the player to use an alternative Edge endpoint, <strong>edge-elb.api.brightcove.com</strong>. This change must be made to every player that needs to access the IP restricted account from outside North America.</p>
+        <p class="BCL-aside">Note: There is a downside to this approach. A very slight delay to the retrieval of cached content from outside of the US will be introduced because catalog requests will be going to Virginia rather than through Cloudfront's global network with local servers. It's likely that this will be barely noticeable.</p>
+        <p>The actual configuration change involves setting a value for the Video Cloud <code>base_url</code>. Remember, this should ONLY be changed if IP restrictions are used with Brightcove Players outside of North America. For an existing player, you would use the following curl command that uses the <code>PATCH</code> HTTP method (you must substitute your data for the environment variables <code>$EMAIL</code>, <code>$ACCOUNT_ID</code> and <code>$PLAYER_ID</code>):</p>
+        <pre><code>curl \
+--header "Content-Type: application/json" \
+--user $EMAIL \
+--request PATCH \
+--data '{
+    "video_cloud": {
+        "base_url": "https://edge-elb.api.brightcove.com/playback/v1/"
+    }
+  }' \
+https://players.api.brightcove.com/v1/accounts/$ACCOUNT_ID/players/$PLAYER_ID/configuration</code></pre>
+        <p>If you are new to curl, the following documents will be of help:</p>
+        <ul>
+          <li><a href="http://docs.brightcove.com/en/video-cloud/player-management/getting-started/player-mgmt-quick-start.html">Quick Start to Player Management</a></li>
+          <li><a href="http://docs.brightcove.com/en/video-cloud/concepts/curl/curl.html">Set up cURL</a></li>
+          <li><a href="http://docs.brightcove.com/en/video-cloud/player-management/guides/postman.html">Use Postman for HTTP Requests</a></li>
+        </ul>
       </div>
       <div class="section" id="BCLreferences">
         <h2>Related Topics</h2>
