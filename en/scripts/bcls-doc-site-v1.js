@@ -384,7 +384,7 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
             // add other items
             iMax = navGroups.length;
             for (i = 0; i < iMax; i++) {
-                if (data[navGroups[i]].items.length > 0) {
+                if (isDefined(data[navGroups[i]]) && data[navGroups[i]].items.length > 0) {
                     buildNavItem(navGroups[i]);
                 }
             }
@@ -703,11 +703,11 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                     }
                     // if section is brightcove-player check for Video Cloud only items to remove from nav
                     if (section === 'brightcove-player') {
-                        var i = bclsNavData[product].sections[section].items.length;
-                        while (i > 0) {
-                            i--;
-                            if (isItemInArray(bclsNavData[product].sections[section].items[i].groups, 'no-perform')) {
-                                bclsNavData[product].sections[section].items.splice(i, 1);
+                        var playerItem = bclsNavData[product].sections[section].items.length;
+                        while (playerItem > 0) {
+                            playerItem--;
+                            if (isItemInArray(bclsNavData[product].sections[section].items[playerItem].groups, 'no-perform')) {
+                                bclsNavData[product].sections[section].items.splice(playerItem, 1);
                             }
                         }
                         bclslog('bclsNavData[product].sections[section]', bclsNavData[product].sections[section]);

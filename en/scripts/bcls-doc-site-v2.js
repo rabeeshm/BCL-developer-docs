@@ -358,7 +358,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
             // add other items
             iMax = navGroups.length;
             for (i = 0; i < iMax; i++) {
-                if (data[navGroups[i]].items.length > 0) {
+                if (isDefined(data[navGroups[i]]) && data[navGroups[i]].items.length > 0) {
                     buildNavItem(navGroups[i]);
                 }
             }
