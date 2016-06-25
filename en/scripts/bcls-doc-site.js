@@ -284,7 +284,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             }
         }
         if (exists(sectionName)) {
-            str += "<li class=\"current\">" + document.getElementsByTagName("title")[0].innerHTML + "</li>"
+            str += "<li class=\"current\">" + document.getElementsByTagName("title")[0].innerHTML + "</li>";
         }
         $breadCrumbWrapper.html(str);
     };
@@ -594,7 +594,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                         section = "player-management";
                         sectionName = "player-management";
                     }  else if (section === "studio") {
-                        modulesIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", "Modules")
+                        modulesIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", "Modules");
                     } else {
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
                     }
