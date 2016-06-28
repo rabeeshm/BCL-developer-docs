@@ -2,285 +2,145 @@
 <html lang="en">
 
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
-	<!-- change title to match the h1 heading -->
-	<title>Batch update Using CMS API</title>
-	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
-	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
-	<script src="//use.edgefonts.net/source-code-pro.js"></script>
-	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <!-- change title to match the h1 heading -->
+    <title>Batch update Using CMS API</title>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
+<script src="//use.edgefonts.net/source-code-pro.js"></script>
+<link rel="stylesheet" href="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.css">
+<link rel="stylesheet" href="//docs.brightcove.com/en/styles/template/css/bcls-doc.css">
+<link rel="stylesheet" href="/en/styles/foundation-fixes.css">
 
-	<link rel="stylesheet" type="text/css" href="//docs.brightcove.com/en/styles/bcls-doc-site.css">
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/atelier-forest.light.min.css">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
+<script>
+    (function(i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function() {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
-	<style>
-	input, select {
-		max-width: 60%;
-		font-size: .8rem;
-	}
-	fieldset {
-		border: 1px #366 solid;
-		border-radius: 5px;
-	}
-	textarea {
-		width: 90%;
-		height: 4rem;
-		font-size: .8rem;
-	}
-	textarea#videoData {
-		width: 90%;
-		background-color: #f5f5f5;
-		height: 24rem;
-		font-size: .8rem;
-	}
-	</style>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
+    ga('create', 'UA-2728311-29', 'auto');
+    ga('send', 'pageview');
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
 </head>
 
 <body>
-	<!-- header navbar -->
-	<div id="navWrapper" class="fixed"></div>
-	<!-- breadcrumbs -->
-	<nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
-	<!-- search -->
-	<div id="searchModal" class="reveal-modal" data-reveal></div>
-	<!-- content -->
-	<div class="row">
-		<div class="sidebar large-2 columns show-for-large-up">
-			<div id="sidenav" class="side-nav"></div>
-		</div>
-		<div id="main" class="large-10 small-12 columns">
-			<header id="bcls_header" class="bcls-header">
-            	<h1>Batch Update Using CMS API</h1>
-                <p>This is a sample of making batch updates to video metadata using the CMS Ingest API. To get access tokens and make the API calls, it uses a proxy built by Brightcove Learning services.
-			    </div>
-                <div class="section" id="getCredentials">
-                    <h2>Get credentials</h2>
-                    <p>To use the CMS API you will need proper credentials. Later in this quick start, you will use the credentials in a form when submitting requests to the API.</p>
-				<ol>
-					<li>To obtain proper credentials use your choice of the <strong>Get Client Credentials</strong> documents listed below. Whichever option you choose, you will need to ask for the correct operation permissions. In this quick start you will need <strong>video</strong> operations. The following can be used with curl or Postman to get the proper permissions:</li>
-				</ol>
-				<p><code data-gist-id="7661acb7095f0c8b0e34" data-gist-hide-footer="true" data-gist-line="1-3"></code></p>
-		        <ul>
-		            <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html">OAuth: Get Client Credentials Using CURL</a></li>
-		            <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">OAuth: Get Client Credentials Using Postman</a></li>
-		        </ul>
-                </div>
-				<div class="section" id="dataInput">
-				    <h2>Inputs for the Update</h2>
-				    <fieldset class="bcls-fieldset">
-				        <legend>Inputs</legend>
-				        <p>
-							Account ID:
-							<input size="60" id="account_id" type="text" value="57838016001">
-						</p>
-				        <p>
-							Client ID:
-							<input size="60" id="client_id" type="text" value="f05869d2-f201-47d1-9606-aaafa66fea6e">
-						</p>
-				        <p>
-							Client Secret:
-							<input size="120" id="client_secret" type="text" value="2F4CvF8DER1j3fmQr3TjKSmD6jMfvigM3HwCVkdhykvYOOUamFYeu9U8fRpks-EH7PCJcthc8IsEPT3bAnAqNQ">
-						</p>
-						<p>
-							Video metadata for update:
-							<textarea id="videoData">[
-							     {
-							          "name": "Betty Boop Full Movie",
-							          "id": "96851865001",
-							          "description": "Classic cartoon"
-							     },
-							     {
-							          "name": "Water-Liquid-Flow",
-							          "id": "1194921693001",
-							          "description": "Water flowing"
-							     },
-							     {
-							          "name": "Wildlife_Zebra",
-							          "id": "734484324001",
-							          "description": "The striped mammal"
-							     }
-							]</textarea>
-						</p>
-						<p><button id="setRequest">Submit Request</button></p>
-				    </fieldset>
-				</div>
-				<div class="section" id="outputLog">
-				    <h2>Results</h2>
-				    <fieldset class="bcls-fieldset">
-				    	<legend>Outputs</legend>
-						<p>
-							API request:
-							<textarea id="apiRequest"></textarea>
-						</p>
-				        <pre><code id="response"></code></pre>
-				    </fieldset>
-				</div>
-    			<div class="section" id="sampleCode">
-				    <h2>Code for the sample</h2>
-				    <h3>HTML code:</h3>
-				    <p><script src="https://gist.github.com/ffb48d916d56332a445a.js"></script></p>
-				    <h3>JavaScript code:</h3>
-				    <p><script src="https://gist.github.com/a5513a48366cc55effcf.js"></script></p>
-				</div>
-		</div>
-	</div>
-	<!-- bcl scripts -->
-	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.2/gist-embed.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.3/handlebars.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
-	<script src="//docs.brightcove.com/en/scripts/docs-nav-data.min.js"></script>
-	<script src="//docs.brightcove.com/en/scripts/bcls-doc-site-v1.js"></script>
-
-	<script>
-		$(document).foundation();
-	</script>
-	<script id="pageScript">
-	var BCLS = ( function (window, document) {
-		var account_id_field = document.getElementById("account_id"),
-			account_id,
-			client_id_field = document.getElementById("client_id"),
-			client_id = null,
-			client_secret_field = document.getElementById("client_secret"),
-			client_secret = null,
-			setRequest_btn = document.getElementById("setRequest"),
-			apiRequest = null,
-            apiRequest_field = document.getElementById("apiRequest"),
-			submit_button = document.getElementById("submit"),
-			response = document.getElementById("response"),
-			totalVideos = 0,
-			offset = 0,
-			callNumber = 0,
-			requestBody,
-			videoData_display = document.getElementById("videoData"),
-			videoData,
-			t1,
-			currentVideo,
-			// functions
-			isDefined,
-			cleanString,
-			cleanUpData,
-			submitRequest,
-			setRequest,
-			logResponse,
-			init;
-		// is defined
-		isDefined = function(x){
-			if(x !== "" && x !== null && x !== undefined){
-				return true;
-			} else{
-				return false;
-			}
-		};
-		// function to remove spaces from string
-		cleanString = function (str) {
-			// remove spaces
-			str = str.replace(/\s/g, "");
-			return str;
-		};
-		// clean up data before submitting
-		cleanUpData = function () {
-			var i, iMax, item;
-			iMax = videoData.length;
-			for (i = 0; i < iMax; i++) {
-				item = videoData[i];
-				// truncate over-long descriptions
-				if (item.description.length > 120) {
-					item.description = item.description.substr(0, 250) + "...";
-				}
-				// use name for missing descriptions
-				if (item.description === "") {
-					item.description = item.name;
-				}
-			}
-			// console.log("videoData Cleaned", videoData);
-		}
-		// function to set up request
-		setRequest = function () {
-
-			currentVideo = videoData[callNumber];
-			if (isDefined(currentVideo)) {
-				apiRequest = "https://cms.api.brightcove.com/v1/accounts/" + account_id + "/videos/" + currentVideo.id;
-				requestBody = '{"description":"' + currentVideo.description + '"}';
-				// display the request URL
-				apiRequest_field.textContent = apiRequest;
-				submitRequest();
-			}
-
-		}
-		// function to set the request
-		logResponse = function (data) {
-			response.innerHTML += data + ",<br />"
-		}
-		// function to make API request
-		submitRequest = function () {
-		    var httpRequest = new XMLHttpRequest(),
-				proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
-				requestData,
-				getResponse = function () {
-					try {
-					    if (httpRequest.readyState === 4) {
-					      if (httpRequest.status === 200) {
-					        logResponse(httpRequest.responseText);
-					        if (callNumber < totalVideos) {
-					        	callNumber++;
-					        	setRequest();
-					        }
-					      } else {
-					        alert("There was a problem with the request. Request returned " + httpRequest.status);
-					      }
-					    }
-					  }
-					  catch(e) {
-					    alert('Caught Exception: ' + e);
-					  }
-				};
-			if (account_id === null || client_id === null || client_secret === null) {
-				alert("You must provide an account id, client id, and client secret");
-				return false;
-			}
-			// get latest request URL in case use edited it
-			apiRequest = cleanString(apiRequest_field.value);
-			// set up request data
-			requestData = "client_id=" + client_id + "&client_secret=" + client_secret + "&url=" + encodeURIComponent(apiRequest) + "&requestBody=" + encodeURIComponent(requestBody) + "&requestType=PATCH";
-			// set response handler
-			httpRequest.onreadystatechange = getResponse;
-			// open the request
-			httpRequest.open("POST", proxyURL);
-			// set headers
-			httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-			// open and send request
-			httpRequest.send(requestData);
-		};
-		// init function to set up event listeners
-		init = function () {
-			// event listeners
-			setRequest_btn.addEventListener("click", function () {
-				// trim any leading/trailing spaces from the input strings
-				account_id = cleanString(account_id_field.value);
-				client_id = cleanString(client_id_field.value);
-				client_secret = cleanString(client_secret_field.value);
-				// get and clean up video data
-				videoData = JSON.parse(videoData_display.value);
-				totalVideos = videoData.length;
-				cleanUpData();
-				// set up the request
-				setRequest();
-			});
-		}
-		// initialize - set up data
-		init();
-
-	})(window, document);
-	</script>
+    <!-- header navbar -->
+    <div id="navWrapper" class="fixed"></div>
+    <!-- breadcrumbs -->
+    <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+    <!-- search -->
+    <div id="searchModal" class="reveal-modal" data-reveal></div>
+    <!-- content -->
+    <div class="row">
+        <div class="sidebar large-2 columns show-for-large-up">
+            <div id="sidenav" class="side-nav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+            <h1>Batch Update Using CMS API</h1>
+            <!-- begin drupal content -->
+            <article class="bcls-article">
+                <header id="bcls_header" class="bcls-header">
+                    <p>This is a sample of making batch updates to video metadata using the CMS Ingest API. To get access tokens and make the API calls, it uses a proxy built by Brightcove Learning services.
+                    </header>
+                    <section class="bcls-section" id="getCredentials">
+                        <h2>Get credentials</h2>
+                        <p>To use the CMS API you will need proper credentials. Later in this quick start, you will use the credentials in a form when submitting requests to the API.</p>
+                    <ol>
+                        <li>To obtain proper credentials use your choice of the <strong>Get Client Credentials</strong> documents listed below. Whichever option you choose, you will need to ask for the correct operation permissions. In this quick start you will need <strong>video</strong> operations. The following can be used with curl or Postman to get the proper permissions:</li>
+                    </ol>
+                <pre class="line-numbers"><code class="language-json">"operations": ["video-cloud/video/all"]</code></pre>
+                    <ul>
+                        <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html">OAuth: Get Client Credentials Using CURL</a></li>
+                        <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">OAuth: Get Client Credentials Using Postman</a></li>
+                    </ul>
+                    </section>
+                    <section class="bcls-section" id="dataInput">
+                        <h2>Inputs for the Update</h2>
+                        <fieldset class="bcls-fieldset">
+                            <legend>Inputs</legend>
+                            <p>
+                                Account ID:
+                                <input size="60" id="account_id" type="text" placeholder="57838016001">
+                            </p>
+                            <p>
+                                Client ID:
+                                <input size="60" id="client_id" type="text" placeholder="f05869d2-f201-47d1-9606-aaafa66fea6e">
+                            </p>
+                            <p>
+                                Client Secret:
+                                <input size="120" id="client_secret" type="text" placeholder="2F4CvF8DER1j3fmQr3TjKSmD6jMfvigM3HwCVkdhykvYOOUamFYeu9U8fRpks-EH7PCJcthc8Is">
+                            </p>
+                            <p>
+                                Video metadata for update:
+<textarea id="videoData" class="bcls-code" style="height:20em;">[
+     {
+          "name": "Tiger and Cub",
+          "id": "3851380732001",
+          "description": "Unbearably cute tiger and her cub"
+     },
+     {
+          "name": "Some Great Blue Herons",
+          "id": "4793962133001",
+          "description": "Nature video"
+     },
+     {
+          "name": "Sea Marvels",
+          "id": "4426931680001",
+          "description": "A collection of exotic fishes"
+     }
+]</textarea>
+                            </p>
+                            <p><button id="setRequest" class="bcls-button">Submit Request</button></p>
+                        </fieldset>
+                    </section>
+                    <section class="bcls-section" id="outputLog">
+                        <h2>Results</h2>
+                        <fieldset class="bcls-fieldset">
+                            <legend>Outputs</legend>
+                            <p>
+                                API request:
+                                <textarea id="apiRequest"></textarea>
+                            </p>
+                            <pre><code id="response"></code></pre>
+                        </fieldset>
+                    </section>
+                    <section class="bcls-section" id="sampleCode">
+                        <h2>Code for the sample</h2>
+                        <h3>HTML code:</h3>
+                        <p>To see the HTML code, view the source for this page.</p>
+                        <h3>JavaScript code:</h3>
+                <pre data-src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/cms-api/code-samples/update-metadata/update-metadata.js" class="line-numbers"></pre>
+                    </section>
+            </article>
+                <script src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/cms-api/code-samples/update-metadata/creds.js"></script>
+                <script src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/cms-api/code-samples/update-metadata/update-metadata.js"></script>
+                <!-- end drupal content -->
+        </div>
+    </div>
+    <!-- bcl scripts -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+<script src="/en/scripts/docs-nav-data.min.js"></script>
+<script src="/en/scripts/bcls-doc-site-v2.js"></script>
+<script src="//learning-services-media.brightcove.com/doc-assets/js/bcls-utils.js"></script>
+<script src="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.js"></script>
+<script>
+    $(document).foundation();
+</script>
 <iframe id="CSAT" src="//learning-services-media.brightcove.com/doc-assets/general/surveylink.html" style="margin-left:40%; padding-bottom:20px;width:300px;border:none"></iframe>
 
 <br><br>
