@@ -61,25 +61,47 @@
 
                 <section class="bcls-section" id="Overview">
                   <h2>Overview</h2>
-                  <p>The chances of you needing the exact DFP Premium configuration detailed in this document is almost nill. That being said, this document will introduce you to the terms, concepts and configuration steps needed to start you on your path to successfully integrating DFP and Brightcove Player.</p>
+                  <aside class="bcls-aside bcls-aside--tip">If you are new to video advertising, it would be a good idea to read through the <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/ads-learning-guide.html">Video Advertising Learning Guide</a>.</aside>
+                  <p>The chances of you needing the exact DFP Premium configuration detailed in this document is almost nil. That being said, this document will introduce you to the terms, concepts and configuration steps needed to start you on your path to successfully integrating DFP and Brightcove Player.</p>
                   <p>You need to build some kind of a knowledge foundation so that the detailed steps that follow in this document can be used in reference to a bigger picture. This overview section of the document will help you familiarize yourself with terms, high-level concepts and broad steps you need to understand before getting "into the weeds" of implementation.</p>
-                  <p>The following terms are essential in understanding DFP:</p>
+                  <h3>Vocabulary establishment</h3>
+                  <p>The following terms are used extensively in this document. Understanding them will assist in successful implementation and understanding of the integration process detailed in the steps below. The definitions have a video advertising slant reflected in this document and may not be applicable to all DFP uses.</p>
+                  <ul>
+                    <li><strong>Inventory</strong>: The video ad slots available to sell.</li>
+                    <li><strong>Advertiser</strong>: A company purchasing your video ad slots.</li>
+                    <li><strong>Ad unit</strong>: A container to organize your inventory and detail how your inventory is defined.</li>
+                    <li><strong>Order</strong>: An agreement between the inventory owner and a buyer that specifies the details of an advertising campaign.</li>
+                    <li><strong>Line item</strong>: Specifies when/where an advertiser's ads will appear Also specifies the actual videos ads and companion ad images.</li>
+                    <li><strong>Creative/creative set</strong>: The video or image that is the actual ad or companion ad. With video advertising the combination of a video and companion ad is a creative set. Creatives are associated with line items.</li>
+                    <li><strong>Video content source</strong>: In this case Brightcove Video Cloud.</li>
+                    <li><strong>Ad rule</strong>: Define how ads display with your video content. For instance, as a pre-roll or a mid-roll every 5 minutes.</li>
+                    <li><strong>Ad tag</strong>: A URL that points to the definition of how ads should be used when playing back a video. The ad tag is supplied when setting up the IMA advertising in Studio.</li>
+                  </ul>
+                  <h3>Process overview</h3>
+                  <p>The following illustrates the entities created and their relationships.</p>
+                  <figure class="bcls-figure">
+                    <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/dfp/dfp-overview-diagram.png" alt="DFP Overview Diagram">
+                  </figure>
+                  <p>The following provides the next level of detail of the process.</p>
                   <ol>
-                    <li>Advertiser: </li>
-                    <li>Inventory: </li>
-                    <li>Ad unit: </li>
-                    <li>Order: </li>
-                    <li>Line item: </li>
-                    <li>Creative/creative set: </li>
-                    <li>Video content source: </li>
-                    <li>Ad rule: </li>
-                    <li>Ad tag: </li>
+                    <li><strong>Create an advertiser.</strong> In DFP speak, this is a company of type <strong>Advertiser</strong>. This is required as when an order is created it must be associated with an advertiser.</li>
+                    <li><strong>Create an ad unit.</strong> This is an organizer for your inventory and you will specify the size of video ads and companion ads you want from the advertiser.</li>
+                    <li><strong>Create an order.</strong> The order will detail who the advertiser is. Although it can be done later, the DFP interface also allows the line items to be created as part of the order, which will be done in the steps.</li>
+                    <li><strong>Create a line item as part of the order.</strong> The line item will detail you want to use Video VAST ads, the size of the ad videos, when they should start and stop.</li>
+                    <li><strong>Target (link) the particular line item to an ad unit.</strong> The order, through a line item, matches the advertiser's ads to your inventory.</li>
+                    <li><strong>Create creative sets.</strong> Before this step you have line items which contain no actual video ads. In this exercise you will supply both video ads and corresponding companion ad images (if you wish to display them).</li>
+                    <li><strong>Associate creative sets with a particular line item.</strong></li>
+                    <li><strong>Create an ad rule.</strong> This defines when and how the ads should play. As part of the ad rule creation you associate it with an ad unit. This means that if inventory from an ad unit is used, the definitions of the ad rule will be used to specify ad playback times.</li>
+                    <li><strong>Generate an ad tag.</strong> This is the URL that is used when configuring the IMA3 plugin. Note the original ad tag will not function correctly. Three query string parameters must be added for proper configuration.</li>
+                    <li><strong>Connect to Video Cloud.</strong> This is done to retrieve a value needed for one of the aforementioned query string parameters.</li>
+                    <li><strong>Use Google's Video Suite Inspector</strong> to be sure the ad tag is functioning correctly.</li>
+                    <li>Lastly (and finally) <strong>use the ad tag with Brightcove Player</strong>.</li>
                   </ol>
-                  <aside class="bcls-aside bcls-aside--warning">Changes made in these steps do NOT immediately change DFP configuration. Some changes can take up to an hour to be realized, as detailed in Google's <a href="https://support.google.com/dfp_premium/answer/177316?hl=en">Update periods for changes made in DFP</a> document.</aside>
                 </section>
 
                 <section class="bcls-section" id="Create_an_advertiser">
                   <h2>Create an advertiser</h2>
+                  <aside class="bcls-aside bcls-aside--warning">Changes made in the steps of this document do NOT immediately change DFP configuration. Some changes can take up to an hour to be realized, as detailed in Google's <a href="https://support.google.com/dfp_premium/answer/177316?hl=en">Update periods for changes made in DFP</a> document. If something is not working as expected, it might be the best approach to simply wait some time before trying to solve any issues you are seeing.</aside>
                   <p>If an advertiser already exists you will be using, you do not need to complete this section.</p>
                   <ol class="bcls-tasklist">
                     <li>Follow the numbered steps and click <strong>New company</strong>.
@@ -250,32 +272,6 @@
                   </ol>
                 </section>
 
-                <section class="bcls-section" id="Connect_to_Video_Cloud">
-                  <h2>Connect to Video Cloud</h2>
-                  <ol class="bcls-tasklist">
-                    <li>Follow the numbered steps and click <strong>New source</strong>.
-                      <figure class="bcls-figure">
-                          <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/dfp/navigate-to-source.png" alt="navigate to source">
-                      </figure>
-                    </li>
-                    <li>Provide a <strong>Name</strong> for the source.</li>
-                    <li>Set the <strong>Type</strong> to <strong>Brightcove</strong>.</li>
-                    <li>Enter, then validate, a read-only, no URL access <strong>API token</strong> for your Video Cloud account. When you validate you will see a partial list of videos from your Video Cloud account.</li>
-                    <li>Check to be sure your form is filled out similarly to the following:
-                      <figure class="bcls-figure">
-                          <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/dfp/source-form.png" alt="source form">
-                      </figure>
-                    </li>
-                    <li>Click <strong>Save</strong>.</li>
-                    <li>
-                      After saving, you will see information similar to the following. Record your source <strong>ID</strong> as it will be used later in the exercise.
-                      <figure class="bcls-figure">
-                          <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/dfp/source-created.png" alt="source created">
-                      </figure>
-                    </li>
-                  </ol>
-                </section>
-
                 <section class="bcls-section" id="Create_an_ad_rule">
                   <h2>Create an ad rule</h2>
                   <p>In an ad rule you configure when you want your ads to play. You will have options for each of pre-, mid- and post-role, as follows:</p>
@@ -338,6 +334,33 @@
                   </ol>
                 </section>
 
+                <section class="bcls-section" id="Connect_to_Video_Cloud">
+                  <h2>Connect to Video Cloud</h2>
+                  <p>For this exercie, the only reason the steps in this section need to be performed if to generate a source ID that indicates a connection to Video Cloud. This ID is required in the next section.</p>
+                  <ol class="bcls-tasklist">
+                    <li>Follow the numbered steps and click <strong>New source</strong>.
+                      <figure class="bcls-figure">
+                          <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/dfp/navigate-to-source.png" alt="navigate to source">
+                      </figure>
+                    </li>
+                    <li>Provide a <strong>Name</strong> for the source.</li>
+                    <li>Set the <strong>Type</strong> to <strong>Brightcove</strong>.</li>
+                    <li>Enter, then validate, a read-only, no URL access <strong>API token</strong> for your Video Cloud account. When you validate you will see a partial list of videos from your Video Cloud account.</li>
+                    <li>Check to be sure your form is filled out similarly to the following:
+                      <figure class="bcls-figure">
+                          <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/dfp/source-form.png" alt="source form">
+                      </figure>
+                    </li>
+                    <li>Click <strong>Save</strong>.</li>
+                    <li>
+                      After saving, you will see information similar to the following. Record your source <strong>ID</strong> as it will be used later in the exercise.
+                      <figure class="bcls-figure">
+                          <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/dfp/source-created.png" alt="source created">
+                      </figure>
+                    </li>
+                  </ol>
+                </section>
+
                 <section class="bcls-section" id="Testing_the_ad_tag">
                   <h2>Test the ad tag</h2>
                   <ol class="bcls-tasklist">
@@ -359,7 +382,7 @@
                       </figure>
                     </li>
                     <li>Add the query string parameter to the ad tag in the Video Suite Inspector and you will see the pre- and post-roll ads now play.</li>
-                    <li>Locate the source ID recorded from step 58 above.</li>
+                    <li>Locate the source ID recorded from step 73 above.</li>
                     <li>Also, locate a video ID from a Video Cloud media asset.</li>
                     <li>Add another query string to the ad tag, this time using the field to be <strong>cmsid</strong>, and the value to be the retrieved source ID.
                       <pre class="line-numbers"><code class="language-javascript">cmsid=1111</code></pre>
@@ -420,8 +443,8 @@
             <section class="bcls-section" id="Related_topics">
                 <h2>Related Topics</h2>
                 <ul>
-                    <li><a href="">Doc 1</a></li>
-                    <li><a href="">Doc 2</a></li>
+                    <li><a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/ads-learning-guide.html">Video Advertising Learning Guide</a></li>
+                    <li><a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/ima-plugin.html">Advertising with IMA3 Plugin Guide</a></li>
                 </ul>
             </section>
         </div>
