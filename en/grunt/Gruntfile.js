@@ -14,6 +14,7 @@ module.exports = function (grunt) {
                         'source/video-cloud.json',
                         'source/analytics-api.json',
                         'source/analytics-api-v0.json',
+                        'source/audience-api.json',
                         'source/batch-provisioning.json',
                         'source/mobile-sdks.json',
                         'source/mobile-sdks-v1.json',
