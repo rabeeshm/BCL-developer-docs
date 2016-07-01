@@ -47,9 +47,10 @@
             <div id="sidenav" class="side-nav"></div>
         </div>
         <div id="main" class="large-10 small-12 columns">
+            <h1>Getting Access Tokens</h1>
+            <!-- begin drupal content -->
             <article class="bcls-article">
                 <header id="bcls_header" class="bcls-header">
-                    <h1>Getting Access Tokens</h1>
                     <p>This explains how to get access tokens and shows you strategies for implementing this logic in your apps.</p>
                 </header>
                 <section class="bcls-section" id="gettingToken">
@@ -78,14 +79,23 @@
                 <section class="bcls-section" id="implementation">
                     <h2>Implementation Strategies</h2>
                     <p>If your app will only be making sporadic calls to the Brightcove APIs, you might as well ignore the <code>expires_in</code> parameter and just fetch a new access token for every call. In that case, the processing sequence will look like this:</p>
-                    <div><img src="assets/get-token-new-token.png" alt="get-token-new-token" width="456" height="82"></div>
+                    <figure class="bcls-figure">
+                        <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/oauth-api/guides/get-token/get-token-new-token.png" alt="Get New Token">
+                        <figcaption class="bcls-caption--image">Get New Token</figcaption>
+                    </figure>
                     <p>On the other hand, if you know that your app will frequently make many API calls in quick succession (for, say, generating long reports), then it will be more efficient to fetch access tokens only when you need them. There are two basic ways of doing this:</p>
                     <ol>
                         <li>Go ahead and try the API call and if you get an <code>UNAUTHORIZED</code> error in response, go fetch a new token and make the API call again. In this case, the processing sequence will look like this:
-                          <div><img src="assets/get-token-check-call-fail.png" alt="get-token-check-call-fail" width="626" height="274"></div>
+                            <figure class="bcls-figure">
+                                <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/oauth-api/guides/get-token/get-token-check-call-fail.png" alt="Get Token with Check for Call Fail">
+                                <figcaption class="bcls-caption--image">Get Token with Check for Call Fail</figcaption>
+                            </figure>
                         </li>
                         <li>Another approach would be to add the <code>expires_in</code> value to the current time in Epoch seconds each time you fetch a token, and then on later API calls, check the expires time against the current time to see if you need to fetch a new token. In this case, your processing sequence will look like this:
-                        <div><img src="assets/get-token-check-expiration.png" alt="get-token-check-expiration" width="492" height="248"></div>
+                            <figure class="bcls-figure">
+                                <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/oauth-api/guides/get-token/get-token-check-expiration.png" alt="Get Token with Check for Expiration">
+                                <figcaption class="bcls-caption--image">Get Token with Check for Expiration</figcaption>
+                            </figure>
                         </li>
                     </ol>
                 </section>
@@ -94,9 +104,9 @@
                     <p>Here are some code samples to help you get started.</p>
                     <h3>Shell script example</h3>
                     <p>The first example is a shell script that implements the first implementation logic above: it takes inputs from the user, always gets a new token, and then makes the API call. The script will work on any of the Brightcove APIs, and you may find it useful for testing API calls as you build your app.</p>
-                    <div class="BCL-aside">
+                    <aside class="bcls-aside bcls-aside--information">
                         <p>Note: this script uses cURL, and also the jq command line app. See <a href="../../concepts/curl/curl.html">Set up cURL and jq</a> for setup instructions. The Python json.tool is also used to pretty-print the response, but that should already be installed on your system.</p>
-                        <p>To run the script, save the code as <strong>api-tester.sh</strong> on your system, open a command line in the same folder, and enter <code class="language-bash">bash api-tester.sh</code> - you will be prompted for the following inputs:</p>
+                        <p>To run the script, save the code as <strong>api-tester.sh</strong> on your system, open a command line in the same folder, and enter <code>bash api-tester.sh</code> - you will be prompted for the following inputs:</p>
                         <ul>
                             <li>client id (required)</li>
                             <li>client secret (required)</li>
@@ -104,28 +114,29 @@
                             <li>the HTTP verb for the call: GET | POST | PATCH | PUT | DELETE  (required)</li>
                             <li>data for the request body (optional)</li>
                         </ul>
-                    </div>
+                    </aside>
                     <h4 id="shell">Shell script code</h4>
-                    <p><script src="https://gist.github.com/999cd134e48421c1ec8b.js"></script></p>
+<pre data-src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/assets/api-tester.sh" class="line-numbers"></pre>
                     <h3 id="ruby">Ruby example</h3>
                     <p>The next example is a Ruby script that also employs the first implementation logic: always get a token and then make the API call. This example makes a call to the Analytics API, but can be adapted to work with any of the APIs.</p>
                     <h4>Ruby code</h4>
-                    <p><script src="https://gist.github.com/7c23bdbc48c870bd79e6.js"></script></p>
+<pre data-src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/oauth-api/guides/get-token/get-token.rb" class="line-numbers"></pre>
                     <h3 id="python">Python example</h3>
                     <p>The last sample is a Python script that implements the 3rd implementation logic above. It attempts to make an Analytics API call, but if the call fails on an UNAUTHORIZED error, it fetches a new access token and retries the call.</p>
                     <p>
                         This script also reads the client credentials from an external file - the credentials data file is shown below the Python code.
                     </p>
                     <h4>Python code</h4>
-                    <p><script src="https://gist.github.com/797a6dd98f1581e786b7.js"></script></p>
+<pre data-src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/oauth-api/guides/get-token/get-token.py" class="line-numbers"></pre>
                     <h5>Credentials file for Python sample</h5>
-                    <p><script src="https://gist.github.com/2e46e622f289fc121141.js"></script></p>
+<pre data-src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/oauth-api/guides/get-token/credsFile.json" class="line-numbers"></pre>
                     <h3 id="php">PHP example</h3>
                     <p>This is a simple proxy that takes client credentials and an API call, gets an access token, makes the API request, and returns the results to the client.</p>
                     <h4>PHP code</h4>
-                    <p><script src="https://gist.github.com/8b18129a418cf0a080c0.js"></script></p>
+<pre data-src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/oauth-api/guides/get-token/get-token.php" class="line-numbers"></pre>
                 </section>
             </article>
+            <!-- end drupal content -->
             <div class="bcls-section" id="references">
                 <h2>Related Topics</h2>
                 <ul>
@@ -144,9 +155,7 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
 <script src="/en/scripts/docs-nav-data.min.js"></script>
 <script src="/en/scripts/bcls-doc-site-v0.js"></script>
-<script src="/en/scripts/expander-v2.js"></script>
-<script src="/en/scripts/faq.js"></script>
-<script src="/en/scripts/select-code.js"></script>
+<script src="//learning-services-media.brightcove.com/doc-assets/js/bcls-utils.js"></script>
 <script src="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.js"></script>
 <script>
     $(document).foundation();
