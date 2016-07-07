@@ -5,15 +5,14 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
     <title id="bclPageTitle">Creating a slides/doc tutorial</title>
-    <script type="text/javascript" src="//use.edgefonts.net/source-code-pro.js"></script>
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
-    <script src="//use.edgefonts.net/source-code-pro.js"></script>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link rel="stylesheet" href="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.css">
+    <link rel="stylesheet" href="//docs.brightcove.com/en/styles/template-less/css/bcls-doc.css">
+    <link rel="stylesheet" href="/en/styles/foundation-fixes.css">
 
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/atelier-forest.light.min.css" />
-    <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css" />
     <script>
         (function(i, s, o, g, r, a, m) {
             i['GoogleAnalyticsObject'] = r;
@@ -48,581 +47,284 @@
 
         <!-- main content starts here -->
         <div id="main" class="large-10 small-12 columns deck-container">
-            <!-- title slide -->
-            <div id="top" class="section title slide">
-                <h1>Quick Start: Ingest Profiles API</h1>
-                <p class="doc-only">The Ingest Profiles API allows you to manage ingest and transcode profiles for your account. This tutorial will walk you through these operations.</p>
+            <h1>Quick Start: Ingest Profiles API</h1>
+            <!-- begin drupal content -->
+            <article class="bcls-article">
+                <header id="bcls_header" class="bcls-header">
+                    <p>The Ingest Profiles API allows you to manage ingest and transcode profiles for your account. This tutorial will walk you through these operations.</p>
 
-            </div>
-            <!-- regular content slide -->
-            <div id="intro" class="slide">
-                <h3>Introduction</h3>
-                <p class="slide-only">The Ingest Profiles API allows you to manage profiles that determine how videos added via the Dynamic Ingest API or the Upload Module are transcoded.</p>
-                <p>The Ingest Profiles API allows you to:</p>
-                <ul>
-                    <li class="slide">
-                        <p>Get the profiles for your account</p>
-                    </li>
-                    <li class="slide">
-                        <p>Create new profiles</p>
-                    </li>
-                    <li class="slide">
-                        <p>Update profiles</p>
-                    </li>
-                    <li class="slide">
-                        <p>Delete profiles</p>
-                    </li>
-                    <li class="slide">
-                        <p>Set or update the default profile for your account</p>
-                    </li>
-                </ul>
-            </div>
-            <div id="restful" class="slide">
-                <h3>A Restful API</h3>
-                <p>The Ingest Profiles API is a RESTful API. It accepts HTTPS requests and returns a JSON response.</p>
-                <p>This means that you can use the API with any language you choose - Ruby, Java, PHP, Python, JavaScript (via AJAX or nodejs), etc. All you have to be able to do is make HTTPS requests and handle a JSON response.</p>
-            </div>
-            <div id="baseURL" class="slide">
-                <h3>The base URL</h3>
-                <p>The base URL for the Ingest Profiles API is:</p>
-    <pre class="slide"><code>https://ingestion.api.brightcove.com/v1</code></pre>
-            </div>
-            <div id="authorization" class="slide">
-                <h3>Authorization</h3>
-                <p>API calls are authorized using OAuth2 access tokens. The token is passed with requests in an authorization header:</p>
-    <pre class="slide"><code>Authorization: Bearer {access_token}</code></pre>
-                <p class="slide">Access tokens are short-lived (5 min), so you must get one each time you make a request</p>
-                <p class="slide">In these exercises, we'll make requests via a <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-token.html#php">proxy</a> that will fetch an access token and then make the request.</p>
-            </div>
-            <div id="setupSection" class="section slide">
-                <h2>Setup for the Exercises</h2>
-            </div>
-            <div>
-                <div id="setup" class="slide" style="padding-left: 1.5em;max-width: 100%">
-                    <h3>Setup</h3>
-                    <p>You have two options:</p>
+                </header>
+                <!-- regular content slide -->
+                <section id="intro" class="bcls-section">
+                    <h3>Introduction</h3>
+                    <p>The Ingest Profiles API allows you to:</p>
                     <ul>
-                        <li class="slide">Perform the exercises on a sample account (recommended)</li>
-                        <li class="slide">Use your own account</li>
+                        <li>
+                            <p>Get the profiles for your account</p>
+                        </li>
+                        <li>
+                            <p>Create new profiles</p>
+                        </li>
+                        <li>
+                            <p>Update profiles</p>
+                        </li>
+                        <li>
+                            <p>Delete profiles</p>
+                        </li>
+                        <li>
+                            <p>Set or update the default profile for your account</p>
+                        </li>
                     </ul>
-                    <p class="slide"><button class="bcls-button" id="useSampleAccount">Use Sample Account</button> <button class="bcls-button" id="useMyAccount">Use My Account</button></p>
-                    <div id="basicInfo" class="display-none" style="width:90%">
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <td>Video Cloud Account (Publisher ID):</td>
-                                    <td>
-                                        <input id="account_id" type="text" size="30"></td>
-                                </tr>
-                                <tr>
-                                    <td class="align-top no-wrap">Client id:</td>
-                                    <td>
-                                        <input id="client_id" type="text" size="40" value="" /><p>
-                                    </td>
-                                </tr><tr>
-                                    <td>Client secret:</td>
-                                    <td>
-                                        <input id="client_secret" type="text" size="40" value="" /><p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <p><button class="bcls-button" id="setOptions">Set Account Options</button></p>
-                        <p>See <a href="https://support.brightcove.com/en/video-cloud/docs/managing-api-authentication-credentials">Managing API Credentials</a> for information on getting client credentials.</p>
+                </section>
+                <section id="restful" class="bcls-section">
+                    <h3>A Restful API</h3>
+                    <p>The Ingest Profiles API is a RESTful API. It accepts HTTPS requests and returns a JSON response.</p>
+                    <p>This means that you can use the API with any language you choose - Ruby, Java, PHP, Python, JavaScript (via AJAX or nodejs), etc. All you have to be able to do is make HTTPS requests and handle a JSON response.</p>
+                </section>
+                <section id="baseURL" class="bcls-section">
+                    <h3>The base URL</h3>
+                    <p>The base URL for the Ingest Profiles API is:</p>
+                <pre class="line-numbers"><code class="language-http">https://ingestion.api.brightcove.com/v1</code></pre>
+                </section>
+                <section id="authorization" class="bcls-section">
+                    <h3>Authorization</h3>
+                    <p>API calls are authorized using OAuth2 access tokens. The token is passed with requests in an authorization header:</p>
+                <pre class="line-numbers"><code class="language-bash">Authorization: Bearer {access_token}</code></pre>
+                    <p>Access tokens are short-lived (5 min), so you must get one each time you make a request</p>
+                    <p>In these exercises, we'll make requests via a <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-token.html#php">proxy</a> that will fetch an access token and then make the request.</p>
+                </section>
+                <section id="setupSection"  class="bcls-section">
+                    <h2>Setup for the Exercises</h2>
+                    <div id="setup" style="padding-left: 1.5em;max-width: 100%">
+                        <h3>Setup</h3>
+                        <p>You have two options:</p>
+                        <ul>
+                            <li>Perform the exercises on a sample account (recommended)</li>
+                            <li>Use your own account</li>
+                        </ul>
+                        <p><button class="bcls-button" id="useSampleAccount">Use Sample Account</button> <button class="bcls-button" id="useMyAccount">Use My Account</button></p>
+                        <div id="basicInfo" style="display:none;">
+                            <table class="bcls-table">
+                                <tbody class="bcls-table__body">
+                                    <tr>
+                                        <td>Video Cloud Account (Publisher ID):</td>
+                                        <td>
+                                            <input id="account_id" type="text" size="30"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-top no-wrap">Client id:</td>
+                                        <td>
+                                            <input id="client_id" type="text" size="40" value="" /><p>
+                                        </td>
+                                    </tr><tr>
+                                        <td>Client secret:</td>
+                                        <td>
+                                            <input id="client_secret" type="text" size="40" value="" /><p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p><button class="bcls-button" id="setOptions">Set Account Options</button></p>
+                            <p>See <a href="https://support.brightcove.com/en/video-cloud/docs/managing-api-authentication-credentials">Managing API Credentials</a> for information on getting client credentials.</p>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <!-- end slide - no content - for slides only -->
-            <div class="slide endSlide slide-only"></div>
-            <div id="getAllProfilesSection" class="section slide">
-                <h2>Getting all profiles</h2>
-            </div>
-            <div id="getAllProfilesSetup" class="slide">
-                <h3>Getting the account profiles</h3>
-                <p>To get all the profiles for an account, make a GET request to the endpoint:</p>
-    <pre class="slide"><code>/accounts/{account_id}/profiles</code></pre>
-                <p class="slide">Example:</p>
-    <pre class="slide"><code>https://ingestion.api.brightcove.com/v1/accounts/57838016001/profiles</code></pre>
-            </div>
-            <div id="exercise1" class="slide">
-                <h3>Exercise 1: Get all profiles</h3>
-                <p>Make the following GET request:</p>
-                <textarea id="ex1request"></textarea>
-                <p><button id="ex1button" class="bcls-button">Submit Request</button></p>
-                <textarea id="ex1response" style="height:12em;">Response will appear here</textarea>
-            </div>
-            <!-- end slide - no content - for slides only -->
-            <div class="slide endSlide slide-only"></div>
-            <div id="createProfilesSection" class="section slide">
-                <h2>Creating a profile</h2>
-            </div>
-            <div id="createProfilesSetup" class="slide">
-                <h3>Creating profiles</h3>
-                <p>To create a profile, make a POST request to the endpoint:</p>
-    <pre class="slide"><code>/accounts/{account_id}/profiles</code></pre>
-                <p class="slide">Example:</p>
-    <pre class="slide"><code>https://ingestion.api.brightcove.com/v1/accounts/57838016001/profiles</code></pre>
-                <p class="slide">The JSON for the profile is included as the request body. See the <a href="//docs.brightcove.com/en/video-cloud/ingest-profiles-api/reference/profile-fields-reference.html">Profile Field Reference</a> for profile, rendition, and DRM package fields</p>
-            </div>
-            <div id="exercise2" class="slide">
-                <h3>Exercise 2: Create a profile</h3>
-                <p>Make the following POST request:</p>
-                <textarea id="ex2request"></textarea>
-                <textarea id="ex2data" style="height:12em;"></textarea>
-                <p><button id="ex2button" class="bcls-button">Submit Request</button></p>
-                <p class="slide-only">(Response will appear on the next slide)</p>
-            </div>
-            <div id="ex2resp" class="slide">
-                <h3 class="slide-only">Exercise 2 Response</h3>
-                <textarea id="ex2response" style="height:12em;">Response will appear here</textarea>
-            </div>
-            <!-- end slide - no content - for slides only -->
-            <div class="slide endSlide slide-only"></div>
-            <div id="getProfileByIdSection" class="section slide">
-                <h2>Getting a Single Profile</h2>
-            </div>
-            <div id="getProfileByIdSetup" class="slide">
-                <h3>Getting a profile by id</h3>
-                <p>To retrieve a profile by id, make a GET request to the endpoint:</p>
-    <pre class="slide"><code>/accounts/{account_id}/profiles/{profile_id}</code></pre>
-                <p class="slide">For the <code>profile_id</code>, you can use either the:</p>
-                <ul>
-                    <li class="slide">name (e.g. balanced-high-definition)</li>
-                    <li class="slide">generated id (e.g. 54de14cce4b0a6d2bf9cb08a)</li>
-                </ul>
-                <p class="slide">Examples:</p>
-    <pre class="slide"><code>https://ingestion.api.brightcove.com/v1/accounts/57838016001/profiles/screencast
-    https://ingestion.api.brightcove.com/v1/accounts/57838016001/profiles/54de14cce4b0a6d2bf9cb08a
-    </code></pre>
-            </div>
-            <div id="exercise3" class="slide">
-                <h3>Exercise 3: Get one profile</h3>
-                <p>Make the following GET request to get back the profile you created:</p>
-                <textarea id="ex3request"></textarea>
-                <p><button id="ex3button" class="bcls-button">Submit Request</button></p>
-                <textarea id="ex3response" style="height:12em;">Response will appear here</textarea>
-            </div>
-            <!-- end slide - no content - for slides only -->
-            <div class="slide endSlide slide-only"></div>
-            <div id="updateProfileSection" class="section slide">
-                <h2>Updating a Profile</h2>
-            </div>
-            <div id="getProfileByIdSetup" class="slide">
-                <h3>Update a profile by id</h3>
-                <p>To update a profile by id, make a PUT request to the endpoint:</p>
-    <pre class="slide"><code>/accounts/{account_id}/profiles/{profile_id}</code></pre>
-                <p class="slide">For the <code>profile_id</code>, you can use either the:</p>
-                <ul>
-                    <li class="slide">name (e.g. balanced-high-definition)</li>
-                    <li class="slide">generated id (e.g. 54de14cce4b0a6d2bf9cb08a)</li>
-                </ul>
-                <p class="slide">Example:</p>
-    <pre class="slide"><code>https://ingestion.api.brightcove.com/v1/accounts/57838016001/profiles/my-test-profile
-    </code></pre>
-            <p class="slide">Include the profile data in the request body as you did when you created the profile. The profile data <strong>must</strong> include the <code>id</code> for the profile!</p>
-            </div>
+                        </section>
 
-            <div id="exercise4" class="slide">
-                <h3>Exercise 4: Update profile</h3>
-                <p>Make the following PUT request to update the profile you created (the description will be updated):</p>
-                <textarea id="ex4request"></textarea>
-                <textarea id="ex4data" style="height:12em;"></textarea>
-                <p><button id="ex4button" class="bcls-button">Submit Request</button></p>
-                <p class="slide-only">(Response will appear on the next slide)</p>
-            </div>
-            <div id="ex4resp" class="slide">
-                <h3 class="slide-only">Exercise 4 Response</h3>
-                <textarea id="ex4response" style="height:12em;">Response will appear here</textarea>
-            </div>
-            <!-- end slide - no content - for slides only -->
-            <div class="slide endSlide slide-only"></div>
-            <div id="deleteProfileSection" class="section slide">
-                <h2>Deleting a Profile</h2>
-            </div>
-            <div id="deleteProfileSetup" class="slide">
-                <h3>Delete a profile by id</h3>
-                <p>To delete a profile by id, make a DELETE request to the endpoint:</p>
-    <pre class="slide"><code>/accounts/{account_id}/profiles/{profile_id}</code></pre>
-                <p class="slide">For the <code>profile_id</code>, you can use either the:</p>
-                <ul>
-                    <li class="slide">name (e.g. balanced-high-definition)</li>
-                    <li class="slide">generated id (e.g. 54de14cce4b0a6d2bf9cb08a)</li>
-                </ul>
-                <p class="slide">Example:</p>
-    <pre class="slide"><code>https://ingestion.api.brightcove.com/v1/accounts/57838016001/profiles/my-test-profile
-    </code></pre>
-            </div>
-            <div id="exercise5" class="slide">
-                <h3>Exercise 5: Delete profile</h3>
-                <p>Make the following DELETE request to update the profile you created (cannot be undone!):</p>
-                <textarea id="ex5request"></textarea>
-                <p><button id="ex5button" class="bcls-button">Submit Request</button></p>
-                <textarea id="ex5response" style="height:12em;">Response will appear here</textarea>
-            </div>
-            <!-- end slide - no content - for slides only -->
-            <div class="slide endSlide slide-only"></div>
-            <div id="getDefaultProfileSection" class="section slide">
-                <h2>Getting Default Profile</h2>
-            </div>
-            <div id="getDefaultProfileSetup" class="slide">
-                <h3>Get the default profile</h3>
-                <p>To get the default profile for the account, make a GET request to the endpoint:</p>
-    <pre class="slide"><code>/accounts/account_id/configuration</code></pre>
-                <p class="slide">Example:</p>
-    <pre class="slide"><code>https://ingestion.api.brightcove.com/v1/accounts/57838016001/configuration
-    </code></pre>
-            </div>
-            <div id="exercise6" class="slide">
-                <h3>Exercise 6: Get default profile</h3>
-                <p>Make the following GET request to get the default profile for the account:</p>
-                <textarea id="ex6request"></textarea>
-                <p><button id="ex6button" class="bcls-button">Submit Request</button></p>
-                <textarea id="ex6response" style="height:12em;">Response will appear here</textarea>
-            </div>
-            <!-- end slide - no content - for slides only -->
-            <div class="slide endSlide slide-only"></div>
-            <div id="setDefaultProfileSection" class="section slide">
-                <h2>Setting Default Profile</h2>
-            </div>
-            <div id="setDefaultProfileSetup" class="slide">
-                <h3>Set the default profile</h3>
-                <p>To set the default profile for the account, make a POST request to the endpoint:</p>
-    <pre class="slide"><code>/accounts/account_id/configuration</code></pre>
-                <p class="slide">Include this JSON as the request body</p>
-    <pre class="slide"><code>{
-      "account_id": {account_id},
-      "default_profile_id": {default_profile_id}
-    }</code></pre>
-                <p class="slide">As with other operations you can use the name or id for the <code>profile_id</code>.</p>
-                <ul>
-                    <li class="slide">name (e.g. balanced-high-definition)</li>
-                    <li class="slide">generated id (e.g. 54de14cce4b0a6d2bf9cb08a)</li>
-                </ul>
-                <p class="slide">Example:</p>
-    <pre class="slide"><code>https://ingestion.api.brightcove.com/v1/accounts/57838016001/configuration
-    </code></pre>
-            </div>
-            <div id="exercise7" class="slide">
-                <h3>Exercise 7: Set default profile</h3>
-                <p>Make the following POST request to set the default profile (note that this will fail if the account already has a default profile - we will update the default in the next exercise):</p>
-                <textarea id="ex7request"></textarea>
-                <textarea id="ex7data" style="height:12em;"></textarea>
-                <p><button id="ex7button" class="bcls-button">Submit Request</button></p>
-                <p class="slide-only">(Response will appear on the next slide)</p>
-            </div>
-            <div id="ex7resp" class="slide">
-                <h3 class="slide-only">Exercise 7 Response</h3>
-                <textarea id="ex7response" style="height:12em;">Response will appear here</textarea>
-            </div>
-            <!-- end slide - no content - for slides only -->
-            <div class="slide endSlide slide-only"></div>
-            <div id="updateDefaultProfileSection" class="section slide">
-                <h2>Updating Default Profile</h2>
-            </div>
-            <div id="updateDefaultProfileSetup" class="slide">
-                <h3>Update the default profile</h3>
-                <p>To update the default profile for the account, make a PATCH request to the endpoint:</p>
-    <pre class="slide"><code>/accounts/account_id/configuration</code></pre>
-                <p class="slide">Include this JSON as the request body</p>
-    <pre class="slide"><code>{
-      "id": {configuration_id},
-      "account_id": {account_id},
-      "default_profile_id": {default_profile_id}
-    }</code></pre>
-                <p class="slide">The configuration id is returned when you get the default profile. If there is no default profile, see <a href="#setDefaultProfileSection">Setting the Default Profile</a>. As with other operations you can use the name or id for the <code>profile_id</code>.</p>
-                <ul>
-                    <li class="slide">name (e.g. balanced-high-definition)</li>
-                    <li class="slide">generated id (e.g. 54de14cce4b0a6d2bf9cb08a)</li>
-                </ul>
-                <p class="slide">Example:</p>
-    <pre class="slide"><code>https://ingestion.api.brightcove.com/v1/accounts/57838016001/configuration/{configuration_id}
-    </code></pre>
-    <p class="BCL-aside">The <code>configuration_id</code> is the <code>id</code> you get in the response to a GET or POST request.</p>
-            </div>
-            <div id="exercise8" class="slide">
-                <h3>Exercise 8: Update default profile</h3>
-                <p>Make the following PUT request to update the default profile for the account:</p>
-                <textarea id="ex8request"></textarea>
-                <textarea id="ex8data" style="height:12em;"></textarea>
-                <p><button id="ex8button" class="bcls-button">Submit Request</button></p>
-                <p class="slide-only">(Response will appear on the next slide)</p>
-            </div>
-            <div id="ex8resp" class="slide">
-                <h3 class="slide-only">Exercise 7 Response</h3>
-                <textarea id="ex8response" style="height:12em;">Response will appear here</textarea>
-            </div>
-            <!-- end slide - no content - for slides only -->
-            <div class="slide endSlide slide-only"></div>
+                <section id="getAllProfilesSection"  class="bcls-section">
+                    <h2>Getting all profiles</h2>
+                    <h3>Getting the account profiles</h3>
+                    <p>To get all the profiles for an account, make a GET request to the endpoint:</p>
+                    <pre><code>/accounts/{account_id}/profiles</code></pre>
+                    <p>Example:</p>
+                    <pre class="line-numbers"><code class="language-http">https://ingestion.api.brightcove.com/v1/accounts/57838016001/profiles</code></pre>
+                    <h3>Exercise 1: Get all profiles</h3>
+                    <p>Make the following GET request:</p>
+                    <textarea class="bcls-code" id="ex1request"></textarea>
+                    <p><button id="ex1button" class="bcls-button">Submit Request</button></p>
+                    <textarea class="bcls-code" id="ex1response" style="height:12em;">Response will appear here</textarea>
+                </section>
+
+                <section id="createProfilesSection"  class="bcls-section">
+                    <h2>Creating a profile</h2>
+                    <h3>Creating profiles</h3>
+                    <p>To create a profile, make a POST request to the endpoint:</p>
+                    <pre><code>/accounts/{account_id}/profiles</code></pre>
+                    <p>Example:</p>
+                    <pre class="line-numbers"><code class="language-http">https://ingestion.api.brightcove.com/v1/accounts/57838016001/profiles</code></pre>
+                    <p>The JSON for the profile is included as the request body. See the <a href="//docs.brightcove.com/en/video-cloud/ingest-profiles-api/reference/profile-fields-reference.html">Profile Field Reference</a> for profile, rendition, and DRM package fields</p>
+                    <h3>Exercise 2: Create a profile</h3>
+                    <p>Make the following POST request:</p>
+                    <textarea class="bcls-code" id="ex2request"></textarea>
+                    <textarea class="bcls-code" id="ex2data" style="height:12em;"></textarea>
+                    <p><button id="ex2button" class="bcls-button">Submit Request</button></p>
+                    <p class="slide-only">(Response will appear on the next slide)</p>
+                    <h3 class="slide-only">Exercise 2 Response</h3>
+                    <textarea class="bcls-code" id="ex2response" style="height:12em;">Response will appear here</textarea>
+                </section>
+
+                <section id="getProfileByIdSection"  class="bcls-section">
+                    <h2>Getting a Single Profile</h2>
+                    <h3>Getting a profile by id</h3>
+                    <p>To retrieve a profile by id, make a GET request to the endpoint:</p>
+                    <pre><code>/accounts/{account_id}/profiles/{profile_id}</code></pre>
+                    <p>For the <code>profile_id</code>, you can use either the:</p>
+                    <ul>
+                        <li>name (e.g. balanced-high-definition)</li>
+                        <li>generated id (e.g. 54de14cce4b0a6d2bf9cb08a)</li>
+                    </ul>
+                    <p>Examples:</p>
+                    <pre class="line-numbers"><code class="language-http">https://ingestion.api.brightcove.com/v1/accounts/57838016001/profiles/screencast
+                    https://ingestion.api.brightcove.com/v1/accounts/57838016001/profiles/54de14cce4b0a6d2bf9cb08a
+                    </code></pre>
+                    <h3>Exercise 3: Get one profile</h3>
+                    <p>Make the following GET request to get back the profile you created:</p>
+                    <textarea class="bcls-code" id="ex3request"></textarea>
+                    <p><button id="ex3button" class="bcls-button">Submit Request</button></p>
+                    <textarea class="bcls-code" id="ex3response" style="height:12em;">Response will appear here</textarea>
+                </section>
+
+                <section id="updateProfileSection"  class="bcls-section">
+                    <h2>Updating a Profile</h2>
+                    <h3>Update a profile by id</h3>
+                    <p>To update a profile by id, make a PUT request to the endpoint:</p>
+                    <pre><code>/accounts/{account_id}/profiles/{profile_id}</code></pre>
+                    <p>For the <code>profile_id</code>, you can use either the:</p>
+                    <ul>
+                        <li>name (e.g. balanced-high-definition)</li>
+                        <li>generated id (e.g. 54de14cce4b0a6d2bf9cb08a)</li>
+                    </ul>
+                    <p>Example:</p>
+                    <pre class="line-numbers"><code class="language-http">https://ingestion.api.brightcove.com/v1/accounts/57838016001/profiles/my-test-profile
+                    </code></pre>
+                <p>Include the profile data in the request body as you did when you created the profile. The profile data <strong>must</strong> include the <code>id</code> for the profile!</p>
+                    <h3>Exercise 4: Update profile</h3>
+                    <p>Make the following PUT request to update the profile you created (the description will be updated):</p>
+                    <textarea class="bcls-code" id="ex4request"></textarea>
+                    <textarea class="bcls-code" id="ex4data" style="height:12em;"></textarea>
+                    <p><button id="ex4button" class="bcls-button">Submit Request</button></p>
+                    <p class="slide-only">(Response will appear on the next slide)</p>
+                    <h3 class="slide-only">Exercise 4 Response</h3>
+                    <textarea class="bcls-code" id="ex4response" style="height:12em;">Response will appear here</textarea>
+                </section>
+
+                <section id="deleteProfileSection"  class="bcls-section">
+                    <h2>Deleting a Profile</h2>
+                    <h3>Delete a profile by id</h3>
+                    <p>To delete a profile by id, make a DELETE request to the endpoint:</p>
+                    <pre><code>/accounts/{account_id}/profiles/{profile_id}</code></pre>
+                    <p>For the <code>profile_id</code>, you can use either the:</p>
+                    <ul>
+                        <li>name (e.g. balanced-high-definition)</li>
+                        <li>generated id (e.g. 54de14cce4b0a6d2bf9cb08a)</li>
+                    </ul>
+                    <p>Example:</p>
+                    <pre class="line-numbers"><code class="language-http">https://ingestion.api.brightcove.com/v1/accounts/57838016001/profiles/my-test-profile
+                    </code></pre>
+                    <h3>Exercise 5: Delete profile</h3>
+                    <p>Make the following DELETE request to update the profile you created (cannot be undone!):</p>
+                    <textarea class="bcls-code" id="ex5request"></textarea>
+                    <p><button id="ex5button" class="bcls-button">Submit Request</button></p>
+                    <textarea class="bcls-code" id="ex5response" style="height:12em;">Response will appear here</textarea>
+                </section>
+
+                <section id="getDefaultProfileSection"  class="bcls-section">
+                    <h2>Getting Default Profile</h2>
+                    <h3>Get the default profile</h3>
+                    <p>To get the default profile for the account, make a GET request to the endpoint:</p>
+                    <pre><code>/accounts/account_id/configuration</code></pre>
+                    <p>Example:</p>
+                    <pre class="line-numbers"><code class="language-http">https://ingestion.api.brightcove.com/v1/accounts/57838016001/configuration
+                    </code></pre>
+                    <h3>Exercise 6: Get default profile</h3>
+                    <p>Make the following GET request to get the default profile for the account:</p>
+                    <textarea class="bcls-code" id="ex6request"></textarea>
+                    <p><button id="ex6button" class="bcls-button">Submit Request</button></p>
+                    <textarea class="bcls-code" id="ex6response" style="height:12em;">Response will appear here</textarea>
+                </section>
+
+                <section id="setDefaultProfileSection"  class="bcls-section">
+                    <h2>Setting Default Profile</h2>
+                    <h3>Set the default profile</h3>
+                    <p>To set the default profile for the account, make a POST request to the endpoint:</p>
+                    <pre><code>/accounts/account_id/configuration</code></pre>
+                    <p>Include this JSON as the request body</p>
+                    <pre><code>{
+                      "account_id": {account_id},
+                      "default_profile_id": {default_profile_id}
+                    }</code></pre>
+                    <p>As with other operations you can use the name or id for the <code>profile_id</code>.</p>
+                    <ul>
+                        <li>name (e.g. balanced-high-definition)</li>
+                        <li>generated id (e.g. 54de14cce4b0a6d2bf9cb08a)</li>
+                    </ul>
+                    <p>Example:</p>
+                    <pre class="line-numbers"><code class="language-http">https://ingestion.api.brightcove.com/v1/accounts/57838016001/configuration
+                    </code></pre>
+                    <h3>Exercise 7: Set default profile</h3>
+                    <p>Make the following POST request to set the default profile (note that this will fail if the account already has a default profile - we will update the default in the next exercise):</p>
+                    <textarea class="bcls-code" id="ex7request"></textarea>
+                    <textarea class="bcls-code" id="ex7data" style="height:12em;"></textarea>
+                    <p><button id="ex7button" class="bcls-button">Submit Request</button></p>
+                    <p class="slide-only">(Response will appear on the next slide)</p>
+                    <h3 class="slide-only">Exercise 7 Response</h3>
+                    <textarea class="bcls-code" id="ex7response" style="height:12em;">Response will appear here</textarea>
+                </section>
+
+                <section id="updateDefaultProfileSection"  class="bcls-section">
+                    <h2>Updating Default Profile</h2>
+                    <h3>Update the default profile</h3>
+                    <p>To update the default profile for the account, make a PATCH request to the endpoint:</p>
+                    <pre><code>/accounts/account_id/configuration</code></pre>
+                    <p>Include this JSON as the request body</p>
+                    <pre><code>{
+                      "id": {configuration_id},
+                      "account_id": {account_id},
+                      "default_profile_id": {default_profile_id}
+                    }</code></pre>
+                    <p>The configuration id is returned when you get the default profile. If there is no default profile, see <a href="#setDefaultProfileSection">Setting the Default Profile</a>. As with other operations you can use the name or id for the <code>profile_id</code>.</p>
+                    <ul>
+                        <li>name (e.g. balanced-high-definition)</li>
+                        <li>generated id (e.g. 54de14cce4b0a6d2bf9cb08a)</li>
+                    </ul>
+                    <p>Example:</p>
+                    <pre class="line-numbers"><code class="language-http">https://ingestion.api.brightcove.com/v1/accounts/57838016001/configuration/{configuration_id}
+                    </code></pre>
+                    <aside class="bcls-aside bcls-aside--information">The <code>configuration_id</code> is the <code>id</code> you get in the response to a GET or POST request.</aside>
+                    <h3>Exercise 8: Update default profile</h3>
+                    <p>Make the following PUT request to update the default profile for the account:</p>
+                    <textarea class="bcls-code" id="ex8request"></textarea>
+                    <textarea class="bcls-code" id="ex8data" style="height:12em;"></textarea>
+                    <p><button id="ex8button" class="bcls-button">Submit Request</button></p>
+                    <p class="slide-only">(Response will appear on the next slide)</p>
+                    <h3 class="slide-only">Exercise 7 Response</h3>
+                    <textarea class="bcls-code" id="ex8response" style="height:12em;">Response will appear here</textarea>
+                </section>
+            </article>
+            <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+            <script src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/ingest-profiles-api/getting-started/quick-start/quick-start.js"></script>
+            <!-- end drupal content -->
         </div>
-        <!-- main content ends here -->
 
     </div>
     <!-- bcl scripts -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.3/handlebars.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
     <script src="/en/scripts/docs-nav-data.min.js"></script>
-    <script src="/en/scripts/bcls-doc-site-v1.js"></script>
-
-    </div>
-
-    <script id="pageScript" type="text/javascript">
-var BCLS = (function ($, window, document) {
-    "use strict";
-    var proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
-        baseURL = "https://ingestion.api.brightcove.com/v1",
-        useMyAccount = document.getElementById("useMyAccount"),
-        basicInfo = document.getElementById("basicInfo"),
-        account_id = document.getElementById("account_id"),
-        client_id = document.getElementById("client_id"),
-        client_secret = document.getElementById("client_secret"),
-        setOptions = document.getElementById("setOptions"),
-        /**
-         * defaults - Brightcove Learning account values here - change to account you want to use
-         * permissions for:
-         * Ingest Profiles API - all operations
-         */
-        defaults = {
-            account_id: "57838016001",
-            client_id: "c953f97a-1050-4597-a22e-46ea68f8143b",
-            client_secret: "HhzY-WS7NVCPkbQJBfxCmGfB_FYuWfvUGn9-lUNRY3eY6p05Bo1JEErYs-vOWcQ-72Aecel83cN5U22e8S7b-g"
-        },
-        options = {},
-        // for the exercises
-        sampleProfile = {"renditions":[{"speed":3,"fixed_keyframe_interval":true,"media_type":"video","keyframe_rate":0.333,"video_codec":"h264","width":848,"reference_id":"mp1","h264_profile":"high","format":"mp4","audio_codec":"aac","audio_bitrate":48,"height":480,"video_bitrate":1280},{"speed":3,"media_type":"video","max_frame_rate":30,"keyframe_rate":0.5,"video_codec":"h264","decoder_bitrate_cap":1920,"reference_id":"hls3","type":"segmented","h264_profile":"high","width":848,"max_hls_protocol_version":2,"format":"ts","audio_codec":"aac","audio_bitrate":48,"hls_optimized_ts":"true","decoder_buffer_size":5120,"height":480,"video_bitrate":1280,"package_format":"zip"},{"height":360,"label":"poster","width":480,"media_type":"image","format":"png"},{"height":90,"label":"thumbnail","width":160,"media_type":"image","format":"png"}],"account_id":"your_account_id","name":"Test_Profile","description":"This will produce 1 MP4 rendition, 1 HLS rendition, and 2 image renditions.","packages":[]},
-        profileData,
-        profileDataStr = "",
-        updateData,
-        updateDataStr = "",
-        defaultData = {"account_id":57838016001,"profile_id":"screencast"},
-        defaultDataStr = "",
-        updateDefaultData = {"id":"","account_id":57838016001,"default_profile_id":"balanced-high-definition"},
-        updateDefaultDataStr = "",
-        config_id = "",
-        profile_id = "",
-        ex1request = document.getElementById("ex1request"),
-        ex1response = document.getElementById("ex1response"),
-        ex1button = document.getElementById("ex1button"),
-        ex2request = document.getElementById("ex2request"),
-        ex2response = document.getElementById("ex2response"),
-        ex2button = document.getElementById("ex2button"),
-        ex2data = document.getElementById("ex2data"),
-        ex3request = document.getElementById("ex3request"),
-        ex3response = document.getElementById("ex3response"),
-        ex3button = document.getElementById("ex3button"),
-        ex4request = document.getElementById("ex4request"),
-        ex4response = document.getElementById("ex4response"),
-        ex4button = document.getElementById("ex4button"),
-        ex4data = document.getElementById("ex4data"),
-        ex5request = document.getElementById("ex5request"),
-        ex5response = document.getElementById("ex5response"),
-        ex5button = document.getElementById("ex5button"),
-        ex6request = document.getElementById("ex6request"),
-        ex6response = document.getElementById("ex6response"),
-        ex6button = document.getElementById("ex6button"),
-        ex7request = document.getElementById("ex7request"),
-        ex7response = document.getElementById("ex7response"),
-        ex7button = document.getElementById("ex7button"),
-        ex7data = document.getElementById("ex7data"),
-        ex8request = document.getElementById("ex8request"),
-        ex8response = document.getElementById("ex8response"),
-        ex8button = document.getElementById("ex8button"),
-        ex8data = document.getElementById("ex8data"),
-        // functions
-        isDefined,
-        bclslog,
-        copyObj,
-        setAccountOptions,
-        setupExercises,
-        submitRequest;
-        /**
-         * tests for all the ways a variable might be undefined or not have a value
-         * @param {*} x the variable to test
-         * @return {Boolean} true if variable is defined and has a value
-         */
-        isDefined = function(x){
-            if ( x !== "" && x !== null && x !== undefined && x !== NaN && x !== {} && x !== []) {
-                return true;
-            } else {
-                return false;
-            }
-        };
-        /**
-         * Logging function - safe for IE
-         * @param  {string} context description of the data
-         * @param  {*} message the data to be logged by the console
-         * @return {}
-         */
-        bclslog = function (context, message) {
-            if (window["console"] && console["log"]) {
-              console.log(context, message);
-            };
-            return;
-        };
-        /**
-         * get a copy of (rather than reference to) an object
-         * @param  {object} obj the object you want a copy
-         * @return {object}     the copy
-         */
-        copyObj = function (obj) {
-            return JSON.parse(JSON.stringify(obj));
-        };
-        /**
-         * set up account options when you are ready to assemble the URL and make the API call
-         */
-        setAccountOptions = function () {
-            defaults.account_id = isDefined(account_id.value) ? account_id.value : defaults.account_id;
-            defaults.client_id = isDefined(client_id.value) ? client_id.value : defaults.client_id;
-            defaults.client_secret = isDefined(client_secret.value) ? client_secret.value : defaults.client_secret;
-            bclslog("defaults", defaults);
-        };
-        /**
-         * set up values for exercises
-         */
-        setupExercises = function () {
-            profileData = copyObj(sampleProfile);
-            profileData["account_id"] = defaults.account_id;
-            profileData["name"] += new Date().toISOString();
-            profileDataStr = JSON.stringify(profileData, null, "  ");
-            updateData = copyObj(profileData);
-            updateData["description"] = "Test Profile Updated";
-            updateData["id"] = profile_id;
-            updateDataStr = JSON.stringify(updateData, null, "  ");
-            defaultDataStr = JSON.stringify(defaultData, null, "  ");
-            updateDefaultData["id"] = config_id;
-            updateDefaultDataStr = JSON.stringify(updateDefaultData, null, "  ");
-            bclslog("updateDefaultDataStr", updateDefaultDataStr);
-            ex1request.value = baseURL + "/accounts/" + defaults.account_id + "/profiles";
-            ex2request.value = baseURL + "/accounts/" + defaults.account_id + "/profiles";
-            ex2data.value = profileDataStr;
-            ex3request.value = baseURL + "/accounts/" + defaults.account_id + "/profiles/" + profile_id;
-            ex4request.value = baseURL + "/accounts/" + defaults.account_id + "/profiles/" + profile_id;
-            ex4data.value = updateDataStr;
-            ex5request.value = baseURL + "/accounts/" + defaults.account_id + "/profiles/" + profile_id;
-            ex6request.value = baseURL + "/accounts/" + defaults.account_id + "/configuration";
-            ex7request.value = baseURL + "/accounts/" + defaults.account_id + "/configuration";
-            ex7data.value = defaultDataStr;
-            ex8request.value = baseURL + "/accounts/" + defaults.account_id + "/configuration/" + config_id;
-            ex8data.value = updateDefaultDataStr;
-        };
-        // listeners
-        // toggle sample/customer account
-        useMyAccount.addEventListener("click", function () {
-            if (basicInfo.className === "display-none") {
-                basicInfo.className = "display-block";
-                useMyAccount.textContent = "Cancel";
-            } else {
-                basicInfo.className = "display-none";
-                useMyAccount.textContent = "Use My Account";
-            }
-        });
-        useSampleAccount.addEventListener("click", function () {
-            setAccountOptions();
-            useSampleAccount.textContent = "Setup Complete!";
-            setupExercises();
-        });
-        /**
-         * submits the api request to the proxy and writes the response
-         * @param  {string} the request type get, post, patch, put, delete
-         * @param  {object:htmlElement} reqEl  element that holds the api request
-         * @param  {object:htmlElement} respEl element to write the response to
-         * @param  {object:htmlElement} dataEl element that holds request data (optional)
-         */
-        submitRequest = function (exNum, reqType, reqEl, respEl, dataEl) {
-            var options = {},
-                respData;
-            options.client_id = defaults.client_id;
-            options.client_secret = defaults.client_secret;
-            options.url = reqEl.value;
-            options.requestType = reqType.toUpperCase();
-            options.requestBody = (isDefined(dataEl)) ? dataEl.value : null;
-            bclslog("options", options);
-            $.ajax({
-                url: proxyURL,
-                method: "POST",
-                data: options,
-                success : function (data) {
-                    try {
-                        bclslog("data", data);
-                        respData = JSON.parse(data);
-                        respEl.value = JSON.stringify(respData, null, "  ");
-                        if (exNum === 2) {
-                            profile_id = respData.id;
-                            bclslog("profile_id", profile_id);
-                            setupExercises();
-                        }
-                        if (exNum === 6 || exNum === 7) {
-                            config_id = respData["id"];
-                            bclslog("config_id", config_id);
-                            setupExercises();
-                        }
-                    } catch (e) {
-                         bclslog("invalid JSON - something went wrong", e);
-                         data = {"Error": e};
-                         switch (exNum) {
-                            case 5:
-                            respEl.value = "[DELETE requests do not return any data - you will just see an empty HTTP 204 response]"
-                            break;
-                            case 6:
-                            respEl.value = "There is no default profile - we'll set one in the next exercise";
-                            break;
-                            case 7:
-                            respEl.value = "There is already a default profile - we'll update it in the next exercise";
-                            break;
-                            default:
-                            respEl.value = "There was a problem with the request";
-                         }
-                    }
-                    // write the response to the response element
-
-                }
-            })
-        }
-        // set account options
-        setOptions.addEventListener("click", function () {
-            setAccountOptions();
-            setOptions.textContent = "Setup Complete!";
-            setupExercises();
-        });
-        // exercise button handlers
-        ex1button.addEventListener("click", function () {
-            submitRequest(1, "get", ex1request, ex1response);
-        });
-        ex2button.addEventListener("click", function () {
-            submitRequest(2, "post", ex2request, ex2response, ex2data);
-        });
-        ex3button.addEventListener("click", function () {
-            submitRequest(3, "get", ex3request, ex3response);
-        });
-        ex4button.addEventListener("click", function () {
-            submitRequest(4, "put", ex4request, ex4response, ex4data);
-        });
-        ex5button.addEventListener("click", function () {
-            submitRequest(5, "delete", ex5request, ex5response);
-        });
-        ex6button.addEventListener("click", function () {
-            submitRequest(6, "get", ex6request, ex6response);
-        });
-        ex7button.addEventListener("click", function () {
-            submitRequest(7, "post", ex7request, ex7response, ex7data);
-        });
-        ex8button.addEventListener("click", function () {
-            submitRequest(8, "put", ex8request, ex8response, ex8data);
-        });
-    return {}
-})($, window, document);
-    </script>
+    <script src="/en/scripts/bcls-doc-site-v2.js"></script>
+    <script src="//learning-services-media.brightcove.com/doc-assets/js/bcls-utils.js"></script>
+    <script src="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.js"></script>
     <script>
         $(document).foundation();
     </script>
-<div style="text-align:center">
+    <div style="text-align:center">
     <iframe id="CSAT" src="//learning-services-media.brightcove.com/doc-assets/general/surveylink.html" style=" padding-bottom:20px;border:none"></iframe>
 </div>
 <br><br>
-<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+<div class="bcls-footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
 <script>
 var feedbackMail = document.getElementById("feedbackMail");
 feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
