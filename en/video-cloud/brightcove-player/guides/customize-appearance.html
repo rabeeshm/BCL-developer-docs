@@ -244,33 +244,65 @@
         </aside>
         <p>Specifically, the following code is used to insert a download video icon in front of the volume icon:</p>
         <ul>
-          <li>Lines 280-284: Style for the download button.</li>
-          <li>Lines 302-306: Assign variables and create HTML elements for:
+          <li>Lines 280-285: Style for the download button.</li>
+          <li>Lines 291-295: Assign variables and create HTML elements for:
           <ul>
             <li>The <code>&lt;div&gt;</code> which will contain the icon for the download icon.</li>
             <li>The anchor tag which make the icon clickable.</li>
             <li>The icon image itself.</li>
           </ul>
           </li>
-          <li>Lines 309-310: Assign and id and CSS classes to the new element.</li>
-          <li>Line 313: Assign a source to the image.</li>
-          <li>Line 314: Assign an <code>href</code> to the link.</li>
-          <li>Line 315: Append the image to the link.</li>
-          <li>Line 316: Append the link to the dynamically created <code>&lt;div&gt;</code>.</li>
-          <li>Line 320: Get a reference to the controlbar to use with <code>insertBefore()</code>.</li>
-          <li>Line 323: Get a reference to the element which the new icon will be insert in front of, to use with <code>insertBefore()</code>.</li>
-          <li>Line 326: Insert the dynamically created element.</li>
+          <li>Lines 297-2980: Assign and id and CSS classes to the new element.</li>
+          <li>Line 300: Assign a source to the image.</li>
+          <li>Line 301: Assign an <code>href</code> to the link.</li>
+          <li>Line 302: Append the image to the link.</li>
+          <li>Line 303: Append the link to the dynamically created <code>&lt;div&gt;</code>.</li>
+          <li>Line 306: Get a reference to the controlbar to use with <code>insertBefore()</code>.</li>
+          <li>Line 308: Get a reference to the element which the new icon will be insert in front of, to use with <code>insertBefore()</code>.</li>
+          <li>Line 310: Insert the dynamically created element.</li>
         </ul>
-        <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="270,280-285,286,299-328"></code></p>
+        <pre class="line-numbers" data-start="279"><code class="language-javascript">  &lt;!-- styles for page --&gt;
+    /* Style the download icon */
+    #downloadButton {
+        width: 34px;
+        height: 33px;
+        margin-top: 6px;
+    }
+  &lt;/style&gt;
+
+  &lt;script type=&quot;text/javascript&quot;&gt;
+    videojs('myPlayerID').ready(function(){
+      // Create variables and new div, anchor and image for download icon
+      var myPlayer = this,
+        controlBar,
+        newElement = document.createElement('div'),
+        newLink = document.createElement('a'),
+        newImage = document.createElement('img');
+      // Assign id and classes to div for icon
+      newElement.id = 'downloadButton';
+      newElement.className = 'downloadStyle vjs-control';
+      // Assign properties to elements and assign to parents
+      newImage.setAttribute('src','http://solutions.brightcove.com/bcls/brightcove-player/download-video/file-download.png');
+      newLink.setAttribute('href','http://www.brightcove.com');
+      newLink.appendChild(newImage);
+      newElement.appendChild(newLink);
+      // Get control bar and insert before elements
+      // Remember that getElementsByClassName() returns an array
+      controlBar = document.getElementsByClassName('vjs-control-bar')[0];
+      // Change the class name here to move the icon in the controlBar
+      insertBeforeNode = document.getElementsByClassName('vjs-volume-menu-button')[0];
+      // Insert the icon div in proper location
+      controlBar.insertBefore(newElement,insertBeforeNode);
+    });</code></pre>
         <p>Here you see the result of the code, with the newly inserted icon highlighted in yellow:</p>
         <div><img src="/en/video-cloud/brightcove-player/guides/assets/customize-appearance/download-icon-before-volume.png" alt="download before volume"></div>
         <p>If you wish to have the icon in a different location, you need only to change the code which gets the element to insert in front of. For instance, to move the new icon in front of the fullscreen button, use this:</p>
-        <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="338"></code></p>
+        <pre><code class="language-javascript">insertBeforeNode = document.getElementsByClassName('vjs-fullscreen-control')[0];</code></pre>
         <p>The result would appear as follows:</p>
         <div><img src="/en/video-cloud/brightcove-player/guides/assets/customize-appearance/download-icon-before-fullscreen.png" alt="download before full screen"></div>
         <h3>Icon on far right</h3>
         <p>If you wish the icon to appear at the far right of the controlbar, you would replace the <code>insertBefore()</code> with  the <code>appendChild()</code> method, as shown here:</p>
-        <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="343"></code></p>
+        <pre><code class="language-javascript">controlBar.appendChild(newElement);</code></pre>
         <p>An example of adding an icon (for downloading a file in this case) is shown in the <a href="../../brightcove-player/samples/download-video.html">Brightcove Player Sample: Download Video Plugin</a> document.</p>
         <h3 id="spacer">Use the spacer</h3>
         <p>Although the techniques above work for placing icons on the controlbar, it is possible they will not be compatible with other code that manipulates the controlbar. Also, you most likely would not want to abstract the code into a plugin for general reuse.</p>
@@ -278,10 +310,14 @@
         <p>The spacer element is located in the controlbar between the time information on the left and the fullscreen icon on the right, as shown in the following screenshot (highlighted in the green oval). Note in the <strong>Elements</strong> section of the Dev Tools the element is defined an HTML <code>&lt;div&gt;</code>.</p>
         <div><img src="/en/video-cloud/brightcove-player/guides/assets/customize-appearance/spacer.png" alt="spacer in console"></div>
         <p>To place an icon in the spacer element, you use the following code, which is very similar to the code shown earlier in this section. The result of the code is shown in the screenshot which follows the code snippet.</p>
-        <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="351,352,359,360"></code></p>
+        <pre><code class="language-javascript">      // Get the spacer element
+      spacer = document.getElementsByClassName('vjs-spacer')[0];
+      // Place the new element in the spacer
+      spacer.appendChild(newElement);</code></pre>
         <div><img src="/en/video-cloud/brightcove-player/guides/assets/customize-appearance/spacer-left.png" alt="spacer in console"></div>
         <p>If you wish to place the icon on the right side of the spacer, another line of code needs to be used. The spacer layout is controlled by an HTML Flexbox. So adding a Flexbox style you can push the added icon to the right. The result of the code is shown in the screenshot which follows the code snippet.</p>
-        <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="353,354"></code></p>
+        <pre><code class="language-javascript">      // Set the content of the spacer to be right justified
+      spacer.setAttribute("style", "justify-content: flex-end;");</code></pre>
         <div><img src="/en/video-cloud/brightcove-player/guides/assets/customize-appearance/spacer-right.png" alt="spacer in console"></div>
       </section>
 
@@ -289,12 +325,18 @@
         <h2>Hover gradient</h2>
         <p>When the player is first loaded, and when you mouse over the player, you see the video title displayed, as well as a black to transparent gradient over the top portion of the player. This section will show you how to alter the gradient.</p>
         <p>The actual gradient is controlled by the CSS <code>linear-gradient</code> function in the <code>vjs-dock-text</code> HTML <code>&lt;div&gt;.</code> The size of the gradient can be controlled by the height of the <code>vjs-dock-text</code> HTML <code>&lt;div&gt;</code>. Here is that element, and its children, from the player:</p>
-        <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="365-368"></code></p>
+        <pre><code class="language-html">&lt;div class=&quot;vjs-dock-text&quot;&gt;
+  &lt;h1 class=&quot;vjs-dock-title&quot;&gt;Tiger&lt;/h1&gt;
+  &lt;h2 class=&quot;vjs-dock-description&quot;&gt;&lt;/h2&gt;
+&lt;/div&gt;</code></pre>
         <p>The default values for the gradient use the <code>rgba()</code> (red-green-blue-alpha) function, as shown here:</p>
-        <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="371"></code></p>
+        <pre><code class="language-javascript">linear-gradient(180deg,rgba(0,0,0,.8) 25%,transparent 100%);</code></pre>
         <p>These values cause the gradient to horizontally fade from black, with an alpha of <strong>.8</strong>, to transparent. The value of <strong>25%</strong> is a cut off value, meaning the value set in the <code>rgba</code> function will be used for the first 25% of the space before the fading to transparent begins.</p>
         <p>For instructional purposes, as you would not use this gradient in production, the following style creates the gradient in the screenshot.</p>
-        <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="375-378"></code></p>
+        <pre><code class="language-css">.video-js .vjs-dock-text {
+  background: linear-gradient(45deg, rgba(0,0,255,.8) 35%, transparent);
+  height: 80%;
+}</code></pre>
         <div><img src="assets/customize-appearance/gradient-blue.png" alt="bad blue gradient"></div>
         <p>In this example, a blue gradient with a .8 alpha is applied at a 45 degree downhill angle. The color/alpha set in the linear gradient will be used for the first 35% of the gradient before it begins to fade. Also, 80% of the element height is used.</p>
         <p>The following CodePen permits you to experiment with values. Start the video and mouse in and out to see the subtle gradient used by default.</p>
@@ -316,9 +358,22 @@
         <h3>Referencing an id</h3>
           <p>Since an <code>id</code> attribute has a high relevance regarding CSS specificity, adding an <code>id</code> to the CSS selector will override the <code>background-color</code> property.</p>
           <p>If you haven't already done so, add an <code>id</code> attribute to the <code>video</code> element as follows:</p>
-          <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="112-116" data-gist-highlight-line="112"></code></p>
+          <pre><code class="language-html"><span class="bcls-highlight">    &lt;video id=&quot;video_1&quot;</span>
+      data-account=&quot;1752604059001&quot;
+      data-player=&quot;68f30408-8fb4-431d-accb-8c5baa8c4790&quot;
+      data-embed=&quot;default&quot;
+      class=&quot;video-js&quot; controls&gt;&lt;/video&gt;</code></pre>
           <p>In the CSS, add the id value to the <code>.vjs-big-play-button</code> class selector. Override the background color and opacity as follows:</p>
-          <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="58-67" data-gist-highlight-line="59-62"></code></p>
+          <pre class="line-numbers"><code class="language-css">  &lt;style&gt;
+<span class="bcls-highlight">    #video_1 .vjs-big-play-button {
+      background-color: #B37D5B;
+      opacity: .6;
+    }</span>
+    .video-js {
+      width: 640px;
+      height: 360px;
+    }
+  &lt;/style&gt;</code></pre>
           <p>You should see that the big play button is now orange.</p>
           <div><img src="assets/customize-appearance/orange-play-button.png" alt="orange-play-button"></div>
 
@@ -326,7 +381,16 @@
           <p>Since the <code>background</code> property for the big play button is set using two classes, you will need at least two classes in the CSS selector to override this property.</p>
           <p>Add the <code>.video-js</code> class to the <code>.vjs-big-play-button</code> class selector. Remember that the <code>.video-js</code> class is set on the video container.</p>
          <p>With these values, we are saying select all elements with a class name of <code>vjs-big-play-button</code> which are decedents of elements with a class name of <code>.video-js</code>.</p>
-          <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="126-135" data-gist-highlight-line="127"></code></p>
+         <pre><code class="language-css">&lt;style&gt;
+<span class="bcls-highlight">  .video-js .vjs-big-play-button {</span>
+    background-color: #B37D5B;
+    opacity: .6;
+  }
+  .video-js {
+    width: 640px;
+    height: 360px;
+  }
+&lt;/style&gt;</code></pre>
           <p>You should see that the big play button is now orange. Working with multiple classes can be tricky and may affect multiple elements, whereas an id is specific to one element.</p>
 
         <h3>Using JavaScript</h3>
@@ -336,9 +400,23 @@
             <li>Line 173: Gets a reference to the first element which has a class of <code>vjs-big-play-button</code>.</li>
             <li>Line 174: Adds an <code>id</code> attribute to the big play button.</li>
           </ul>
-          <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="171-176"></code></p>
+          <pre class="line-numbers" data-start="171"><code class="language-html">  &lt;script type=&quot;text/JavaScript&quot;&gt;
+
+    var playButton = document.getElementsByClassName(&quot;vjs-big-play-button&quot;)[0];
+    playButton.setAttribute(&quot;id&quot;, &quot;myPlayButton&quot;);
+
+  &lt;/script&gt;</code></pre>
           <p>In the CSS, change the selector to use the <code>myPlayButton</code> id name.</p>
-            <p><code data-gist-id="a84d9ce7fb1054d288b6" data-gist-hide-footer="true" data-gist-line="148-157" data-gist-highlight-line="149"></code></p>
+          <pre class="line-numbers"><code class="language-css">  &lt;style&gt;
+<span class="bcls-highlight">    #myPlayButton {</span>
+      background-color: #B37D5B;
+      opacity: .6;
+    }
+    .video-js {
+      width: 640px;
+      height: 360px;
+    }
+  &lt;/style&gt;</code></pre>
           <p>You should see that the big play button is now orange.</p>
       </section>
       <section id="componentselectors" class="bcls-section">
