@@ -60,18 +60,19 @@
                         <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/general-information/di-status/ingestion-status-architecture.png" alt="Ingest Status Workflow">
                         <figcaption class="bcls-caption--image">Ingest Status Workflow</figcaption>
                     </figure>
-                    <dl>
-                        <dt>Dynamic Ingest Notification Service</dt>
-                        <dd>
+                </section>
+                    <section id="Dynamic_Ingest_Notifications" class="bcls-section">
+                        <h2>Dynamic Ingest Notifications</h2>
                             <p>The Dynamic Ingest notification service sends you notifications for several kinds of events. The three that are most useful for figuring out when the video is "ready" are ones indicating that particular renditions have been created, ones indicating that a manifest has been created, and the one that indicates that all processing is complete. Here are  examples of each:</p>
+                            <h3>Rendition created notification</h3>
                             <figure class="bcls-figure">
 <pre class="line-numbers"><code class="language-json">{
-    <span class="bcls-hightlight">"entity": "5002412132001",</span>
+    "entity": "5002412132001",
     <span class="bcls-highlight">"profileRefId": "ts7",</span>
     "accountId": "57838016001",
     "entityType": "ASSET",
-    "videoId": "5002361893001",
-    "status": "SUCCESS",
+    <span class="bcls-highlight">"videoId": "5002361893001",</span>
+    <span class="bcls-highlight">"status": "SUCCESS",</span>
     "version": "1",
     "action": "CREATE",
     "jobId": "bb316631-c58b-4bd4-a686-13c5f7a3a779"
@@ -85,6 +86,7 @@
                                 <li>if the <code>status</code> value is "SUCCESS", the rendition was created successfully</li>
                                 <li>For a segmented type like HLS or MPEG-DASH, the existence of the rendition does not make it playable - you also need the appropriate manifest (see the next example). MP4 renditons are playable as soon as they are created.</li>
                             </ul>
+                            <h3>Manifest created notification</h3>
                             <figure class="bcls-figure">
 <pre class="line-numbers"><code class="language-json">{
     "jobId": "31f0b112-9890-4567-adb5-0f4ed1673701",
@@ -107,6 +109,7 @@
                                 <li>If the <code>status</code> value is "SUCCESS", the manifest was created successfully</li>
                                 <li>For a segmented type like HLS or MPEG-DASH, there is no definite order for the creation of the renditions and manifest - these renditions are not playable until both are created (or the video has been fully processed - see the next example).</li>
                             </ul>
+                            <h3>Processing complete notification</h3>
                             <figure class="bcls-figure">
 <pre class="line-numbers"><code class="language-json">{
     <span class="bcls-highlight">"entityType": "TITLE",</span>
@@ -133,38 +136,27 @@
     }, "profile": "high-resolution",
     <strong>"callbacks": ["http://host1/path1”, “http://host2/path2”]</strong>
 }</code></pre>
-                        </dd>
-                        <dt>CMS API</dt>
-                        <dd>
-                            <p>The CMS API is used to retrieve video metadata, including an array of video sources. The request looks like this:</p>
-                            <pre><code>https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/<strong>sources</strong></code></pre>
-                            <p>The response will be an array of objects. Depending on how your account is configured, these may not correspond 1:1 with renditions created - for example, if your account is set up to provide streaming over SSL connections, there will be 2 sources for each HLS rendition (1 secure, 1 unsecured). What's important, however, is that as long as the sources array is not empty, the video has some renditions, and the ingest was successuful. If there are no sources, then something went wrong - the most common issues are:</p>
-                            <ul>
-                                <li>the source video file was invalid</li>
-                                <li>the S3 URL was unreacheable</li>
-                                <li>a transcode error was encountered</li>
-                            </ul>
-                        </dd>
-                    </dl>
                 </section>
                 <section class="bcls-section" id="sample">
-                    <h2>Sample</h2>
-                    <h3>An Example to create a dashboard of Dynamic Ingestion jobs</h3>
-                    <p>This section explains how notications and the CMS API call can be put together to build a simple dashboard for the Dynamic Ingest API. The handler for notifications parses notifications from the Dynamic Ingest API to identify processing complete notifications. It then adds the video id into an array in a JavaScript file. The dashboard itself is an HTML page that includes the array of processed video ids. It uses the ids to makes 2 requests to the <a href="../../cms-api/getting-started/quick-start-cms.html">CMS API</a>                    to get the video metadata and the array of sources (renditions). Whether renditions exist or not shows whether the ingest succeeded or failed. You can view the dashboard <a href="//solutions.brightcove.com/bcls/di-api/di-log.html">here</a>.</p>
+                    <h2>Sample Dashboard</h2>
+                    <p>This section explains how notications can be put together to build a simple dashboard for the Dynamic Ingest API. The handler for notifications parses notifications from the Dynamic Ingest API to identify processing complete notifications. It then adds the video notifications into an array of objects for each video in a JSON file. The dashboard itself is an HTML page that imports the JSON file to get the notification data. It uses the ids to makes a request to the <a href="../../cms-api/getting-started/quick-start-cms.html">CMS API</a> to get the video metadata. You can view the dashboard <a href="//solutions.brightcove.com/bcls/di-api/di-log.html">here</a>.</p>
                     <p>All the files for this app, along with instructions for setting it up for your account, are in <a href="https://github.com/BrightcoveLearning/dynamic-ingest-dashboard">this repository</a>.</p>
                     <p>
                         Here is the high-level architecture of the app:
                     </p>
-                    <p><img src="./assets/ingestion-dashboard-architecture.png" alt="ingest-dashboard-architecture"></p>
+                    <figure class="bcls-figure">
+                        <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/general-information/di-status/ingestion-dashboard-architecture.png" alt="Ingest Dashboad Architecture">
+                        <figcaption class="bcls-caption--image">Ingest Dashboad Architecture</figcaption>
+                    </figure>
                     <h3>The app parts</h3>
                     <p>The handler for notifications is built in PHP - it looks for processing complete notifications and adds the video id to an array in a separate JavaScript file:</p>
                     <h4>Notification handler</h4>
                     <p>
                         <script src="https://gist.github.com/846bf4f1b8d52b442121.js"></script>
                     </p>
-                    <h4>JavaScript file:</h4>
+                    <h4>JSON file:</h4>
                     <p>
-                        <script src="https://gist.github.com/c4b36c1f826762be75f9.js"></script>
+                        The JSON file is initially empty - data is added by the notification handler.
                     </p>
                     <h4>Dashboard</h4>
                     <p>The dashboard include the JavaScript file, and uses additional JavaScript to fetch data from the CMS API and write the results into a table:</p>
