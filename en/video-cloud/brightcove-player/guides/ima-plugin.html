@@ -30,14 +30,6 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
 
-    <style type="text/css">
-     iframe {
-       width: 640px;
-       height: 360px;
-     }
-    </style>
-
-
 </head>
 
 <body>
@@ -55,6 +47,14 @@
         <div id="main" class="large-10 small-12 columns">
           <h1 id="bclPageHeading">Advertising with IMA3 Plugin Guide</h1>
       <!-- begin drupal content -->
+
+      <style type="text/css">
+       iframe {
+         width: 640px;
+         height: 360px;
+       }
+      </style>
+
       <article class="bcls-article">
             <header id="bcls_header" class="bcls-header">
                 <!-- content starts here -->
@@ -125,11 +125,17 @@
                       <li><strong>Pre-roll -</strong> The maximum amount of time to wait for an ad  to initiate a preroll, in milliseconds</li>
                       <li><strong>Post-roll -</strong> The maximum amount of time to wait for an ad  to initiate a postroll, in milliseconds</li>
                     </ul>
+                    <figure class="bcls-figure">
+                        <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/ima3-plugin/studio-ad-props.png" alt="ad properties in Studio">
+                    </figure>
                     <div><img alt="" src="assets/studio-ad-props.png" /></div>
                   </li>
                   <li>Click <strong>Save</strong> to save the changes.</li>
               </ol>
               <p>When  the changes to the advertising properties are saved, the IMA plugin will be configured as part of the Plugin settings.</p>
+              <figure class="bcls-figure">
+                  <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/ima3-plugin/studio-ima-plugin-props.png" alt="IMA3 properties in Studio">
+              </figure>
               <div><img alt="" src="assets/studio-ima-plugin-props.png" /></div>
               <p>The IMA plugin does support additional properties that are not available in the UI. If needed, modify the IMA plugin JSON to include any other options you may need.</p>
               <aside class="bcls-aside bcls-aside--tip">Note: You may want to dynamically build the <code>serverURL</code> at the client (which means the IMA3 plugin would already be initialized), for example after a user login. You can do this by setting that value to an empty string in the <strong>options</strong> <code>{ "serverUrl": "" }</code>, then later assign the value programmatically.</aside>
@@ -616,10 +622,19 @@ Pi.I bridge3.1.33.html:121
               <h2>Ad network flow</h2>
               <p>For those wishing to see a bit more "under the hood", a browser's development tools Network tab can reveal interesting details about the key files being downloaded as part of the ad process.</p>
               <p>In this example using the IMA3 plugin, you first see the the plugin's SWF version being downloaded. Note that the screenshots are from a desktop, so the browser is getting the Flash version of the plugin.</p>
+              <figure class="bcls-figure">
+                  <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/ima3-plugin/ads-learning-guide-network-plugin-swf.png" alt="network flow SWF">
+              </figure>
               <div><img src="/en/video-cloud/brightcove-player/guides/assets/ads-learning-guide-network-plugin-swf.png" alt="plugin swf"></div>
+              <figure class="bcls-figure">
+                  <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/ima3-plugin/ads-learning-guide-network-vmap.png" alt="network flow VMAP">
+              </figure>
               <p>The next ads related file to download is the VMAP document.</p>
               <div><img src="/en/video-cloud/brightcove-player/guides/assets/ads-learning-guide-network-vmap.png" alt="network vmap"></div>
               <p>Last to load is a VAST document for a particular ad.</p>
+              <figure class="bcls-figure">
+                  <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/ima3-plugin/ads-learning-guide-network-vast.png" alt="nework flow VAST">
+              </figure>
               <div><img src="/en/video-cloud/brightcove-player/guides/assets/ads-learning-guide-network-vast.png" alt="network vast"></div>
             </section>
 
@@ -627,22 +642,46 @@ Pi.I bridge3.1.33.html:121
              <h2 class="bcls-expander-head">Implement using code</h2>
              <div class="bcls-expander-content">
                   <p>To implement a plugin the player needs to know the location of the plugin code, a stylesheet if needed, the plugin name and plugin configuration options. The location of the plugin code and stylesheet are as follows:</p>
-                    <ul>
-                      <li>http://players.brightcove.net/videojs-ima3/2/videojs.ima3.min.js</li>
-                        <li>http://players.brightcove.net/videojs-ima3/2/videojs.ima3.min.css</li>
-              </ul>
+                  <pre><code class="language-html">http://players.brightcove.net/videojs-ima3/2/videojs.ima3.min.js</code></pre>
+                  <pre><code class="language-html">http://players.brightcove.net/videojs-ima3/2/videojs.ima3.min.css</code></pre>
                     <p>The name of the plugin is <code>ima3</code>, and an example set of options is:</p>
-                    <p><code data-gist-id="6edffc8c896381fb71e9" data-gist-hide-footer="true" data-gist-line="1-5"></code></p>
+                    <pre><code class="language-json">{
+  "serverUrl": "http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=%2F6062...",
+  "timeout": 5000,
+  "postrollTimeout": 2000
+}</code></pre>
                     <p>The following shows using the In-Page Embed implementation of the player to associate the IMA Plugin with a single instance of a player.</p>
                       <ul>
-                          <li>Line 31: Uses a <code>link</code> tag to include the plugin's CSS in the <code>head</code> of the HTML page.</li>
+                          <li>Line 36: Uses a <code>link</code> tag to include the plugin's CSS in the <code>head</code> of the HTML page.</li>
                           <li>Line 38: Gives the <code>video</code> tag an <code>id</code> attribute, with some value, in this case <strong>video_1</strong>.</li>
                           <li>Line 46: Uses a <code>script</code> tag to include the plugin's JavaScript in the <code>body</code> of the HTML page.</li>
+                          <li>Line 53: Creates a reference to the player.</li>
                           <li><p>Line 51-57: Initializes the plugin and passes in custom options. Here, we listen for the first <code>loadedmetadata</code> event, which is fired when the player content, including ads, is loaded in the player.</p>
                   <aside class="bcls-aside bcls-aside--tip">NOTE: While the <code>ready()</code> method is used to indicate that the player is loaded and ready, the <code>loadedmetadata</code> event is used to indicate that the player content, like ads, is ready to interact with. Here, we are also using the <code>one()</code> method so that our function is executed the first time the plugin is loaded and not every time a video is loaded. For details, see the <a href="../../brightcove-player/guides/events.html">Understanding Player Events</a> document.</aside></li>
-                          <li>Line 53: Creates a reference to the player.</li>
                       </ul>
-                      <p><code data-gist-id="6edffc8c896381fb71e9" data-gist-hide-footer="true" data-gist-line="31,37-58"></code></p>
+                  <pre class="line-numbers" data-start="36"><code class="language-html">&lt;link href=&quot;//players.brightcove.net/videojs-ima3/2/videojs.ima3.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+
+&lt;video id=&quot;video_1&quot;
+  data-account=&quot;3676484086001&quot;
+  data-player=&quot;8fb8f3c6-5b2b-471f-953c-56d65267ff11&quot;
+  data-embed=&quot;default&quot;
+  class=&quot;video-js&quot; controls&gt;&lt;/video&gt;
+
+&lt;script src=&quot;//players.brightcove.net/3676484086001/8fb8f3c6-5b2b-471f-953c-56d65267ff11_default/index.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;script src=&quot;//players.brightcove.net/videojs-ima3/2/videojs.ima3.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;script&gt;
+  var myPlayer;
+
+  videojs(&quot;video_1&quot;).one('loadedmetadata', function(){
+        // get a reference to the player
+        myPlayer = this;
+        myPlayer.ima3({
+            serverUrl: &quot;http://pubads.g.doubleclick.net/gampad/ads?sz=640x360&amp;iu=/6390/Marks-Ads-Test-Unit-1&amp;ciu_szs=728x90&amp;impl=s&amp;gdfp_req=1&amp;env=vp&amp;output=xml_vmap1&amp;unviewed_position_start=1&amp;url=[referrer_url]&amp;correlator=[timestamp]&amp;ad_rule=1&amp;cmsid=580&amp;vid=1760859514001&quot;
+          });
+      });
+&lt;/script&gt;</code></pre>
             </div>
           </section>
 
