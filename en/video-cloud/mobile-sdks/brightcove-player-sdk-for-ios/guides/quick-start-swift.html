@@ -507,70 +507,188 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate {
           <div class="perform-only">
             <h4>Set the playback controller delegate</h4>
             <p>This allows your app to listen and respond to video playback events.</p>
-            <ol start="3">
-              <li><p>Update the View Controller class to include the Brightcove playback controller delegate.</p></li>
-              <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="77" data-gist-hide-footer="true"></code></p>
+            <ol class="bcls-tasklist">
+              <li><p>Update the View Controller class to include the Brightcove playback controller delegate.</p>
+              <pre class="line-numbers" data-start="12"><code class="language-swift">class ViewController: UIViewController, BCOVPlaybackControllerDelegate {</code></pre>
+							</li>
+              <!-- <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="77" data-gist-hide-footer="true"></code></p> -->
             </ol>
             <h4>Customize the project with your values</h4>
 
             <p>Set the value of your Perform Account Id, which will be sent to Brightcove in a later step.</p>
-            <ol start="4">
-              <li><p>Below the <code>#import</code> directives, add your own value for your Brightcove Perform Account Id.</p></li>
-              <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="75" data-gist-hide-footer="true"></code></p>
+            <ol class="bcls-tasklist">
+              <li><p>Below the <code>#import</code> directives, add your own value for your Brightcove Perform Account Id.</p>
+								<pre class="line-numbers" data-start="10"><code class="language-swift">let kAccountID = "123456789" // for analytics</code></pre>
+							</li>
+              <!-- <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="75" data-gist-hide-footer="true"></code></p> -->
             </ol>
 
             <h4>Declare constants and set the view</h4>
-            <ol start="5">
+            <ol class="bcls-tasklist">
               <li><p>In the <code>ViewController</code> class, add the following :</p>
               <ul>
-                <li>Line 79: defines a constant for the playback controller. The <a href="//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/reference/current/Protocols/BCOVPlaybackController.html"><code>BCOVPlaybackController</code></a> has methods to control playback functionality.</li>
-                <li><p>Line 80: defines a variable for the view.</p></li>
-                </ul></li>
-                <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="77-80" data-gist-hide-footer="true" data-gist-highlight-line="79-80"></code></p>
+                <li>Line 14: defines a constant for the playback controller. The <a href="//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/reference/current/Protocols/BCOVPlaybackController.html"><code>BCOVPlaybackController</code></a> has methods to control playback functionality.</li>
+                <li><p>Line 15: defines a variable for the view.</p></li>
+                </ul>
+								<pre class="line-numbers" data-start="12"><code class="language-swift">class ViewController: UIViewController, BCOVPlaybackControllerDelegate {
+
+    <span class="bcls-highlight">let playbackController :BCOVPlaybackController
+    @IBOutlet weak var videoContainerView: UIView!</span></code></pre>
+							</li>
+                <!-- <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="77-80" data-gist-hide-footer="true" data-gist-highlight-line="79-80"></code></p> -->
             </ol>
 
             <h4>Create an init function</h4>
-            <ol start="6">
+            <ol class="bcls-tasklist">
               <li>Create an <code>init</code>function as follows:
               <ul>
-                <li>Line 83: initializes a shared manager. The <a href="//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/reference/current/Classes/BCOVPlayerSDKManager.html"><code>BCOVPlayerSDKManager</code></a> class is a singleton that allows you to create other objects in the SDK ecosystem.</li>
-                <li>Line 84: uses the shared manager to create a playback controller with the default view strategy.</li>
-                <li><p>Line 88: Sends your Video Cloud Publisher ID to analytics. </p></li>
-                <li><p>Lines 90-92: set the delegate and turn on the autoadvance and autoplay features.</p></li>
-                </ul></li>
-                <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="82-93"></code></p>
+                <li>Line 18: initializes a shared manager. The <a href="//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/reference/current/Classes/BCOVPlayerSDKManager.html"><code>BCOVPlayerSDKManager</code></a> class is a singleton that allows you to create other objects in the SDK ecosystem.</li>
+                <li>Line 19: uses the shared manager to create a playback controller with the default view strategy.</li>
+                <li><p>Line 23: Sends your Video Cloud Publisher ID to analytics. </p></li>
+                <li><p>Lines 25-27: set the delegate and turn on the autoadvance and autoplay features.</p></li>
+                </ul>
+								<pre class="line-numbers" data-start="17"><code class="language-swift">required init?(coder aDecoder: NSCoder) {
+    let manager = BCOVPlayerSDKManager.sharedManager();
+    playbackController = manager.createPlaybackControllerWithViewStrategy(manager.defaultControlsViewStrategy())
+
+    super.init(coder: aDecoder)
+
+    playbackController.analytics.account = kAccountID
+
+    playbackController.delegate = self
+    playbackController.autoAdvance = true
+    playbackController.autoPlay = true
+}</code></pre>
+							</li>
+                <!-- <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="82-93"></code></p> -->
             </ol>
 
             <h4>Configure the player</h4>
-            <ol start="7">
+            <ol class="bcls-tasklist">
               <li><p>In the <code>viewDidLoad</code> method add the following:</p>
                 <p><ul>
-                  <li>Lines 97-100: create an array of video sources using url paths.</li>
-                  <li>Lines 102-103: configure the playback controller's view.</li>
-                  <li>Line 104: adds the player view as a subview of the main view.</li>
-                  <li>Line 106: adds the video array to the controller's playback queue.</li>
-                  <li>Line 107: starts playback of the first video.</li>
+                  <li>Lines 33-35: create an array of video sources using url paths.</li>
+                  <li>Lines 37-38: configure the playback controller's view.</li>
+                  <li>Line 39: adds the player view as a subview of the main view.</li>
+                  <li>Line 41: adds the video array to the controller's playback queue.</li>
+                  <li>Line 42: starts playback of the first video.</li>
                 </ul></p>
-              <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="95-108" data-gist-highlight-line="97-107"></code></p></li>
+								<pre class="line-numbers" data-start="30"><code class="language-swift">override func viewDidLoad() {
+	super.viewDidLoad()
+    <span class="bcls-highlight">// create an array of videos
+    var videoArray = [AnyObject]()
+	videoArray = [videoWithURL(NSURL(string: &quot;http://cf9c36303a9981e3e8cc-31a5eb2af178214dc2ca6ce50f208bb5.r97.cf1.rackcdn.com/bigger_badminton_600.mp4&quot;)!),
+      videoWithURL(NSURL(string: &quot;http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8&quot;)!)]
+
+	playbackController.view.frame = videoContainerView.bounds
+    playbackController.view.autoresizingMask = [.FlexibleHeight, .FlexibleWidth]
+    videoContainerView.addSubview(playbackController.view)
+
+    playbackController.setVideos(videoArray)
+    playbackController.play();</span>
+}</code></pre>
+              <!-- <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="95-108" data-gist-highlight-line="97-107"></code></p> -->
+						</li>
             </ol>
 
             <h4>Set the delivery method for video sources</h4>
-            <ol start="8">
-              <li><p>Create a function that sets the delivery method for <code>BCOVSources</code> that belong to a video.</p></li>
-              <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="110-115"></code></p>
+            <ol class="bcls-tasklist">
+              <li><p>Create a function that sets the delivery method for <code>BCOVSources</code> that belong to a video.</p>
+								<pre class="line-numbers" data-start="45"><code class="language-swift">func videoWithURL(url: NSURL) -&gt; BCOVVideo {
+    // set the delivery method for BCOVSources that belong to a video
+    let source:BCOVSource = BCOVSource(URL: url, deliveryMethod: kBCOVSourceDeliveryHLS, properties: nil)
+    let video = BCOVVideo.init(source: source, cuePoints: BCOVCuePointCollection.init(array: []), properties: [NSObject:AnyObject]())
+    return video
+}</code></pre>
+							</li>
+              <!-- <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="110-115"></code></p> -->
             </ol>
 
             <h4>The rest</h4>
-            <ol start="9">
-              <li><p>Create a function to handle when the playback session advances.</p></li>
-              <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="117-119" data-gist-hide-footer="true"></code></p>
-              <li><p>Create a function to set the status bar style.</p></li>
-              <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="122-124" data-gist-hide-footer="true"></code></p>
+            <ol class="bcls-tasklist">
+              <li><p>Create a function to handle when the playback session advances.</p>
+								<pre class="line-numbers" data-start="52"><code class="language-swift">func playbackController(controller: BCOVPlaybackController!, didAdvanceToPlaybackSession session: BCOVPlaybackSession!) {
+    NSLog(&quot;ViewController Debug - Advanced to new session.&quot;)
+}</code></pre>
+							</li>
+              <!-- <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="117-119" data-gist-hide-footer="true"></code></p> -->
+              <li><p>Create a function to set the status bar style.</p>
+								<pre class="line-numbers" data-start="57"><code class="language-swift">override func preferredStatusBarStyle() -&gt; UIStatusBarStyle {
+    return .LightContent
+}</code></pre>
+							</li>
+              <!-- <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="122-124" data-gist-hide-footer="true"></code></p> -->
             </ol>
 
             <h4 id="viewControllerPerform">View the code</h4>
             <p>The View Controller is now complete. Here is the full code:</p>
-            <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="66-131"></code></p>
+						<pre class="line-numbers" data-start="1"><code class="language-swift">//
+//  ViewController.swift
+//  Simple Video Playback - Perform
+//
+//  Copyright © 2016 Brightcove. All rights reserved.
+//
+
+import UIKit
+
+let kAccountID = "123456789" // for analytics
+
+class ViewController: UIViewController, BCOVPlaybackControllerDelegate {
+
+	let playbackController :BCOVPlaybackController
+	@IBOutlet weak var videoContainerView: UIView!
+
+	required init?(coder aDecoder: NSCoder) {
+		let manager = BCOVPlayerSDKManager.sharedManager();
+		playbackController = manager.createPlaybackControllerWithViewStrategy(manager.defaultControlsViewStrategy())
+
+		super.init(coder: aDecoder)
+
+		playbackController.analytics.account = kAccountID
+
+		playbackController.delegate = self
+		playbackController.autoAdvance = true
+		playbackController.autoPlay = true
+	}
+
+	override func viewDidLoad() {
+		super.viewDidLoad()
+		// create an array of videos
+		var videoArray = [AnyObject]()
+		videoArray = [videoWithURL(NSURL(string: &quot;http://cf9c36303a9981e3e8cc-31a5eb2af178214dc2ca6ce50f208bb5.r97.cf1.rackcdn.com/bigger_badminton_600.mp4&quot;)!),
+				videoWithURL(NSURL(string: &quot;http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8&quot;)!)]
+
+		playbackController.view.frame = videoContainerView.bounds
+		playbackController.view.autoresizingMask = [.FlexibleHeight, .FlexibleWidth]
+		videoContainerView.addSubview(playbackController.view)
+
+		playbackController.setVideos(videoArray)
+		playbackController.play();
+	}
+
+	  func videoWithURL(url: NSURL) -&gt; BCOVVideo {
+      // set the delivery method for BCOVSources that belong to a video
+      let source:BCOVSource = BCOVSource(URL: url, deliveryMethod: kBCOVSourceDeliveryHLS, properties: nil)
+      let video = BCOVVideo.init(source: source, cuePoints: BCOVCuePointCollection.init(array: []), properties: [NSObject:AnyObject]())
+      return video
+	  }
+
+	  func playbackController(controller: BCOVPlaybackController!, didAdvanceToPlaybackSession session: BCOVPlaybackSession!) {
+	    NSLog(&quot;ViewController Debug - Advanced to new session.&quot;)
+	  }
+
+	// MARK: UI Styling
+	override func preferredStatusBarStyle() -&gt; UIStatusBarStyle {
+		return .LightContent
+	}
+
+	override func didReceiveMemoryWarning() {
+		super.didReceiveMemoryWarning()
+		// Dispose of any resources that can be recreated.
+	}
+
+}</code></pre>
+            <!-- <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="66-131"></code></p> -->
           </div><!--class="perform-only"-->
 
 				</section><!--class="section" id="buildTheApp"-->
@@ -578,14 +696,26 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate {
 					<section class="bcls-section" id=">Connect_the_storyboard_view">
 						<h2>Connect the storyboard view</h2>
 							<p>Connect the <code>Main.storyboard</code> view with the<code>videoContainer</code> property.</p>
-							<ol>
+							<ol class="bcls-tasklist">
 								<li><p>In the Assistant Editor, open the <code>Main.storyboard</code>.</p></li>
-								<li><p>In the companion view, expand the <strong>View Controller Scene</strong> and then the <strong>View Controller</strong> menu to expose the <strong>View</strong> object.</p></li>
-								<div><img src="assets/quick-start-swift/storyboard-view.png" alt="storyboard-vew" title="storyboard-view"></div>
-								<li><p>Open the <code>ViewController.swift</code> file in the Assistant Editor.</p></li>
-								<div><img src="assets/quick-start-swift/assistant-editor.png" alt="assistant-editor" title="assistant-editor"></div>
-								<li><p>Select the open circle next to the <code>@IBOutlet</code> for the <code>videoContainerView</code>, and drag it to the <strong>View</strong> object to connect these components.</p></li>
-								<div><img src="assets/quick-start-swift/connect-view.png" alt="connect-view" title="connect-view"></div>
+								<li><p>In the companion view, expand the <strong>View Controller Scene</strong> and then the <strong>View Controller</strong> menu to expose the <strong>View</strong> object.</p>
+									<figure class="bcls-figure">
+									   <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/ios/getting-started/quick-start-swift/storyboard-view.png" alt="Storyboard view">
+									   <figcaption class="bcls-caption--image">Storyboard view</figcaption>
+									</figure>
+								</li>
+								<li><p>Open the <code>ViewController.swift</code> file in the Assistant Editor.</p>
+									<figure class="bcls-figure">
+									   <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/ios/getting-started/quick-start-swift/assistant-editor.png" alt="Assistant editor">
+									   <figcaption class="bcls-caption--image">Assistant editor</figcaption>
+									</figure>
+								</li>
+								<li><p>Select the open circle next to the <code>@IBOutlet</code> for the <code>videoContainerView</code>, and drag it to the <strong>View</strong> object to connect these components.</p>
+									<figure class="bcls-figure">
+									   <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/ios/getting-started/quick-start-swift/connect-view.png" alt="Connect the view">
+									   <figcaption class="bcls-caption--image">Connect the view</figcaption>
+									</figure>
+								</li>
 							</ol>
 					</section>
 
@@ -594,7 +724,7 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate {
 		        <p>App Transport Security (ATS) enforces secure connections between your app and web services.</p>
 						<h3>Configure App Transport Security (ATS)</h3>
 		        <p>With Apple's release of the iOS 9 SDK, a new feature called <a href="https://developer.apple.com/library/prerelease/ios/technotes/App-Transport-Security-Technote/">App Transport Security (ATS)</a> was added.</p>
-		        <p class="text-warning">Note: This is only an issue if you are building applications that target the iOS 9 SDK or later. Since ATS restrictions do not apply to previous versions of the iOS SDK, you can skip this section if you are working with a previous version.</p>
+						<aside class="bcls-aside bcls-aside--information">This is only an issue if you are building applications that target the iOS 9 SDK or later. Since ATS restrictions do not apply to previous versions of the iOS SDK, you can skip this section if you are working with a previous version.</aside>
 		        <p>You can do either:</p>
 		        <ul>
 		          <li>Build your app with ATS enabled
@@ -609,7 +739,7 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate {
 		        <p>To learn more, see the <a href="../../brightcove-player-sdk-for-ios/guides/ats.html">Working with App Transport Security (ATS)</a> document.</p>
 
 		        <p>If you try to build and run the app that you created by following the steps in this guide, you may encounter this error message:</p>
-		        <pre><code>App Transport Security has blocked a cleartext HTTP (http://) resource load since it is insecure.
+						<pre class="line-numbers" data-start="1"><code class="language-swift">App Transport Security has blocked a cleartext HTTP (http://) resource load since it is insecure.
 		Temporary exceptions can be configured via your app's Info.plist file.</code></pre>
 						<p>This means that ATS is enabled, but your system is not configured to meet the ATS requirements.</p>
 		      </section>
@@ -618,12 +748,18 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate {
 				<h2>Run the app</h2>
         <div class="video-cloud-only">
             <p>The app is ready to build and run on an iPhone, iPad or the iOS Simulator. You should be able to play the videos from your playlist.</p>
-				    <div><img src="assets/quick-start-swift/svp-app.png" alt="iphone sample" title="iphone sample"></div>
+						<figure class="bcls-figure">
+						   <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/ios/getting-started/quick-start-swift/svp-app.png" alt="iPhone sample">
+						   <figcaption class="bcls-caption--image">iPhone sample</figcaption>
+						</figure>
         </div>
 
         <div class="perform-only">
             <p>The app is ready to build and run on an iPhone, iPad or the iOS Simulator. You should be able to play the videos defined in your array.</p>
-            <div><img src="assets/quick-start/perform-quick-start-video.png" alt="iphone sample" title="iphone sample"></div>
+						<figure class="bcls-figure">
+						   <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/ios/getting-started/quick-start-swift/perform-quick-start-video.png" alt="iPhone sample">
+						   <figcaption class="bcls-caption--image">iPhone sample</figcaption>
+						</figure>
           </div><!--class="perform-only"-->
 		  </section>
 		</article>
