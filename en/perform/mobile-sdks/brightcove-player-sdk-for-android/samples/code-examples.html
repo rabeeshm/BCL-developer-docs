@@ -68,11 +68,12 @@
 					 <section class="bcls-section" id="top">
 						 <h3>Table of contents</h3>
 
-	 <!--
-	                 <h3 class="bcls-question">Advertising</h3>
-	                 <ul class="bcls-answer">
-	                 </ul>
-	 -->
+
+             <h3 class="bcls-question">Advertising</h3>
+             <ul class="bcls-answer">
+							 <li><a href="#Seek_without_ads">Seek without ads</a></li>
+             </ul>
+
 
 	 					<h3 class="bcls-question">Analytics</h3>
 	 					<ul class="bcls-answer">
@@ -225,6 +226,56 @@ Uri video = Uri.parse("android.asset://" + PACKAGE_NAME + "/" + R.video.getting_
 brightcoveVideoView.add(Video.createVideo(video.toString()));
 brightcoveVideoView.start();</code></pre></a>
         <aside class="bcls-aside bcls-aside--information">You may get an exception error if you try to play MP4 videos stored in the application resource folder (/res/raw).</aside>
+      </section>
+
+			<section class="bcls-section" id="Seek_without_ads">
+				<h2>Seek without ads</h2>
+				<p>You can use the <code>adsDisabled</code> property for the <code>VideoPlaybackController</code> to disable ad playback while you are seeking through a video.</p>
+				<aside class="bcls-aside bcls-aside--information">This feature currently works only with the Brightcove OnceUX and Google IMA plugins.</aside>
+				<p>
+					To use this feature, follow these steps:
+				</p>
+				<ol class="bcls-tasklist">
+					<li>
+						<p>
+							Get the <code>VideoPlaybackController</code> instance from the <code>BrightcoveVideoView</code>.
+						</p>
+						<pre class="line-numbers" data-start="1"><code class="language-java">VideoPlaybackController playbackController = brightcoveVideoView.getPlaybackController();</code></pre>
+					</li>
+					<li>
+						<p>
+							Disable ad playback.
+						</p>
+						<pre class="line-numbers" data-start="1"><code class="language-java">playbackController.setAdsDisabled(true);</code></pre>
+					</li>
+					<li>
+						Seek to the desired time position in the current video.
+					</li>
+					<li>
+						<p>
+							Resume normal ad behavior.
+						</p>
+						<pre class="line-numbers" data-start="1"><code class="language-java">playbackController.setAdsDisabled(false);</code></pre>
+					</li>
+				</ol>
+				<p>
+					Your code should look something like this:
+				</p>
+				<pre class="line-numbers" data-start="1"><code class="language-java">final VideoPlaybackController playbackController = brightcoveVideoView.getPlaybackController();
+eventEmitter.on(EventType.VIDEO_DURATION_CHANGED, new EventListener() {
+    @Override
+    public void processEvent(final Event event) {
+        playbackController.setAdsDisabled(true);
+        brightcoveVideoView.seekTo(10000);
+    }
+});
+
+eventEmitter.on(EventType.DID_SEEK_TO, new EventListener() {
+    @Override
+    public void processEvent(final Event event) {
+        playbackController.setAdsDisabled(false);
+    }
+});</code></pre>
       </section>
 
 			<section class="bcls-section" id="Setting_the_buffer_size">
