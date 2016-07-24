@@ -581,7 +581,16 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                         section = "smart-player-api";
                     } else if (section === "player-management") {
                         sectionName = "player-management";
-                    } else if (section === "ingest-profiles-api" || section === "di-api" || section === "cms-api") {
+                    } else if (section === "ingest-profiles-api") {
+                        section = "ingest-profiles-api";
+                        sectionName = "Ingest Profiles API";
+                    } else if (section === "di-api") {
+                        section = "di-api";
+                        sectionName = "Dynamic Ingest API";
+                    } else if (section === "cms-api") {
+                        section = "cms-api";
+                        sectionName = "CMS API";
+                    } else if (section === "media-management" ) {
                         section = "media-management";
                         sectionName = "Media Management";
                     } else if (section === "policy-api") {
