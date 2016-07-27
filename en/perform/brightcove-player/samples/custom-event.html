@@ -43,7 +43,6 @@
 	<!-- search -->
 	<div id="searchModal" class="reveal-modal" data-reveal></div>
 	<!-- content -->
-	<!-- content -->
 	<div class="row">
 		<div class="sidebar large-2 columns show-for-large-up">
 			<div id="sidenav" class="side-nav"></div>
@@ -67,9 +66,10 @@
 				<p>This topic shows you how to dispatch and listen for a custom event. Even though the Brightcove player provides a number of out-of-the-box events, you may want to use your own custom events to decouple and eliminate dependencies between DOM objects and event listeners. This event-driven model is an architectural choice that you may want to consider.</p>
 				<p>This sample adds a back button to the control bar. When the user clicks the back button, a custom event is triggered along with the amount of time to rewind. The custom event listener finds the current video position and rewinds the video.</p>
 			</header>
-			<section class="bcls-section">
-        <h2 class="bcls-expander-head">Development sequence</h2>
-        <div class="bcls-expander-content">
+
+			<section id="Development_sequence" class="bcls-section">
+			   <h2 class="bcls-expander-head">Development sequence</h2>
+			   <div class="bcls-expander-content">
           <p>Here is the recommended development sequence:</p>
           <ol>
             <li>Use the embed_in_page player implementation to test the functionality of your player, plugin and CSS (if CSS is needed)</li>
@@ -141,8 +141,51 @@
 					<p>Position before rewind: <span id="beforePosition"></span></p>
 					<p>Position after rewind: <span id="afterPosition"></span></p>
 				</fieldset>
-
+        <br />
 			</section>
+
+      <section id="Understanding_Custom_events" class="bcls-section">
+				<h2>Understanding Custom events</h2>
+				<p>Custom events allow you to decouple and eliminate dependencies between DOM objects and event listeners, creating an event-driven architectural model.</p>
+				<h3>Dispatch</h3>
+				<p>To dispatch a custom event, use the <code>trigger()</code> method as follows:</p>
+				<pre class="line-numbers"><code class="language-javascript">// trigger a custom event
+myPlayer.trigger('eventName');
+or
+// trigger a custom event with data
+myPlayer.trigger('eventName', {data: 'some data'});</code></pre>
+			 <p>For details about dispatching custom events, see the <a href="../../brightcove-player/reference/api/player.html#Methodstrigger">Player API index</a>.</p>
+			 <p>In this sample, the code does the following:</p>
+			 <ul>
+				 <li>Dispatches a custom event, named <code>rewind</code></li>
+				 <li>Sends a data object with a name of <code>amount</code> and a value of <code>5</code> - You'll see in the JavaScript code where this value is set</li>
+			 </ul>
+			 <pre class="line-numbers"><code class="language-javascript">// trigger a custom event with data
+myPlayer.trigger('rewind', {'amount': rewindAmount});</code></pre>
+
+			 <h3>Listen</h3>
+			 <p>To listen for a custom event, you can use the <code>on()</code> method as follows:</p>
+			 <pre class="line-numbers"><code class="language-javascript">// listen for a custom event
+player.on('eventName', function(evt){});
+or
+// listen for a custom event with data
+player.on('eventName', function(evt,data){});</code></pre>
+			 <p>You can also use the <code>one()</code> method if you want the event listener to be triggered only once and then removed. For details about listening for events, see the <a href="../../brightcove-player/reference/api/player.html#Methodson">Player API index</a>.</p>
+
+			 <p>In this sample, the code does the following:</p>
+			 <ul>
+				 <li>Listens for a custom event, named <code>rewind</code></li>
+				 <li>Passes the event and data objects into a function</li>
+			 </ul>
+			 <pre class="line-numbers"><code class="language-javascript">// listen for a custom event with data
+ myPlayer.on('rewind',function(evt,data){
+});</code></pre>
+			 <p>When you display the event and data objects in the console, it should look similar to this:</p>
+			 <figure class="bcls-figure">
+			    <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/player-development/architecture/custom-event/custom-event-data.png" alt="Custom event data">
+			    <figcaption class="bcls-caption--image">Custom event data</figcaption>
+			 </figure>
+		 </section>
 
        <section id="code" class="bcls-section">
        <h2>How it works</h2>
@@ -150,14 +193,15 @@
 
         <h3>Create the player</h3>
         <p>To create a player and assign a video to it, follow these steps:</p>
-          <ol>
+          <ol class="bcls-tasklist">
               <li>In the <strong>Players</strong> module, create a new player or use an existing one.</li>
               <li><span class="video-cloud-only">In the <strong>Media</strong> module, select a video and publish it with this player.</span><span class="perform-only">Assign video content to the player and publish it.</span></li>
-              <li>Copy the In-Page embed code and paste it into a new HTML file.</li>
-          </ol>
-          <aside class="bcls-aside bcls-aside--information">For details on how to get this embed code, see the <a href="../../brightcove-player/getting-started/quick-start-bc-player.html">Quick Start to Brightcove Player</a> document.</aside>
-          <p>The embed code should look similar to this:</p>
-          <pre class="video-cloud-only"><code class="language-javascript">&lt;video id=&quot;video_1&quot; style=&quot;width: 640px; height: 360px;&quot;
+              <li><p>
+								Copy the In-Page embed code and paste it into a new HTML file.
+							</p>
+								<p>The embed code should look similar to this:</p>
+
+			          <pre class="line-numbers video-cloud-only" data-start="1"><code class="language-javascript">&lt;video id=&quot;video_1&quot; style=&quot;width: 640px; height: 360px;&quot;
 	data-video-id=&quot;4454629913001&quot;
 	data-account=&quot;1752604059001&quot;
 	data-player=&quot;default&quot;
@@ -165,55 +209,25 @@
 	class=&quot;video-js&quot;
 	controls&gt;&lt;/video&gt;
 &lt;script src=&quot;//players.brightcove.net/1752604059001/default_default/index.min.js&quot;&gt;&lt;/script&gt;</code></pre>
-<pre class="perform-only"><code class="language-javascript">  &lt;video id=&quot;video_1&quot; style=&quot;width: 640px; height: 360px;&quot;
+			<pre class="line-numbers perform-only" data-start="1"><code class="language-javascript">&lt;video id=&quot;video_1&quot; style=&quot;width: 640px; height: 360px;&quot;
 	data-account=&quot;1752604059001&quot;
 	data-player=&quot;default&quot;
 	data-embed=&quot;default&quot;
 	class=&quot;video-js&quot;
 	controls&gt;&lt;/video&gt;
-    &lt;script src=&quot;//players.brightcove.net/1752604059001/default_default/index.min.js&quot;&gt;&lt;/script&gt;</code></pre>
+&lt;script src=&quot;//players.brightcove.net/1752604059001/default_default/index.min.js&quot;&gt;&lt;/script&gt;</code></pre>
+					<br />
+					<aside class="bcls-aside bcls-aside--tip">For details on how to get this embed code, see the <a href="../../brightcove-player/getting-started/quick-start-bc-player.html">Quick Start to Brightcove Player</a> document.</aside>
+				    </li>
+          </ol>
 
-		   <h3>Custom events</h3>
-		   <p>Custom events allow you to decouple and eliminate dependencies between DOM objects and event listeners, creating an event-driven architectural model.</p>
-		   <h4>Dispatch</h4>
-		   <p>To dispatch a custom event, use the <code>trigger()</code> method as follows:</p>
-		   <pre class="line-numbers"><code class="language-javascript">// trigger a custom event
-myPlayer.trigger('eventName');
-or
-// trigger a custom event with data
-myPlayer.trigger('eventName', {data: 'some data'});</code></pre>
-		   <p>For details about dispatching custom events, see the <a href="../../brightcove-player/reference/api/player.html#Methodstrigger">Player API index</a>.</p>
-			<p>In this sample, the code does the following:</p>
-			<ul>
-				<li>Dispatches a custom event, named <code>rewind</code></li>
-				<li>Sends a data object with a name of <code>amount</code> and a value of <code>5</code> - You'll see in the JavaScript code where this value is set</li>
-			</ul>
-      <pre class="line-numbers"><code class="language-javascript">// trigger a custom event with data
-myPlayer.trigger('rewind', {'amount': rewindAmount});</code></pre>
-
-			<h4>Listen</h4>
-			<p>To listen for a custom event, you can use the <code>on()</code> method as follows:</p>
-		   <pre class="line-numbers"><code class="language-javascript">// listen for a custom event
-player.on('eventName', function(evt){});
-or
-// listen for a custom event with data
-player.on('eventName', function(evt,data){});</code></pre>
-		   <p>You can also use the <code>one()</code> method if you want the event listener to be triggered only once and then removed. For details about listening for events, see the <a href="../../brightcove-player/reference/api/player.html#Methodson">Player API index</a>.</p>
-
-		    <p>In this sample, the code does the following:</p>
-		    <ul>
-				<li>Listens for a custom event, named <code>rewind</code></li>
-				<li>Passes the event and data objects into a function</li>
-			</ul>
-      <pre class="line-numbers"><code class="language-javascript">// listen for a custom event with data
-  myPlayer.on('rewind',function(evt,data){
-});</code></pre>
-			<p>When you display the event and data objects in the console, it should look similar to this:</p>
-      <figure class="bcls-figure">
-          <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/architecture/custom-event/custom-event-data.png" alt="custom event data">
-      </figure>
         <h3>The JavaScript code</h3>
         <p>The following code shows how we started with the custom event trigger and listener in the page code for testing.</p>
+				<ol class="bcls-tasklist">
+					<li>
+						<p>
+							Add the following JavaScript to your page code:
+						</p>
             <ul>
                 <li>Lines 38-50: Create the back/rewind button and place it in the spacer element of the control bar. </li>
                 <li>Line 50: Gets a reference to the new back button.</li>
@@ -269,6 +283,8 @@ player.on('eventName', function(evt,data){});</code></pre>
         });
     });
   &lt;/script&gt;</code></pre>
+</li>
+</ol>
 	  </section>
 
 			<section id="plugin" class="bcls-section">
@@ -278,14 +294,20 @@ player.on('eventName', function(evt,data){});</code></pre>
 
 				<h3>Create the JavaScript file</h3>
 				<p>Move the plugin's JavaScript code into a file and place it in an Internet accessible URL.</p>
-                <ol>
+                <ol class="bcls-tasklist">
                   <li>Create a new file for your plugin JavaScript code. In this case, name it <code>custom-event.js</code>.</li>
-                  <li>Cut and paste the JavaScript code from your main HTML file into this new file.</li>
-                  <li>Lines 147,166: Wrap your JavaScript code using the <code>videojs.plugin()</code> function. The first argument, <code>customEventPlugin</code>, is the plugin name.</li>
-                  <li>Line 149: Gets a reference to your player.</li>
-                  <li><p>The rest is your JavaScript code which was reviewed in a previous section.</p>
-                <aside class="bcls-aside bcls-aside--tip">Note: Line 166: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</aside>
-                <pre class="line-numbers" data-start="147"><code class="language-javascript">videojs.plugin('customEventPlugin', function() {
+                  <li><p>
+										Cut and paste the JavaScript code from your main HTML file into this new file.
+									</p>
+										<ul>
+											<li>
+												Lines 1,20: Wrap your JavaScript code using the <code>videojs.plugin()</code> function. The first argument, <code>customEventPlugin</code>, is the plugin name.
+											</li>
+											<li>Line 3: Gets a reference to your player.</li>
+											<li><p>The rest is your JavaScript code which was reviewed in a previous section.</p></li>
+										</ul>
+                <aside class="bcls-aside bcls-aside--tip">Note: Line 20: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</aside>
+                <pre class="line-numbers" data-start="1"><code class="language-javascript">videojs.plugin('customEventPlugin', function() {
 
   var myPlayer = this;
 
@@ -305,6 +327,7 @@ player.on('eventName', function(evt,data){});</code></pre>
       myPlayer.currentTime(newTime);
   });
 });</code></pre>
+                  </li>
                   <li><p>In the HTML file, add the following code just below the existing <code>&lt;script&gt;</code> tags. This code includes the JavaScript file and then calls the method defined in that JavaScript.</p>
                 <pre class="line-numbers"><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;custom-event.js&quot;&gt;&lt;/script&gt;
 &lt;script&gt;videojs('video_1').customEventPlugin();&lt;/script&gt;</code></pre>
@@ -313,7 +336,7 @@ player.on('eventName', function(evt,data){});</code></pre>
 
         <h3>Deploy plugin</h3>
         <p>To deploy the plugin using the Players module, follow these steps:</p>
-        <ol>
+        <ol class="bcls-tasklist">
           <li>In <span class="video-cloud-only">Video Cloud</span><span class="perform-only">Perform</span> Studio, open the <strong>Players</strong> module and locate the player.</li>
           <li>Click the link for the player to open the player properties.</li>
           <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
@@ -419,29 +442,30 @@ player.on('eventName', function(evt,data){});</code></pre>
 		</div>
 	</div>
 
-  <!-- bcl scripts -->
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
-  <script src="/en/scripts/docs-nav-data.min.js"></script>
-  <script src="/en/scripts/bcls-doc-site-v2.js"></script>
-  <script src="//learning-services-media.brightcove.com/doc-assets/js/bcls-utils.js"></script>
-  <script src="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.js"></script>
-  <script>
-      $(document).foundation();
-  </script>
+	<!-- bcl scripts -->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+	<script src="/en/scripts/docs-nav-data.min.js"></script>
+	<script src="/en/scripts/bcls-doc-site-v2.js"></script>
+	<script src="//learning-services-media.brightcove.com/doc-assets/js/bcls-utils.js"></script>
+	<script src="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.js"></script>
+	<script>
+	    $(document).foundation();
+	</script>
+	<!-- Any scripts specific to page samples should go here -->
 
-<div style="text-align:center">
-    <iframe id="CSAT" src="//learning-services-media.brightcove.com/doc-assets/general/surveylink.html" style=" padding-bottom:20px;border:none"></iframe>
-</div>
-<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
-<script>
-var feedbackMail = document.getElementById("feedbackMail");
-feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
-</script>
+	<div style="text-align:center">
+	    <iframe id="CSAT" src="//learning-services-media.brightcove.com/doc-assets/general/surveylink.html" style=" padding-bottom:20px;border:none"></iframe>
+	</div>
+	<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+	<script>
+	var feedbackMail = document.getElementById("feedbackMail");
+	feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+	</script>
 </body>
 
 </html>
