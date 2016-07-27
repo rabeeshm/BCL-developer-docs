@@ -105,20 +105,25 @@
                   <li>Locate the <strong>Advertising</strong> section and click <strong>Edit</strong></li>
                   <li>Click <strong>Yes</strong> to enable IMA ads.</li>
                   <li>Enter the <strong>Server URL</strong> for the ad server.</li>
-                  <li>Select the <strong>Request Ads</strong> setting. </li>
-                  <li>
+                  <li>Select the <strong>Request Ads</strong> setting.
                     <ul>
                     <li><strong>On load -</strong> Ads are requested immediately when the player loads (this is normally the best experience for DFP / VPAID)</li>
                     <li><strong>On play -</strong> The first ad request is delayed until playback is initiated</li>
                     <li><strong>On demand -</strong> All ad requests will be initiated programmatically using the <code>player.ima3.adrequest()</code> method</li>
                     </ul>
                   </li>
-                  <li>Select the ad <strong>Content Type</strong>.    The Content Type determines the ad integration technologies to attempt to use. The player  will test each ad technology on initialization and use the first supported one for the lifetime of the player.</li>
-                  <li><ul>
+                  <li>Select the ad <strong>Content Type</strong>.    The Content Type determines the ad integration technologies to attempt to use. The player  will test each ad technology on initialization and use the first supported one for the lifetime of the player.<ul>
                     <li><strong>Flash preferred -</strong> Use Flash-based ads, if not available, use HTML5-based ads</li>
                     <li><strong>HTML5 preferred -</strong> Use HTML5-based ads, if not available, use Flash-based ads</li>
                     <li><strong>HTML5 only -</strong> Use only HTML5-based ads</li>
                   </ul></li>
+                  <li>Select the ad <strong>VPAID Mode</strong>.    The VPAID Mode is used to enable VPAID 2 support in IMA ads.
+                    <ul>
+                      <li><strong>Enabled -</strong> Play VPAID ads in an iframe with a different domain</li>
+                      <li><strong>Insecure -</strong> Play VPAID ads in an iframe with the same domain</li>
+                      <li><strong>Disabled -</strong> VPAID ads throw an error                  </li>
+                    </ul>
+                  </li>
                   <li>Set the <strong>Timeout</strong> values.
                     <ul>
                       <li><strong>Initialization -</strong> The maximum amount of time to wait, in milliseconds, for an ad  to initialize before playback</li>
@@ -128,7 +133,6 @@
                     <figure class="bcls-figure">
                         <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/ima3-plugin/studio-ad-props.png" alt="ad properties in Studio">
                     </figure>
-                    <div><img alt="" src="assets/studio-ad-props.png" /></div>
                   </li>
                   <li>Click <strong>Save</strong> to save the changes.</li>
               </ol>
@@ -136,7 +140,6 @@
               <figure class="bcls-figure">
                   <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/ima3-plugin/studio-ima-plugin-props.png" alt="IMA3 properties in Studio">
               </figure>
-              <div><img alt="" src="assets/studio-ima-plugin-props.png" /></div>
               <p>The IMA plugin does support additional properties that are not available in the UI. If needed, modify the IMA plugin JSON to include any other options you may need.</p>
               <aside class="bcls-aside bcls-aside--tip">Note: You may want to dynamically build the <code>serverURL</code> at the client (which means the IMA3 plugin would already be initialized), for example after a user login. You can do this by setting that value to an empty string in the <strong>options</strong> <code>{ "serverUrl": "" }</code>, then later assign the value programmatically.</aside>
             </section>
@@ -565,26 +568,26 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
           <section id="issues" class="bcls-section">
             <h2>Known issues</h2>
             <h3>Content playing before pre-roll</h3>
-            <p>It is possible for the following issues to occur when using the IMA3 plugin with Brightcove Player:</p>
+            <p>It was possible for the following issues to occur when using the IMA3 plugin with Brightcove Player:</p>
             <ul>
-              <li>One to two seconds of video will play, then be interrupted by the pre-roll ad.</li>
-              <li>When using video autoplay, the poster image will be displayed before the pre-roll ad.</li>
+              <li>One to two seconds of video would play, then be interrupted by the pre-roll ad.</li>
+              <li>When using video autoplay, the poster image would be displayed before the pre-roll ad.</li>
             </ul>
-            <p>A possible quick fix is to use Studio to simply reset the IMA3 plugin. You do this by disabling IMA ads, then re-enabling using your ad tag Server URL (see following screenshot). The settings will automatically update to the latest recommendations when doing this. Of course, you will need to re-publish your player after making this configuration change.</p>
+            <p>If you are still experiencing either of these issues, a possible quick fix is to use Studio to simply reset the IMA3 plugin. You do this by disabling IMA ads, then re-enabling using your ad tag Server URL (see following screenshot). The settings will automatically update to the latest recommendations when doing this. Of course, you will need to re-publish your player after making this configuration change.</p>
             <figure class="bcls-figure">
                 <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/ima3-plugin/known-issue-reset-ima.png" alt="resetting IMA3 ads">
             </figure>
             <p>The reason these issues arose is:</p>
             <ul>
-              <li><strong>Pre-roll timeout is too low</strong>: It can take several seconds to run client-side VPAID scripts, run real-time bidding auctions, and transmit the appropriate ad.</li>
-              <li><strong>Soft timeout behavior</strong>: After old default timeout value of one second, Brightcove Player begins playing video, but when the pre-roll becomes available after one second it interrupts the video and starts to play and .</li>
-              <li><strong>Bug caused timeouts to malfunction</strong>: When a second video is loaded a bug occurred that didn’t wait for the timeout period before starting the video.</li>
+              <li><strong>Pre-roll timeout was too low</strong>: It can take several seconds to run client-side VPAID scripts, run real-time bidding auctions, and transmit the appropriate ad back to the player.</li>
+              <li><strong>Soft timeout behavior</strong>: After the old default pre-roll timeout value of one second passes, Brightcove Player begins playing video, but when the pre-roll becomes available after one second it interrupts the video and starts to play the pre-roll ad.</li>
+              <li><strong>Bug caused timeouts to malfunction</strong>: When a second video is loaded, a bug occurred that didn’t wait for the pre-roll timeout period before starting the video.</li>
               <li><strong>iOS web doesn’t pause immediately</strong>: Even though Brightcove Player is paused immediately after the video is loaded, and before playback starts, iOS can sometimes still show a few frames of the video.</li>
             </ul>
             <p>The issues have been resolved by:</p>
             <ul>
               <li><strong>Increase default timeout value</strong>: The defaults have been updated to make the default pre-roll timeout 4 seconds (4000 ms). Of course, you can reduce this value if best for your environment.</li>
-              <li><strong>Change to hard timeouts</strong>: Instead of allowing late ads to interrupt, pre-roll ads are now abandoned if they do not load in given pre-roll timeout value.</li>
+              <li><strong>Change to hard timeouts</strong>: Instead of allowing late ads to interrupt, pre-roll ads are now abandoned if they do not load in given pre-roll timeout value. This is the default when using Studio to create a player, but if using the API you will need to set the <code>hardTimeouts</code> value to true.</li>
               <li><strong>Fixed out-of-order events bug</strong>: This fixed the second video load issue.</li>
               <li>The bug fix for the iOS issue will be released in August.</li>
             </ul>
