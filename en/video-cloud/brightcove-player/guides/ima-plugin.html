@@ -565,12 +565,36 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-id&#39;);
           <section id="issues" class="bcls-section">
             <h2>Known issues</h2>
             <h3>Content playing before pre-roll</h3>
-            <p>It is possible to see some video content play before the pre-roll, or a "flash" of the content. You can correct this issue by using the following CSS:</p>
+            <p>It is possible for the following issues to occur when using the IMA3 plugin with Brightcove Player:</p>
+            <ul>
+              <li>One to two seconds of video will play, then be interrupted by the pre-roll ad.</li>
+              <li>When using video autoplay, the poster image will be displayed before the pre-roll ad.</li>
+            </ul>
+            <p>A possible quick fix is to use Studio to simply reset the IMA3 plugin. You do this by disabling IMA ads, then re-enabling using your ad tag Server URL (see following screenshot). The settings will automatically update to the latest recommendations when doing this. Of course, you will need to re-publish your player after making this configuration change.</p>
+            <figure class="bcls-figure">
+                <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/ima3-plugin/known-issue-reset-ima.png" alt="resetting IMA3 ads">
+            </figure>
+            <p>The reason these issues arose is:</p>
+            <ul>
+              <li><strong>Pre-roll timeout is too low</strong>: It can take several seconds to run client-side VPAID scripts, run real-time bidding auctions, and transmit the appropriate ad.</li>
+              <li><strong>Soft timeout behavior</strong>: After old default timeout value of one second, Brightcove Player begins playing video, but when the pre-roll becomes available after one second it interrupts the video and starts to play and .</li>
+              <li><strong>Bug caused timeouts to malfunction</strong>: When a second video is loaded a bug occurred that didn’t wait for the timeout period before starting the video.</li>
+              <li><strong>iOS web doesn’t pause immediately</strong>: Even though Brightcove Player is paused immediately after the video is loaded, and before playback starts, iOS can sometimes still show a few frames of the video.</li>
+            </ul>
+            <p>The issues have been resolved by:</p>
+            <ul>
+              <li><strong>Increase default timeout value</strong>: The defaults have been updated to make the default pre-roll timeout 4 seconds (4000 ms). Of course, you can reduce this value if best for your environment.</li>
+              <li><strong>Change to hard timeouts</strong>: Instead of allowing late ads to interrupt, pre-roll ads are now abandoned if they do not load in given pre-roll timeout value.</li>
+              <li><strong>Fixed out-of-order events bug</strong>: This fixed the second video load issue.</li>
+              <li>The bug fix for the iOS issue will be released in August.</li>
+            </ul>
+
+            <!-- <p>It is possible to see some video content play before the pre-roll, or a "flash" of the content. You can correct this issue by using the following CSS:</p>
             <pre class="line-numbers"><code class="language-css">.vjs-ima3-flash.vjs-ad-loading .vjs-tech,
 .vjs-ima3-html5.vjs-ad-loading .vjs-poster,
 .vjs-ima3-html5.vjs-ad-loading .vjs-tech {
   opacity: 0;
- }</code></pre>
+ }</code></pre> -->
                     <h3>Supported environments</h3>
                     <p>To check for supported combinations of platforms, advertising standards and video media, see Google's <a href="https://developers.google.com/interactive-media-ads/video_features_and_sdk_versions">Video Feature and SDK compatibility</a> document. That document and the <a href="https://developers.google.com/interactive-media-ads/docs/vastinspector_dual">Video Suite Inspector</a> will help you diagnose attempted IMA3 advertisement configurations that simply will not function.</p>
                     <aside class="bcls-aside bcls-aside--information">Note: To use the Video Suite Inspector you will need your VAST ad tag or VAST ad response. You can then paste it into the given text field and then click the <strong>Test Ad</strong> button.</aside>
