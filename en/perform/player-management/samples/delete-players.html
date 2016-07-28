@@ -2,52 +2,39 @@
 <html lang="en">
 
 <head>
-    
-  
+
+
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  
+
   <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
   <!-- change title to match the h1 heading -->
   <title>New Player Sample Code: Delete Players</title>
   <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
-	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
-  <script src="//use.edgefonts.net/source-code-pro.js"></script>
-  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
+ <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
+ <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
+ <script src="//use.edgefonts.net/source-code-pro.js"></script>
+ <link rel="stylesheet" href="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.css">
+ <link rel="stylesheet" href="//docs.brightcove.com/en/styles/template-less/css/bcls-doc.css">
+ <link rel="stylesheet" href="/en/styles/foundation-fixes.css">
 
-  <link rel="stylesheet" type="text/css" href="/en/styles/bcls-doc-site.css">
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/atelier-forest.light.min.css">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/font-hack/2.015/css/hack-extended.min.css">
+ <script>
+     (function(i, s, o, g, r, a, m) {
+         i['GoogleAnalyticsObject'] = r;
+         i[r] = i[r] || function() {
+             (i[r].q = i[r].q || []).push(arguments)
+         }, i[r].l = 1 * new Date();
+         a = s.createElement(o),
+             m = s.getElementsByTagName(o)[0];
+         a.async = 1;
+         a.src = g;
+         m.parentNode.insertBefore(a, m)
+     })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
-  <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+     ga('create', 'UA-2728311-29', 'auto');
+     ga('send', 'pageview');
+ </script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
 
-  ga('create', 'UA-2728311-29', 'auto');
-  ga('send', 'pageview');
-
-</script>
-  <style type="text/css">
-    .formylabel {
-        display: block;
-        padding-left: 15px;
-        text-indent: -15px;
-    }
-    .formycheckbox {
-        width: 13px;
-        height: 13px;
-        padding: 0;
-        margin:0;
-        vertical-align: bottom;
-        position: relative;
-        top: -5px;
-        *overflow: hidden;
-    }
-  </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
 </head>
 
 <body>
@@ -63,173 +50,91 @@
             <div id="sidenav" class="side-nav"></div>
         </div>
         <div id="main" class="large-10 small-12 columns">
-      <div id="top" class="section">
-        <h1>New Player Sample Code: Delete Players</h1>
-        <!-- content starts here -->
-        <p class="BCL-aside">Deleting players is a non-reversible action. To err on the side of caution, this page is non-functional (the <em>Delete Players</em> button does nothing). You can get the functional, non-styled <a href="https://gist.github.com/bcls/9351324">Delete Player code</a> and place it on a local web server if you need a delete players app.</p>
-        <p>In this example you enter your account username, ID and password. On click of the button all the account's players are displayed with a checkbox for each one. After selecting one or more players to delete, click the <em>Delete Players</em> button to delete indicated players.</p>
-        <p class="BCL-aside">This sample app is meant as a way for you to explore the basics of the Player Management API. It is not meant to be an enterprise ready, deployable app. For instance, form validation is not exhaustive and passwords are sent NOT using HTTPS.</p>
-        <p>To learn about the general approach concerning the architecture of this sample app, specifically authentication and AJAX implementations, see the <a href="examples-overview.html">Examples Home Page</a>.</p>
-      </div>
-      <div id="defaultplayer" class="section">
-        <h2>Default player</h2>
-        <p>It is not possible to remove the default player. This is so there is always at least one player in each account, which provides an optimal UI experience.</p>
-      </div>
-      <div id="architecture" class="section">
-        <h2><a name="architecture"></a>App architecture</h2>
-        <p>The high-level application logic for this app is as follows:</p>
-        <ol>
-          <li>Gather necessary data to access account</li>
-          <li>On button click, perform AJAX call to retrieve all player info</li>
-          <li>On AJAX call success perform the following:</li>
-            <ul>
-              <li>Call function to display a checkbox, followed by player name, for all players</li>
-              <li>Call function that continuously watches checkboxes for checked status and keeps an array of IDs for all checked players</li>
-            </ul>
-          <li>On button click, start process to loop over selected player IDs and perform AJAX call to delete each player</li>
-          <li>On AJAX call success perform the following:</li>
-            <ul>
-              <li>Clear the existing list of players</li>
-              <li>Display the returned <code>204</code> status code that indicates successful deletion</li>
-            </ul>
-        </ol>
-      </div>
-      <div id="accountinput" class="section">
-        <h2><a name="accountinput"></a>Account input</h2>
-        <p>Username:
-          <input name="account_username" id="account_username" type="text" size="100" value="mboles@brightcove.com">
-        </p>
-        <p>Account ID:
-          <input name="account_id" id="account_id" type="text" size="40" value="1507807800001">
-        </p>
-        <p>Password:
-          <input name="account_password" id="account_password" type="password" size="40">
-        </p>
-        <p><span class="bcls-button" onclick="getPlayerInfo()">Display Players</span>
-        </p>
-        <p>
-          <div id="choosePlayers">Your players will be displayed here. <br /></div>
-        </p>
-        <p class="BCL-aside">Deleting players is a non-reversible action. To err on the side of caution, this page is non-functional (the <em>Delete Players</em> button does nothing). You can get the functional, non-styled <a href="https://gist.github.com/bcls/9351324">Delete Player code</a> and place it on a local web server if you need a delete players app.</p>
-        <p><span class="bcls-button" >Delete Players</span>
-      </div>
-      <div id="processedResponse" class="section">
-        <h2><a name="processedResponse"></a>Processed response</h2>
-        <p>No response data is returned on a player delete, so the successful delete code of <code>204</code> is retrieved and displayed from the AJAX object for each deletion:</p>
-        <div id="htmlOutput"></div>
-      </div>
+            <h1>New Player Sample Code: Delete Players</h1>
+            <!-- begin drupal content -->
+      <article class="bcls-article">
+          <header id="bcls_header" class="bcls-header">
+              <p>In this example you enter your account username, ID and password. On click of the button all the account's players are displayed with a checkbox for each one. After selecting one or more players to delete, click the <em>Delete Players</em> button to delete indicated players.</p>
+          </header>
+          <section id="Disclaimer" class="bcls-section">
+              <h2>Disclaimer</h2>
+                <aside class="bcls-aside bcls-aside--warning">Deleting players is a non-reversible action. To err on the side of caution, this page is non-functional (the <em>Delete Players</em> button does nothing).</aside>
+              <p > You can get the functional, non-styled <a href="https://gist.github.com/bcls/9351324">Delete Player code</a> and place it on a local web server if you need a delete players app.</p>
+                <aside class="bcls-aside bcls-aside--warning">This sample app is meant as a way for you to explore the basics of the Player Management API. It is not meant to be an enterprise ready, deployable app. For instance, form validation is not exhaustive and passwords are sent NOT using HTTPS.
+              <p>To learn about the general approach concerning the architecture of this sample app, specifically authentication and AJAX implementations, see the <a href="examples-overview.html">Examples Home Page</a>.</p></aside>
+          </section>
+
+          <section id="defaultplayer" class="bcls-section">
+            <h2>Default player</h2>
+            <p>Although you can delete the default player, a new default player will automatically be recreated instantly. This is so there is always at least one player in each account, which provides an optimal UI experience.</p>
+          </section>
+          <section id="architecture" class="bcls-section">
+            <h2>App architecture</h2>
+            <p>The high-level application logic for this app is as follows:</p>
+            <ol>
+              <li>Gather necessary data to access account</li>
+              <li>On button click, perform AJAX call to retrieve all player info</li>
+              <li>On AJAX call success perform the following:
+                <ul>
+                  <li>Call function to display a checkbox, followed by player name, for all players</li>
+                  <li>Call function that continuously watches checkboxes for checked status and keeps an array of IDs for all checked players</li>
+                </ul>
+            </li>
+              <li>On button click, start process to loop over selected player IDs and perform AJAX call to delete each player</li>
+              <li>On AJAX call success perform the following:
+                <ul>
+                  <li>Clear the existing list of players</li>
+                  <li>Display the returned <code>204</code> status code that indicates successful deletion</li>
+                </ul>
+            </li>
+            </ol>
+          </section>
+          <section id="accountinput" class="bcls-section">
+            <h2>Account input</h2>
+            <p>Username:
+              <input name="account_username" id="account_username" type="text" size="100" value="mboles@brightcove.com">
+            </p>
+            <p>Account ID:
+              <input name="account_id" id="account_id" type="text" size="40" value="1507807800001">
+            </p>
+            <p>Password:
+              <input name="account_password" id="account_password" type="password" size="40">
+            </p>
+            <p><span class="bcls-button" onclick="getPlayerInfo()">Display Players</span>
+            </p>
+              <div id="choosePlayers">Your players will be displayed here. <br /></div>
+            <aside class="bcls-aside bcls-aside--warning">Deleting players is a non-reversible action. To err on the side of caution, this page is non-functional (the <em>Delete Players</em> button does nothing). You can get the functional, non-styled <a href="https://gist.github.com/bcls/9351324">Delete Player code</a> and place it on a local web server if you need a delete players app.</aside>
+            <p><span class="bcls-button">Delete Players</span>
+          </section>
+          <section id="processedResponse" class="bcls-section">
+            <h2><a name="processedResponse"></a>Processed response</h2>
+            <p>No response data is returned on a player delete, so the successful delete code of <code>204</code> is retrieved and displayed from the AJAX object for each deletion:</p>
+            <div id="htmlOutput"></div>
+          </section>
+      </article>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+      <script src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/player-management-api/samples/delete-player/delete-player.js"></script>
+      <!-- end drupal content -->
     </div>
   </div>
-  <!-- bcl scripts ============================================================ -->
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.2/gist-embed.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
-  
-  <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.3/handlebars.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
-  <script src="/en/scripts/log.js"></script>
-    <script src="/en/scripts/docs-nav-data.min.js"></script>
-    <script src="/en/scripts/bcls-doc-site.js"></script>
-    <script src="/en/scripts/bc-mapi.js"></script>
-    <script>
-        $(document).foundation();
-    </script>
-    <script type="text/javascript">
-    /******** Any scripts specific to page samples should go here *********/
-    var account_id = "",
-      account_password = "",
-      account_username = "",
-      callPurpose = "",
-      toDelete = [];
+  <!-- bcl scripts -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+<script src="/en/scripts/docs-nav-data.min.js"></script>
+<script src="/en/scripts/bcls-doc-site-v0.js"></script>
+<script src="//learning-services-media.brightcove.com/doc-assets/js/bcls-utils.js"></script>
+<script src="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.js"></script>
+<script>
+    $(document).foundation();
+</script>
 
-    var ajaxSuccess = function (data,textStatus,jqXHR) {
-      switch (callPurpose) {
-        case "getPlayers":
-          createCheckboxes(data);
-          watchCheckboxes();
-          break;
-        case "deletePlayer":
-          document.getElementById("choosePlayers").innerHTML = "Your players will be displayed here. <br />";
-          document.getElementById("htmlOutput").innerHTML += jqXHR.status +"<br />";
-          break;
-      }
-    },
-    ajaxError = function (data) {
-      console.log("error data: ");
-      console.log(data);
-    },
-    makeAjaxCall = function (callURL, callType, callData) {
-      if (callData) {
-        $.ajax({
-          type: callType,
-          headers: {
-            "Authorization": "Basic " + btoa(account_username + ":" + account_password),
-            "Content-Type": "application/json"
-          },
-          url: callURL,
-          data: JSON.stringify(callData),
-          success: ajaxSuccess,
-          error: ajaxError
-        });
-      } else {
-        $.ajax({
-          type: callType,
-          headers: {
-            "Authorization": "Basic " + btoa(account_username + ":" + account_password),
-            "Content-Type": "application/json"
-          },
-          url: callURL,
-          success: ajaxSuccess,
-          error: ajaxError
-        });
-      }
-    },
-    getPlayerInfo = function () {
-      account_id = document.getElementById("account_id").value,
-      account_password = document.getElementById("account_password").value,
-      account_username = document.getElementById("account_username").value;
-      call_url = "https://players.api.brightcove.com/v1/accounts/" + account_id + "/players";
-      callPurpose = "getPlayers"
-      makeAjaxCall(call_url, "GET", null);
-    },
-    createCheckboxes = function (playerData) {
-      var numPlayers = playerData.length,
-        dynamicHTML = "";
-      for (var i = 0; i < numPlayers; i++) {
-        dynamicHTML += "<label class='formylabel'><input class='formycheckbox' id='" + playerData[i].id + "' type='checkbox' /> " + playerData[i].name + "</label>";
-      };
-      document.getElementById("choosePlayers").innerHTML = dynamicHTML;
-      document.getElementById("htmlOutput").innerHTML = "";
-    },
-    deletePlayers = function(){
-      callPurpose = "deletePlayer";
-      var numToDelete = toDelete.length;
-
-      for (var i = 0; i < numToDelete; i++) {
-        call_url = "https://players.api.brightcove.com/v1/accounts/" + account_id + "/player-management/" + toDelete[i];
-        makeAjaxCall(call_url, "DELETE", null);
-      };
-    },
-    watchCheckboxes = function(){
-      $("input:checkbox").change(function() {
-        toDelete = [];
-
-          $("input:checkbox").each(function() {
-              if ($(this).is(":checked")) {
-                  toDelete.push($(this).attr("id"));
-              }
-          });
-      });
-    };
-  </script>
-    
-    
 	<div style="text-align:center">
     <iframe id="CSAT" src="//learning-services-media.brightcove.com/doc-assets/general/surveylink.html" style=" padding-bottom:20px;border:none"></iframe>
 </div>
-<div class="footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+<div class="bcls-footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
 <script>
 var feedbackMail = document.getElementById("feedbackMail");
 feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
