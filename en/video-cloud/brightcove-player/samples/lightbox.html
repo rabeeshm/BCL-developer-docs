@@ -175,7 +175,7 @@
                 </p></li>
         		  </ul>
               <aside class="bcls-aside bcls-aside--information">Line 131: Make sure to move the player <code>&lt;script&gt;</code> tag below the page HTML code. The Brightcove player script must be placed after your page code. It is common practice to put your scripts just before the closing <code>&lt;/body&gt;</code> tag.</aside>
-              <pre class="line-numbers" data-start="1"><code class="language-html">&lt;div class=&quot;player-block&quot;&gt;
+              <pre class="line-numbers" data-start="111"><code class="language-html">&lt;div class=&quot;player-block&quot;&gt;
     &lt;div id=&quot;scroller-outer-container&quot;&gt;
         &lt;div id=&quot;scroller&quot; class=&quot;customScroll&quot;&gt;
       &lt;!-- This container is for the clickable video still images --&gt;
@@ -215,7 +215,7 @@
           			<li>Lines 198-208: Define the <code>scroller</code> item <code>onclick</code> event as a function that loads the selected video, reveals the lightbox and attempts to start playing the video.</li>
           			<li>Lines 210-214: Define the <code>Close</code> button <code>onclick</code> event as a function that stops playing the currently loaded video and hides the lightbox.</li>
             </ol>
-            <pre class="line-numbers" data-start="1"><code class="language-html">&lt;script type=&quot;text/JavaScript&quot;&gt;
+            <pre class="line-numbers" data-start="134"><code class="language-html">&lt;script type=&quot;text/JavaScript&quot;&gt;
 	var myPlayer,
             playlistData = [
                 {
@@ -429,50 +429,173 @@
 		    <p>It is a best practice to use a plugin so that you can easily add this functionality to multiple players.</p>
         <h3>Create the JavaScript file</h3>
         <p>Move the plugin's JavaScript code into a file and place it in an Internet accessible URL.</p>
-        <ol>
+        <ol class="bcls-tasklist">
           <li>Create a new file for your plugin JavaScript code. In this case, name it <code>lightbox.js</code>.</li>
           <li>Cut and paste the JavaScript code from your main HTML file into this new file.</li>
           <li>Lines 254,336: Wrap your JavaScript code using the <code>videojs.plugin()</code> function. The first argument, <code>lightbox</code> is the plugin name.</li>
           <li>Line 255: Gets a reference to your player.</li>
-          <li>The rest is your JavaScript code which was reviewed in a previous section.</li>
-        </ol>
-        <p class="BCL-aside">Note: Line 336: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</p>
-        <p><code data-gist-id="9940b9dfdc01a82e0837" data-gist-hide-footer="true" data-gist-line="254-336"></code></p>
-        <ol start="6">
-          <li>In the HTML file, add the following code just below the existing <code>&lt;script&gt;</code> tags. This code includes the JavaScript file and then calls the method defined in that JavaScript.</li>
-        </ol>
-        <p><code data-gist-id="9940b9dfdc01a82e0837" data-gist-hide-footer="true" data-gist-line="373-374" ></code></p>
-        <ol start="7">
+          <li><p>
+            The rest is your JavaScript code which was reviewed in a previous section.
+          </p>
+            <aside class="bcls-aside bcls-aside--information">Line 336: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</aside>
+            <pre class="line-numbers" data-start="254"><code class="language-html">videojs.plugin('lightbox', function() {
+    var myPlayer = this,
+    playlistData = [
+        {
+        &quot;shortDescription&quot;:&quot;Tiger&quot;,
+        &quot;thumbnailURL&quot;:&quot;//solutions.brightcove.com/bcls/assets/images/Tiger.jpg&quot;,
+        &quot;sources&quot;:[
+            {
+            &quot;type&quot;:&quot;application/x-mpegURL&quot;,
+            &quot;src&quot;:&quot;http://solutions.brightcove.com/bcls/assets/videos/Tiger.m3u8&quot;
+            },
+            {
+            &quot;type&quot;:&quot;video/mp4&quot;,
+            &quot;src&quot;:&quot;http://solutions.brightcove.com/bcls/assets/videos/Tiger.mp4&quot;
+            }
+        ]
+        },
+        {
+        &quot;shortDescription&quot;:&quot;Great Blue Heron&quot;,
+        &quot;thumbnailURL&quot;:&quot;//solutions.brightcove.com/bcls/assets/images/Great-Blue-Heron.png&quot;,
+        &quot;sources&quot;:[
+            {
+            &quot;type&quot;:&quot;application/x-mpegURL&quot;,
+            &quot;src&quot;:&quot;http://solutions.brightcove.com/bcls/assets/videos/Great-Blue-Heron.m3u8&quot;
+            },
+            {
+            &quot;type&quot;:&quot;video/mp4&quot;,
+            &quot;src&quot;:&quot;http://solutions.brightcove.com/bcls/assets/videos/Great-Blue-Heron.mp4&quot;
+            }
+        ]
+        },
+        {
+        &quot;shortDescription&quot;:&quot;Birds of a Feather&quot;,
+        &quot;thumbnailURL&quot;:&quot;http://solutions.brightcove.com/bcls/assets/images/BirdsOfAFeather.png&quot;,
+        &quot;sources&quot;:[
+            {
+            &quot;type&quot;:&quot;video/mp4&quot;,
+            &quot;src&quot;:&quot;http://solutions.brightcove.com/bcls/assets/videos/BirdsOfAFeather.mp4&quot;
+            }
+        ]
+        },
+        {
+        &quot;shortDescription&quot;:&quot;Sea Marvels&quot;,
+        &quot;thumbnailURL&quot;:&quot;http://solutions.brightcove.com/bcls/assets/images/Sea Marvels.png&quot;,
+        &quot;sources&quot;:[
+            {
+            &quot;type&quot;:&quot;video/mp4&quot;,
+            &quot;src&quot;:&quot;http://solutions.brightcove.com/bcls/assets/videos/Sea-Marvels.mp4&quot;
+            }
+        ]
+        }
+    ];
+
+    function buildPlaylistData() {
+        // build the scroller of video thumbnails and descriptions
+        var str = &quot;&quot;;
+        for (var i in playlistData) {
+            str += &quot;&lt;div id='scroller-item'&gt;&lt;img id='&quot; + i + &quot;' src='&quot; + playlistData[i].thumbnailURL +
+                &quot;' /&gt;&lt;div class=\&quot;scroller-caption\&quot;&gt;&lt;span&gt;&quot; +
+                playlistData[i].shortDescription + &quot;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&quot;;
+        }
+        document.getElementById(&quot;scroller&quot;).innerHTML = str;
+
+        document.getElementById(&quot;scroller&quot;).onclick = function(e) {
+            //console.log(&quot;EVENT.onClick video:&quot; + e.target.id);
+            // load the selected video
+            myPlayer.src(playlistData[e.target.id].sources);
+            // reveal the lightbox
+            document.getElementById(&quot;playerLightbox&quot;).className = &quot;playerShow&quot;;
+
+            // play the video
+            myPlayer.play();
+        }
+
+        document.getElementById(&quot;playerClose&quot;).onclick = function(e) {
+            myPlayer.pause();
+            // hide the lightbox
+            document.getElementById(&quot;playerLightbox&quot;).className = &quot;playerHide&quot;;
+        }
+    };
+
+    buildPlaylistData();
+});</code></pre>
+            <!-- <p><code data-gist-id="9940b9dfdc01a82e0837" data-gist-hide-footer="true" data-gist-line="254-336"></code></p> -->
+          </li>
+          <li>In the HTML file, add the following code just below the existing <code>&lt;script&gt;</code> tags. This code includes the JavaScript file and then calls the method defined in that JavaScript.
+          <pre class="line-numbers" data-start="1"><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;lightbox.js&quot;&gt;&lt;/script&gt;
+    &lt;script&gt;videojs('video_1').lightbox();&lt;/script&gt;</code></pre>
+          <!-- <p><code data-gist-id="9940b9dfdc01a82e0837" data-gist-hide-footer="true" data-gist-line="373-374" ></code></p> -->
+          </li>
           <li>Browse the HTML page. You should see that the lightbox still works, except now your JavaScript code has been removed from the HTML page.</li>
         </ol>
 
   		  <h3>Create the CSS file</h3>
         <p>If you are using CSS, move styles into a file and place it in an Internet accessible URL.</p>
-        <ol>
+        <ol class="bcls-tasklist">
             <li>Create a new file for your CSS styles. In this case, name it <code>lightbox.css</code>.</li>
-            <li>In the <code>&lt;head&gt;</code> section of your HTML file, add the following link to include your newly created CSS file.</li>
-          </ol>
-        <p><code data-gist-id="9940b9dfdc01a82e0837" data-gist-hide-footer="true" data-gist-line="346" ></code></p>
-        <ol start="3">
+            <li>In the <code>&lt;head&gt;</code> section of your HTML file, add the following link to include your newly created CSS file.
+              <pre class="line-numbers" data-start="1"><code class="language-html">&lt;link href=&quot;lightbox.css&quot; rel=&quot;stylesheet&quot;&gt;</code></pre>
+              <!-- <p><code data-gist-id="9940b9dfdc01a82e0837" data-gist-hide-footer="true" data-gist-line="346" ></code></p> -->
+            </li>
             <li>Browse the HTML page. You should see that the lightbox still works, except now your styles have been removed from the HTML page.</li>
-        </ol>
+          </ol>
 
         <h3>Deploy plugin and CSS</h3>
         <p>On your player's properties page, edit the <strong>Plugins</strong> section.</p>
-        <ol>
+        <ol class="bcls-tasklist">
             <li>Begin by specifying a <strong>JavaScript URL</strong> for the video loop plugin.
-            <div><img src="/en/video-cloud/brightcove-player/samples/assets/lightbox-js.png" alt="lightbox javascript file"></div></li>
+              <figure class="bcls-figure">
+                 <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/player-development/player-customization/behavior/lightbox-scroller/lightbox-js.png" alt="Lightbox javascript file">
+                 <figcaption class="bcls-caption--image">Lightbox javascript file</figcaption>
+              </figure>
+            </li>
             <li>Next, apply a <strong>CSS URL</strong> to define styles to the video player.
-            <div><img src="/en/video-cloud/brightcove-player/samples/assets/lightbox-css.png" alt="lightbox css file"></div></li>
-        </ol>
+              <figure class="bcls-figure">
+                 <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/player-development/player-customization/behavior/lightbox-scroller/lightbox-css.png" alt="Lightbox css file">
+                 <figcaption class="bcls-caption--image">Lightbox css file</figcaption>
+              </figure>
+            </li>
+            <li>Save and publish your changes.</li>
+            <li>Copy the <strong>In-Page</strong> embed code and place it within your HTML page. Your page should look similar to this:
+              <pre class="line-numbers" data-start="1"><code class="language-html">&lt;!doctype html&gt;
+&lt;html&gt;
 
-        <ol start="3">
-          <li>Save and publish your changes.</li>
-          <li>Copy the <strong>In-Page</strong> embed code and place it within your HTML page. Your page should look similar to this:</li>
-        </ol>
-        <p><code data-gist-id="9940b9dfdc01a82e0837" data-gist-hide-footer="true" data-gist-line="400-433" ></code></p>
-        <ol start="5">
-          <li>Browse the HTML page and you should see the player with the plugin functioning correctly.</li>
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;title&gt;Lightbox Player with CSS and JS plugin&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;!-- custom code for horizontal scroller and lightbox player --&gt;
+    &lt;div class=&quot;player-block&quot;&gt;
+        &lt;div id=&quot;scroller-outer-container&quot;&gt;
+            &lt;div id=&quot;scroller&quot; class=&quot;customScroll&quot;&gt;
+                &lt;!-- This container is for the clickable video still images --&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- lightbox container --&gt;
+        &lt;div id=&quot;playerLightbox&quot; class=&quot;playerHide&quot;&gt;
+
+            &lt;video id=&quot;video_1&quot;
+                data-account=&quot;1752604059001&quot;
+                data-player=&quot;e0f55b3f-2970-4cd8-967f-e1875223c9f8&quot;
+                data-embed=&quot;default&quot;
+                class=&quot;video-js&quot; controls&gt;&lt;/video&gt;
+
+            &lt;div id=&quot;playerClose&quot; class=&quot;playerClose&quot; onClick=&quot;hideAndStop();&quot;&gt;Close&lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;script src=&quot;//players.brightcove.net/1752604059001/e0f55b3f-2970-4cd8-967f-e1875223c9f8_default/index.js&quot;&gt;&lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+              <!-- <p><code data-gist-id="9940b9dfdc01a82e0837" data-gist-hide-footer="true" data-gist-line="400-433" ></code></p> -->
+            </li>
+            <li>Browse the HTML page and you should see the player with the plugin functioning correctly.</li>
         </ol>
       </section>
 
