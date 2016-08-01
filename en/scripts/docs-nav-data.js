@@ -1569,7 +1569,7 @@ var bclsNavData = {
 						url: "//docs.brightcove.com/en/video-cloud/player-management/guides/policy-key.html",
 						name: "Policy Keys"
 					}, {
-						url: "//docs.brightcove.com/en/video-cloud/player-management/guides/postman.html",
+						url: "//docs.brightcove.com/en/video-cloud/concepts/postman/postman.html",
 						name: "Use Postman for HTTP Requests"
 					}],
 					name: "Guides",
