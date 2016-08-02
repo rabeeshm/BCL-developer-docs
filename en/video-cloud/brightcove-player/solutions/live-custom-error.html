@@ -137,12 +137,11 @@
       		<li class="video-cloud-only">Login to your Video Cloud Studio account and create a new video player. In a later step, you will use JavaScript to specify a <strong>URL</strong> for the live stream that you wish to use.
   <!--        <div><img src="assets/live-error-vc-src.png" alt="video cloud studio" class="video-cloud-only"></div>-->
 
-          <li class="perform-only">Login to your Perform Studio account and create a new video player. Open the player's properties page and edit the <strong>Video Content</strong> section. Here you can specify a <strong>URL</strong> for the live stream you wish to publish.</>
+          <li class="perform-only">Login to your Perform Studio account and create a new video player. Open the player's properties page and edit the <strong>Video Content</strong> section. Here you can specify a <strong>URL</strong> for the live stream you wish to publish.
           <figure class="bcls-figure perform-only">
               <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/player-customization/overlays/live-custom-error/live-error-perform-src.png" alt="Perform studio">
               <figcaption class="bcls-caption--image">Perform studio</figcaption>
           </figure>
-          <div><img src="assets/live-error-perform-src.png" alt="Perform studio" class="perform-only"></div>
           </li>
         </ol>
 
@@ -187,18 +186,20 @@
           <ul>
             <li>Line 214: Gets a reference to the player.</li>
       		  <li>Line 215: Initializes a variable to hide the overlay unless an error is encountered.</li>
-      		  <li>Lines 217-224: <strong>Optional: </strong>Change the <code>headline</code> and <code>type</code> message text for standard error code of <strong>4</strong>. It is helpful for users if you change to default message text for this live stream case.</li>
-      			<ul>
-      				<li>The standard error, with error code <strong>4</strong> is what you will get when the live stream is not available. See the <a href="../guides/errors-plugin.html#standarderrors">Display Error Messages Plugin</a> document for details about standard errors.</li>
-      				<li>The user won't see this message unless you don't implement the overlay image or if the overlay fails to load the image for some reason.</li>
-      			</ul>
-                <li>Lines 226-242: Do the following:</li>
+      		  <li>Lines 217-224: <strong>Optional: </strong>Change the <code>headline</code> and <code>type</code> message text for standard error code of <strong>4</strong>. It is helpful for users if you change to default message text for this live stream case.
+        			<ul>
+        				<li>The standard error, with error code <strong>4</strong> is what you will get when the live stream is not available. See the <a href="../guides/errors-plugin.html#standarderrors">Display Error Messages Plugin</a> document for details about standard errors.</li>
+        				<li>The user won't see this message unless you don't implement the overlay image or if the overlay fails to load the image for some reason.</li>
+        			</ul>
+            </li>
+            <li>Lines 226-242: Do the following:
       		  	<ul>
-      				<li>Listens for the player's <code>error</code> event.</li>
-      				<li>Checks the error <code>code</code> for a value of <strong>4</strong>. </li>
-      				<li>Checks the player <code>duration</code> for a value of <strong>0</strong>. This is done so that the overlay will only appear if the video stream has not started playing.</li>
-      				<li>Sets a variable to display the custom overlay image. Then, either remove the <code>hide-overlay</code> class to show the overlay image, or add the class to hide the overlay.</li>
-      			</ul>
+        				<li>Listens for the player's <code>error</code> event.</li>
+        				<li>Checks the error <code>code</code> for a value of <strong>4</strong>. </li>
+        				<li>Checks the player <code>duration</code> for a value of <strong>0</strong>. This is done so that the overlay will only appear if the video stream has not started playing.</li>
+        				<li>Sets a variable to display the custom overlay image. Then, either remove the <code>hide-overlay</code> class to show the overlay image, or add the class to hide the overlay.</li>
+        			</ul>
+              </li>
               <li class="video-cloud-only">Lines 240-243: Define the HLS live stream to be played.</li>
             </ul>
             <pre class="line-numbers video-cloud-only" data-start="213"><code class="language-javascript">&lt;script id=&quot;pageScript&quot; type=&quot;text/javascript&quot;&gt;
@@ -238,7 +239,38 @@
 
 &lt;/script&gt;</code></pre>
     		<!-- <p class="video-cloud-only"><code data-gist-id="6755c16cc18986e989bd" data-gist-line="213-249"></code></p> -->
-        <p class="perform-only"><code data-gist-id="6755c16cc18986e989bd" data-gist-line="213-243,249"></code></p>
+        <pre class="line-numbers perform-only" data-start="213"><code class="language-html">&lt;script id=&quot;pageScript&quot; type=&quot;text/javascript&quot;&gt;
+    var myPlayer = videojs(&quot;myPlayerId&quot;),
+        showOverlay = false;
+
+    myPlayer.errors({
+      'errors': {
+        '4': {
+          'headline': 'The Live Event you are trying to watch is either unavailable or has not started',
+          'type': 'MEDIA_UNAVAILABLE',
+        }
+      }
+    });
+
+    myPlayer.on(&quot;error&quot;, function(err) {
+      var errNo = myPlayer.error().code;
+      var duration = myPlayer.duration();
+      if ((errNo == '4') &amp;&amp; (duration=='0')) {
+        showOverlay = true;
+      }
+      if (showOverlay) {
+      	// hide error dialog message
+        myPlayer.error(null);
+        // show overlay image
+        myPlayer.removeClass(&quot;hide-overlay&quot;);
+      } else {
+        // hide overlay image
+        myPlayer.addClass(&quot;hide-overlay&quot;);
+      }
+    })
+
+  &lt;/script&gt;</code></pre>
+        <!-- <p class="perform-only"><code data-gist-id="6755c16cc18986e989bd" data-gist-line="213-243,249"></code></p> -->
         </li>
       </ol>
 
@@ -326,7 +358,42 @@ videojs.plugin('liveCustomError', function() {
   });
 });</code></pre>
             <!-- <p class="video-cloud-only"><code data-gist-id="6755c16cc18986e989bd" data-gist-hide-footer="true" data-gist-line="258-296"></code></p> -->
-            <p class="perform-only"><code data-gist-id="6755c16cc18986e989bd" data-gist-hide-footer="true" data-gist-line="258-291,296"></code></p>
+            <pre class="line-numbers perform-only" data-start="258"><code class="language-html">/**
+ * Live Custom Error
+ */
+videojs.plugin('liveCustomError', function() {
+  var myPlayer = this,
+      showOverlay = false;
+
+  myPlayer.errors({
+    'errors': {
+      '4': {
+        'headline': 'The Live Event you are trying to watch is either unavailable or has not started',
+        'type': 'MEDIA_UNAVAILABLE',
+      }
+    }
+  });
+
+  myPlayer.on(&quot;error&quot;, function(err) {
+    var errNo = myPlayer.error().code;
+    var duration = myPlayer.duration();
+
+    if ((errNo == '4') &amp;&amp; (duration=='0')) {
+      showOverlay = true;
+    }
+    if (showOverlay) {
+      // hide the default error dialog
+      myPlayer.error(null);
+      // show overlay image
+      myPlayer.removeClass(&quot;hide-overlay&quot;);
+    } else {
+      // hide overlay image
+      myPlayer.addClass(&quot;hide-overlay&quot;);
+    }
+  })
+
+});</code></pre>
+            <!-- <p class="perform-only"><code data-gist-id="6755c16cc18986e989bd" data-gist-hide-footer="true" data-gist-line="258-291,296"></code></p> -->
           </li>
           <li>In the HTML file, add the following code just below the existing <code>&lt;script&gt;</code> tags. This code includes the JavaScript file and then calls the method defined in that JavaScript.
             <pre class="line-numbers" data-start="146"><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;live-custom-error.js&quot;&gt;&lt;/script&gt;
@@ -384,11 +451,28 @@ videojs.plugin('liveCustomError', function() {
 					<li>Return to the <strong>Players</strong> module and click the <strong>Embed Code &amp; URL</strong> button.</li>
 					<li>Choose the <strong>Published Player</strong> link.</li>
 					<li>Copy the <strong>iframe Embed Code</strong> and paste it into a new HTML document.</li>
-					<li>Add styles to set the size of the player.</li>
+					<li>Add styles to set the size of the player.
+            <p>Here is the complete code:</p>
+            <pre class="line-numbers" data-start="1"><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;utf-8&quot;&gt;
+  &lt;meta name=&quot;apple-mobile-web-app-capable&quot; content=&quot;yes&quot; /&gt;
+  &lt;title&gt;Live Custom Error&lt;/title&gt;
+
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;iframe style=&quot;width: 560px; height: 440px;
+    &quot;src=&quot;//players.brightcove.net/1752604059001/VkBoiYTCx_default/index.html&quot;
+    allowfullscreenwebkitallowfullscreenmozallowfullscreen&gt;
+  &lt;/iframe&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            <!-- <p><code data-gist-id="6755c16cc18986e989bd" data-gist-hide-footer="true" data-gist-line="302-317" ></code></p> -->
+          </li>
+          <li>Browse the HTML page and you should see the player with the plugin functioning correctly.</li>
 				</ol>
-				<p>Here is the complete code:</p>
-        <p><code data-gist-id="6755c16cc18986e989bd" data-gist-hide-footer="true" data-gist-line="302-317" ></code></p>
-        <p>Browse the HTML page and you should see the player with the plugin functioning correctly.</p>
       </section>
 
     </article>
