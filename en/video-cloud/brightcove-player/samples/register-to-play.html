@@ -50,7 +50,6 @@
         <div id="main" class="large-10 small-12 columns">
             <h1>Brightcove Player Sample: Register to Play</h1>
             <!-- begin drupal content -->
-            <link rel="stylesheet" href="//learning-services-media.brightcove.com/doc-assets/player-development/samples/register-to-play/register-to-play.css" media="screen">
       <article class="bcls-article">
           <header id="bcls_header" class="bcls-header">
             <p>This topic shows you how to use a Brightcove player where the user must fill in a form to view the video.</p>
@@ -96,7 +95,7 @@
 
           <section id="selectimplementation" class="section">
                     <h2>Select implementation</h2>
-                    <p>In this example, you will test with the embed_in_page code and then move the styles and scripts into separate files to test locally. Then, you will use the Embed API to append the age gate styles, script and plugin to a child player based on the properties of the parent. With this player, you must run this example as an in-page embed, as explained <a href="#limitation">below</a>.</p>
+                    <p>In this example, you will test with the embed_in_page code and then move the styles and scripts into separate files to test locally. Then, you will add your JavaScript and CSS to the player as a plugin, after which you can publish the player using either the iframe or in-page embed code.</p>
                 </section>
 
           <div id="resources" class="section">
@@ -104,13 +103,16 @@
               <p>The following sections detail resources used from various APIs.</p>
             <h3>Brightcove player API methods</h3>
             <ul>
-              <li><code>addClass()</code></li>
-              <li><code>removeClass()</code></li>
-              <li><code>play()</code></li>
+                <li><code>play()</code></li>
+                <li><code>pause()</code></li>
+                <li><code>addClass()</code></li>
+                <li><code>removeClass()</code></li>
+                <li><code>one()</code></li>
+                <li><code>off()</code></li>
             </ul>
             <h3>Brightcove player API events</h3>
             <ul>
-              <li><code>loadedmetadata</code></li>
+              <li><code>timeupdate</code></li>
             </ul>
           </div>
 
@@ -141,7 +143,7 @@
                 <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/samples/register-to-play/register-to-play.png" alt="Logic Diagram">
                 <figcaption class="bcls-caption--image">Logic Diagram</figcaption>
             </figure>
-            <aside class="bcls-aside bcls-aside--information">The example here does not implement the communication between the registration form and the backend services for registration and authentication. To get an idea of how to do that, you could look at some of our samples that access Brightcove APIs from a client (see the <a href="../../cms-api/getting-started/quick-start-cms.html">Quick Start to the CMS API</a> for example). If the backend services require authentication, you should route the requests through a proxy, so that you do not expose credentials on the client side.</aside>
+            <aside class="bcls-aside bcls-aside--information">The example here does not implement the communication between the plugin and the backend services for registration and authentication. To get an idea of how to do that, you could look at some of our samples that access Brightcove APIs from a client (see the <a href="../../cms-api/getting-started/quick-start-cms.html">Quick Start to the CMS API</a> for example). If the backend services require authentication, you should route the requests through a proxy, so that you do not expose credentials on the client side.</aside>
             <p class="BCL-aside">Note: </p>
             <h3>Create the player</h3>
               <p>To create a player and assign a video to it, follow these steps:</p>
@@ -156,15 +158,7 @@
                         <li>The CSS for the plugin is provided and will not change for different plugin implementations. For the <strong>CSS URL</strong>, enter:<br/>
                         <pre> //players.brightcove.net/videojs-overlay/1/videojs-overlay.css</pre></li>
                         <li>For the <strong>Name</strong>, enter <strong>overlay</strong>.</li>
-                        <li><p>Enter the plugin options. The example below displays clickable text when the video data is loaded, and hides the overlay once the video starts playing.</p>
-                            <p><script src="https://gist.github.com/7782561fb421af951e1c.js"></script></p>
-                            <p class="BCL-aside">Note: replace <code>your-domain.com</code> with the appropriate path to the registration form page that you will create below. You can host the player and the registration page on a local or remote web server, but they must be on the same domain, as explained <a href="#limitations">below</a></p>
-                            <figure class="bcls-figure">
-                                <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/samples/register-to-play/overlay-options.png" alt="Overlay Options">
-                                <figcaption class="bcls-caption--image">Overlay Options</figcaption>
-                            </figure>
-                      </ol>
-                  </li>
+                        <li>No options are required for the overlay plugin.</li>
                   <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
                   <li><span class="video-cloud-only">In the <strong>Media</strong> module, select a video and publish it with this player.</span><span class="perform-only">Assign video content to the player and publish it.</span></li>
                   <li>Copy the In-Page embed code and paste it into a new HTML file. Give the file any name you like, but it must reside on the same local or remote domain as the registration form.</li>
@@ -175,27 +169,6 @@
               <p class="video-cloud-only"></p>
               <p class="perform-only"><script src="https://gist.github.com/58d289811df637411269.js"></script></p>
 
-            <h3>The Registration Form page</h3>
-            <p>
-                The registration form page will appear in the iframe in the overlay. It's just an ordinary web page with HTML, CSS, and JavaScript - we won't dwell on the details, since there are explanatory comments in the code. The one feature that might be unfamiliar to you is this line, which appears in the handlers for clicking the submit password buttons:
-            </p>
-          <pre><code>parent.playVideo();</code></pre>
-            <p>
-                In an ordinary web page, parent would be the browser window. But since the page will be embedded in an iframe, the parent is the page that contains the frame. So this code is calling a function on the player page.
-            </p>
-            <div class="BCL-aside">
-                <p>Note: to call a function on the parent page, two conditions must be met:</p>
-                <ul>
-                    <li>The parent and child pages must reside on the same domain</li>
-                    <li>The function must be in the globle scope of the parent page</li>
-                </ul>
-                <p>Here is the full code for the registration page:</p>
-                <ol start="7">
-                    <li>Copy the code into a new HTML page.</li>
-                    <li>Save the page. Make sure that the path and filename match what you entered as the iframe src in the overlay options, or edit the overlay options in Studio as necessary.</li>
-                </ol>
-                <p><script src="https://gist.github.com/6b8fbc967d56b2097b7d.js"></script></p>
-            </div>
             <h3>The HTML code for the player page.</h3>
             <p>No extra HTML code is needed for this example.</p>
 
