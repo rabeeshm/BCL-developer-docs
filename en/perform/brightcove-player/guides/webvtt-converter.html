@@ -61,11 +61,11 @@
             <section class="bcls-section" id="Workflow">
                 <h2>Workflow</h2>
                 <p>Here's a general workflow for converting your old DFXP captions to the WebVTT format required for the Brightcove Player:</p>
-                <ol class="bcls-tasklist">
-                    <li>Find all media with DXFP captions (using the Media API <a href="http://docs.brightcove.com/en/video-cloud/media/references/reference.html#Video_Read">search_videos method</a>, and including <code>captioning</code> in the <code>fields</code> to return)</li>
-                    <li>Get the DXFP files for each video (the URL for each DFXP file is included in the response for the search_videos request)</li>
-                    <li>Convert using <a href="#Caption_converter">captions tool</a></li>
-                    <li>If you've already added WebVTT captions to some of your videos, you won't want to overwrite those - you can identify which videos already have WebVTT captions by looking at the <code>text_tracks</code> object returned by the <a href="http://docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html#api-videoGroup-Get_Videos">CMS API</a></li>
+                <ol>
+                    <li>Find all media with DXFP captions (using the Media API <a href="http://docs.brightcove.com/en/video-cloud/media/references/reference.html#Video_Read">search_videos method</a>, and including <code>captioning</code> in the <code>fields</code> to return).</li>
+                    <li>Get the DXFP files for each video (the URL for each DFXP file is included in the response for the search_videos request).</li>
+                    <li>Convert using <a href="#Caption_converter">captions tool</a>.</li>
+                    <li>If you've already added WebVTT captions to some of your videos, you won't want to overwrite those - you can identify which videos already have WebVTT captions by looking at the <code>text_tracks</code> object returned by the <a href="http://docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html#api-videoGroup-Get_Videos">CMS API</a>.</li>
                     <li>Finally, for videos you need to add your converted captions files to, you can do this using the <a href="http://docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html#api-videoGroup-Update_Video">CMS API Update Video</a> method.</li>
                 </ol>
             </section>
@@ -98,14 +98,21 @@
             <section id="installation" class="bcls-section">
                 <h2>Installation</h2>
                 <p>Follow these steps to install the converter tool:</p>
-                <ol>
+                <ol class="bcls-tasklist">
                     <li>If you don't already have it, install <code>Git</code> on your computer. Refer to the <a href="http://git-scm.com/downloads">Git downloads</a> page.
                   <p>You can use the following command to check the current version installed on your computer:</p>
                   <pre class="line-numbers"><code class="language-javascript">git --version</code></pre></li>
                     <li>If you don't already have it, install <code>Python 2.7</code> on your computer. Refer to the <a href="https://www.python.org/downloads/">Python downloads</a> page.
                   <p>You can use the following command to check the current version installed on your computer:</p>
                   <pre class="line-numbers"><code class="language-javascript">python --version</code></pre></li>
-                    <li>Clone the GitHub repository for <a href="https://github.com/pbs/pycaption">pycaption</a> to your desktop. This module reads a captions file and writes out a captions file in your desired format.</li>
+                    <li>Clone the GitHub repository for <a href="https://github.com/pbs/pycaption">pycaption</a> to your desktop. This module reads a captions file and writes out a captions file in your desired format.
+                      <aside class="bcls-aside bcls-aside--warning">Note: It has been found you need to make an edit to the code in this repo. Once you have cloned the repo, move into <strong>pycaption/dfxp</strong> folder. Then in the <strong>base.py</strong> file, edit line <strong>62</strong>. Change it from
+                        <pre class="line-numbers"><code class="language-javascript">if type(content) != str:</code></pre>
+                        to
+                        <pre class="line-numbers"><code class="language-javascript">if type(content) != unicode:</code></pre>.
+                      </aside>
+
+                    </li>
                     <li>Clone the GitHub repository for <a href="https://github.com/jnorton001/pycaption-cli">pycaption-cli</a> to your desktop. This module adds a command line interface for the <code>pycaption</code> module.</li>
                     <li>At the command line, change the directory to the folder where you cloned the <code>pycaption</code> repository.</li>
                     <li>
@@ -230,7 +237,7 @@ if __name__ == '__main__':
             <section id="convertfiles" class="bcls-section">
                 <h2>Convert files</h2>
                 <p>Now, you are ready to convert captions files from one format to another.</p>
-                <ol>
+                <ol class="bcls-tasklist">
                     <li>At the command line, return to the folder where you cloned the <code>pycaption-cli</code> repository.</li>
                     <li>
                         <p>On your computer, locate your captions file. In this example, we are converting a DFXP/TTML file to WebVTT format. Here is a sample DFXP/TTML file:</p>
@@ -257,10 +264,9 @@ if __name__ == '__main__':
   &lt;/body&gt;
 &lt;/tt&gt;</code></pre>
                     </li>
-                    <li>
-                        <p>At the command line, enter the following:
-                            <p>
-                                <pre class="line-numbers"><code class="language-javascript">pycaption &lt;pathtocaptionfile&gt; --webvtt &gt; output_file.vtt</code></pre></li>
+                    <li>At the command line, enter the following:
+                                <pre class="line-numbers"><code class="language-javascript">pycaption &lt;pathtocaptionfile&gt; --webvtt &gt; output_file.vtt</code></pre>
+                    </li>
                     <li>
                         <p>In an editor, browse the <code>output_file.vtt</code> contents. You should see your new WebVTT captions.
                             <p>
