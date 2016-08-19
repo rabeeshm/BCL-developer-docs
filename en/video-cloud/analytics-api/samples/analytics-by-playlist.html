@@ -52,16 +52,25 @@
                     <p>This tool allows you to select a playlist from your account and get analytics data for all the videos in the playlist.</p>
                 </header>
                 <section id="Notes" class="bcls-section">
-                    <h2>Notes</h2>
+                    <h2>Limitations</h2>
                     <aside class="bcls-aside bcls-aside--information">
                         <ul>
                             <li>You must retrieve playlist data and select a playlist before submitting the request to the Analytics API</a>
                             </li>
+                            <li>For smart playlists, analytics data will be returned for videos currently in the playlist - data will not be returned for videos that are no longer in the playlist because they have been deactivated, deleted, or removed because the definition of the playlist has changed</li>
                             <li>If any of the videos are also published in single video players, or in multiple playlists, you will need to specify the player to get accurate data for a specific playlist</li>
                             <li>The returned data includes the data for individual videos plus cumulative or average values for the playlist</li>
                             <li>If the returned data does not include items for all videos in the playlist, no data was returned for those videos over the time period specified</li>
                         </ul>
                     </aside>
+                </section>
+                <section id="logic" class="bcls-section">
+                    <h2>App Logic</h2>
+                    <p>This is a hybrid app that uses the CMS API to retrieve playlist information, and then the Analytics API to retrieve analytics for the videos in the playlist. There is a slight twist: for EXPLICIT (manual) playlist, the metadata includes the video ids, so we can take those directly to the Analytics API; for smart playlists, however, we need to go back to CMS API using the search, sort, and limit criteria for the playlist to get the video information, which we can then take to the Analytics API:</p>
+                    <figure class="bcls-figure">
+                        <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/analytics-api/code-samples/analytics-by-playlist/get-analytics-by-playlist.png" alt="App Logic">
+                        <figcaption class="bcls-caption--image">App Logic</figcaption>
+                    </figure>
                 </section>
                 <section id="Request_Options" class="bcls-section">
                     <h2>Request Options</h2>
@@ -83,14 +92,14 @@
                                         <tr>
                                             <td class="align-top no-wrap">Client id:</td>
                                             <td>
-                                                <input id="client_id" class="required aapi-request" type="text" size="100" value="" />
+                                                <input id="client_id" class="required aapi-request" type="text" size="100" value="" /> (must include permissions for Analytics/Read, Videos/Read, and Playlists/Read)
                                                 <p>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td class="align-top no-wrap">Client secret:</td>
                                             <td>
-                                                <input id="client_secret" class="required aapi-request" type="text" size="100" value="" />
+                                                <input id="client_secret" class="required aapi-request" type="text" size="100" value="" /> (must include permissions for Analytics/Read, Videos/Read, and Playlists/Read)
                                                 <p>
                                             </td>
                                         </tr>
@@ -99,30 +108,7 @@
                                 <p class="small" id="n1"><sup class="red">[1]</sup> See <a href="//docs.brightcove.com/en/video-cloud/analytics-api/guides/managing-api-credentials.html">Managing API Credentials</a> for information on getting client credentials.</p>
                             </div>
                         </fieldset>
-                        <fieldset class="bcls-fieldset">
-                            <legend>Media API Options</legend>
-                            <div id="mapiInfo">
-                                <table class="bcls-table">
-                                    <tbody class="bcls-table__body">
-                                        <tr>
-                                            <td>Media API READ Token:
-                                                <br />(to retrieve videos to report or filter on)</td>
-                                            <td>
-                                                <input id="mapitoken" class="required aapi-request" type="text" size="60" value="v87kWelIdjUwVm7_Rzv09k-KqtLz-ty8ONbMxVYAI7-Q0eOilegqqg.." />(default: BC Training Videos)</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Media API Location</td>
-                                            <td>
-                                                <select id="readApiLocation" class="required aapi-request">
-                                                    <option value="http://api.brightcove.com/services/library">http://api.brightcove.com/services/library</option>
-                                                    <option value="http://api.brightcove.co.jp/services/library">http://api.brightcove.co.jp/services/library (Japan)</option>
-                                                </select>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </fieldset>
+
                         <fieldset class="bcls-fieldset">
                             <legend>Select Playlist</legend>
                             <p><button class="bcls-button" id="getPlaylists">Get Playlists</button>
@@ -198,7 +184,6 @@
                     </aside>
                 </section>
             </article>
-            <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
             <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
             <script src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/js/pikaday/pikaday.min.js"></script>
             <script src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/js/bc-mapi.js"></script>
@@ -207,6 +192,7 @@
         </div>
     </div>
     <!-- bcl scripts -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
