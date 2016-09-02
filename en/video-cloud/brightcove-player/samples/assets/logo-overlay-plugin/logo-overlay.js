@@ -72,6 +72,7 @@ videojs.plugin('logoOverlay', function(options) {
     if (isDefined(overlayOptions.clickThruURL)) {
         aTag = document.createElement('a');
         aTag.setAttribute('href', overlayOptions.clickThruURL);
+        aTag.setAttribute('target', '_blank');
         aTag.appendChild(imgTag);
         overlayContent = aTag.outerHTML;
     } else {
