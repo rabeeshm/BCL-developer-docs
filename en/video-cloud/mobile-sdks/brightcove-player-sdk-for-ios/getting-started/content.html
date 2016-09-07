@@ -76,23 +76,31 @@ static NSString * const kViewControllerPlaybackServicePolicyKey = @&quot;BCpkADa
 static NSString * const kViewControllerAccountID = @&quot;3636334180001&quot;;
 static NSString * const kViewControllerVideoID = @&quot;3987127390001&quot;;
 
-@interface ViewController () &lt;BCOVPlaybackControllerDelegate&gt;
+@interface ViewController () &lt;BCOVPlaybackControllerDelegate, BCOVPUIPlayerViewDelegate>&gt;
 
 @property (nonatomic, strong) BCOVPlaybackService *service;
 @property (nonatomic, strong) id&lt;BCOVPlaybackController&gt; playbackController;
-
+@property (nonatomic) BCOVPUIPlayerView *playerView;
 @property (nonatomic, weak) IBOutlet UIView *videoContainer;
-@property (nonatomic, strong) AVPlayerViewController *playerViewController;
 
 @end
 
 @implementation ViewController
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+    if (self)
+    {
+        [self setup];
+    }
+    return self;
+}
 
 - (void)setup
 {
     BCOVPlayerSDKManager *manager = [BCOVPlayerSDKManager sharedManager];
+    _playbackController = [manager createPlaybackController];
 
-    _playbackController = [manager createSidecarSubtitlesPlaybackControllerWithViewStrategy:[manager defaultControlsViewStrategy]];
     _playbackController.delegate = self;
     _playbackController.autoAdvance = YES;
     _playbackController.autoPlay = YES;
@@ -104,9 +112,20 @@ static NSString * const kViewControllerVideoID = @&quot;3987127390001&quot;;
 {
     [super viewDidLoad];
 
-    self.playbackController.view.frame = self.videoContainer.bounds;
-    self.playbackController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    [self.videoContainer addSubview:self.playbackController.view];
+    // Create and set options
+    BCOVPUIPlayerViewOptions *options = [[BCOVPUIPlayerViewOptions alloc] init];
+    options.presentingViewController = self;
+
+    // Create and configure Control View
+    BCOVPUIBasicControlView *controlsView = [BCOVPUIBasicControlView basicControlViewWithVODLayout];
+    BCOVPUIPlayerView *playerView = [[BCOVPUIPlayerView alloc] initWithPlaybackController:self.playbackController options:options controlsView:controlsView ];
+    playerView.delegate = self;
+    playerView.frame = _videoContainer.bounds;
+    playerView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+
+    [_videoContainer addSubview:playerView];
+    _playerView = playerView;
+    _playerView.playbackController = _playbackController;
 
     [self requestContentFromPlaybackService];
 
@@ -130,7 +149,9 @@ static NSString * const kViewControllerVideoID = @&quot;3987127390001&quot;;
 
 @end</code></pre>
                 <!-- <p><code data-gist-id="6e5ca0259094fb71d07f" data-gist-line="9,17-34,45-83,100-101"></code></p> -->
-                <br />
+                <p>
+                  For a complete sample, see the <a href="../../brightcove-player-sdk-for-ios/guides/quick-start.html">Simple Video Playback App</a> guide.
+                </p>
 
                 <h4>Using the Media API</h4>
                 <p>The Media API is a RESTful API that lets you interact with your Video Cloud media library. For details, see the <a href="../../../media/index.html">Media API Documentation</a>.</p>
@@ -144,25 +165,31 @@ static NSString * const kViewControllerVideoID = @&quot;3987127390001&quot;;
 // ** Customize these values with your own account information **
 static NSString * const kViewControllerCatalogToken = @&quot;ZUPNyrUqRdcAtjytsjcJplyUc9ed8b0cD_eWIe36jXqNWKzIcE6i8A..&quot;;
 static NSString * const kViewControllerPlaylistID = @&quot;3637400917001&quot;;
-static NSString * const kPublisherID = @&quot;&lt;insert valid accountId&gt;&quot;; // for analytics
 
-@interface ViewController () &lt;BCOVPlaybackControllerDelegate&gt;
+@interface ViewController () &lt;BCOVPlaybackControllerDelegate, BCOVPUIPlayerViewDelegate&gt;
 
 @property (nonatomic, strong) BCOVCatalogService *catalogService;
 @property (nonatomic, strong) id&lt;BCOVPlaybackController&gt; playbackController;
+@property (nonatomic) BCOVPUIPlayerView *playerView;
 @property (nonatomic, weak) IBOutlet UIView *videoContainer;
 
 @end
 
 @implementation ViewController
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+    if (self)
+    {
+        [self setup];
+    }
+    return self;
+}
 
 - (void)setup
 {
     BCOVPlayerSDKManager *manager = [BCOVPlayerSDKManager sharedManager];
-
-    _playbackController = [manager createPlaybackControllerWithViewStrategy:[manager defaultControlsViewStrategy]];
-
-    _playbackController.analytics.account = kPublisherID;
+    _playbackController = [manager createPlaybackController];
 
     _playbackController.delegate = self;
     _playbackController.autoAdvance = YES;
@@ -176,9 +203,20 @@ static NSString * const kPublisherID = @&quot;&lt;insert valid accountId&gt;&quo
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
 
-    self.playbackController.view.frame = self.videoContainer.bounds;
-    self.playbackController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    [self.videoContainer addSubview:self.playbackController.view];
+    // Create and set options
+    BCOVPUIPlayerViewOptions *options = [[BCOVPUIPlayerViewOptions alloc] init];
+    options.presentingViewController = self;
+
+    // Create and configure Control View
+    BCOVPUIBasicControlView *controlsView = [BCOVPUIBasicControlView basicControlViewWithVODLayout];
+    BCOVPUIPlayerView *playerView = [[BCOVPUIPlayerView alloc] initWithPlaybackController:self.playbackController options:options controlsView:controlsView ];
+    playerView.delegate = self;
+    playerView.frame = _videoContainer.bounds;
+    playerView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+
+    [_videoContainer addSubview:playerView];
+    _playerView = playerView;
+    _playerView.playbackController = _playbackController;
 
     [self requestContentFromCatalog];
 }
@@ -270,6 +308,9 @@ entries =&gt;
     return [[BCOVVideo alloc] initWithSource:source cuePoints:[BCOVCuePointCollection collectionWithArray:@[]] properties:@{}];
 }</code></pre>
                 <!-- <p><code data-gist-id="59b47e25a8aa9965de7e" data-gist-hide-footer="true" data-gist-line="50-55,60-65,66-71"></code></p> -->
+                <p>
+                  For a complete sample, see the <a href="../../brightcove-player-sdk-for-ios/guides/quick-start.html">Simple Video Playback App</a> guide.
+                </p>
             </section>
 
             <br/>
