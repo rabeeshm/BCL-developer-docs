@@ -587,24 +587,36 @@ static NSString * const kAccountID = @"1234567899001";</code></pre>
 							</li>
             </ol>
 
-            <h4>Declare properties</h4>
+						<h4>Declare properties</h4>
             <ol class="bcls-tasklist">
-              <li><p>Add the following class declarations in the ViewController interface:</p>
-								<pre class="line-numbers" data-start="13"><code class="language-swift">@interface ViewController ()
+              <li><p>In the ViewController interface section, add the following class declarations:</p>
+								<ul>
+									<li>
+										Line 13: Adds the Brightcove delegates to the <code>interface</code>.
+									</li>
+									<li>
+										Line 15: Defines the <a href="//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/reference/current/Protocols/BCOVPlaybackController.html"><code>BCOVPlaybackController</code></a>, which has methods to control playback functionality.
+									</li>
+									<li>
+										Line 16: Defines the player view for the Brightcove UI controls.
+									</li>
+									<li>
+										Line 17: Defines the video container view.
+									</li>
+								</ul>
+								<pre class="line-numbers" data-start="13"><code class="language-swift">@interface ViewController () &lt;BCOVPlaybackControllerDelegate, BCOVPUIPlayerViewDelegate&gt;
 
 @property (nonatomic, strong) id&lt;BCOVPlaybackController&gt; playbackController;
+@property (nonatomic) BCOVPUIPlayerView *playerView;
 @property (nonatomic, weak) IBOutlet UIView *videoContainer;
 
 @end</code></pre>
-                <!-- <p><code data-gist-id="59b47e25a8aa9965de7e" data-gist-line="13-18" data-gist-hide-footer="true"></code></p> -->
-							</li>
             </ol>
-            <p>The <a href="//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/reference/current/Protocols/BCOVPlaybackController.html"><code>BCOVPlaybackController</code></a> has methods to control playback functionality.</p>
 
             <h4>Define intialization methods</h4>
             <ol class="bcls-tasklist">
               <li><p>Define an <code>init</code> function which calls a <code>setup</code> function which you will define in the next step. </p>
-								<pre class="line-numbers" data-start="24"><code class="language-swift">- (instancetype)initWithCoder:(NSCoder *)coder
+								<pre class="line-numbers" data-start="25"><code class="language-swift">- (instancetype)initWithCoder:(NSCoder *)coder
 {
     self = [super initWithCoder:coder];
     if (self)
@@ -617,20 +629,20 @@ static NSString * const kAccountID = @"1234567899001";</code></pre>
 							</li>
             </ol>
 
-            <h4>Set up the player</h4>
+						<h4>Set up the player</h4>
             <ol class="bcls-tasklist">
               <li>Create a method named <code>setup</code>, which is called when the app loads.
               <ul>
-                <li>Line 36: Initializes a shared manager. The <a href="//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/reference/current/Classes/BCOVPlayerSDKManager.html"><code>BCOVPlayerSDKManager</code></a> class is a singleton that allows you to create other objects in the SDK ecosystem.</li>
-                <li>Line 38: Uses the shared manager to create a playback controller with the default view strategy.</li>
-                <li>Line 40: Sends your Perform Account Id to Brightcove.</li>
-                <li>Lines 42-44: set the delegate and turn on the autoadvance and autoplay features.</li>
+                <li>Line 37: Initializes a shared manager. The <a href="//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-ios/reference/current/Classes/BCOVPlayerSDKManager.html"><code>BCOVPlayerSDKManager</code></a> class is a singleton that allows you to create other objects in the SDK ecosystem.</li>
+                <li>Line 39: Uses the shared manager to create a playback controller.</li>
+                <li>Line 41: Sends your Perform Account Id to Brightcove.</li>
+                <li>Lines 43-45: set the delegate and turn on the autoadvance and autoplay features.</li>
               </ul>
-							<pre class="line-numbers" data-start="34"><code class="language-swift">- (void)setup
+							<pre class="line-numbers" data-start="35"><code class="language-swift">- (void)setup
 {
     BCOVPlayerSDKManager *manager = [BCOVPlayerSDKManager sharedManager];
 
-    _playbackController = [manager createPlaybackControllerWithViewStrategy:[manager defaultControlsViewStrategy]];
+    _playbackController = [manager createPlaybackController];
 
     _playbackController.analytics.account = kAccountID;
 
@@ -646,13 +658,16 @@ static NSString * const kAccountID = @"1234567899001";</code></pre>
             <ol start="12">
               <li><p>In the <code>viewDidLoad</code> method do the following:</p>
                  <ul>
-                  <li>Lines 51-54: Create an array of video sources. You'll define the <code>videoWithURL</code> function in the next step.</li>
-                  <li>Lines 56-57: Configure the <code>playbackController</code>'s view.</li>
-                  <li>Line 58: Adds the player view as a subview of the main view.</li>
-                  <li>Line 61: Adds the video array to the controller's playback queue.</li>
-                  <li>Line 63: Starts playback of the first video.</li>
+                  <li>Lines 53-56: Create an array of video sources. You'll define the <code>videoWithURL</code> function in the next step.</li>
+									<li>Lines 59-60: Create and set the options for the player view.</li>
+                  <li>Lines 63-67: Create and set the Brightcove player controls.</li>
+                  <li>Line 69: Adds the player view as a subview of the main view.</li>
+									<li>Lines 70-71: Assigns the player view and playback controller to their associated global variables.</li>
+                  <li>Line 74: Adds the video array to the controller's playback queue.</li>
+                  <li>Line 76: Starts playback of the first video.</li>
                 </ul>
-								<pre class="line-numbers" data-start="47"><code class="language-swift">- (void)viewDidLoad {
+
+								<pre class="line-numbers" data-start="48"><code class="language-swift">- (void)viewDidLoad {
     [super viewDidLoad];
 
     // create an array of videos
@@ -661,9 +676,20 @@ static NSString * const kAccountID = @"1234567899001";</code></pre>
         [self videoWithURL:[NSURL URLWithString:@"http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8"]]
     ];
 
-    self.playbackController.view.frame = self.videoContainer.bounds;
-    self.playbackController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    [self.videoContainer addSubview:self.playbackController.view];
+    // Create and set options
+    BCOVPUIPlayerViewOptions *options = [[BCOVPUIPlayerViewOptions alloc] init];
+    options.presentingViewController = self;
+
+    // Create and configure Control View
+    BCOVPUIBasicControlView *controlsView = [BCOVPUIBasicControlView basicControlViewWithVODLayout];
+    BCOVPUIPlayerView *playerView = [[BCOVPUIPlayerView alloc] initWithPlaybackController:self.playbackController options:options controlsView:controlsView ];
+    playerView.delegate = self;
+    playerView.frame = _videoContainer.bounds;
+    playerView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+
+    [_videoContainer addSubview:playerView];
+    _playerView = playerView;
+    _playerView.playbackController = _playbackController;
 
     // add the video array to the controller's playback queue
     [self.playbackController setVideos:videos];
@@ -677,7 +703,7 @@ static NSString * const kAccountID = @"1234567899001";</code></pre>
             <h4>The rest</h4>
             <ol class="bcls-tasklist">
               <li><p>Create a function that sets the delivery method for BCOVSources that belong to a video.</p>
-								<pre class="line-numbers" data-start="66"><code class="language-swift">- (BCOVVideo *)videoWithURL:(NSURL *)url
+								<pre class="line-numbers" data-start="79"><code class="language-swift">- (BCOVVideo *)videoWithURL:(NSURL *)url
 {
     // set the delivery method for BCOVSources that belong to a video
     BCOVSource *source = [[BCOVSource alloc] initWithURL:url deliveryMethod:kBCOVSourceDeliveryHLS properties:nil];
@@ -693,7 +719,7 @@ static NSString * const kAccountID = @"1234567899001";</code></pre>
 //  ViewController.m
 //  Simple Video Playback
 //
-//  Copyright (c) 2014 Brightcove. All rights reserved.
+//  Copyright (c) 2016 Brightcove. All rights reserved.
 //
 
 #import "ViewController.h"
@@ -701,9 +727,10 @@ static NSString * const kAccountID = @"1234567899001";</code></pre>
 // ** Customize these values with your own account information **
 static NSString * const kAccountID = @"1234567899001";
 
-@interface ViewController ()
+@interface ViewController () &lt;BCOVPlaybackControllerDelegate, BCOVPUIPlayerViewDelegate&gt;
 
 @property (nonatomic, strong) id&lt;BCOVPlaybackController&gt; playbackController;
+@property (nonatomic) BCOVPUIPlayerView *playerView;
 @property (nonatomic, weak) IBOutlet UIView *videoContainer;
 
 @end
@@ -726,7 +753,7 @@ static NSString * const kAccountID = @"1234567899001";
 {
     BCOVPlayerSDKManager *manager = [BCOVPlayerSDKManager sharedManager];
 
-    _playbackController = [manager createPlaybackControllerWithViewStrategy:[manager defaultControlsViewStrategy]];
+    _playbackController = [manager createPlaybackController];
 
     _playbackController.analytics.account = kAccountID;
 
@@ -737,16 +764,28 @@ static NSString * const kAccountID = @"1234567899001";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    // Do any additional setup after loading the view, typically from a nib.
 
     // create an array of videos
     NSArray *videos = @[
-        [self videoWithURL:[NSURL URLWithString:@"http://cf9c36303a9981e3e8cc-31a5eb2af178214dc2ca6ce50f208bb5.r97.cf1.rackcdn.com/bigger_badminton_600.mp4"]],
-        [self videoWithURL:[NSURL URLWithString:@"http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8"]]
+      [self videoWithURL:[NSURL URLWithString:@"http://cf9c36303a9981e3e8cc-31a5eb2af178214dc2ca6ce50f208bb5.r97.cf1.rackcdn.com/bigger_badminton_600.mp4"]],
+      [self videoWithURL:[NSURL URLWithString:@"http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8"]]
     ];
 
-    self.playbackController.view.frame = self.videoContainer.bounds;
-    self.playbackController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    [self.videoContainer addSubview:self.playbackController.view];
+    // Create and set options
+    BCOVPUIPlayerViewOptions *options = [[BCOVPUIPlayerViewOptions alloc] init];
+    options.presentingViewController = self;
+
+    // Create and configure Control View
+    BCOVPUIBasicControlView *controlsView = [BCOVPUIBasicControlView basicControlViewWithVODLayout];
+    BCOVPUIPlayerView *playerView = [[BCOVPUIPlayerView alloc] initWithPlaybackController:self.playbackController options:options controlsView:controlsView ];
+    playerView.delegate = self;
+    playerView.frame = _videoContainer.bounds;
+    playerView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+
+    [_videoContainer addSubview:playerView];
+    _playerView = playerView;
+    _playerView.playbackController = _playbackController;
 
     // add the video array to the controller's playback queue
     [self.playbackController setVideos:videos];
