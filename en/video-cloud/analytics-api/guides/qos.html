@@ -58,13 +58,17 @@
             <!-- begin drupal content -->
             <article class="bcls-article">
                 <header id="bcls_header" class="bcls-header">
-                    <p>
-                        Quality metrics are included in most dimension reports, and help you see the quality of the playback experience for your users.
-                        <aside class="bcls-aside bcls-aside--warning">These metrics are in beta testing, and the implementation may change.</aside>
-                    </p>
+                    <p>In this topic, you will learn about quality metrics provided by the Analytics API. Quality metrics are included in most dimension reports, and help you see the quality of the playback experience for your users.</p>
+                    <aside class="bcls-aside bcls-aside--warning">All features discussed in this topic are currently in beta release, and the final implementation may change.</aside>
+                    <h3>Discussed in this topic:</h3>
+                    <ul>
+                        <li><a href="#qosFields">Available quality fields</a></li>
+                        <li><a href="#calculatedFields">Calculated fields</a></li>
+                        <li><a href="#sample">Sample request</a></li>
+                    </ul>
                 </header>
                 <section class="bcls-section" id="qosFields">
-                    <h2>Available fields</h2>
+                    <h2>Available quality fields</h2>
                     <p>The following quality of playback fields are currently available:</p>
                     <dl>
                         <dt><code>errors_before_view</code></dt>
@@ -89,54 +93,59 @@
                         <dd>Number of times a viewer was successfully able to begin playback of a video stream (occurs when first frame of video is displayed).</dd>
                     </dl>
                 </section>
-                <section class="bcls-section" id="examples">
-                    <h2>Example</h2>
+                <section id="calculatedFields" class="bcls-section">
+                    <h2>Calculated fields</h2>
+                    <!-- <aside class="bcls-aside bcls-aside--warning">The calculated fields feature is in open beta testing. You are welcome to try it and offer feedback using the <a href="#feedbackMail">Questions and Comments</a> link below. You should not use this feature in mission-critical apps, as the implementation may change as a result of beta feedback.</aside> -->
+                    <p>You can add calculated fields to your API requests using the syntax:</p>
+<pre class="line-numbers"><code class="language-http">fields=calulated_field_name:expression</code></pre>
+                <p>The name for the calculated field can be any URI-compatible string. The expression can include regular field names and arithmatic operators. ("<code>+</code>" signs should be encoded as <code>%2B</code> and "<code>-</code>" signs as <code>%2D</code>)</p>
+                <h3>Example</h3>
+<pre class="line-numbers"><code class="language-http">fields=total_errors:errors_before_view<span class="bcls-highlight">%2B</span>errors_during_view,avg_sec_viewed:video_seconds_viewed/video_view</code></pre>
+                </section>
+                <section class="bcls-section" id="sample">
+                    <h2>Sample request</h2>
                     <p>
-                        To return the quality of playback fields, simply include them in the <code>field</code> parameter list:
+                        To return the quality of playback fields, simply include them in the <code>field</code> parameter list. Below is a sample request, including all the currently available quality metrics and some calculated fields. The response is shown below the request.
                     </p>
-<pre class="line-numbers" style="white-space:pre-wrap;padding-top:1em;padding-bottom:1em;"><code class="language-http">https://analytics.api.brightcove.com/v1/data?accounts=1752604059001&dimensions=account,video&fields=start_time_ms,start_time_ms_count,load_time_ms,load_time_ms_count,rendition_switches,measured_bps_count&limit=2</code></pre>
+<textarea class="bcls-code" style="height:12em;">https://analytics.api.brightcove.com/v1/data?accounts=20318290001&dimensions=account,video&where=video==3989527116001&fields=errors_before_view,errors_during_view,start_time_ms,start_time_ms_count,load_time_ms,load_time_ms_count,measured_bps,measured_bps_count,play_request,video_view,average_load_time:load_time_ms/load_time_ms_count,average_start_time:start_time_ms/start_time_ms_count</textarea>
                     <p>
                         <strong>Response</strong>
                     </p>
 <pre class="line-numbers"><code class="language-json">{
-  "item_count": 78,
+  "item_count": 1,
   "items": [
     {
-      "video": "5068505928001",
-      "account": "1752604059001",
-      "video_view": 1,
-      "start_time_ms": 655,
-      "start_time_ms_count": 1,
-      "load_time_ms": 2508,
-      "load_time_ms_count": 1,
-      "measured_bps": null,
-      "measured_bps_count": null
-    },
-    {
-      "video": "4426931680001",
-      "account": "1752604059001",
-      "video_view": 1,
-      "start_time_ms": 2,
-      "start_time_ms_count": 1,
-      "load_time_ms": 814,
-      "load_time_ms_count": 1,
-      "rendition_switches": null,
-      "measured_bps_count": null
+      "video": "3989527116001",
+      "account": "20318290001",
+      "errors_before_view": null,
+      "errors_during_view": null,
+      "start_time_ms": 50353,
+      "start_time_ms_count": 176,
+      "load_time_ms": 1954760,
+      "load_time_ms_count": 173,
+      "measured_bps": 25164660511,
+      "measured_bps_count": 606,
+      "play_request": 603,
+      "video_view": 177,
+      "average_load_time": 11299.190751445087,
+      "average_start_time": 286.09659090909093
     }
   ],
   "summary": {
-    "load_time_ms": 72390497,
-    "load_time_ms_count": 6346,
-    "video_view": 8334</code></pre>
-                </section>
-                <section id="calculateFields" class="bcls-section">
-                    <h2>Calculated fields (BETA)</h2>
-                    <aside class="bcls-aside bcls-aside--warning">The calculated fields feature is in open beta testing. You are welcome to try it and offer feedback using the <a href="#feedbackMail">Questions and Comments</a> link below. You should not use this feature in mission-critical apps, as the implementation may change as a result of beta feedback.</aside>
-                    <p>You can add calculated fields to your API requests using the syntax:</p>
-<pre class="line-numbers"><code class="language-http">fields=calulated_field_name:expression</code></pre>
-                <p>The name for the calculated field can be any URI-compatible string. The expression can include regular field names and arithmatic operators. (<code>+</code> signs should be encoded as <code>%2B</code>, <code>-</code> signs as <code>%2D</code>), and <code>/</code> signs as <code>%2F</code></p>
-                <h3>Example</h3>
-<pre class="line-numbers"><code class="language-http">fields=avg_percent_viewed:video_percent_viewed%2Fvideo_view,avg_sec_viewed:video_seconds_viewed%2Fvideo_view,video.name</code></pre>
+    "errors_before_view": 0,
+    "measured_bps": 25164660511,
+    "load_time_ms": 1954760,
+    "average_start_time": 286.09659090909093,
+    "load_time_ms_count": 173,
+    "video_view": 177,
+    "start_time_ms": 50353,
+    "play_request": 603,
+    "errors_during_view": 0,
+    "measured_bps_count": 606,
+    "average_load_time": 11299.190751445087,
+    "start_time_ms_count": 176
+  }
+}</code></pre>
                 </section>
             </article>
             <!-- end drupal content -->
@@ -158,7 +167,7 @@
         </script>
 
 
-        <div style="text-align:center">
+        <!-- <div style="text-align:center">
     <iframe id="CSAT" src="//learning-services-media.brightcove.com/doc-assets/general/surveylink.html" style=" padding-bottom:20px;border:none"></iframe>
 </div>
         <script>
@@ -173,7 +182,7 @@
         <script>
             var feedbackMail = document.getElementById("feedbackMail");
             feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
-        </script>
+        </script> -->
 </body>
 
 </html>
