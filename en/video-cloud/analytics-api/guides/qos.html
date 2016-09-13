@@ -43,23 +43,23 @@
 
 <body>
     <!-- header navbar -->
-    <div id="navWrapper" class="fixed"></div>
+    <!-- <div id="navWrapper" class="fixed"></div> -->
     <!-- breadcrumbs -->
-    <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+    <!-- <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav> -->
     <!-- search -->
-    <div id="searchModal" class="reveal-modal" data-reveal></div>
+    <!-- <div id="searchModal" class="reveal-modal" data-reveal></div> -->
     <!-- content -->
     <div class="row">
-        <div class="sidebar large-2 columns show-for-large-up">
-            <!-- <div id="sidenav" class="side-nav"></div> -->
-        </div>
-        <div id="main" class="large-10 small-12 columns">
-            <h1>Quality of Playback Metrics (BETA)</h1>
+        <!-- <div class="sidebar large-2 columns show-for-large-up">
+            <div id="sidenav" class="side-nav"></div>
+        </div> -->
+        <div id="main" class="large-12 small-12 columns">
+            <h1>Quality Metrics (BETA)</h1>
             <!-- begin drupal content -->
             <article class="bcls-article">
                 <header id="bcls_header" class="bcls-header">
                     <p>
-                        Quality of playback metrics are included in most dimension reports, and help you see the quality of the playback experience for your users.
+                        Quality metrics are included in most dimension reports, and help you see the quality of the playback experience for your users.
                         <aside class="bcls-aside bcls-aside--warning">These metrics are in beta testing, and the implementation may change.</aside>
                     </p>
                 </header>
@@ -67,24 +67,28 @@
                     <h2>Available fields</h2>
                     <p>The following quality of playback fields are currently available:</p>
                     <dl>
+                        <dt><code>errors_before_view</code></dt>
+                        <dd>Total number of requested playback sessions which ended before playback began due to an error.</dd>
+                        <dt><code>errors_during_view</code></dt>
+                        <dd>Total number of playback sessions which ended due to an error.</dd>
                         <dt><code>load_time_ms</code></dt>
-                        <dd>The amount of time, in milliseconds, that the user waited for the player to become interactive. This metric is the measured time between the first initiation of the player and the first video_impression event for that player. It is only collected for players which implement protocol version 2 of the Data Collection API.</dd>
-                        <dt><code>load_time_ms_count</code> (00-14)</dt>
-                        <dd>The number of load time measurements that were successfully taken. Many players do not implement the load_time measurement; this count exists to indicate what subset of the total were configured to measure load time.</dd>
-                        <dt>
-                            <code>measured_bps_count</code>
-                        </dt>
-                            <dd>sum and count of instances of measured client bandwidth across all video viewing sessions that reported measured bps</dd>
-                        <dt><code>rendition_switches</code></dt>
-                        <dd>The number of rendition switches that were counted</dd>
+                        <dd>Total load time across all load time measurements which is the time to when the player displays a poster image which we refer to as an impression (the average is this metric divided by the count below).</dd>
+                        <dt><code>load_time_ms_count</code></dt>
+                        <dd>Number of times that a valid load time measurement was made.</dd>
+                        <dt><code>measured_bps</code></dt>
+                        <dd>Total sum of the measured client bandwidth.</dd>
+                        <dt><code>measured_bps_count</code></dt>
+                        <dd>Number of times a valid measured bps measurement was made</dd>
+                        <dt><code>play_request</code></dt>
+                        <dd>Number of playback requests (this occurs when a viewer presses play or an autoplay event is triggered).</dd>
                         <dt><code>start_time_ms</code></dt>
-                        <dd>The amount of time, in milliseconds, that the user waited for video to start after playback was initiated. This measurement does not include any advertising time caused by <code>pre-roll</code> ads. The measurement begins either due to an <code>autoStart</code> setting or an explicit play request. This metric is the sum of the measured time between the <code>play_request</code> event and the <code>video_view</code> event, minus any duration between ad_start and ad_end events. It is only collected for players which implement protocol version 2 of the Data Collection API.</dd>
-                        <dt><code>start_time_ms_count</code> (00-14)</dt>
-                        <dd>The number of start time measurements that were successfully taken. Many players do not implement the <code>start_time_ms</code> measurement; this count exists to indicate what subset of the total were configured to measure start time.</dd>
+                        <dd>Total start time across all start time measurements which is the time between the play request and the first frame, which we refer to as a video view event (the average is this metric divided by the count below).</dd>
+                        <dt><code>start_time_ms_count</code></dt>
+                        <dd>Number of times a valid measured bps measurement was made.</dd>
+                        <dt><code>video_view</code></dt>
+                        <dd>Number of times a viewer was successfully able to begin playback of a video stream (occurs when first frame of video is displayed).</dd>
                     </dl>
-                    <p>The average load time is the ratio of <code>load_time_ms</code> to <code>load_time_ms_count</code> and the average start time is the ratio of <code>start_time_ms</code> to <code>start_time_ms_count</code>.</p>
                 </section>
-
                 <section class="bcls-section" id="examples">
                     <h2>Example</h2>
                     <p>
@@ -105,7 +109,7 @@
       "start_time_ms_count": 1,
       "load_time_ms": 2508,
       "load_time_ms_count": 1,
-      "rendition_switches": null,
+      "measured_bps": null,
       "measured_bps_count": null
     },
     {
@@ -124,6 +128,15 @@
     "load_time_ms": 72390497,
     "load_time_ms_count": 6346,
     "video_view": 8334</code></pre>
+                </section>
+                <section id="calculateFields" class="bcls-section">
+                    <h2>Calculated fields (BETA)</h2>
+                    <aside class="bcls-aside bcls-aside--warning">The calculated fields feature is in open beta testing. You are welcome to try it and offer feedback using the <a href="#feedbackMail">Questions and Comments</a> link below. You should not use this feature in mission-critical apps, as the implementation may change as a result of beta feedback.</aside>
+                    <p>You can add calculated fields to your API requests using the syntax:</p>
+<pre class="line-numbers"><code class="language-http">fields=calulated_field_name:expression</code></pre>
+                <p>The name for the calculated field can be any URI-compatible string. The expression can include regular field names and arithmatic operators. (<code>+</code> signs should be encoded as <code>%2B</code>, <code>-</code> signs as <code>%2D</code>), and <code>/</code> signs as <code>%2F</code></p>
+                <h3>Example</h3>
+<pre class="line-numbers"><code class="language-http">fields=avg_percent_viewed:video_percent_viewed%2Fvideo_view,avg_sec_viewed:video_seconds_viewed%2Fvideo_view,video.name</code></pre>
                 </section>
             </article>
             <!-- end drupal content -->
