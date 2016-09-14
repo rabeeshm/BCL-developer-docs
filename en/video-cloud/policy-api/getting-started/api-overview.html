@@ -62,7 +62,7 @@
                 </header>
                 <section id="needed" class="bcls-section">
                     <h2>Do you need one?</h2>
-                    <aside class="bcls-aside bcls-aside--information">Policy keys are generated for Brightcove Players automatically when you create them. You only need to generate policy keys directly using this API if you wish to get a key to access the Playback API without creating a player - typically this would be for apps created using the <a href="http://docs.brightcove.com/en/video-cloud/mobile-sdks/index.html">//docs.brightcove.com/en/video-cloud/mobile-sdks/index.html</a>. See <a href="//docs.brightcove.com/en/video-cloud/player-management/guides/policy-key.html">Policy Keys</a> for instructions on how to obtain the policy key for any Brightcove Player.</aside>
+                    <aside class="bcls-aside bcls-aside--information">Policy keys are generated for Brightcove Players automatically when you create them. You only need to generate policy keys directly using this API if you wish to get a key with geo-restrictions for a player, or to access the Playback API without creating a player - typically this would be for apps created using the <a href="http://docs.brightcove.com/en/video-cloud/mobile-sdks/index.html">//docs.brightcove.com/en/video-cloud/mobile-sdks/index.html</a>. See <a href="//docs.brightcove.com/en/video-cloud/player-management/guides/policy-key.html">Policy Keys</a> for instructions on how to obtain the policy key for any Brightcove Player.</aside>
                 </section>
                 <section class="bcls-section" id="faq">
                     <h2>FAQ</h2>
@@ -104,7 +104,9 @@
     }
 }</code></pre>
                     <p>This is the most basic policy, which restricts access to the account, you must include this in any policy you create. The account id here must match the account id in the request URL, or an error will be returned.</p>
-                    <h4>Domain restriction</h4>
+                </section>
+                <section id="domain-restriction" class="bcls-section">
+                    <h2>Domain restriction</h2>
                     <p>In addition to limiting access to the account, you can also limit access to specific domains by adding the <code>allowed-domains</code> key:</p>
 <pre class="line-numbers"><code class="language-json">{
     "key-data": {
@@ -118,7 +120,27 @@
     }
 }</code></pre>
                     <aside class="bcls-aside bcls-aside--warning">Any key for your account may be used to access the account content via the Playback API, so if you are using domain restriction, we highly recommend that you domain restrict all of your players.</aside>
-                    <h3>Request body (full format)</h3>
+                </section>
+                <section id="geoRestriction" class="bcls-section">
+                    <h2>Geo restriction</h2>
+                    <p>The Policy API can be used to implement geo-restriction for a player instead of or in addition to <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/geo.html">individual videos.</a></p>
+                    <aside class="bcls-aside bcls-aside--information">
+                        <ul>
+                            <li>A policy may restrict playback based on the viewer's detected country. To create and use a key with this policy, the account must be permitted to use geo-restriction features. This policy will also deny access if the end-user appears to be making their request through or from an anonymizing proxy.</li>
+                            <li>Geo restrictions applied in a policy key are enforced <strong>only</strong> by players that use that policy key.</li>
+                        </ul>
+                        </aside>
+                    <h3>Sample</h3>
+                    <p>Here is an example whitelist policy set that only allows playback from the US and US territories and military bases:</p>
+<pre class="line-numbers"><code class="language-json">{"account-id": "8523232323",
+ "geo": {
+   "countries": ["us", "usmil", "pr", "gu", "vi", "as", "mp"],
+   "exclude_countries": false
+ }
+}</code></pre>
+                    <p>To blacklist those countries instead, set <code>exclude_countries</code> to true.</p>
+                </section>
+                    <!-- <h3>Request body (full format)</h3>
                     <p>You can also use the full format for the request body. In this format, you include a <code>policies</code> array of policy objects, which allow or deny access to the Playback API based on logical patterns. A <code>pattern</code> is an object whose only property is a logical operator. The following logical operators can be used:</p>
                     <ul>
                         <li><code>=</code> equals</li>
@@ -154,9 +176,10 @@
                     "effect": "deny"
                 }
             ]
- }</code></pre>
-                    <h3>Response</h3>
-                    <p>The response to create requests will be JSON that includes the encrypted <code>key-string</code> that you can use to authenticate requests to the Playback API, as well as the policy associated with the key:</p>
+ }</code></pre> -->
+                 <section id="apiResponse" class="bcls-section">
+                    <h2>Response</h2>
+                    <p>The response to policy create requests will be JSON that includes the encrypted <code>key-string</code> that you can use to authenticate requests to the Playback API, as well as the policy associated with the key:</p>
 <pre class="line-numbers"><code class="language-json">{
     "key-data": {
         "account-id": "57838016001"
