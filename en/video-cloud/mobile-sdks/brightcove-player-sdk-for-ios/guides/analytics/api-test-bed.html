@@ -2,6 +2,13 @@
 <html lang="en">
 
 <head>
+    <!-- Begin Drupal Taxonomy Data -->
+    <meta name="product" content="Video Cloud">
+    <meta name="audience" content="API Developer">
+    <meta name="product-area" content="Analytics API">
+    <meta name="product-focus" content="Getting Started">
+    <meta name="keywords" content="analytics">
+    <!-- End Drupal Taxonomy Data -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
     <title>Analytics API Test Bed</title>
@@ -49,99 +56,8 @@
             <!-- begin drupal content -->
             <article class="bcls-article">
                 <header class="bcls-header" id="bcls_header">
-                    <p>Test Analytics API requests on your own account or a Brightcove sample account.</p>
+                    <p>In this sample, you can test Analytics API requests on your own account or a Brightcove sample account.</p>
                 </header>
-                <section id="Typical_uses" class="bcls-section">
-                    <h2>Typical uses</h2>
-                    <p>Here are some typical uses of the API:</p>
-                    <ul>
-                        <li>Creating custom charts and displays</li>
-                        <li>Working with multiple APIs together - for example, getting video data using the CMS API for videos with the most views over the previous week</li>
-                        <li>Combining your video analytic data with other site analytics data</li>
-                        <li>For some sample solutions, see
-                            <ul>
-                                <li><a href="//solutions.brightcove.com/bcls/analytics-api/most-popular-videos.html">Most Popular Videos</a>
-                                </li>
-                                <li><a href="//solutions.brightcove.com/bcls/analytics-api/analytics-by-playlist.html">Analytics for Playlists</a>
-                                </li>
-                                <li><a href="//solutions.brightcove.com/bcls/analytics-api/video-views-by-country-and-day/video-views-by-country-and-day.html">Analytics by Country and Day</a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <aside class="bcls-aside bcls-aside--warning">if you have been using the Limited Availability version of the Analytics API, we strongly encourage you to upgrade your apps to the current version. If you still need the documentation for the Limited Availability version, you can find it <a href="//docs.brightcove.com/en/video-cloud/analytics-api-v0/index.html">here</a>.</aside>
-                </section>
-                <section class="bcls-section" id="Base_URL">
-                    <h2>Base URL</h2>
-                    <p>The base URL for the Analytics API is:</p>
-<pre class="line-numbers" style="white-space:pre-wrap;padding-top:1em;padding-bottom:1em;"><code class="language-http">https://analytics.api.brightcove.com/v1</code></pre>
-                </section>
-                <section class="bcls-section" id="Headers">
-                    <h2>Headers</h2>
-                    <h3>Authentication (required)</h3>
-                    <p>The Analytics API uses the Brightcove <a href="../../oauth-api/index.html">OAuth Service</a> to authenticate calls.</p>
-                    <p>You will first need to obtain client credentials (a <code>client_id</code> and <code>client_secret</code>). This is a one-time operation that can be performed using the <a href="../guides/managing-api-credentials.html">OAuth Credentials UI</a>. You can get client credentials directly from the Brightcove OAuth Service using <a href="../../oauth-api/guides/get-client-credentials.html">CURL</a> or <a href="../../oauth-api/guides/get-client-credentials-postman.html">Postman</a>.</p>
-                    <p>You will also need an <code>access_token</code>, which is obtained using the <code>client_id</code> and <code>client_secret</code> and passed in an Authorization header with your API request:</p>
-    <pre class="line-numbers" style="white-space:pre-wrap;padding-top:1em;padding-bottom:1em;"><code class="language-http">Authorization: Bearer <em>{access_token}</em></code></pre>
-                    <p>The <code>access_token</code> expires after five minutes, so you must obtain one for each request, or check to make sure that your token is still valid. See <a href="../../oauth-api/guides/get-token.html">Getting Access Tokens</a> for a detailed explanation of how to get access tokens, including code samples.</p>
-                    <h3>Accept-Encoding: gzip (optional)</h3>
-                    <p>Passing this header will cause the response to be returned in compressed form. This may improve performance for large reports.</p>
-                    <p class="BCL-aside">Note: the permanent Analytics API tokens issued during the Limited Availability program are no longer supported. Access tokens must be acquired from the Brightcove OAuth Service.</p>
-                </section>
-                <section class="bcls-section" id="Caching">
-                    <h2>Caching</h2>
-                    <p>For performance reasons, API responses are cached for approximately 5 minutes, though the exact amount of time may vary based on several factors. For any Analytics API query, you can get information about the cache from the response headers:</p>
-                    <figure class="bcls-figure">
-                        <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/analytics-api/general-information/api-overview/aapi-cach-headers.png" alt="Cach Control Headers">
-                        <figcaption class="bcls-caption--image">Cach Control Headers</figcaption>
-                    </figure>
-                    <p>
-                        The <code>Cache-Control</code> tells you the maximum time the results will be cached for in seconds (in the example above, 24 seconds). The <code>Last-Modified</code> and <code>Expires</code> headers tell you when the current cache was created and when it will expire.
-                    </p>
-                    <p>
-                        In most cases this is probably not an issue, but if the freshness of analytics data is of critical importance, you should know that the longer a query runs, the longer it will be cached, and reports that fetch realtime (unreconciled hourly) data only will not be cached as long as those that fetch reconciled data (only, or in addition to realtime data). Find a <a href="http://support.brightcove.com/en/video-cloud/docs/faq-analytics-module#26">full explanation of realtime and reconciled data</a> if you like; the short version is that the Analytics API relies on two data buckets:
-                    </p>
-                    <ul>
-                        <li>realtime, or hourly unreconciled data, which is made available immediately and stored for 32 days</li>
-                        <li>reconciled data, which is stored permanently; realtime data is reconciled to improve accuracy and stored in the reconciled data repository every 24 hours</li>
-                    </ul>
-                    <p>
-                        You can limit the results to reconciled or realtime data using the <a href="#reconciled">reconciled</a> parameter.
-                    </p>
-                    <p>To minimize caching:</p>
-                    <ul>
-                        <li>Use the <a href="#reconciled"><code class="language-http">reconciled=false</code></a> parameter to limit results to realtime data</li>
-                        <li>Use a small <a href="#dateRanges">date range</a>, and be sure that the entire range falls within the past 32 days</li>
-                    </ul>
-                </section>
-                <section class="bcls-section" id="concurrency">
-                    <h2>Concurrent Requests</h2>
-                    <p>A single account is limited to one request at a time. Multiple concurrent requests will execute in series.</p>
-                    <p>For example:</p>
-                    <ol>
-                        <li>Start an API request "A".</li>
-                        <li>Start API request "B" for the same account.</li>
-                        <li>Request "B" will not complete until "A" completes.</li>
-                        <li>If request "A" takes too long, request "A" will receive an error saying "your request is pending; try again".</li>
-                        <li>If request "A" takes too long, it may cause request "B" to receive the same error. Note that request "B" will get an error if the time to complete A + B is greater than our timeout value. </li>
-                    </ol>
-                    <p>If you make multiple concurrent requests, they will be processed one at a time, in the order received.</p>
-                    <p>Requests that return with a “pending error” will eventually complete and be saved to our cache. This means that future requests for the same data will return almost instantly, but only if the request is made before the five minute cache expires.</p>
-                    <p>Your systems should handle the pending error by waiting 2-4 minutes and making the same request again.</p>
-                </section>
-                <section id="Best_practices" class="bcls-section">
-                    <h2>Best practices</h2>
-                    <aside class="bcls-aside bcls-aside--tip">Based on the information above, we recommend the following as best practices:
-                        <ol>
-                            <li>Make requests to the Analytics API asynchronously if other operations in your app can proceed without the data</li>
-                            <li>Automatically retry requests if the response is the "you have been queued" message</li>
-                            <li>Don't repeat requests oftener than every 5 minutes, since you will be retrieving cached data anyway</li>
-                            <li>If you are making several request concurrently or in quick succession, try to make longer-running requests (those that will return the most items and data) last, so that they don't delay shorter-running requests</li>
-                        </ol>
-                    </aside>
-                </section>
-                
-
                 <section class="bcls-section" id="metrics">
                     <h2>Dimensions and fields</h2>
                     <p>Select dimension(s) below to see the fields that can be returned for it. You can also click the <strong>Make a Request</strong> button to make a sample request and see the results.</p>
@@ -156,7 +72,6 @@
                         <div id="fieldsCol1" class="fields-list"></div>
                         <div id="fieldsCol2" class="fields-list"></div>
                     <p><button id="getData" class="bcls-button">Make a Request with these Options</button> (uses a sample Brightcove account)</p>
-                    <aside class="bcls-aside bcls-aside--information">Data for <code>ad_mode_begin</code>, <code>ad_mode_complete</code>, and <code>play_request</code> is available starting 06-13-2016.</aside>
                     </fieldset>
                     <fieldset class="bcls-fieldset">
                         <legend>Output</legend>
@@ -167,18 +82,6 @@
                         <h5>Response data</h5>
                         <pre><code id="responseData" class="language-json"></code></pre>
                     </fieldset>
-
-                    <h3>Notes</h3>
-                    <ol>
-                        <li>By default, <code>video_view</code> is the only field returned - other fields will be returned only if they are specified in the value of the <code>fields</code> parameter.</li>
-                        <li>If you specify a field to return that is not supported for the dimension or dimension combination, an <code>UNSUPPORTED_FIELD_COMBINATION_ERROR</code> error will be returned.</li>
-                        <li>The <code>bytes_delivered</code> field includes all data delivered by Video Cloud to clients, including video data, images, text tracks and other assets, as well as the player code itself. Some of this data is obtained from CDNs, and may not be available for up to 3 days.</li>
-                    </ol>
-                    <h3>Example</h3>
-                    <p>A typical use case for getting a report on multiple dimensions: you want a breakdown of video views between desktop and mobile devices, and also want to know how many of the mobile device views were on iOS versus Android devices, and how many of the desktop views were on Macs versus Windows machines. Currently there is no standard report in the Studio Analytics Module that provides this information, but you can obtain it via this Analytics API call:</p>
-<pre class="line-numbers" style="white-space:pre-wrap;padding-top:1em;padding-bottom:1em;"><code class="language-http">https://analytics.api.brightcove.com/v1/data?accounts=57838016001&amp;dimensions=video,device_type,device_os&amp;from=2014-01-01&amp;to=2014-04-01&amp;fields=video_view</code></pre>
-                    <p>(In this case we are requesting video views for the period from January 1 to April 1 in 2014.)</p>
-
                 </section>
             </article>
             <script src="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.js"></script>

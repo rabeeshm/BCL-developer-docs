@@ -2,21 +2,18 @@
 <html lang="en">
 
 <head>
-<script>
-    // force into https mode if not already there -- currently not used
-    forceSecure = function () {
-        var pageURL = window.location.href,
-            pageProtocol = window.location.protocol;
-        if (pageProtocol === "http:") {
-            window.location.href = pageURL.replace("http:", "https:");
-        }
-    };
-</script>
-
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
-	<!-- change title to match the h1 heading -->
-	<title>Generate Sitemaps</title>
+    <head>
+        <!-- Begin Drupal Taxonomy Data -->
+        <meta name="product" content="Video Cloud">
+        <meta name="audience" content="API Developer">
+        <meta name="product-area" content="CMS API">
+        <meta name="product-focus" content="General Information">
+        <meta name="keywords" content="">
+        <!-- End Drupal Taxonomy Data -->
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <!-- change title to match the h1 heading -->
+    <title>Generate Sitemaps</title>
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
 <link href='//fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
@@ -45,65 +42,65 @@
 </head>
 
 <body>
-	<!-- header navbar -->
-	<div id="navWrapper" class="fixed"></div>
-	<!-- breadcrumbs -->
-	<nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
-	<!-- search -->
-	<div id="searchModal" class="reveal-modal" data-reveal></div>
-	<!-- content -->
-	<div class="row">
-		<div class="sidebar large-2 columns show-for-large-up">
-			<div id="sidenav" class="side-nav"></div>
-		</div>
-		<div id="main" class="large-10 small-12 columns">
+    <!-- header navbar -->
+    <div id="navWrapper" class="fixed"></div>
+    <!-- breadcrumbs -->
+    <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+    <!-- search -->
+    <div id="searchModal" class="reveal-modal" data-reveal></div>
+    <!-- content -->
+    <div class="row">
+        <div class="sidebar large-2 columns show-for-large-up">
+            <div id="sidenav" class="side-nav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
             <h1>Generate Video Sitemaps</h1>
             <!-- begin drupal content -->
-			<article class="bcls-article">
-			    <header id="bcls_header" class="bcls-header">
-			        <!-- Place document intro sentence(s) here -->
-			        <p>There is a standard document called a sitemap that search engine indexers look for when examining your site. The sitemap concisely tells the search engines what content is exposed on your site, the metadata for that content, and where that content is located on your site. A sitemap is an XML file that follows a standard specification.</p>
-			                </header>
-			                <section id="Sitemap_types" class="bcls-section">
-			                    <h2>Sitemap types</h2>
-			                        <p>There are two different flavors of sitemaps that you can (and should) create:</p>
-			                        <ul>
-			                            <li><em>Sitemap</em> – A sitemap that will index your content in the standard text based search engines such as www.google.com or search.yahoo.com</li>
-			                            <li><em>Video Sitemap</em> – A sitemap that will index your content in media-centric search engines such as video.google.com</li>
-			                        </ul>
-			                        <p>This topic focuses primarily on video sitemaps.</p>
-			                        <p>A proper SEO strategy for your video content will include creating both a standard sitemaps as well as a video sitemap. From a priority perspective, you want to create a standard sitemap first and then a video sitemap. Using the Media API, you can create your sitemaps automatically, rather than compiling them by hand. </p>
-			                        <p>The example in this document is written in (node.js) JavaScript and would run on your server.</p>
-			                </section>
-			    <section id="standard-sitemap" class="bcls-section">
-			        <h2>Standard sitemaps</h2>
-			        <p>Sitemaps follow the sitemap specification that is defined here: <a href="www.sitemaps.org">www.sitemaps.org</a>. The purpose of the sitemap file is to provide a list of URLs on your site to the search engines.</p>
-			    </section>
-			    <section id="video-sitemaps" class="bcls-section">
-			        <h2>Video sitemaps</h2>
-			        <p>A video sitemap is similar in concept to the standard sitemap file; there will be one entry in the sitemap file per video in your account. In fact, a video sitemap uses the sitemap schema as its base and adds additional tags specific to video metadata. For more detailed information, visit  <a href="https://developers.google.com/webmasters/videosearch/sitemaps">Google's video sitemap documentation</a>.</p>
-			        <p>The code required to create a video sitemap is almost exactly the same as that to create a sitemap. The only difference is that we add additional metadata about each video into each url entry. </p>
-			        <p>Using the CMS API you can automatically generate the <code>sitemap.xml</code> file by fetching video data from a Video Cloud account and injecting relevant data into an XML template. CMS API requests require an <a href="../../oauth-api/guides/get-token.html">access token</a> for authentication. The access token must carry read permissions for videos.</p>
-			    </section>
-			    <section class="bcls-section" id="sample">
-			        <h2>Sample app</h2>
-			        <p>Below is a sample app written in node.js to generate a video sitemap for a Video Cloud account using the CMS API. Some notes on the app:</p>
-			        <ul>
-			            <li>All the data required for a video sitemap is available via the CMS API with one exception: the <code>loc</code> that provides the page URL where the video is published. You will either need to pull this from some other data source in your CMS, or you can store the information somewhere in the video metadata (as we did in the sample here, using a custom field called "galleryurl").</li>
-			            <li>Some data from Video Cloud will need to be manipulated a bit. For example, the <code>duration</code> returned by the CMS API is in milliseconds, but in the sitemap you should provide it in seconds.</li>
-			            <li>
-			                If you are providing <code>player_loc</code> instead of <code>video_loc</code>, you will need to know what the player URL will look like:
+            <article class="bcls-article">
+                <header id="bcls_header" class="bcls-header">
+                    <!-- Place document intro sentence(s) here -->
+                    <p>There is a standard document called a sitemap that search engine indexers look for when examining your site. The sitemap concisely tells the search engines what content is exposed on your site, the metadata for that content, and where that content is located on your site. A sitemap is an XML file that follows a standard specification.</p>
+                            </header>
+                            <section id="Sitemap_types" class="bcls-section">
+                                <h2>Sitemap types</h2>
+                                    <p>There are two different flavors of sitemaps that you can (and should) create:</p>
+                                    <ul>
+                                        <li><em>Sitemap</em> – A sitemap that will index your content in the standard text based search engines such as www.google.com or search.yahoo.com</li>
+                                        <li><em>Video Sitemap</em> – A sitemap that will index your content in media-centric search engines such as video.google.com</li>
+                                    </ul>
+                                    <p>This topic focuses primarily on video sitemaps.</p>
+                                    <p>A proper SEO strategy for your video content will include creating both a standard sitemaps as well as a video sitemap. From a priority perspective, you want to create a standard sitemap first and then a video sitemap. Using the Media API, you can create your sitemaps automatically, rather than compiling them by hand. </p>
+                                    <p>The example in this document is written in (node.js) JavaScript and would run on your server.</p>
+                            </section>
+                <section id="standard-sitemap" class="bcls-section">
+                    <h2>Standard sitemaps</h2>
+                    <p>Sitemaps follow the sitemap specification that is defined here: <a href="www.sitemaps.org">www.sitemaps.org</a>. The purpose of the sitemap file is to provide a list of URLs on your site to the search engines.</p>
+                </section>
+                <section id="video-sitemaps" class="bcls-section">
+                    <h2>Video sitemaps</h2>
+                    <p>A video sitemap is similar in concept to the standard sitemap file; there will be one entry in the sitemap file per video in your account. In fact, a video sitemap uses the sitemap schema as its base and adds additional tags specific to video metadata. For more detailed information, visit  <a href="https://developers.google.com/webmasters/videosearch/sitemaps">Google's video sitemap documentation</a>.</p>
+                    <p>The code required to create a video sitemap is almost exactly the same as that to create a sitemap. The only difference is that we add additional metadata about each video into each url entry. </p>
+                    <p>Using the CMS API you can automatically generate the <code>sitemap.xml</code> file by fetching video data from a Video Cloud account and injecting relevant data into an XML template. CMS API requests require an <a href="../../oauth-api/guides/get-token.html">access token</a> for authentication. The access token must carry read permissions for videos.</p>
+                </section>
+                <section class="bcls-section" id="sample">
+                    <h2>Sample app</h2>
+                    <p>Below is a sample app written in node.js to generate a video sitemap for a Video Cloud account using the CMS API. Some notes on the app:</p>
+                    <ul>
+                        <li>All the data required for a video sitemap is available via the CMS API with one exception: the <code>loc</code> that provides the page URL where the video is published. You will either need to pull this from some other data source in your CMS, or you can store the information somewhere in the video metadata (as we did in the sample here, using a custom field called "galleryurl").</li>
+                        <li>Some data from Video Cloud will need to be manipulated a bit. For example, the <code>duration</code> returned by the CMS API is in milliseconds, but in the sitemap you should provide it in seconds.</li>
+                        <li>
+                            If you are providing <code>player_loc</code> instead of <code>video_loc</code>, you will need to know what the player URL will look like:
 <pre class="line-numbers"><code class="language-http">http://players.brightcove.net/{player_id}/index.html?videoId={video_id}</code></pre>
-			                <p>From this you can easily generate a URL for each video.</p>
-			            </li>
-			            <li>If instead you are providing <code>video_loc</code>, you will need to make an additional <a href="../references/cms-api/versions/v1/index.html#api-Video-Get_Video_Sources">sources request</a> for each video and pick out an HTTP MP4 rendition.</li>
-			            <li>The generated sitemap doesn't include every video in the account, for this sample, we just show the videos that have a page URL in the custom fields. You may want to choose/exclude videos on some other basis, but it's important that you do not include videos that are not published anywhere, as search engines may penalize your site for providing inaccurate information in the sitemap.</li>
-			        </ul>
-			    <pre data-src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/cms-api/guides/sitemaps/sitemaps.js" class="line-numbers"></pre>
-			    </section>
-			    <section class="bcls-section" id="samplemap">
-			        <h2>Sample sitemap</h2>
-			        <p>Below is a sitemap generated by the sample app shown above:</p>
+                            <p>From this you can easily generate a URL for each video.</p>
+                        </li>
+                        <li>If instead you are providing <code>video_loc</code>, you will need to make an additional <a href="../references/cms-api/versions/v1/index.html#api-Video-Get_Video_Sources">sources request</a> for each video and pick out an HTTP MP4 rendition.</li>
+                        <li>The generated sitemap doesn't include every video in the account, for this sample, we just show the videos that have a page URL in the custom fields. You may want to choose/exclude videos on some other basis, but it's important that you do not include videos that are not published anywhere, as search engines may penalize your site for providing inaccurate information in the sitemap.</li>
+                    </ul>
+                <pre data-src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/cms-api/guides/sitemaps/sitemaps.js" class="line-numbers"></pre>
+                </section>
+                <section class="bcls-section" id="samplemap">
+                    <h2>Sample sitemap</h2>
+                    <p>Below is a sitemap generated by the sample app shown above:</p>
 <pre class="line-numbers"><code class="language-xml">&lt;urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1"&gt;
     &lt;url&gt;
         &lt;loc&gt;http://video.brightcovelearning.com/detail/videos/managing-videos/video/731140811001/&lt;/loc&gt;
@@ -396,19 +393,19 @@
         &lt;/video&gt;
     &lt;/url&gt;
 &lt;/urlset&gt;</code></pre>
-			    </section>
-			</article>
+                </section>
+            </article>
 
             <!-- end drupal content -->
-			<div class="bcls-section" id="BCLreferences">
-				<h2>Related Topics</h2>
-				<ul>
-					<li><a href="https://support.brightcove.com/en/video-cloud/docs/seo-best-practices">SEO Best Practices</a></li>
-					<li><a href="http://support.brightcove.com/en/video-cloud/docs/make-your-video-content-indexable">Make Your Video Content Indexable</a></li>
-				</ul>
-			</div>
-		</div>
-	</div>
+            <div class="bcls-section" id="BCLreferences">
+                <h2>Related Topics</h2>
+                <ul>
+                    <li><a href="https://support.brightcove.com/en/video-cloud/docs/seo-best-practices">SEO Best Practices</a></li>
+                    <li><a href="http://support.brightcove.com/en/video-cloud/docs/make-your-video-content-indexable">Make Your Video Content Indexable</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
     <!-- bcl scripts -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>

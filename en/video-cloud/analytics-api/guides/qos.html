@@ -2,6 +2,13 @@
 <html lang="en">
 
 <head>
+    <!-- Begin Drupal Taxonomy Data -->
+    <meta name="product" content="Video Cloud">
+    <meta name="audience" content="API Developer">
+    <meta name="product-area" content="Analytics API">
+    <meta name="product-focus" content="">
+    <meta name="keywords" content="analytics">
+    <!-- End Drupal Taxonomy Data -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
@@ -30,115 +37,183 @@
 
         ga('create', 'UA-2728311-29', 'auto');
         ga('send', 'pageview');
+
     </script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px #CCC solid;
+            vertical-align: top;
+            padding: .4em;
+        }
+    </style>
 </head>
 
 <body>
     <!-- header navbar -->
-    <div id="navWrapper" class="fixed"></div>
+    <!-- <div id="navWrapper" class="fixed"></div> -->
     <!-- breadcrumbs -->
-    <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+    <!-- <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav> -->
     <!-- search -->
-    <div id="searchModal" class="reveal-modal" data-reveal></div>
+    <!-- <div id="searchModal" class="reveal-modal" data-reveal></div> -->
     <!-- content -->
     <div class="row">
-        <div class="sidebar large-2 columns show-for-large-up">
-            <!-- <div id="sidenav" class="side-nav"></div> -->
-        </div>
-        <div id="main" class="large-10 small-12 columns">
-            <h1>Quality of Playback Metrics (BETA)</h1>
+        <!-- <div class="sidebar large-2 columns show-for-large-up">
+            <div id="sidenav" class="side-nav"></div>
+        </div> -->
+        <div id="main" class="large-12 small-12 columns">
+            <h1>Quality Metrics (BETA)</h1>
             <!-- begin drupal content -->
             <article class="bcls-article">
                 <header id="bcls_header" class="bcls-header">
-                    <p>
-                        Quality of playback metrics are included in most dimension reports, and help you see the quality of the playback experience for your users.
-                        <aside class="bcls-aside bcls-aside--warning">These metrics are in beta testing, and the implementation may change.</aside>
-                    </p>
+                    <p>In this topic, you will learn about quality metrics provided by the Analytics API. Quality metrics are included in most dimension reports, and help you see the quality of the playback experience for your users.</p>
+                    <aside class="bcls-aside bcls-aside--warning">All features discussed in this topic are currently in beta release, and the final implementation may change.</aside>
+                    <h3>Discussed in this topic:</h3>
+                    <ul>
+                        <li><a href="#qosFields">Available quality fields</a></li>
+                        <li><a href="#calculatedFields">Calculated fields</a></li>
+                        <li><a href="#sample">Sample request</a></li>
+                    </ul>
                 </header>
                 <section class="bcls-section" id="qosFields">
-                    <h2>Available fields</h2>
+                    <h2>Available quality fields</h2>
                     <p>The following quality of playback fields are currently available:</p>
-                    <dl>
-                        <dt><code>load_time_ms</code></dt>
-                        <dd>The amount of time, in milliseconds, that the user waited for the player to become interactive. This metric is the measured time between the first initiation of the player and the first video_impression event for that player. It is only collected for players which implement protocol version 2 of the Data Collection API.</dd>
-                        <dt><code>load_time_ms_count</code> (00-14)</dt>
-                        <dd>The number of load time measurements that were successfully taken. Many players do not implement the load_time measurement; this count exists to indicate what subset of the total were configured to measure load time.</dd>
-                        <dt>
-                            <code>measured_bps_count</code>
-                        </dt>
-                            <dd>sum and count of instances of measured client bandwidth across all video viewing sessions that reported measured bps</dd>
-                        <dt><code>rendition_switches</code></dt>
-                        <dd>The number of rendition switches that were counted</dd>
-                        <dt><code>start_time_ms</code></dt>
-                        <dd>The amount of time, in milliseconds, that the user waited for video to start after playback was initiated. This measurement does not include any advertising time caused by <code>pre-roll</code> ads. The measurement begins either due to an <code>autoStart</code> setting or an explicit play request. This metric is the sum of the measured time between the <code>play_request</code> event and the <code>video_view</code> event, minus any duration between ad_start and ad_end events. It is only collected for players which implement protocol version 2 of the Data Collection API.</dd>
-                        <dt><code>start_time_ms_count</code> (00-14)</dt>
-                        <dd>The number of start time measurements that were successfully taken. Many players do not implement the <code>start_time_ms</code> measurement; this count exists to indicate what subset of the total were configured to measure start time.</dd>
-                    </dl>
-                    <p>The average load time is the ratio of <code>load_time_ms</code> to <code>load_time_ms_count</code> and the average start time is the ratio of <code>start_time_ms</code> to <code>start_time_ms_count</code>.</p>
+                    <table>
+                        <thead>
+                            <tr style="vertical-align:top;">
+                                <th>Metric</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="vertical-align:top;">
+                                <td><code>errors_before_view</code></td>
+                                <td>Total number of requested playback sessions which ended before playback began due to an error.</td>
+                            </tr>
+                            <tr style="vertical-align:top;">
+                                <td><code>errors_during_view</code></td>
+                                <td>Total number of playback sessions which ended due to an error.</td>
+                            </tr>
+                            <tr style="vertical-align:top;">
+                                <td><code>load_time_ms</code></td>
+                                <td>Total load time across all load time measurements which is the time to when the player displays a poster image which we refer to as an impression (the average is this metric divided by the count below).</td>
+                            </tr>
+                            <tr style="vertical-align:top;">
+                                <td><code>load_time_ms_count</code></td>
+                                <td>Number of times that a valid load time measurement was made.</td>
+                            </tr>
+                            <tr style="vertical-align:top;">
+                                <td><code>measured_bps</code></td>
+                                <td>Total sum of the measured client bandwidth.</td>
+                            </tr>
+                            <tr style="vertical-align:top;">
+                                <td><code>measured_bps_count</code></td>
+                                <td>Number of times a valid measured bps measurement was made</td>
+                            </tr>
+                            <tr style="vertical-align:top;">
+                                <td><code>play_request<sup><strong><a href="#note1">[1]</a></strong></sup></code></td>
+                                <td>Number of playback requests (this occurs when a viewer presses play or an autoplay event is triggered).</td>
+                            </tr>
+                            <tr style="vertical-align:top;">
+                                <td><code>start_time_ms</code></td>
+                                <td>Total start time across all start time measurements which is the time between the play request and the first frame, which we refer to as a video view event (the average is this metric divided by the count below).</td>
+                            </tr>
+                            <tr style="vertical-align:top;">
+                                <td><code>start_time_ms_count</code></td>
+                                <td>Number of times a valid measured bps measurement was made.</td>
+                            </tr>
+                            <tr style="vertical-align:top;">
+                                <td><code>video_view<sup><strong><a href="#note1">[1]</a></strong></sup></code></td>
+                                <td>Number of times a viewer was successfully able to begin playback of a video stream (occurs when first frame of video is displayed).</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <h3>Notes</h3>
+                    <ul style="list-style-type:none;">
+                        <li id="note1"><sup><strong>[1]</strong></sup> This metric is not new, but is included here because it is useful for gauging the quality of playback experience.</li>
+                    </ul>
                 </section>
-
-                <section class="bcls-section" id="examples">
-                    <h2>Example</h2>
+                <section id="calculatedFields" class="bcls-section">
+                    <h2>Calculated fields</h2>
+                    <!-- <aside class="bcls-aside bcls-aside--warning">The calculated fields feature is in open beta testing. You are welcome to try it and offer feedback using the <a href="#feedbackMail">Questions and Comments</a> link below. You should not use this feature in mission-critical apps, as the implementation may change as a result of beta feedback.</aside> -->
+                    <p>You can add calculated fields to your API requests using the syntax:</p>
+                    <pre class="line-numbers"><code class="language-http">fields=calulated_field_name:expression</code></pre>
+                    <p>The name for the calculated field can be any URI-compatible string. The expression can include regular field names and arithmatic operators. ("<code>+</code>" signs should be encoded as <code>%2B</code> and "<code>-</code>" signs as
+                        <code>%2D</code>)</p>
+                    <h3>Example</h3>
+                    <pre class="line-numbers"><code class="language-http">fields=total_errors:errors_before_view<span class="bcls-highlight">%2B</span>errors_during_view,avg_sec_viewed:video_seconds_viewed/video_view</code></pre>
+                </section>
+                <section class="bcls-section" id="sample">
+                    <h2>Sample request</h2>
                     <p>
-                        To return the quality of playback fields, simply include them in the <code>field</code> parameter list:
+                        To return the quality of playback fields, simply include them in the <code>field</code> parameter list. Below is a sample request, including all the currently available quality metrics and some calculated fields. The response is
+                        shown below the request.
                     </p>
-<pre class="line-numbers" style="white-space:pre-wrap;padding-top:1em;padding-bottom:1em;"><code class="language-http">https://analytics.api.brightcove.com/v1/data?accounts=1752604059001&dimensions=account,video&fields=start_time_ms,start_time_ms_count,load_time_ms,load_time_ms_count,rendition_switches,measured_bps_count&limit=2</code></pre>
+                    <textarea class="bcls-code" style="height:12em;">https://analytics.api.brightcove.com/v1/data?accounts=20318290001&dimensions=account,video&where=video==3989527116001&fields=errors_before_view,errors_during_view,start_time_ms,start_time_ms_count,load_time_ms,load_time_ms_count,measured_bps,measured_bps_count,play_request,video_view,average_load_time:load_time_ms/load_time_ms_count,average_start_time:start_time_ms/start_time_ms_count</textarea>
                     <p>
                         <strong>Response</strong>
                     </p>
-<pre class="line-numbers"><code class="language-json">{
-  "item_count": 78,
+                    <pre class="line-numbers"><code class="language-json">{
+  "item_count": 1,
   "items": [
     {
-      "video": "5068505928001",
-      "account": "1752604059001",
-      "video_view": 1,
-      "start_time_ms": 655,
-      "start_time_ms_count": 1,
-      "load_time_ms": 2508,
-      "load_time_ms_count": 1,
-      "rendition_switches": null,
-      "measured_bps_count": null
-    },
-    {
-      "video": "4426931680001",
-      "account": "1752604059001",
-      "video_view": 1,
-      "start_time_ms": 2,
-      "start_time_ms_count": 1,
-      "load_time_ms": 814,
-      "load_time_ms_count": 1,
-      "rendition_switches": null,
-      "measured_bps_count": null
+      "video": "3989527116001",
+      "account": "20318290001",
+      "errors_before_view": null,
+      "errors_during_view": null,
+      "start_time_ms": 50353,
+      "start_time_ms_count": 176,
+      "load_time_ms": 1954760,
+      "load_time_ms_count": 173,
+      "measured_bps": 25164660511,
+      "measured_bps_count": 606,
+      "play_request": 603,
+      "video_view": 177,
+      "average_load_time": 11299.190751445087,
+      "average_start_time": 286.09659090909093
     }
   ],
   "summary": {
-    "load_time_ms": 72390497,
-    "load_time_ms_count": 6346,
-    "video_view": 8334</code></pre>
+    "errors_before_view": 0,
+    "measured_bps": 25164660511,
+    "load_time_ms": 1954760,
+    "average_start_time": 286.09659090909093,
+    "load_time_ms_count": 173,
+    "video_view": 177,
+    "start_time_ms": 50353,
+    "play_request": 603,
+    "errors_during_view": 0,
+    "measured_bps_count": 606,
+    "average_load_time": 11299.190751445087,
+    "start_time_ms_count": 176
+  }
+}</code></pre>
                 </section>
             </article>
             <!-- end drupal content -->
         </div>
-        </div>
-        <!-- bcl scripts -->
-        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
-        <script src="/en/scripts/docs-nav-data.min.js"></script>
-        <script src="/en/scripts/bcls-doc-site-v2.js"></script>
-        <script src="//learning-services-media.brightcove.com/doc-assets/js/bcls-utils.js"></script>
-        <script src="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.js"></script>
-        <script>
-            $(document).foundation();
-        </script>
+    </div>
+    <!-- bcl scripts -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+    <script src="/en/scripts/docs-nav-data.min.js"></script>
+    <script src="/en/scripts/bcls-doc-site-v2.js"></script>
+    <script src="//learning-services-media.brightcove.com/doc-assets/js/bcls-utils.js"></script>
+    <script src="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.js"></script>
+    <script>
+        $(document).foundation();
+
+    </script>
 
 
-        <div style="text-align:center">
+    <!-- <div style="text-align:center">
     <iframe id="CSAT" src="//learning-services-media.brightcove.com/doc-assets/general/surveylink.html" style=" padding-bottom:20px;border:none"></iframe>
 </div>
         <script>
@@ -153,7 +228,7 @@
         <script>
             var feedbackMail = document.getElementById("feedbackMail");
             feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
-        </script>
+        </script> -->
 </body>
 
 </html>
