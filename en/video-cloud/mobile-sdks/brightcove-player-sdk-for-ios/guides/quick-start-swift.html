@@ -552,7 +552,7 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate, BCOVPUIP
             <p>Set the value of your Perform Account Id, which will be sent to Brightcove in a later step.</p>
             <ol class="bcls-tasklist">
               <li><p>Below the <code>#import</code> directives, add your own value for your Brightcove Perform Account Id.</p>
-								<pre class="line-numbers" data-start="10"><code class="language-swift">let kAccountID = "123456789" // for analytics</code></pre>
+								<pre class="line-numbers" data-start="10"><code class="language-swift">let kViewControllerAccountID = &quot;123456789&quot; // for analytics</code></pre>
 							</li>
               <!-- <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="75" data-gist-hide-footer="true"></code></p> -->
             </ol>
@@ -591,12 +591,12 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate, BCOVPUIP
                 <li><p>Lines 25-27: set the delegate and turn on the autoadvance and autoplay features.</p></li>
                 </ul>
 								<pre class="line-numbers" data-start="17"><code class="language-swift">required init?(coder aDecoder: NSCoder) {
-    let manager = BCOVPlayerSDKManager.sharedManager();
+    let manager = BCOVPlayerSDKManager.shared()!
     playbackController = manager.createPlaybackController()
 
     super.init(coder: aDecoder)
 
-    playbackController.analytics.account = kAccountID
+    playbackController.analytics.account = kViewControllerAccountID
 
     playbackController.delegate = self
     playbackController.autoAdvance = true
@@ -620,8 +620,8 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate, BCOVPUIP
 	super.viewDidLoad()
     // create an array of videos
     var videoArray = [AnyObject]()
-	videoArray = [videoWithURL(NSURL(string: &quot;http://cf9c36303a9981e3e8cc-31a5eb2af178214dc2ca6ce50f208bb5.r97.cf1.rackcdn.com/bigger_badminton_600.mp4&quot;)!),
-    videoWithURL(NSURL(string: &quot;http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8&quot;)!)]
+    videoArray = [videoWithURL(url: NSURL(string: &quot;http://cf9c36303a9981e3e8cc-31a5eb2af178214dc2ca6ce50f208bb5.r97.cf1.rackcdn.com/bigger_badminton_600.mp4&quot;)!),
+              videoWithURL(url: NSURL(string: &quot;http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8&quot;)!)]
 
     // Create and set options
     let options = BCOVPUIPlayerViewOptions()
@@ -629,7 +629,7 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate, BCOVPUIP
 
     // Create and configure Control View
     let controlsView = BCOVPUIBasicControlView.basicControlViewWithVODLayout()
-    let playerView = BCOVPUIPlayerView.init(playbackController: self.playbackController, options: options, controlsView: controlsView)
+    let playerView = BCOVPUIPlayerView.init(playbackController: playbackController, options: options, controlsView: controlsView)!
 
     playerView.delegate = self
     playerView.frame = videoContainer.bounds
@@ -637,7 +637,7 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate, BCOVPUIP
 
     videoContainer.addSubview(playerView)
 
-    playbackController.setVideos(videoArray)
+    playbackController.setVideos(videoArray as NSFastEnumeration!)
     playbackController.play();
 }</code></pre>
               <!-- <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="95-108" data-gist-highlight-line="97-107"></code></p> -->
@@ -649,9 +649,9 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate, BCOVPUIP
               <li><p>Create a function that sets the delivery method for <code>BCOVSources</code> that belong to a video.</p>
 								<pre class="line-numbers" data-start="56"><code class="language-swift">func videoWithURL(url: NSURL) -&gt; BCOVVideo {
   // set the delivery method for BCOVSources that belong to a video
-  let source:BCOVSource = BCOVSource(URL: url, deliveryMethod: kBCOVSourceDeliveryHLS, properties: nil)
+  let source:BCOVSource = BCOVSource(url: url as URL!, deliveryMethod: kBCOVSourceDeliveryHLS, properties: nil)
   let video = BCOVVideo.init(source: source, cuePoints: BCOVCuePointCollection.init(array: []), properties: [NSObject:AnyObject]())
-  return video
+  return video!
 }</code></pre>
 							</li>
               <!-- <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="110-115"></code></p> -->
@@ -660,8 +660,8 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate, BCOVPUIP
             <h4>The rest</h4>
             <ol class="bcls-tasklist">
               <li><p>Create a function to handle when the playback session advances.</p>
-								<pre class="line-numbers" data-start="63"><code class="language-swift">func playbackController(controller: BCOVPlaybackController!, didAdvanceToPlaybackSession session: BCOVPlaybackSession!) {
-    NSLog(&quot;ViewController Debug - Advanced to new session.&quot;)
+								<pre class="line-numbers" data-start="63"><code class="language-swift">private func playbackController(controller: BCOVPlaybackController!, didAdvanceToPlaybackSession session: BCOVPlaybackSession!) {
+    print(&quot;ViewController Debug - Advanced to new session.&quot;)
 }</code></pre>
 							</li>
               <!-- <p><code data-gist-id="aa87403235764a27cae1" data-gist-line="117-119" data-gist-hide-footer="true"></code></p> -->
@@ -684,7 +684,7 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate, BCOVPUIP
 
 import UIKit
 
-let kAccountID = "123456789" // for analytics
+let kViewControllerAccountID = &quot;123456789&quot; // for analytics
 
 class ViewController: UIViewController, BCOVPlaybackControllerDelegate, BCOVPUIPlayerViewDelegate  {
 
@@ -692,53 +692,53 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate, BCOVPUIP
 	@IBOutlet weak var videoContainer: UIView!
 
 	required init?(coder aDecoder: NSCoder) {
-		let manager = BCOVPlayerSDKManager.sharedManager();
-		playbackController = manager.createPlaybackController()
+      let manager = BCOVPlayerSDKManager.shared()!
+      playbackController = manager.createPlaybackController()
 
-		super.init(coder: aDecoder)
+      super.init(coder: aDecoder)
 
-		playbackController.analytics.account = kAccountID
+      playbackController.analytics.account = kViewControllerAccountID
 
-		playbackController.delegate = self
-		playbackController.autoAdvance = true
-		playbackController.autoPlay = true
+      playbackController.delegate = self
+      playbackController.isAutoAdvance = true
+      playbackController.isAutoPlay = true
 	}
 
 	override func viewDidLoad() {
-		super.viewDidLoad()
+	  super.viewDidLoad()
 
-		// Load an array of videos
-		var videoArray = [AnyObject]()
-		videoArray = [videoWithURL(NSURL(string: &quot;http://cf9c36303a9981e3e8cc-31a5eb2af178214dc2ca6ce50f208bb5.r97.cf1.rackcdn.com/bigger_badminton_600.mp4&quot;)!),
-				videoWithURL(NSURL(string: &quot;http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8&quot;)!)]
+	  // Load an array of videos
+	  var videoArray = [AnyObject]()
+    videoArray = [videoWithURL(url: NSURL(string: &quot;http://cf9c36303a9981e3e8cc-31a5eb2af178214dc2ca6ce50f208bb5.r97.cf1.rackcdn.com/bigger_badminton_600.mp4&quot;)!),
+          videoWithURL(url: NSURL(string: &quot;http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8&quot;)!)]
 
-	    // Create and set options
-	    let options = BCOVPUIPlayerViewOptions()
-	    options.presentingViewController = self;
+      // Create and set options
+      let options = BCOVPUIPlayerViewOptions()
+      options.presentingViewController = self;
 
-	    // Create and configure Control View
-	    let controlsView = BCOVPUIBasicControlView.basicControlViewWithVODLayout()
-	    let playerView = BCOVPUIPlayerView.init(playbackController: self.playbackController, options: options, controlsView: controlsView)
+      // Create and configure Control View
+      let controlsView = BCOVPUIBasicControlView.basicControlViewWithVODLayout()
+      let playerView = BCOVPUIPlayerView.init(playbackController: playbackController, options: options, controlsView: controlsView)!
 
-	    playerView.delegate = self
-	    playerView.frame = videoContainer.bounds
-	    playerView.autoresizingMask = [.FlexibleHeight, .FlexibleWidth]
+      playerView.delegate = self
+      playerView.frame = videoContainer.bounds
+      playerView.autoresizingMask = [.FlexibleHeight, .FlexibleWidth]
 
-	    videoContainer.addSubview(playerView)
+      videoContainer.addSubview(playerView)
 
-	    playbackController.setVideos(videoArray)
-	    playbackController.play();
-			}
+      playbackController.setVideos(videoArray as NSFastEnumeration!)
+      playbackController.play();
+	}
 
     func videoWithURL(url: NSURL) -&gt; BCOVVideo {
       // set the delivery method for BCOVSources that belong to a video
-      let source:BCOVSource = BCOVSource(URL: url, deliveryMethod: kBCOVSourceDeliveryHLS, properties: nil)
+      let source:BCOVSource = BCOVSource(url: url as URL!, deliveryMethod: kBCOVSourceDeliveryHLS, properties: nil)
       let video = BCOVVideo.init(source: source, cuePoints: BCOVCuePointCollection.init(array: []), properties: [NSObject:AnyObject]())
-      return video
+      return video!
     }
 
-    func playbackController(controller: BCOVPlaybackController!, didAdvanceToPlaybackSession session: BCOVPlaybackSession!) {
-      NSLog(&quot;ViewController Debug - Advanced to new session.&quot;)
+    private func playbackController(controller: BCOVPlaybackController!, didAdvanceToPlaybackSession session: BCOVPlaybackSession!) {
+        print(&quot;ViewController Debug - Advanced to new session.&quot;)
     }
 
 	override func didReceiveMemoryWarning() {
