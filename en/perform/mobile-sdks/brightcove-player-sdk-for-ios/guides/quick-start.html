@@ -64,6 +64,17 @@
 	      <section class="bcls-section" id="top">
 					<p class="video-cloud-only">This example plays a video returned from the <a href="../../../playback-api/index.html">Brightcove Playback API</a>, which is the latest and recommended API to retrieve content from your Video Cloud library.</p>
 	        <p class="video-cloud-only">For this option, you will need a Policy Key. If you are not familiar with Policy Keys, see <a href="../../../policy-api/getting-started/api-overview.html">Policy API Overview</a>.</p>
+          <aside class="bcls-aside bcls-aside--tip">
+            This example is written in Objective-C, but you can also experiment with Swift. See the following:
+            <ul>
+              <li>
+                <a href="../../brightcove-player-sdk-for-ios/guides/quick-start-swift.html">Quick Start: Create a Simple Video App using Swift</a>
+              </li>
+              <li>
+                <a href="https://github.com/BrightcoveOS/ios-player-samples/tree/master/Player/VideoCloudBasicPlayer/swift">Swift version of the VideoCloudBasicPlayer</a>
+              </li>
+            </ul>
+          </aside>
 	      </section>
 
 				<section class="bcls-section" id="Get_started">
@@ -81,16 +92,12 @@
 						<li class="video-cloud-only">Download the entire Xcode project for experimentation.
 						<ol class="video-cloud-only" type=a>
 							<li><p>Download the <a href="https://github.com/BrightcoveOS/ios-player-samples/tree/master/Player/VideoCloudBasicPlayer/objc">VideoCloudBasicPlayer</a> sample to your local system.</p>
-              <p class="text-warning">Note: This sample currently uses the Media API, but can be easily modified to use the Playback API.</p></li>
+                <aside class="bcls-aside bcls-aside--information">The <strong>VideoCloudBasicPlayer</strong> sample currently uses the Media API, but can be easily modified to use the Playback API.</aside>
+              </li>
 							<li>Run the <code>pod install</code> command.</li>
 							<li>Open and run the newly created workspace.</li>
 						</ol></li>
 					</ol>
-          <div class="video-cloud-only">
-						<aside class="bcls-aside bcls-aside--tip">
-							This example is written in Objective-C, but you can also experiment with a sample written in Swift. See the <a href="https://github.com/BrightcoveOS/ios-player-samples/tree/master/Player/VideoCloudBasicPlayer/swift">Swift version of the VideoCloudBasicPlayer</a> sample.
-						</aside>
-          </div>
         </section>
 
 				<section class="bcls-section" id="Create_the_project">
@@ -167,7 +174,7 @@
 
 use_frameworks!
 
-platform :ios, '9.0' # (or whatever version you want)
+platform :ios, '10.0' # (or whatever version you want)
 
 target 'Simple-Video-Playback' do
   pod 'Brightcove-Player-SDK'
@@ -199,9 +206,11 @@ end</code></pre>
 					<ol class="bcls-tasklist">
 						<li>In Xcode, open the <strong>Simple-Video-Playback.xcworkspace</strong> file.</li>
 					</ol>
+
 					<h3 id="appdelegate">Set the audio behavior for the app</h3>
 					<p>The audio session handles audio behavior at the app level. Learn more about the <a href="https://developer.apple.com/library/ios/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/Introduction/Introduction.html">AVAudioSession</a> class.</p>
-          <p>You can choose from several audio session categories and settings to customize your app's audio behavior. <a href="https://developer.apple.com/library/ios/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/AudioSessionBasics/AudioSessionBasics.html#//apple_ref/doc/uid/TP40007875-CH3-SW1">Choose the best audio session category</a> for your app.</p>
+          <aside class="bcls-aside bcls-aside--tip">You can choose from several audio session categories and settings to customize your app's audio behavior. <a href="https://developer.apple.com/library/ios/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/AudioSessionBasics/AudioSessionBasics.html#//apple_ref/doc/uid/TP40007875-CH3-SW1">Choose the best audio session category</a> for your app.</aside>
+
           <p>For this sample, we will use <code>AVAudioSessionCategoryPlayback</code>. This plays audio even when the screen is locked and with the Ring/Silent switch set to silent. To keep it simple, we will put the code for this in the App Delegate.</p>
 					<ol class="bcls-tasklist">
 						<li><p>In your project, open the App Delegate implementation file (<strong>AppDelegate.m</strong>).</p></li>
@@ -209,7 +218,7 @@ end</code></pre>
 						<pre class="line-numbers"><code class="language-swift">//  AppDelegate.m
 //  Simple-Video-Playback
 //
-//  Created on 9/7/16.
+//  Created on 9/16/16.
 //  Copyright © 2016 Brightcove. All rights reserved.
 //
 
@@ -282,7 +291,7 @@ end</code></pre>
           <p>This allows your app to listen and respond to video playback events.</p>
 					<ol class="bcls-tasklist">
 						<li><p>Update the line <code>@interface ViewController : UIViewController</code> as follows:</p>
-<pre class="line-numbers" data-start="11"><code class="language-swift">@interface ViewController : UIViewController &lt;BCOVPlaybackControllerDelegate&gt;</code></pre>
+<pre class="line-numbers" data-start="11"><code class="language-swift">@interface ViewController : UIViewController &lt;BCOVPlaybackControllerDelegate, BCOVPUIPlayerViewDelegate&gt;</code></pre>
 						</li>
 					</ol>
 					<h4 id="header">View the code</h4>
@@ -290,14 +299,14 @@ end</code></pre>
 					<pre class="line-numbers"><code class="language-swift">//  ViewController.h
 //  Simple-Video-Playback
 //
-//  Created on 9/7/16.
+//  Created on 9/16/16.
 //  Copyright © 2016 Brightcove. All rights reserved.
 //
 
 #import &lt;UIKit/UIKit.h&gt;
 @import BrightcovePlayerSDK;
 
-@interface ViewController : UIViewController &lt;BCOVPlaybackControllerDelegate&gt;
+@interface ViewController : UIViewController &lt;BCOVPlaybackControllerDelegate, BCOVPUIPlayerViewDelegate&gt;
 
 @end</code></pre>
 					<!-- <p><code data-gist-id="c96b2ac63e5c859d9164" data-gist-hide-footer="true"></code> </p>-->
@@ -321,9 +330,9 @@ end</code></pre>
                     <li>Line 14: Defines your Video Cloud Video ID.</li>
                   </ul>
 									<pre class="line-numbers" data-start="11"><code class="language-swift">// ** Customize these values with your own account information **
-static NSString * const kViewControllerPlaybackServicePolicyKey = @"BCpkADawqM1Sh_RsWQTEtCCpMbpKrbKQN_lhGY3fSZE-Cbp67h2aDRTDuifFXnT3yEYrxPNy640VTr224uWjtky-6YDzzqIDRyjqZq_wXu4Py0MSUMdf2rPmS102D6QGi8bIEQEXutS-eeVp";
-static NSString * const kViewControllerAccountID = @"3636334180001";
-static NSString * const kViewControllerVideoID = @"3987127390001"</code></pre>
+static NSString * const kViewControllerPlaybackServicePolicyKey = @&quot;BCpkADawqM2NZcfpTGYMHaafJU597X9J0XTvw8CXZcMITep7BFNYHFKGz3XJQfYzudYCp9GWn3u18OQdlqJxSKFrIipF4Ndx9umqQ5EtUaAn_oTXaQgIs1lAe4-FciLISBFDCTAA3j2qALp8&quot;;
+static NSString * const kViewControllerAccountID = @&quot;3636334163001&quot;;
+static NSString * const kViewControllerVideoID = @&quot;3637773814001&quot;;</code></pre>
                 <!-- <p><code data-gist-id="b545d8a8fdeac7cdd7c2" data-gist-line="11-14"></code></p></li> -->
 <!--
               <li><p><strong>Optional:</strong> If you override the <code>BCOVVideo</code> class or do not use the Brightcove player and catalog, you need to send your Video Cloud Publisher ID to Video Cloud Analytics. This allows you to view data for this app in Video Cloud Analytics.</p>
@@ -451,7 +460,7 @@ static NSString * const kViewControllerVideoID = @"3987127390001"</code></pre>
             <p>In order to play back video content, you will request a video from your Video Cloud library.</p>
             <ol class="bcls-tasklist">
               <li><p>Create a function named <code>requestContentFromPlaybackService</code> as follows:</p>
-								<pre class="line-numbers" data-start="63"><code class="language-swift">- (void)requestContentFromPlaybackService
+								<pre class="line-numbers" data-start="74"><code class="language-swift">- (void)requestContentFromPlaybackService
 {
     [self.service findVideoWithVideoID:kViewControllerVideoID parameters:nil completion:^(BCOVVideo *video, NSDictionary *jsonResponse, NSError *error) {
 
@@ -486,16 +495,16 @@ static NSString * const kViewControllerVideoID = @"3987127390001"</code></pre>
 //  ViewController.m
 //  Simple-Video-Playback
 //
-//  Created on 9/7/16.
+//  Created on 9/16/16.
 //  Copyright © 2016 Brightcove. All rights reserved.
 //
 
 #import "ViewController.h"
 
 // ** Customize these values with your own account information **
-static NSString * const kViewControllerPlaybackServicePolicyKey = @"BCpkADawqM1Sh_RsWQTEtCCpMbpKrbKQN_lhGY3fSZE-Cbp67h2aDRTDuifFXnT3yEYrxPNy640VTr224uWjtky-6YDzzqIDRyjqZq_wXu4Py0MSUMdf2rPmS102D6QGi8bIEQEXutS-eeVp";
-static NSString * const kViewControllerAccountID = @"3636334180001";
-static NSString * const kViewControllerVideoID = @"3987127390001";
+static NSString * const kViewControllerPlaybackServicePolicyKey = @&quot;BCpkADawqM2NZcfpTGYMHaafJU597X9J0XTvw8CXZcMITep7BFNYHFKGz3XJQfYzudYCp9GWn3u18OQdlqJxSKFrIipF4Ndx9umqQ5EtUaAn_oTXaQgIs1lAe4-FciLISBFDCTAA3j2qALp8&quot;;
+static NSString * const kViewControllerAccountID = @&quot;3636334163001&quot;;
+static NSString * const kViewControllerVideoID = @&quot;3637773814001&quot;;
 
 @interface ViewController () &lt;BCOVPlaybackControllerDelegate, BCOVPUIPlayerViewDelegate&gt;
 
@@ -507,7 +516,6 @@ static NSString * const kViewControllerVideoID = @"3987127390001";
 @end
 
 @implementation ViewController
-
 #pragma mark Setup Methods
 
 - (instancetype)initWithCoder:(NSCoder *)coder
@@ -526,7 +534,7 @@ static NSString * const kViewControllerVideoID = @"3987127390001";
 
     _playbackController = [manager createPlaybackController];
 
-    _playbackController.analytics.account = kViewControllerAccountID;
+    _playbackController.analytics.account = kViewControllerAccountID; // optional
 
     _playbackController.delegate = self;
     _playbackController.autoAdvance = YES;
@@ -590,7 +598,7 @@ static NSString * const kViewControllerVideoID = @"3987127390001";
             <ol class="bcls-tasklist">
               <li><p>Below the <code>#import</code> directives, add your own value for your Brightcove Perform Account Id.</p>
 							<pre class="line-numbers" data-start="10"><code class="language-swift">// ** Customize these values with your own account information **
-static NSString * const kAccountID = @"1234567899001";</code></pre>
+static NSString * const kViewControllerAccountID = @"1234567899001";</code></pre>
               <!-- <p><code data-gist-id="59b47e25a8aa9965de7e" data-gist-line="10-11" data-gist-hide-footer="true"></code></p> -->
 							</li>
             </ol>
@@ -652,7 +660,7 @@ static NSString * const kAccountID = @"1234567899001";</code></pre>
 
     _playbackController = [manager createPlaybackController];
 
-    _playbackController.analytics.account = kAccountID;
+    _playbackController.analytics.account = kViewControllerAccountID;
 
     _playbackController.delegate = self;
     _playbackController.autoAdvance = YES;
