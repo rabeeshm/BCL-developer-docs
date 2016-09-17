@@ -58,7 +58,7 @@
             <!-- begin drupal content -->
             <article class="bcls-article">
             <header id="bcls_header" class="bcls-header">
-                <p>In this topic, you will learn how to use the Dynamic Ingest API to ingest videos for Bolt. Ingesting Bolt assets is very similar to ingesting ordinary assets, so you will also want to look at the general documentation for the <a href="./index.html">Dynamic Ingest API</a>. This guide will focus mainly on what's different.</p>
+                <p>In this topic, you will learn how to use the Dynamic Ingest API to ingest videos so that they can be delivered through Bolt. Ingesting Bolt assets is very similar to ingesting ordinary assets, so you will also want to look at the general documentation for the <a href="./index.html">Dynamic Ingest API</a>. This guide will focus mainly on what's different.</p>
             </header>
             <section id="operations" class="bcls-section">
                 <h2>Operations</h2>
@@ -68,10 +68,6 @@
                     <li>video-cloud/video/read</li>
                     <!-- for adding images -->
                     <li>video-cloud/video/update</li>
-                    <li>video-cloud/ingest-profiles/profile/read</li>
-                    <li>video-cloud/ingest-profiles/account/read</li>
-                    <li>video-cloud/ingest-profiles/account/write</li>
-                    <li>video-cloud/ingest-profiles/profile/write</li>
                 </ul>
                 <p>To obtain client credentials, use the Studio <a href="//support.brightcove.com/en/video-cloud/docs/managing-api-authentication-credentials">admin tools</a>.</p>
             </section>
@@ -93,41 +89,31 @@
                 <h3>Sample Bolt profile</h3>
                 <p>Below is a sample Bolt profile that you can use to get started. All you need to do is replace <code>YOUR_ACCOUNT_ID</code> with your account id, and then you can copy and paste the profile to the ingest profile editor.</p>
 <pre class="line-numbers"><code class="language-json">{
-  "name": "BoltProfile#1",
-  "description": "Bolt ingest profile.",
-  "account_id": "YOUR_ACCOUNT_ID",
-  "keep_renditions": true,
-  "renditions": [
-
-  ],
-  "packages": [
-
-  ],
-  "dynamic_origin": {
-    "renditions": [
-      "default/audio64",
-      "default/audio128",
-      "default/video700",
-      "default/video1700",
-      "default/video2500",
-      "default/audio96",
-      "default/video1200",
-      "default/video450",
-      "default/video900"
-    ],
-    "images": [
-      {
-        "label": "thumbnail",
-        "height": 90,
-        "width": 160
-      },
-      {
-        "label": "poster",
-        "height": 360,
-        "width": 480
-      }
-    ]
-  }
+    "name": "BoltIngestProfile",
+    "description": "Bolt ingest profile.",
+    "account_id": "<Replace with your Video Cloud Account ID>",
+    "dynamic_origin": {
+        "renditions": [
+            "default/audio64",
+            "default/audio96",
+            "default/audio128",
+            "default/video450",
+            "default/video700",
+            "default/video900",
+            "default/video1200",
+            "default/video1700",
+            "default/video2000"
+        ],
+        "images": [{
+            "label": "poster",
+            "height": 360,
+            "width": 480
+        }, {
+            "label": "thumbnail",
+            "height": 90,
+            "width": 160
+        }]
+    }
 }</code></pre>
                 <p>This profile contains 3 audio-only and 6 video renditions - the details are shown in the tables below.</p>
                 <table class="bcls-table">
@@ -192,8 +178,8 @@
                             <td>2</td>
                         </tr>
                         <tr>
-                            <td>video750</td>
-                            <td>750</td>
+                            <td>video700</td>
+                            <td>700</td>
                             <td>360</td>
                             <td>Baseline</td>
                             <td>preserve</td>
@@ -242,8 +228,8 @@
                             <td>2</td>
                         </tr>
                         <tr>
-                            <td>video2500</td>
-                            <td>2500</td>
+                            <td>video2000</td>
+                            <td>2000</td>
                             <td>720</td>
                             <td>Main</td>
                             <td>preserve</td>
@@ -263,7 +249,7 @@
                 <p>There are two API calls required for ingesting videos:</p>
                 <ol>
                     <li>Call the CMS API to create a video object in the Video Cloud system and get its id</li>
-                    <li>Call the DI API to provide the URL for the video source file and specify the <a href="//docs.brightcove.com/en/video-cloud/ingest-profiles-api/guides/standard-profiles.html">ingest profile</a> to be used</li>
+                    <li>Call the Dynamic Ingest API to provide the URL for the video source file, and specify the ingest profile you just created using the example above</li>
                 </ol>
                 <p>A sample set of basic requests would look like the following:</p>
                 <h3>CMS API request</h3>
@@ -340,7 +326,45 @@ POST /v1/accounts/{account_id}/videos/{video_id}/ingest-requests
                 <p>In your ingest request, you can specify a one or more callback URLs to receive notifications of the results of the ingest process. The URLs you specify should be for apps than can accept POST requests. Notifications will be sent in JSON format.</p>
                 <p>Details of receiving and interpreting notifications can be found in <a href="../guides/notifications-bolt.html">Notifications</a></p>
                 <h3>Status API</h3>
-                <p>Coming soon....</p>
+                <p>You can also get the current status of ingest jobs using the Status API.</p>
+                <aside class="bcls-aside bcls-aside--information">Status messages are available only for ingest jobs submitted within the past 7 days.</aside>
+                <h4>Endpoints</h4>
+                <h5>All status messages for a video</h5>
+<pre><code class="language-http">https://cms.api.brightcove.com/v1/accounts/:account_id/videos/:video_id/ingest_jobs</code></pre>
+                <h5>Example</h5>
+<pre><code class="language-http">https://cms.api.brightcove.com/v1/accounts/57838016001/videos/5128433746001/ingest_jobs</code></pre>
+                <h5>Status message for a particular job</h5>
+<pre><code class="language-http">https://cms.api.brightcove.com/v1/accounts/:account_id/videos/:video_id/ingest_jobs/:job_id</code></pre>
+                <h5>Example</h5>
+                <textarea class="bcls-code">https://cms.api.brightcove.com/v1/accounts/57838016001/videos/5128433746001/ingest_jobs/7a196557-56ba-4218-ada5-e107ed554555</textarea>
+                <h4>Responses</h4>
+                <p>Below is a sample response for a successfully finished job.</p>
+<pre class="line-numbers"><code class="language-json">{
+  "id": "7a196557-56ba-4218-ada5-e107ed554555",
+  <span class="bcls-highlight">"state": "finished",</span>
+  "account_id": "57838016001",
+  "video_id": "5128433746001",
+  <span class="bcls-highlight">"error_code": null,</span>
+  <span class="bcls-highlight">"error_message": null,</span>
+  "updated_at": "2016-09-16T16:51:46.313Z",
+  "started_at": "2016-09-16T16:51:22.258Z"
+}</code></pre>
+                <p>The most important items here are:</p>
+                <ul>
+                    <li><code>state</code>: the status of the job (<code>processing</code> | <code>publishing</code> | <code>finished</code> | <code>failed</code>)</li>
+                    <li><code>error_code</code> and <code>error_message</code>: for a successful job, these will be <code>null</code>; for failed jobs, you will get an error code and an explanatory message</li>
+                </ul>
+                <p>Here is an example of a status message for a failed job for comparison:</p>
+<pre class="line-numbers"><code class="language-json">{
+  "id": "bc9dfb58-d502-43d5-97e4-41f3dcd44265",
+  <span class="bcls-highlight">"state": "failed",</span>
+  "account_id": "57838016001",
+  "video_id": "5128710227001",
+  <span class="bcls-highlight">"error_code": "NoMediaError",</span>
+  <span class="bcls-highlight">"error_message": "Audio-only output was requested on a file that only contains video.",</span>
+  "updated_at": "2016-09-16T20:30:58.016Z",
+  "started_at": "2016-09-16T20:29:14.139Z"
+}</code></pre>
             </section>
         </article>
         <!-- end drupal content -->
