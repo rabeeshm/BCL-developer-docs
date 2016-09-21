@@ -165,8 +165,51 @@
         <p>You will need to produce DRM protected content which uses MPEG-DASH manifests with segmented and encrypted videos.</p>
         <h3>Widevine Modular</h3>
         <p>
-          For Widevine Modular content, you also need to configure your player to use your Widevine licensing server. Here is an example of using the <a href="../../player-management/getting-started/player-mgmt-quick-start.html">Player Management API</a> to update the player configuration:
-        </p>
+          For Widevine Modular content, you also need to configure your player to use your Widevine licensing server. There are two ways that you can do this:</p>
+          <ul>
+            <li>
+              Using the player's source handler
+            </li>
+            <li>
+              Using the Player Management API
+            </li>
+          </ul>
+          <h4 id="Using_the_player's_source_handler">Using the player's source handler</h4>
+          <p>
+            To update an instance of a player on your web page, you can use the player's source handler. Here is an example of using the <code>keySystemsOptions</code> array with the <code>player.src()</code> function:
+          </p>
+          <pre class="line-numbers"><code class="language-java">player.src({
+  src: 'http://example.com/my/manifest.mpd',
+  type: 'application/dash+xml',
+  keySystemOptions: [
+    {
+      name: 'com.widevine.alpha',
+      options: {
+        licenseUrl: 'http://m.widevine.com/proxy'
+      }
+    }
+  ]
+});</code></pre>
+          <p>
+            You can also use the <code>updateSourceData</code> function as follows:
+          </p>
+          <pre class="line-numbers"><code class="language-java">videojs.Html5DashJS.updateSourceData = function(source) {
+  source.keySystemOptions = [{
+    name: 'com.widevine.alpha',
+    options: {
+      serverURL:'https://example.com/anotherlicense'
+    }
+  }];
+  return source;
+};</code></pre>
+          <p>
+            For more details, see the <a href="https://github.com/videojs/videojs-contrib-dash">videojs-contrib-dash</a> information on GitHub.
+          </p>
+
+          <h4 id="Using_the_Player_Management_API">Using the Player Management API</h4>
+          <p>
+            To update all instances of your player, you can use the <a href="../../player-management/getting-started/player-mgmt-quick-start.html">Player Management API</a>. Here is an example of updating your player's configuration:
+         </p>
         <pre class="line-numbers"><code class="language-java">curl \
   --header &quot;Content-Type: application/json&quot; \
   --user $EMAIL \
