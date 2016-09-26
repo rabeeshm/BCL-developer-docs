@@ -12,7 +12,7 @@
     <!-- End Drupal Taxonomy Data -->
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
     <!-- change title to match the h1 heading -->
-    <title>Brightcove Player Sample: Newest Videos in Playlist</title>
+    <title>Brightcove Player Sample: Most Watched Videos in Playlist</title>
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
 <link href='//fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
@@ -55,7 +55,7 @@
             <div id="sidenav" class="side-nav"></div>
         </div>
         <div id="main" class="large-10 small-12 columns">
-            <h1>Brightcove Player Sample: Newest Videos in Playlist</h1>
+            <h1>Brightcove Player Sample: Most Watched Videos in Playlist</h1>
             <!-- begin drupal content -->
 
             <style>
@@ -66,13 +66,13 @@
             </style>
 
             <div class="perform-only">
-                <h1>Brightcove Player Sample: Newest Videos in Playlist</h1>
+                <h1>Brightcove Player Sample: Most Watched Videos in Playlist</h1>
                 <p>The information contained in this document is not applicable for Perform customers.</p>
             </div>
             <article class="bcls-article">
                 <header id="bcls_header" class="bcls-header">
                     <!-- Place document intro sentence(s) here -->
-                    <p>In this topic, you will learn how to  use the <a href="../../cms-api/getting-started/overview-cms.html">CMS API</a> to return the last ten videos created in an account and display them in a playlist.</p>
+                    <p>In this topic, you will learn how to  use the <a href="../../cms-api/getting-started/overview-cms.html">CMS API</a> to return the most played videos in an account and display them in a playlist.</p>
                 </header>
 
                 <section id="developmentsequence" class="bcls-section">
@@ -127,7 +127,7 @@
 
                 <section id="player" class="bcls-section">
                     <h2>The player</h2>
-                        <iframe src="//players.brightcove.net/1752604059001/HJx5vaWQa_default/index.html" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
+                        <iframe src="//players.brightcove.net/1752604059001/BJvcsJv6_default/index.html" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe></iframe>
                 </section>
 
                 <section id="code" class="bcls-section">
@@ -167,9 +167,9 @@
                     <h3>The JavaScript code</h3>
                     <p>The main flow of logic in the JavaScript code is</p>
                     <ol>
-                      <li>Prepare to make the call to the CMS API by setting the search criteria, in this case return the 10 newest videos created.</li>
+                      <li>Prepare to make the call to the CMS API by setting the search criteria, in this case return the 10 most watched videos.</li>
                       <li>Make the actual request using the CMA API for the data. This step will use a callback function, which means the callback function is passed as a parameter to another, second, function. The callback function is then called inside the second function's logic.</li>
-                      <li>Once the data is retrieved, data is extracted to build an array of the video IDs for the newest videos.</li>
+                      <li>Once the data is retrieved, data is extracted to build an array of the video IDs for the most watched videos.</li>
                       <li>The array of video IDs is then passed as a parameter to another function which retrieves the complete video object for for each ID. The returned objects are stored in an array. A callback function is used in this step also.</li>
                       <li>The array of video objects is assigned as the player's playlist.</li>
                     </ol>
@@ -192,17 +192,17 @@
       videojs(&quot;myPlayerID&quot;).ready(function () {
           myPlayer = this,
           requestData = {},
-          newestVideos = [],
+          mostWatchedVideos = [],
           videoData = [],
           videoObjects = [];
           // set up data for CMS API request
           requestData = setRequestData();
           // make the CMS API request to get matching video IDs
-          getNewestVideos(requestData, function (newestVideos) {
+          getMostWatchedVideos(requestData, function (mostWatchedVideos) {
               // extract the needed video data into an array
-              videoData = extractVideoData(newestVideos);
+              videoData = extractVideoData(mostWatchedVideos);
               getVideoData(videoData, function (videoObjects) {
-                  // add the newest videos list to the player as a playlist
+                  // add the most watched videos list to the player as a playlist
                   myPlayer.playlist(videoObjects);
               });
           });
@@ -219,14 +219,14 @@
               requestData = {},
               dataReturned = false;
           requestURL = cmsURL + accountId + '/videos';
-          // return the 10 newest videos created
-          endPoint = '?sort=-created_at&amp;limit=10';
+          // return the 10 most watched videos created
+          endPoint = '?sort=-plays_total&limit=10';
           requestData.url = requestURL + endPoint;
           requestData.requestType = 'GET';
           return requestData;
       }
 
-      function getNewestVideos(options, callback) {
+      function getMostWatchedVideos(options, callback) {
           var httpRequest = new XMLHttpRequest(),
               responseRaw,
               parsedData,
@@ -343,28 +343,28 @@
                     <p>Move the plugin's JavaScript code into a file and place it in an Internet accessible URL.</p>
                     <ul>
                         <li>Lines 1, 130: Use the standard syntax to begin and end a Brightcove Player plugin.</li>
-                        <li>Line 1: The first argument of the function call is the name of the function defined in the plugin code, in this case <code>newestVideosInPlaylist</code>.</li>
+                        <li>Line 1: The first argument of the function call is the name of the function defined in the plugin code, in this case <code>mostWatchedVideosInPlaylist</code>.</li>
                         <li>Line 130: The trailing semicolon is required.</li>
                     </ul>
                     <aside class="bcls-aside bcls-aside--information">Note that the <code>ready</code> method is removed.</aside>
-<pre class="line-numbers"><code class="language-javascript">videojs.plugin('newestVideosInPlaylist', function() {
+<pre class="line-numbers"><code class="language-javascript">videojs.plugin('mostWatchedVideosInPlaylist', function() {
 
   var myPlayer = this,
       proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
       cmsURL = 'https://cms.api.brightcove.com/v1/accounts/',
       myPlayer = this,
       requestData = {},
-      newestVideos = [],
+      mostWatchedVideos = [],
       videoData = [],
       videoObjects = [];
       // set up data for CMS API request
       requestData = setRequestData();
       // make the CMS API request to get matching video IDs
-      getNewestVideos(requestData, function (newestVideos) {
+      getMostWatchedVideos(requestData, function (mostWatchedVideos) {
           // extract the needed video data into an array
-          videoData = extractVideoData(newestVideos);
+          videoData = extractVideoData(mostWatchedVideos);
           getVideoData(videoData, function (videoObjects) {
-              // add the newest videos list to the player as a playlist
+              // add the most watched videos list to the player as a playlist
               myPlayer.playlist(videoObjects);
           });
       });
@@ -387,7 +387,7 @@
       return requestData;
   }
 
-  function getNewestVideos(options, callback) {
+  function getMostWatchedVideos(options, callback) {
       var httpRequest = new XMLHttpRequest(),
           responseRaw,
           parsedData,
@@ -493,14 +493,14 @@
 </code></pre>
                     <h3>Deploy plugin and CSS</h3>
                         <p>You must load both the JavaScript and CSS files for the custom plugin.</p>
-                        <p>To deploy the <strong>newestVideosInPlaylist</strong> plugin using the Players module, follow these steps:</p>
+                        <p>To deploy the <strong>mostWatchedVideosInPlaylist</strong> plugin using the Players module, follow these steps:</p>
                         <ol class="bcls-tasklist__restart">
                           <li>In Video Cloud Studio, open the <strong>Players</strong> module either locate a player wo which you wish to add the plugin, or create a new one.</li>
                           <li>Click the link for the player to open the player properties.</li>
                           <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
                           <li>For the <strong>JavaScript URL</strong>, enter the URL which specifies the location of where you saved your plugin's JavaScript.</li>
                           <li>For the <strong>CSS URL</strong>, enter the URL which specifies the location of where you saved your plugin's CSS.</li>
-                          <li>For the <strong>Name</strong>, enter <strong>newestVideosInPlaylist</strong>.</li>
+                          <li>For the <strong>Name</strong>, enter <strong>mostWatchedVideosInPlaylist</strong>.</li>
                           <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
                         </ol>
                 </section>
