@@ -87,7 +87,7 @@
                     <p>The CMS API request is the same as for any Dynamic Ingest operation to add a new video.</p>
                     <h3>Request syntax</h3>
                     <p>This is a <code>POST</code> request to:</p>
-<pre class="line-numbers"><code class="language-http">https://cms.api.brightcove.com/v1/accounts/{ACCOUNT_ID}</code></pre>
+<pre class="line-numbers"><code class="language-http">https://cms.api.brightcove.com/v1/accounts/<span class="bcls-highlight">{ACCOUNT_ID}</span></code></pre>
                     <h4>Parameters</h4>
                     <p>URL parameters for the request:</p>
                     <ul>
@@ -112,7 +112,7 @@
                     <p>The first request to the Ingest API will retrieve the information you need to PUT your video file to the Brightcove S3 bucket and then ingest it from there into Video Cloud.</p>
                      <h3>Request syntax</h3>
                     <p>This is a <code>GET</code> request to:</p>
-<pre class="line-numbers"><code class="language-http">https://ingest.api.brightcove.com/v1/accounts/{ACCOUNT_ID}/videos/{VIDEO_IS}/upload-urls/{SOURCE_NAME}</code></pre>
+<pre class="line-numbers"><code class="language-http">https://ingest.api.brightcove.com/v1/accounts/<span class="bcls-highlight">{ACCOUNT_ID}</span>/videos/<span class="bcls-highlight">{VIDEO_ID}</span>/upload-urls/<span class="bcls-highlight">{SOURCE_NAME}</span></code></pre>
                     <h4>Parameters</h4>
                     <p>URL parameters for the request:</p>
                     <ul>
@@ -128,12 +128,12 @@
                     <h4>Response</h4>
                     <p>The response will be a JSON object similar to the following:</p>
 <pre class="line-numbers"><code class="language-json">{
-  "Bucket": "ingestion-upload",
+  "Bucket": "ingestion-upload-prod",
   "AccessKeyId": "ASIAI7GON2VNXYMSY4IA",
   "SecretAccessKey": "JIqRnx0fwcq+jd5TmAPOoqBBCWqMrd1S7eX1Wt6/",
   "ObjectKey": "12345/5678/3712cd37504911ab06a77a26a387ce/source.mp4",
-  "ApiRequestUrl": "https://ingestion-upload-qa.s3.amazonaws.com/12345/5678/3712cd37504911ab06a77a26a387ce/source.mp4",
-  "SignedUrl": "https://ingestion-upload-qa.s3.amazonaws.com/12345/5678/3712cd37504911ab06a77a26a387ce/source.mp4?AWSAccessKeyId=AKIAJWBBMGHEBQ6SISMA&Expires=1469653966&Signature=PKVofH1cCnH1ODWvM2mqhI94cvM%3D",
+  "ApiRequestUrl": "https://ingestion-upload-prod.s3.amazonaws.com/12345/5678/3712cd37504911ab06a77a26a387ce/source.mp4",
+  "SignedUrl": "https://ingestion-upload-prod.s3.amazonaws.com/12345/5678/3712cd37504911ab06a77a26a387ce/source.mp4?AWSAccessKeyId=AKIAJWBBMGHEBQ6SISMA&Expires=1469653966&Signature=PKVofH1cCnH1ODWvM2mqhI94cvM%3D",
   "SessionToken": "F///asdgjaikoewgjuio238928ygi3uh2u3ihgejkl...." 
 }</code></pre>
                     <p>The important items in the response are:</p>
@@ -141,20 +141,48 @@
                         <li><code>SignedUrl</code> - this is the S3 url that you will PUT your video file to</li>
                         <li><code>ApiRequestUrl</code> - this is the URL you will include in your Dynamic Ingest POST request for the Master url</li>
                     </ul>
-                    <aside class="bcls-aside bcls-aside--information">Note that these URLs are valide for <strong>24 hours</strong> - if you do not complete the Dynamic Ingest operations within 24 hours, you will have to make a new request for new URLs.</aside>
+                    <p>Other information regarding the S3 bucket such as the AccessKeyId and ObjectKey are provided, but you don't need to do anything with these, since the necessary information for uploading your video to S3 is included in the <code>SignedUrl</code>.</p>
+                    <aside class="bcls-aside bcls-aside--information">Note that the URLs are valide for <strong>24 hours</strong> - if you do not complete the Dynamic Ingest operations within 24 hours, you will have to make a new request for new URLs.</aside>
                 </section>
                 </section>
                 <section id="S3PUTRequest" class="bcls-section">
                     <h2>PUT video to S3</h2>
-                    <p></p>
+                    <p>After getting the S3 URLs, you make a PUT request to upload your video file, using the <code>SignedUrl</code> as the destination.</p>
                 </section>
                 <section id="DIrequest" class="bcls-section">
                     <h2>Dynamic Ingest request</h2>
-                    <p></p>
+                    <p>After your file has uploaded to the Brightcove S3 bucket, you make an ordinary Dynamic Ingest request to ingest the file from its S3 location.</p>
+                    <h3>Request syntax</h3>
+                    <p>This is a <code>POST</code> request to:</p>
+<pre class="line-numbers"><code class="language-http">https://ingest.api.brightcove.com/v1/accounts/<span class="bcls-highlight">{ACCOUNT_ID}</span>/videos/<span class="bcls-highlight">{VIDEO_ID}</span>/ingest-requests</code></pre>
+                    <h4>Parameters</h4>
+                    <p>URL parameters for the request:</p>
+                    <ul>
+                        <li><code>{ACCOUNT_ID}</code> - your account id</li>
+                        <li><code>{VIDEO_ID}</code> - the video id returned from CMS API request</li>
+                    </ul>
+                    <h4>Request body</h4>
+                    <p>The request body consists of a JSON object containing the <code>master</code> (required) details for the ingest job. The <code>url</code> for the <code>master</code> will be the <code>ApiRequestUrl</code> returned by the request for the S3 bucket information</p>
+<pre class="line-numbers"><code class="language-json">{
+    "master": {
+        "url": "<span class="bcls-highlight">https://ingestion-upload-prod.s3.amazonaws.com/12345/5678/3712cd37504911ab06a77a26a387ce/source.mp4</span>"
+    },
+    "profile": "high-resolution",
+    "capture-images": true
+}</code></pre>
+                    <p>See the <a href="//docs.brightcove.com/en/video-cloud/di-api/reference/versions/v1/index.html#api-Ingest-Ingest_Media_Asset">API Reference</a> for details.</p>
+                    <h4>Headers</h4>
+                    <p>The HTTP headers you need to include with the request are:</p>
+                    <ul>
+                        <li><code>Authorization: Bearer {ACCESS_TOKEN}</code></li>
+                        <li><code>Content-Type: application/json</code></li>
+                    </ul>
+                    <h4>Response</h4>
+                    <p>The response will contain the <code>job_id</code> for the ingest request, which allows you to track the status via <a href="//docs.brightcove.com/en/video-cloud/media-management/guides/notifications.html">Notifications</a>.</p>
                 </section>
                 <section id="codeSamples" class="bcls-section">
                     <h2>Sample code</h2>
-                    <p></p>
+                    <p>To help you get started with push-based Dynamic Ingest, we have created some sample apps in Java and Python. You can find them on our <a href="//github.com/BrightcoveLearning/dynamic-ingest-code-samples">Github site</a>.</p>
                 </section>
             </article>
             <section class="bcls-section" id="BCLreferences">
