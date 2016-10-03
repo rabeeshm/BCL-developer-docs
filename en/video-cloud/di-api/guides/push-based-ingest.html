@@ -12,7 +12,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
     <!-- change title to match the h1 heading -->
-    <title>Push-Based Ingestion</title>
+    <title>Source File Upload API for Dynamic Ingest</title>
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
     <link href='//fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
@@ -53,18 +53,18 @@
             <div id="sidenav" class="side-nav"></div>
         </div>
         <div id="main" class="large-10 small-12 columns">
-            <h1>Push-Based Ingestion</h1>
+            <h1>Source File Upload API for Dynamic Ingest</h1>
             <!-- begin drupal content -->
             <article class="bcls-article">
                 <header id="bcls_header" class="bcls-header">
-                    <p>In this topic, you will learn how to add videos to your Video Cloud account using the Dynamic Ingest API with push-based ingest. Push-based ingest is provided for those who cannot make their videos available on an HTTP(S) URL or an S3 URI for Dynamic Ingest to pull.</p>
+                    <p>In this topic, you will learn how to add videos to your Video Cloud account using the Source File Upload API for Dynamic Ingest. The Source File Upload API provides the ability to upload (“push”) source files into Video Cloud via Dynamic Ingest.</p>
                 </header>
                 <section class="bcls-section" id="introduction">
                     <h2>Introduction</h2>
-                    <p>For push-based ingestion, Brightcove provides an S3 bucket that you can upload your videos to, and Dynamic Ingest then pulls the video from S3 bucket in same way it would from your own S3 bucket or URL. The diagram below shows the difference between pull-based and push-based logic.</p>
+                    <p>For ingest via source file upload, Brightcove provides an S3 bucket that you can upload your videos to, and Dynamic Ingest then pulls the video from S3 bucket in same way it would from your own S3 bucket or URL. The diagram below shows the difference between the workflows for basic dynamic ingest and ingest with source file upload.</p>
                     <figure class="bcls-figure">
-                        <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/di-api/guides/push-based-ingest/push-based-ingest.png" alt="Push vs Pull Based Ingestion">
-                        <figcaption class="bcls-caption--image">Push vs Pull Based Ingestion</figcaption>
+                        <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/di-api/guides/push-based-ingest/source-file-upload.png" alt="Workflow Differences">
+                        <figcaption class="bcls-caption--image">Workflow Differences</figcaption>
                     </figure>
                 </section>
                 <section id="authentication" class="bcls-section">
@@ -77,14 +77,14 @@
                     <ol>
                         <li>CMS API POST request to create the video object in Video Cloud (same as for pull-based ingestion)</li>
                         <li>Dynamic Ingest GET request to get the Brightcove S3 bucket URLs</li>
-                        <li>PUT request to upload the video to the Brightcove S3 bucket</li>
-                        <li>Dynamic Ingest POST request to ingest the video (same as for pull-based ingestion)</li>
+                        <li>PUT request to upload the source file to the Brightcove S3 bucket</li>
+                        <li>Dynamic Ingest POST request to ingest the source file (same as for pull-based ingestion)</li>
                     </ol>
                     <p>These requests are detailed in the sections that follow.</p>
                 </section>
                 <section id="cmsRequest" class="bcls-section">
                     <h2>CMS API request</h2>
-                    <p>The CMS API request is the same as for any Dynamic Ingest operation to add a new video.</p>
+                    <p>The CMS API request is the same as for any Dynamic Ingest operation to add a new video. This request is required to ingest a new video. If are replacing or adding assets to an existing video, you will not need this step - instead, you will use the existing video id in the other requests.</p>
                     <h3>Request syntax</h3>
                     <p>This is a <code>POST</code> request to:</p>
 <pre class="line-numbers"><code class="language-http">https://cms.api.brightcove.com/v1/accounts/<span class="bcls-highlight">{ACCOUNT_ID}</span></code></pre>
@@ -109,7 +109,7 @@
                     <p>The response will be a JSON object containing the video metadata. The important item for the rest of the Dynamic Ingest operations is the <code>id</code>, which you will substiture for the <code>{VIDEO_ID}</code> in the requests to the Ingest API.</p>
                 <section id="S3urlRequest" class="bcls-section">
                     <h2>Request for S3 URLs</h2>
-                    <p>The first request to the Ingest API will retrieve the information you need to PUT your video file to the Brightcove S3 bucket and then ingest it from there into Video Cloud.</p>
+                    <p>The first request to the Ingest API will retrieve the information you need to PUT your source file(s) to the Brightcove S3 bucket and then ingest from there into Video Cloud.</p>
                      <h3>Request syntax</h3>
                     <p>This is a <code>GET</code> request to:</p>
 <pre class="line-numbers"><code class="language-http">https://ingest.api.brightcove.com/v1/accounts/<span class="bcls-highlight">{ACCOUNT_ID}</span>/videos/<span class="bcls-highlight">{VIDEO_ID}</span>/upload-urls/<span class="bcls-highlight">{SOURCE_NAME}</span></code></pre>
@@ -138,15 +138,15 @@
 }</code></pre>
                     <p>The important items in the response are:</p>
                     <ul>
-                        <li><code>SignedUrl</code> - this is the S3 url that you will PUT your video file to</li>
-                        <li><code>ApiRequestUrl</code> - this is the URL you will include in your Dynamic Ingest POST request for the Master url</li>
+                        <li><code>SignedUrl</code> - this is the S3 url that you will PUT your source file(s) to</li>
+                        <li><code>ApiRequestUrl</code> - this is the URL you will include in your Dynamic Ingest POST request for the Master url or url for the image/text_tracks assets</li>
                     </ul>
                     <p>Other information regarding the S3 bucket such as the AccessKeyId and ObjectKey are provided, but you don't need to do anything with these, since the necessary information for uploading your video to S3 is included in the <code>SignedUrl</code>.</p>
-                    <aside class="bcls-aside bcls-aside--information">Note that the URLs are valide for <strong>24 hours</strong> - if you do not complete the Dynamic Ingest operations within 24 hours, you will have to make a new request for new URLs.</aside>
+                    <aside class="bcls-aside bcls-aside--information">Note that the URLs are valid for <strong>24 hours</strong> - if you do not complete the Dynamic Ingest operations within 24 hours, you will have to make a new request for new URLs.</aside>
                 </section>
                 </section>
                 <section id="S3PUTRequest" class="bcls-section">
-                    <h2>PUT video to S3</h2>
+                    <h2>PUT source file(s) to S3</h2>
                     <p>After getting the S3 URLs, you make a PUT request to upload your video file, using the <code>SignedUrl</code> as the destination.</p>
                 </section>
                 <section id="DIrequest" class="bcls-section">
