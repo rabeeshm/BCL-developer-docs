@@ -1,35 +1,43 @@
-var BCLS = (function () { 
+var BCLS = (function () {
     "use strict";
-	  var proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
+    var proxyURL = "https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy.php",
         serviceURL = "https://cms.api.brightcove.com/v1",
-        $accountID = $("#accountID"),
-        $client_id = $("#client_id"),
+        $accountID = document.getElementById("accountID"),
+            // for testing purposes
+            account_id = "1486906377",
+        $client_id = document.getElementById("client_id"),
             // for testing purposes
             client_id = "",
-        $client_secret = $("#client_secret"),
+        $client_secret = document.getElementById("client_secret"),
             // for testing purposes
             client_secret = "",
-        $pageURL = $("#pageURL"),
-        $playerID = $("#playerID"),
-        $playerWidth = $("#playerWidth"),
-        $playerHeight = $("#playerHeight"),
-        $videoID = $("#videoID"),
-        $searchTerms = $("#searchTerms"),
-        $pageSize = $("#pageSize"),
-        $generateButton = $("#generateButton"),
-        $requestInputs = $(".papi-request"),
-        $responseFrame = $("#responseFrame"),
-        $generatedResults = $("#generatedResults"),
-        $publishingCode = $("#publishingCode"), 
+        $pageURL = document.getElementById("pageURL"),
+        $playerID = document.getElementById("playerID"),
+            // for testing purposes
+            player_id = "rkhHnDth",
+        $playerWidth = document.getElementById("playerWidth"),
+        $playerHeight = document.getElementById("playerHeight"),
+        $videoID = document.getElementById("videoID"),
+            // for testing purposes
+            video_id = "4779638563001",
+        $searchTerms = document.getElementById("searchTerms"),
+        $pageSize = document.getElementById("pageSize"),
+        $generateButton = document.getElementById("generateButton"),
+        $requestInputs = document.getElementById(".papi-request"),
+        $responseFrame = document.getElementById("responseFrame"),
+        $generatedResults = document.getElementById("generatedResults"),
+        $publishingCode = document.getElementById("publishingCode"),
         validJSON = false,
-        template, data, result, selectedVideo, $selectCode = $("#selectCode"),
+        template, data, result, selectedVideo,
+        $selectCode = document.getElementById("selectCode"),
         $this,
         socialTemplate = "&lt;!-- Open Graph Sharing Metadata --&gt; \n&lt;meta property=\"og:site_name\" content=\"\"/&gt; \n&lt;meta property=\"og:title\" content=\"{{name}}\"/&gt; \n&lt;meta property=\"og:description\" content=\"{{description}}\"/&gt; \n&lt;meta property=\"og:url\" content=\"{{pageURL}}\"/&gt; \n&lt;meta property=\"og:image\" content=\"{{images.thumbnail.src}}\"/&gt; \n&lt;meta property=\"og:type\" content=\"video\"/&gt; \n&lt;meta property=\"og:video:secure_url\" content=\"{{securePageURL}}\"/&gt; \n&lt;meta property=\"og:video:type\" content=\"application/x-shockwave-flash\"/&gt; \n&lt;meta property=\"og:video:width\" content=\"{{playerWidth}}\"/&gt; \n&lt;meta property=\"og:video:height\" content=\"{{playerHeight}}\"/&gt; \n\n&lt;!-- Twitter: card/meta-tags --&gt; \n&lt;meta name=\"twitter:card\" content=\"player\"/&gt; \n&lt;meta name=\"twitter:title\" content=\"{{name}}\"/&gt; \n&lt;meta name=\"twitter:description\" content=\"{{description}}\"/&gt; \n<meta name=\"twitter:url\" content=\"{{pageURL}}\"/&gt; \n&lt;meta name=\"twitter:image\" content=\"{{images.thumbnail.src}}\"/&gt; \n&lt;meta name=\"twitter:player\" content=\"{{playerURL}}\"/&gt; \n&lt;meta name=\"twitter:player:width\" content=\"{{playerWidth}}\"/&gt; \n&lt;meta name=\"twitter:player:height\" content=\"{{playerHeight}}\"/&gt;",
         // functions
         getVideo,
         generateSocialTags,
         isDefined,
-        bclslog;         
+        bclslog,
+        options;
 
     /**
      * Logging function - safe for IE
@@ -50,76 +58,100 @@ var BCLS = (function () {
             return true;
         } else { return false; }
     };
-    
+
     // submit request to get video data for account
     getVideo = function () {
-        if ($accountID.val().length == 0 ||
-            $client_id.val().length == 0 ||
-            $client_secret.val().length == 0 ||
-            $pageURL.val().length == 0 ||
-            $playerID.val().length == 0 ||
-            $playerWidth.val().length == 0 ||
-            $playerHeight.val().length == 0 ||
-            $videoID.val().length == 0) {
+        if ($accountID.value == "" ||
+            $client_id.value == "" ||
+            $client_secret.value == "" ||
+            $pageURL.value == "" ||
+            $playerID.value == "" ||
+            $videoID.value == "") {
                 // clicked on generate before entering data
                 alert("Please enter your data before generating tags");
                 return;
         }
-        var options = {};
-        options.client_id = (isDefined($client_id.val())) ? $client_id.val() : client_id;
-        options.client_secret = (isDefined($client_secret.val())) ? $client_secret.val() : client_secret;
-        options.url = serviceURL + "/accounts/" + $accountID.val() + "/videos/" + $videoID.val();
+
+        account_id = (isDefined($accountID.value) ? $accountID.value : account_id);
+        video_id = (isDefined($videoID.value) ? $videoID.value : video_id);
+        player_id = (isDefined($playerID.value) ? $playerID.value : player_id);
+
+        options = {};
+        options.client_id = (isDefined($client_id.value) ? $client_id.value : client_id);
+        options.client_secret = (isDefined($client_secret.value) ? $client_secret.value : client_secret);
+        options.url = serviceURL + "/accounts/" + account_id + "/videos/" + video_id;
         options.requestType = "GET";
-        
+
         bclslog("options", options);
-        $.ajax({
-            url: proxyURL,
-            type: "POST",
-            data: options,
-            success : function (data) {
-                try {
-                    var data = JSON.parse(data);
-                    console.log("successful call: " );
-                    console.log(data);
-                    validJSON = true;
-				} catch (e) {
-				    alert('invalid json');
-                    $responseFrame.html("invalid json");
-                    bclslog("invalid json", e);
-                }
-                if (validJSON) {
-                    generateSocialTags(data);
-                }
-            },
-            error : function (XMLHttpRequest, textStatus, errorThrown) {
-                $responseFrame.html("Sorry, the GET request to read videos for your account was not successful. Here's what the server sent back: " + errorThrown);
-            }
+
+        // make the CMS API request to get matching video IDs
+        getVideoData(options, function (data) {
+            generateSocialTags(data);
         });
     };
-    
-    generateSocialTags = function(JSONdata) {
-        console.log("generateSocialTags");
-        selectedVideo = JSONdata;
-        selectedVideo.playerID = $playerID.val();
-        selectedVideo.pageURL = $pageURL.val();
-        selectedVideo.securePageURL = "";
-        if ($pageURL.val().substr(0,5) == "https") {
-            selectedVideo.securePageURL = $pageURL.val();
+
+    /**
+     * make the API request
+     */
+    function getVideoData(options, callback) {
+        var httpRequest = new XMLHttpRequest(),
+            responseRaw,
+            parsedData,
+            requestParams,
+            dataReturned;
+        // set up request data
+        requestParams = 'url=' + encodeURIComponent(options.url) + '&requestType=' + options.requestType + '&client_id=' + options.client_id + '&client_secret=' + options.client_secret;
+        // set response handler
+        httpRequest.onreadystatechange = getResponse;
+        // open the request
+        httpRequest.open('POST', proxyURL);
+        // set headers
+        httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        // open and send request
+        httpRequest.send(requestParams);
+        // response handler
+        function getResponse() {
+            dataReturned = false;
+            try {
+                if (httpRequest.readyState === 4) {
+                    if (httpRequest.status === 200) {
+                        responseRaw = httpRequest.responseText;
+                        parsedData = JSON.parse(responseRaw);
+                        dataReturned = true;
+                    } else {
+                        alert('There was a problem with the request. Request returned ' + httpRequest.status);
+                    }
+                }
+            } catch (e) {
+                alert('Caught Exception: ' + e);
+            }
+            if (dataReturned) {
+                callback(parsedData);
+            }
         }
-        selectedVideo.playerWidth = $playerWidth.val();
-        selectedVideo.playerHeight = $playerHeight.val();
-        selectedVideo.playerURL = "https://players.brightcove.net/" + $accountID.val() + "/" + $playerID.val() + "_default/index.html?videoId=" + $videoID.val();
+    }
+
+    generateSocialTags = function(JSONdata) {
+        selectedVideo = JSONdata;
+        selectedVideo.playerID = player_id;
+        selectedVideo.pageURL = $pageURL.value;
+        selectedVideo.securePageURL = "";
+        if ($pageURL.value.substr(0,5) == "https") {
+            selectedVideo.securePageURL = $pageURL.value;
+        }
+        selectedVideo.playerWidth = $playerWidth.value;
+        selectedVideo.playerHeight = $playerHeight.value;
+        selectedVideo.playerURL = "https://players.brightcove.net/" + account_id + "/" + player_id + "_default/index.html?videoId=" + video_id;
         template = Handlebars.compile(socialTemplate);
         data = selectedVideo;
         result = template(data);
-        $publishingCode.html(result);
+        $publishingCode.innerHTML = result;
     };
-    
+
     // set listeners for buttons
-    console.log("set button listeners");
-    $generateButton.on("click", getVideo);
-    $selectCode.on("click", function() {
+    $generateButton.addEventListener("click", getVideo);
+    $selectCode.addEventListener("click", function() {
         document.getElementById("publishingCode").select();
     });
-	
+
 })();
