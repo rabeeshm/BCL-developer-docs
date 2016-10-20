@@ -60,7 +60,7 @@
           <p>There are three instances when CORS must be used with Brightcove services/products:</p>
           <ol>
             <li><strong>Captions for videos</strong>: The file that contains captions for a video can be stored on a non-Brightcove domain. Since the video itself will be served from a Brightcove domain, this will cause cross-domain issues.</li>
-            <li><strong>New player and HLS</strong>: The <span class="video-cloud-only">next generation</span> player's HLS plugin uses AJAX requests to retrieve the HLS video's manifest and individual segments. Since these HLS resources can be stored on any Internet accessible domain, it is likely these resources will be served from a different server than from the Brightcove domain that served the player. This will again cause cross-domain issues.</li>
+            <li><strong>Brightcove Player and HLS</strong>: The <span class="video-cloud-only">Brightcove</span> Player's HLS plugin uses AJAX requests to retrieve the HLS video's manifest and individual segments. Since these HLS resources can be stored on any Internet accessible domain, it is likely these resources will be served from a different server than from the Brightcove domain that served the player. This will again cause cross-domain issues.</li>
             <li><strong>Video Still and Thumbnail Images</strong>: for <a href="//support.brightcove.com/en/video-cloud/docs/capturing-video-still-and-thumbnail-images">capturing video still and thumbnail images in Studio</a>, the video rendition must be served with CORS headers (which should be enabled on most of Brightcove's house CDNs by default); if you have a custom CDN, or one we haven't updated yet, image capture will not work</li>
           </ol>
         </section>
@@ -68,13 +68,13 @@
           <h2>Solutions</h2>
           <p>The solution that Brightcove is using at this time involves configuring an <code>Access-Control-Allow-Origin</code> header in the CDN origin server’s configuration file.  It’s important to note that since different CDN partners use different server solutions to deliver their content, the header information below is offered as an example, and not as a drop-in code snippet.</p>
           <p>Brightcove has had success with the following header directive for in-house CDN server's properties:</p>
-          <pre class="line-numbers"><code class="language-apache">&lt;FilesMatch ".(dfxp|xml)$">
+          <pre class="line-numbers"><code class="language-apache">&lt;FilesMatch ".(vtt|xml)$">
               Header set Access-Control-Allow-Headers: X-Requested-With
               Header add Access-Control-Allow-Origin: http://admin.brightcove.com
           &lt;/FilesMatch></code></pre>
           <p>The following provides brief explanations of the directive:</p>
           <ul>
-            <li><code>&lt;FilesMatch ".(dfxp|xml)$"></code>: This conditional sets the <code>Access-Control-Allow-Origin</code> header only on dfxp or xml files.  Testing has confirmed that this header is not sent with images or other http-delivered content.</li>
+            <li><code>&lt;FilesMatch ".(vtt|xml)$"></code>: This conditional sets the <code>Access-Control-Allow-Origin</code> header only on vtt or xml files.  Testing has confirmed that this header is not sent with images or other http-delivered content.</li>
             <li><code>Header set Access-Control-Allow-Headers: X-Requested-With</code>: This header is required for the <code>Access-Control-Allow-Origin</code> header to work, since the request the player is making is an XmlHttpRequest.</li>
             <li><code>Header add Access-Control-Allow-Origin: http://admin.brightcove.com</code>: This is the access control header itself to allow content from the indicated domain.</li>
           </ul>
