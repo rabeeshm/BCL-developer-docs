@@ -124,12 +124,12 @@
         <h2>The player</h2>
         <p>A custom display image is displayed when the live event below is not available or has not started yet.</p>
 
-<!--        <iframe src='//players.brightcove.net/1752604059001/c88021db-125a-41de-a13e-51158c867287_default/index.html' allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>-->
-
-
-        <iframe style="width: 560px; height:440px;" src="//players.brightcove.net/1752604059001/VkBoiYTCx_default/index.html"
-        allowfullscreenwebkitallowfullscreenmozallowfullscreen>
-        </iframe>
+        <iframe src="//players.brightcove.net/1752604059001/VkBoiYTCx_default/index.html?videoId=5185914204001"
+        allowfullscreen
+        webkitallowfullscreen
+        mozallowfullscreen
+        width="560"
+        height="440"></iframe>
 
       </section><!-- id="player" -->
 
@@ -138,7 +138,7 @@
 
         <p>The following sections explain the player, JavaScript and CSS code used in the example.</p>
         <h3>Create the player</h3>
-        <p class="video-cloud-only">Login to your Video Cloud Studio account and create a new video player. In a later step, you will use JavaScript to specify a <strong>URL</strong> for the live stream that you wish to use. </p>
+        <p class="video-cloud-only">Login to your Video Cloud Studio account and create a new video player. In the <strong>MEDIA</strong> module create a live stream and publish it using the newly created player.</p>
 
         <p class="perform-only">Login to your Perform Studio account and create a new video player. Open the player's properties page and edit the <strong>Video Content</strong> section. Here you can specify a <strong>URL</strong> for the live stream you wish to publish.</p>
         <figure class="bcls-figure perform-only">
@@ -174,60 +174,63 @@
 
         <p>Add the following JavaScript to your page code.</p>
         <ul>
-          <li>Line 214: Gets a reference to the player.</li>
-          <li>Line 215: Initializes a variable to hide the overlay unless an error is encountered.</li>
-          <li>Lines 217-224: <strong>Optional: </strong>Change the <code>headline</code> and <code>type</code> message text for standard error code of <strong>4</strong>. It is helpful for users if you change to default message text for this live stream case.
+          <li>Line 215: Gets a reference to the player.</li>
+          <li>Line 216: Initializes a variable to hide the overlay unless an error is encountered.</li>
+          <li>Lines 218-224: <strong>Optional: </strong>Change the <code>headline</code> and <code>type</code> message text for standard error code of <strong>4</strong>. It is helpful for users if you change to default message text for this live stream case.
             <ul>
                 <li>The standard error, with error code <strong>4</strong> is what you will get when the live stream is not available. See the <a href="../guides/errors-plugin.html#standarderrors">Display Error Messages Plugin</a> document for details about standard errors.</li>
                 <li>The user won't see this message unless you don't implement the overlay image or if the overlay fails to load the image for some reason.</li>
             </ul>
-    </li>
-          <li>Lines 226-242: Does the following:
+          </li>
+          <li>Lines 226-250: Does the following:
               <ul>
                 <li>Listens for the player's <code>error</code> event.</li>
                 <li>Checks the error <code>code</code> for a value of <strong>4</strong>. </li>
                 <li>Checks the player <code>duration</code> for a value of <strong>0</strong>. This is done so that the overlay will only appear if the video stream has not started playing.</li>
                 <li>Sets a variable to display the custom overlay image. Then, either remove the <code>hide-overlay</code> class to show the overlay image, or add the class to hide the overlay.</li>
             </ul>
-    </li>
-          <li class="video-cloud-only">Lines 244-247: Define the HLS live stream to be played.</li>
+          </li>
         </ul>
-        <pre class="line-numbers video-cloud-only" data-start="213"><code class="language-html">  &lt;script id=&quot;pageScript&quot; type=&quot;text/javascript&quot;&gt;
-    var myPlayer = videojs(&quot;myPlayerId&quot;),
-        showOverlay = false;
+        <pre class="line-numbers video-cloud-only" data-start="213"><code class="language-html">  &lt;script type=&quot;text/javascript&quot;&gt;
+    videojs('myPlayerID').ready(function(){
+      var myPlayer = this,
+      showOverlay = false;
 
-    myPlayer.errors({
-      'errors': {
-        '4': {
-          'headline': 'The Live Event you are trying to watch is either unavailable or has not started',
-          'type': 'MEDIA_UNAVAILABLE',
+      myPlayer.overlay({
+          overlays: [{
+            &quot;start&quot;: &quot;loadstart&quot;,
+            &quot;end&quot;: &quot;ended&quot;,
+            &quot;content&quot;: &quot;&lt;img src='http://solutions.brightcove.com/bcls/assets/images/please-stand-by.png'&gt;&quot;
+          }]
+        });
+
+      myPlayer.errors({
+        'errors': {
+          '4': {
+            'headline': 'The Live Event you are trying to watch is either unavailable or has not started',
+            'type': 'MEDIA_UNAVAILABLE',
+          }
         }
-      }
+      });
+
+      myPlayer.on(&quot;error&quot;, function(err) {
+        var errNo = myPlayer.error().code;
+        var duration = myPlayer.duration();
+        if (((errNo == '2') &amp;&amp; (duration =='0')) || (errNo == '4') &amp;&amp; (duration == '0')) {
+          showOverlay = true;
+        }
+        if (showOverlay) {
+            // hide error dialog message
+          myPlayer.error(null);
+          // show overlay image
+          myPlayer.removeClass(&quot;hide-overlay&quot;);
+        } else {
+          // hide overlay image
+          myPlayer.addClass(&quot;hide-overlay&quot;);
+        }
+      })
+
     });
-
-    myPlayer.on(&quot;error&quot;, function(err) {
-      var errNo = myPlayer.error().code;
-      var duration = myPlayer.duration();
-
-      if (((errNo == '2') &amp;&amp; (duration =='0')) || (errNo == '4') &amp;&amp; (duration == '0')) {
-        showOverlay = true;
-      }
-      if (showOverlay) {
-          // hide error dialog message
-        myPlayer.error(null);
-        // show overlay image
-        myPlayer.removeClass(&quot;hide-overlay&quot;);
-      } else {
-        // hide overlay image
-        myPlayer.addClass(&quot;hide-overlay&quot;);
-      }
-    })
-
-    myPlayer.src({
-      &quot;type&quot;: &quot;application/x-mpegURL&quot;,
-      &quot;src&quot;: &quot;http://bcoveliveios-i.akamaihd.net/hls/live/218295/3412563332001/account=3412563332001/918049446c624332a80c502af5033bcf/master.m3u8&quot;
-    });
-
   &lt;/script&gt;</code></pre>
         <pre class="line-numbers perform-only" data-start="213"><code class="language-html">  &lt;script id=&quot;pageScript&quot; type=&quot;text/javascript&quot;&gt;
     var myPlayer = videojs(&quot;myPlayerId&quot;),
@@ -297,17 +300,26 @@
         <ul>
           <li>Create a new file for your plugin JavaScript code. In this case, name it <code>live-custom-error.js</code>.</li>
           <li>Cut and paste the JavaScript code from your main HTML file into this new file.</li>
-          <li>Lines 261,296: Wrap your JavaScript code using the <code>videojs.plugin()</code> function. The first argument, <code>liveCustomError</code>, is the plugin name.</li>
-          <li>Line 262: Gets a reference to your player.</li>
+          <li>Lines 261,300: Wrap your JavaScript code using the <code>videojs.plugin()</code> function. The first argument, <code>liveCustomError</code>, is the plugin name.</li>
+          <li>Line 263: Gets a reference to your player.</li>
           <li>The rest is your JavaScript code which was reviewed in a previous section.</li>
         </ul>
-        <aside class="bcls-aside bcls-aside--tip">Note: Line 296: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</aside>
-        <pre class="line-numbers video-cloud-only" data-start="258"><code class="language-javascript">/**
+        <aside class="bcls-aside bcls-aside--tip">Note: Line 300: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</aside>
+        <pre class="line-numbers" data-start="258"><code class="language-javascript">/**
  * Live Custom Error
  */
 videojs.plugin('liveCustomError', function() {
+
   var myPlayer = this,
-      showOverlay = false;
+  showOverlay = false;
+
+  myPlayer.overlay({
+      overlays: [{
+        &quot;start&quot;: &quot;loadstart&quot;,
+        &quot;end&quot;: &quot;ended&quot;,
+        &quot;content&quot;: &quot;&lt;img src='http://solutions.brightcove.com/bcls/assets/images/please-stand-by.png'&gt;&quot;
+      }]
+    });
 
   myPlayer.errors({
     'errors': {
@@ -318,60 +330,20 @@ videojs.plugin('liveCustomError', function() {
     }
   });
 
-  myPlayer.on("error", function(err) {
+  myPlayer.on(&quot;error&quot;, function(err) {
     var errNo = myPlayer.error().code;
     var duration = myPlayer.duration();
-
     if (((errNo == '2') &amp;&amp; (duration =='0')) || (errNo == '4') &amp;&amp; (duration == '0')) {
       showOverlay = true;
     }
     if (showOverlay) {
-      // hide the default error dialog
+        // hide error dialog message
       myPlayer.error(null);
       // show overlay image
-      myPlayer.removeClass("hide-overlay");
+      myPlayer.removeClass(&quot;hide-overlay&quot;);
     } else {
       // hide overlay image
-      myPlayer.addClass("hide-overlay");
-    }
-  })
-
-  myPlayer.src({
-    "type": "application/x-mpegURL",
-    "src": "http://bcoveliveios-i.akamaihd.net/hls/live/218295/3412563332001/account=3412563332001/918049446c624332a80c502af5033bcf/master.m3u8"
-  });
-});</code></pre>
-        <pre class="line-numbers perform-only" data-start="258"><code class="language-javascript">/**
- * Live Custom Error
- */
-videojs.plugin('liveCustomError', function() {
-  var myPlayer = this,
-      showOverlay = false;
-
-  myPlayer.errors({
-    'errors': {
-      '4': {
-        'headline': 'The Live Event you are trying to watch is either unavailable or has not started',
-        'type': 'MEDIA_UNAVAILABLE',
-      }
-    }
-  });
-
-  myPlayer.on("error", function(err) {
-    var errNo = myPlayer.error().code;
-    var duration = myPlayer.duration();
-
-    if (((errNo == '2') &amp;&amp; (duration =='0')) || (errNo == '4') &amp;&amp; (duration == '0')) {
-      showOverlay = true;
-    }
-    if (showOverlay) {
-      // hide the default error dialog
-      myPlayer.error(null);
-      // show overlay image
-      myPlayer.removeClass("hide-overlay");
-    } else {
-      // hide overlay image
-      myPlayer.addClass("hide-overlay");
+      myPlayer.addClass(&quot;hide-overlay&quot;);
     }
   })
 
