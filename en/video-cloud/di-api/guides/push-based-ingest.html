@@ -195,13 +195,55 @@
                         <li><code>SignedUrl</code> - this is a shorthand S3 url that you can PUT your source file(s) to if you have relatively small videos and are not implementing multipart upload</li>
                         <li><code>ApiRequestUrl</code> - this is the URL you will include in your Dynamic Ingest POST request for the Master url or url for the image/text_tracks assets</li>
                     </ul>
+                    <p>It is recommended that you use multipart upload using the AWS SDK for the language you are using. SDKs are available for many languages, including Java, .NET, Ruby, PHP, Python, JavaScript, Go, and C++. See the <a href="https://aws.amazon.com/blogs/developer/">AWS Developer Blog</a> for more information.</p>
                     <p>If you are implementing multipart upload, the following documents and sample code will be useful:</p>
                     <ul>
                         <li><a href="//docs.aws.amazon.com/AmazonS3/latest/dev/llJavaUploadFile.html">Upload a File</a></li>
                         <li><a href="//github.com/BrightcoveLearning/dynamic-ingest-code-samples/blob/master/dynamic-ingest/java/src/main/java/com/brightcove/ingest/App.java">Java sample</a></li>
                         <li><a href="//github.com/BrightcoveLearning/dynamic-ingest-code-samples/blob/master/dynamic-ingest/python/di-example-source-file-multipart-upload.py">Python sample</a></li>
                     </ul>
-                    <aside class="bcls-aside bcls-aside--information">Note that the URLs are valid for <strong>24 hours</strong> - if you do not complete the Dynamic Ingest operations within 24 hours, you will have to make a new request for new URLs.</aside>
+                    <p>Here is simple example in PHP:</p>
+<pre class="line-numbers"><code class="language-php"><?php
+    // AWS SDK (for push ingests)
+    require 'vendor/aws-autoloader.php';
+
+    use Aws\S3\S3Client;
+    use Aws\S3\MultipartUploader;
+    use Aws\Exception\MultipartUploadException;
+
+    /**
+     * get S3 information as described above in this doc
+     * the code below assumes it has been decoded as $s3response
+     * and that $filePath is the local path to the asset file
+     */
+
+    s3 = new S3Client([
+        'version' => 'latest',
+        'region'  => 'us-east-1',
+        'credentials' => array(
+            'key'    => $s3response->access_key_id,
+            'secret' => $s3response->secret_access_key,
+            'token'	 => $s3response->session_token
+        )
+    ]);
+    $params = array(
+        'bucket' => $s3response->s3->bucket,
+        'key' => $s3response->s3->object_key
+    );
+    $uploader = new MultipartUploader($this->s3, $filePath, $params);
+    try {
+        $uploadResponse = $uploader->upload();
+    } catch (MultipartUploadException $e) {
+        echo $e->getMessage() . "\n";
+    }
+</code></pre>
+                    <aside class="bcls-aside bcls-aside--information">
+                        <ul>
+                            <li>Note that the URLs are valid for <strong>24 hours</strong> - if you do not complete the Dynamic Ingest operations within 24 hours, you will have to make a new request for new URLs.</li>
+                            <li>Dynamic Ingest allows no more than 100 jobs running concurrently per account</li>
+                        </ul>
+
+                    </aside>
                 </section>
                 </section>
                 <section id="S3PUTRequest" class="bcls-section">
