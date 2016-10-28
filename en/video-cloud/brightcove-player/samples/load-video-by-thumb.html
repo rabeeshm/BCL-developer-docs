@@ -135,7 +135,6 @@
                     <p>This example displays displays thumbnails of additional videos below the player. Test the functionality by <strong>clicking on a thumbnail</strong>.</p>
 
                     <video id="myPlayerID"
-                    data-video-id="4845798282001"
                     data-account="1752604059001"
                     data-player="HJHx0gc7"
                     data-embed="default"
@@ -183,99 +182,91 @@
                     <h3>The JavaScript code</h3>
                     <ol class="bcls-tasklist">
                         <li>Copy and include the code below and include it as a script in your page:
-                          <pre class="line-numbers"><code class="language-javascript">videojs(&quot;myPlayerID&quot;).ready(function() {
-    // videoIds are the ids for the videos to display
-    // videos is an array to hold the retrieved video objects
-    // player is a var we'll use to hold a reference to the player
-    // figures is a placeholder we'll use to store the collection of injected figure elements later
-    // videoList is a reference to the div element added to hold the thumbnails
-    // fragment is document fragment we'll store the elements for the thumbnail display in until we're ready to add them to the DOM
-    var // note that you need to substitute your own video ids for the ones below
-        videoIds = ['4825296720001', '4825279519001', '4825279542001'],
-        videos = [],
-        player = this,
-        i,
-        counter = 0,
-        figures,
-        videoList = document.getElementById('videoList'),
-        fragment = document.createDocumentFragment();
+                          <pre class="line-numbers"><code class="language-javascript">videojs(&quot;myPlayerID&quot;).ready(function () {
+  // videoIds are the ids for the videos to display
+  // videos is an array to hold the retrieved video objects
+  // player is a var we'll use to hold a reference to the player
+  // videoList is a reference to the div element added to hold the thumbnails
+  // fragment is document fragment we'll store the elements for the thumbnail display in until we're ready to add them to the DOM
+  var // note that you need to substitute your own video ids for the ones below
+  videoIds = ['4825296720001', '4825279519001', '4825279542001'],
+    videos = [],
+    player = this,
+    i,
+    counter = 0,
+    list = 0,
+    videoList = document.getElementById('videoList'),
+    fragment = document.createDocumentFragment();
 
-    /**
-     * adds a retrieved video to an array so that it can loaded later
-     * and creates a figure/img/caption element block that to be injected
-     * into the DOM
-     *
-     * @param {Object} video video object to be added
-     * @param {Function} callback function to call when all videos are retrieved
-     */
-    function addVideoToList(video, callback) {
-        // add elements for the thumbnail display
-        var figure = document.createElement('figure'),
-            caption = document.createElement('figcaption'),
-            thumbnail = document.createElement('img'),
-            videoName;
-        // save the returned video object in the videos array
-        videos.push(video);
-        // attach the index of this video object to the figure element
-        figure.setAttribute('data-video-index', (videos.length - 1));
-        figure.setAttribute('class', 'bcls-thumbnail');
-        // set properties for the thumbnail and caption elements and put the figure together
-        thumbnail.setAttribute('src', video.thumbnail);
-        videoName = document.createTextNode(video.name);
-        caption.appendChild(videoName);
-        figure.appendChild(thumbnail);
-        figure.appendChild(caption);
-        // add the figure to the document fragment
-        fragment.appendChild(figure);
-        // increment the counter
-        counter++;
-        // if we've done all the videos in the id array, execute the callback
-        if (counter === videoIds.length) {
-            callback();
-        }
+  /**
+   * adds a retrieved video to an array so that it can loaded later
+   */
+  function addVideoToList(video) {
+    // save the returned video object in the videos array
+    videos.push(video);
+    if (videos.length == videoIds.length) {
+      configureVideoList();
     }
+  }
 
-    /**
-     * event handler for click events on the thumbnails - loads and plays the associated video
-     */
-    function playVideo() {
-        var videoIndex = parseInt(this.getAttribute('data-video-index'));
-            player.catalog.load(videos[videoIndex]);
-            player.play();
+  /**
+   * Called when videos array is populated
+   * Creates a figure/img/caption element block that to be injected into the DOM
+   */
+  function configureVideoList() {
+    for (var x = 0; x &lt; videos.length; x++) {
+      // add elements for the thumbnail display
+      var figure = document.createElement('figure'),
+        caption = document.createElement('figcaption'),
+        thumbnail = document.createElement('img'),
+        videoName;
+      // attach the index of this video object to the figure element
+      figure.setAttribute('data-video-index', x);
+      figure.setAttribute('class', 'bcls-thumbnail');
+      // set properties for the thumbnail and caption elements and put the figure together
+      thumbnail.setAttribute('src', videos[x].thumbnail);
+      videoName = document.createTextNode(videos[x].name);
+      caption.appendChild(videoName);
+      figure.appendChild(thumbnail);
+      figure.appendChild(caption);
+      figure.addEventListener('click', playVideo);
+      // add the figure to the document fragment
+      fragment.appendChild(figure);
+      // now that the thumbnail display is complete, add it to the DOM
+      videoList.appendChild(fragment);
     }
+    //Put first video in video array list in player
+    player.catalog.load(videos[0]);
+    player.play();
+  }
 
-    /**
-     * callback function passed to addVideoToList
-     * appends the doc fragment holding the figure blocks
-     * to the DOM, gets a collection of the figure elements,
-     * and adds an event listener to each figure to play
-     * the associated video
-     */
-    function setUpVideoList() {
-        var i;
-        // now that the thumbnail display is complete, add it to the DOM
-        videoList.appendChild(fragment);
-        // get the figures collection
-        figures = document.getElementsByClassName('bcls-thumbnail');
-        // add event listener to the figures
-        for (i = 0; i &lt; figures.length; i++) {
-            figures[i].addEventListener('click', playVideo);
-        }
-    }
+  /**
+   * event handler for click events on the thumbnails - loads and plays the associated video
+   */
+  function playVideo() {
+    var videoIndex = parseInt(this.getAttribute('data-video-index'));
+    player.catalog.load(videos[videoIndex]);
+    player.play();
+  }
 
-    // retrieve the video objects
-    for (i = 0; i &lt; videoIds.length; i++) {
-        player.catalog.getVideo(videoIds[i], function(error, video){
-            // handle error here
-            addVideoToList(video, setUpVideoList);
-        });
-    }
+  // retrieve the video objects
+  for (i = 0; i &lt; videoIds.length; i++) {
+    player.catalog.getVideo(videoIds[i], function (error, video) {
+      // handle error here
+      addVideoToList(video);
+    });
+  }
+
 });</code></pre>
                         </li>
                         <li>See the comments in the code for an explanation of how it works. Here are a few additional notes:
                             <ul>
-                                <li>Everything happens inside a listener for the player <code>ready</code> event, meaning that we are waiting for player to be ready before doing anything</li>
-                                <li>Lines 13 and 46: the counter is needed because the <code>catalog.getVideo()</code> call is asynchronous and there is no way to know what order the videos will come back in. If the order they come back is important to you, instead of making the <code>getVideo()</code> calls in a <code>for</code> loop, wait for one result before make the next request. (The performance will be slightly slower, but the difference shouldn't be noticeable.)</li>
+                              <li>Everything happens inside a listener for the player <code>ready</code> event, meaning that we are waiting for player to be ready before doing anything</li>
+                              <li>Lines 69-74: The first code run at the bottom of the JavaScript that uses a <code>for</code> loop and the <code>getVideo()</code> method to request a video object for each video ID supplied.
+                                <aside class="bcls-aside bcls-aside--warning">Realize that the video objects will not necessarily be returned in the order in which they are asked for because the <code>getVideo()</code> method is asynchronous.</aside>
+                              </li>
+                              <li>Lines 23: Checks to see if all the video objects have been returned.</li>
+                              <li>Lines 32-57: Loops over video objects and creates the clickable thumbnail and injects into the HTML, then puts the video at the zeroth array location into the player.</li>
                             </ul>
                         </li>
                     </ol>
@@ -304,94 +295,81 @@ figure.bcls-thumbnail img {
                 </section>
             </article>
             <script>
-                videojs("myPlayerID").ready(function() {
-                    // videoIds are the ids for the videos to display
-                    // videos is an array to hold the retrieved video objects
-                    // player is a var we'll use to hold a reference to the player
-                    // figures is a placeholder we'll use to store the collection of injected figure elements later
-                    // videoList is a reference to the div element added to hold the thumbnails
-                    // fragment is document fragment we'll store the elements for the thumbnail display in until we're ready to add them to the DOM
-                    var // note that you need to substitute your own video ids for the ones below
-                        videoIds = ['4825296720001', '4825279519001', '4825279542001'],
-                        videos = [],
-                        player = this,
-                        i,
-                        counter = 0,
-                        figures,
-                        videoList = document.getElementById('videoList'),
-                        fragment = document.createDocumentFragment();
+            videojs("myPlayerID").ready(function () {
+              // videoIds are the ids for the videos to display
+              // videos is an array to hold the retrieved video objects
+              // player is a var we'll use to hold a reference to the player
+              // videoList is a reference to the div element added to hold the thumbnails
+              // fragment is document fragment we'll store the elements for the thumbnail display in until we're ready to add them to the DOM
+              var // note that you need to substitute your own video ids for the ones below
+              videoIds = ['4825296720001', '4825279519001', '4825279542001'],
+                videos = [],
+                player = this,
+                i,
+                counter = 0,
+                list = 0,
+                videoList = document.getElementById('videoList'),
+                fragment = document.createDocumentFragment();
+              /**
+               * adds a retrieved video to an array so that it can loaded later
+               */
+              function addVideoToList(video) {
+                // save the returned video object in the videos array
+                videos.push(video);
+                if (videos.length == videoIds.length) {
+                  configureVideoList();
+                }
+              }
 
-                    /**
-                     * adds a retrieved video to an array so that it can loaded later
-                     * and creates a figure/img/caption element block that to be injected
-                     * into the DOM
-                     *
-                     * @param {Object} video video object to be added
-                     * @param {Function} callback function to call when all videos are retrieved
-                     */
-                    function addVideoToList(video, callback) {
-                        // add elements for the thumbnail display
-                        var figure = document.createElement('figure'),
-                            caption = document.createElement('figcaption'),
-                            thumbnail = document.createElement('img'),
-                            videoName;
-                        // save the returned video object in the videos array
-                        videos.push(video);
-                        // attach the index of this video object to the figure element
-                        figure.setAttribute('data-video-index', (videos.length - 1));
-                        figure.setAttribute('class', 'bcls-thumbnail');
-                        // set properties for the thumbnail and caption elements and put the figure together
-                        thumbnail.setAttribute('src', video.thumbnail);
-                        videoName = document.createTextNode(video.name);
-                        caption.appendChild(videoName);
-                        figure.appendChild(thumbnail);
-                        figure.appendChild(caption);
-                        // add the figure to the document fragment
-                        fragment.appendChild(figure);
-                        // increment the counter
-                        counter++;
-                        // if we've done all the videos in the id array, execute the callback
-                        if (counter === videoIds.length) {
-                            callback();
-                        }
-                    }
+              /**
+               * Called when videos array is populated
+               * Creates a figure/img/caption element block that to be injected into the DOM
+               */
+              function configureVideoList() {
+                for (var x = 0; x < videos.length; x++) {
+                  // add elements for the thumbnail display
+                  var figure = document.createElement('figure'),
+                    caption = document.createElement('figcaption'),
+                    thumbnail = document.createElement('img'),
+                    videoName;
+                  // attach the index of this video object to the figure element
+                  figure.setAttribute('data-video-index', x);
+                  figure.setAttribute('class', 'bcls-thumbnail');
+                  // set properties for the thumbnail and caption elements and put the figure together
+                  thumbnail.setAttribute('src', videos[x].thumbnail);
+                  videoName = document.createTextNode(videos[x].name);
+                  caption.appendChild(videoName);
+                  figure.appendChild(thumbnail);
+                  figure.appendChild(caption);
+                  figure.addEventListener('click', playVideo);
+                  // add the figure to the document fragment
+                  fragment.appendChild(figure);
+                  // now that the thumbnail display is complete, add it to the DOM
+                  videoList.appendChild(fragment);
+                }
+                //Put first video in video array list in player
+                player.catalog.load(videos[0]);
+                player.play();
+              }
 
-                    /**
-                     * event handler for click events on the thumbnails - loads and plays the associated video
-                     */
-                    function playVideo() {
-                        var videoIndex = parseInt(this.getAttribute('data-video-index'));
-                            player.catalog.load(videos[videoIndex]);
-                            player.play();
-                    }
+              /**
+               * event handler for click events on the thumbnails - loads and plays the associated video
+               */
+              function playVideo() {
+                var videoIndex = parseInt(this.getAttribute('data-video-index'));
+                player.catalog.load(videos[videoIndex]);
+                player.play();
+              }
 
-                    /**
-                     * callback function passed to addVideoToList
-                     * appends the doc fragment holding the figure blocks
-                     * to the DOM, gets a collection of the figure elements,
-                     * and adds an event listener to each figure to play
-                     * the associated video
-                     */
-                    function setUpVideoList() {
-                        var i;
-                        // now that the thumbnail display is complete, add it to the DOM
-                        videoList.appendChild(fragment);
-                        // get the figures collection
-                        figures = document.getElementsByClassName('bcls-thumbnail');
-                        // add event listener to the figures
-                        for (i = 0; i < figures.length; i++) {
-                            figures[i].addEventListener('click', playVideo);
-                        }
-                    }
-
-                    // retrieve the video objects
-                    for (i = 0; i < videoIds.length; i++) {
-                        player.catalog.getVideo(videoIds[i], function(error, video){
-                            // handle error here
-                            addVideoToList(video, setUpVideoList);
-                        });
-                    }
+              // retrieve the video objects
+              for (i = 0; i < videoIds.length; i++) {
+                player.catalog.getVideo(videoIds[i], function (error, video) {
+                  // handle error here
+                  addVideoToList(video);
                 });
+              }
+
+            });
             </script>
 
         <!-- end drupal content -->
