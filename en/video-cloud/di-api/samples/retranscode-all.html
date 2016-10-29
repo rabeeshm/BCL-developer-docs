@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Begin Drupal Taxonomy Data -->
+    <meta name="product" content="Video Cloud">
+    <meta name="audience" content="API Developer">
+    <meta name="product-area" content="Dynamic Ingest API">
+    <meta name="product-focus" content="Code Samples,Adding Media">
+    <meta name="keywords" content="">
+    <!-- End Drupal Taxonomy Data -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <!-- change title to match the h1 heading -->
+    <title>Code Sample: Re-transcoding All Videos Using Dynamic Ingest</title>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
+<link href='//fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
+<script src="//use.edgefonts.net/source-code-pro.js"></script>
+<link rel="stylesheet" href="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.css">
+<link rel="stylesheet" href="//docs.brightcove.com/en/styles/template-less/css/bcls-doc.css">
+<link rel="stylesheet" href="/en/styles/foundation-fixes.css">
+
+<script>
+    (function(i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function() {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-2728311-29', 'auto');
+    ga('send', 'pageview');
+</script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
+
+</head>
+
+<body>
+    <!-- header navbar -->
+    <div id="navWrapper" class="fixed"></div>
+    <!-- breadcrumbs -->
+    <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+    <!-- search -->
+    <div id="searchModal" class="reveal-modal" data-reveal></div>
+    <!-- content -->
+    <div class="row">
+        <div class="sidebar large-2 columns show-for-large-up">
+            <div id="sidenav" class="side-nav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+            <h1>Code Sample: Re-transcoding All Videos Using Dynamic Ingest</h1>
+            <!-- begin drupal content -->
+            <article class="bcls-article">
+                <header id="bcls_header" class="bcls-header">
+                    <p>In this sample, you will learn how to retranscode all videos in an account using the Dynamic Ingest API. All videos will remain playable with existing renditions until retranscoding is complete.</p>
+                    <aside class="bcls-aside bcls-aside--information">Dynamic Ingest does <strong>not</strong> have a mechanism for processing multiple videos - this sample simply executes a loop to make a Dynamic Ingest request for each video.</aside>
+                </header>
+                <section class="bcls-section" id="gettingCredentials">
+                    <h2>Getting credentials</h2>
+                    <aside class="bcls-aside bcls-aside--information">This section will show you how to get the client credentials you need for this app <em>if you are going to use a <a href="//docs.brightcove.com/en/video-cloud/ingest-profiles-api/guides/standard-profiles.html">standard profile</a></em>. If you want the app to retrieve custom ingest profiles from your account, see the <a href="#advancedAuthentication">advanced authentication</a> section.</aside>
+                    <p>To get a <code>client_id</code> and <code>client_secret</code>, you will need to go to the OAuth UI and register this app:</p>
+                    <p><a href="//studio.brightcove.com/products/videocloud/admin/oauthsettings">https://studio.brightcove.com/products/videocloud/admin/oauthsettings</a></p>
+                    <p>The recommended permissions are</p>
+                    <figure class="bcls-figure">
+                        <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/di-api/samples/retranscode-all/basic-credentials.png" alt="Basic Credentials for Retranscoding">
+                        <figcaption class="bcls-caption--image">Basic Credentials for Retranscoding</figcaption>
+                    </figure>
+                    <p>You can also get your credentials via CURL or Postman - see:</p>
+                    <ul>
+                        <li><a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html">Get Client Credentials Using CURL</a></li>
+                        <li><a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">Get Client Credentials Using Postman</a></li>
+                    </ul>
+                </section>
+                <section id="advancedAuthentication" class="bcls-section">
+                    <h2 class="bcls-expander-head">Advanced authentication</h2>
+                    <div class="bcls-expander-content">
+                        <p>If you want this app to retrieve ingest profiles from your account so that you can retranscode to a custom profile, you need client credentials with expanded permissions that are <strong>not</strong> currently available use the Studio admin.</p>
+                        <p>To get expanded credentials, you will need to get them directly from the Brightcove OAuth API using <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html">cURL</a> or an HTTP client such as <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">Postman</a></p>
+                    </div>
+                </section>
+                <section class="bcls-section" id="rateLimiting">
+                    <h2>Rate limiting</h2>
+                    <p>No more than 100 concurrent Dynamic Ingest jobs are allowed. The best way to avoid violating this rule is to create an app that receives notifications from the Dynamic Ingest system as well as submitting ingest requests, so that you can keep track of how many jobs are running and how many have completed - see <a href="../guides/fallback-retry.html#sample">Fallback / Retry Strategy</a>. This sample implements rudimentary rate limiting by pausing for 30 minutes after submitting 100 requests.</p>
+                </section>
+
+                <section class="bcls-section" id="app">
+                    <h2>Retranscode app</h2>
+                    <div class="form-wrapper">
+                        <fieldset class="bcls-fieldset">
+                            <legend>Inputs for Dynamic Ingest</legend>
+
+                                <p>
+                                    Account: (defaults to Brightcove sample account)
+                                    <input name="account_id" id="account_id" type="text" value="">
+                                </p>
+                                <p>
+                                    Client id: (defaults to Brightcove sample account)
+                                    <input name="client_id" id="client_id" type="text" value="">
+                                </p>
+                                <p>
+                                    Client secret: (defaults to Brightcove sample account)
+                                    <input name="client_secret" id="client_secret" type="text" value="">
+                                </p>
+                                <p>
+                                    Ingest profile:
+                                    <select id="ingest_profile_display"></select>
+                                    <br>or Custom Profile:
+                                    <input id="custom_profile_display" name="custom_profile_display" type="text" value=""> (you must use the name exactly as it appears in the Video Cloud system, or the request will fail)
+                                </p>
+                                <p>
+                                    Full request URL for the API call:<br />
+                                    <textarea name="url" id="di_url"></textarea>
+                                    (automatically generated - for information only)
+                                </p>
+                                <p>
+                                    <input id="di_Submit" type="submit" value="Start Ingest">
+                                </p>
+
+                        </fieldset>
+                    </div>
+                </section>
+                <section class="bcls-section" id="logger">
+                    <h2>Results Log</h2>
+<pre class="line-numbers"><code id="response" class="language-json"></code></pre>
+                </section>
+                <section class="bcls-section" id="pageCode">
+                    <h2>Code for this app</h2>
+                    <h3>HTML</h3>
+                    <p>To see the HTML code, view the page source.</p>
+                    <h3>The JavaScript code for this sample:</h3>
+<pre data-src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/di-api/samples/retranscode-all/retranscode-all.js?buster" class="line-numbers"></pre>
+                    <h4>Proxy code</h4>
+                    <aside class="bcls-aside bcls-aside--information">In order to build your own version the sample app on this page, you must create and host your own proxy. (The proxies used by Brightcove Learning Services only accept requests from Brightcove domains.) You can download two versions of our proxy code:
+                        <ul>
+                            <li><a href="//learning-services-media.brightcove.com/doc-assets/proxy/bcls-proxy-for-distribution.php.zip">This is a general version that expects client credentials to be passed with the request</a></li>
+                            <li><a href="//learning-services-media.brightcove.com/doc-assets/proxy/doc-samples-proxy.php.zip">This version allows you to save your client credentials in the proxy itself on lines 25-26 (recommended)</a></li>
+                        </ul>
+                    </aside>
+<pre data-src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/di-api/samples/sample-proxy-code.php" class="line-numbers"></pre>
+                </section>
+            </article>
+            <script src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/di-api/samples/retranscode-all/retranscode-all.js"></script>
+            <!-- end drupal content -->
+        </div>
+    </div>
+    <!-- bcl scripts -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+    <script src="/en/scripts/docs-nav-data.min.js"></script>
+    <script src="/en/scripts/bcls-doc-site-v2.js"></script>
+    <script src="//learning-services-media.brightcove.com/doc-assets/js/bcls-utils.js"></script>
+    <script src="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.js"></script>
+    <script>
+        $(document).foundation();
+    </script>
+        <div style="text-align:center">
+    <iframe id="CSAT" src="//learning-services-media.brightcove.com/doc-assets/general/surveylink.html" style=" padding-bottom:20px;border:none"></iframe>
+</div>
+
+<br><br>
+<div class="bcls-footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+<script>
+var feedbackMail = document.getElementById("feedbackMail");
+feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+</script>
+</body>
+
+</html>
