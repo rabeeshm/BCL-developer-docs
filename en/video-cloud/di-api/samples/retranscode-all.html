@@ -62,7 +62,7 @@
                     <aside class="bcls-aside bcls-aside--information">Dynamic Ingest does <strong>not</strong> have a mechanism for processing multiple videos - this sample simply executes a loop to make a Dynamic Ingest request for each video.</aside>
                 </header>
                 <section class="bcls-section" id="gettingCredentials">
-                    <h2>Getting credentials</h2>
+                    <h2>Authentication</h2>
                     <aside class="bcls-aside bcls-aside--information">This section will show you how to get the client credentials you need for this app <em>if you are going to use a <a href="//docs.brightcove.com/en/video-cloud/ingest-profiles-api/guides/standard-profiles.html">standard profile</a></em>. If you want the app to retrieve custom ingest profiles from your account, see the <a href="#advancedAuthentication">advanced authentication</a> section.</aside>
                     <p>To get a <code>client_id</code> and <code>client_secret</code>, you will need to go to the OAuth UI and register this app:</p>
                     <p><a href="//studio.brightcove.com/products/videocloud/admin/oauthsettings">https://studio.brightcove.com/products/videocloud/admin/oauthsettings</a></p>
@@ -81,7 +81,31 @@
                     <h2 class="bcls-expander-head">Advanced authentication</h2>
                     <div class="bcls-expander-content">
                         <p>If you want this app to retrieve ingest profiles from your account so that you can retranscode to a custom profile, you need client credentials with expanded permissions that are <strong>not</strong> currently available use the Studio admin.</p>
-                        <p>To get expanded credentials, you will need to get them directly from the Brightcove OAuth API using <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html">cURL</a> or an HTTP client such as <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">Postman</a></p>
+                        <p>To get expanded credentials, you will need to get them directly from the Brightcove OAuth API using <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html">cURL</a> or an HTTP client such as <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">Postman</a>. Whichever method you use, you will need to obtain the BC_TOKEN cookie from your browser while you are logged into Studio.</p>.
+                        <h3>Get your BC_TOKEN</h3>
+                        <ol class="bcls-tasklist">
+                            <li>
+                                Login to Studio, and open your browser's developer console. For most browsers, you can open the console by pressing OPTION-COMMAND-i (Mac) or ALT-CTRL-i (Windows)
+                            </li>
+                            <li>
+                                In the console, paste the following JavaScript and press <strong>Return</strong> (Mac) or <strong>Enter</strong> (Windows):
+<pre class="line-numbers"><code class="language-javascript">var cookiesArray = document.cookie.split(";"), cookiesObj = {}, i, tmpArray = [];
+for (i = 0; i < cookiesArray.length; i++) {
+    tmpArray = cookiesArray[i].split("=");
+    if (tmpArray[0].indexOf('BC_TOKEN') > -1) {
+        cookiesObj.BC_TOKEN = tmpArray[1];
+    }
+}
+window.prompt("BC_TOKEN:", cookiesObj.BC_TOKEN);</code></pre>
+                            </li>
+                            <li>
+                                Save the cookie value for the next step
+                                <aside class="bcls-aside bcls-aside--information">If for some reason the script above does not work, simply locate the BC_TOKEN cookie in your cookies, and copy and save the value.</aside>
+                            </li>
+                        </ol>
+                        <p>Once you have the BC_TOKEN, you can get your credentials using either cURL or Postman.</p>
+                        <h3>Get credentials using cURL</h3>
+                        <p>If you have a Mac (or other Linux/Unix system), cURL is built into the operating system, and you can access it by opening the Terminal app. </p>
                     </div>
                 </section>
                 <section class="bcls-section" id="rateLimiting">
@@ -97,11 +121,11 @@
 
                                 <p>
                                     Account: (defaults to Brightcove sample account)
-                                    <input name="account_id" id="account_id" type="text" value="">
+                                    <input name="account_id" id="account_id" type="text" value="" style="width:50%;">
                                 </p>
                                 <p>
                                     Client id: (defaults to Brightcove sample account)
-                                    <input name="client_id" id="client_id" type="text" value="">
+                                    <input name="client_id" id="client_id" type="text" value="" style="width:50%;">
                                 </p>
                                 <p>
                                     Client secret: (defaults to Brightcove sample account)
@@ -109,18 +133,16 @@
                                 </p>
                                 <p>
                                     Ingest profile:
-                                    <select id="ingest_profile_display"></select>
-                                    <br>or Custom Profile:
-                                    <input id="custom_profile_display" name="custom_profile_display" type="text" value=""> (you must use the name exactly as it appears in the Video Cloud system, or the request will fail)
+                                    <select id="ingest_profile_display" style="width:50%;"></select><br>
+                                    <input style="margin-top:1em;" id="customProfiles "type="checkbox"> <label for="customProfiles">Get profiles from my account</label><span class="bcls-highlight">If you select this option, you must use <a href="#advancedAuthentication">advanced authentication</a>!</span>
                                 </p>
                                 <p>
-                                    Full request URL for the API call:<br />
-                                    <textarea name="url" id="di_url"></textarea>
-                                    (automatically generated - for information only)
+                                    <button class="bcls-button" id="di_Submit">Start</button>
                                 </p>
-                                <p>
-                                    <input id="di_Submit" type="submit" value="Start Ingest">
-                                </p>
+                                <h3>Status Messages</h3>
+                                <p>Total videos to process: <span class="bcls-status" id="videoCount"></span></p>
+                                <p>Processing: <span class="bcls-status" id="currentlyProcessing"></span> Remaining: <span class="bcls-status" id="toBeProcessed"></span></p>
+                                <p>The following videos could not be processed because no video master was found:</p>
 
                         </fieldset>
                     </div>
