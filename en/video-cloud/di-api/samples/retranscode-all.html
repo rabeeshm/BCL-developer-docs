@@ -83,6 +83,7 @@
                         <p>If you want this app to retrieve ingest profiles from your account so that you can retranscode to a custom profile, you need client credentials with expanded permissions that are <strong>not</strong> currently available use the Studio admin.</p>
                         <p>To get expanded credentials, you will need to get them directly from the Brightcove OAuth API using <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html">cURL</a> or an HTTP client such as <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">Postman</a>. Whichever method you use, you will need to obtain the BC_TOKEN cookie from your browser while you are logged into Studio.</p>.
                         <h3>Get your BC_TOKEN</h3>
+                        <h4>Steps</h4>
                         <ol class="bcls-tasklist">
                             <li>
                                 Login to Studio, and open your browser's developer console. For most browsers, you can open the console by pressing OPTION-COMMAND-i (Mac) or ALT-CTRL-i (Windows)
@@ -105,7 +106,39 @@ window.prompt("BC_TOKEN:", cookiesObj.BC_TOKEN);</code></pre>
                         </ol>
                         <p>Once you have the BC_TOKEN, you can get your credentials using either cURL or Postman.</p>
                         <h3>Get credentials using cURL</h3>
-                        <p>If you have a Mac (or other Linux/Unix system), cURL is built into the operating system, and you can access it by opening the Terminal app. </p>
+                        <p>If you have a Mac (or other Linux/Unix system), cURL is built into the operating system, and you can access it by opening the Terminal app. If you are on Windows and have not installed cURL, see <a href="//docs.brightcove.com/en/video-cloud/concepts/curl/curl.htm">Using cURL</a> for details on how to obtain and install it.</p>
+                        <h4>Steps</h4>
+                        <ol class="bcls-tasklist">
+                            <l1>
+                                Copy the code below into a text editor
+<pre class="line-numbers"><code class="language-bash">curl \
+  --include \
+  --header "Authorization: BC_TOKEN <span class="bcls-input">YOUR_BC_TOKEN</span>" \
+  --data 'name=DIcredentials \
+    name&amp;maximum_scope=[
+    {
+      "identity": {
+        "type": "video-cloud-account",
+        "account-id": <span class="bcls-input">YOUR_ACCOUNT_ID</span>
+      },
+      "operations": [
+        "video-cloud/upload-urls/read",
+        "video-cloud/video/create",
+        "video-cloud/video/read",
+        "video-cloud/video/update",
+        "video-cloud/ingest-profiles/profile/write",
+        "video-cloud/ingest-profiles/account/write",
+        "video-cloud/ingest-profiles/profile/read",
+        "video-cloud/ingest-profiles/account/read"
+      ]
+    }
+  ]' \
+https://oauth.brightcove.com/v4/client_credentials
+</code></pre>
+                            </l1>
+                            <l1></l1>
+                            <l1></l1>
+                        </ol>
                     </div>
                 </section>
                 <section class="bcls-section" id="rateLimiting">
