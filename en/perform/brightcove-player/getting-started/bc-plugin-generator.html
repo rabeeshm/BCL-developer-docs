@@ -93,6 +93,9 @@
             <a href="#Build_your_plugin">Build your plugin</a>
           </li>
           <li>
+            <a href="#Pass_data_to_your_plugin">Pass data to your plugin</a>
+          </li>
+          <li>
             <a href="#Recommendations">Recommendations</a>
           </li>
           <li>
@@ -112,11 +115,17 @@
             <aside class="bcls-aside bcls-aside--tip">Use the "Recommended For Most Users" version of Node.js.</aside>
           </li>
           <li>
-            Clone or download the <a href="https://github.com/videojs/generator-videojs-plugin">video.js plugin generator</a> to your computer.
+            Create a local folder on your computer. For this example, we will create one named <strong>test</strong>. This is where the generator files and your plugin files will go.
+          </li>
+          <li>
+            Review the <strong>README</strong> information for the <a href="https://github.com/videojs/generator-videojs-plugin">video.js plugin generator</a>. In the <strong>docs</strong> folder, open and review the <a href="https://github.com/videojs/generator-videojs-plugin/blob/master/docs/standards.md">video.js Plugin Standards</a>. This document talks about the recommended rules for creating your plugin.
+          </li>
+          <li>
+            Open the Terminal app in the folder you created in a previous step. For this example, open the Terminal app in the <strong>test</strong> folder.
           </li>
           <li>
             <p>
-              In the Terminal, install the plugin generator along with Yeoman:
+              In the Terminal app, install the plugin generator along with Yeoman:
             </p>
             <pre class="line-numbers"><code class="language-javascript">$ npm install -g yo generator-videojs-plugin</code></pre>
             <p>
@@ -431,7 +440,7 @@ export default demo;
           </li>
           <li>
             <p>
-              Now,let's try adding code to the plugin to automatically start playing the video when the player loads. Return to the <strong>src &gt; plugin.js</strong> file in your editor.
+              Now, let's try adding code to the plugin to automatically start playing the video when the player loads. Return to the <strong>src &gt; plugin.js</strong> file in your editor.
             </p>
           </li>
           <li>
@@ -456,6 +465,7 @@ export default demo;
               Remove the line of code to start playing the video.
             </p>
             <pre class="line-numbers"><code class="language-javascript">player.play();</code></pre>
+            <aside class="bcls-aside bcls-aside--tip">To stop the development server, press CRTL-C.</aside>
           </li>
         </ol>
       </section>
@@ -616,6 +626,164 @@ export default demo;
 
         </ol>
       </section>
+
+      <section id="Pass_data_to_your_plugin" class="bcls-section">
+        <h2>Pass data to your plugin</h2>
+        <p>
+          This section is optional. You can skip this section unless you want to learn how to pass data to your plugin.
+        </p>
+        <ol class="bcls-tasklist">
+          <li>
+            <p>
+              We'll use the <code>options</code> property to pass data from our HTML page into the plugin. For details on using this property, see the <a href="../../brightcove-player/guides/pass-data.html">Pass Data to the Plugin</a> document.
+            </p>
+          </li>
+          <li>
+            <p>
+              In your editor, return to the <strong>src &gt; plugin.js</strong> file.
+            </p>
+          </li>
+          <li>
+            <p>
+              In the <code>onPlayerReady()</code> function, add code to use the text value in the <code>options</code> property if it exists, otherwise use a default text value.
+            </p>
+            <ul>
+              <li>
+                Line 6: checks if the <code>displayText</code> object exists in the <code>options</code> property.
+              </li>
+              <li>
+                Line 7: uses the <code>displayText</code> value to populate the text display.
+              </li>
+              <li>
+                Line 9: uses the default text display value.
+              </li>
+            </ul>
+            <pre class="line-numbers"><code class="language-javascript">const onPlayerReady = (player, options) =&gt; {
+  player.addClass('vjs-demo');
+  var textDisplay = document.createElement('p');
+  textDisplay.className = 'vjs-text';
+
+<span class="bcls-highlight">  if ('displayText' in options) {
+    textDisplay.innerHTML = options.displayText;
+  } else {
+    textDisplay.innerHTML = &quot;Becoming a plugin developer&quot;;
+  }</span>
+
+  player.el().appendChild(textDisplay);
+};</code></pre>
+          </li>
+          <li>
+            Save the file and return to the testing browser. You should not see any change to the text display.
+          </li>
+          <li>
+            Build your plugin. We'll use the files in the <strong>dist</strong> folder in a test web page.
+          </li>
+          <li>
+            In your local testing server, like MAMP, create a folder named <strong>plugin-generator</strong>.
+          </li>
+          <li>
+            In this folder, copy the <strong>videojs-demo.css</strong> and <strong>videojs-demo.js</strong> files from the <strong>dist</strong> folder and paste them into your testing server folder, <strong>plugin-generator</strong>.
+          </li>
+          <li>
+            <p>
+              Next, in this folder, create an HTML file with a player that calls our <code>demo</code> plugin and passes in a value for the display text. We'll name this file <strong>testing.html</strong>.
+            </p>
+            <ul>
+              <li>
+                Line 8: includes our plugin styles.
+              </li>
+              <li>
+                Lines 13-22: add a Brightcove player to our web page.
+              </li>
+              <li>
+                Line 24: includes our plugin JavaScript file.
+              </li>
+              <li>
+                Lines 26-32: execute a custom page script.
+              </li>
+              <li>
+                Line 27: waits for the player to be ready.
+              </li>
+              <li>
+                Line 28: gets a reference to the player.
+              </li>
+              <li>
+                Line 29: defines the <code>options</code> object.
+              </li>
+              <li>
+                Line 30: calls our <code>demo</code> plugin and passes in the <code>options</code> object. Notice that the plugin name is <code>demo</code>, while the plugin files names are <code>videojs-demo</code>.
+              </li>
+            </ul>
+            <pre class="line-numbers"><code class="language-html">&lt;!doctype html&gt;
+&lt;html&gt;
+
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;title&gt;Passing data to the plugin&lt;/title&gt;
+
+  &lt;link href=&quot;videojs-demo.css&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+
+  &lt;video id=&quot;myPlayerID&quot;
+    data-video-id=&quot;4784463159001&quot;
+    data-account=&quot;1507807800001&quot;
+    data-player=&quot;ByAlTf9xl&quot;
+    data-embed=&quot;default&quot;
+    data-application-id
+    class=&quot;video-js&quot;
+    width=&quot;640px&quot; height=&quot;360px&quot;
+    controls&gt;&lt;/video&gt;
+  &lt;script src=&quot;//players.brightcove.net/1507807800001/ByAlTf9xl_default/index.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;script type=&quot;text/javascript&quot; src=&quot;videojs-demo.js&quot;&gt;&lt;/script&gt;
+
+&lt;script type=&quot;text/javascript&quot;&gt;
+  videojs('myPlayerID').ready(function(){
+    var myPlayer = this,
+      options = {&quot;displayText&quot;: &quot;This data supplied at initialization&quot;};
+      myPlayer.demo(options);
+  });
+&lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+          </li>
+          <li>
+            <p>
+              In a browser, run the <strong>testing.html</strong> file. You should see the display text value is coming from the page code instead of the plugin.
+            </p>
+            <figure class="bcls-figure">
+              <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/player-development/getting-started/plugin-generator/passed-data.png" alt="Data passed to the plugin">
+              <figcaption class="bcls-caption--image">Data passed to the plugin</figcaption>
+            </figure>
+          </li>
+        </ol>
+      </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       <section id="Recommendations" class="bcls-section">
         <h2>Recommendations</h2>
