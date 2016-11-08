@@ -193,7 +193,7 @@
 
       <section id="Implementing_the_DRM_plugin" class="bcls-section">
         <h2>Implementing the DRM plugin</h2>
-        <p>There are two approaches to implementing DRM with Brightcove Player and which approach you should use is based on what DRM system you are using. The DRM systems and approaches are detailed here:</p>
+        <p>There are two approaches to implementing DRM with Brightcove Player and which approach you should use is based on what DRM system you are using. The DRM systems and approaches are listed here:</p>
         <ul>
           <li>FairPlay: Use the DRM plugin with configuration options</li>
           <li>PlayReady: Use the DRM plugin with NO options</li>
@@ -201,12 +201,213 @@
         </ul>
       </section>
 
-      <section id="" class="bcls-section">
+      <section id="FairPlay_implementation" class="bcls-section  video-cloud-only">
         <h2>FairPlay implementation</h2>
-        <p>To configure your Brightcove player to support DASH enable content, you need to add the DRM Plugin.</p>
-        <aside class="bcls-aside bcls-aside--information">The DRM plugin is for use with DRM only, and cannot be used to configure a valid playback technology ("tech")</aside>
-        <p>Follow these steps to use the DRM Plugin with DASH content:</p>
-        <ol class="bcls-tasklist">
+        <p>Follow these steps to use the DRM Plugin with FairPlay protected content:</p>
+        <ol>
+          <li>In <span class="video-cloud-only">Video Cloud</span><span class="perform-only">Perform</span> Studio, open the <strong>Players</strong> module and locate the desired player.</li>
+          <li>Click the link for the player to open the player properties.</li>
+          <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
+          <li>For the <strong>JavaScript URL</strong>, enter:
+            <pre class="line-numbers"><code class="language-html">//players.brightcove.net/videojs-drm/3/videojs-drm.min.js</code></pre>
+          </li>
+          <li>For the <strong>CSS URL</strong>, enter:
+            <pre class="line-numbers"><code class="language-html">//players.brightcove.net/videojs-drm/3/videojs-drm.css</code></pre>
+          </li>
+          <li>Enter the plugin <strong>Name</strong> to be <code>eme</code> and the <strong>Options</strong> must supply your FairPlay license credentials.
+            <figure class="bcls-figure">
+                <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/content-protection-drm/bcp-and-drm/fairplay-plugin-configuration.png" alt="Supply options">
+            </figure>
+          </li>
+          <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
+        </ol>
+        <p>You now have a player that can play FairPlay DRM protected videos on all supported desktop browsers and platforms.</p>
+        <!-- 		      <aside class="bcls-aside bcls-aside--information">Note: The preview player that appears when you click to see an expanded view of your media in the <strong>Media</strong> module uses your Brightcove Default Player. By following the same steps above with the Brightcove Default Player, you can enable the previewing of DRM protected content in the <strong>Media</strong> module.</aside> -->
+        <h3 class="bcls-expander-head">Implementing FairPlay playback in code</h3>
+        <div class="bcls-expander-content">
+          <p>If you wish to implment FairPlay playback using the in-page embed code you must follow these steps to use the DRM plugin:</p>
+          <ol>
+            <li>In the header of your HTML page, include the plugin's stylesheet:
+              <pre class="line-numbers"><code class="language-html">&lt;link href=&quot;//players.brightcove.net/videojs-drm/3/videojs-drm.css&quot; rel=&quot;stylesheet&quot;&gt;</code></pre>
+            </li>
+            <li>
+              Include the plugin's JavaScript:
+              <pre class="line-numbers"><code class="language-html">&lt;script src=&quot;//players.brightcove.net/videojs-drm/3/videojs-drm.min.js&quot;&gt;&lt;/script&gt;</code></pre>
+            </li>
+            <li>In a JavaScript block in the page, call and configure the plugin with FairPlay credential information:
+              <pre class="line-numbers"><code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
+  videojs('myPlayerID').ready(function(){
+    var myPlayer = this;
+    myPlayer.eme({
+        &quot;applicationId&quot;: &quot;<span class="bcls-input">YOUR_APPLICATION_ID</span>&quot;,
+        &quot;publisherId&quot;: &quot;<span class="bcls-input">YOUR_PUBISHER_ID</span>&quot;
+      });
+  });
+&lt;/script&gt;</code></pre>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section id="FairPlay_implementation_perform" class="bcls-section  perform-only">
+        <h2>FairPlay implementation</h2>
+        <p>Follow these steps to use the DRM Plugin with FairPlay protected content:</p>
+          <ol>
+            <li>In the header of your HTML page, include the plugin's stylesheet:
+              <pre class="line-numbers"><code class="language-html">&lt;link href=&quot;//players.brightcove.net/videojs-drm/3/videojs-drm.css&quot; rel=&quot;stylesheet&quot;&gt;</code></pre>
+            </li>
+            <li>
+              Include the plugin's JavaScript:
+              <pre class="line-numbers"><code class="language-html">&lt;script src=&quot;//players.brightcove.net/videojs-drm/3/videojs-drm.min.js&quot;&gt;&lt;/script&gt;</code></pre>
+            </li>
+            <li>In a JavaScript block in the page, call and configure the plugin with FairPlay credential information by providing <strong>getCertificate</strong>, <strong>getContentId</strong> and <strong>getLicense</strong> functions to the EME plugin. These functions are specific to your own FairPlay license server implementation, and may be passed directly to the EME plugin before a <strong>src</strong> is set:
+              <pre class="line-numbers"><code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
+  videojs('myPlayerID').ready(function(){
+    var myPlayer = this;
+    myPlayer.eme({
+      keySystems: {
+        'com.apple.fps.1_0': {
+          getCertificate: function (emeOptions, callback) {
+            // request certificate
+            // if err, callback(err)
+            // if success, callback(null, certificate) where certificate
+            // is a Uint8Array
+          },
+          getContentId: function (emeOptions, initData) {
+            // return content ID as a string
+          },
+          getLicense: function (emeOptions, contentId, keyMessage, callback) {
+            // request key
+            // if err, callback(err)
+            // if success, callback(null, key) as an arraybuffer
+          }
+        }
+      }
+    });
+&lt;/script&gt;</code></pre>
+            </li>
+          </ol>
+          <p>Note that the FairPlay information can also be passed as part of each <strong>src</strong> object. Note that <strong>emeOptions</strong> are provided as a parameter to all functions. They are a reference to plugin options merged with (overwritten by) the source options of the current source. It is available to make it easier to access options so that you don't have to maintain them yourself.</p>
+        <pre class="line-numbers"><code class="language-javascript">player.src({
+  type: 'application/vnd.apple.mpegurl',
+  src: 'http://www.example.com/path/to/master.m3u8',
+  keySystems: {
+    "com.apple.fps.1_0": {
+      getCertificate: function(emeOptions, callback) { ... },
+      getContentId: function(emeOptions, initData) { ... },
+      getLicense: function(emeOptions, contentId, keyMessage, callback) { ... }
+    }
+  }
+});</code></pre>
+        <p>For example, if you need to use an <strong>applicationId</strong> and <strong>publisherId</strong> for the <strong>getCertificate</strong> request, you can pass in plugin options this way:</p>
+        <pre class="line-numbers"><code class="language-javascript">{
+  keySystems: {
+    "com.apple.fps.1_0": {
+      getCertificate: function(emeOptions, callback) {
+        var applicationId = emeOptions.applicationId; // 'application-id'
+        var publisherId = emeOptions.publisherId; // 'publisher-id'
+        // ...
+      }
+      // ...
+    }
+  },
+  applicationId: 'application-id'
+  publisherId: 'publisher-id'
+}</code></pre>
+        <p>Or,if you need a source-specific <strong>publisherId</strong> you can overwrite it via the source options:</p>
+        <pre class="line-numbers"><code class="language-javascript">// plugin options
+{
+  keySystems: {
+    &quot;com.apple.fps.1_0&quot;: {
+      getCertificate: function(emeOptions, callback) {
+        var applicationId = emeOptions.applicationId; // 'application-id'
+        var publisherId = emeOptions.publisherId; // 'source-specific-publisher-id'
+        // ...
+      },
+      // ...
+    }
+  },
+  applicationId: 'application-id'
+  publisherId: 'publisher-id'
+}
+
+// source options
+player.src({
+  src: '&lt;URL&gt;',
+  type: 'application/vnd.apple.mpegurl',
+  publisherId: 'source-specific-publisher-id'
+});</code></pre>
+        <p>The following is an example implementation, passing the options in as <strong>src</strong> options, retrieving the content ID from the hostname, fixed license and certificate URIs, and a license URI that requires a POST with a body of the key message:</p>
+        <pre class="line-numbers"><code class="language-javascript">var uint8ArrayToString = function(array) {
+  return String.fromCharCode.apply(null, new Uint16Array(array.buffer));
+};
+
+
+var getHostnameFromUri = function(uri) {
+  var link = document.createElement('a');
+  link.href = uri;
+  return link.hostname;
+};
+
+
+var getCertificate = function(emeOptions, callback) {
+  videojs.xhr({
+    uri: emeOptions.certificateUri,
+    responseType: 'arraybuffer'
+  }, function(err, response, responseBody) {
+    if (err) {
+      callback(err);
+      return;
+    }
+    callback(null, new Uint8Array(responseBody));
+  });
+};
+
+
+var getContentId = function(emeOptions, initData) {
+  return getHostnameFromUri(uint8ArrayToString(initData));
+};
+
+
+var getLicense = function(emeOptions, contentId, keyMessage, callback) {
+  videojs.xhr({
+    uri: emeOptions.licenseUri,
+    method: 'POST',
+    responseType: 'arraybuffer',
+    body: keyMessage,
+    headers: {
+      'Content-type': 'application/octet-stream'
+    }
+  }, function(err, response, responseBody) {
+    if (err) {
+      callback(err);
+      return;
+    }
+    callback(null, responseBody);
+  });
+};
+
+
+player.src({
+  type: 'application/vnd.apple.mpegurl',
+  src: 'http://www.example.com/path/to/master.m3u8',
+  keySystems: {
+    "com.apple.fps.1_0": {
+      getCertificate: getCertificate,
+      getContentId: getContentId,
+      getLicense: getLicense
+    }
+  },
+  certificateUri: 'http://example.com/fairplay/certificate/endpoint',
+  licenseUri: 'http://example.com/fairplay/license/endpoint'
+});</code></pre>
+      </section>
+
+      <section id="PlayReady_implementation" class="bcls-section">
+        <h2>PlayReady implementation</h2>
+        <p>To configure your Brightcove player to support PlayReady protected content, you need to add the DRM Plugin.</p>
+        <p>Follow these steps to use the DRM Plugin with PlayReady protected content:</p>
+        <ol>
           <li>In <span class="video-cloud-only">Video Cloud</span><span class="perform-only">Perform</span> Studio, open the <strong>Players</strong> module and locate the desired player.</li>
           <li>Click the link for the player to open the player properties.</li>
           <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
@@ -224,8 +425,8 @@
         <aside class="bcls-aside bcls-aside--information">Note: Protocol-aware source selection is not available when using DASH content. It is only available for HLS and MP4 content.</aside>
       </section>
 
-      <section id="FairPlay_implementation" class="bcls-section">
-        <h2>FairPlay implementation</h2>
+      <section id="Widevine_implementation" class="bcls-section">
+        <h2>Widevine implementation</h2>
         <p>To configure your Brightcove player to support FairPlay content, you need to add the DRM Plugin and some plugin options. Follow these steps to use the DRM Plugin with FairPlay content:</p>
         <ol class="bcls-tasklist">
           <li>In <span class="video-cloud-only">Video Cloud</span><span class="perform-only">Perform</span> Studio, open the <strong>Players</strong> module and locate the desired player.</li>
@@ -241,29 +442,6 @@
           <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
         </ol>
         <p>You now have a player that can play DRM protected videos on all supported desktop browsers and platforms.</p>
-      </section>
-
-      <section id="" class="bcls-section">
-        <h2>FairPlay implementation</h2>
-        <p>To configure your Brightcove player to support DASH enable content, you need to add the DRM Plugin.</p>
-        <aside class="bcls-aside bcls-aside--information">The DRM plugin is for use with DRM only, and cannot be used to configure a valid playback technology ("tech")</aside>
-        <p>Follow these steps to use the DRM Plugin with DASH content:</p>
-        <ol class="bcls-tasklist">
-          <li>In <span class="video-cloud-only">Video Cloud</span><span class="perform-only">Perform</span> Studio, open the <strong>Players</strong> module and locate the desired player.</li>
-          <li>Click the link for the player to open the player properties.</li>
-          <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
-          <li>For the <strong>JavaScript URL</strong>, enter:
-            <pre class="line-numbers"><code class="language-html">//players.brightcove.net/videojs-drm/3/videojs-drm.min.js</code></pre>
-          </li>
-          <li>For the <strong>CSS URL</strong>, enter:
-            <pre class="line-numbers"><code class="language-html">//players.brightcove.net/videojs-drm/3/videojs-drm.css</code></pre>
-          </li>
-          <li>You will NOT enter a <strong>Name</strong> or <strong>Options</strong>.</li>
-          <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
-        </ol>
-        <p>You now have a player that can play DRM protected videos on all supported desktop browsers and platforms.</p>
-        <!-- 		      <aside class="bcls-aside bcls-aside--information">Note: The preview player that appears when you click to see an expanded view of your media in the <strong>Media</strong> module uses your Brightcove Default Player. By following the same steps above with the Brightcove Default Player, you can enable the previewing of DRM protected content in the <strong>Media</strong> module.</aside> -->
-        <aside class="bcls-aside bcls-aside--information">Note: Protocol-aware source selection is not available when using DASH content. It is only available for HLS and MP4 content.</aside>
       </section>
 
       <section id="drmconfigureplayer" class="bcls-section perform-only">
