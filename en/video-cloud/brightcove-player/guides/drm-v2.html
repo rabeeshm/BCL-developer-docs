@@ -65,7 +65,7 @@
         <p>Brightcove is embracing the following technologies to deliver DRM protected content to widest possible variety of browsers and devices:</p>
         <ul>
           <li>
-            MPEG-DASH with CENC encoding
+            MPEG-DASH with dash.js supported CENC DRMs
           </li>
           <li>
             HLS with FairPlay
@@ -118,7 +118,14 @@
 
       <section id="section-name" class="bcls-section">
         <h2>DRM plugin architecture</h2>
-        <p>The DRM plugin actually wraps two other plugins, namely the <strong>videojs-dash</strong> and <strong>videojs-contrib-eme</strong> plugins. This is why when using the DRM plugin you can supply a plugin name of <strong>eme</strong>.</p>
+
+        <p>The DRM plugin is a wrapper around three plugins:</p>
+        <ul>
+          <li>videojs-contrib-dash</li>
+          <li>videojs-silverlight</li>
+          <li>videojs-contrib-eme</li>
+        </ul>
+         <p>The <strong>videojs-contrib-dash</strong> and <strong>videojs-silverlight</strong> plugins allow for playback of DASH content. The <strong>videojs-contrib-eme</strong> plugin allows for playback of FairPlay HLS content. When specifying FairPlay options, the plugin name reflects <strong>videojs-contrib-eme</strong>'s plugin name, <code>eme</code>.</p>
       </section>
 
       <section id="Playback_technologies_used" class="bcls-section">
@@ -229,7 +236,7 @@
               Include the plugin's JavaScript:
               <pre class="line-numbers"><code class="language-html">&lt;script src=&quot;//players.brightcove.net/videojs-drm/3/videojs-drm.min.js&quot;&gt;&lt;/script&gt;</code></pre>
             </li>
-            <li>In a JavaScript block in the page, call and configure the plugin with FairPlay credential information:
+            <li>In a JavaScript block in the page, call and configure the EME plugin with FairPlay credential information:
               <pre class="line-numbers"><code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
   videojs('myPlayerID').ready(function(){
     var myPlayer = this;
@@ -255,7 +262,7 @@
               Include the plugin's JavaScript:
               <pre class="line-numbers"><code class="language-html">&lt;script src=&quot;//players.brightcove.net/videojs-drm/3/videojs-drm.min.js&quot;&gt;&lt;/script&gt;</code></pre>
             </li>
-            <li>In a JavaScript block in the page, call and configure the plugin with FairPlay credential information by providing <strong>getCertificate</strong>, <strong>getContentId</strong> and <strong>getLicense</strong> functions to the EME plugin. These functions are specific to your own FairPlay license server implementation, and may be passed directly to the EME plugin before a <strong>src</strong> is set:
+            <li>In a JavaScript block in the page, call and configure the EME plugin with FairPlay credential information by providing <strong>getCertificate</strong>, <strong>getContentId</strong> and <strong>getLicense</strong> functions to the EME plugin. These functions are specific to your own FairPlay license server implementation, and may be passed directly to the EME plugin before a <strong>src</strong> is set:
               <pre class="line-numbers"><code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
   videojs('myPlayerID').ready(function(){
     var myPlayer = this;
@@ -309,7 +316,7 @@
   applicationId: 'application-id'
   publisherId: 'publisher-id'
 }</code></pre>
-        <p>Or,if you need a source-specific <strong>publisherId</strong> you can overwrite it via the source options:</p>
+        <p>Or, if you need a source-specific <strong>publisherId</strong> you can overwrite it via the source options:</p>
         <pre class="line-numbers"><code class="language-javascript">// plugin options
 {
   keySystems: {
@@ -472,6 +479,7 @@ player.src({
 
       <section id="Enable_debugging" class="bcls-section">
         <h2>Enable debugging</h2>
+        <aside class="bcls-aside bcls-aside--information">Note: The debugger functions only with DASH content. The debugger does NOT support FairPlay HLS content.</aside>
         <p>Built into the DRM plugin is a debugging option you can turn on which displays information in the console. To enable debugging use the following code:</p>
         <pre class="line-numbers"><code class="language-javascript">  &lt;script type=&quot;text/javascript&quot;&gt;
     videojs('myPlayerID').on('loadedmetadata',function(){
