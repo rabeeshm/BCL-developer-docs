@@ -71,22 +71,12 @@
         <p>
           Select the image below to open the player and debugger in another window.
         </p>
-        <video id="myPlayer"
-      	  data-video-id="4825296720001"
-      		data-account="1752604059001"
-      		data-player="SJJokFGWx"
-      		data-embed="default"
-      		data-application-id
-      		class="video-js"
-      		controls
-      		width="640"
-      		height="360"></video>
-      	<script src="//players.brightcove.net/1752604059001/SJJokFGWx_default/index.min.js"></script>
-        <!-- BC Player Debugger styles and script -->
-        <link href="https://solutions.brightcove.com/marguin/debugger/css/brightcove-player-debugger.css" rel="stylesheet">
-
-        <script src="https://solutions.brightcove.com/marguin/debugger/js/brightcove-player-debugger.min.js"></script>
-
+        <a href="http://solutions.brightcove.com/bcls/brightcove-player/debugger/debugger-embed.html">
+          <figure class="bcls-figure">
+            <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/player-development/getting-started/debugger/player-image.png" alt="Player link to external file">
+            <figcaption class="bcls-caption--image">Player link to external file</figcaption>
+          </figure>
+        </a>
       </section>
 
       <section id="Overview" class="bcls-section">
@@ -120,7 +110,7 @@
             <a href="#The_Player_Settings_tab">The Player Settings tab</a>
           </li>
           <li>
-            <a href="#Recommendations">Recommendations</a>
+            <a href="#Debug_IMA_ads">Debug IMA ads</a>
           </li>
           <li>
             <a href="#Resources">Resources</a>
@@ -409,7 +399,7 @@
             <p>
               Your complete HTML page code should look similar to this:
             </p>
-            <pre class="line-numbers video-cloud-only" data-start="1"><code class="language-html">&lt;!doctype html&gt;
+            <pre class="line-numbers" data-start="1"><code class="language-html">&lt;!doctype html&gt;
 &lt;html&gt;
 
 &lt;head&gt;
@@ -584,36 +574,150 @@
         </ol>
       </section>
 
-
-
-
-      <section id="Resources" class="bcls-section">
-        <h2>Resources</h2>
+      <section id="Debug_IMA_ads" class="bcls-section">
+        <h2>Debug IMA ads</h2>
         <p>
-          Here is a summary of the resources you will use while working through this quick start. These links are also provided in the steps below:
+          The debugger captures and records ad events and the state of the player at the time the event occurs. The debugger creates a breadcrumb trail, making it easier to see the progression of events during ad playback.
         </p>
-        <ul>
+        <ol class="bcls-tasklist">
           <li>
-            Download and install: <a href="https://nodejs.org/en/">Node.js (This includes npm)</a>
             <p>
-              Use the "Recommended For Most Users" version.
+              First, we'll include the ad plugin and ad URL to our player. In this example, we are using IMA ads.
             </p>
-          </li>
-          <li>
-            <a href="https://github.com/videojs/generator-videojs-plugin">The video.js generator</a>
-          </li>
-          <li>
-            <a href="https://github.com/videojs/generator-videojs-plugin/blob/master/docs/standards.md">The video.js plugin conventions</a>
-          </li>
-          <li>
-            <a href="https://docs.npmjs.com/">Getting started with npm</a>
-          </li>
-          <li>
-            <a href="http://yeoman.io/">The yeoman scaffolding tool</a>
-          </li>
-        </ul>
+            <p>
+              Return to your HTML file. Below the player's <code>&lt;script&gt;</code> tag, add the following files for the IMA plugin:
+            </p>
+            <ul>
+              <li>
+                Line 4: defines the styles for the IMA plugin.
+              </li>
+              <li>
+                Line 5: defines the JavaScript file for the IMA plugin.
+              </li>
+            </ul>
+            <pre class="line-numbers"><code class="language-html">  &lt;script src=&quot;//players.brightcove.net/1752604059001/SJJokFGWx_default/index.min.js&quot;&gt;&lt;/script&gt;
 
+  &lt;!-- IMA styles and script --&gt;
+<span class="bcls-highlight">  &lt;link href=&quot;//players.brightcove.net/videojs-ima3/2/videojs.ima3.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+  &lt;script src=&quot;//players.brightcove.net/videojs-ima3/2/videojs.ima3.min.js&quot;&gt;&lt;/script&gt;</span></code></pre>
+          </li>
+          <li>
+            <p>
+              In the page script section, add code to define the ad URL and call the IMA plugin.
+            </p>
+            <ul>
+              <li>
+                Line 8: defines the ad URL.
+              </li>
+              <li>
+                Lines 9-13: calls the IMA plugin with the ad URL and options.
+              </li>
+              <li>
+                Line 15: defines the options for the player debugger. Notice that <code>debugAds</code> option has been set to <code>true</code>.
+              </li>
+            </ul>
+            <pre class="line-numbers"><code class="language-javascript">&lt;script&gt;
+  var myPlayer,
+      options;
+
+  videojs('myPlayer').ready(function() {
+    myPlayer = this;
+
+<span class="bcls-highlight">    var myAdUrl = &quot;https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&amp;iu=/124319096/external/single_ad_samples&amp;ciu_szs=300x250&amp;impl=s&amp;gdfp_req=1&amp;env=vp&amp;output=vast&amp;unviewed_position_start=1&amp;cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&amp;correlator=&quot;;
+    myPlayer.ima3({
+      serverUrl: myAdUrl,
+      prerollTimeout: 5000,
+      debug: true
+    });</span>
+
+    options = {<span class="bcls-highlight">&quot;debugAds&quot;:true</span>, &quot;logClasses&quot;: true, &quot;showPlayerClasses&quot;: true };
+    myPlayer.playerDebugger(options);
+  });
+
+	&lt;/script&gt;</code></pre>
+          </li>
+          <li>
+            <p>
+              Your complete HTML page code should look similar to this:
+            </p>
+            <pre class="line-numbers" data-start="1"><code class="language-html">&lt;!doctype html&gt;
+&lt;html&gt;
+
+&lt;head&gt;
+	&lt;meta charset=&quot;UTF-8&quot;&gt;
+	&lt;title&gt;BC Player Debugger&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+
+	&lt;video id=&quot;myPlayer&quot;
+	  data-video-id=&quot;4825296720001&quot;
+		data-account=&quot;1752604059001&quot;
+		data-player=&quot;SJJokFGWx&quot;
+		data-embed=&quot;default&quot;
+		data-application-id
+		class=&quot;video-js&quot;
+		controls
+		width=&quot;640&quot;
+		height=&quot;360&quot;&gt;&lt;/video&gt;
+	&lt;script src=&quot;//players.brightcove.net/1752604059001/SJJokFGWx_default/index.min.js&quot;&gt;&lt;/script&gt;
+
+  &lt;!-- IMA styles and script --&gt;
+  &lt;link href=&quot;//players.brightcove.net/videojs-ima3/2/videojs.ima3.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+	&lt;script src=&quot;//players.brightcove.net/videojs-ima3/2/videojs.ima3.min.js&quot;&gt;&lt;/script&gt;
+
+  &lt;!-- BC Player Debugger styles and script --&gt;
+	&lt;link href=&quot;https://solutions.brightcove.com/marguin/debugger/css/brightcove-player-debugger.css&quot; rel=&quot;stylesheet&quot;&gt;
+	&lt;script src=&quot;https://solutions.brightcove.com/marguin/debugger/js/brightcove-player-debugger.min.js&quot;&gt;&lt;/script&gt;
+
+  &lt;!-- page script --&gt;
+	&lt;script&gt;
+	  var myPlayer,
+      options;
+
+	  videojs('myPlayer').ready(function() {
+	    myPlayer = this;
+
+      var myAdUrl = &quot;https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&amp;iu=/124319096/external/single_ad_samples&amp;ciu_szs=300x250&amp;impl=s&amp;gdfp_req=1&amp;env=vp&amp;output=vast&amp;unviewed_position_start=1&amp;cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&amp;correlator=&quot;;
+	    myPlayer.ima3({
+	      serverUrl: myAdUrl,
+	      prerollTimeout: 5000,
+	      debug: true
+	    });
+
+      options = {&quot;debugAds&quot;:true, &quot;logClasses&quot;: true, &quot;showPlayerClasses&quot;: true };
+      myPlayer.playerDebugger(options);
+	  });
+
+	&lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          </li>
+          <li>
+            <p>
+              Run your HTML page in the browser. Select the <strong>Ad Settings</strong> tab. You should see the Ad Settings section below the player.
+            </p>
+            <figure class="bcls-figure">
+              <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/player-development/getting-started/debugger/ima-ads.png" alt="Ad Settings tab">
+              <figcaption class="bcls-caption--image">Ad Settings tab</figcaption>
+            </figure>
+          </li>
+          <li>
+            <p>
+              Start playing the video. This example has one ad at the beginning of the video. You should see additional event information as the ad plays.
+            </p>
+            <figure class="bcls-figure">
+              <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/player-development/getting-started/debugger/ads-playback.png" alt="IMA ad events">
+              <figcaption class="bcls-caption--image">IMA ad events</figcaption>
+            </figure>
+          </li>
+          <li>
+            Now you know the basics of using the Brightcove player debugger. You are ready to explore on your own.
+          </li>
+        </ol>
       </section>
+
 
     </article>
     <!-- end drupal content -->
@@ -635,18 +739,6 @@
         $(document).foundation();
     </script>
     <!-- Any scripts specific to page samples should go here -->
-    <!-- page script -->
-    <script>
-      var myPlayer,
-        options;
-
-      videojs('myPlayer').ready(function() {
-        myPlayer = this;
-        options = {"debugAds":false, "logClasses": true, "showPlayerClasses": true };
-        myPlayer.playerDebugger(options);
-      });
-
-    </script>
 
     <div style="text-align:center">
         <iframe id="CSAT" src="//learning-services-media.brightcove.com/doc-assets/general/surveylink.html" style=" padding-bottom:20px;border:none"></iframe>
