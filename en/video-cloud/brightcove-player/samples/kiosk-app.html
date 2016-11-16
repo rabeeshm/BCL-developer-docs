@@ -112,8 +112,9 @@
                     <p>The following sections detail resources used from various APIs/plugins.</p>
                     <h3>Brightcove Player API</h3>
                     <ul>
-                      <li><code>playlist()</code>: Method to assign an array of video objects to a player's playlist. Note that this method can also be used to retrieve the playlist currently playing in the player, but will not be used in this way in this document.</li>
+                      <li><code>play()</code>: Method to play the video currently in the player.</li>
                       <li><code>catalog.getVideo()</code>: Method to make a catalog request for the video with the specified id and invokes a callback when the request completes.</li>
+                      <li><code>catalog.load()</code>: Method to load a video object into the player. It does not automatically start the video playing.</li>
                     </ul>
                     <h3>CMS API</h3>
                     <p>The CMS API will be used first to return the total number of videos in an account, then again be used to return video information on all the videos in said account.</p>
@@ -137,19 +138,19 @@
                         <h3>Create the player</h3>
                         <div >
                           <p>To create a player, follow these steps:</p>
-                <ol class="bcls-tasklist">
-                  <li>Using Video Cloud Studio, in the <strong>Players</strong> module, create a new player.</li>
-                  <li>Click on the video's title to alter its settings.</li>
-                  <li>In the <strong>SETTINGS</strong> section click the <strong>Edit</strong> button.</li>
-                  <li>Click the radio button for the <strong>Display Playlist</strong> option.</li>
-                  <li>Remove any <strong>width</strong> and <strong>height</strong> values. The size of the player and iframe will be set using CSS for the players in this document.</li>
-                  <li>Click the checkbox for the <strong>Adjust Player Dimensions for Playlist</strong> option.</li>
-                  <li>Click <strong>Save</strong> to save your changed settings.</li>
-                  <li>Publish the player.</li>
-                  <li>Near the top-right of the page, click the <strong>Embed Code & URL</strong> button.</li>
-                  <li>Click the <strong>Published Player</strong> option.</li>
-                  <li>Copy the <strong>Advanced Embed Code</strong>.</li>
-                </ol>
+                          <ol class="bcls-tasklist">
+                            <li>Using Video Cloud Studio, in the <strong>Players</strong> module, create a new player.</li>
+                            <li>Click on the video's title to alter its settings.</li>
+                            <li>In the <strong>SETTINGS</strong> section click the <strong>Edit</strong> button.</li>
+                            <li>Click the radio button for the <strong>Display Playlist</strong> option.</li>
+                            <li>Remove any <strong>width</strong> and <strong>height</strong> values. The size of the player and iframe will be set using CSS for the players in this document.</li>
+                            <li>Click the checkbox for the <strong>Adjust Player Dimensions for Playlist</strong> option.</li>
+                            <li>Click <strong>Save</strong> to save your changed settings.</li>
+                            <li>Publish the player.</li>
+                            <li>Near the top-right of the page, click the <strong>Embed Code & URL</strong> button.</li>
+                            <li>Click the <strong>Published Player</strong> option.</li>
+                            <li>Copy the <strong>Advanced Embed Code</strong>.</li>
+                          </ol>
                         </div>
 
                     <h3>The player code</h3>
@@ -169,15 +170,15 @@
                     <p>The main flow of logic in the JavaScript code is</p>
                     <ol>
                       <li>Prepare to make the call to the CMS API that will return the count of total videos in the account.</li>
-                      <li>Make the actual request using the CMA API for the count. This step will use a callback function, which means the callback function is passed as a parameter to another, second, function. The callback function is then called inside the second function's logic. In this case the callback function simply extracts the count property from an object.</li>
-                      <li>Determine the number of calls to the CMS API to retrieve all the videos when following the best practice of asking for 25 videos per call.</li>
-                      <li>Create a <code>do-while</code> loop that iterates for the required number of calls. This loop must be in the callback function of the request for the video count.</li>
+                      <li>Make the actual request using the CMA API for the count. This step will use a callback function, which means the callback function is passed as a parameter to another, second, function. The callback function is then called inside the second function's logic. In this case the callback function simply extracts the count property from an object returned by the CMS API.</li>
+                      <li>Determine the number of calls to the CMS API to retrieve all the videos when following the best practice of asking for 25 videos per call. This is done by dividing the count of all the videos by 25.</li>
+                      <li>Create a <code>do-while</code> loop that iterates for the required number of calls determined in the previous step. This loop must be in the callback function of the request for the video count.</li>
                       <li>In the loop, prepare to make the call to the CMS API that will return the first 25 videos in the account.</li>
                       <li>Still in the loop, make the actual request using the CMA API for the video data. This step will use a callback function, which means the callback function is passed as a parameter to another, second, function. The callback function is then called inside the second function's logic. In this case the callback function will perform these tasks:</li>
                       <ul>
                         <li>Extract data to build an array of the video IDs for the returned video information.</li>
                         <li>The array of video IDs is then passed as a parameter to another function which retrieves the complete video object for for each ID. The returned objects are stored in an array of all video objects. A callback function is used in this step also.</li>
-                        <li>Check when all videos are returned (when the number of returned videos matches the previously returned count). When the condition is met, call a function that players the first video in the array (zeroth element).</li>
+                        <li>Check when all videos are returned (when the number of returned videos matches the previously returned count). When the condition is met, call a function that plays the first video in the array (zeroth element).</li>
                       </ul>
                       <li>Setup an event listener to listen for the <code>ended</code> event. When each video ends play the next video, or if it is the last video in the array, play the first video.</li>
                     </ol>
