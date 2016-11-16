@@ -22,6 +22,7 @@ module.exports = function (grunt) {
                         'source/cms-api.json',
                         'source/di-api.json',
                         'source/ingest-profiles-api.json',
+                        'source/live.json',
                         'source/media-management.json',
                         'source/forums.json',
                         'source/oauth-api.json',
