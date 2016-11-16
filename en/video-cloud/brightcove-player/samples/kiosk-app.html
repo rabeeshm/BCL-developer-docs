@@ -12,7 +12,7 @@
     <!-- End Drupal Taxonomy Data -->
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
     <!-- change title to match the h1 heading -->
-    <title>Brightcove Player Sample: Newest Videos in Playlist</title>
+    <title>Brightcove Player Sample: Kiosk App</title>
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
 <link href='//fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
@@ -55,7 +55,7 @@
             <div id="sidenav" class="side-nav"></div>
         </div>
         <div id="main" class="large-10 small-12 columns">
-            <h1>Brightcove Player Sample: Newest Videos in Playlist</h1>
+            <h1>Brightcove Player Sample: Kiosk App</h1>
             <!-- begin drupal content -->
 
             <style>
@@ -70,7 +70,7 @@
                   <aside class="bcls-aside bcls-aside--information perform-only">The information contained in this document is not applicable for Perform customers because it uses the Video Cloud catalog.
                   </aside>
                     <!-- Place document intro sentence(s) here -->
-                    <p>In this topic, you will learn how to  use the <a href="//docs.brightcove.com/en/video-cloud/cms-api/getting-started/overview-cms.html">CMS API</a> to return the last ten videos created in an account and display them in a playlist.</p>
+                    <p>In this topic, you will learn how to  use the <a href="//docs.brightcove.com/en/video-cloud/cms-api/getting-started/overview-cms.html">CMS API</a> to return to return all the videos in an account. The videos will then play in a continuous loop. This code meets the needs of a kiosk use case where an unattended computer plays videos all day.</p>
                 </header>
 
                 <section id="developmentsequence" class="bcls-section">
@@ -116,7 +116,7 @@
                       <li><code>catalog.getVideo()</code>: Method to make a catalog request for the video with the specified id and invokes a callback when the request completes.</li>
                     </ul>
                     <h3>CMS API</h3>
-                    <p>The CMS API will be used to return the ten newest videos in an account.</p>
+                    <p>The CMS API will be used first to return the total number of videos in an account, then again be used to return video information on all the videos in said account.</p>
                     <aside class="bcls-aside bcls-aside--information">In order to build your own version the sample app on this page, you must create and host your own proxy. (The proxies used by Brightcove Learning Services only accept requests from Brightcove domains.) You can download two versions of our proxy code:
                         <ul>
                             <li><a href="//learning-services-media.brightcove.com/doc-assets/proxy/bcls-proxy-for-distribution.php.zip">This is a general version that expects client credentials to be passed with the request</a></li>
@@ -168,11 +168,18 @@
                     <h3>The JavaScript code</h3>
                     <p>The main flow of logic in the JavaScript code is</p>
                     <ol>
-                      <li>Prepare to make the call to the CMS API by setting the search criteria, in this case return the 10 newest videos created.</li>
-                      <li>Make the actual request using the CMA API for the data. This step will use a callback function, which means the callback function is passed as a parameter to another, second, function. The callback function is then called inside the second function's logic.</li>
-                      <li>Once the data is retrieved, data is extracted to build an array of the video IDs for the newest videos.</li>
-                      <li>The array of video IDs is then passed as a parameter to another function which retrieves the complete video object for for each ID. The returned objects are stored in an array. A callback function is used in this step also.</li>
-                      <li>The array of video objects is assigned as the player's playlist.</li>
+                      <li>Prepare to make the call to the CMS API that will return the count of total videos in the account.</li>
+                      <li>Make the actual request using the CMA API for the count. This step will use a callback function, which means the callback function is passed as a parameter to another, second, function. The callback function is then called inside the second function's logic. In this case the callback function simply extracts the count property from an object.</li>
+                      <li>Determine the number of calls to the CMS API to retrieve all the videos when following the best practice of asking for 25 videos per call.</li>
+                      <li>Create a <code>do-while</code> loop that iterates for the required number of calls. This loop must be in the callback function of the request for the video count.</li>
+                      <li>In the loop, prepare to make the call to the CMS API that will return the first 25 videos in the account.</li>
+                      <li>Still in the loop, make the actual request using the CMA API for the video data. This step will use a callback function, which means the callback function is passed as a parameter to another, second, function. The callback function is then called inside the second function's logic. In this case the callback function will perform these tasks:</li>
+                      <ul>
+                        <li>Extract data to build an array of the video IDs for the returned video information.</li>
+                        <li>The array of video IDs is then passed as a parameter to another function which retrieves the complete video object for for each ID. The returned objects are stored in an array of all video objects. A callback function is used in this step also.</li>
+                        <li>Check when all videos are returned (when the number of returned videos matches the previously returned count). When the condition is met, call a function that players the first video in the array (zeroth element).</li>
+                      </ul>
+                      <li>Setup an event listener to listen for the <code>ended</code> event. When each video ends play the next video, or if it is the last video in the array, play the first video.</li>
                     </ol>
                     <p>The actual JavaScript code is show below, with comments in the code and functionality  highlighted in these bullets:</p>
                         <ul>
