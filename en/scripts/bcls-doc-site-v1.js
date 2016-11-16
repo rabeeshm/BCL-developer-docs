@@ -739,6 +739,11 @@ var BCLSmain = (function (window, document, bclsNavData, hljs) {
                 }
                 navMenuRight.innerHTML = menuRightBase + vcSupportNav;
                 break;
+            case 'live':
+                product = 'live';
+                section = 'live';
+                sectionName = 'Live';
+                break;
             default:
                 section = "index";
                 sectionName = null;
