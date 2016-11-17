@@ -60,8 +60,8 @@
 
             <style>
               iframe {
-                width: 88%;
-                min-height: 300px;
+                width: 610px;
+                min-height: 344px;
               }
             </style>
 
@@ -115,6 +115,7 @@
                       <li><code>play()</code>: Method to play the video currently in the player.</li>
                       <li><code>catalog.getVideo()</code>: Method to make a catalog request for the video with the specified id and invokes a callback when the request completes.</li>
                       <li><code>catalog.load()</code>: Method to load a video object into the player. It does not automatically start the video playing.</li>
+                      <li><code>on()</code>: Method to add an event listener</li>
                     </ul>
                     <h3>CMS API</h3>
                     <p>The CMS API will be used first to return the total number of videos in an account, then again be used to return video information on all the videos in said account.</p>
@@ -128,8 +129,9 @@
 
                 <section id="player" class="bcls-section">
                     <h2>The player</h2>
-                    <aside class="bcls-aside bcls-aside--information">The account used for this sample is a living account used occasionally for testing. For this reason, periodically it may contain some intentionally unplayable videos for testing.</aside>
-                        <iframe src="//players.brightcove.net/1752604059001/HJx5vaWQa_default/index.html" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
+                    <p>The player will be playing a video from the array of video objects.</p>
+                    <iframe src="//players.brightcove.net/1752604059001/HJ7bvB0uZl_default/index.html" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
+
                 </section>
 
                 <section id="code" class="bcls-section">
@@ -141,12 +143,6 @@
                           <ol class="bcls-tasklist">
                             <li>Using Video Cloud Studio, in the <strong>Players</strong> module, create a new player.</li>
                             <li>Click on the video's title to alter its settings.</li>
-                            <li>In the <strong>SETTINGS</strong> section click the <strong>Edit</strong> button.</li>
-                            <li>Click the radio button for the <strong>Display Playlist</strong> option.</li>
-                            <li>Remove any <strong>width</strong> and <strong>height</strong> values. The size of the player and iframe will be set using CSS for the players in this document.</li>
-                            <li>Click the checkbox for the <strong>Adjust Player Dimensions for Playlist</strong> option.</li>
-                            <li>Click <strong>Save</strong> to save your changed settings.</li>
-                            <li>Publish the player.</li>
                             <li>Near the top-right of the page, click the <strong>Embed Code & URL</strong> button.</li>
                             <li>Click the <strong>Published Player</strong> option.</li>
                             <li>Copy the <strong>Advanced Embed Code</strong>.</li>
@@ -154,15 +150,15 @@
                         </div>
 
                     <h3>The player code</h3>
-                          <p>Your player code should look similar to the following (note that the <code>&lt;ol&gt;</code> for the playlist is included):</p>
-<div><pre class="line-numbers"><code class="language-html">&lt;video data-account=&quot;1752604059001&quot;
-  data-player=&quot;HJx5vaWQa&quot;
+                          <p>Your player code should look similar to the following (an <code>id</code> has been added to the tag):</p>
+<div><pre class="line-numbers"><code class="language-html"> &lt;video id="myPlayerID"
+  data-account=&quot;1752604059001&quot;
+  data-player=&quot;HJ7bvB0uZl&quot;
   data-embed=&quot;default&quot;
   data-application-id
   class=&quot;video-js&quot;
   controls&gt;&lt;/video&gt;
-&lt;script src=&quot;//players.brightcove.net/1752604059001/HJx5vaWQa_default/index.min.js&quot;&gt;&lt;/script&gt;
-&lt;ol class=&quot;vjs-playlist&quot;&gt;&lt;/ol&gt; </code></pre></div>
+&lt;script src=&quot;//players.brightcove.net/1752604059001/HJ7bvB0uZl_default/index.min.js&quot;&gt;&lt;/script&gt; </code></pre></div>
 
                         <h3>The HTML code</h3>
                         <p>No HTML code is added to the page.</p>
@@ -182,165 +178,239 @@
                       </ul>
                       <li>Setup an event listener to listen for the <code>ended</code> event. When each video ends play the next video, or if it is the last video in the array, play the first video.</li>
                     </ol>
-                    <p>The actual JavaScript code is show below, with comments in the code and functionality  highlighted in these bullets:</p>
+                    <p>The actual JavaScript code is show below, with comments in the code and functionality highlighted in these bullets:</p>
                         <ul>
-                          <li>Lines 2-4: Set variables for the page and request.</li>
-                          <li>Line  5: Wait for the player to be ready to act upon.</li>
-                          <li>Lines 6-10: Set local variables for the <code>ready</code> event  handler function.</li>
-                          <li>Lines 12-19: Make the calls to the functions that implement the logic highlighted in steps 1-5 above.</li>
-                          <li>Lines 26-40: A function that prepares for the CMS API request. If you would like to change the logic for what videos are returned, the ONLY line of code that must be changed in all of this JavaScript is line 36. Of course, you might want to change variable and function names to meet your new search criteria, but it would not be necessary.</li>
-                          <li>Lines 42-77: A function to make the actual CMA API call using JavaScript's <code>XMLHttpRequest</code> API, which provides client functionality for transferring data between a client and a server.</li>
-                          <li>Lines 83-96: A function that loops over the data returned by the CMS API and extracts only the video IDs into an array.</li>
-                          <li>Lines 102-117: A function that loops or the array of video IDs and use the <code>catalog.getVideo()</code> method to retrieve the complete video object for each ID.</li>
-                          <li>Lines 124-128: A function that pushes video objects into an array.</li>
+                          <li>Lines 2-8: Set variables for the page and request.</li>
+                          <li>Line  10: Wait for the player to be ready to act upon.</li>
+                          <li>Lines 14-18: Set local variables for the <code>ready</code> event  handler function.</li>
+                          <li>Line 20: Build the request that will be sent to the proxy and then onto the CMS API.</li>
+                          <li>Lines 22-53: Direct the main flow of the application.
+                            <ul>
+                              <li>Line 22: The call for the count and associated callback are done first.</li>
+                              <li>Lines 30, 52: The <code>do-while</code> loop is setup in the callback function of get count</li>
+                              <li>Line 32: Prepare the request for 25 videos.</li>
+                              <li>Line 34: Make the call for 25 videos.</li>
+                              <li>Line 36: Assign the returned data to an array of video IDs.</li>
+                              <li>Line 38: Call  the function to get full video objects based on the video IDs passed as a parameter.</li>
+                              <li>Lines 43-46: Check if all videos are returned, and if true play the first video</li>
+                            </ul>
+                          </li>
+                          <li>Lines 59-69: Add an event listener to listen for the <code>ended</code> event and either play next video in array or start again</li>
+                          <li>Lines 76-97: A function that prepares for the CMS API request. If you would like to change the logic for what videos are returned, the ONLY line of code that must be changed in all of this JavaScript is line 36. Of course, you might want to change variable and function names to meet your new search criteria, but it would not be necessary.</li>
+                          <li>Lines 103-136: A function to make the actual CMA API call using JavaScript's <code>XMLHttpRequest</code> API, which provides client functionality for transferring data between a client and a server.</li>
+                          <li>Lines 143-156: A function that loops over the data returned by the CMS API and extracts only the video IDs into an array.</li>
+                          <li>Lines 163-179: A function that loops or the array of video IDs and use the <code>catalog.getVideo()</code> method to retrieve the complete video object for each ID.</li>
+                          <li>Lines 187-192: A function that pushes video objects into an array.</li>
+                          <li>Lines 197-201: A function that is called on all videos being loaded and plays the first video.</li>
                         </ul>
-<pre class="line-numbers"><code class="language-html">  &lt;script type=&quot;text/javascript&quot;&gt;
+<pre class="line-numbers"><code class="language-html">    &lt;script type=&quot;text/javascript&quot;&gt;
       var myPlayer,
-          proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
-          cmsURL = 'https://cms.api.brightcove.com/v1/accounts/';
-      videojs(&quot;myPlayerID&quot;).ready(function () {
-          myPlayer = this,
-          requestData = {},
-          newestVideos = [],
-          videoData = [],
-          videoObjects = [];
-          // set up data for CMS API request
-          requestData = setRequestData();
-          // make the CMS API request to get matching video IDs
-          getNewestVideos(requestData, function (newestVideos) {
-              // extract the needed video data into an array
-              videoData = extractVideoData(newestVideos);
-              getVideoData(videoData, function (videoObjects) {
-                  // add the newest videos list to the player as a playlist
-                  myPlayer.playlist(videoObjects);
-              });
-          });
+        proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
+        cmsURL = 'https://cms.api.brightcove.com/v1/accounts/',
+        totalCalls,
+        callNumber = 0,
+        allVideoObjects = [],
+        currentlyPlayingIndex;
+
+      videojs(&quot;myPlayerID&quot;).ready(function() {
+        myPlayer = this;
+
+        // Define key variables
+        var videoIDs = [],
+          videoObjects = [],
+          videoCount,
+          videoIDRequest = {},
+          videoCountRequest = {};
+        // Setup for video count CMS API request
+        videoCountRequest = setRequestData('getCount');
+        // Use CMSAPI to get video count
+        getCMSAPIData(videoCountRequest, function(parsedData) {
+          // Extract count from returned data
+          videoCount = parsedData.count;
+          console.log('videoCount', videoCount);
+          // Calculate number of calls that must be made
+          // ask for 25 at a time (recommended best practice)
+          totalCalls = Math.ceil(videoCount / 25);
+          // Loop over requests for videos
+          do {
+            // Setup for video info CMS API request
+            videoIDRequest = setRequestData('getIDs');
+            // Use CMS API to get each block of videos
+            getCMSAPIData(videoIDRequest, function(parsedData) {
+              // Call function to extract IDs from video info
+              videoIDs = extractVideoData(parsedData);
+              // Call function to get video objects per IDs
+              getVideoData(videoIDs, function (videoObjects) {
+                //Push returned array into master array
+                Array.prototype.push.apply(allVideoObjects, videoObjects);
+                console.table(allVideoObjects);
+                // Check if all video objects have been returned
+                if (allVideoObjects.length === videoCount) {
+                  // If all video objects returned, call function to start playing first video
+                  beginPlayingVideos();
+                }
+              })
+            });
+            // Increment call number so calls eventually stop
+            callNumber++;
+           }
+          while (callNumber &lt;= totalCalls - 1);
+        });
+
+        /**
+         * On end of each video progress to next video
+         * or if the last video start again
+         */
+        myPlayer.on('ended',function(){
+          if (currentlyPlayingIndex &lt;= allVideoObjects.length) {
+            currentlyPlayingIndex++;
+            myPlayer.catalog.load(allVideoObjects[currentlyPlayingIndex]);
+            myPlayer.play();
+          } else {
+            myPlayer.catalog.load(allVideoObjects[0]);
+            myPlayer.play();
+            currentlyPlayingIndex = 0;
+          }
+        }); // End of add event listener
+
       });
+
       /**
        * sets up the data for the API request
        */
-      function setRequestData() {
-          var endPoint = '',
-              accountId = '1752604059001',
-              videoName,
-              requestURL,
-              endPoint,
-              requestData = {},
-              dataReturned = false;
-          requestURL = cmsURL + accountId + '/videos';
-          // return the 10 newest videos created
-          endPoint = '?sort=-created_at&amp;limit=10';
-          requestData.url = requestURL + endPoint;
-          requestData.requestType = 'GET';
-          return requestData;
+      function setRequestData(task) {
+        var accountId = '1752604059001',
+          videoName,
+          requestURL,
+          endPoint,
+          requestData = {},
+          dataReturned = false;
+        // Determine if setting up to get video count or video IDs
+        switch (task) {
+        case 'getCount':
+          requestURL = cmsURL + accountId + '/counts/videos';
+          break;
+        case 'getIDs':
+          requestURL = cmsURL + accountId + '/videos?limit=25&amp;offset='+ 25 * callNumber;
+          console.log('requestURL',requestURL);
+          break;
+        }
+        requestData.url = requestURL;
+        requestData.requestType = 'GET';
+        // Return the request object
+        return requestData;
       }
 
-      function getNewestVideos(options, callback) {
-          var httpRequest = new XMLHttpRequest(),
-              responseRaw,
-              parsedData,
-              requestParams;
-          // set up request data
-          requestParams = 'url=' + encodeURIComponent(options.url) + '&amp;requestType=' + options.requestType;
-          // set response handler
-          httpRequest.onreadystatechange = getResponse;
-          // open the request
-          httpRequest.open('POST', proxyURL);
-          // set headers
-          httpRequest.setRequestHeader(&quot;Content-Type&quot;, &quot;application/x-www-form-urlencoded&quot;);
-          // open and send request
-          httpRequest.send(requestParams);
-          // response handler
-          function getResponse() {
-              dataReturned = false;
-              try {
-                  if (httpRequest.readyState === 4) {
-                      if (httpRequest.status === 200) {
-                          responseRaw = httpRequest.responseText;
-                          parsedData = JSON.parse(responseRaw);
-                          dataReturned = true;
-                      } else {
-                          alert('There was a problem with the request. Request returned ' + httpRequest.status);
-                      }
-                  }
-              } catch (e) {
-                  alert('Caught Exception: ' + e);
+      /**
+       * This function is used for all calls to CMS API and
+       *  returns the JSON parsed data, whatever that may be
+       */
+      function getCMSAPIData(options, callback) {
+        var httpRequest = new XMLHttpRequest(),
+          responseRaw,
+          parsedData,
+          requestParams;
+        // set up request data
+        requestParams = 'url=' + encodeURIComponent(options.url) + '&amp;requestType=' + options.requestType;
+        // set response handler
+        httpRequest.onreadystatechange = getResponse;
+        // open the request
+        httpRequest.open('POST', proxyURL);
+        // set headers
+        httpRequest.setRequestHeader(&quot;Content-Type&quot;, &quot;application/x-www-form-urlencoded&quot;);
+        // open and send request
+        httpRequest.send(requestParams);
+        // response handler
+        function getResponse() {
+          dataReturned = false;
+          try {
+            if (httpRequest.readyState === 4) {
+              if (httpRequest.status === 200) {
+                responseRaw = httpRequest.responseText;
+                parsedData = JSON.parse(responseRaw);
+                dataReturned = true;
+                callback(parsedData);
+              } else {
+                alert('There was a problem with the request. Request returned ' + httpRequest.status);
               }
-              if (dataReturned) {
-                  callback(parsedData);
-              }
+            }
+          } catch (e) {
+            alert('Caught Exception: ' + e);
           }
+        }
       }
+
       /**
        * extract video data from CMS API response
        * @param {array} cmsData the data from the CMS API
        * @return {array} videoData array of video info
        */
       function extractVideoData(cmsData) {
-          var i,
-              iMax = cmsData.length,
-              videoItem,
-              videoDataForReturn = [];
-          for (i = 0; i &lt; iMax; i++) {
-              if (cmsData[i].id !== null) {
-                  videoItem = {};
-                  videoItem.id = cmsData[i].id;
-                  videoDataForReturn.push(videoItem);
-              }
+        var i,
+          iMax = cmsData.length,
+          videoItem,
+          videoDataForReturn = [];
+        for (i = 0; i &lt; iMax; i++) {
+          if (cmsData[i].id !== null) {
+            videoItem = {};
+            videoItem.id = cmsData[i].id;
+            videoDataForReturn.push(videoItem);
           }
-          return videoDataForReturn;
+        }
+        return videoDataForReturn;
       }
+
       /**
        * get video objects
        * @param {array} videoIds array of video ids
        * @return {array} videoData array of video objects
        */
       function getVideoData(videoIds, callback) {
-          var i = 0,
-              iMax = videoIds.length,
-              videoObjectsForReturn =  [];
-          /**
-           * makes catalog calls for all video ids in the array
-           */
-          getVideo();
+        var i = 0,
+          iMax = videoIds.length,
+          videoObjectsForReturn = [];
 
-          function getVideo() {
-              if (i &lt; iMax) {
-                  myPlayer.catalog.getVideo(videoIds[i].id, pushData);
-              } else {
-                  callback(videoObjectsForReturn);
-              }
+        /**
+         * makes catalog calls for all video ids in the array
+         */
+        getVideo();
+
+        function getVideo() {
+          if (i &lt; iMax) {
+            myPlayer.catalog.getVideo(videoIds[i].id, pushData);
+          } else {
+            callback(videoObjectsForReturn);
           }
-          /**
-           * callback for the catalog calls
-           * pushes the returned data object into an array
-           * @param {string} error error returned if the call fails
-           * @parap {object} video the video object
-           */
-          function pushData(error, video) {
-              videoObjectsForReturn.push(video);
-              i++;
-              getVideo();
-          }
+        }
+
+        /**
+         * callback for the catalog calls
+         * pushes the returned data object into an array
+         * @param {string} error error returned if the call fails
+         * @parap {object} video the video object
+         */
+        function pushData(error, video) {
+          videoObjectsForReturn.push(video);
+          i++;
+          getVideo();
+        }
       }
-  &lt;/script&gt;</code></pre>
+
+      /**
+       * Starts initial playback of videos
+       */
+      function beginPlayingVideos(){
+        myPlayer.catalog.load(allVideoObjects[0]);
+        myPlayer.play();
+        currentlyPlayingIndex = 0;
+      }
+    &lt;/script&gt;</code></pre>
                         <h3>The stylesheet</h3>
-                    <p>Add the following styles to your page code:</p>
-                        <ul>
-                          <li>Lines 2-7: Styles the player.</li>
-                          <li>Lines 8-12: Styles the playlist.</li>
-                        </ul>
+                    <p>Add the following style to your page code:</p>
 <pre class="line-numbers"><code class="language-html">  &lt;style&gt;
     .video-js {
-      float: left;
-      margin: 15px;
       height: 344px;
       width: 610px;
-    }
-    .vjs-playlist {
-      width: 250px;
-      float: left;
-      margin: 15px;
     }
   &lt;/style&gt;</code></pre>
                 </section>
@@ -351,155 +421,216 @@
                     <h3>Create the JavaScript file</h3>
                     <p>Move the plugin's JavaScript code into a file and place it in an Internet accessible URL.</p>
                     <ul>
-                        <li>Lines 1, 130: Use the standard syntax to begin and end a Brightcove Player plugin.</li>
-                        <li>Line 1: The first argument of the function call is the name of the function defined in the plugin code, in this case <code>newestVideosInPlaylist</code>.</li>
-                        <li>Line 130: The trailing semicolon is required.</li>
+                        <li>Lines 1, 199: Use the standard syntax to begin and end a Brightcove Player plugin.</li>
+                        <li>Line 1: The first argument of the function call is the name of the function defined in the plugin code, in this case <code>kioskApp</code>.</li>
+                        <li>Line 199: The trailing semicolon is required.</li>
                     </ul>
                     <aside class="bcls-aside bcls-aside--information">Note that the <code>ready</code> method is removed.</aside>
-<pre class="line-numbers"><code class="language-javascript">videojs.plugin('newestVideosInPlaylist', function() {
+<pre class="line-numbers"><code class="language-javascript">videojs.plugin('kioskApp', function() {
+  var myPlayer,
+    proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
+    cmsURL = 'https://cms.api.brightcove.com/v1/accounts/',
+    totalCalls,
+    callNumber = 0,
+    allVideoObjects = [],
+    currentlyPlayingIndex;
 
-  var myPlayer = this,
-      proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
-      cmsURL = 'https://cms.api.brightcove.com/v1/accounts/',
-      myPlayer = this,
-      requestData = {},
-      newestVideos = [],
-      videoData = [],
-      videoObjects = [];
-      // set up data for CMS API request
-      requestData = setRequestData();
-      // make the CMS API request to get matching video IDs
-      getNewestVideos(requestData, function (newestVideos) {
-          // extract the needed video data into an array
-          videoData = extractVideoData(newestVideos);
-          getVideoData(videoData, function (videoObjects) {
-              // add the newest videos list to the player as a playlist
-              myPlayer.playlist(videoObjects);
-          });
-      });
+    myPlayer = this;
+
+    // Define key variables
+    var videoIDs = [],
+      videoObjects = [],
+      videoCount,
+      videoIDRequest = {},
+      videoCountRequest = {};
+    // Setup for video count CMS API request
+    videoCountRequest = setRequestData('getCount');
+    // Use CMSAPI to get video count
+    getCMSAPIData(videoCountRequest, function(parsedData) {
+      // Extract count from returned data
+      videoCount = parsedData.count;
+      console.log('videoCount', videoCount);
+      // Calculate number of calls that must be made
+      // ask for 25 at a time (recommended best practice)
+      totalCalls = Math.ceil(videoCount / 25);
+      // Loop over requests for videos
+      do {
+        // Setup for video info CMS API request
+        videoIDRequest = setRequestData('getIDs');
+        // Use CMS API to get each block of videos
+        getCMSAPIData(videoIDRequest, function(parsedData) {
+          // Call function to extract IDs from video info
+          videoIDs = extractVideoData(parsedData);
+          // Call function to get video objects per IDs
+          getVideoData(videoIDs, function (videoObjects) {
+            //Push returned array into master array
+            Array.prototype.push.apply(allVideoObjects, videoObjects);
+            console.table(allVideoObjects);
+            // Check if all video objects have been returned
+            if (allVideoObjects.length === videoCount) {
+              // If all video objects returned, call function to start playing first video
+              beginPlayingVideos();
+            }
+          })
+        });
+        // Increment call number so calls eventually stop
+        callNumber++;
+       }
+      while (callNumber &lt;= totalCalls - 1);
+    });
+
+    /**
+     * On end of each video progress to next video
+     * or if the last video start again
+     */
+    myPlayer.on('ended',function(){
+      if (currentlyPlayingIndex &lt;= allVideoObjects.length) {
+        currentlyPlayingIndex++;
+        myPlayer.catalog.load(allVideoObjects[currentlyPlayingIndex]);
+        myPlayer.play();
+      } else {
+        myPlayer.catalog.load(allVideoObjects[0]);
+        myPlayer.play();
+        currentlyPlayingIndex = 0;
+      }
+    }); // End of add event listener
+
   /**
    * sets up the data for the API request
    */
-  function setRequestData() {
-      var endPoint = '',
-          accountId = '1752604059001',
-          videoName,
-          requestURL,
-          endPoint,
-          requestData = {},
-          dataReturned = false;
-      requestURL = cmsURL + accountId + '/videos';
-      // return the 10 most recently created videos
-      endPoint = '?sort=-created_at&amp;limit=10';
-      requestData.url = requestURL + endPoint;
-      requestData.requestType = 'GET';
-      return requestData;
+  function setRequestData(task) {
+    var accountId = '1752604059001',
+      videoName,
+      requestURL,
+      endPoint,
+      requestData = {},
+      dataReturned = false;
+    // Determine if setting up to get video count or video IDs
+    switch (task) {
+    case 'getCount':
+      requestURL = cmsURL + accountId + '/counts/videos';
+      break;
+    case 'getIDs':
+      requestURL = cmsURL + accountId + '/videos?limit=25&amp;offset='+ 25 * callNumber;
+      console.log('requestURL',requestURL);
+      break;
+    }
+    requestData.url = requestURL;
+    requestData.requestType = 'GET';
+    // Return the request object
+    return requestData;
   }
 
-  function getNewestVideos(options, callback) {
-      var httpRequest = new XMLHttpRequest(),
-          responseRaw,
-          parsedData,
-          requestParams;
-      // set up request data
-      requestParams = 'url=' + encodeURIComponent(options.url) + '&amp;requestType=' + options.requestType;
-      // set response handler
-      httpRequest.onreadystatechange = getResponse;
-      // open the request
-      httpRequest.open('POST', proxyURL);
-      // set headers
-      httpRequest.setRequestHeader(&quot;Content-Type&quot;, &quot;application/x-www-form-urlencoded&quot;);
-      // open and send request
-      httpRequest.send(requestParams);
-      // response handler
-      function getResponse() {
-          dataReturned = false;
-          try {
-              if (httpRequest.readyState === 4) {
-                  if (httpRequest.status === 200) {
-                      responseRaw = httpRequest.responseText;
-                      parsedData = JSON.parse(responseRaw);
-                      dataReturned = true;
-                  } else {
-                      alert('There was a problem with the request. Request returned ' + httpRequest.status);
-                  }
-              }
-          } catch (e) {
-              alert('Caught Exception: ' + e);
+  /**
+   * This function is used for all calls to CMS API and
+   *  returns the JSON parsed data, whatever that may be
+   */
+  function getCMSAPIData(options, callback) {
+    var httpRequest = new XMLHttpRequest(),
+      responseRaw,
+      parsedData,
+      requestParams;
+    // set up request data
+    requestParams = 'url=' + encodeURIComponent(options.url) + '&amp;requestType=' + options.requestType;
+    // set response handler
+    httpRequest.onreadystatechange = getResponse;
+    // open the request
+    httpRequest.open('POST', proxyURL);
+    // set headers
+    httpRequest.setRequestHeader(&quot;Content-Type&quot;, &quot;application/x-www-form-urlencoded&quot;);
+    // open and send request
+    httpRequest.send(requestParams);
+    // response handler
+    function getResponse() {
+      dataReturned = false;
+      try {
+        if (httpRequest.readyState === 4) {
+          if (httpRequest.status === 200) {
+            responseRaw = httpRequest.responseText;
+            parsedData = JSON.parse(responseRaw);
+            dataReturned = true;
+            callback(parsedData);
+          } else {
+            alert('There was a problem with the request. Request returned ' + httpRequest.status);
           }
-          if (dataReturned) {
-              callback(parsedData);
-          }
+        }
+      } catch (e) {
+        alert('Caught Exception: ' + e);
       }
+    }
   }
+
   /**
    * extract video data from CMS API response
    * @param {array} cmsData the data from the CMS API
    * @return {array} videoData array of video info
    */
   function extractVideoData(cmsData) {
-      var i,
-          iMax = cmsData.length,
-          videoItem,
-          videoDataForReturn = [];
-      for (i = 0; i &lt; iMax; i++) {
-          if (cmsData[i].id !== null) {
-              videoItem = {};
-              videoItem.id = cmsData[i].id;
-              videoDataForReturn.push(videoItem);
-          }
+    var i,
+      iMax = cmsData.length,
+      videoItem,
+      videoDataForReturn = [];
+    for (i = 0; i &lt; iMax; i++) {
+      if (cmsData[i].id !== null) {
+        videoItem = {};
+        videoItem.id = cmsData[i].id;
+        videoDataForReturn.push(videoItem);
       }
-      return videoDataForReturn;
+    }
+    return videoDataForReturn;
   }
+
   /**
    * get video objects
    * @param {array} videoIds array of video ids
    * @return {array} videoData array of video objects
    */
   function getVideoData(videoIds, callback) {
-      var i = 0,
-          iMax = videoIds.length,
-          videoObjectsForReturn =  [];
-      /**
-       * makes catalog calls for all video ids in the array
-       */
-      getVideo();
+    var i = 0,
+      iMax = videoIds.length,
+      videoObjectsForReturn = [];
 
-      function getVideo() {
-          if (i &lt; iMax) {
-              myPlayer.catalog.getVideo(videoIds[i].id, pushData);
-          } else {
-              callback(videoObjectsForReturn);
-          }
+    /**
+     * makes catalog calls for all video ids in the array
+     */
+    getVideo();
+
+    function getVideo() {
+      if (i &lt; iMax) {
+        myPlayer.catalog.getVideo(videoIds[i].id, pushData);
+      } else {
+        callback(videoObjectsForReturn);
       }
-      /**
-       * callback for the catalog calls
-       * pushes the returned data object into an array
-       * @param {string} error error returned if the call fails
-       * @parap {object} video the video object
-       */
-      function pushData(error, video) {
-          videoObjectsForReturn.push(video);
-          i++;
-          getVideo();
-      }
+    }
+
+    /**
+     * callback for the catalog calls
+     * pushes the returned data object into an array
+     * @param {string} error error returned if the call fails
+     * @parap {object} video the video object
+     */
+    function pushData(error, video) {
+      videoObjectsForReturn.push(video);
+      i++;
+      getVideo();
+    }
   }
 
+  /**
+   * Starts initial playback of videos
+   */
+  function beginPlayingVideos(){
+    myPlayer.catalog.load(allVideoObjects[0]);
+    myPlayer.play();
+    currentlyPlayingIndex = 0;
+  }
 });</code></pre>
                     <h3>Create the CSS file</h3>
                     <p>Move the CSS into a file and place it in an Internet accessible URL.</p>
 <pre class="line-numbers"><code class="language-css">.video-js {
-  float: left;
-  margin: 15px;
   height: 344px;
   width: 610px;
-}
-.vjs-playlist {
-  width: 250px;
-  float: left;
-  margin: 15px;
-}
-</code></pre>
+}</code></pre>
                     <h3>Deploy plugin and CSS</h3>
                         <p>You must load both the JavaScript and CSS files for the custom plugin.</p>
                         <p>To deploy the <strong>newestVideosInPlaylist</strong> plugin using the Players module, follow these steps:</p>
@@ -509,7 +640,7 @@
                           <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
                           <li>For the <strong>JavaScript URL</strong>, enter the URL which specifies the location of where you saved your plugin's JavaScript.</li>
                           <li>For the <strong>CSS URL</strong>, enter the URL which specifies the location of where you saved your plugin's CSS.</li>
-                          <li>For the <strong>Name</strong>, enter <strong>newestVideosInPlaylist</strong>.</li>
+                          <li>For the <strong>Name</strong>, enter <strong>kioskApp</strong>.</li>
                           <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
                         </ol>
                 </section>
@@ -517,7 +648,7 @@
                       <div id="useiframe" class="bcls-section">
                         <h2>Use iframe</h2>
                         <p>It is a best practice to use the iframe player implementation. Since you can create this functionality as a plugin, replace the embed_in_page implementation with the iframe implementation.</p>
-<pre class="line-numbers"><code class="language-html">&lt;iframe src=&quot;//players.brightcove.net/1752604059001/HJx5vaWQa_default/index.html&quot; allowfullscreen webkitallowfullscreen mozallowfullscreen&gt;&lt;/iframe&gt;</code></pre>
+<pre class="line-numbers"><code class="language-html">&lt;iframe src=&quot;//players.brightcove.net/1752604059001/HJ7bvB0uZl_default/index.html&quot; allowfullscreen webkitallowfullscreen mozallowfullscreen&gt;&lt;/iframe&gt;</code></pre>
                         <p>You will also want to control the size of the iframe, for example:</p>
                         <pre class="line-numbers"><code class="language-html">&lt;style&gt;
   iframe {
@@ -531,9 +662,6 @@
             <div class="bcls-section" id="BCLreferences">
                 <h2>Related Topics</h2>
                 <ul>
-                  <li> <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/samples/most-watched-in-playlist.html">Brightcove Player Sample: Most Watched Videos in Playlist</a></li>
-                  <li> <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/samples/related-overlay.html">Brightcove Player Sample: Related Videos Overlay</a></li>
-                  <li> <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/samples/popular-videos-overlay.html">Brightcove Player Sample: Popular Videos Overlay</a></li>
                     <li> <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a></li>
                     <li> <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-guide.html">Player Plugin Overview</a></li>
                 </ul>
