@@ -11,7 +11,7 @@
     <!-- End Drupal Taxonomy Data -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
-        <title id="bclPageTitle">Concepts: The Module Pattern</title>
+        <title id="bclPageTitle">Concepts: The JavaScript Module Design Pattern</title>
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
 <link href='//fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700' rel='stylesheet' type='text/css'>
@@ -53,7 +53,7 @@
             <div id="sidenav" class="side-nav"></div>
         </div>
         <div id="main" class="large-10 small-12 columns">
-            <h1>Concepts: The Module Pattern</h1>
+            <h1>Concepts: The JavaScript Module Design Pattern</h1>
             <!-- begin drupal content -->
             <article class="bcls-article">
                 <header id="bcls_header" class="bcls-header">
@@ -65,7 +65,8 @@
                     <p>
                       Let's look at a code example. In the following code, the function and the variables exist within the scope of the page.
                     </p>
-                    <pre class="line-numbers"><code class="language-javascript">var incrementCount = function() {
+                    <pre class="line-numbers"><code class="language-javascript">// script 1
+var incrementCount = function() {
 	count++;
 }
 
@@ -76,9 +77,42 @@ myButton.onclick = incrementCount;</code></pre>
                    <p>
                      Now, let's say there is a function outside of your script that also modifies the global <code>count</code> variable. This collision of scripts can cause unexpected results.
                    </p>
-                   <pre class="line-numbers"><code class="language-javascript">var countVideos = function(videoList) {
+                   <pre class="line-numbers"><code class="language-javascript">// script 2
+var countVideos = function(videoList) {
 	count = videoList.length;
 }</code></pre>
+                    <p>
+                      Results:
+                    </p>
+                    <ol>
+                      <li>
+                        User selects the <code>myButton</code> button two times, incrementing the <code>count</code> variable in <code>script 1</code>.
+                        <ul>
+                          <li>
+                            <code>count</code> = <strong>2</strong>
+                          </li>
+                        </ul>
+                      </li>
+                      <li>
+                        The <code>countvideos</code> function is called which exists in <code>Script 2</code>, but also on your web page. Let's say that the <code>videoList</code> contains 10 items. Now, the <code>count</code> global variable has a value of <strong>10</strong>.
+                        <ul>
+                          <li>
+                            <code>count</code> = <strong>10</strong>
+                          </li>
+                        </ul>
+                      </li>
+                      <li>
+                        The next time the user selects the <code>myButton</code> button, the <code>count</code> variable will return unexpected results.
+                        <ul>
+                          <li>
+                            Expected: <code>count</code> = <strong>3</strong>
+                          </li>
+                          <li>
+                            Actual: <code>count</code> = <strong>11</strong>
+                          </li>
+                        </ul>
+                      </li>
+                    </ol>
                     <p>
                       You may try to avoid conflicts in your scripts, but there is no guarantee that third-party scripts included in your page will not use similar function and variable names.
                     </p>
@@ -86,7 +120,7 @@ myButton.onclick = incrementCount;</code></pre>
 
                 <section class="bcls-section" id="Anonymous_functions">
                     <h2>Anonymous functions</h2>
-                    <p>The solution is to wrap your code in an anonymous function (also called a closure), that gets executed immediately. Your code within a closure is not accessible by other scripts. So, this gives you a way to create private functions and variables. </p>
+                    <p>One solution is to wrap your code in an anonymous function (also called a closure), that gets executed immediately. Your code within a closure is not accessible by other scripts. So, this gives you a way to create private functions and variables. </p>
                     <p>
                       Here is the syntax for an anonymous function:
                     </p>
@@ -166,8 +200,12 @@ myButton.onclick = incrementCount;</code></pre>
                 </section>
 
                 <section class="bcls-section" id="Complete_example">
-                    <h2>Complete example</h2>
-                    <p>Here is a complete example of the JavaScript Module Design Pattern.  </p>
+                    <h2>Complete examples</h2>
+                    <p>Here are some complete examples of the JavaScript Module Design Pattern.</p>
+                    <h3>Example 1</h3>
+                    <p>
+                      This example shows how to create private and public variables and functions using the Module Pattern.
+                    </p>
                     <ul>
                       <li>
                         Private variables: <code>myvar</code>, <code>myvar2</code>
@@ -200,6 +238,28 @@ myButton.onclick = incrementCount;</code></pre>
         myvar3 = value;
    };
 }());</code></pre>
+                    <h3>Example 2</h3>
+                    <p>
+                      This example passes in global objects and exposes a public function.
+                    </p>
+                    <pre class="line-numbers"><code class="language-javascript">var BCLS = (function( window, document, videojs ) {
+	var myvar = value;
+
+	// use a global object passed into the anonymous function
+	videojs.plugin('overlay');
+
+	fname = function() {
+		...
+	}
+	return {
+	  fname2 : function() {
+			...
+		}
+	}
+})(window, document, videojs);
+
+// call the public function fname2
+var newvar = BCLS.fname2();</code></pre>
                 </section>
                 <section class="bcls-section" id="Code_samples">
                     <h2>Code samples</h2>
