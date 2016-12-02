@@ -148,7 +148,7 @@
             <ol>
               <li>Using Video Cloud Studio, in the <strong>Players</strong> module, create a new player or use an existing one.</li>
               <li>In the <strong>Media</strong> module, select a video and publish it with this player.</li>
-              <li>Copy the In-Page embed code and paste it into a new HTML file.</li>
+              <li>Copy the Advanced (in-page embed) code and paste it into a new HTML file.</li>
             </ol>
         </div>
         <div class="perform-only">
@@ -160,52 +160,388 @@
 
 				<h3>The player code</h3>
           <p>Your player code should look similar to the following:</p>
-          <p class="video-cloud-only"><code data-gist-id="6c8a2515c0393da561d3" data-gist-hide-footer="true" data-gist-line="35-41"></code></p>
+          <pre class="line-numbers"><code class="language-html">  &lt;video id=&quot;myPlayerID&quot;
+    data-video-id=&quot;4607746980001&quot;
+    data-account=&quot;1507807800001&quot;
+    data-player=&quot;B1w12UsGx&quot;
+    data-embed=&quot;default&quot;
+    data-application-id
+    class=&quot;video-js&quot;
+    controls&gt;&lt;/video&gt;
+  &lt;script src=&quot;//players.brightcove.net/1507807800001/B1w12UsGx_default/index.min.js&quot;&gt;&lt;/script&gt;</code></pre>
         <h3>The HTML code</h3>
         <p>No extra HTML code, beyond the requirements for a basic page, were added to the content.</p>
 				<h3>The JavaScript code</h3>
-        <p>The JavaScript is broken into two major portions. The first part is the options definition for the FreeWheel plugin. You can see this below Complete code section below, lines 48-107. For more information using FreeWheel for video advertising see the <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/freewheel-plugin.html">FreeWheel Plugin</a> document.</p>
-        <p>The next major portion is the JavaScript that controls the ad countdown timer. This major potions will be explained here.</p>
-        <p>A utility function is used to convert the value from the calculation that determines total seconds into minutes and seconds.</p>
-        <p><code data-gist-id="6c8a2515c0393da561d3" data-gist-hide-footer="true" data-gist-line="109-136"></code></p>
+        <p>The JavaScript is broken into two major portions. The first part is a function that formats seconds into a <strong>mm:ss</strong> look. Of course, you can choose another formatting function, or choose to display just raw seconds.</p>
+        <pre class="line-numbers"><code class="language-javascript">  /**
+   * utility to extract h/m/s from seconds
+   * @param {number} secs - seconds to convert to hh:mm:ss
+   */
+  function secondsToTime(secs) {
+    var hours = Math.floor(secs / (60 * 60));
+    if (hours < 10) {
+      hours = "0" + hours.toString();
+    } else {
+      hours = hours.toString();
+    };
+    var divisor_for_minutes = secs % (60 * 60);
+    var minutes = Math.floor(divisor_for_minutes / 60);
+    minutes = minutes.toString();
+    var divisor_for_seconds = divisor_for_minutes % 60;
+    var seconds = Math.ceil(divisor_for_seconds);
+    if (seconds < 10) {
+      seconds = "0" + seconds.toString();
+    } else {
+      seconds = seconds.toString();
+    };
+    var obj = {
+      "h": hours,
+      "m": minutes,
+      "s": seconds
+    };
+    return obj;
+  }</code></pre>
+        <p>The next major portion is the JavaScript that controls the ad countdown timer. This will be explained next.</p>
         <ul>
-          <li>Lines 138-139: Standard code to prepare to programmatically address the player and create a variable, <code>myPlayer</code>, to reference the player.</li>
-          <li>Lines 141-142: Load the options into the FreeWheel plugin.</li>
-          <li>Lines 144-151: Load the overlay. The <code>content</code> contains HTML that will be used to inject the time remaining into the overlay, specifically the &lt;span&gt; tag. The overlay will be loaded at startup, hence the <code>start</code> on the <code>loadedmetatdata</code>event.</li>
-          <li>Lines </li>
-          <li></li>
-          <li></li>
-          <li></li>
+          <li>Lines 2-3: Standard code to prepare to programmatically address the player and create a variable, <code>myPlayer</code>, to reference the player.</li>
+          <li>Lines 4-6: Calls the IMA3 plugin and supplies the URL to the VMAP XML which defines ads behavior.
+            <aside class="bcls-aside bcls-aside--warning">If you are using the FreeWheel plugin, you will need to use the appropriate code for FreeWheel ad insertion.</aside>
+          </li>
+          <li>Lines 8-14: Loads the overlay. The <code>content</code> contains HTML that will be used to inject the time remaining into the overlay, specifically the &lt;span&gt; tag. The overlay will be loaded at startup, hence the <code>start</code> on the <code>loadedmetatdata</code> event.</li>
+          <li>Line 16: Once the Overlay is loaded into the DOM, initially hide it.</li>
+          <li>Line 18: Adds an event listener for the <code>loadedmetadata</code> event, with an accompanying anonymous function.</li>
+          <li>Lines 19-20: Creates two variables.</li>
+          <li>Lines 23-26: Creates a function that will be called every second when an ad is playing. The function calculates time remaining and injects the time into the overlay.
+            <aside class="bcls-aside bcls-aside--warning">If you are using the FreeWheel plugin, the line that calculates the remaining time will appear as follows:<br />
+            <code>var timeObject = secondsToTime(Math.floor( myPlayer.ads.pod.duration -  myPlayer.ads.pod.currentTime()));</code></aside>
+          </li>
+          <li>Lines 28-33: Adds an event listener for the <code>ads-pod-started</code> event, with an accompanying anonymous function.</li>
+          <li>Line 30: Removes the <code>hide-overlay</code> class so the overlay appears.</li>
+          <li>Line 32: Uses the JavaScript <code>setInterval()</code> function to define that the <code>everySecond()</code> function should be called every 1000ms (every second).</li>
+          <li>Lines 35-42: Adds an event listener for the <code>ads-pod-ended</code> event, with an accompanying anonymous function.</li>
+          <li>Line 37: Uses the JavaScript <code>clearInterval()</code> function so the <code>everySecond()</code> stops being called.</li>
+          <li>Line 39: Adds the <code>hide-overlay</code> class so the overlay disappears.</li>
+          <li>Line 41: Empties any text in the overlay so it does not appear next time overlay is displayed.</li>
         </ul>
-        <p><code data-gist-id="6c8a2515c0393da561d3" data-gist-hide-footer="true" data-gist-line="138-154"></code></p>
-        <ul>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-        </ul>
-        <p><code data-gist-id="6c8a2515c0393da561d3" data-gist-hide-footer="true" data-gist-line=""></code></p>
-        <ul>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-        </ul>
-        <p><code data-gist-id="6c8a2515c0393da561d3" data-gist-hide-footer="true" data-gist-line=""></code></p>
-
+  <pre class="line-numbers"><code class="language-javascript">//On player ready load the IMA3 plugin with a serverUrl with VAST ad definition
+videojs('myPlayerID').ready(function () {
+  var myPlayer = this;
+  myPlayer.ima3({
+    serverUrl: &quot;http://solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vmap.xml&quot;
+  });
+  //Place overlay at top of video on loadedmetadata
+  myPlayer.overlay({
+    overlays: [{
+      &quot;content&quot;: &quot;&lt;p&gt;Ad: &lt;span id='timeTarget'&gt;&lt;/span&gt;&lt;/p&gt;&quot;,
+      &quot;align&quot;: &quot;top&quot;,
+      &quot;start&quot;: &quot;loadedmetadata&quot;
+    }]
+  });
+  //Initially  hide the overlay
+  myPlayer.addClass(&quot;hide-overlay&quot;);
+  //Listen for ad events
+  myPlayer.on('loadedmetadata', function () {
+    var theInterval,
+      timeLeftInAd;
+    //Function to be called every second during ad playback
+    //Calculates time remaining and injects into overlay
+    function everySecond() {
+      var timeObject = secondsToTime(Math.floor(myPlayer.ima3.adPlayer.duration() - myPlayer.ima3.adPlayer.currentTime()));
+      document.getElementById('timeTarget').innerHTML = timeObject.m + ':' + timeObject.s;
+    }
+    //On start of ads in pod
+    myPlayer.on('ads-pod-started', function () {
+      //Remove the hide class so overlay displays
+      myPlayer.removeClass(&quot;hide-overlay&quot;);
+      //Start the counter that calls function every second
+      theInterval = setInterval(everySecond, 1000);
+    });
+    //On end of ads in pod
+    myPlayer.on('ads-pod-ended', function () {
+      //Stop the counter
+      clearInterval(theInterval);
+      //Hide the overlay
+      myPlayer.addClass(&quot;hide-overlay&quot;);
+      //Clear any numbers so on display of overlay no small numbers left
+      document.getElementById('timeTarget').innerHTML = '';
+    });
+  });
+});</code></pre>
         <h3>The stylesheet</h3>
 				<p>Add the following styles to your page code:</p>
+        <pre class="line-numbers"><code class="language-css">&lt;style&gt;
+  /* hide the overlay */
+  .hide-overlay .vjs-overlay {
+    display: none;
+  }
+  .video-js {
+    width: 640px;
+    height: 360px;
+  }
+  /* style the overlay */
+  .vjs-overlay, .vjs-overlay.vjs-overlay-top {
+    position: absolute;
+    width: 80px;
+    background-color: #000000;
+    color: #fff;
+    padding: 10px;
+    margin: 0;
+    border-radius: 0px;
+    top: 0px;
+    left: 0px;
+    text-align: left;
+  }
+&lt;/style&gt;</code></pre>
 			</section>
       <section id="completecode" class="bcls-section">
         <h2>Complete code</h2>
-        <p>The code below shows the entire HTML page for the example.</p>
-          <p><code data-gist-id="6c8a2515c0393da561d3" data-gist-hide-footer="true" data-gist-line="1-191"></code></p>
+        <p>The code below shows the entire HTML page for the example. Note that the CSS for for the IMA3 and Overlay plugins are linked to (lines 7-8), and the JavaScript for same plugins in loaded (lines 45-47).</p>
+        <pre class="line-numbers"><code class="language-html">&lt;!doctype html&gt;
+&lt;html&gt;
+
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;title&gt;Untitled Document&lt;/title&gt;
+  &lt;link href=&quot;//players.brightcove.net/videojs-ima3/2/videojs.ima3.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+  &lt;link href=&quot;//players.brightcove.net/videojs-overlay/1/videojs-overlay.css&quot; rel=&quot;stylesheet&quot;&gt;
+  &lt;style&gt;
+    /* hide the overlay */
+    .hide-overlay .vjs-overlay {
+      display: none;
+    }
+    .video-js {
+      width: 640px;
+      height: 360px;
+    }
+    /* style the overlay */
+    .vjs-overlay, .vjs-overlay.vjs-overlay-top {
+      position: absolute;
+      width: 80px;
+      background-color: #000000;
+      color: #fff;
+      padding: 10px;
+      margin: 0;
+      border-radius: 0px;
+      top: 0px;
+      left: 0px;
+      text-align: left;
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+  &lt;video id=&quot;myPlayerID&quot;
+    data-video-id=&quot;4607746980001&quot;
+    data-account=&quot;1507807800001&quot;
+    data-player=&quot;B1w12UsGx&quot;
+    data-embed=&quot;default&quot;
+    data-application-id
+    class=&quot;video-js&quot;
+    controls&gt;&lt;/video&gt;
+  &lt;script src=&quot;//players.brightcove.net/1507807800001/B1w12UsGx_default/index.min.js&quot;&gt;&lt;/script&gt;
+  &lt;!-- Load the IMA3 plugin --&gt;
+  &lt;script src=&quot;//players.brightcove.net/videojs-ima3/2/videojs.ima3.min.js&quot;&gt;&lt;/script&gt;
+  &lt;!-- Load the Overlay plugin --&gt;
+  &lt;script src=&quot;//players.brightcove.net/videojs-overlay/1/videojs-overlay.min.js&quot;&gt;&lt;/script&gt;
+
+  &lt;script type=&quot;text/javascript&quot;&gt;
+    /**
+     * utility to extract h/m/s from seconds
+     * @param {number} secs - seconds to convert to hh:mm:ss
+     */
+    function secondsToTime(secs) {
+      var hours = Math.floor(secs / (60 * 60));
+      if (hours &lt; 10) {
+        hours = &quot;0&quot; + hours.toString();
+      } else {
+        hours = hours.toString();
+      };
+      var divisor_for_minutes = secs % (60 * 60);
+      var minutes = Math.floor(divisor_for_minutes / 60);
+      minutes = minutes.toString();
+      var divisor_for_seconds = divisor_for_minutes % 60;
+      var seconds = Math.ceil(divisor_for_seconds);
+      if (seconds &lt; 10) {
+        seconds = &quot;0&quot; + seconds.toString();
+      } else {
+        seconds = seconds.toString();
+      };
+      var obj = {
+        &quot;h&quot;: hours,
+        &quot;m&quot;: minutes,
+        &quot;s&quot;: seconds
+      };
+      return obj;
+    }
+    //On player ready load the IMA3 plugin with a serverUrl with VAST ad definition
+    videojs('myPlayerID').ready(function () {
+      var myPlayer = this;
+      myPlayer.ima3({
+        serverUrl: &quot;http://solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vmap.xml&quot;
+      });
+      //Place overlay at top of video on loadedmetadata
+      myPlayer.overlay({
+        overlays: [{
+          &quot;content&quot;: &quot;&lt;p&gt;Ad: &lt;span id='timeTarget'&gt;&lt;/span&gt;&lt;/p&gt;&quot;,
+          &quot;align&quot;: &quot;top&quot;,
+          &quot;start&quot;: &quot;loadedmetadata&quot;
+        }]
+      });
+      //Initially  hide the overlay
+      myPlayer.addClass(&quot;hide-overlay&quot;);
+      //Listen for ad events
+      myPlayer.on('loadedmetadata', function () {
+        var theInterval,
+          timeLeftInAd;
+        //Function to be called every second during ad playback
+        //Calculates time remaining and injects into overlay
+        function everySecond() {
+          var timeObject = secondsToTime(Math.floor(myPlayer.ima3.adPlayer.duration() - myPlayer.ima3.adPlayer.currentTime()));
+          document.getElementById('timeTarget').innerHTML = timeObject.m + ':' + timeObject.s;
+        }
+        //On start of ads in pod
+        myPlayer.on('ads-pod-started', function () {
+          //Remove the hide class so overlay displays
+          myPlayer.removeClass(&quot;hide-overlay&quot;);
+          //Start the counter that calls function every second
+          theInterval = setInterval(everySecond, 1000);
+        });
+        //On end of ads in pod
+        myPlayer.on('ads-pod-ended', function () {
+          //Stop the counter
+          clearInterval(theInterval);
+          //Hide the overlay
+          myPlayer.addClass(&quot;hide-overlay&quot;);
+          //Clear any numbers so on display of overlay no small numbers left
+          document.getElementById('timeTarget').innerHTML = '';
+        });
+      });
+    });
+  &lt;/script&gt;
+&lt;/body&gt;
+
+&lt;/html&gt;</code></pre>
+      </section>
+
+      <section id="Use_a_plugin" class="bcls-section">
+        <h2>Use a plugin</h2>
+        <p>It is a best practice to use a plugin so that you can easily add this functionality to multiple players.</p>
+        <ul>
+          <li>Create a new file for your plugin JavaScript code in an Internet accessible location.</li>
+          <li>Cut and paste the JavaScript code from your main HTML file into this new file.</li>
+          <li>Lines 1,76: Wrap your JavaScript code using the <code>videojs.plugin()</code> function. The first argument, <code>adCountdown</code>, is the plugin name.</li>
+          <li>Line 32: Gets a reference to your player (note that the <code>ready()</code> method is removed).</li>
+          <li>The rest is your JavaScript code which was reviewed in a previous section.</li>
+        </ul>
+        <pre class="line-numbers"><code class="language-javascript">videojs.plugin('adCountdown', function () {
+
+  /**
+   * utility to extract h/m/s from seconds
+   * @param {number} secs - seconds to convert to hh:mm:ss
+   */
+  function secondsToTime(secs) {
+    var hours = Math.floor(secs / (60 * 60));
+    if (hours &lt; 10) {
+      hours = &quot;0&quot; + hours.toString();
+    } else {
+      hours = hours.toString();
+    };
+    var divisor_for_minutes = secs % (60 * 60);
+    var minutes = Math.floor(divisor_for_minutes / 60);
+    minutes = minutes.toString();
+    var divisor_for_seconds = divisor_for_minutes % 60;
+    var seconds = Math.ceil(divisor_for_seconds);
+    if (seconds &lt; 10) {
+      seconds = &quot;0&quot; + seconds.toString();
+    } else {
+      seconds = seconds.toString();
+    };
+    var obj = {
+      &quot;h&quot;: hours,
+      &quot;m&quot;: minutes,
+      &quot;s&quot;: seconds
+    };
+    return obj;
+  }
+  //Start code for plugin
+  var myPlayer = this;
+
+  //Place overlay at top of video on loadedmetadata
+  myPlayer.overlay({
+    overlays: [{
+      &quot;content&quot;: &quot;&lt;p&gt;Ad: &lt;span id='timeTarget'&gt;&lt;/span&gt;&lt;/p&gt;&quot;,
+      &quot;align&quot;: &quot;top&quot;,
+      &quot;start&quot;: &quot;loadedmetadata&quot;
+    }]
+  });
+
+  //Initially  hide the overlay
+  myPlayer.addClass(&quot;hide-overlay&quot;);
+
+  //Listen for ad events per best practice
+  myPlayer.on('loadedmetadata', function () {
+    var theInterval,
+      timeLeftInAd;
+
+    //Function to be called every second during ad playback
+    //Calculates time remaining and injects into overlay
+    function everySecond() {
+      var timeObject = secondsToTime(Math.floor(myPlayer.ima3.adPlayer.duration() - myPlayer.ima3.adPlayer.currentTime()));
+      document.getElementById('timeTarget').innerHTML = timeObject.m + ':' + timeObject.s;
+    }
+
+    //On start of ads in pod
+    myPlayer.on('ads-pod-started', function () {
+      //Remove the hide class so overlay displays
+      myPlayer.removeClass(&quot;hide-overlay&quot;);
+      //Start the counter that calls function every second
+      theInterval = setInterval(everySecond, 1000);
+    });
+
+    //On end of ads in pod
+    myPlayer.on('ads-pod-ended', function () {
+      //Stop the counter
+      clearInterval(theInterval);
+      //Hide the overlay
+      myPlayer.addClass(&quot;hide-overlay&quot;);
+      //Clear any numbers so on display of overlay no small numbers left
+      document.getElementById('timeTarget').innerHTML = '';
+    });
+  });
+});</code></pre>
+        <p>You also need to create a file in an Internet accessible location that contains the CSS.</p>
+        <pre class="line-numbers"><code class="language-css">.video-js {
+  width: 640px;
+  height: 360px;
+}
+/* hide the overlay */
+.hide-overlay .vjs-overlay {
+  display: none;
+}
+.vjs-overlay, .vjs-overlay.vjs-overlay-top {
+  position: absolute;
+  width: 200px;
+  background-color: #000000;
+  color: #fff;
+  padding: 10px;
+  margin: 0;
+  border-radius: 0px;
+  top: 0px;
+  left: 0px;
+  text-align: left;
+}</code></pre>
+      </section>
+
+      <section id="Use_iframe" class="bcls-section">
+        <h2>Use iframe</h2>
+        <p>To use the iframe implementation of the player with this plugin you will need to do the following in Studio's <strong>Players</strong> module:</p>
+        <ol>
+          <li>Configure IMA3 in the <strong>ADVERTISING</strong> section.</li>
+          <li>Add the Overlay plugin's CSS and JavaScript in the <strong>PLUGINS</strong> section. See the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/reference/plugin-version-reference.html">Plugin Version Reference</a> for the proper URLs. No name or options need be entered for the Overlay plugin as that is configured in the Ad Countdown's plugin code.</li>
+          <li>Still in the <strong>PLUGINS</strong> section, add the URL to the Ad Countdown plugin's JavaScript and CSS files which you created earlier.</li>
+          <li>Add a name of <strong>adCountdown</strong>. No options are necessary.</li>
+        </ol>
+        <p>You know have a player with which you can publish a video and in which the ad counter will be functional.</p>
       </section>
 
     </article>
@@ -214,7 +550,8 @@
 			<section class="bcls-section" id="BCLreferences">
 				<h2>Related Topics</h2>
 				<ul>
-					<li> <a href="internal:node/XXXX">DOC TITLE</a></li>
+          <li> <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/ima-plugin.html">Advertising with the IMA3 Plugin</a></li>
+          <li> <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/freewheel-plugin.html">Advertising with the FreeWheel Plugin</a></li>
 					<li> <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a></li>
 					<li> <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/plugin-guide.html">Player Plugin Overview</a></li>
 				</ul>
