@@ -166,9 +166,17 @@ https://players.api.brightcove.com/v1/accounts/$ACCOUNT_ID/players</code></pre>
 
       <section id="Reload_source_on_error" class="bcls-section">
         <h2>Reload source on error</h2>
-        <p>When using the HLS plugin there is a method you can call that will reload the source when an error is emitted by the player. To turn on this feature you need to call the <code>reloadSourceOnError()</code> method. The syntax is as follows:</p>
+        <p>When using the HLS plugin there is a method you can call that will reload the source at its current time when an error is emitted by the player. To turn on this feature you need to call the <code>reloadSourceOnError()</code> method. The following short video shows the method in action. All the code shown in the video is described later in this section.</p>
+        <iframe src="//players.brightcove.net/20318290001/E16-WGGOe_default/index.html?videoId=5246169715001"
+          allowfullscreen
+          webkitallowfullscreen
+          mozallowfullscreen
+          width = "640"
+          height= "380"
+          ></iframe>
+        <p>The syntax for the <code>reloadSourceOnError()</code> method is as follows:</p>
         <pre class="line-numbers"><code class="language-javascript">reloadSourceOnError(optionsObject)</code></pre>
-        <p>The optional <code>optionsObject</code> has the following properties you can supply:</p>
+        <p>The optional <code>optionsObject</code> has the following properties:</p>
         <table class="bcls-table">
           <thead class="bcls-table__head">
             <tr>
@@ -183,7 +191,7 @@ https://players.api.brightcove.com/v1/accounts/$ACCOUNT_ID/players</code></pre>
               <td><code>errorInterval</code></td>
               <td>Number</td>
               <td>30</td>
-              <td>The minimum amount of time (in seconds) that has to pass between two errors for the reload to trigger. For example, if you set the time to 10, each time an error occurs the function will check to see if a reload has happened less than 10 seconds ago. If so, it will NOT reload the source. (This is to ensure that content with an error doesn't reload constantly.) The video should play for at least the number of seconds assigned before trying to reload the source again.</td>
+              <td>The minimum amount of time (in seconds) that has to pass between two errors for the reload to trigger. For example, if you set the time to 10, each time an error occurs the function will check to see if a reload has happened less than 10 seconds ago. If less than the time interval has passed, it will NOT reload the source. (This is to ensure that content with an error doesn't reload constantly.) If more time than the interval specified has passed, the video is reloaded at the point when the error occurred.</td>
             </tr>
             <tr>
               <td><code>getSource()</code></td>
@@ -193,6 +201,41 @@ https://players.api.brightcove.com/v1/accounts/$ACCOUNT_ID/players</code></pre>
             </tr>
           </tbody>
         </table>
+        <p>The following details the code used in the video demonstration above:</p>
+        <ul>
+          <li>Lines 1-9: Standard in-page embed code with a player <code>id</code> added.</li>
+          <li>Line 11: Button to manually create errors.</li>
+          <li>Lines 22-24: Function called on button click to dispatch an error.</li>
+          <li>Line 19: Create an object in which to place configuration options.</li>
+          <li>Line 20: In the configuration object, create an <code>errorInterval</code> property and assign it a value.</li>
+          <li>Line 21: Call the <code>reloadSourceOnError()</code> method, passing the configuration object as an argument.</li>
+        </ul>
+        <pre class="line-numbers"><code class="language-html">&lt;video id=&quot;myPlayerID&quot;
+  data-video-id=&quot;4607746980001&quot;
+  data-account=&quot;1507807800001&quot;
+  data-player=&quot;HJLp3Hvmg&quot;
+  data-embed=&quot;default&quot;
+  data-application-id
+  class=&quot;video-js&quot;
+  controls
+&gt;&lt;/video&gt;
+
+&lt;p&gt;&lt;button onclick=&quot;createError()&quot;&gt;createError&lt;/button&gt;&lt;/p&gt;
+
+&lt;script src=&quot;//players.brightcove.net/1507807800001/HJLp3Hvmg_default/index.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;script type=&quot;text/javascript&quot;&gt;
+  var createError;
+  videojs('myPlayerID').ready(function(){
+    var myPlayer = this,
+      <span class="bcls-highlight">reloadOptions = {};
+    reloadOptions.errorInterval = 10;
+    myPlayer.reloadSourceOnError(reloadOptions);</span>
+    createError = function(){
+      myPlayer.error({code:'2'});
+    }
+  });
+&lt;/script&gt;</code></pre>
       </section>
 
       <section id="adaptiveswitching" class="bcls-section">
