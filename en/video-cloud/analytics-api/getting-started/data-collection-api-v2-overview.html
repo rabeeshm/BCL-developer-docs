@@ -67,7 +67,7 @@
                 <section class="bcls-section video-cloud-only" id="introduction">
                     <h2>Introduction</h2>
                     <p>The Analytics Data Collection API is the endpoint for realtime analytics events. Event data is sent to Brightcove via a series of parameters submitted via HTTP requests, such as:</p>
-<pre class="line-numbers" style="white-space:pre-wrap;padding-top:1em;padding-bottom:1em;"><code class="language-http">http://metrics.brightcove.com/tracker?event=video_view&amp;amp;domain=videocloud&amp;account=123&amp;video=789</code></pre>
+<pre class="line-numbers" style="white-space:pre-wrap;padding-top:1em;padding-bottom:1em;"><code class="language-http">http://metrics.brightcove.com/v2/tracker?event=video_view&amp;amp;domain=videocloud&amp;account=123&amp;video=789</code></pre>
                     <p>These parameters describe a <strong>fact</strong> about the state of the system when an event occurred. The example above describes the fact that a <code>video_view</code> event occurred for video <code>789</code> for account <code>123</code> (or: a user started watching account <code>123</code>'s video <code>789</code>. See <a href="#video-cloud-events">below</a> for a description of the current analytics events tracked).</p>
                     <h3 id="dimensions">Dimensions</h3>
                     <p>Dimensions are qualitative facts about the state of the system when an event occurs. For example, if the request is:</p>
@@ -157,6 +157,34 @@
                                 <td>
 <pre class="line-numbers" style="white-space:pre-wrap;padding-top:1em;padding-bottom:1em;"><code class="language-http">http://metrics.brightcove.com/tracker
     ?event=player_load&amp;destination=http%3A-%2F%2Fsup-port.brightcove.com%2F
+    &amp;source=http%3A-%2F%2Fwww.google.com
+    %2Furl%3Fsa%3D-t%26rct%3Dj%26q%3D%26esrc%3Ds%26source
+    %3Dweb-%26cd%3D1%26ved%3D0CDYQFjAA%26url
+    %3Dhttp%253A-%252F%252Fsupport.brightcove.com%252F%26ei%3DoEYWUtCgEIXq9ATzn-oCgCQ
+    %26usg%3DAFQjCNEtLodOdxWZSGdJ-pL7WJaEeUJVlnw%26bvm%3Dbv.51156542%2Cd.dmg
+    &amp;domain=videocloud&amp;account=1749339200&amp;time=1377191644796</code></pre></td>
+
+                            </tr>
+                            <tr>
+                                <td><code>catalog_request</code></td>
+                                <td>Sent when a request to the videocloud catalog api is made.</td>
+                                <td>
+<pre class="line-numbers" style="white-space:pre-wrap;padding-top:1em;padding-bottom:1em;"><code class="language-http">http://metrics.brightcove.com/tracker
+    ?event=catalog_request&amp;catalog_url=&amp;destination=http%3A-%2F%2Fsup-port.brightcove.com%2F
+    &amp;source=http%3A-%2F%2Fwww.google.com
+    %2Furl%3Fsa%3D-t%26rct%3Dj%26q%3D%26esrc%3Ds%26source
+    %3Dweb-%26cd%3D1%26ved%3D0CDYQFjAA%26url
+    %3Dhttp%253A-%252F%252Fsupport.brightcove.com%252F%26ei%3DoEYWUtCgEIXq9ATzn-oCgCQ
+    %26usg%3DAFQjCNEtLodOdxWZSGdJ-pL7WJaEeUJVlnw%26bvm%3Dbv.51156542%2Cd.dmg
+    &amp;domain=videocloud&amp;account=1749339200&amp;time=1377191644796</code></pre></td>
+
+                            </tr>
+                            <tr>
+                                <td><code>catalog_response</code></td>
+                                <td>Sent when a response to a prior <code>catalog_request</code> is received.</td>
+                                <td>
+<pre class="line-numbers" style="white-space:pre-wrap;padding-top:1em;padding-bottom:1em;"><code class="language-http">http://metrics.brightcove.com/tracker
+    ?event=catalog_response&amp;destination=http%3A-%2F%2Fsup-port.brightcove.com%2F
     &amp;source=http%3A-%2F%2Fwww.google.com
     %2Furl%3Fsa%3D-t%26rct%3Dj%26q%3D%26esrc%3Ds%26source
     %3Dweb-%26cd%3D1%26ved%3D0CDYQFjAA%26url
@@ -511,6 +539,75 @@ ex. https://www.example.com/foo/bar/baz
                     <h3>Sample implementation script</h3>
 <pre data-src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/analytics-api/getting-started/data-collection-overview/sample.js" class="line-numbers"></pre>
                     <!-- <script src="https://gist.github.com/11100330.js"></script> -->
+                </section>
+                <section id="changesFromV1" class="bcls-section">
+                    <h2>V2 Changes</h2>
+                    <p>This section provides a summary of changes from v1 to v2 of the Data Collector for those who have been using v1.</p>
+                    <h3>Base url for tracker</h3>
+
+                    <pre><code>http(s)://metrics.brightcove.com/v2</code></pre>
+
+                    <h3>Additional Fields Supported on All Events:</h3>
+
+                    <p><strong>session</strong>: The session identifier. The session value should be constant for the lifecycle of an experience and sent for all events from that experience. It should be as close as is possible to a universally unique identifier. If there are collisions, the two sessions may be discarded as invalid if they cannot be disentangled. </p>
+
+                    <p><strong>device_os_version</strong>: The version of os being used by the device. When not specified, this will be calculated by parsing the user agent string for the tracking request.</p>
+
+                    <p><strong>platform_version</strong>: Used to indicate that a new release of the specified platform is being used to send the events.</p>
+
+                    <h3>New Events For V2</h3>
+
+                    <p><strong>catalog_request</strong>: Sent when a request to the videocloud catalog api is made</p>
+
+                    <ul>
+                        <li><strong>catalog_url</strong>: The destination url associated with the <code>catalog_request</code> event.</li>
+                    </ul>
+
+                    <p><strong>catalog_response</strong>: Sent when a response to a prior <code>catalog_request</code> is received</p>
+
+                    <ul>
+                        <li><strong>catalog_url</strong>: The destination url associated with the <code>catalog_request</code> event that initiated this response.</li>
+                        <li><strong>response_time_ms</strong>: The time, in milliseconds, between the <code>catalog_request</code> event and the <code>catalog_response</code> event. </li>
+                    </ul>
+
+                    <p><strong>play_request</strong>: Sent when the playback is initiated either by the user expressly clicking the play button, or automatically when the platform triggers playback in an auto-play scenario.</p>
+
+                    <p><strong>ad_mode_begin</strong>: [Replaces <code>ad_start</code>] Sent when control is handed over to an advertising agent by the playback platform.</p>
+
+                    <p><strong>ad_mode_complete</strong>: [Replaces <code>ad_end</code>]Sent when control is handed back from the advertising agent to the playback platform.</p>
+
+                    <p><strong>error</strong>: Sent when fatal errors which disrupt the playback experience are encountered.</p>
+
+                    <ul>
+                        <li><strong>error_code</strong>: A platform specific error code associated with the event.</li>
+                    </ul>
+
+                    <h3>Updated Events for V2</h3>
+
+                    <p><strong>video_view</strong>: Includes new latency measurements</p>
+
+                    <ul>
+                        <li><strong>load_time_ms</strong>: The time, in milliseconds, between initiating data load for the video and the video becoming playable.</li>
+                        <li><strong>start_time_ms</strong>: The time, in milliseconds, between initiation of playback and the first frame of the video being rendered. This can be different depending on the experience, for instance, if there are no pre-roll ads configured, this measurement is the time between the 'play_request' and <code>video_view</code> events. If there is a preroll ad, the time between <code>ad_mode_begin</code> and <code>ad_mode_complete</code> should not be included. </li>
+                    </ul>
+
+                    <p><strong>video_engagement</strong>: Includes additional rendition selection, bitrate measurements, and buffering information. A subtle change to video engagement was also made in that it should be sent periodically even if no viewing occurred during the engagement period. This change is to enable tracking re-buffering delays and counts that cause users to wait for playback.</p>
+
+                    <ul>
+                        <li><strong>range</strong>: The range parameter is now optional, range can be left out of an engagement event to show that during the period covered by the event, there was no viewing activity. (for example, when there is only re-buffering activity)</li>
+                        <li><strong>rendition_url</strong>: The url to the most recently selected rendition. For example, for an HLS stream this would be the url to the most recently selected variant.</li>
+                        <li><strong>rendition_indicated_bps</strong>: The indicated bitrate, in bits per second, of the most recently selected rendition.</li>
+                        <li><strong>rendition_mime_type</strong>: The mime type of the most recently selected rendition.</li>
+                        <li><strong>rendition_height</strong>: The encoded height of the video rendition in pixels</li>
+                        <li><strong>rendition_width</strong>: The encoded width of the video rendition in pixels</li>
+                        <li><strong>rebuffering_seconds</strong>: The number of seconds the user spent waiting for video to playback due to un-requested delay during the engagement period.</li>
+                        <li><strong>rebuffering_count</strong>: The number of times playback stopped due to re-buffering during the represented engagement period.</li>
+                        <li><strong>forward_buffer_seconds</strong>: The number of seconds of video currently residing in the forward buffer.</li>
+                        <li><strong>measured_bps</strong>: The ratio of the number of bits included in the most recently downloaded segment to the time spend downloading that segment, in bits per second.</li>
+                        <li><strong>player_width</strong> The current pixel width of the player at the end of the engagement range.</li>
+                        <li><strong>player_height</strong> The current pixel height of the player at the end of the engagement range.</li>
+                        <li><strong>dropped_frames</strong>: The number of frames that were dropped from video playback during this engagement period</li>
+                    </ul>
                 </section>
             </article>
 
