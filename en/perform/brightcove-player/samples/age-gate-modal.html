@@ -3,7 +3,7 @@
 
 <head>
     <!-- Begin Drupal Taxonomy Data -->
-    <meta name="products" content="Perform">
+    <meta name="products" content="Video Cloud">
     <meta name="audience" content="Player Developer">
     <meta name="task" content="Customizing Players">
     <meta name="feature" content="Overlay">
@@ -71,7 +71,15 @@
                 </header>
 
                 <section id="top" class="bcls-section">
-                  <p></p>
+                  <p>Some advantages of using the <strong>ModalDialog</strong> component include the following:</p>
+                  <ul>
+                    <li>
+                      It covers the entire player by default
+                    </li>
+                    <li>
+                      It has methods to easily open and close the modal window
+                    </li>
+                  </ul>
                   <aside class="bcls-aside bcls-aside--tip">
                     <p>This example uses the <strong>ModalDialog</strong> component of the Brightcove Player. For more details, see the <a href="../../brightcove-player/guides/modal-dialog.html">Implementing the ModalDialog</a> document.</p>
                   </aside>
@@ -208,133 +216,73 @@
 	width=&quot;640&quot;
 	height=&quot;340&quot;&gt;&lt;/video&gt;
 &lt;script src=&quot;//players.brightcove.net/1752604059001/default_default/index.min.js&quot;&gt;&lt;/script&gt;</code></pre>
-                    <!-- <p class="video-cloud-only"><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="84-91"></code></p> -->
-                    <pre class="line-numbers perform-only" data-start="1"><code class="language-html">&lt;video id=&quot;video_1&quot; style=&quot;width: 640px; height: 360px;&quot;
-    	data-account=&quot;1752604059001&quot;
-    	data-player=&quot;NkBaWlzKl&quot;
-    	data-embed=&quot;default&quot;
-    	class=&quot;video-js&quot; controls=&quot;&quot;&gt;&lt;/video&gt;
-
-    &lt;script src=&quot;//players.brightcove.net/1752604059001/NkBaWlzKl_default/index.min.js&quot;&gt;&lt;/script&gt;</code></pre>
-                    <!-- <p class="perform-only"><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="84,86-91"></code></p> -->
+                    <pre class="line-numbers perform-only" data-start="1"><code class="language-html">&lt;video id=&quot;myPlayerID&quot;
+	data-account=&quot;1752604059001&quot;
+	data-player=&quot;default&quot;
+	data-embed=&quot;default&quot;
+	data-application-id
+	class=&quot;video-js&quot;
+	controls
+	width=&quot;640&quot;
+	height=&quot;340&quot;&gt;&lt;/video&gt;
+&lt;script src=&quot;//players.brightcove.net/1752604059001/default_default/index.min.js&quot;&gt;&lt;/script&gt;</code></pre>
 
                     <h3>The HTML code</h3>
                     <p>No extra HTML code is needed for this example.</p>
 
                     <h3>The JavaScript code</h3>
                     <p>Add the following JavaScript to your page code.</p>
-                    <p>Here you will use the player's <code class="language-javascript">addClass()</code> and <code class="language-javascript">removeClass()</code> methods to hide and then show the player controls. We'll look at the details of the <code class="language-css">video-agelist</code> class in the next section.</p>
+                    <p>Here you will use the <strong>ModalDialog</strong> component's <code class="language-javascript">open()</code> and <code class="language-javascript">close()</code> methods to show and then hide the modal window.</p>
                     <ul>
-                        <li>Line 6: Gets a reference to the player when it is ready.</li>
-                        <li>Line 7: Adds the class which hides the player controls and the big play button.</li>
-                        <li>Line 9: Listens for when the player has initial duration and dimension information.</li>
-                        <li>Line 10: Gets a reference to the age verification text in the overlay.</li>
-                        <li>Line 11: Listens for when the user clicks the age verification text.</li>
-                        <li>Line 12: Removes the class which hides the player controls and the big play button.</li>
-                        <li>Line 13: Starts video playback.</li>
+                        <li>Line 3: Gets a reference to the player when it is ready.</li>
+                        <li>Lines 4-9: Create an <code>options</code> object and set properties for the <strong>ModalDialog</strong> class. For details about this object, see the <a href="../../brightcove-player/guides/modal-dialog.html#The_options_object">Implementing the ModalDialog</a> document.</li>
+                        <li>Lines 11-12: Instantiate the <strong>ModalDialog</strong> class.</li>
+                        <li>Line 13: Adds a custom class to our modal window so that we can style the content. We will add styles in the next section.</li>
+                        <li>Line 14: Adds the <strong>ModalDialog</strong> to the player.</li>
+                        <li>Line 15: Opens the modal window.</li>
+                        <li>Lines 17-20: When the user selects the modal window text, the window is closed and the video playback is started.</li>
                     </ul>
-                    <pre class="line-numbers" data-start="1"><code class="language-javascript">&lt;script type=&quot;text/JavaScript&quot;&gt;
-    var myPlayer,
-    eAgeGateButton;
+                    <pre class="line-numbers" data-start="1"><code class="language-javascript">&lt;script type=&quot;text/javascript&quot;&gt;
+  videojs('myPlayerID').ready(function(){
+    var myPlayer = this,
+        options = {};
 
-    videojs(&quot;video_1&quot;).ready(function(){
-        myPlayer = this;
-        myPlayer.addClass(&quot;video-agelist&quot;);
+    options.content = 'By clicking here you certify that you are over 18 years old';
+    options.label = 'age gate text';
+    options.temporary = true;
+    options.uncloseable = true;
 
-        myPlayer.on(&quot;loadedmetadata&quot;, function() {
-            eAgeGateButton = document.getElementById(&quot;ageGateButton&quot;);
-            eAgeGateButton.addEventListener(&quot;click&quot;, function() {
-                myPlayer.removeClass(&quot;video-agelist&quot;);
-                myPlayer.play();
-            });
-        });
+    var ModalDialog = videojs.getComponent('ModalDialog');
+    var myModal = new ModalDialog(myPlayer, options);
+    myModal.addClass('vjs-my-custom-modal');
+    myPlayer.addChild(myModal);
+    myModal.open();
+
+    myModal.on(&quot;click&quot;, function(){
+      myModal.close();
+      myPlayer.play();
     });
+  });
 &lt;/script&gt;</code></pre>
-                    <!-- <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="94-110"></code></p> -->
 
                     <h3>The stylesheet</h3>
-                    <p>This example uses CSS styles for the Brightcove player and the Overlay plugin.</p>
+                    <p>This example uses CSS styles for the <strong>ModalDialog</strong> content.</p>
                     <ul>
-                        <li>Lines 3-15: Override the default styles for the Overlay plugin.</li>
-                        <li>Lines 17-20: Hide the player controls and the big play button.</li>
-                        <li>Lines 22-24: Set the cursor for the age verification text in the overlay.</li>
-                        <li>Lines 26-29: Set the dimensions of the player.</li>
+                        <li>Line 3: Sets the content text color to red.</li>
+                        <li>Lines 4-5: Center the text horizontally and vertically.</li>
+                        <li>Line 6: Sets the cursor to use the hand pointer when over the text area.</li>
                     </ul>
                     <pre class="line-numbers" data-start="1"><code class="language-html">&lt;style&gt;
-    /* override default styles for overlay */
-    .vjs-overlay,
-    .vjs-overlay.vjs-overlay-top-left {
-        width: 100%;
-        height: 100%;
-        color: #FFF;
-        background-color: rgba(255, 255, 255, 0.6);
-        left: 0;
-        top: 0;
-        padding-top: 100px;
-        font-size: 24px;
-        text-align: center;
-        padding-left: 0;
-    }
-    /* hide the control bar and big play button */
-    .video-agelist.video-js .vjs-control-bar,
-    .video-agelist .vjs-big-play-button {
-        display: none;
-    }
-    /* set cursor for overlay text */
-    #ageGateButton {
-       cursor: pointer;
-    }
-    /* set player size */
-    .video-js {
-        width: 640px;
-        height: 360px;
-    }
+  .vjs-my-custom-modal .vjs-modal-dialog-content {
+    color: red;
+    text-align: center;
+    top: 30%;
+    cursor: pointer;
+  }
 &lt;/style&gt;</code></pre>
-                    <!-- <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="51-80"></code></p> -->
-                    <h4>Hiding player controls</h4>
-                    <p>Let's take a closer look at how we used CSS to hide the big play button and the control bar. For an introduction about changing the appearance of the Brightcove player, see the <a href="../../brightcove-player/guides/customize-appearance.html">Customize Player Appearance</a>                        guide.</p>
-                    <p>First, let's change the style to hide the player's big play button.</p>
-                    <ol class="bcls-tasklist">
-                        <li>In the Chrome browser, open the <strong>Developer Tools</strong>.</li>
-                        <li>Right click on the player and select <strong>Inspect Element</strong>.</li>
-                        <li>In the <strong>Elements</strong> section of the <strong>Developer Tools</strong>, select the HTML associated with the big play button.</li>
-                        <li>In the <strong>Styles</strong> section, you can see that the original <code class="language-css">display</code> property with a value of <code class="language-css">block</code> is set on the <code class="language-html">&lt;div&gt;</code> element.
-                            <figure class="bcls-figure">
-                                <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/player-customization/overlays/age-gate/age-gate-hide-button.png" alt="Hide Big Play Button">
-                                <figcaption class="bcls-caption--image">Hide Big Play Button</figcaption>
-                            </figure>
-                        </li>
-                        <li>When overriding CSS values, more specific styles win over less specific ones. Since elements have the lowest specificity value, we can override the display property by simply specifying the <code class="language-css">vjs-big-play-button</code> class.</li>
-                        <li><p>Look at our CSS for the big play button below. In this example, we are saying select all elements with a class name of <code class="language-css">vjs-big-play-button</code> which are decendents of the element with class name of <code class="language-css">video-agelist</code>.
-                            Remember that in the JavaScript code, we added the <code class="language-css">video-agelist</code> class to the player.</p>
-                            <pre class="line-numbers" data-start="17"><code class="language-css">  video-agelist.video-js .vjs-control-bar,
-<span class="bcls-highlight">  .video-agelist .vjs-big-play-button {
-      display: none;</span>
-  }</code></pre>
-                            <!-- <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="67-70" data-gist-highlight-line="68,69"></code></p> -->
-                        </li>
-                    </ol>
-
-                    <p>Next, let's change the style to hide the player's control bar.</p>
-                    <ol class="bcls-tasklist">
-                        <li>In the <strong>Elements</strong> section of the <strong>Developer Tools</strong>, select the HTML associated with the player control bar.</li>
-                        <li>In the <strong>Styles</strong> section, you can see that the original <code class="language-css">display</code> property with a value of <code class="language-css">flex</code> is set with three class attributes in the selector.
-                            <figure class="bcls-figure">
-                                <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/player-customization/overlays/age-gate/age-gate-hide-controls.png" alt="Hide Control Bar">
-                                <figcaption class="bcls-caption--image">Hide Control Bar</figcaption>
-                            </figure>
-                        </li>
-                        <li>To override the style for the control bar, we need at least three class attributes in our selector, including the <code class="language-css">vjs-control-bar</code> class.</li>
-                        <li>Look at our CSS for the control bar below. In this example, we are saying select all elements with a class name of <code class="language-css">vjs-control-bar</code> which are decendents of the element with both a class name of <code class="language-css">video-agelist</code>                            and a class name of <code class="language-css">video-js</code>.
-                        <pre class="line-numbers" data-start="17"><code class="language-html"><span class="bcls-highlight">.video-agelist.video-js .vjs-control-bar,</span>
-.video-agelist .vjs-big-play-button {
-<span class="bcls-highlight">    display: none;</span>
-}</code></pre>
-                            <!-- <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="67-70" data-gist-highlight-line="67,69"></code></p> -->
-                            <p>For more information about calculating specificity value, see the <a href="//css-tricks.com/specifics-on-css-specificity/">Specifics on CSS Specificity</a> page.</p>
-                        </li>
-
-                    </ol>
+                    <p>
+                      Browse the HTML page. You should see that the age gate modal window hides when you select anywhere within the window.
+                    </p>
 
                 </section>
 
@@ -347,54 +295,59 @@
                       <li>
                         Move the plugin's JavaScript code to a file located on your machine for easy testing.
                         <ul>
-                            <li>Create a new file for your plugin JavaScript code. In this case, name it <code>age-gate.js</code>.</li>
+                            <li>Create a new file for your plugin JavaScript code. In this case, name it <code>age-gate-modal.js</code>.</li>
                             <li>Cut and paste the JavaScript code from your main HTML file into this new file.</li>
-                            <li>Lines 4,17: Wrap your JavaScript code using the <code class="language-javascript">videojs.plugin()</code> function. The first argument, <code class="language-javascript">ageGate</code>, is the plugin name.</li>
+                            <li>Lines 4,25: Wrap your JavaScript code using the <code class="language-javascript">videojs.plugin()</code> function. The first argument, <code class="language-javascript">ageGateModal</code>, is the plugin name.</li>
                             <li>Line 5: Gets a reference to your player.</li>
                             <li>The rest is your JavaScript code which was reviewed in a previous section.</li>
                         </ul>
-                    <aside class="bcls-aside bcls-aside--warning">Line 17: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</aside>
+                    <aside class="bcls-aside bcls-aside--warning">Line 25: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</aside>
                     <pre class="line-numbers" data-start="1"><code class="language-javascript">/**
- * Age Gate
+ * Age Gate Modal
  */
-videojs.plugin('ageGate', function() {
-    var myPlayer = this,
-        eAgeGateButton;
-    myPlayer.addClass(&quot;video-agelist&quot;);
+videojs.plugin('ageGateModal', function() {
+  var myPlayer = this,
+      options = {};
 
-    // listen for the &quot;loadedmetadata&quot; event, show the controls and play the video
-    myPlayer.on(&quot;loadedmetadata&quot;, function() {
-        eAgeGateButton = document.getElementById(&quot;ageGateButton&quot;);
-        eAgeGateButton.addEventListener(&quot;click&quot;, function() {
-            myPlayer.removeClass(&quot;video-agelist&quot;);
-            myPlayer.play();
-        });
-    });
+  options.content = 'By clicking here you certify that you are over 18 years old';
+  options.label = 'age gate text';
+  options.temporary = true;
+  options.uncloseable = true;
+
+  var ModalDialog = videojs.getComponent('ModalDialog');
+  var myModal = new ModalDialog(myPlayer, options);
+  myModal.addClass('vjs-my-custom-modal');
+  myPlayer.addChild(myModal);
+
+  myModal.open();
+
+  myModal.on(&quot;click&quot;, function(){
+    console.log(&quot;made it inside the modal&quot;);
+    myModal.close();
+    myPlayer.play();
+  });
 });</code></pre>
-                    <!-- <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="119-135"></code></p> -->
                   </li>
                 </ol>
                     <ol class="bcls-tasklist">
                         <li>In the HTML file, add the following code just below the existing <code class="language-html">&lt;script&gt;</code> tags. This code includes the JavaScript file and then calls the method defined in that JavaScript.
-                        <pre class="line-numbers" data-start="1"><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;age-gate.js&quot;&gt;&lt;/script&gt;
-&lt;script&gt;videojs('video_1').ageGate();&lt;/script&gt;
+                        <pre class="line-numbers" data-start="1"><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;age-gate-modal.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;videojs('myPlayerID').ageGateModal();&lt;/script&gt;
 </code></pre></li>
                     </ol>
-                    <!-- <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="160-161"></code></p> -->
                     <ol class="bcls-tasklist">
-                        <li>Browse the HTML page. You should see that the age gate overlay still works, except now your JavaScript code has been removed from the HTML page.</li>
+                        <li>Browse the HTML page. You should see that the age gate modal window still works, except now your JavaScript code has been removed from the HTML page.</li>
                     </ol>
 
                     <h3>Create the CSS file</h3>
                     <p>If you are using CSS, move styles to a file located on your machine for easy testing.</p>
                     <ol class="bcls-tasklist">
-                        <li>Create a new file for your CSS styles. In this case, name it <code>age-gate.css</code>.</li>
+                        <li>Create a new file for your CSS styles. In this case, name it <code>age-gate-modal.css</code>.</li>
                         <li>In the <code class="language-html">&lt;head&gt;</code> section of your HTML file, add the following link to include your newly created CSS file.
-                        <pre class="line-numbers" data-start="1"><code class="language-html">&lt;link href=&quot;age-gate.css&quot; rel=&quot;stylesheet&quot;&gt;</code></pre></li>
+                        <pre class="line-numbers" data-start="1"><code class="language-html">&lt;link href=&quot;age-gate-modal.css&quot; rel=&quot;stylesheet&quot;&gt;</code></pre></li>
                     </ol>
-                    <!-- <p><code data-gist-id="b897156dc01d948ad295" data-gist-hide-footer="true" data-gist-line="146"></code></p> -->
                     <ol class="bcls-tasklist">
-                        <li>Browse the HTML page. You should see that the navigate on end link still works, except now your styles have been removed from the HTML page.</li>
+                        <li>Browse the HTML page. You should see that the age gate modal window still works, except now your styles have been removed from the HTML page.</li>
                     </ol>
                     <p>When you have finished testing the functionality of your plugin code, you are ready to implement the plugin in the player as described in the next step.</p>
 
