@@ -65,21 +65,44 @@
                 </header>
 
                 <section class="bcls-section" id="top">
-                  <aside class="bcls-aside bcls-aside--warning">As of January 1, 2017, all App Store apps are required to use App Transport Security. You will no longer be able to disable ATS for App Store apps. For details, see the <a href="https://techcrunch.com/2016/06/14/apple-will-require-https-connections-for-ios-apps-by-the-end-of-2016/">Apple will require HTTPS connections for iOS apps by the end of 2016</a> document.</aside>
-                  <p>With Apple's release of the iOS 9 SDK, a new feature called <a href="https://developer.apple.com/library/prerelease/ios/technotes/App-Transport-Security-Technote/">App Transport Security (ATS)</a> enforces secure connections between an app and web services.</p>
-                  <p>Because ATS restrictions do not apply for older versions of iOS, it will only affect applications targeting the iOS 9.0 SDK and later. Applications targeting early versions of the iOS SDK and those already in the App Store will not be affected.</p>
-          				<p>Support for ATS within the Brightcove ecosystem is now available. You can either:</p>
+                  <aside class="bcls-aside bcls-aside--warning">In early 2017, all App Store apps will be required to use App Transport Security. You will no longer be able to disable ATS for App Store apps.
+                    <ul>
+                      <li>
+                        For details, see the <a href="https://techcrunch.com/2016/06/14/apple-will-require-https-connections-for-ios-apps-by-the-end-of-2016/">Apple will require HTTPS connections for iOS apps by the end of 2016</a> document.
+                      </li>
+                      <li>
+                        Follow <a href="https://developer.apple.com/news/#article-12212016b">Apple's News and Updates</a> to find out when ATS will be required.
+                      </li>
+                    </ul>
+                  </aside>
+                  <p>With the release of iOS 9, Apple introduced a new feature called <a href="https://developer.apple.com/library/prerelease/ios/technotes/App-Transport-Security-Technote/">App Transport Security (ATS)</a> which enforces secure connections between an app and web services. As of January 1, 2017, all apps in the app store will be required to have ATS enabled unless you provide reasonable justification for ATS exceptions, as part of the app review process.</p>
+                  <p>
+                    ATS restrictions apply to applications that target iOS 9.0 and later. Existing apps in the app store will not be affected, but you will need to apply ATS restrictions when you publish new apps or update your existing apps.
+                  </p>
+                  <p>
+                    The Brightcove ecosystem supports ATS restrictions. In most cases, you should build your apps with ATS enabled. If you have a need to connect to non-secure URLs, then you can submit your ATS exceptions along with justification to Apple's App Store review.
+                  </p>
+                  <p>
+                    Choose either:
+                  </p>
+                  <ul>
+                    <li><a href="#Building_Apps_with_ATS_Enabled">Building apps with ATS enabled</a></li>
+                    <li><a href="#Using_ATS_exceptions">Using ATS exceptions</a></li>
+                  </ul>
+
+                  <p>
+                    As a last resort, you can disable ATS requirements. Keep in mind that this option will be going away in early 2017.
+                  </p>
           				<ul>
-          					<li><a href="#Build_Apps_with_ATS_Enabled">Build your apps with ATS enabled</a></li>
-          					<li><a href="#Disable_ATS_requirements">Disable ATS requirements</a></li>
+          					<li><a href="#Disabling_ATS_requirements">Disabling ATS requirements</a></li>
           				</ul>
                 </section>
 
-        <section class="bcls-section" id="Build_Apps_with_ATS_Enabled">
-				    <h2>Build Apps with ATS Enabled</h2>
-					<p>The following steps need to be in place for ATS to work:</p>
+        <section class="bcls-section" id="Building_Apps_with_ATS_Enabled">
+				    <h2>Building Apps with ATS Enabled</h2>
+					<p>If you use secure connections over HTTPS between your app and web services, then you can enable App Transport Security for your app. To do this, follow these steps:</p>
 					<ol class="bcls-tasklist">
-						<li><p>Use secure communication to deliver your media content.</p>
+						<li><p>Make sure you are using secure communication to deliver your media content. This includes video, ads, captions, images and other third-party API connections.</p>
               <aside class="bcls-aside bcls-aside--tip">For complete specifications, see the
    <a href="https://developer.apple.com/library/ios/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW35">Requirements for Connecting Using ATS</a> document.</aside>
 						    <ul>
@@ -96,28 +119,38 @@
 
   <span class="bcls-highlight">BCOVBasicSessionProviderOptions *options = [[BCOVBasicSessionProviderOptions alloc] init];
   options.sourceSelectionPolicy = [BCOVBasicSourceSelectionPolicy sourceSelectionHLSWithScheme:kBCOVSourceURLSchemeHTTPS];
-  id&lt;BCOVPlaybackSessionProvider&gt; provider = [manager createBasicSessionProviderWithOptions:options];</span>
+  id&lt;BCOVPlaybackSessionProvider&gt; provider = [manager createBasicSessionProviderWithOptions:options];
   _playbackController = [manager createPlaybackControllerWithSessionProvider:provider viewStrategy:[manager defaultControlsViewStrategy]];
+}</span></code></pre>
 
-  _playbackController.analytics.account = kViewControllerAccountID;
-
-  _playbackController.delegate = self;
-  _playbackController.autoAdvance = YES;
-  _playbackController.autoPlay = YES;
-
-  _service = [[BCOVPlaybackService alloc] initWithAccountId:kViewControllerAccountID policyKey:kViewControllerPlaybackServicePolicyKey];
-}</code></pre>
-						<!-- <p><code data-gist-id="d27e3a0e5343da1eb6dcf6e7af2ca58b" data-gist-line="2-18" data-gist-highlight-line="6-8"></code></p> -->
 						<p>For details, see the <strong>Source Selection</strong> section of the <a href="../../brightcove-player-sdk-for-ios/reference/current/index.html">Brightcove Player SDK for iOS reference</a> document.</p>
-            <aside class="bcls-aside bcls-aside--information">Brightcove recommends using the <code>BCOVPlaybackService</code> class to retrieve your media content from the Playback API. This is the latest and recommended API to use to retrieve your video and playlist data from your Video Cloud library. For details, see the <a href="../../../playback-api/index.html">Playback API Documentation</a>.</aside>
             </li>
 					</ol>
 				</section>
 
-        <section class="bcls-section" id="Disable_ATS_requirements">
-				    <h2>Disable ATS requirements</h2>
+        <section class="bcls-section" id="Using_ATS_exceptions">
+          <h2>Using ATS exceptions</h2>
+          <p>
+            If you need to use non-secure connections between your app and web services, then you can try using ATS exceptions. Keep in mind that the reason for ATS requirements is to ensure users have a good level of security when using your app. So, make sure that your app cannot use secure connections before digging into ATS exceptions.
+          </p>
+          <p>
+            There are specific keys that you can use to bypass ATS requirements. These exceptions will trigger an additional App Store review and will require that you provide reasonable justification. For details, see the <a href="https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW59">App Store Review for ATS</a> document.
+          </p>
+        </section>
+
+        <section class="bcls-section" id="Disabling_ATS_requirements">
+				    <h2>Disabling ATS requirements</h2>
 					<p>When building applications that target the iOS 9 SDK or later, you may choose to disable ATS. Follow these steps to disable ATS requirements in your app:</p>
-          <aside class="bcls-aside bcls-aside--warning">As of January 1, 2017, all App Store apps are required to use App Transport Security. You will no longer be able to disable ATS for App Store apps. For details, see the <a href="https://techcrunch.com/2016/06/14/apple-will-require-https-connections-for-ios-apps-by-the-end-of-2016/">Apple will require HTTPS connections for iOS apps by the end of 2016</a> document.</aside>
+          <aside class="bcls-aside bcls-aside--warning">In early 2017, all App Store apps will be required to use App Transport Security. You will no longer be able to disable ATS for App Store apps.
+            <ul>
+              <li>
+                For details, see the <a href="https://techcrunch.com/2016/06/14/apple-will-require-https-connections-for-ios-apps-by-the-end-of-2016/">Apple will require HTTPS connections for iOS apps by the end of 2016</a> document.
+              </li>
+              <li>
+                Follow <a href="https://developer.apple.com/news/#article-12212016b">Apple's News and Updates</a> to find out when ATS will be required.
+              </li>
+            </ul>
+          </aside>
           <ol class="bcls-tasklist__restart">
             <li>
               <p>
@@ -159,8 +192,20 @@
 					<!-- <p><code data-gist-id="d27e3a0e5343da1eb6dcf6e7af2ca58b" data-gist-line="24-28" data-gist-hide-footer="true"></code></p> -->
 
 					<p>Disabling ATS does not alter existing HTTPS connections. It simply prevents iOS from enforcing additional security requirements on your http communication.</p>
-					<p>You may also try whitelisting certain domains to disable ATS requirements. For details, see the <a href="https://developer.apple.com/library/ios/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW33">NSAppTransportSecurity</a> document.</p>
+					<!-- <p>You may also try whitelisting certain domains to disable ATS requirements. For details, see the <a href="https://developer.apple.com/library/ios/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW33">NSAppTransportSecurity</a> document.</p> -->
 				</section>
+
+        <section class="bcls-section" id="Additional_Resources">
+				    <h2>Additional Resources</h2>
+            <ul>
+              <li>
+                Apple Developer Forum: <a href="https://forums.developer.apple.com/thread/48979">App Transport Security Required January 2017</a>
+              </li>
+              <li>
+                Apple Developer Forum: <a href="https://forums.developer.apple.com/message/15705#15705">App Transport Security update</a>
+              </li>
+            </ul>
+        </section>
 
       </article>
  <!-- end drupal content -->
