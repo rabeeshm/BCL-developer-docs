@@ -3,7 +3,7 @@
 
 <head>
     <!-- Begin Drupal Taxonomy Data -->
-    <meta name="products" content="Perform">
+    <meta name="products" content="Video Cloud">
     <meta name="audience" content="Player Developer">
     <meta name="task" content="">
     <meta name="feature" content="General Info">
@@ -173,6 +173,124 @@
     });
   &lt;/script&gt;</code></pre>
 			</section>
+
+      <section id="Catalog_events" class="bcls-section">
+        <h2>Catalog events</h2>
+        <p>There are three catalogs events for which you can listen. They are:</p>
+        <ul>
+          <li><code>catalog_request</code>: An event dispatched when a request to the catalog is made.</li>
+          <li><code>catalog_response</code>: An event dispatched when a response from the catalog is received. The JSON formatted response contains the raw data the Catalog API returned. See the  <a href="#Response_information">Response information</a> content later in this section for more details.</li>
+          <li><code>catalog_request_error</code>: An event dispatched when there is an error when interacting with the catalog.</li>
+        </ul>
+        <p>The following shows the console log of the events from a request to, and response from, the catalog:</p>
+        <figure class="bcls-figure">
+            <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/references/player-catalog/events.png" alt="Request and response event objects">
+        </figure>
+        <p>You see many standard properties of an event object. Of special interest for catalog events is <strong>type</strong> and <strong>url</strong>.</p>
+        <p>The following shows a console log of a catalog request error object:</p>
+        <figure class="bcls-figure">
+            <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/references/player-catalog/error-event-object.png" alt="Error event object">
+        </figure>
+        <h3 id="Response_information">Response information</h3>
+        <p>The <code>catalog_response</code> event object contains a JSON formatted <code>response</code> property that contains the raw data from the Catalog API response. The following shows the console log of the response property:</p>
+        <figure class="bcls-figure">
+            <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/references/player-catalog/parsed-response.png" alt="Response event objects">
+        </figure>
+        <p>To actually use data from the response property, you need to parse the raw JSON formatted string into an object. The following shows accessing the <code>name</code> property:</p>
+        <pre class="line-numbers"><code class="language-javascript">myPlayer.on('catalog_response',function(evt){
+  var api_response = JSON.parse(evt.response.response);
+  console.log('api_response.name',api_response.name);
+});</code></pre>
+        <p>Below is the JSON of an example <code>response</code> property:</p>
+        <pre class="line-numbers"><code class="language-json">{
+  "description": null,
+  "poster_sources": [{
+    "src": "http://brightcove.vo.llnwd.net/e1/pd/1507807800001/1507807800001_4784518686001_4784463159001-vs.jpg?pubId=1507807800001&videoId=4784463159001"
+  }, {
+    "src": "https://brightcove.hs.llnwd.net/e1/pd/1507807800001/1507807800001_4784518686001_4784463159001-vs.jpg?pubId=1507807800001&videoId=4784463159001"
+  }],
+  "tags": [],
+  "cue_points": [{
+    "id": "4784326156001",
+    "name": "First cue point",
+    "type": "CODE",
+    "time": 3.0,
+    "metadata": "5;This is the first CTA;http://www.brightcove.com",
+    "force_stop": false
+  }, {
+    "id": "4784326155001",
+    "name": "Second cue point",
+    "type": "CODE",
+    "time": 13.0,
+    "metadata": "3;This is the second CTA;http://docs.brightcove.com/",
+    "force_stop": false
+  }],
+  "custom_fields": {},
+  "account_id": "1507807800001",
+  "sources": [{
+    "avg_bitrate": 513000,
+    "width": 480,
+    "duration": 21098,
+    "size": 1357587,
+    "stream_name": "mp4:1507807800001/1507807800001_4784519206001_4784463159001.mp4&1483545600000&c190f37500f15373c964858e54b4e2a1",
+    "codec": "H264",
+    "asset_id": "4784519206001",
+    "container": "MP4",
+    "height": 270,
+    "app_name": "rtmp://brightcove.fcod.llnwd.net/a500/e1/uds/rtmp/ondemand"
+  }, {
+    "avg_bitrate": 513000,
+    "width": 480,
+    "src": "http://brightcove.vo.llnwd.net/e1/uds/pd/1507807800001/1507807800001_4784519206001_4784463159001.mp4?pubId=1507807800001&videoId=4784463159001",
+    "size": 1357587,
+    "height": 270,
+    "duration": 21098,
+    "container": "MP4",
+    "codec": "H264",
+    "asset_id": "4784519206001"
+  }, {
+    "avg_bitrate": 1804000,
+    "width": 960,
+    "src": "https://brightcove.hs.llnwd.net/e1/uds/pd/1507807800001/1507807800001_4784519221001_4784463159001.mp4?pubId=1507807800001&videoId=4784463159001",
+    "size": 4752091,
+    "height": 540,
+    "duration": 21098,
+    "container": "MP4",
+    "codec": "H264",
+    "asset_id": "4784519221001"
+  }, {
+    "type": "application/x-mpegURL",
+    "src": "http://c.brightcove.com/services/mobile/streaming/index/master.m3u8?videoId=4784463159001&pubId=1507807800001",
+    "container": "M2TS",
+    "codec": "H264"
+  }, {
+    "type": "application/x-mpegURL",
+    "src": "https://secure.brightcove.com/services/mobile/streaming/index/master.m3u8?videoId=4784463159001&pubId=1507807800001&secure=true",
+    "container": "M2TS",
+    "codec": "H264"
+  }],
+  "name": "small-waterfall.mp4",
+  "reference_id": null,
+  "long_description": null,
+  "duration": 21098,
+  "economics": "AD_SUPPORTED",
+  "published_at": "2016-03-03T14:56:42.982Z",
+  "text_tracks": [],
+  "updated_at": "2016-05-03T18:53:43.573Z",
+  "thumbnail": "http://brightcove.vo.llnwd.net/e1/pd/1507807800001/1507807800001_4784518327001_4784463159001-th.jpg?pubId=1507807800001&videoId=4784463159001",
+  "poster": "http://brightcove.vo.llnwd.net/e1/pd/1507807800001/1507807800001_4784518686001_4784463159001-vs.jpg?pubId=1507807800001&videoId=4784463159001",
+  "link": null,
+  "id": "4784463159001",
+  "ad_keys": "key1%3Dvalue1%26key2%3Dvalue2",
+  "thumbnail_sources": [{
+    "src": "http://brightcove.vo.llnwd.net/e1/pd/1507807800001/1507807800001_4784518327001_4784463159001-th.jpg?pubId=1507807800001&videoId=4784463159001"
+  }, {
+    "src": "https://brightcove.hs.llnwd.net/e1/pd/1507807800001/1507807800001_4784518327001_4784463159001-th.jpg?pubId=1507807800001&videoId=4784463159001"
+  }],
+  "created_at": "2016-03-03T14:56:42.982Z"
+}</code></pre>
+      </section>
+
       <section id="catalog-error" class="bcls-section">
         <h2>Handle bc-catalog-error</h2>
         <p>It is possible that handling errors in the normal <code>ready()</code> section in the <code>script</code> block can cause issues. For instance, it can happen that the <code>bc-catalog-error</code> event could be dispatched before the player is ready, and if you listen for the error in the <code>ready()</code> section, you will not be able to handle the error. This issue can occur when using geo-filtering, a video is unpublished, a video is out of scheduling range, or in a different account. You may find that there is not a problem in your code, but the issue can browser dependent, so use caution.</p>
