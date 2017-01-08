@@ -86,7 +86,27 @@
             <p>You can re-transcode your videos using Video Cloud's FTP Batch Provisioning feature which is available only to Video Cloud Pro and Enterprise publishers. In a future release, we plan to make re-transcoding available using the Media API. For introductory information on batch provisioning, read <a href="/en/video-cloud/batch-provisioning/reference/using-ftpbp.html">Using FTP Batch Provisioning</a>.</p>
             <h3>Main steps for re-transcoding videos with FTP&nbsp;Batch Provisioning</h3>
             <ol>
-               <li>If you are uploading new source video files, prepare your assets for uploading.</li>
+               <li>If you are uploading new source video files, you will need to perform two batch operations: 1) upload the new source; 2) retranscode the video. The manifests for the two jobs would look like this:
+                <p>First request:</p>
+<pre><code>&lt;?xml version="1.0" encoding="utf-8" ?&gt;
+&lt;publisher-upload-manifest publisher-id="YOUR_PUBLISHER_ID" preparer="YOUR_NAME" report-success="true"&gt;
+  &lt;notify email="YOUR_EMAIL" /&gt;
+  &lt;asset filename="FILENAME.mp4"
+      refid="VIDEO_ASSET_REFERENCE_ID"
+      type="VIDEO_FULL"
+      encode-to="MP4"
+      encode-multiple="TRUE" /&gt;
+&lt;/publisher-upload-manifest&gt;</code></pre>
+                <p>Second request:</p>
+<pre><code>&lt;?xml version="1.0" encoding="utf-8" ?&gt;
+&lt;publisher-upload-manifest publisher-id="YOUR_PUBLISHER_ID" preparer="YOUR_NAME" report-success="true"&gt;
+  &lt;notify email="YOUR_EMAIL" /&gt;
+  &lt;reencode-from-new-source
+      title-refid="VIDEO_REFERENCE_ID"
+      new-source-refid="VIDEO_ASSET_REFERENCE_ID (DEFINED IN STEP 1)"
+      overwrite-images="TRUE" /&gt;
+&lt;/publisher-upload-manifest&gt;</code></pre>
+               </li>
                <li><a href="#manifest">Create an XML manifest file</a> that describes the videos you are re-transcoding.</li>
                <li>If you are providing new source video files, upload your files to the Video Cloud FTP server. If you are re-transcoding from existing files, skip to the next step. (If you are a Video Cloud Enterprise publisher, you can optionally upload your files to the <a href="http://support.brightcove.com/en/video-cloud/docs/uploading-videos-aspera">Video Cloud Aspera server</a>.)</li>
                <li>Upload your XML manifest file to the Video Cloud FTP server.</li>
