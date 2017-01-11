@@ -78,7 +78,8 @@
 
                         <h3 class="bcls-question">Advertising</h3>
                         <ul class="bcls-answer">
-                            <li><a href="#Media_progress_values">Media progress values</a></li>
+                          <li><a href="#Media_progress_values">Media progress values</a></li>
+                          <li><a href="#OnceUX_quartile_events">OnceUX quartile events</a></li>
                         </ul>
 
                         <h3 class="bcls-question">Analytics</h3>
@@ -202,17 +203,45 @@ var preferredPeakBitRate: Double
       </section>
 
             <section class="bcls-section" id="Media_progress_values">
-        <h2>Media progress values</h2>
-                    <p>During media playback, the values reported to the Player SDK progress delegate method may include an initial value of negative infinity and a final value of positive infinity. These values are used when processing pre-roll and post-roll ads.</p>
-                  <p>If these values are not important to you or interfere with your own progress tracking, they can be easily ignored with a conditional statement like this:</p>
-                    <a href="../reference/current/Protocols/BCOVPlaybackControllerBasicDelegate.html#//api/name/playbackController:playbackSession:didProgressTo:"><pre class="line-numbers"><code class="language-swift">- (void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller playbackSession:(id&lt;BCOVPlaybackSession&gt;)session didProgressTo:(NSTimeInterval)progress
-{
+              <h2>Media progress values</h2>
+                          <p>During media playback, the values reported to the Player SDK progress delegate method may include an initial value of negative infinity and a final value of positive infinity. These values are used when processing pre-roll and post-roll ads.</p>
+                        <p>If these values are not important to you or interfere with your own progress tracking, they can be easily ignored with a conditional statement like this:</p>
+                          <a href="../reference/current/Protocols/BCOVPlaybackControllerBasicDelegate.html#//api/name/playbackController:playbackSession:didProgressTo:"><pre class="line-numbers"><code class="language-swift">- (void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller playbackSession:(id&lt;BCOVPlaybackSession&gt;)session didProgressTo:(NSTimeInterval)progress
+  {
     if (progress &lt; 0.0 || progress &gt;= INFINITY)
         return;
 
     // Your code here
-}</code></pre></a>
-      </section>
+  }</code></pre></a>
+            </section>
+
+            <section class="bcls-section" id="OnceUX_quartile_events">
+              <h2>OnceUX quartile events</h2>
+              <p>
+                When reading OnceUX VMAPS with the <a href="https://github.com/brightcove/brightcove-player-sdk-ios-oux">Brightcove OnceUX plugin</a>, the quartile events must define valid offset values. In other words, the quartiles must contain offsets within their quartile impressions in order to be fired at that time.
+              </p>
+              <p>
+                Here are the observed events that are fired through the end of a pre-roll ad, when the quartile offsets are absent:
+              </p>
+              <pre class="line-numbers"><code class="language-html">impression
+companionCreativeView
+creativeView
+complete</code></pre>
+              <p>
+                Here are the observed events when valid offset values are used:
+              </p>
+              <pre class="line-numbers"><code class="language-html">companionCreativeView
+impression
+creativeView
+start
+firstQuartile
+midpoint
+thirdQuartile
+complete</code></pre>
+              <p>
+                OnceUX maintains an array of events to be fired during playback of ads, and that array is ordered by the event offsets. An event which does not possess a valid offset cannot be added to the array which means it cannot be fired during ad playback. The <code>complete</code> event is a special case which is handled without using the ordered event array.
+              </p>
+            </section>
 
             <section class="bcls-section" id="Programmatically_adding_cue_points">
         <h2>Programmatically adding cue points</h2>
