@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Begin Drupal Taxonomy Data -->
+    <meta name="products" content="Video Cloud">
+    <meta name="audience" content="Player Developer">
+    <meta name="task" content="">
+    <meta name="feature" content="">
+    <meta name="type" content="Code Sample">
+    <meta name="keywords" content="player,mediainfo">
+    <!-- End Drupal Taxonomy Data -->
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <!-- change title to match the h1 heading -->
+    <title>Brightcove Player Sample: Alltime Video Views</title>
+
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700" rel="stylesheet" type="text/css">
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link rel="stylesheet" href="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.css">
+    <link rel="stylesheet" href="//docs.brightcove.com/en/styles/template-less/css/bcls-doc.css">
+    <link rel="stylesheet" href="/en/styles/foundation-fixes.css">
+
+    <script>
+        (function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function() {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-2728311-29', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
+
+</head>
+
+<body>
+    <!-- header navbar -->
+    <div id="navWrapper" class="fixed"></div>
+    <!-- breadcrumbs -->
+    <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+    <!-- search -->
+    <div id="searchModal" class="reveal-modal" data-reveal></div>
+    <!-- content -->
+    <div class="row">
+        <div class="sidebar large-2 columns show-for-large-up">
+            <div id="sidenav" class="side-nav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+            <h1>Brightcove Player Sample: Alltime Video Views</h1>
+            <!-- begin drupal content -->
+            <article class="bcls-article perform-only">
+                <header class="bcls-header">
+                    <p>This sample only works for Video Cloud.</p>
+                </header>
+            </article>
+            <article class="bcls-article video-cloud-only">
+                <header id="bcls_header" class="bcls-header">
+                    <!-- Place document intro sentence(s) here -->
+                    <p>In this topic, you will learn how to display the all-time views for each video loaded into a player. The code will be written as a plugin for easy use with different players.</p>
+                    <aside class="bcls-aside bcls-aside--information">
+                        Note:
+                        <ul>
+                            <li>This plugin requires a proxy on the server to get the all-time views from the Analytics API. Sample PHP code for the proxy is included below, but the proxy can be written in any language as long is it can be accessed via an HTTP request from the player plugin.</li>
+                            <li>This plugin <strong>will only work with in-page embeds</strong>.</li>
+                        </ul>
+                    </aside>
+                </header>
+
+                <section id="Development_sequence" class="bcls-section">
+                    <h2 class="bcls-expander-head">Development sequence</h2>
+                    <div class="bcls-expander-content">
+                        <p>Here is the recommended development sequence:</p>
+                        <ol>
+                            <li>Use the embed_in_page player implementation to test the functionality of your player, plugin and CSS (if CSS is needed)</li>
+                            <li>Put the plugin's JavaScript and CSS into separate files for local testing</li>
+                            <li>Deploy the plugin code and CSS to your server once you have worked out any errors</li>
+                            <li>Use <span class="video-cloud-only">Video Cloud</span><span class="perform-only">Perform</span> Studio to add the plugin and CSS to your player</li>
+                            <li>Replace the embed_in_page player implementation if you determine that the iframe implementation is a better fit (detailed in next section)</li>
+                        </ol>
+                        <p>For details about these steps, review the <a href="../../brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a> guide.</p>
+                        <h3>iframe or embed_in_page</h3>
+                        <p>When developing enhancements for the Brightcove player you will need to decide if the code is a best fit for the iframe or embed_in_page implementation. This plugin will only work for <strong>in-page</strong> embeds.</p>
+                    </div>
+                    <!-- class="bcls-expander-content" -->
+                </section>
+
+                <section id="Select_implementation" class="bcls-section">
+                    <h2>Select implementation</h2>
+                    <p>In this sample, the functionality is contained in the code and CSS with no dependencies on the parent page, so a plugin is a good choice for this functionality. You may not choose to use the iframe implementation, because the iframe player will not allow the plugin to insert the element required to display the all-time views.</p>
+                </section>
+
+                <section id="API_resources_used" class="bcls-section">
+                    <h2>API resources used</h2>
+                    <p>The following sections detail resources used from various APIs.</p>
+                    <h3>Brightcove Player API properties</h3>
+                    <ul>
+                        <li><code>mediainfo</code></li>
+                    </ul>
+                    <h3>Brightcove Player API events</h3>
+                    <ul>
+                        <li><code>metadataloaded</code></li>
+                    </ul>
+                    <h3>Brightcove Analytics API</h3>
+                </section>
+
+                <section id="single_video_player" class="bcls-section">
+                    <h2>Sample player</h2>
+                    <p>The player below includes a playlist to show you that the plugin will work with playlists. It will also work with a single video player.</p>
+                    <p>You should see the all-time views for for the first video displayed below the player. Select other videos in the playlist to see their all-time views displayed.</p>
+
+                    <video id="bcls_alltimePlaysPlayer" data-playlist-id="5282200243001"
+                    data-account="1752604059001"
+                    data-player="BJFYWrtUl"
+                    data-embed="default"
+                    data-application-id
+                    class="video-js"
+                    controls
+                    width="500"
+                    height="281"></video>
+                    <script src="//players.brightcove.net/1752604059001/BJFYWrtUl_default/index.min.js"></script><ol id="bcls_alltimePlaysPlaylist" class="vjs-playlist"></ol>
+
+                </section>
+
+                <section id="How_it_works" class="bcls-section">
+                    <h2>How it works</h2>
+                    <p>The following sections explain the player, JavaScript, CSS, and PHP proxy code used in the example.</p>
+
+                    <h3>Set up the Proxy</h3>
+                    <p>For this plugin to work, you will need to host a proxy app that can make a request to the <a href="http://docs.brightcove.com/en/video-cloud/analytics-api/getting-started/api-overview.html">Brightcove Analytics API</a> - this request must come from the server side, and cannot be made directly from the plugin. A sample is provided here in PHP. You can simply copy the sample code, insert your own client credentials for the Analytics API, and host the file on any server that supports PHP.</p>
+                    <p>If you wish to write the proxy in another language that is fine - it just needs to able to:</p>
+                    <ol>
+                        <li>Accept a POST request from the player plugin that will include the full Analytics API request as an x-www-form-urlencoded parameter</li>
+                        <li>Get client credentials for the Analytics API and the appropriate account - typically you would just save these in the server-side code, or if you have multiple users with different accounts, retrieve them from user information repository</li>
+                        <li>Use the credentials to <a href="retrieve">get an access token</a> from the Brightcove OAuth API</li>
+                        <li>Use the access token to authorize the request to the Analytics API, make, the request and return the raw response to the plugin</li>
+                    </ol>
+                    <p>The steps below assume that you will just use the PHP proxy provided here.</p>
+                    <ol class="bcls-tasklist">
+                        <li>Copy the PHP code below and paste it into an empty file:
+<pre class="line-numbers"><code class="language-php">&lt;?php
+/**
+ * proxy for Brightcove RESTful APIs
+ * gets an access token, makes the request, and returns the response
+ * Accessing:
+ *     Method: POST
+ *
+ * @post {string} url - the URL for the API request
+ * @post {string} [requestType=GET] - HTTP method for the request
+ *
+ * @returns {string} $response - JSON response received from the API
+ */
+
+// CORS enablement and other headers
+header("Access-Control-Allow-Origin: *");
+header("Content-type: application/json");
+header("X-Content-Type-Options: nosniff");
+
+// set up request for access token
+$data = array();
+
+    $client_id = '<span class="bcls-input">ENTER_YOUR_CLIENT_ID_HERE</span>';
+    $client_secret = '<span class="bcls-input">ENTER_YOUR_CLIENT_SECRET_HERE</span>';
+
+// note that the $auth_string below must be BASE64 encoded - the PHP CURL
+// functions will take case of that automatically, but if you are
+// writing a proxy in another language, you may need to do that
+// encoding explicitly
+//
+$auth_string = "{$client_id}:{$client_secret}";
+$request     = "https://oauth.brightcove.com/v3/access_token?grant_type=client_credentials";
+$ch          = curl_init($request);
+curl_setopt_array($ch, array(
+        CURLOPT_POST           =&gt; TRUE,
+        CURLOPT_RETURNTRANSFER =&gt; TRUE,
+        CURLOPT_SSL_VERIFYPEER =&gt; FALSE,
+        CURLOPT_USERPWD        =&gt; $auth_string,
+        CURLOPT_HTTPHEADER     =&gt; array(
+            'Content-type: application/x-www-form-urlencoded',
+        ),
+        CURLOPT_POSTFIELDS =&gt; $data
+    ));
+$response = curl_exec($ch);
+curl_close($ch);
+
+// Check for errors
+if ($response === FALSE) {
+    die(curl_error($ch));
+}
+
+// Decode the response
+$responseData = json_decode($response, TRUE);
+$access_token = $responseData["access_token"];
+
+// set up the API call
+// get data
+if ($_POST["requestBody"]) {
+    $data = json_decode($_POST["requestBody"]);
+} else {
+    $data = array();
+}
+// get request type or default to GET
+if ($_POST["requestType"]) {
+    $method = $_POST["requestType"];
+} else {
+    $method = "GET";
+}
+
+// more security checks
+$needle = '.com';
+$endapi = strpos($_POST["url"], $needle) + 4;
+$nextChar = substr($_POST['url'], $endapi, 1);
+if (strpos($_POST["url"], 'api.brightcove.com') == false) {
+    exit('{"ERROR":"Only requests to Brightcove APIs are accepted by this proxy"}');
+} else if ($nextChar !== '/' && $nextChar !== '?') {
+    exit('{"ERROR": "There was a problem with your API request - please check the URL"}');
+}
+// get the URL and authorization info from the form data
+$request = $_POST["url"];
+//send the http request
+$ch = curl_init($request);
+curl_setopt_array($ch, array(
+        CURLOPT_CUSTOMREQUEST  =&gt; $method,
+        CURLOPT_RETURNTRANSFER =&gt; TRUE,
+        CURLOPT_SSL_VERIFYPEER =&gt; FALSE,
+        CURLOPT_HTTPHEADER     =&gt; array(
+            'Content-type: application/json',
+            "Authorization: Bearer {$access_token}",
+        ),
+        CURLOPT_POSTFIELDS =&gt; json_encode($data)
+    ));
+$response = curl_exec($ch);
+curl_close($ch);
+
+// Check for errors
+if ($response === FALSE) {
+    $logEntry = "\nError:\n".
+    "\n".date("Y-m-d H:i:s")." UTC \n"
+    .$response;
+    $logFileLocation = "log.txt";
+    $fileHandle      = fopen($logFileLocation, 'a') or die("-1");
+    fwrite($fileHandle, $logEntry);
+    fclose($fileHandle);
+    echo "Error: there was a problem with your API call"+
+    die(curl_error($ch));
+}
+
+// Decode the response
+// $responseData = json_decode($response, TRUE);
+// return the response to the AJAX caller
+$responseDecoded = json_decode($response);
+if (!isset($responseDecoded)) {
+    $response = '{null}';
+}
+echo $response;
+?&gt;
+</code></pre>
+                        </li>
+                        <li>Save the file and host it on a server where it will have a public URL - you will need that URL in a later step</li>
+                    </ol>
+                    <h3>Create the player</h3>
+                    <p>To create a player and assign a playlist to it, follow these steps:</p>
+                    <ol class="bcls-tasklist">
+                        <li>In the <strong>Players</strong> module, create a new player or use an existing one.</li>
+                        <li>Be sure to <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/playlist-using.html#enableplayer">http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/playlist-using.html#enableplayer</a> and <strong>Publish</strong> the player to make the changes live.
+                            <aside class="bcls-aside bcls-aside--information">Skip this step for a single-video player</aside>
+                        </li>
+                        <li>In the <strong>Media</strong> module, select a playlist and publish it with this player.</li>
+                        <li>
+                            <p>
+                                Copy the In-Page embed code and paste it into a new HTML file.
+                            </p>
+                            <p>The embed code should look similar to this:</p>
+<pre class="line-numbers video-cloud-only" data-start="1"><code class="language-html">&lt;video <span class="bcls-highlight">id="bcls_alltimePlaysPlayer"</span> data-playlist-id="5282200243001"
+data-account="1752604059001"
+data-player="BJFYWrtUl"
+data-embed="default"
+data-application-id
+class="video-js"
+controls
+width="600"
+height="338"&gt;&lt;/video&gt;
+&lt;script src="//players.brightcove.net/1752604059001/BJFYWrtUl_default/index.min.js"&gt;&lt;/script&gt;
+&lt;ol <span class="bcls-highlight">id="bcls_alltimePlaysPlaylist"</span> class="vjs-playlist"&gt;&lt;/ol&gt;</code></pre>
+                            <aside class="bcls-aside bcls-aside--tip">For details on how to get this embed code, see the <a href="../../brightcove-player/getting-started/quick-start-bc-player.html">Quick Start to Brightcove Player</a> document.</aside>
+                        </li>
+                        <li>Your code should look similar to what is shown above <strong>except</strong> for the highlighted <code>id</code> attributes on the tags for the video and playlist.</li>
+                        <li>Add <strong>exactly</strong> these ids to the <code>video</code> and <code>ol</code> tags for the player and playlist:
+                            <ul>
+                                <li>video tag: <code>bcls_alltimePlaysPlayer</code></li>
+                                <li>ol tag: <code>bcls_alltimePlaysPlaylist</code></li>
+                            </ul>
+                            <aside class="bcls-aside bcls-aside--information">if for some reason you must use different values for the ids, you will need to modify the JavaScript code for the plugin to account for this.</aside>
+                        </li>
+                    </ol>
+                    <h3>The JavaScript code</h3>
+                    <p>The following provides an overview of the functionality of the plugin code:</p>
+                    <ol class="bcls-tasklist">
+                        <li>In the variable initialization, get a reference to the <code>video</code> element, and get the account id from the <code>data-account</code> attribute of the video element. (lines 7-8)</li>
+                        <li>Listen for the <strong>first</strong> <code>loadedmetadata</code> event, at which time the <code>mediainfo</code> property will be populated and the playlist will be set up. (line 11)</li>
+                        <li>Create a new <code>p</code> element, give it the <code>id</code> 'bcls_alltimeViews', and add any styling that you want (here we have just set the <code>font-weight</code> to 'bold'). (lines 13-15)</li>
+                        <li>Depending on whether this is a playlist or single video player (based on a <code>hasPlaylist</code> option that will be passed in) add this new element to DOM either after the video element or after the playlist element using the <code>insertAdjacentElement()</code> method. (lines 16-22)</li>
+                        <li>Get a reference to the new element in the global scope for the plugin. (line 23)</li>
+                        <li>Retrieve the <code>id</code> for the video currently in the player from the <code>mediainfo</code> property and save this in the plugin's global scope also. (line 25)</li>
+                        <li>Call the <code>createRequest()</code> function (we'll see what this does in a moment). (line 27)</li>
+                        <li>Set a listener for additional <code>loadedmetadata</code> events - the new listener will just get the video <code>id</code> and call <code>createRequest()</code>, without creating and adding a new element to the DOM. (lines 30-35)</li>
+                    </ol>
+
+                    <p>The following code is the actual implementation of the general steps above.</p>
+                    <ul>
+                        <li>Line 469: Listens for the <code>loadstart</code> event.</li>
+                        <li>Line 471: Assigns the <code>name</code> of the video to a variable for later use in the link tag.</li>
+                        <li>Line 472: Assigns the <code>sources</code> array to a variable.</li>
+                        <li>Line: 473: Assigns the length of the array to variable.</li>
+                        <li>Lines 473-478: Loop over the array and assign to a second array renditions where the <code>container</code> is <strong>MP4</strong>, AND the rendition has a <code>src</code> property. The MP4 renditions appear twice in the <code>sources</code>                            array, once with a <code>src</code> property and once with a <code>stream_name</code> property. The first is for progressive download and the second for streaming.</li>
+                        <li>Lines 480-482: Sort the array of MP4s.</li>
+                        <li>Line 484: Assigns the largest rendition to a variable.</li>
+                        <li>Lines 487-488: Assign the <code>id</code> and <code>className</code> attributes for the newly created <code>div</code> element for the icon.</li>
+                        <li>Lines 491-493: Assign image and link element attributes.</li>
+                        <li>Lines 484-495: Append child elements to parents.</li>
+                        <li>
+                            <p>Lines 498-502: Get the spacer element, set the style to right justify the content and places the new icon element in the spacer.</p>
+                            <aside class="bcls-aside bcls-aside--tip">For more details about control bar icons, see the <a href="../../brightcove-player/guides/customize-appearance.html#iconmanipulation">Controlbar icon manipulation</a> section of the Customize Player Appearance document.</aside>
+                        </li>
+
+                    </ul>
+<pre class="line-numbers"><code class="language-html">videojs.plugin('alltimeViews', function(options) {
+    var player = this,
+        el,
+        txt,
+        video_id,
+        alltimeViewsEl,
+        videoElement = document.getElementById('bcls_alltimePlaysPlayer'),
+        account_id = videoElement.getAttribute('data-account');
+
+    // listener for the first video load
+    player.one('loadedmetadata', function() {
+        // create the element to hold the video views
+        el = document.createElement('p');
+        el.setAttribute('id', 'bcls_alltimeViews');
+        el.setAttribute('style', 'font-weight:bold;');
+        if (options.hasPlaylist) {
+            var playlistEl = document.getElementById('bcls_alltimePlaysPlaylist');
+            console.log('playlistEl', playlistEl);
+            playlistEl.insertAdjacentElement('afterend', el);
+        } else {
+            videoElement.insertAdjacentElement('afterend', el);
+        }
+        alltimeViewsEl = document.getElementById('bcls_alltimeViews');
+        // get the current video id from mediainfo
+        video_id = player.mediainfo.id;
+        // launch the Analytics API request to get the alltime video views
+        createRequest();
+
+        // set listener for future requests
+        player.on('loadedmetadata', function() {
+            // get the current video id from mediainfo
+            video_id = player.mediainfo.id;
+            // launch the Analytics API request to get the alltime video views
+            createRequest();
+        });
+    });
+
+
+    /**
+     * formats an integer by adding commas for thousands separators
+     * @param  {Integer} x Number to format
+     * @return {String}   The formatted number
+     */
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+
+    /**
+     * createRequest sets up requests, send them to makeRequest(), and handles responses
+     * @param  {string} type the request type
+     */
+    function createRequest() {
+        var requestOptions   = {},
+            responseDecoded;
+
+        // set the proxy url
+        requestOptions.proxyURL = options.proxyURL;
+        // set the Analytics API request
+        requestOptions.url      = 'https://analytics.api.brightcove.com/v1/alltime/accounts/' + account_id + '/videos/' + video_id;
+        // send the request and handle the response
+        makeRequest(requestOptions, function(response) {
+            // parse the response
+            responseDecoded = JSON.parse(response);
+            // should always get a response, but just in case...
+            if (responseDecoded &amp;&amp; responseDecoded.alltime_video_views) {
+                // write the views to the UI
+                alltimeViewsEl.textContent = numberWithCommas(responseDecoded.alltime_video_views) + ' views';
+            } else {
+                alltimeViewsEl.textContent = 'All-time views for this video are not available';
+            }
+        });
+    }
+
+    /**
+     * sends Brightcove API requests to a server-side proxy
+     * @param  {Object} requestOptions for the request
+     * @param  {String} requestOptions.url the full API request URL
+     * @param  {String="GET","POST","PATCH","PUT","DELETE"} requestData [options.requestType="GET"] HTTP type for the request
+     * @param  {String} requestOptions.proxyURL proxyURL to send the request to
+     * @param  {Function} [callback] callback function that will process the response
+     */
+    function makeRequest(requestOptions, callback) {
+        var httpRequest = new XMLHttpRequest(),
+            response,
+            requestParams,
+            proxyURL    = requestOptions.proxyURL,
+            // response handler
+            getResponse = function() {
+                try {
+                    if (httpRequest.readyState === 4) {
+                        if (httpRequest.status === 200) {
+                            response = httpRequest.responseText;
+                            // some API requests return '{null}' for empty responses - breaks JSON.parse
+                            if (response === '{null}') {
+                                response = null;
+                            }
+                            // return the response
+                            callback(response);
+                        } else {
+                            alert('There was a problem with the request. Request returned ' + httpRequest.status);
+                        }
+                    }
+                } catch (e) {
+                    alert('Caught Exception: ' + e);
+                }
+            };
+        requestParams = 'url=' + encodeURIComponent(requestOptions.url) + '&amp;requestType=GET';
+        // set response handler
+        httpRequest.onreadystatechange = getResponse;
+        // open the request
+        httpRequest.open('POST', proxyURL);
+        // set headers
+        httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        // open and send request
+        httpRequest.send(requestParams);
+    }
+
+});
+</code></pre>
+                    <!-- <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="456-505"></code></p> -->
+
+                    <h3>The stylesheet</h3>
+                    <p>This example uses CSS styles for the Brightcove player.</p>
+                    <ol class="bcls-tasklist">
+                        <li>
+                            <p>
+                                Add the following CSS to your page code:
+                            </p>
+                            <ul>
+                                <li>This code sets the dimensions for the container and horizontally positions the download icon within the container.</li>
+                            </ul>
+                            <pre class="line-numbers" data-start="1"><code class="language-css">&lt;style type=&quot;text/css&quot;&gt;
+    #downloadButton {
+    width: 34px;
+    height: 33px;
+    margin-top: 6px;
+     }
+&lt;/style&gt;</code></pre>
+                            <!-- <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="435-441"></code></p> -->
+                        </li>
+                    </ol>
+                </section>
+
+                <section id="Use_a_plugin" class="bcls-section">
+                    <h2>Use a plugin</h2>
+                    <p>It is a best practice to use a plugin so that you can easily add the JavaScript code's functionality to multiple players.</p>
+
+                    <h3>Create the JavaScript file</h3>
+                    <p>Move the plugin's JavaScript code into a file and place it in an Internet accessible URL.</p>
+                    <ol class="bcls-tasklist">
+                        <li>Create a new file for your plugin JavaScript code. In this case, name it <code>download-video.js</code>.</li>
+                        <li>Cut and paste the JavaScript code from your main HTML file into this new file.</li>
+                        <li>Lines 1,49: Wrap your JavaScript code using the <code>videojs.plugin()</code> function. The first argument, <code>downloadVideoPlugin</code>, is the plugin name.</li>
+                        <li>Line 4: Gets a reference to your player.</li>
+                        <li>
+                            <p>The rest is your JavaScript code which was reviewed in a previous section.</p>
+                            <aside class="bcls-aside bcls-aside--information">Line 49: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</aside>
+                            <pre class="line-numbers" data-start="1"><code class="language-javascript">videojs.plugin('downloadVideoPlugin', function() {
+
+  // Create variables and new div, anchor and image for download icon
+  var myPlayer = this,
+      videoName,
+      totalRenditions,
+      mp4Ara=[],
+      highestQuality,
+      spacer,
+      newElement = document.createElement('div'),
+      newLink = document.createElement('a'),
+      newImage = document.createElement('img');
+
+  myPlayer.on('loadstart',function(){
+      // Get video name and the MP4 renditions
+      videoName = myPlayer.mediainfo['name'];
+      rendtionsAra = myPlayer.mediainfo.sources;
+      totalRenditions = rendtionsAra.length;
+      for (var i = 0; i &lt; totalRenditions; i++) {
+          if (rendtionsAra[i].container === &quot;MP4&quot; &amp;&amp; rendtionsAra[i].hasOwnProperty('src')) {
+              mp4Ara.push(rendtionsAra[i]);
+          };
+      };
+      // Sort the renditions from highest to lowest
+      mp4Ara.sort( function (a,b){
+          return b.size - a.size;
+      });
+      // Set the highest rendition
+      highestQuality= mp4Ara[0].src;
+
+      // Assign id and classes to div for icon
+      newElement.id = 'downloadButton';
+      newElement.className = 'downloadStyle vjs-control';
+
+      // Assign properties to elements and assign to parents
+      newImage.setAttribute('src','http://solutions.brightcove.com/bcls/brightcove-player/download-video/file-download.png');
+      newLink.setAttribute('href',highestQuality);
+      newLink.setAttribute('download',videoName);
+      newLink.appendChild(newImage);
+      newElement.appendChild(newLink);
+
+      // Get the spacer element
+      spacer = myPlayer.controlBar.customControlSpacer.el();
+      // Set the content of the spacer to be right justified
+      spacer.setAttribute(&quot;style&quot;, &quot;justify-content: flex-end;&quot;);
+      // Place the new element in the spacer
+      spacer.appendChild(newElement);
+  })
+});</code></pre>
+                            <!-- <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="527-575"></code></p> -->
+                        </li>
+                        <li>
+                            <p>In the HTML file, add the following code just below the existing <code>&lt;script&gt;</code> tags. This code includes the JavaScript file and then calls the method defined in that JavaScript.</p>
+                            <pre class="line-numbers" data-start="1"><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;download-video.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;videojs('myPlayerID').downloadVideoPlugin();&lt;/script&gt;</code></pre>
+                            <!-- <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="287-288" ></code></p> -->
+                        </li>
+
+                        <li>Browse the HTML page. You should see the download video button, except now your JavaScript code has been removed from the HTML page.</li>
+                    </ol>
+
+                    <h3>Create the CSS file</h3>
+                    <p>Move the CSS styles into a file and place it in an Internet accessible URL.</p>
+                    <ol class="bcls-tasklist">
+                        <li>Create a new file for your CSS styles. In this case, name it <code>download-video.css</code>.</li>
+                        <li>Cut and paste the CSS code from your main HTML file into this new file.</li>
+                        <li>
+                            <p>Remove the opening <code>&lt;style&gt;</code> tag and the closing <code>&lt;/style&gt;</code> tag. Your code should look similar to this:</p>
+                            <pre class="line-numbers" data-start="1"><code class="language-css">/***************************
+ * Download Video          *
+ ***************************/
+#downloadButton {
+    width: 34px;
+    height: 33px;
+    margin-top: 6px;
+}</code></pre>
+                            <!-- <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="514-521" ></code></p> -->
+                        </li>
+                        <li>
+                            <p>In the <code>&lt;head&gt;</code> section of your HTML file, add the following link to include your newly created CSS file.</p>
+                            <pre class="line-numbers" data-start="1"><code class="language-html">&lt;link href=&quot;download-video.css&quot; rel=&quot;stylesheet&quot;&gt;</code></pre>
+                            <!-- <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="285" ></code></p> -->
+                        </li>
+                        <li>Browse the HTML page. You should see the download video button, except now your styles have been removed from the HTML page.</li>
+                    </ol>
+
+                    <h3>Deploy plugin and CSS</h3>
+                    <p>To deploy the plugin using the Players module, follow these steps:</p>
+                    <ol class="bcls-tasklist">
+                        <li>In <span class="video-cloud-only">Video Cloud</span><span class="perform-only">Perform</span> Studio, open the <strong>Players</strong> module and locate the player.</li>
+                        <li>Click the link for the player to open the player properties.</li>
+                        <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
+                        <li>For the <strong>JavaScript URL</strong>, enter the URL which specifies the location of where you saved your plugin's JavaScript.</li>
+                        <li>For the <strong>CSS URL</strong>, enter the URL which specifies the location of where you saved your plugin's CSS.</li>
+                        <li>For the <strong>Name</strong>, enter <strong>downloadVideoPlugin</strong>. No options need be entered.</li>
+                        <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
+                    </ol>
+                </section>
+
+                <section id="Use_iframe" class="bcls-section">
+                    <h2>Use iframe</h2>
+                    <p>It is a best practice to use the iframe player implementation. Since you can create the download video functionality as a plugin, replace the In_Page embed implementation with the iframe implementation.</p>
+                    <aside class="bcls-aside bcls-aside--information">You may not want to use the iframe implementation, because some browsers will open the downloaded video within the iframe instead of downloading the video.</aside>
+                    <pre class="line-numbers" data-start="1"><code class="language-html">&lt;iframe style=&quot;width: 640px; height: 360px;&quot;
+    src=&quot;//players.brightcove.net/1752604059001/VJuPrI3cg_default/index.html?videoId=4093643993001&quot;
+    allowfullscreen
+    webkitallowfullscreen
+    mozallowfullscreen&gt;&lt;/iframe&gt;</code></pre>
+                    <!-- <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="581-585"></code></p> -->
+                </section>
+
+                <section id="Overlay_implementation" class="bcls-section">
+                    <h2>Overlay implementation</h2>
+                    <p>To replace the icon in the control bar, and have an overlay on the video, you need to make a few changes.</p>
+                    <p>First, in the JavaScript remove all the code that creates and displays the linked icon. Replace that code with code that creates and appends an overlay.</p>
+                    <pre class="line-numbers" data-start="1"><code class="language-javascript">downloadString = &quot;&lt;a href='&quot; + highestQuality + &quot;' download='&quot; + videoName + &quot;'&gt;Download the Video&lt;/a&gt;&quot;;
+overlay = document.createElement('p');
+overlay.innerHTML = downloadString;
+overlay.id = 'download-overlay';
+myPlayer.el().appendChild(overlay);</code></pre>
+                    <!-- <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="134-138"></code></p> -->
+                    <p>You will also need to use CSS to style and place the overlay, which obviously can be changed to suit your implementation.</p>
+                    <pre class="line-numbers" data-start="1"><code class="language-css">&lt;style type=&quot;text/css&quot;&gt;
+    #download-overlay {
+        background-color: #FFFFFF;
+        color: #000000;
+        font-size: 1em;
+        padding: 2px;
+        position: absolute;
+        bottom: 35px;
+        left: 485px;
+        width: 135px;
+        text-align: center;
+    }</code></pre>
+                    <!-- <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="83-94"></code></p> -->
+                    <p>If you wish to use this approach for your plugin, you will need to place the CSS into a separate file, save in a Internet accessible URL, and enter that URL when associating the plugin with a player in Studio.</p>
+                </section>
+
+                <section id="HTML_page_implementation" class="bcls-section">
+                    <h2>HTML page implementation</h2>
+                    <p>To replace the icon in the control bar, and define a location in your HTML page for a download link, you need to make a few changes.</p>
+                    <p>First, in your HTML page determine where you wish to insert the link and place the following HTML there.</p>
+                    <pre class="line-numbers" data-start="1"><code class="language-html">&lt;p id=&quot;insertionPoint&quot;&gt;&lt;/p&gt;</code></pre>
+                    <!-- <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="211"></code></p> -->
+                    <p>Next, in the JavaScript remove all the code that creates and displays the linked icon. Replace that code with code that creates a hyperlink and dynamically injects that hyperlink into the HTML page at your insertion point.</p>
+                    <pre class="line-numbers" data-start="1"><code class="language-javascript">downloadString = &quot;&lt;a href='&quot; + highestQuality + &quot;' download='&quot; + videoName + &quot;'&gt;Download the Video&lt;/a&gt;&quot;;
+document.getElementById('insertionPoint').innerHTML = downloadString;</code></pre>
+                    <!-- <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="242-243"></code></p> -->
+                </section>
+
+            </article>
+            <!-- end drupal content -->
+
+            <section id="Related_Topics" class="bcls-section">
+                <h2>Related Topics</h2>
+                <ul>
+                    <li> <a href="../../brightcove-player/guides/plugin-dev-quick-start.html">Quick Start to Plugin Development</a></li>
+                    <li> <a href="../../brightcove-player/guides/plugin-guide.html">Player Plugin Overview</a></li>
+                </ul>
+            </section>
+
+        </div>
+    </div>
+    <!-- bcl scripts -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+    <script src="/en/scripts/docs-nav-data.min.js"></script>
+    <script src="/en/scripts/bcls-doc-site-v2.js"></script>
+    <script src="//learning-services-media.brightcove.com/doc-assets/js/bcls-utils.js"></script>
+    <script src="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.js"></script>
+    <script>
+        $(document).foundation();
+    </script>
+    <!-- Any scripts specific to page samples should go here -->
+
+    <div style="text-align:center">
+        <iframe id="CSAT" src="//learning-services-media.brightcove.com/doc-assets/general/surveylink.html" style=" padding-bottom:20px;border:none"></iframe>
+    </div>
+    <div class="bcls-footer"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+    <script>
+        var feedbackMail = document.getElementById("feedbackMail");
+        feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+    </script>
+</body>
+
+</html>
