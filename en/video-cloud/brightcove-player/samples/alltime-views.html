@@ -303,7 +303,7 @@ height="338"&gt;&lt;/video&gt;
                     </ol>
                     <h3>The JavaScript code</h3>
                     <p>The following provides an overview of the functionality of the plugin code:</p>
-                    <ol class="bcls-tasklist">
+                    <ul>
                         <li>In the variable initialization, get a reference to the <code>video</code> element, and get the account id from the <code>data-account</code> attribute of the video element. (lines 7-8)</li>
                         <li>Listen for the <strong>first</strong> <code>loadedmetadata</code> event, at which time the <code>mediainfo</code> property will be populated and the playlist will be set up. (line 11)</li>
                         <li>Create a new <code>p</code> element, give it the <code>id</code> 'bcls_alltimeViews', and add any styling that you want (here we have just set the <code>font-weight</code> to 'bold'). (lines 13-15)</li>
@@ -312,26 +312,12 @@ height="338"&gt;&lt;/video&gt;
                         <li>Retrieve the <code>id</code> for the video currently in the player from the <code>mediainfo</code> property and save this in the plugin's global scope also. (line 25)</li>
                         <li>Call the <code>createRequest()</code> function (we'll see what this does in a moment). (line 27)</li>
                         <li>Set a listener for additional <code>loadedmetadata</code> events - the new listener will just get the video <code>id</code> and call <code>createRequest()</code>, without creating and adding a new element to the DOM. (lines 30-35)</li>
-                    </ol>
-
-                    <p>The following code is the actual implementation of the general steps above.</p>
-                    <ul>
-                        <li>Line 469: Listens for the <code>loadstart</code> event.</li>
-                        <li>Line 471: Assigns the <code>name</code> of the video to a variable for later use in the link tag.</li>
-                        <li>Line 472: Assigns the <code>sources</code> array to a variable.</li>
-                        <li>Line: 473: Assigns the length of the array to variable.</li>
-                        <li>Lines 473-478: Loop over the array and assign to a second array renditions where the <code>container</code> is <strong>MP4</strong>, AND the rendition has a <code>src</code> property. The MP4 renditions appear twice in the <code>sources</code>                            array, once with a <code>src</code> property and once with a <code>stream_name</code> property. The first is for progressive download and the second for streaming.</li>
-                        <li>Lines 480-482: Sort the array of MP4s.</li>
-                        <li>Line 484: Assigns the largest rendition to a variable.</li>
-                        <li>Lines 487-488: Assign the <code>id</code> and <code>className</code> attributes for the newly created <code>div</code> element for the icon.</li>
-                        <li>Lines 491-493: Assign image and link element attributes.</li>
-                        <li>Lines 484-495: Append child elements to parents.</li>
-                        <li>
-                            <p>Lines 498-502: Get the spacer element, set the style to right justify the content and places the new icon element in the spacer.</p>
-                            <aside class="bcls-aside bcls-aside--tip">For more details about control bar icons, see the <a href="../../brightcove-player/guides/customize-appearance.html#iconmanipulation">Controlbar icon manipulation</a> section of the Customize Player Appearance document.</aside>
-                        </li>
-
+                        <li>The <code>createRequest()</code> function (lines 53-73) sets up the request to the Analytics API and handles the response, injecting the all-time views returned by the API into the paragraph element we created for it earlier (lines 63-70).</li>
+                        <li>The <code>makeRequest()</code> function (lines 83-117) is just an AJAX utility function that submits the Analytics API request to the proxy and then executes a callback function to return the respons to the caller (line 99).</li>
+                        <li>The <code>numberWithCommas()</code> is another utility function that adds formatting to the all time views number.</li>
                     </ul>
+
+                    <p>The following code is the actual implementation of the functionality described above.</p>
 <pre class="line-numbers"><code class="language-html">videojs.plugin('alltimeViews', function(options) {
     var player = this,
         el,
@@ -452,26 +438,38 @@ height="338"&gt;&lt;/video&gt;
 
 });
 </code></pre>
-                    <!-- <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="456-505"></code></p> -->
-
+                    <h4>Implementing the plugin</h4>
+                    <p>To implement the plugin in your HTML page, include the following at the end of the body:</p>
+<pre class="line-numbers"><code class="language-html">&lt;script&gt;
+var options = {
+    "proxyURL": "https://solutions.brightcove.com/bcls/bcls-proxy/alltime-views-proxy.php",
+    "hasPlaylist": true
+    };
+&lt;/script&gt;
+&lt;script&gt;
+// put the contents of the long JavaScript above here
+&lt;/script&gt;
+&lt;script&gt;
+videojs('bcls_alltimePlaysPlayer').alltimeViews(options);
+&lt;/script&gt;</code></pre>
                     <h3>The stylesheet</h3>
-                    <p>This example uses CSS styles for the Brightcove player.</p>
+                    <p>This example uses CSS styles for the Brightcove player and playlist. You can modify the styles to suit your own needs.</p>
                     <ol class="bcls-tasklist">
                         <li>
                             <p>
-                                Add the following CSS to your page code:
+                                Add the following CSS to your page code via a linked css file or a <code>style</code> tag:
                             </p>
-                            <ul>
-                                <li>This code sets the dimensions for the container and horizontally positions the download icon within the container.</li>
-                            </ul>
-                            <pre class="line-numbers" data-start="1"><code class="language-css">&lt;style type=&quot;text/css&quot;&gt;
-    #downloadButton {
-    width: 34px;
-    height: 33px;
-    margin-top: 6px;
-     }
-&lt;/style&gt;</code></pre>
-                            <!-- <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="435-441"></code></p> -->
+<pre class="line-numbers" data-start="1"><code class="language-css">.video-js {
+  height: 350px;
+  width: 640px;
+  float: left;
+}
+.vjs-playlist {
+  height: 281px;
+}
+.vjs-playlist-item {
+    min-height: 120px;
+}</code></pre>
                         </li>
                     </ol>
                 </section>
