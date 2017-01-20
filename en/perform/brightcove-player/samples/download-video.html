@@ -2,14 +2,15 @@
 <html lang="en">
 
 <head>
-    <!-- Begin Drupal Taxonomy Data -->
-    <meta name="products" content="Video Cloud">
-    <meta name="audience" content="Player Developer">
-    <meta name="task" content="">
-    <meta name="feature" content="">
-    <meta name="type" content="Code Sample">
-    <meta name="keywords" content="player,mediainfo">
-    <!-- End Drupal Taxonomy Data -->
+  <meta charset="UTF-8">
+  <!-- Begin Drupal Taxonomy Data -->
+  <meta name="products" content="Video Cloud">
+  <meta name="audience" content="Player Developer">
+  <meta name="task" content="">
+  <meta name="feature" content="">
+  <meta name="type" content="Code Sample">
+  <meta name="keywords" content="player,mediainfo">
+  <!-- End Drupal Taxonomy Data -->
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
 	<!-- change title to match the h1 heading -->
 	<title>Brightcove Player Sample: Download Video Plugin</title>
@@ -201,22 +202,23 @@
 
         <p>The following code is the actual implementation of the general steps above.</p>
             <ul>
-                <li>Line 469: Listens for the <code>loadstart</code> event.</li>
-                <li>Line 471: Assigns the <code>name</code> of the video to a variable for later use in the link tag.</li>
-                <li>Line 472: Assigns the <code>sources</code> array to a variable.</li>
-                <li>Line: 473: Assigns the length of the array to variable.</li>
-                <li>Lines 473-478: Loop over the array and assign to a second array renditions where the <code>container</code> is <strong>MP4</strong>, AND the rendition has a <code>src</code> property. The MP4 renditions appear twice in the <code>sources</code> array, once with a <code>src</code> property and once with a <code>stream_name</code> property. The first is for progressive download and the second for streaming.</li>
-                <li>Lines 480-482: Sort the array of MP4s.</li>
-                <li>Line 484: Assigns the largest rendition to a variable.</li>
-				<li>Lines 487-488: Assign the <code>id</code> and <code>className</code> attributes for the newly created <code>div</code> element for the icon.</li>
-				<li>Lines 491-493: Assign image and link element attributes.</li>
-				<li>Lines 484-495: Append child elements to parents.</li>
-				<li><p>Lines 498-502: Get the spacer element, set the style to right justify the content and places the new icon element in the spacer.</p>
-					<aside class="bcls-aside bcls-aside--tip">For more details about control bar icons, see the <a href="../../brightcove-player/guides/customize-appearance.html#iconmanipulation">Controlbar icon manipulation</a> section of the Customize Player Appearance document.</aside>
-				</li>
-
+                <li>Lines 4-12: Create and initialize varibles.</li>
+                <li>Line 14: Listens for the <code>loadstart</code> event.</li>
+                <li>Line 17: Initialize array of MP4s in case the download is used with a playlist. The array would contain a cumulative list of arrays for all videos in the plugin is this is not done.</li>
+                <li>Line 19: Assigns the <code>name</code> of the video to a variable for later use in the link tag.</li>
+                <li>Line 20: Assigns the <code>sources</code> array to a variable.</li>
+                <li>Line 21: Assigns the length of the array to variable.</li>
+                <li>Lines 22-26: Loop over the array and assign to a second array renditions where the <code>container</code> is <strong>MP4</strong>, AND the rendition has a <code>src</code> property. The MP4 renditions appear twice in the <code>sources</code> array, once with a <code>src</code> property and once with a <code>stream_name</code> property. The first is for progressive download and the second for streaming.</li>
+                <li>Lines 28-30: Sort the array of MP4s.</li>
+                <li>Line 32: Assigns the largest rendition to a variable.</li>
+        				<li>Lines 35-36: Assign the <code>id</code> and <code>className</code> attributes for the newly created <code>div</code> element for the icon.</li>
+        				<li>Lines 39-41: Assign image and link element attributes.</li>
+        				<li>Lines 42-43: Append child elements to parents.</li>
+        				<li>Lines 46-50: Get the spacer element, set the style to right justify the content and places the new icon element in the spacer.
+        					<aside class="bcls-aside bcls-aside--tip">For more details about control bar icons, see the <a href="../../brightcove-player/guides/customize-appearance.html#iconmanipulation">Controlbar icon manipulation</a> section of the Customize Player Appearance document.</aside>
+        				</li>
             </ul>
-						<pre class="line-numbers" data-start="456"><code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
+						<pre class="line-numbers"><code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
     videojs(&quot;myPlayerID&quot;).ready(function() {
       // Create variables and new div, anchor and image for download icon
       var myPlayer = this,
@@ -230,7 +232,10 @@
 	    newImage = document.createElement('img');
 
       myPlayer.on('loadstart',function(){
-	// Get video name and the MP4 renditions
+        //Reinitialize array of MP4 renditions in case used with playlist
+        //This prevents the array having a cumulative list for all videos in playlist
+        mp4Ara=[];
+        // Get video name and the MP4 renditions
         videoName = myPlayer.mediainfo['name'];
         rendtionsAra = myPlayer.mediainfo.sources;
         totalRenditions = rendtionsAra.length;
@@ -239,33 +244,33 @@
             mp4Ara.push(rendtionsAra[i]);
           };
         };
-	// Sort the renditions from highest to lowest
+        // Sort the renditions from highest to lowest
         mp4Ara.sort( function (a,b){
           return b.size - a.size;
         });
-	// Set the highest rendition
+        // Set the highest rendition
         highestQuality= mp4Ara[0].src;
 
         // Assign id and classes to div for icon
         newElement.id = 'downloadButton';
         newElement.className = 'downloadStyle vjs-control';
 
-	// Assign properties to elements and assign to parents
-	newImage.setAttribute('src','http://solutions.brightcove.com/bcls/brightcove-player/download-video/file-download.png');
-	newLink.setAttribute('href',highestQuality);
-	newLink.setAttribute('download',videoName);
-	newLink.appendChild(newImage);
-	newElement.appendChild(newLink);
+        // Assign properties to elements and assign to parents
+        newImage.setAttribute('src','http://solutions.brightcove.com/bcls/brightcove-player/download-video/file-download.png');
+        newLink.setAttribute('href',highestQuality);
+        newLink.setAttribute('download',videoName);
+        newLink.appendChild(newImage);
+        newElement.appendChild(newLink);
 
-	// Get the spacer element
+        // Get the spacer element
         spacer = myPlayer.controlBar.customControlSpacer.el();
-	// Set the content of the spacer to be right justified
+        // Set the content of the spacer to be right justified
         spacer.setAttribute(&quot;style&quot;, &quot;justify-content: flex-end;&quot;);
         // Place the new element in the spacer
         spacer.appendChild(newElement);
       })
     });
-  &lt;/script&gt;</code></pre>
+&lt;/script&gt;</code></pre>
           <!-- <p><code data-gist-id="4decd28717b7e9c4d56e" data-gist-hide-footer="true" data-gist-line="456-505"></code></p> -->
 
            <h3>The stylesheet</h3>
@@ -317,6 +322,9 @@
       newImage = document.createElement('img');
 
   myPlayer.on('loadstart',function(){
+      //Reinitialize array of MP4 renditions in case used with playlist
+      //This prevents the array having a cumulative list for all videos in playlist
+      mp4Ara=[];
       // Get video name and the MP4 renditions
       videoName = myPlayer.mediainfo['name'];
       rendtionsAra = myPlayer.mediainfo.sources;
