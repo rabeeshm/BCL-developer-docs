@@ -253,7 +253,7 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-provided-id&#39;);
                           <ul>
                             <li><code>name</code>: Required; must be the string value <code>adCue</code></li>
                             <li><code>id</code>: Required; A unique value to identify the ad given that times are relative in live streams</li>
-                            <li><code>serverUrl</code>: Optional; Appended as a breaklength parameter to the server url</li>
+                            <li><code>serverUrl</code>: Optional; Appended as a break length parameter to the server url</li>
                             <li><code>duration</code>: Optional; ad duration</li>
                           </ul>
                           <p>Example: <code>{"name": "adCue", "id": 123}</code></p>
@@ -309,9 +309,9 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-provided-id&#39;);
                 <section id="adMacros" class="bcls-section">
                     <h2>Ad macros and the serverURL</h2>
                     <p>There are ad macros available to make your job easier when creating the ad server URL. These macros enable you to use variables in the server URL for which the IMA3 plugin will substitute appropriate values. For instance, the following server URL contains some of the variables: </p>
-                    <pre class="line-numbers"><code class="language-json">{"serverUrl": "http://myadserver.com/ad/?video={mediainfo.id}&duration={player.duration}"}</code></pre>
+                    <pre class="line-numbers"><code class="language-json">{"serverUrl": "http://myadserver.com/ad?video={mediainfo.id}&duration={player.duration}"}</code></pre>
                     <p>The IMA3 plugins would substitute in the appropriate values, and the server URL actually used would appear as follows:</p>
-                    <pre class="line-numbers"><code class="language-json">{"serverUrl": "http://myadserver.com/ad/?video=12340001&duration=60"}</code></pre>
+                    <pre class="line-numbers"><code class="language-json">{"serverUrl": "http://myadserver.com/ad?video=12340001&duration=60"}</code></pre>
                     <p>The following is the complete list of variable for which substituted values will be used:</p>
                     <table class="table-styles">
                       <thead>
@@ -342,7 +342,7 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-provided-id&#39;);
                           <td>Tags (metadata) associated with the video</td>
                         </tr>
                         <tr>
-                          <td>{mediainfo.reference_id}</td>
+                          <td>{mediainfo.referenceID}</td>
                           <td>Reference ID</td>
                         </tr>
                         <tr>
@@ -350,7 +350,7 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-provided-id&#39;);
                           <td>Duration of the video as reported by Video Cloud</td>
                         </tr>
                         <tr>
-                          <td>{mediainfo.ad_keys}</td>
+                          <td>{mediainfo.adKeys}</td>
                           <td>Free form text string that can be added and edited in the Media module of Studio; you should use the query parameter in the form
                             <pre class="line-numbers"><code class="language-javascript">cust_params={mediainfo.ad_keys}</code></pre>
                           </td>
@@ -379,34 +379,15 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-provided-id&#39;);
                     </table>
             </section>
 
-            <section id="Custom_ad_macros" class="bcls-section">
-              <h2>Custom ad macros</h2>
-              <p>The ad macros in the previous section are very helpful, but you may have defined custom values you use when requesting ads from your ad server. You can utilize your values by overriding the <code>adMacroReplacement()</code> method. When you override this method it allows you to pass your specialized values for the ad request.</p>
-              <aside class="bcls-aside bcls-aside--tip">To override a method in JavaScript, you simply place the altered method in your JavaScript for the page or plugin.</aside>
-              <p>The following is an example of overriding the <code>adMacroReplacement()</code> method. In this example, the custom values are defined as part of the page DOM, thus enabling ad requests to be customized on a per page basis. In this example,  <code>window.parent.adConfig.category</code> is the location where the ad request information is stored.</p>
-              <pre class="line-numbers"><code class="language-javascript">brightcovePlayer.ima3.adMacroReplacement = function (url) {
-  <span class="bcls-highlight">var parameters = {
-    '{category}': window.parent.adConfig.category
-  };</span>
-  for (var i in parameters) {
-    url = url.split(i).join(encodeURIComponent(parameters[i]));
-  }
-  return url;
-}</code></pre>
-              <p>Using specific values will help clarify exactly what is happening. Assume your request URL to the ad server is the following:</p>
-              <pre class="line-numbers"><code class="language-html">http://myadserver.com/myads?adWord={category}</code></pre>
-              <p>And assume the value dynamically assigned to <code>window.parent.adConfig.category</code> in the page is the string <strong>fishing-pole</strong>. Then after your version of the <code>adMacroReplacement()</code> method is called your ad request URL would appear as:</p>
-              <pre class="line-numbers"><code class="language-html">http://myadserver.com/myads?adWord=fishing-pole</code></pre>
-              <p>To summarize, when you override the <code>adMacroReplacement()</code> method it allows you to use custom values as ad macros, and dynamically assign values to the URL ad request.</p>
-            </section>
-
             <section id="Dynamic_macros" class="bcls-section">
               <h2>Dynamic macros</h2>
               <p>Dynamic macros provide access to values in the following:</p>
               <ul>
-                <li>The video's <code>customFields</code> object through the <code>mediainfo.custom_fields</code> variable.</li>
+                <li>The video's <code>customFields</code> object through the <code>mediainfo.customFields</code> variable.</li>
                 <li>The DOM's <code>window</code> object through the <code>pageVariable</code> variable.</li>
               </ul>
+              <p>For example, you could use the following in your ad request:</p>
+              <pre class="line-numbers"><code class="language-html">http://myadserver.com/ad?l={<span class="bcls-highlight">pageVariable.navigator.language</span>}&category={<span class="bcls-highlight">mediainfo.customFields.type</span>}</code></pre>
               <p>For the <code>pageVariable</code> values, only certain value types are allowed to be used, as shown in this table:</p>
               <table class="bcls-table">
                 <thead class="bcls-table__head">
@@ -442,6 +423,27 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-provided-id&#39;);
                   </tr>
                 </tbody>
               </table>
+            </section>
+
+            <section id="Custom_ad_macros" class="bcls-section">
+              <h2>Custom ad macros</h2>
+              <p>Although the <strong>Dynamic macros</strong> technique described just above is the much preferred method to access specific information via macros, you may have defined custom values you use when requesting ads from your ad server that you cannot reach via dynamic macros. In this case, you can utilize your values by overriding the <code>adMacroReplacement()</code> method. When you override this method it allows you to pass your specialized values for the ad request.</p>
+              <aside class="bcls-aside bcls-aside--tip">To override a method in JavaScript, you simply place the altered method in your JavaScript for the page or plugin.</aside>
+              <p>The following is an example of overriding the <code>adMacroReplacement()</code> method. In this example, the custom values are defined as part of the page DOM, thus enabling ad requests to be customized on a per page basis. In this example,  <code>window.parent.adConfig.category</code> is the location where the ad request information is stored.</p>
+              <pre class="line-numbers"><code class="language-javascript">brightcovePlayer.ima3.adMacroReplacement = function (url) {
+  <span class="bcls-highlight">var parameters = {
+    '{category}': window.parent.adConfig.category
+  };</span>
+  for (var i in parameters) {
+    url = url.split(i).join(encodeURIComponent(parameters[i]));
+  }
+  return url;
+}</code></pre>
+              <p>Using specific values will help clarify exactly what is happening. Assume your request URL to the ad server is the following:</p>
+              <pre class="line-numbers"><code class="language-html">http://myadserver.com/myads?adWord={category}</code></pre>
+              <p>And assume the value dynamically assigned to <code>window.parent.adConfig.category</code> in the page is the string <strong>fishing-pole</strong>. Then after your version of the <code>adMacroReplacement()</code> method is called your ad request URL would appear as:</p>
+              <pre class="line-numbers"><code class="language-html">http://myadserver.com/myads?adWord=fishing-pole</code></pre>
+              <p>To summarize, when you override the <code>adMacroReplacement()</code> method it allows you to use custom values as ad macros, and dynamically assign values to the URL ad request.</p>
             </section>
 
           <section id="methods" class="bcls-section">
