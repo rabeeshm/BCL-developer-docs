@@ -109,6 +109,15 @@
                              <li><a href="#Getting_duration_for_live_streams">Getting duration for live streams</a></li>
                          </ul>
 
+                         <h3 class="bcls-question">Playback</h3>
+                         <ul class="bcls-answer">
+                           <li><a href="#Playing_local_videos">Playing local videos</a></li>
+                            <li><a href="#Setting_the_buffer_size">Setting the buffer size</a></li>
+                            <li><a href="#Setting_VR_Goggles_mode_for_360_videos">Setting VR Goggles mode for 360° videos</a></li>
+                            <li><a href="#Starting_playback_in_the_middle_of_a_video">Starting playback in the middle of a video</a></li>
+                            <li><a href="#Swapping_videos">Swapping videos</a></li>
+                         </ul>
+
                          <h3 class="bcls-question">Player controls</h3>
                          <ul class="bcls-answer">
                              <li><a href="#Fullscreen_mode">Fullscreen mode</a></li>
@@ -123,11 +132,7 @@
                          <h3 class="bcls-question">Video content</h3>
                          <ul class="bcls-answer">
                              <li><a href="#Getting_URL_for_thumbnail_images">Getting URL for thumbnail images</a></li>
-                             <li><a href="#Playing_local_videos">Playing local videos</a></li>
-                             <li><a href="#Setting_the_buffer_size">Setting the buffer size</a></li>
                              <li><a href="#Showing_hiding_video_still_images">Showing/ hiding video still images</a></li>
-                             <li><a href="#Starting_playback_in_the_middle_of_a_video">Starting playback in the middle of a video</a></li>
-                             <li><a href="#Swapping_videos">Swapping videos</a></li>
                          </ul>
                      </section>
 
@@ -347,15 +352,34 @@ eventEmitter.on(EventType.DID_SEEK_TO, new EventListener() {
 });</code></pre></a>
       </section>
 
-            <section class="bcls-section" id="Showing_hiding_video_still_images">
-        <h2>Showing/ hiding video still images</h2>
-                <p>You can show the video still at any time by emitting a <a href="../reference/current/javadoc/com/brightcove/player/event/EventType.html#SET_VIDEO_STILL"><code>SET_VIDEO_STILL</code></a> event with a <a href="../reference/current/javadoc/com/brightcove/player/event/Event.html#VIDEO_STILL"><code>VIDEO_STILL</code></a> property set to the URI of the video still.</p>
-                <p>Hiding should happen automatically whenever a <a href="../reference/current/javadoc/com/brightcove/player/event/EventType.html#CUE_POINT"><code>CUE_POINT</code></a>, <a href="../reference/current/javadoc/com/brightcove/player/event/EventType.html#DID_PLAY"><code>DID_PLAY</code></a>, <a href="../reference/current/javadoc/com/brightcove/player/event/EventType.html#DID_SEEK_TO"><code>DID_SEEK_TO</code></a>, <a href="../reference/current/javadoc/com/brightcove/player/event/EventType.html#WILL_INTERRUPT_CONTENT"><code>WILL_INTERRUPT_CONTENT</code></a>, <a href="../reference/current/javadoc/com/brightcove/player/event/EventType.html#ACTIVITY_STOPPED"><code>ACTIVITY_STOPPED</code></a>, or <a href="../reference/current/javadoc/com/brightcove/player/event/EventType.html#FRAGMENT_STOPPED"><code>FRAGMENT_STOPPED</code></a> event occurs.</p>
-                <p>In general, we try to promote doing things via events, rather than direct method calls.</p>
-            </section>
+      <section class="bcls-section" id="Setting_VR_Goggles_mode_for_360_videos">
+        <h2>Setting VR Goggles mode for 360° videos</h2>
+          <p>When playing a 360° video, users can select the Video 360 button on the control bar to switch to VR Goggles mode. If you are using either the <code>BrightcovePlayer</code> or <code>BrightcovePlayerFragment</code> activity, then the screen orientation will change to landscape when VR Goggles mode is enabled.</p>
+          <p>
+            If you are using a custom activity, then you will need to add the following:
+          </p>
+          <a href="../reference/current/javadoc/com/brightcove/player/view/BaseVideoView.html#seekTo(int)"><pre class="line-numbers"><code class="language-java">brightcoveVideoView.getEventEmitter().on(EventType.CHANGE_ORIENTATION, new EventListener() {
+  @Override
+  public void processEvent(Event event) {
+      int orientation = event.getIntegerProperty(Event.REQUESTED_ORIENTATION);
+      setRequestedOrientation(orientation);
+  }
+});</code></pre></a>
+          <aside class="bcls-aside bcls-aside--information">
+              In the method that contains the above code, you must add <code>@SuppressWarnings(&quot;ResourceType&quot;)</code> to the method.
+          </aside>
+      </section>
 
-            <section class="bcls-section" id="Starting_playback_in_the_middle_of_a_video">
-        <h2>Starting playback in the middle of a video</h2>
+        <section class="bcls-section" id="Showing_hiding_video_still_images">
+          <h2>Showing/ hiding video still images</h2>
+            <p>You can show the video still at any time by emitting a <a href="../reference/current/javadoc/com/brightcove/player/event/EventType.html#SET_VIDEO_STILL"><code>SET_VIDEO_STILL</code></a> event with a <a href="../reference/current/javadoc/com/brightcove/player/event/Event.html#VIDEO_STILL"><code>VIDEO_STILL</code></a> property set to the URI of the video still.</p>
+            <p>Hiding should happen automatically whenever a <a href="../reference/current/javadoc/com/brightcove/player/event/EventType.html#CUE_POINT"><code>CUE_POINT</code></a>, <a href="../reference/current/javadoc/com/brightcove/player/event/EventType.html#DID_PLAY"><code>DID_PLAY</code></a>, <a href="../reference/current/javadoc/com/brightcove/player/event/EventType.html#DID_SEEK_TO"><code>DID_SEEK_TO</code></a>, <a href="../reference/current/javadoc/com/brightcove/player/event/EventType.html#WILL_INTERRUPT_CONTENT"><code>WILL_INTERRUPT_CONTENT</code></a>, <a href="../reference/current/javadoc/com/brightcove/player/event/EventType.html#ACTIVITY_STOPPED"><code>ACTIVITY_STOPPED</code></a>, or <a href="../reference/current/javadoc/com/brightcove/player/event/EventType.html#FRAGMENT_STOPPED"><code>FRAGMENT_STOPPED</code></a> event occurs.</p>
+            <p>In general, we try to promote doing things via events, rather than direct method calls.</p>
+        </section>
+
+        <section class="bcls-section" id="Starting_playback_in_the_middle_of_a_video">
+
+          <h2>Starting playback in the middle of a video</h2>
                 <p>Sometimes, you may need to start playback from somewhere in the middle of the video. To do this, you can call <a href="../reference/current/javadoc/com/brightcove/player/view/BaseVideoView.html#seekTo(int)"><code>BrightCoveVideoView.seekTo()</code></a> before starting playback.</p>
                 <a href="../reference/current/javadoc/com/brightcove/player/view/BaseVideoView.html#seekTo(int)"><pre class="line-numbers"><code class="language-java">catalog.findVideoByID(getString(R.string.videoId), new VideoListener() {
     @Override
