@@ -293,6 +293,49 @@ https://players.api.brightcove.com/v1/accounts/$ACCOUNT_ID/players</code></pre>
       <section id="changelog" class="bcls-section">
         <h2>Changelog</h2>
 
+        <h4>25 Jan 2017</h4>
+        <p>v5.0.0</p>
+        <ul>
+          <li>Updated issue template to use unpkg for latest versions</li>
+          <li>Used a snapshot of the issue template JSBin to protect from changes by owner</li>
+          <li>Fixed any possible <code>fillBuffer_</code> race conditions by debouncing all <code>fillBuffers_</code>
+            <ul>
+              <li>Converted all calls to <code>fillBuffer_</code> to calls to <code>monitorBuffer_</code></li>
+              <li>Renamed <code>monitorBuffer_</code> to <code>monitorBufferTick_</code> which becomes the 500ms buffer check timer loop</li>
+              <li>Made <code>monitorBuffer_</code> schedule an immediate timer for <code>monitorBufferTick_</code></li>
+            </ul>
+          </li>
+          <li>Made it possible for processing segment reachable even after playlist update removes it
+            <ul>
+              <li>Changed processing segment reference on playlist refresh</li>
+              <li>Tested for correct segment references on pending segments</li>
+              <li>Fixed unreachable segment tests after rebase on async monitor buffer change</li>
+              <li>Updated media index on playlist refreshes for all requests (including syncs)</li>
+            </ul>
+          </li>
+          <li>Made progress events bubble
+            <ul>
+              <li>If the segment request triggers progress events (that is, XHR2 is supported), bubble those up to the tech. This makes it clearer that buffering is happening even on very slow connections.</li>
+            </ul>
+          </li>
+          <li>Running decryption in a webworker no longer supported for IE10</li>
+          <li>Fixed <code>mediaIndex</code> tracking so that it is consistent when the playlist updates during a live stream
+            <ul>
+              <li>Fixed <code>mediaIndex</code> tracking so that it is consistent when the playlist updates during a live stream</li>
+              <li>Removed any code in <code>SegmentLoader#handleUpdateEnd_</code> that changed the <code>mediaIndex</code></li>
+              <li>Reordered <code>SegmentLoader#playlist</code> to make it easier to follow</li>
+              <li>All changes to both <code>mediaIndexes</code> (SegmentLoader&#39;s and segmentInfo&#39;s) now happen in <code>SegmentLoader#playlist</code></li>
+              <li>Added tests for proper <code>mediaIndex</code> tracking with live playlists</li>
+            </ul>
+          </li>
+        </ul>
+
+        <h4>20 Jan 2017</h4>
+        <p>v4.1.1</p>
+        <ul>
+          <li>Fixed the m3u8-parser to support ES3</li>
+        </ul>
+
         <h4>13 Jan 2017</h4>
         <p>v4.1.0</p>
         <ul>
