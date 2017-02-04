@@ -112,11 +112,12 @@
                     <li><strong>On demand -</strong> All ad requests will be initiated programmatically using the <code>player.ima3.adrequest()</code> method</li>
                     </ul>
                   </li>
-                  <li>Select the ad <strong>Content Type</strong>.    The Content Type determines the ad integration technologies to attempt to use. The player  will test each ad technology on initialization and use the first supported one for the lifetime of the player.<ul>
-                    <li><strong>Flash preferred -</strong> Use Flash-based ads, if not available, use HTML5-based ads</li>
-                    <li><strong>HTML5 preferred -</strong> Use HTML5-based ads, if not available, use Flash-based ads</li>
-                    <li><strong>HTML5 only -</strong> Use only HTML5-based ads</li>
-                  </ul></li>
+                  <li>Select the ad <strong>Content Type</strong>.  The Content Type determines the ad integration technologies to attempt to use.
+                    <ul>
+                      <li><strong>HTML5 -</strong> Use only HTML5-based ads, if not available no ads are shown</li>
+                      <li><strong>Flash preferred (legacy) -</strong> Use Flash-based ads, if not available, use HTML5-based ads</li>
+                    </ul>
+                  </li>
                   <li>Select the ad <strong>VPAID Mode</strong>.    The VPAID Mode is used to enable VPAID 2 support in IMA ads.
                     <ul>
                       <li><strong>Enabled -</strong> Play VPAID ads in an iframe with a different domain</li>
@@ -124,11 +125,9 @@
                       <li><strong>Disabled -</strong> VPAID ads throw an error                  </li>
                     </ul>
                   </li>
-                  <li>Set the <strong>Timeout</strong> values.
+                  <li>Set the <strong>Timeout</strong> value.
                     <ul>
-                      <li><strong>Initialization -</strong> The maximum amount of time to wait, in milliseconds, for an ad  to initialize before playback</li>
-                      <li><strong>Pre-roll -</strong> The maximum amount of time to wait for an ad  to initiate a preroll, in milliseconds</li>
-                      <li><strong>Post-roll -</strong> The maximum amount of time to wait for an ad  to initiate a postroll, in milliseconds</li>
+                      <li><strong>Initialization -</strong> The maximum amount of time to wait, in milliseconds, for an ad to initialize before playback</li>
                     </ul>
                     <figure class="bcls-figure">
                         <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/ima3-plugin/studio-ad-props.png" alt="ad properties in Studio">
@@ -136,7 +135,7 @@
                   </li>
                   <li>Click <strong>Save</strong> to save the changes.</li>
               </ol>
-              <p>When  the changes to the advertising properties are saved, the IMA plugin will be configured as part of the Plugin settings.</p>
+              <p>When  the changes to the advertising properties are saved, the IMA plugin will be configured as part of the Plugin settings. The JavaScript and CSS will be hidden since you added them via the <strong>ADVERTISING</strong> section.</p>
               <figure class="bcls-figure">
                   <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/ima3-plugin/studio-ima-plugin-props.png" alt="IMA3 properties in Studio">
               </figure>
@@ -273,33 +272,43 @@ window.google.ima.ImaSdkSettings.setPpid(&#39;publisher-provided-id&#39;);
                     <pre class="line-numbers"><code class="language-javascript">player.ima3({
   serverUrl: 'your ad server'
 });</code></pre>
-<h3>timeout</h3>
-      <p>Type: <code>number</code> Default Value: <code>5000</code></p>
-      <p>The maximum amount of time to wait, in milliseconds, for an ad implementation to initialize before playback. If the viewer has requested playback and the ad implementation does not dispatch the <code>adsready</code> event before this timeout expires the content video will begin playback. It's still possible for an ad implementation to play ads after this waiting period has finished, but video playback will already be in progress.</p>
-      <p>This option is part of the ad framework is configured as follows:</p>
+            <h3>timeout</h3>
+                  <p>Type: <code>number</code> Default Value: <code>5000</code></p>
+                  <p>The maximum amount of time to wait, in milliseconds, for an ad implementation to initialize before playback. If the viewer has requested playback and the ad implementation does not dispatch the <code>adsready</code> event before this timeout expires the content video will begin playback. It's still possible for an ad implementation to play ads after this waiting period has finished, but video playback will already be in progress.</p>
+                  <p>This option is part of the ad framework is configured as follows:</p>
 <pre class="line-numbers"><code class="language-javascript">player.ima3({
   timeout: 5000
 });</code></pre>
-      <p>Once the ad plugin starts waiting for the <code>adsready</code> event, one of these things will happen:</p>
-      <ul>
-          <li>Integration ready within the timeout: This is the best case, preroll(s) will play without the user seeing any content video first.</li>
-          <li>Integration ready, but after timeout has expired: Preroll(s) still play, but the user will see a bit of content video.</li>
-          <li>Integration never becomes ready: Content video starts playing after timeout.</li>
-      </ul>
-      <p>This timeout is necessary to ensure a good viewer experience in cases where the ad implementation suffers an unexpected or irreparable error and never fires an <code>adsready</code> event. Without this timeout, the ads plugin would wait forever, and neither the content video nor ads would ever play.</p>
-      <p>If the ad implementation takes a long time to initialize and this timeout is too short, then the content video will begin playing before the first preroll opportunity. This has the jarring effect that the viewer would see a little content before the preroll cuts in.</p>
-      <p>In internal Brightcove testing it was found that five seconds seemed to be long enough to accommodate slow initialization in most cases, but still short enough that failures to initialize didn't look like failures of the player or content video.            </p>
+              <p>Once the ad plugin starts waiting for the <code>adsready</code> event, one of these things will happen:</p>
+              <ul>
+                  <li>Integration ready within the timeout: This is the best case, preroll(s) will play without the user seeing any content video first.</li>
+                  <li>Integration ready, but after timeout has expired: Preroll(s) still play, but the user will see a bit of content video.</li>
+                  <li>Integration never becomes ready: Content video starts playing after timeout.</li>
+              </ul>
+              <p>This timeout is necessary to ensure a good viewer experience in cases where the ad implementation suffers an unexpected or irreparable error and never fires an <code>adsready</code> event. Without this timeout, the ads plugin would wait forever, and neither the content video nor ads would ever play.</p>
+              <p>If the ad implementation takes a long time to initialize and this timeout is too short, then the content video will begin playing before the first preroll opportunity. This has the jarring effect that the viewer would see a little content before the preroll cuts in.</p>
+              <p>In internal Brightcove testing it was found that five seconds seemed to be long enough to accommodate slow initialization in most cases, but still short enough that failures to initialize didn't look like failures of the player or content video.</p>
 
-                  <h3 id="vpaidMode">vpaidMode</h3>
-                  <p>Type: <code>string</code> Default Value: <code>ENABLED</code></p>
-                  <p>Specify VPAID 2 mode in the IMA HTML5 SDK.</p>
-                  <p>There are three possible values for this option:</p>
-                  <ul>
-                    <li><code>ENABLED</code>: Play VPAID ads in an iframe with a different domain.</li>
-                    <li><code>INSECURE</code>: Play VPAID ads in an iframe with the same domain.</li>
-                    <li><code>DISABLED</code>:  VPAID ads throw an error.</li>
-                  </ul>
-                  <p>This option is part of the ad framework is configured as follows:</p>
+              <h3>useMediaCuePoints</h3>
+              <p>Type: <code>boolean</code> Default Value: <code>false</code></p>
+              <p>Enables the use of <strong>ad</strong> cue points to be used to trigger an ad to play.</p>
+              <p>For Video Cloud ad cuepoints to be used to trigger ads, the following is required in the plugin configuration:</p>
+              <ul>
+                <li><code>useMediaCuePoints</code>: true</li>
+                <li><code>requestMode</code>: The string <code>oncue</code></li>
+                <li><code>serverUrl</code>: Must point to a valid VAST ad</li>
+              </ul>
+
+              <h3 id="vpaidMode">vpaidMode</h3>
+              <p>Type: <code>string</code> Default Value: <code>ENABLED</code></p>
+              <p>Specify VPAID 2 mode in the IMA HTML5 SDK.</p>
+              <p>There are three possible values for this option:</p>
+              <ul>
+                <li><code>ENABLED</code>: Play VPAID ads in an iframe with a different domain.</li>
+                <li><code>INSECURE</code>: Play VPAID ads in an iframe with the same domain.</li>
+                <li><code>DISABLED</code>:  VPAID ads throw an error.</li>
+              </ul>
+              <p>This option is part of the ad framework is configured as follows:</p>
             <pre class="line-numbers"><code class="language-javascript">player.ima3({
   vpaidMode: 'DISABLED'
 });</code></pre>
@@ -815,13 +824,32 @@ Pi.I bridge3.1.33.html:121
           <section id="changelog" class="bcls-section">
             <h2>Changelog</h2>
 
+            <h4>2 Feb 2017</h4>
+            <p>v2.16.1</p>
+            <p>This is a bugfix update.</p>
+            <ul>
+              <li>Make HTML5 ads in iframes responsive when possible</li>
+              <li>Prevent erroneous <code>admuted</code> tracking in DFP</li>
+              <li>Localize ad control bar for both HTML5 and Flash</li>
+              <li>Allow right-clicking to enable Flash in Chrome</li>
+              <li>Updated to use <strong>videojs-contrib-ads</strong> 4.2.2</li>
+              <li>Re-fixes iOS content flash</li>
+            </ul>
+
+            <h4>27 Jan 2017</h4>
+            <p>v2.16.0</p>
+            <ul>
+              <li>Added support for <strong>cueTextTracks</strong> feature in <strong>videojs-contrib-ads</strong> so Video Cloud cue points can be used to trigger ads.</li>
+            </ul>
+
             <h4>19 Jan 2017</h4>
             <p>v2.15.6</p>
             <ul>
-              <li>Updated to use <strong>videojs-contrib-ads</strong> 4.2.1</li>
+              <li>Updated to use <strong>videojs-contrib-ads</strong> 4.2.1
               <ul>
                 <li>The update reverted the change that prevented ad clickthrough when clicking progress bar during ad. This fix will now be in single-video-template instead.</li>
               </ul>
+              </li>
             </ul>
 
             <h4>20 Dec 2016</h4>
