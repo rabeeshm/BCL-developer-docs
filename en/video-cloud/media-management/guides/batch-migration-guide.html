@@ -76,6 +76,10 @@
                     <p>If you are using Batch Provisioning to add or modify multiple files at once, keep in mind that the Dynamic Ingest API and the CMS API write methods operate on <strong>one file at a time</strong>, and you will need to write your apps accordingly.</p>
                     <aside class="bcls-aside bcls-aside--information">This is not as big a change as you might imagine. If you are working on multiple files, you are probably iterating over some set of files to generate the batch manifest. For the catalog APIs, you will instead create one (or sometimes more than one) API request for each video as you iterate. You will find examples of doing this in the code samples for both Dynamic Ingest and the CMS API.</aside>
                 </section>
+                <section id="Authentication" class="bcls-section">
+                    <h2>Authentication</h2>
+                    <p>Authentication for the Catalog APIs is managed through Brightcove's <a href="//docs.brightcove.com/en/video-cloud/oauth-api/getting-started/oauth-api-overview.html">OAuth Service</a>.</p>
+                </section>
                 <section id="Migration_paths" class="bcls-section">
                     <h2>Migration paths</h2>
                     <p>The diagram below shows the primary migration paths from the legacy APIs to the new APIs. The sections that follow provide more detail on the paths.</p>
@@ -87,7 +91,6 @@
                 </section>
                 <section id="ingest" class="bcls-section">
                     <h2>Video/Asset ingest</h2>
-                    <!-- <h3>Media API/Batch Provisioning <img src="//learning-services-media.brightcove.com/doc-assets/general/images/right2left-arrow.png" alt="arrow"> Dynamic Ingest API</h3> -->
                     <p>In the new Brightcove APIs, ingest functions are separate from media management functions - the rule to remember is that if you are sending files to Video Cloud, they will go via the <a href="//docs.brightcove.com/en/video-cloud/di-api/getting-started/overview-di.html">Dynamic Ingest API</a>, <strong>never</strong> the CMS API. If you are currently using Batch Provisioning to upload videos, images, or captions, you should now migrate that functionality to the Dynamic Ingest API.</p>
                     <h3>Use cases</h3>
                     <p>Here is a breakdown of some specific batch use cases and the new API you would use:</p>
@@ -101,26 +104,16 @@
                         </thead>
                         <tbody class="bcls-table__body">
                             <tr>
-                                <td>Using Batch to upload videos from your CMS</td>
-                                <td>Use the <a href="//docs.brightcove.com/en/video-cloud/di-api/getting-started/overview-di.html">Dynamic Ingest API</a> instead</td>
+                                <td>Using Batch to upload videos from your CMS or other source</td>
+                                <td>Use the <a href="//docs.brightcove.com/en/video-cloud/di-api/getting-started/overview-di.html">Dynamic Ingest API</a> instead. You will first need to create the video data object using the CMS API, then use the Dynamic Ingest API to either pull or upload the video source file.</td>
                             </tr>
                             <tr>
-                                <td>Using Batch Provisioning to upload videos</td>
-                                <td>
-                                    <p>Use the Dynamic Ingest API - you can host the files on your own server or S3 bucket for pull-based ingest, or use <a href="//docs.brightcove.com/en/video-cloud/di-api/guides/push-based-ingest.html">source file upload</a><sup><strong><a href="#note1">[1]</a></strong></sup></p>
-                                    <aside class="bcls-aside bcls-aside--tip">If you will be ingesting large numbers of videos, also see <a href="//docs.brightcove.com/en/video-cloud/di-api/guides/fallback-retry.html">this guide</a> to using Notifications to avoid exceeding ingest rate limits.</aside>
-                                </td>
+                                <td>Using Batch to upload poster and thumbnail images and/or captions</td>
+                                <td>Use the <a href="//docs.brightcove.com/en/video-cloud/di-api/getting-started/overview-di.html">Dynamic Ingest API</a> instead. Images and text tracks (WebVTT captions) can be added at the same time as you ingest the video file, or added later.<sup><strong><a href="#note2">[2]</a></strong></sup> If you are using Batch to add logo overlays, these are now handled differently.<sup><strong><a href="#note3">[3]</a></strong></sup></td>
                             </tr>
                             <tr>
                                 <td>Using Batch Provisioning to replace or retranscode videos</td>
                                 <td>Both of these operations can be performed using the <a href="//docs.brightcove.com/en/video-cloud/di-api/getting-started/overview-di.html#replaceVideo">Dynamic Ingest API</a> - you can host the files on your own server or S3 bucket for pull-based ingest, or use <a href="//docs.brightcove.com/en/video-cloud/di-api/guides/push-based-ingest.html">source file upload</a><sup><strong><a href="#note2">[2]</a></strong></sup>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Using Batch Provisioning to add images or captions to videos</td>
-                                <td>
-                                    <p><a href="//docs.brightcove.com/en/video-cloud/di-api/guides/images.html">Video stills (posters) and thumbnails</a> and <a href="//docs.brightcove.com/en/video-cloud/di-api/guides/webvtt.html">WebVTT text tracks</a>can be added using the Dynamic Ingest API.<sup><strong><a href="#note3">[3]</a></strong></sup></p>
-
                                 </td>
                             </tr>
                         </tbody>
@@ -162,48 +155,16 @@
                         <li><a href="//docs.brightcove.com/en/video-cloud/di-api/reference/versions/v1/index.html#api-Video-Create_Video_Object">Create the video data object</a> using the CMS API</li>
                         <li>//docs.brightcove.com/en/video-cloud/di-api/reference/versions/v1/index.html#api-Ingest-Ingest_Media_AssetRequest injestion of the video using Dynamic Ingest</li>
                     </ul>
-                    <aside class="bcls-aside bcls-aside--information">The preferred method is to send the Dynamic Ingest system an address where your video file can be found and let Video Cloud retrieve it, but if you cannot put your videos in a location where Video Cloud can retreive them, there is also a <a href="//docs.brightcove.com/en/video-cloud/di-api/guides/push-based-ingest.html">source file upload option</a>.</aside>
-                    <p>See the <a href="#methods">API methods comparison</a> below to see equivalent CMS API methods for various Media API methods, and the <a href="#videoFields">Video fields comparison</a> to see where the names of video properties differ between the Media and CMS APIs.</p>
+                    <aside class="bcls-aside bcls-aside--information">Notes:
+                        <ol>
+                            <li>The preferred method is to send the Dynamic Ingest system an address where your video file can be found and let Video Cloud retrieve it, but if you cannot put your videos in a location where Video Cloud can retreive them, there is also a <a href="//docs.brightcove.com/en/video-cloud/di-api/guides/push-based-ingest.html">source file upload option</a>.</li>
+                            <li>Some video metadata can be set when you create the video object, but some fields must be added afterwards using the <a href="#Update_Video">CMS API to update the video</a>.</li>
+                        </ol>
+                        </aside>
+                    <p>See the <a href="#videoFields">Video fields comparison</a> to see where the names of video properties differ between the Media and CMS APIs.</p>
                     <h3>Use cases</h3>
                     <p>Here is a breakdown of some specific use cases:</p>
-                    <table class="bcls-table">
-                        <thead class="bcls-table__head">
-                            <tr>
-                                <th>Current State</th>
-                                <th>Migration Path</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bcls-table__body">
-                            <tr>
-                                <td>Using the Media API to update video metadata (name, description, tags, etc.)</td>
-                                <td>Use the CMS API <a href="//docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html#api-videoGroup-Update_Video">Update Video</a> operation.</td>
-                            </tr>
-                            <tr>
-                                <td>Using the Media API to manage playlists</td>
-                                <td>Use the CMS <a href="//docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html#api-playlistGroup">Playlist operations</a>.</td>
-                            </tr>
-                            <tr>
-                                <td>Using Batch Provisioning to update video metadata</td>
-                                <td>Use the CMS API <a href="//docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html#api-videoGroup-Update_Video">Update Video</a> method</td>
-                            </tr>
-                            <tr>
-                                <td>Using Batch Provisioning to apply geo-filtering to videos</td>
-                                <td>Use the CMS API <a href="//docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html#api-videoGroup-Update_Video">Update Video</a> method<sup><strong><a href="#note4">[4]</a></strong></sup></td>
-                            </tr>
-                            <tr>
-                                <td>Using Media API or Batch Provisioning to share videos between accounts</td>
-                                <td><aside class="bcls-aside bcls-aside--information">Support for Media Sharing is planned but not yet available in the CMS API - you will need to wait until this feature is added.</aside></td>
-                            </tr>
-                            <tr>
-                                <td>Using Batch Provisioning to retranscode videos</td>
-                                <td>Use the <a href="//docs.brightcove.com/en/video-cloud/di-api/getting-started/overview-di.html#retranscode">Dynamic Ingest API</a><sup><strong><a href="#note5">[5]</a></strong></sup></td>
-                            </tr>
-                            <tr>
-                                <td>Using Batch Provisioning or the Media API to add remote remote videos and assets such as captions and images</td>
-                                <td>Use the <a href="//docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html#api-assetGroup">CMS API assets operations</a> - also see <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/remote-assets.html">Using the CMS API: Remote Assets</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
+
                     <p>In short, the new Catalog APIs offer greater performance, reliability, and functionality. In addition, they are part of the larger platform that is the new Video Cloud - in addition to the APIs discussed here, there are APIs for Analytics, Player Management, Ingest Profiles, and OAuth. Putting these all together enables you to create a complete integration between your CMS or app and Video Cloud.</p>
                     <h4>Notes</h4>
                     <ul>
@@ -214,7 +175,7 @@
 
                 <section class="bcls-section" id="videoFields">
                     <h2>Video Field Comparison</h2>
-                    <p>The table below lists video fields that are different in CMS API responses from those in the Media API. Note that only those fields that are different are listed - <a href="http://docs.brightcove.com/en/video-cloud/cms-api/references/video-fields-reference.html">video fields</a> not listed are the same for both APIs.</p>
+                    <p>The table below lists Batch manifest field properties and equivalent properties for the CMS or Dynamic Ingest APIs.</p>
                     <table class="bcls-table">
                         <thead class="bcls-table__head">
                             <tr>
@@ -1016,138 +977,7 @@
                         </tbody>
                     </table>
                 </section>
-                <section class="bcls-section" id="methods">
-                    <h2>API Methods Comparison</h2>
-                    <p>The table below shows Media API methods and the equivalent operation in CMS (or Dynamic Ingest) API</p>
-                    <table class="bcls-table">
-                        <thead class="bcls-table__head">
-                            <tr>
-                                <th>Media API</th>
-                                <th>CMS API Verb + Endpoint</th>
-                            </tr>
-                            <tr>
-                                <th colspan="2">Video Methods</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bcls-table__body">
-                            <tr>
-                                <td>search_videos</td>
-                                <td>GET /accounts/account_id/videos + <a href="http://docs.brightcove.com/en/video-cloud/cms-api/guides/search-videos.html">search</a></td>
-                            </tr>
-                            <tr>
-                                <td>find_modified_videos</td>
-                                <td>GET /accounts/{account_id}/videos?sort=%2Dupdated_at</td>
-                            </tr>
-                            <tr>
-                                <td>find_video_by_id</td>
-                                <td>GET /accounts/{account_id}/videos/{video_id}</td>
-                            </tr>
-                            <tr>
-                                <td>find_videos_by_ids</td>
-                                <td>GET /accounts/{account_id}/videos/{video_id} (iterate over ids)</td>
-                            </tr>
-                            <tr>
-                                <td>find_video_by_reference_id</td>
-                                <td>GET /accounts/{account_id}/videos/ref:{reference_id}</td>
-                            </tr>
-                            <tr>
-                                <td>find_videos_by_reference_ids</td>
-                                <td>/accounts/{account_id}/videos/ref:{reference_id} (iterate over reference ids)</td>
-                            </tr>
-                            <tr>
-                                <td>find_all_videos</td>
-                                <td>GET /accounts/account_id/videos</td>
-                            </tr>
-                            <tr>
-                                <td>find_related_videos</td>
-                                <td>GET /accounts/account_id/videos + <a href="http://docs.brightcove.com/en/video-cloud/cms-api/guides/search-videos.html">search</a> (search according to the relationships you want)</td>
-                            </tr>
-                            <tr>
-                                <td>create_video</td>
-                                <td>POST /accounts/account_id/videos + <a href="http://docs.brightcove.com/en/video-cloud/di-api/getting-started/overview-di.html">Dynamic Ingest API</a></td>
-                            </tr>
-                            <tr>
-                                <td>update_video</td>
-                                <td>PATCH /accounts/{account_id}/videos/{video_id}</td>
-                            </tr>
-                            <tr>
-                                <td>delete_video</td>
-                                <td>DELETE /accounts/{account_id}/videos/{video_id}</td>
-                            </tr>
-                            <tr>
-                                <td>add_captioning</td>
-                                <td>Use <a href="http://docs.brightcove.com/en/video-cloud/di-api/guides/webvtt.html">Dynamic Ingest - Text Tracks</a></td>
-                            </tr>
-                            <tr>
-                                <td>add_image</td>
-                                <td><a href="http://docs.brightcove.com/en/video-cloud/di-api/guides/images.html">Dynamic Ingest - Images</a></td>
-                            </tr>
-                            <tr>
-                                <td>add_logo_overlay</td>
-                                <td>Either use the <a href="http://docs.brightcove.com/en/video-cloud/brightcove-player/guides/overlay-plugin.html">Player Overlay Plugin</a> for detached overlays that can be managed and changed at runtime, or burned-in logos through a  <a href="//docs.brightcove.com/en/video-cloud/ingest-profiles-api/reference/profile-fields-reference.html#watermarkFields">custom Ingest Profile including watermarks</a></td>
-                            </tr>
-                            <tr>
-                                <td>delete_captioning</td>
-                                <td>PATCH /accounts/{account_id}/videos/{video_id}</td>
-                            </tr>
-                            <tr>
-                                <td>get_upload_status</td>
-                                <td>GET /accounts/{account_id}/videos/{video_id} (status is included in the response)</td>
-                            </tr>
-                            <tr>
-                                <td>remove_logo_overlay</td>
-                                <td>No equivalent - see notes on add_logo-overlay above</td>
-                            </tr>
-                            <tr>
-                                <td>share_video</td>
-                                <td>not yet implemented</td>
-                            </tr>
-                            <tr>
-                                <td>unshare_video</td>
-                                <td>not yet implemented</td>
-                            </tr>
-                            <tr>
-                                <th colspan="2">Playlist Methods</th>
-                            </tr>
-                            <tr>
-                                <td>find_all_playlists</td>
-                                <td>GET /account/{account_id}/playlists</td>
-                            </tr>
-                            <tr>
-                                <td>find_playlist_by_id</td>
-                                <td>GET /account/{account_id}/playlists/{playlist_id}</td>
-                            </tr>
-                            <tr>
-                                <td>find_playlist_by_reference_id</td>
-                                <td>GET /account/{account_id}/playlists/ref:{reference_id}</td>
-                            </tr>
-                            <tr>
-                                <td>find_playlists_by_ids</td>
-                                <td>GET /account/{account_id}/playlists/{playlist_id} (iterate over ids)</td>
-                            </tr>
-                            <tr>
-                                <td>find_playlists_by_reference_ids</td>
-                                <td>GET /account/{account_id}/playlists/ref:{reference_id} (iterate over reference ids)</td>
-                            </tr>
-                            <tr>
-                                <td>find_playlists_for_player_id</td>
-                                <td>no equivalent</td>
-                            </tr>
-                            <tr>
-                                <td>create_playlist</td>
-                                <td>POST /account/{account_id}/playlists</td>
-                            </tr>
-                            <tr>
-                                <td>update_playlist</td>
-                                <td>PATCH /account/{account_id}/playlists/{playlist_id}</td>
-                            </tr>
-                            <tr>
-                                <td>delete_playlist</td>
-                                <td>DELETE /account/{account_id}/playlists/{playlist_id}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </section>
+
             </article>
             <!-- end drupal content -->
         </div>
@@ -1179,3 +1009,41 @@ feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question r
 </script>
 </body>
 </html>
+<!-- <table class="bcls-table">
+    <thead class="bcls-table__head">
+        <tr>
+            <th>Current State</th>
+            <th>Migration Path</th>
+        </tr>
+    </thead>
+    <tbody class="bcls-table__body">
+        <tr>
+            <td>Using the Media API to update video metadata (name, description, tags, etc.)</td>
+            <td>Use the CMS API <a href="//docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html#api-videoGroup-Update_Video">Update Video</a> operation.</td>
+        </tr>
+        <tr>
+            <td>Using the Media API to manage playlists</td>
+            <td>Use the CMS <a href="//docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html#api-playlistGroup">Playlist operations</a>.</td>
+        </tr>
+        <tr>
+            <td>Using Batch Provisioning to update video metadata</td>
+            <td>Use the CMS API <a href="//docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html#api-videoGroup-Update_Video">Update Video</a> method</td>
+        </tr>
+        <tr>
+            <td>Using Batch Provisioning to apply geo-filtering to videos</td>
+            <td>Use the CMS API <a href="//docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html#api-videoGroup-Update_Video">Update Video</a> method<sup><strong><a href="#note4">[4]</a></strong></sup></td>
+        </tr>
+        <tr>
+            <td>Using Media API or Batch Provisioning to share videos between accounts</td>
+            <td><aside class="bcls-aside bcls-aside--information">Support for Media Sharing is planned but not yet available in the CMS API - you will need to wait until this feature is added.</aside></td>
+        </tr>
+        <tr>
+            <td>Using Batch Provisioning to retranscode videos</td>
+            <td>Use the <a href="//docs.brightcove.com/en/video-cloud/di-api/getting-started/overview-di.html#retranscode">Dynamic Ingest API</a><sup><strong><a href="#note5">[5]</a></strong></sup></td>
+        </tr>
+        <tr>
+            <td>Using Batch Provisioning or the Media API to add remote remote videos and assets such as captions and images</td>
+            <td>Use the <a href="//docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html#api-assetGroup">CMS API assets operations</a> - also see <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/remote-assets.html">Using the CMS API: Remote Assets</a></td>
+        </tr>
+    </tbody>
+</table> -->
