@@ -57,6 +57,29 @@
         <div id="main" class="large-10 small-12 columns">
           <h1>Player Sample: Playback API Paging</h1>
               <!-- begin drupal content -->
+              <!-- player styes -->
+              <style type="text/css">
+                .vjs-playlist.vjs-playlist {
+                    margin-left: 0;
+                    margin-top: .5em;
+                    width: 640px;
+                    height: 106px;
+                    max-width: 640px;
+                  	width: auto;
+                  	white-space: nowrap;
+                    /*overflow-x: hidden;*/
+                    overflow-y: hidden;
+                  }
+                  .vjs-playlist-item {
+                  	display: inline-block;
+                  	height: 75px;
+                  }
+                  .vjs-playlist-item img{
+                    width: 215px;
+                  	/*height: 121px;*/
+                  }
+              </style>
+
               <article class="bcls-article">
                 <header id="bcls_header" class="bcls-header">
                   <!-- Place document intro sentence(s) here -->
@@ -124,16 +147,202 @@
 
                 <section id="The_player" class="bcls-section">
                     <h2>The player</h2>
-                    <p>This example uses a Brightcove player to display a background video without sound or player controls. Select the <strong>Pause/Play</strong> button to control video playback. Select the <strong>original article</strong> link to go to the company website.</p>
-                    <p>
-                      Select the <strong>HTML</strong>, <strong>CSS</strong> or <strong>JS</strong> buttons to modify the code and change the <strong>Result</strong>.
-                    </p>
+                    <p>This example uses a Brightcove player to display a video in the player along with the first 3 videos in the playlist. Select the <strong>Next Videos</strong> button to display the next 3 videos in the playlist. When you reach the last set of videos in the playlist, then the videos displayed wrap around to the beginning of the playlist.</p>
 
-                    <p data-height="500" data-theme-id="14832" data-slug-hash="RRrGqZ" data-default-tab="result" data-user="bcls" data-embed-version="2" class="codepen">See the Pen <a href="http://codepen.io/team/bcls/pen/RRrGqZ/">RRrGqZ</a> by Brightcove Learning Services (<a href="http://codepen.io/bcls">@bcls</a>) on <a href="http://codepen.io">CodePen</a>.</p>
-                    <script async src="//assets.codepen.io/assets/embed/ei.js"></script>
+                    <div style="display: block; position: relative; max-width: 640px;">
+                      <div style="padding-top: 56.25%;">
+                        <video id="myPlayerID"
+                          data-account="1752604059001"
+                          data-player="S1DM9wMOe"
+                          data-embed="default"
+                          data-application-id
+                          class="video-js"
+                          controls
+                          style="width: 100%; height: 100%; position: absolute; top: 0px; bottom: 0px; right: 0px; left: 0px;"></video>
+                          <script src="//players.brightcove.net/1752604059001/S1DM9wMOe_default/index.min.js"></script>
+                      </div>
+                    </div>
+                    <ol class="vjs-playlist"></ol>
+
+                    <input id="nextButton" class="bcls-button" type="button" value="Next Videos">
+
+                    <!-- custom script -->
+                    <script type="text/javascript">
+                      var myPlayer,
+                          requestData,
+                          mediaData,
+                          apiRequest,
+                          apiBaseURL = 'https://edge.api.brightcove.com/playback/v1/accounts/',
+                          policyKey = 'BCpkADawqM3_9ax216PJYuUTLApMLkLJ3apjFlTRKHHS4q0DE33J0XsiDWmc6SfKwrwRAhejCZpTbwljz4-OlUwyqKi64L25Dwy4yhY1eSZ9ZduI-dO0mjSNVcR9C8nz0jtkimOOtzQgswCr',
+                          accountId = "1752604059001",
+                          playlistId = "5282200243001",
+                          videoData = [],
+                          mediaType,
+                          offsetValue = 0,
+                          limitValue = 3,
+                          firstTime = true,
+                          requestURL,
+                          eNextButton = document.getElementById("nextButton"),
+                          playlistInfo,
+                          playlistLength;
+
+                      videojs("myPlayerID").ready(function(){
+                          myPlayer = this;
+                          // set up data for Playback API request
+                          requestData = setRequestData();
+                          console.log("requestData= ",requestData);
+                          // make the Playback API request to get playlist data
+                          getMediaData('playlist', requestData, function (mediaData) {
+                              console.log("mediaData= ",mediaData);
+                              playlistLength = mediaData.videos.length;
+                              console.log("playlistLength= ",playlistLength);
+                              displayPlaylist();
+                              eNextButton.addEventListener("click",function(){
+                                offsetValue += 3;
+                                if (offsetValue >= playlistLength) {
+                                  offsetValue = 0;
+                                }
+                                displayPlaylist();
+                              });
+                          });
+                      });
+
+                      function displayPlaylist() {
+                        // set up data for Playback API request
+                        requestData = setRequestData();
+                        console.log("requestData= ",requestData);
+                        mediaType = 'playlist';
+                        // make the Playback API request to get playlist data
+                        getMediaData(mediaType, requestData, function (mediaData) {
+                            console.log("mediaData= ",mediaData);
+                            // extract the needed video data into an array
+                            videoData = extractVideoData(mediaData);
+                            console.log("videoData= ",videoData);
+                            getVideoObjects(videoData, function (videoObjects) {
+                                // add the newest videos list to the player as a playlist
+                                myPlayer.catalog.load(videoObjects[0]);
+                                myPlayer.playlist(videoObjects);
+                            });
+                        });
+                      }
+
+                      /**
+                       * sets up the data for the API request
+                       */
+                      function setRequestData() {
+                        console.log("setRequestData");
+                        var endPoint = '';
+
+                        if (firstTime) {
+                          firstTime = false;
+                          requestURL = apiBaseURL +  accountId + '/playlists/' + playlistId;
+                        } else {
+                          requestURL = apiBaseURL +  accountId + '/playlists/' + playlistId + '?offset=' + offsetValue + '&limit=' + limitValue;
+                        }
+                        // apiRequest.innerHTML = requestURL;
+
+                        return requestURL;
+                       }
+
+                       /**
+                        * request data from the Playback API
+                        */
+                        getMediaData = function(mediaType, requestURL, callback) {
+                        var httpRequest = new XMLHttpRequest(),
+                          responseData,
+                          parsedData,
+                          // response handler
+                          getResponse = function() {
+                            try {
+                              if (httpRequest.readyState === 4) {
+                                if (httpRequest.status === 200) {
+                                  responseData = httpRequest.responseText;
+                                  parsedData = JSON.parse(responseData);
+                                  console.log("parsedData",parsedData);
+                                  switch (mediaType) {
+                                    case 'video':
+                                      // do nothing
+                                      break;
+                                    case 'playlist':
+                                      callback(parsedData);
+                                      break;
+                                  }
+                                } else {
+                                  alert('There was a problem with the request. Request returned ' + httpRequest.status);
+                                }
+                              }
+                            } catch (e) {
+                              alert('Caught Exception: ' + e);
+                            }
+                          };
+                        // set response handler
+                        httpRequest.onreadystatechange = getResponse;
+                        // open the request
+                        httpRequest.open('GET', requestURL);
+                        // set headers
+                        httpRequest.setRequestHeader('Accept', 'application/json;pk=' + policyKey);
+                        // open and send request
+                        httpRequest.send();
+                      };
+
+                      /**
+                         * extract video data from Playback API response
+                         * @param {array} playbackData the data from the Playback API
+                         * @return {array} videoData array of video info
+                         */
+                        function extractVideoData(playbackData) {
+                          var i,
+                            iMax = playbackData.videos.length,
+                            videoItem,
+                            videoDataForReturn = [];
+                          for (i = 0; i < iMax; i++) {
+                            if (playbackData.videos[i].id !== null) {
+                                videoItem = {};
+                                videoItem.id = playbackData.videos[i].id;
+                                videoDataForReturn.push(videoItem);
+                            }
+                          }
+                          return videoDataForReturn;
+                        }
+
+                      /**
+                         * get video objects
+                         * @param {array} videoIds array of video ids
+                         * @return {array} videoData array of video objects
+                         */
+                        function getVideoObjects(videoIds, callback) {
+                          var i = 0,
+                            iMax = videoIds.length,
+                            videoObjectsForReturn =  [];
+                          /**
+                           * makes catalog calls for all video ids in the array
+                           */
+                          getVideoData();
+
+                          function getVideoData() {
+                            if (i < iMax) {
+                                myPlayer.catalog.getVideo(videoIds[i].id, pushData);
+                            } else {
+                                callback(videoObjectsForReturn);
+                            }
+                          }
+                          /**
+                           * callback for the catalog calls
+                           * pushes the returned data object into an array
+                           * @param {string} error error returned if the call fails
+                           * @parap {object} video the video object
+                           */
+                          function pushData(error, video) {
+                            videoObjectsForReturn.push(video);
+                            i++;
+                            getVideoData();
+                          }
+                        }
+                    </script>
 
                 </section>
                 <!-- id="player" -->
+                <br /><br />
 
                 <section id="How_it_works" class="bcls-section">
                     <h2>How it works</h2>
@@ -146,170 +355,296 @@
                           In the <strong>Settings</strong> section, select the <strong>Edit</strong> button and do the following:
                           <ul>
                             <li>
-                              Set the <strong>Auto-Start Video on Player Load</strong> option to <strong>Yes</strong>.
+                              Set the <strong>Display Playlist</strong> option to <strong>Enabled</strong>.
                             </li>
                             <li>
                               Set the <strong>Sizing</strong> option to <strong>Responsive</strong>.
                             </li>
+                            <li>
+                              Set the Player Dimensions to fit your web page.
+                            </li>
                           </ul>
                         </li>
                         <li class="video-cloud-only">Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
-                        <li><span class="video-cloud-only">In the <strong>Media</strong> module, select a video and publish it with this player.</span><span class="perform-only">Assign video content to the player and publish it.</span></li>
-                        <li>Copy the Advanced (In-Page) embed code and paste it into a new HTML file.</li>
-                    </ol>
+                        <li><span class="video-cloud-only">In the <strong>Media</strong> module, select a playlist and publish it with this player.</span><span class="perform-only">Assign playlist content to the player and publish it.</span></li>
+                        <li>
+                          <p>
+                            Copy the Advanced (In-Page) embed code and paste it into a new HTML file.
+                          </p>
                     <aside class="bcls-aside bcls-aside--tip">For details on how to get this embed code, see the <a href="../../brightcove-player/getting-started/quick-start-bc-player.html">Quick Start to Brightcove Player</a> document.</aside>
 
-                    <p>The embed code should look like this:</p>
+                    <p>The embed code should look similar to this:</p>
 
-                    <pre class="line-numbers" data-start="1"><code class="language-html">&lt;div id=&quot;videoContainer&quot; style=&quot;display: block; position: relative; max-width: 100%;&quot;&gt;
-   &lt;div style=&quot;padding-top: 56.25%;&quot;&gt;
-     &lt;video id=&quot;video_1&quot;
-        style=&quot;width: 100%; height: 100%; position: absolute; top: 0px; bottom: 0px; right: 0px; left: 0px;&quot;
-        data-video-id=&quot;4825279519001&quot;
-        data-account=&quot;1752604059001&quot;
-        data-player=&quot;H16Hzc27&quot;
-        data-embed=&quot;default&quot;
-        class=&quot;video-js&quot;
-        controls&gt;&lt;/video&gt;
-      &lt;script src=&quot;//players.brightcove.net/1752604059001/H16Hzc27_default/index.min.js&quot;&gt;
-      &lt;/script&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;</code></pre>
+  <pre class="line-numbers" data-start="1"><code class="language-html">&lt;div style=&quot;display: block; position: relative; max-width: 640px;&quot;&gt;
+  &lt;div style=&quot;padding-top: 56.25%;&quot;&gt;
+    &lt;video id=&quot;myPlayerID&quot;
+      data-account=&quot;1752604059001&quot;
+      data-player=&quot;S1DM9wMOe&quot;
+      data-embed=&quot;default&quot;
+      data-application-id
+      class=&quot;video-js&quot;
+      controls
+      style=&quot;width: 100%; height: 100%; position: absolute; top: 0px; bottom: 0px; right: 0px; left: 0px;&quot;&gt;&lt;/video&gt;
+      &lt;script src=&quot;//players.brightcove.net/1752604059001/S1DM9wMOe_default/index.min.js&quot;&gt;&lt;/script&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;ol class=&quot;vjs-playlist&quot;&gt;&lt;/ol&gt;</code></pre>
+                      </li>
+                    </ol>
 
 <br/>
                     <h3>The HTML code</h3>
                     <p>
-                      Here, you will create a text block that will display above the background video. There is a link to the company website, and a pause/play button to control playback of the background video. This is needed since we are hiding the player controls.
+                      Here, you will create a button to get the next set of videos in the playlist and load them into the player.
                     </p>
                     <ol class="bcls-tasklist">
-                      <li>Add the following HTML to your page code, just below the player embed code:</li>
+                      <li>Add the following HTML to your page code, just below the player embed code:
+
+                        <ul>
+                            <li>
+                              <p>
+                                Line 4: Creates a button that you will add functionality to in a later step.
+                              </p></li>
+                        </ul>
+
+  <pre class="line-numbers" data-start="1"><code class="language-html">...
+&lt;ol class=&quot;vjs-playlist&quot;&gt;&lt;/ol&gt;
+
+<span class="bcls-highlight">&lt;input id=&quot;nextButton&quot; type=&quot;button&quot; value=&quot;Next Videos&quot;&gt;</span></code></pre>
+                      </li>
                     </ol>
-
-                    <ul>
-                        <li>Line 4: Creates a link back to the company website.</li>
-                        <li>Line 7: Defines a pause/play button to control video playback. You will add the button functionality in the JavaScript section.</li>
-                    </ul>
-
-                    <pre class="line-numbers" data-start="1"><code class="language-html">&lt;div id=&quot;article&quot;&gt;
-    &lt;h1&gt;Flamingos&lt;/h1&gt;
-    &lt;p&gt;filmed in 2011&lt;/p&gt;
-    &lt;p&gt;&lt;a href=&quot;//brightcove.com&quot;&gt;original article&lt;/a&gt;
-    &lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur porta dictum turpis, eu mollis justo gravida ac. Proin non eros blandit, rutrum est a, cursus quam.&lt;/p&gt;
-    &lt;p&gt;Aenean pharetra convallis pellentesque. Vestibulum et metus lectus. Nunc consectetur, ipsum in viverra eleifend, erat erat ultricies felis, at ultricies mi massa eu ligula.&lt;/p&gt;
-    &lt;button&gt;Pause&lt;/button&gt;
-  &lt;/div&gt;</code></pre>
 
 <br/>
                     <h3>The JavaScript code</h3>
                     <p>
-                      Here, you will add code to control the functionality of the pause/play button.
+                      Here, you will add code to control the functionality of the <strong>Next Videos</strong> button.
                     </p>
                     <ol class="bcls-tasklist">
-                      <li>Add the following JavaScript to your page code:</li>
-                    </ol>
+                      <li>Add the following JavaScript to your page code:
+
                     <ul>
                         <li>Line 3: Gets a reference to the player when it is ready.</li>
                         <li>Line 4: Gets a reference to the pause/play button.</li>
                         <li>Line 5: Turns off the audio for the player.</li>
                         <li>Lines 8-10: Sets the button name to <strong>Play</strong> when the video ends.</li>
-                        <li>Lines 13-21: Listens for a click event on the play/pause button and either resumes playback or pauses the video based on the current playback state.</li>
+                        <li>
+                          <p>
+                            Lines 13-21: Listens for a click event on the play/pause button and either resumes playback or pauses the video based on the current playback state.
+                          </p></li>
                     </ul>
-<pre class="line-numbers" data-start="1"><code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
-    videojs(&quot;video_1&quot;).ready(function() {
-      var myPlayer = this,
-          pauseButton = document.querySelector(&quot;#article button&quot;);
-      myPlayer.muted(true);
+<pre class="line-numbers" data-start="1"><code class="language-javascript">&lt;script type=&quot;text/javascript&quot;&gt;
+  var myPlayer,
+      requestData,
+      mediaData,
+      apiRequest,
+      apiBaseURL = 'https://edge.api.brightcove.com/playback/v1/accounts/',
+      policyKey = 'BCpkADawqM3_9ax216PJYuUTLApMLkLJ3apjFlTRKHHS4q0DE33J0XsiDWmc6SfKwrwRAhejCZpTbwljz4-OlUwyqKi64L25Dwy4yhY1eSZ9ZduI-dO0mjSNVcR9C8nz0jtkimOOtzQgswCr',
+      accountId = &quot;1752604059001&quot;,
+      playlistId = &quot;5282200243001&quot;,
+      videoData = [],
+      mediaType,
+      offsetValue = 0,
+      limitValue = 3,
+      firstTime = true,
+      requestURL,
+      eNextButton = document.getElementById(&quot;nextButton&quot;),
+      playlistInfo,
+      playlistLength;
 
-      // listen for the &quot;ended&quot; event and dislay play button
-      myPlayer.on(&quot;ended&quot;, function() {
-          pauseButton.innerHTML = &quot;Play&quot;;
+  videojs(&quot;myPlayerID&quot;).ready(function(){
+      myPlayer = this;
+      // set up data for Playback API request
+      requestData = setRequestData();
+      console.log(&quot;requestData= &quot;,requestData);
+      // make the Playback API request to get playlist data
+      getMediaData('playlist', requestData, function (mediaData) {
+          console.log(&quot;mediaData= &quot;,mediaData);
+          playlistLength = mediaData.videos.length;
+          console.log(&quot;playlistLength= &quot;,playlistLength);
+          displayPlaylist();
+          eNextButton.addEventListener(&quot;click&quot;,function(){
+            offsetValue += 3;
+            if (offsetValue &gt;= playlistLength) {
+              offsetValue = 0;
+            }
+            displayPlaylist();
+          });
       });
+  });
 
-      // listen for a click event on the pause/play button
-      pauseButton.addEventListener(&quot;click&quot;, function() {
-        if (myPlayer.paused()) {
-          myPlayer.play();
-          pauseButton.innerHTML = &quot;Pause&quot;;
-        } else {
-          myPlayer.pause();
-          pauseButton.innerHTML = &quot;Play&quot;;
-        }
-      });
+  function displayPlaylist() {
+    // set up data for Playback API request
+    requestData = setRequestData();
+    console.log(&quot;requestData= &quot;,requestData);
+    mediaType = 'playlist';
+    // make the Playback API request to get playlist data
+    getMediaData(mediaType, requestData, function (mediaData) {
+        console.log(&quot;mediaData= &quot;,mediaData);
+        // extract the needed video data into an array
+        videoData = extractVideoData(mediaData);
+        console.log(&quot;videoData= &quot;,videoData);
+        getVideoObjects(videoData, function (videoObjects) {
+            // add the newest videos list to the player as a playlist
+            myPlayer.catalog.load(videoObjects[0]);
+            myPlayer.playlist(videoObjects);
+        });
     });
-  &lt;/script&gt;</code></pre>
+  }
+
+  /**
+   * sets up the data for the API request
+   */
+  function setRequestData() {
+    console.log(&quot;setRequestData&quot;);
+    var endPoint = '';
+
+    if (firstTime) {
+      firstTime = false;
+      requestURL = apiBaseURL +  accountId + '/playlists/' + playlistId;
+    } else {
+      requestURL = apiBaseURL +  accountId + '/playlists/' + playlistId + '?offset=' + offsetValue + '&amp;limit=' + limitValue;
+    }
+    // apiRequest.innerHTML = requestURL;
+
+    return requestURL;
+   }
+
+   /**
+    * request data from the Playback API
+    */
+    getMediaData = function(mediaType, requestURL, callback) {
+    var httpRequest = new XMLHttpRequest(),
+      responseData,
+      parsedData,
+      // response handler
+      getResponse = function() {
+        try {
+          if (httpRequest.readyState === 4) {
+            if (httpRequest.status === 200) {
+              responseData = httpRequest.responseText;
+              parsedData = JSON.parse(responseData);
+              console.log(&quot;parsedData&quot;,parsedData);
+              switch (mediaType) {
+                case 'video':
+                  // do nothing
+                  break;
+                case 'playlist':
+                  callback(parsedData);
+                  break;
+              }
+            } else {
+              alert('There was a problem with the request. Request returned ' + httpRequest.status);
+            }
+          }
+        } catch (e) {
+          alert('Caught Exception: ' + e);
+        }
+      };
+    // set response handler
+    httpRequest.onreadystatechange = getResponse;
+    // open the request
+    httpRequest.open('GET', requestURL);
+    // set headers
+    httpRequest.setRequestHeader('Accept', 'application/json;pk=' + policyKey);
+    // open and send request
+    httpRequest.send();
+  };
+
+  /**
+     * extract video data from Playback API response
+     * @param {array} playbackData the data from the Playback API
+     * @return {array} videoData array of video info
+     */
+    function extractVideoData(playbackData) {
+      var i,
+        iMax = playbackData.videos.length,
+        videoItem,
+        videoDataForReturn = [];
+      for (i = 0; i &lt; iMax; i++) {
+        if (playbackData.videos[i].id !== null) {
+            videoItem = {};
+            videoItem.id = playbackData.videos[i].id;
+            videoDataForReturn.push(videoItem);
+        }
+      }
+      return videoDataForReturn;
+    }
+
+  /**
+     * get video objects
+     * @param {array} videoIds array of video ids
+     * @return {array} videoData array of video objects
+     */
+    function getVideoObjects(videoIds, callback) {
+      var i = 0,
+        iMax = videoIds.length,
+        videoObjectsForReturn =  [];
+      /**
+       * makes catalog calls for all video ids in the array
+       */
+      getVideoData();
+
+      function getVideoData() {
+        if (i &lt; iMax) {
+            myPlayer.catalog.getVideo(videoIds[i].id, pushData);
+        } else {
+            callback(videoObjectsForReturn);
+        }
+      }
+      /**
+       * callback for the catalog calls
+       * pushes the returned data object into an array
+       * @param {string} error error returned if the call fails
+       * @parap {object} video the video object
+       */
+      function pushData(error, video) {
+        videoObjectsForReturn.push(video);
+        i++;
+        getVideoData();
+      }
+    }
+&lt;/script&gt;</code></pre>
+                      </li>
+                    </ol>
 
 <br/>
-
 
                     <h3>The stylesheet</h3>
                     <p>This example uses CSS styles for the Brightcove player and the text content.</p>
                     <ol class="bcls-tasklist">
-                      <li>Add the following CSS styles to your page code:</li>
-                    </ol>
+                      <li>Add the following CSS styles to your page code:
                     <ul>
                         <li>Lines 1-4: Set the styles for the page.</li>
                         <li>Lines 5-7: Hide the player controls.</li>
                         <li>Lines 8-10: Disable click events on the video. Instead, the pause/play functionality will be handled by a button in the text content area.</li>
                         <li>Lines 11-29: Set the styes for the text block.</li>
                         <li>Lines 30-40: Set the styes for the <strong>original article</strong> link.</li>
-                        <li>Lines 41-56: Set the styes for the pause/play button.</li>
+                        <li>
+                          <p>
+                            Lines 41-56: Set the styes for the pause/play button.
+                          </p></li>
                     </ul>
-<pre class="line-numbers" data-start="1"><code class="language-css">body {
-  margin: 0;
-  background-color: black;
-}
-.video-js .vjs-control-bar {
-  display: none;
-}
-.video-js {
-  pointer-events: none;
-}
-#article {
-  font-family: Agenda-Light, Agenda Light, Agenda, Arial Narrow, sans-serif;
-  background: rgba(0,0,0,0.3);
-  color: white;
-  padding: 2rem;
-  width: 33%;
-  margin:2rem;
-  float: right;
-  font-size: 1.2rem;
-  position: absolute;
-  top: .25em;
-  right: .25em;
-}
-h1 {
-  font-size: 2rem;
-  text-transform: uppercase;
-  margin-top: 0;
-  letter-spacing: .3rem;
-}
-a {
-  display: inline-block;
-  color: #fff;
-  text-decoration: none;
-  background:rgba(0,0,0,0.5);
-  padding: .5rem;
-  transition: .6s background;
-}
-a:hover{
-  background:rgba(0,0,0,0.9);
-}
-#article button {
-  display: block;
-  width: 80%;
-  padding: .4rem;
-  border: none;
-  margin: 1rem auto;
-  font-size: 1.3rem;
-  background: rgba(255,255,255,0.23);
-  color: #fff;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: .3s background;
-}
-#article button:hover {
-  background: rgba(0,0,0,0.5);
-}</code></pre>
+<pre class="line-numbers" data-start="1"><code class="language-css">&lt;style type=&quot;text/css&quot;&gt;
+  .vjs-playlist.vjs-playlist {
+      margin-left: 0;
+      margin-top: .5em;
+      width: 640px;
+      height: 106px;
+      max-width: 640px;
+    	width: auto;
+    	white-space: nowrap;
+      overflow-y: hidden;
+    }
+    .vjs-playlist-item {
+    	display: inline-block;
+    	height: 75px;
+    }
+    .vjs-playlist-item img{
+      width: 215px;
+    }
+&lt;/style&gt;</code></pre>
+                      </li>
+                    </ol>
 
 <br/>
                 </section>
