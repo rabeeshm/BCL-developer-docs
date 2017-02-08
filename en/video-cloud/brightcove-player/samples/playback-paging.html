@@ -125,9 +125,9 @@
                     <p>The following sections detail resources used from various APIs.</p>
                     <h3>Brightcove player API methods</h3>
                     <ul>
-                        <li><code class="language-javascript">catalog.getVideo()</code>: Method to make a catalog request for the video with the specified id and invokes a callback when the request completes.</li>
-                        <li><code class="language-javascript">catalog.load()</code>: Method to load a video into the player.</li>
-                        <li><code class="language-javascript">playlist()</code>: Method to assign an array of video objects to a player's playlist. Note that this method can also be used to retrieve the playlist currently playing in the player, but will not be used in this way in this document.</li>
+                        <li><code><a href="../../brightcove-player/guides/player-catalog.html#getVideo">catalog.getVideo()</a></code>: Method to make a catalog request for the video with the specified id and invokes a callback when the request completes.</li>
+                        <li><code><a href="../../brightcove-player/guides/player-catalog.html#load">catalog.load()</a></code>: Method to load a video into the player.</li>
+                        <li><code><a href="../../brightcove-player/guides/playlist-api.html#playlist">playlist()</a></code>: Method to assign an array of video objects to a player's playlist. Note that this method can also be used to retrieve the playlist currently playing in the player, but will not be used in this way in this document.</li>
                     </ul>
                     <h3>Playback API</h3>
                     <p>The Playback API will be used to return videos from the specified playlist.</p>
@@ -166,8 +166,8 @@
 
                     <input id="nextButton" class="bcls-button" type="button" value="Next Videos">
                     <br /><br />
-                    <h3>API request:</h3>
-                    <pre class="line-numbers" data-start="1"><code id="apiRequest" class="language-html" style="white-space: pre-line;"></code></pre>
+                    <h3>Playback API request:</h3>
+                    <pre class="line-numbers"><code id="apiRequest" class="language-html" style="white-space: pre-line;"></code></pre>
 
                     <!-- custom script -->
                     <script type="text/javascript">
@@ -187,7 +187,6 @@
                           requestURL,
                           eNextButton = document.getElementById("nextButton"),
                           eApiRequest = document.getElementById('apiRequest'),
-                          playlistInfo,
                           playlistLength;
 
                       videojs("myPlayerID").ready(function(){
@@ -344,6 +343,10 @@
                         }
                     </script>
 
+                    <p>
+                      Notice that the request to the Playback API uses the <a href="//docs.brightcove.com/en/video-cloud/playback-api/references/versions/v1/index.html#api-Playlist-Get_Playlists_by_ID">limit and offset parameters</a> to implement paging.
+                    </p>
+
                 </section>
                 <!-- id="player" -->
                 <br /><br />
@@ -427,14 +430,22 @@
                       <li>Add the following JavaScript to your page code:
 
                     <ul>
-                        <li>Line 3: Gets a reference to the player when it is ready.</li>
-                        <li>Line 4: Gets a reference to the pause/play button.</li>
-                        <li>Line 5: Turns off the audio for the player.</li>
-                        <li>Lines 8-10: Sets the button name to <strong>Play</strong> when the video ends.</li>
-                        <li>
-                          <p>
-                            Lines 13-21: Listens for a click event on the play/pause button and either resumes playback or pauses the video based on the current playback state.
-                          </p></li>
+                        <li>Lines 2-17: Define variables and set values.</li>
+                        <li>Line 20: Gets a reference to the player when it is ready.</li>
+                        <li>Lines 22-26: Make a call to the Playback API to get the total number of videos in the playlist.</li>
+                        <li>Line 28: Makes a call to the Playback API to get the first set of videos in the playlist and loads them into the player.</li>
+                        <li>Lines 30-39: Add a listener to the <strong>Next Videos</strong> button. When selected, make a call to the Playback API to get the next set of videos in the playlist and load them into the player.</li>
+                        <li>Lines 43-49: Make a request to the Playback API to get a set of videos from the playlist.</li>
+                        <li>Line 51: Saves a list of video Ids from the video set returned.</li>
+                        <li>Line 53: Retrieves a video object for each video Id in the current array.</li>
+                        <li>Line 55: Loads the first video object into the player.</li>
+                        <li>Line 57: Loads the current set of video objects into the playlist.</li>
+                        <li>Lines 65-75: Set the Playback API request URL. First time, all videos are returned for the playlist. After that, the next set of videos are returned from the playlist, using the <code>limit</code> and <code>offset</code> parameters.</li>
+                        <li>Lines 80-115: Make the Playback API request using the request URL along with the Policy Key in the header.</li>
+                        <li>Lines 122-135: Save the video Ids from the current list of videos from the playlist.</li>
+                        <li><p>
+                          Lines 142-169: Gets the video object for each video Id in the current array.
+                        </p></li>
                     </ul>
 <pre class="line-numbers" data-start="1"><code class="language-javascript">&lt;script type=&quot;text/javascript&quot;&gt;
   var myPlayer,
@@ -452,54 +463,55 @@
       firstTime = true,
       requestURL,
       eNextButton = document.getElementById(&quot;nextButton&quot;),
-      playlistInfo,
       playlistLength;
 
   videojs(&quot;myPlayerID&quot;).ready(function(){
       myPlayer = this;
       // set up data for Playback API request
       requestData = setRequestData();
-      console.log(&quot;requestData= &quot;,requestData);
-      // make the Playback API request to get playlist data
+      // make the Playback API request - the first request gets all videos in the playlist
       getMediaData('playlist', requestData, function (mediaData) {
-          console.log(&quot;mediaData= &quot;,mediaData);
+          // get the total number of videos in the playlist
           playlistLength = mediaData.videos.length;
-          console.log(&quot;playlistLength= &quot;,playlistLength);
+          // request a set of videos from the playlist and load them into the player
           displayPlaylist();
+          // add a listener for the Next Videos button
           eNextButton.addEventListener(&quot;click&quot;,function(){
+            // increment the offsetValue for the next 3 videos
             offsetValue += 3;
+            // if offsetValue is beyond the playlist length, wrap to the beginning
             if (offsetValue &gt;= playlistLength) {
               offsetValue = 0;
             }
+            // request a set of videos from the playlist and load them into the player
             displayPlaylist();
           });
       });
   });
 
   function displayPlaylist() {
-    // set up data for Playback API request
+    // set up the Playback API request
     requestData = setRequestData();
-    console.log(&quot;requestData= &quot;,requestData);
+    // return playlist data
     mediaType = 'playlist';
     // make the Playback API request to get playlist data
     getMediaData(mediaType, requestData, function (mediaData) {
-        console.log(&quot;mediaData= &quot;,mediaData);
-        // extract the needed video data into an array
+        // extract the video Ids into an array
         videoData = extractVideoData(mediaData);
-        console.log(&quot;videoData= &quot;,videoData);
+        // get video objects from their Ids
         getVideoObjects(videoData, function (videoObjects) {
-            // add the newest videos list to the player as a playlist
+            // add the first video object to the player
             myPlayer.catalog.load(videoObjects[0]);
+            // add the current set of video objects to the player's playlist
             myPlayer.playlist(videoObjects);
         });
     });
   }
 
   /**
-   * sets up the data for the API request
+   * sets up the Playback API request
    */
   function setRequestData() {
-    console.log(&quot;setRequestData&quot;);
     var endPoint = '';
 
     if (firstTime) {
@@ -508,8 +520,6 @@
     } else {
       requestURL = apiBaseURL +  accountId + '/playlists/' + playlistId + '?offset=' + offsetValue + '&amp;limit=' + limitValue;
     }
-    // apiRequest.innerHTML = requestURL;
-
     return requestURL;
    }
 
@@ -527,7 +537,6 @@
             if (httpRequest.status === 200) {
               responseData = httpRequest.responseText;
               parsedData = JSON.parse(responseData);
-              console.log(&quot;parsedData&quot;,parsedData);
               switch (mediaType) {
                 case 'video':
                   // do nothing
@@ -614,18 +623,14 @@
 <br/>
 
                     <h3>The stylesheet</h3>
-                    <p>This example uses CSS styles for the Brightcove player and the text content.</p>
+                    <p>This example uses CSS styles for the Brightcove player and the playlist.</p>
                     <ol class="bcls-tasklist">
                       <li>Add the following CSS styles to your page code:
                     <ul>
-                        <li>Lines 1-4: Set the styles for the page.</li>
-                        <li>Lines 5-7: Hide the player controls.</li>
-                        <li>Lines 8-10: Disable click events on the video. Instead, the pause/play functionality will be handled by a button in the text content area.</li>
-                        <li>Lines 11-29: Set the styes for the text block.</li>
-                        <li>Lines 30-40: Set the styes for the <strong>original article</strong> link.</li>
+                        <li>Lines 2-11: Set the style and size for the playlist container.</li>
                         <li>
                           <p>
-                            Lines 41-56: Set the styes for the pause/play button.
+                            Lines 12-18: Set the style and size of each playlist item and image.
                           </p></li>
                     </ul>
 <pre class="line-numbers" data-start="1"><code class="language-css">&lt;style type=&quot;text/css&quot;&gt;
