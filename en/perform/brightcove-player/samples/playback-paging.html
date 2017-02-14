@@ -214,12 +214,11 @@
                           myPlayer = this;
                           // set up data for Playback API request
                           requestData = setRequestData();
-                          console.log("requestData= ",requestData);
                           // make the Playback API request to get playlist data
                           getMediaData('playlist', requestData, function (mediaData) {
-                              console.log("mediaData= ",mediaData);
+                              // console.log("mediaData= ",mediaData);
                               playlistLength = mediaData.videos.length;
-                              console.log("playlistLength= ",playlistLength);
+                              // console.log("playlistLength= ",playlistLength);
                               displayPlaylist();
                               eNextButton.addEventListener("click",function(){
                                 offsetValue += 3;
@@ -234,19 +233,14 @@
                       function displayPlaylist() {
                         // set up data for Playback API request
                         requestData = setRequestData();
-                        console.log("requestData= ",requestData);
+                        // console.log("requestData= ",requestData);
                         mediaType = 'playlist';
                         // make the Playback API request to get playlist data
                         getMediaData(mediaType, requestData, function (mediaData) {
-                            console.log("mediaData= ",mediaData);
-                            // extract the needed video data into an array
-                            videoData = extractVideoData(mediaData);
-                            console.log("videoData= ",videoData);
-                            getVideoObjects(videoData, function (videoObjects) {
-                                // add the newest videos list to the player as a playlist
-                                myPlayer.catalog.load(videoObjects[0]);
-                                myPlayer.playlist(videoObjects);
-                            });
+                            // console.log("mediaData= ",mediaData);
+                            // add the newest videos list to the player as a playlist
+                            myPlayer.catalog.load(mediaData.videos[0]);
+                            myPlayer.playlist(mediaData.videos);
                         });
                       }
 
@@ -308,60 +302,6 @@
                         // open and send request
                         httpRequest.send();
                       };
-
-                      /**
-                         * extract video data from Playback API response
-                         * @param {array} playbackData the data from the Playback API
-                         * @return {array} videoData array of video info
-                         */
-                        function extractVideoData(playbackData) {
-                          var i,
-                            iMax = playbackData.videos.length,
-                            videoItem,
-                            videoDataForReturn = [];
-                          for (i = 0; i < iMax; i++) {
-                            if (playbackData.videos[i].id !== null) {
-                                videoItem = {};
-                                videoItem.id = playbackData.videos[i].id;
-                                videoDataForReturn.push(videoItem);
-                            }
-                          }
-                          return videoDataForReturn;
-                        }
-
-                      /**
-                         * get video objects
-                         * @param {array} videoIds array of video ids
-                         * @return {array} videoData array of video objects
-                         */
-                        function getVideoObjects(videoIds, callback) {
-                          var i = 0,
-                            iMax = videoIds.length,
-                            videoObjectsForReturn =  [];
-                          /**
-                           * makes catalog calls for all video ids in the array
-                           */
-                          getVideoData();
-
-                          function getVideoData() {
-                            if (i < iMax) {
-                                myPlayer.catalog.getVideo(videoIds[i].id, pushData);
-                            } else {
-                                callback(videoObjectsForReturn);
-                            }
-                          }
-                          /**
-                           * callback for the catalog calls
-                           * pushes the returned data object into an array
-                           * @param {string} error error returned if the call fails
-                           * @parap {object} video the video object
-                           */
-                          function pushData(error, video) {
-                            videoObjectsForReturn.push(video);
-                            i++;
-                            getVideoData();
-                          }
-                        }
                     </script>
 
                     <p>
@@ -451,21 +391,17 @@
                       <li>Add the following JavaScript to your page code:
 
                     <ul>
-                        <li>Lines 2-17: Define variables and set values.</li>
-                        <li>Line 20: Gets a reference to the player when it is ready.</li>
-                        <li>Lines 22-26: Make a call to the Playback API to get the total number of videos in the playlist.</li>
-                        <li>Line 28: Makes a call to the Playback API to get the first set of videos in the playlist and loads them into the player.</li>
-                        <li>Lines 30-39: Add a listener to the <strong>Next Videos</strong> button. When selected, make a call to the Playback API to get the next set of videos in the playlist and load them into the player.</li>
-                        <li>Lines 43-49: Make a request to the Playback API to get a set of videos from the playlist.</li>
-                        <li>Line 51: Saves a list of video Ids from the video set returned.</li>
-                        <li>Line 53: Retrieves a video object for each video Id in the current array.</li>
-                        <li>Line 55: Loads the first video object into the player.</li>
-                        <li>Line 57: Loads the current set of video objects into the playlist.</li>
-                        <li>Lines 65-75: Set the Playback API request URL. First time, all videos are returned for the playlist. After that, the next set of videos are returned from the playlist, using the <code>limit</code> and <code>offset</code> parameters.</li>
-                        <li>Lines 80-115: Make the Playback API request using the request URL along with the Policy Key in the header.</li>
-                        <li>Lines 122-135: Save the video Ids from the current list of videos from the playlist.</li>
+                        <li>Lines 2-18: Define variables. Use your own values for the Policy Key, Account Id and Playlist Id.</li>
+                        <li>Line 21: Gets a reference to the player when it is ready.</li>
+                        <li>Lines 23-27: Make a call to the Playback API to get the total number of videos in the playlist.</li>
+                        <li>Line 29: Makes a call to the Playback API to get the first set of videos in the playlist and loads them into the player.</li>
+                        <li>Lines 30-36: Add a listener to the <strong>Next Videos</strong> button. When selected, make a call to the Playback API to get the next set of videos in the playlist and load them into the player.</li>
+                        <li>Lines 42-46: Make a request to the Playback API to get a set of videos from the playlist.</li>
+                        <li>Line 49: Loads the first video object into the player.</li>
+                        <li>Line 50: Loads the current set of video objects into the playlist.</li>
+                        <li>Lines 61-67: Set the Playback API request URL. First time, all videos are returned for the playlist. After that, the next set of videos are returned from the playlist, using the <code>limit</code> and <code>offset</code> parameters.</li>
                         <li><p>
-                          Lines 142-169: Gets the video object for each video Id in the current array.
+                          Lines 75-111: Make the Playback API request using the request URL along with the Policy Key in the header.
                         </p></li>
                     </ul>
 <pre class="line-numbers" data-start="1"><code class="language-javascript">&lt;script type=&quot;text/javascript&quot;&gt;
@@ -474,9 +410,9 @@
       mediaData,
       apiRequest,
       apiBaseURL = 'https://edge.api.brightcove.com/playback/v1/accounts/',
-      policyKey = 'BCpkADawqM3_9ax216PJYuUTLApMLkLJ3apjFlTRKHHS4q0DE33J0XsiDWmc6SfKwrwRAhejCZpTbwljz4-OlUwyqKi64L25Dwy4yhY1eSZ9ZduI-dO0mjSNVcR9C8nz0jtkimOOtzQgswCr',
-      accountId = &quot;1752604059001&quot;,
-      playlistId = &quot;5282200243001&quot;,
+      policyKey = <span class="bcls-input">your policy key</span>,
+      accountId = <span class="bcls-input">your account Id</span>,
+      playlistId = <span class="bcls-input">your playlist Id</span>,
       videoData = [],
       mediaType,
       offsetValue = 0,
@@ -484,55 +420,48 @@
       firstTime = true,
       requestURL,
       eNextButton = document.getElementById(&quot;nextButton&quot;),
+      eApiRequest = document.getElementById('apiRequest'),
       playlistLength;
 
   videojs(&quot;myPlayerID&quot;).ready(function(){
       myPlayer = this;
       // set up data for Playback API request
       requestData = setRequestData();
-      // make the Playback API request - the first request gets all videos in the playlist
+      // make the Playback API request to get playlist data
       getMediaData('playlist', requestData, function (mediaData) {
-          // get the total number of videos in the playlist
+          // console.log(&quot;mediaData= &quot;,mediaData);
           playlistLength = mediaData.videos.length;
-          // request a set of videos from the playlist and load them into the player
+          // console.log(&quot;playlistLength= &quot;,playlistLength);
           displayPlaylist();
-          // add a listener for the Next Videos button
           eNextButton.addEventListener(&quot;click&quot;,function(){
-            // increment the offsetValue for the next 3 videos
             offsetValue += 3;
-            // if offsetValue is beyond the playlist length, wrap to the beginning
             if (offsetValue &gt;= playlistLength) {
               offsetValue = 0;
             }
-            // request a set of videos from the playlist and load them into the player
             displayPlaylist();
           });
       });
   });
 
   function displayPlaylist() {
-    // set up the Playback API request
+    // set up data for Playback API request
     requestData = setRequestData();
-    // return playlist data
+    // console.log(&quot;requestData= &quot;,requestData);
     mediaType = 'playlist';
     // make the Playback API request to get playlist data
     getMediaData(mediaType, requestData, function (mediaData) {
-        // extract the video Ids into an array
-        videoData = extractVideoData(mediaData);
-        // get video objects from their Ids
-        getVideoObjects(videoData, function (videoObjects) {
-            // add the first video object to the player
-            myPlayer.catalog.load(videoObjects[0]);
-            // add the current set of video objects to the player's playlist
-            myPlayer.playlist(videoObjects);
-        });
+        // console.log(&quot;mediaData= &quot;,mediaData);
+        // add the newest videos list to the player as a playlist
+        myPlayer.catalog.load(mediaData.videos[0]);
+        myPlayer.playlist(mediaData.videos);
     });
   }
 
   /**
-   * sets up the Playback API request
+   * sets up the data for the API request
    */
   function setRequestData() {
+    console.log(&quot;setRequestData&quot;);
     var endPoint = '';
 
     if (firstTime) {
@@ -540,7 +469,9 @@
       requestURL = apiBaseURL +  accountId + '/playlists/' + playlistId;
     } else {
       requestURL = apiBaseURL +  accountId + '/playlists/' + playlistId + '?offset=' + offsetValue + '&amp;limit=' + limitValue;
+      eApiRequest.innerHTML = requestURL.trim();
     }
+
     return requestURL;
    }
 
@@ -558,6 +489,7 @@
             if (httpRequest.status === 200) {
               responseData = httpRequest.responseText;
               parsedData = JSON.parse(responseData);
+              console.log(&quot;parsedData&quot;,parsedData);
               switch (mediaType) {
                 case 'video':
                   // do nothing
@@ -583,61 +515,8 @@
     // open and send request
     httpRequest.send();
   };
-
-  /**
-     * extract video data from Playback API response
-     * @param {array} playbackData the data from the Playback API
-     * @return {array} videoData array of video info
-     */
-    function extractVideoData(playbackData) {
-      var i,
-        iMax = playbackData.videos.length,
-        videoItem,
-        videoDataForReturn = [];
-      for (i = 0; i &lt; iMax; i++) {
-        if (playbackData.videos[i].id !== null) {
-            videoItem = {};
-            videoItem.id = playbackData.videos[i].id;
-            videoDataForReturn.push(videoItem);
-        }
-      }
-      return videoDataForReturn;
-    }
-
-  /**
-     * get video objects
-     * @param {array} videoIds array of video ids
-     * @return {array} videoData array of video objects
-     */
-    function getVideoObjects(videoIds, callback) {
-      var i = 0,
-        iMax = videoIds.length,
-        videoObjectsForReturn =  [];
-      /**
-       * makes catalog calls for all video ids in the array
-       */
-      getVideoData();
-
-      function getVideoData() {
-        if (i &lt; iMax) {
-            myPlayer.catalog.getVideo(videoIds[i].id, pushData);
-        } else {
-            callback(videoObjectsForReturn);
-        }
-      }
-      /**
-       * callback for the catalog calls
-       * pushes the returned data object into an array
-       * @param {string} error error returned if the call fails
-       * @parap {object} video the video object
-       */
-      function pushData(error, video) {
-        videoObjectsForReturn.push(video);
-        i++;
-        getVideoData();
-      }
-    }
-&lt;/script&gt;</code></pre>
+&lt;/script&gt;
+</code></pre>
                       </li>
                     </ol>
 
