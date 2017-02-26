@@ -13,6 +13,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
             "index": "#333333",
             "video-cloud": "#dd712e",
             "once": "#85a93e",
+            "live": "#85a93e",
             "perform": "#35498D"
         },
         gettingStartedBlock = document.getElementById("getting-started"),
@@ -172,6 +173,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
      * works off the section determined in getSection()
      */
     function buildPageArrays() {
+        console.log('n', bclsNavData);
         var navData = bclsNavData[product].sections[section],
             i,
             iMax,
@@ -373,7 +375,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
         // set background color for title area elements
         setAttributeOnNodeList(titleArea, "style", "background-color:" + productColors.index + ";");
         if (product !== "index") {
-            titleStr += product + "/index.html\"><img src=\"" + bclsNavData[product].image + "\"/></a>";
+            titleStr += product + "/index.html\"><img src=\"" + bclsNavData[product].image + "\" style=\"width:237px;height:45px;\" /></a>";
         } else {
             titleStr += "index.html\">" + bclsNavData[product].image + "</a>";
         }
