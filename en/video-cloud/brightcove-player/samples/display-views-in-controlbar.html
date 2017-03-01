@@ -130,7 +130,6 @@
           </ul>
           <h3>APIs</h3>
           <p>This sample uses the Analytics API with the <code>https://analytics.api.brightcove.com/v1/alltime/accounts/{$account_id}/videos/{$video_id}</code> endpoint. Also, a proxy is used so private credentials are not passed from the client. The <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-token.html#codeSamples">Code Samples</a> section of the <strong>Getting Access Tokens</strong> details the proxy.</p>
-          </aside>
         </section>
 
         <section id="How_it_works" class="bcls-section">
@@ -138,7 +137,7 @@
           <p>The following sections explain the player, JavaScript and CSS code used in the example.</p>
 
           <h3>Create the player</h3>
-          <p>The player has an <code>id</code> attribute and assigned the value <code>myPlayer</code>. Also, the <code>width</code> and <code>height</code> are set./p>
+          <p>The player has an <code>id</code> attribute and assigned the value <code>myPlayer</code>. Also, the <code>width</code> and <code>height</code> are set.</p>
           <pre class="line-numbers"><code class="language-html">&lt;video <span class="bcls-highlight">id="myPlayerID"</span>
   data-video-id=&quot;3851380732001&quot;
   data-account=&quot;1752604059001&quot;
@@ -155,13 +154,148 @@
           <p>No other HTML is required.</p>
 
           <h3>The JavaScript code</h3>
-          <p>Add the following JavaScript to your page code.</p>
-          <p>Here you will use the player's <code>play()</code> and <code>pause()</code> methods to start video playback when the player is scrolled into view and stop playback when scrolled out of view.</p>
+          <p>At a very high level the code performs the following tasks:</p>
           <ul>
-            <li>Line 1: </li>
-            <li>Line 2: </li>
+            <li>Creates and populates and <code>options</code> object that is passed to the <code>makeRequest()</code> function that calls the Analytics API.</li>
+            <li>Uses properties of the <code>mediainfo</code> object to dynamically build the proper endpoint needed by the Analytics API. Note that the <code>loadstart</code> event must be dispatched before <code>mediainfo</code> is populated.</li>
+            <li>Call the <code>makeRequest()</code> function, with a callback function that extracts the actual views value.</li>
+            <li>In the callback function, call the <code>placeCountInControlbar()</code></li>
+            <li></li>
           </ul>
-          <pre class="line-numbers"><code class="language-javascript"></code></pre>
+          <p>Key sections of the code are detailed here:</p>
+          <ul>
+            <li>Lines -: </li>
+            <li>Lines -: </li>
+            <li>Lines -: </li>
+            <li>Lines -: </li>
+            <li>Lines -: </li>
+            <li>Lines -: </li>
+            <li>Lines -: </li>
+            <li>Lines -: </li>
+            <li>Lines -: </li>
+            <li>Lines -: </li>
+            <li>Lines -: </li>
+            <li>Lines -: </li>
+            <li>Lines -: </li>
+            <li>Lines -: </li>
+          </ul>
+          <pre class="line-numbers"><code class="language-javascript">  &lt;script type=&quot;text/javascript&quot;&gt;
+    var myPlayer,
+      viewsCount,
+      options =[],
+      viewsObject = [];
+
+    videojs('myPlayerID').ready(function(){
+      myPlayer =this,
+      options.requestType='GET',
+      options.proxyURL = 'http://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
+      options.requestBody = '',
+      options.callback = '';
+      // Wait for loadstart event so mediainfo is populated
+      // and the video ID and account ID can be retrieved
+      myPlayer.on('loadstart',function(){
+        var videoID = myPlayer.mediainfo.id,
+          accountID = myPlayer.mediainfo.accountId;
+        // Build the Analytics API endpoint
+        options.url = 'https://analytics.api.brightcove.com/v1/alltime/accounts/' + accountID + '/videos/' + videoID;
+        // Make the request to the Analytics API
+        // Extract views from data returned by Analytics API
+        makeRequest(options, function(viewsRaw){
+          // Remove console.log command for production code
+          console.log('viewRaw', viewsRaw);
+          viewsObject = JSON.parse(viewsRaw);
+          console.log('viewsObject',viewsObject);
+          viewsCount = viewsObject.alltime_video_views;
+          console.log('views',viewsCount);
+          // Call function to place data in controlbar
+          placeCountInControlbar();
+        });
+      });
+    });
+
+    /**
+     * Dynamically built a div that is then
+     * placed in the controlbar's spacer element
+     */
+    function placeCountInControlbar(){
+      var spacer,
+        newElement = document.createElement('div');
+      //Place data in div
+      newElement.innerHTML = &quot;Total Views: &quot; + viewsCount;
+      //Get the spacer in the controlbar
+      spacer = document.getElementsByClassName('vjs-spacer')[0];
+      //Right justify content in the spacer and add top margin
+      spacer.setAttribute('style', 'justify-content: flex-end; margin-top: 10px');
+      //Add the dynacmially built div to the spacer in the controlbar
+      spacer.appendChild(newElement);
+    }
+
+    /**
+     * send API request to the proxy
+     * @param  {Object} options for the request
+     * @param  {String} options.url the full API request URL
+     * @param  {String=&quot;GET&quot;,&quot;POST&quot;,&quot;PATCH&quot;,&quot;PUT&quot;,&quot;DELETE&quot;} requestData [options.requestType=&quot;GET&quot;] HTTP type for the request
+     * @param  {String} options.proxyURL proxyURL to send the request to
+     * @param  {String} options.client_id client id for the account (default is in the proxy)
+     * @param  {String} options.client_secret client secret for the account (default is in the proxy)
+     * @param  {JSON} [options.requestBody] Data to be sent in the request body in the form of a JSON string
+     * @param  {Function} [callback] callback function that will process the response
+     */
+    function makeRequest(options, callback) {
+      var httpRequest = new XMLHttpRequest(),
+        response,
+        requestParams,
+        dataString,
+        proxyURL = options.proxyURL,
+        // response handler
+        getResponse = function () {
+          try {
+            if (httpRequest.readyState === 4) {
+              if (httpRequest.status === 200 || httpRequest.status === 204) {
+                response = httpRequest.responseText;
+                // some API requests return '{null}' for empty responses - breaks JSON.parse
+                if (response === '{null}') {
+                  response = null;
+                }
+                // return the response
+                callback(response);
+              } else {
+                alert('There was a problem with the request. Request returned ' + httpRequest.status);
+              }
+            }
+          } catch (e) {
+            alert('Caught Exception: ' + e);
+          }
+        };
+      /**
+       * set up request data
+       * the proxy used here takes the following params:
+       * url - the full API request (required)
+       * requestType - the HTTP request type (default: GET)
+       * clientId - the client id (defaults here to a Brightcove sample account value - this should always be stored on the server side if possible)
+       * clientSecret - the client secret (defaults here to a Brightcove sample account value - this should always be stored on the server side if possible)
+       * requestData - request body for write requests (optional JSON string)
+       */
+      requestParams = &quot;url=&quot; + encodeURIComponent(options.url) + &quot;&amp;requestType=&quot; + options.requestType;
+      // only add client id and secret if both were submitted
+      if (options.client_id &amp;&amp; options.client_secret) {
+        requestParams += '&amp;client_id=' + options.client_id + '&amp;client_secret=' + options.client_secret;
+      }
+      // add request data if any
+      if (options.requestData) {
+        requestParams += '&amp;requestBody=' + options.requestBody;
+      }
+      console.log('requestParams', requestParams);
+      // set response handler
+      httpRequest.onreadystatechange = getResponse;
+      // open the request
+      httpRequest.open('POST', proxyURL);
+      // set headers
+      httpRequest.setRequestHeader(&quot;Content-Type&quot;, &quot;application/x-www-form-urlencoded&quot;);
+      // open and send request
+      httpRequest.send(requestParams);
+    }
+  &lt;/script&gt;</code></pre>
 
           <h3 id="CSSCode">The stylesheet</h3>
           <p>This example uses CSS styles for </p>
