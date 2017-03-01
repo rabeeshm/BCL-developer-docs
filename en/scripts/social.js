@@ -12,6 +12,7 @@ var BCLS = (function () {
             // for testing purposes
             client_secret = "",
         $pageURL = document.getElementById("pageURL"),
+        $pageTwitter = document.getElementById("pageTwitter"),
         $playerID = document.getElementById("playerID"),
             // for testing purposes
             player_id = "rkhHnDth",
@@ -31,7 +32,7 @@ var BCLS = (function () {
         template, data, result, selectedVideo,
         $selectCode = document.getElementById("selectCode"),
         $this,
-        socialTemplate = "&lt;!-- Open Graph Sharing Metadata --&gt; \n&lt;meta property=\"og:site_name\" content=\"\"/&gt; \n&lt;meta property=\"og:title\" content=\"{{name}}\"/&gt; \n&lt;meta property=\"og:description\" content=\"{{description}}\"/&gt; \n&lt;meta property=\"og:url\" content=\"{{pageURL}}\"/&gt; \n&lt;meta property=\"og:image\" content=\"{{images.thumbnail.src}}\"/&gt; \n&lt;meta property=\"og:type\" content=\"video\"/&gt; \n&lt;meta property=\"og:video:secure_url\" content=\"{{securePageURL}}\"/&gt; \n&lt;meta property=\"og:video:type\" content=\"application/x-shockwave-flash\"/&gt; \n&lt;meta property=\"og:video:width\" content=\"{{playerWidth}}\"/&gt; \n&lt;meta property=\"og:video:height\" content=\"{{playerHeight}}\"/&gt; \n\n&lt;!-- Twitter: card/meta-tags --&gt; \n&lt;meta name=\"twitter:card\" content=\"player\"/&gt; \n&lt;meta name=\"twitter:site\" content=\"@username\"/&gt; \n&lt;meta name=\"twitter:title\" content=\"{{name}}\"/&gt; \n&lt;meta name=\"twitter:description\" content=\"{{description}}\"/&gt; \n&lt;meta name=\"twitter:image\" content=\"{{images.thumbnail.src}}\"/&gt; \n&lt;meta name=\"twitter:player\" content=\"{{playerURL}}\"/&gt; \n&lt;meta name=\"twitter:player:width\" content=\"{{playerWidth}}\"/&gt; \n&lt;meta name=\"twitter:player:height\" content=\"{{playerHeight}}\"/&gt; \n<meta name=\"twitter:stream\" content=\"{{pageURL}}\"/&gt; \n<meta name=\"twitter:stream:content_type\" content=\"video/mp4\"/&gt;",
+        socialTemplate = "&lt;!-- Open Graph Sharing Metadata --&gt; \n&lt;meta property=\"og:site_name\" content=\"\"/&gt; \n&lt;meta property=\"og:title\" content=\"{{name}}\"/&gt; \n&lt;meta property=\"og:description\" content=\"{{description}}\"/&gt; \n&lt;meta property=\"og:url\" content=\"{{pageURL}}\"/&gt; \n&lt;meta property=\"og:image\" content=\"{{images.thumbnail.src}}\"/&gt; \n&lt;meta property=\"og:type\" content=\"video\"/&gt; \n&lt;meta property=\"og:video:secure_url\" content=\"{{securePageURL}}\"/&gt; \n&lt;meta property=\"og:video:type\" content=\"application/x-shockwave-flash\"/&gt; \n&lt;meta property=\"og:video:width\" content=\"{{playerWidth}}\"/&gt; \n&lt;meta property=\"og:video:height\" content=\"{{playerHeight}}\"/&gt; \n\n&lt;!-- Twitter: card/meta-tags --&gt; \n&lt;meta name=\"twitter:card\" content=\"player\"/&gt; \n&lt;meta name=\"twitter:site\" content=\"{{pageTwitter}}\"/&gt; \n&lt;meta name=\"twitter:title\" content=\"{{name}}\"/&gt; \n&lt;meta name=\"twitter:description\" content=\"{{description}}\"/&gt; \n&lt;meta name=\"twitter:image\" content=\"{{images.thumbnail.src}}\"/&gt; \n&lt;meta name=\"twitter:player\" content=\"{{playerURL}}\"/&gt; \n&lt;meta name=\"twitter:player:width\" content=\"{{playerWidth}}\"/&gt; \n&lt;meta name=\"twitter:player:height\" content=\"{{playerHeight}}\"/&gt; \n<meta name=\"twitter:stream\" content=\"{{pageURL}}\"/&gt; \n<meta name=\"twitter:stream:content_type\" content=\"video/mp4\"/&gt;",
         // functions
         getVideo,
         generateSocialTags,
@@ -142,6 +143,7 @@ var BCLS = (function () {
         selectedVideo.playerWidth = $playerWidth.value;
         selectedVideo.playerHeight = $playerHeight.value;
         selectedVideo.playerURL = "https://players.brightcove.net/" + account_id + "/" + player_id + "_default/index.html?videoId=" + video_id;
+        selectedVideo.pageTwitter = $pageTwitter.value;
         template = Handlebars.compile(socialTemplate);
         data = selectedVideo;
         result = template(data);
