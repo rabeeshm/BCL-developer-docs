@@ -15,30 +15,30 @@
     <!-- change title to match the h1 heading -->
     <title>Creating Clips Using the Brightcove Live API</title>
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
-<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
-<link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700" rel="stylesheet" type="text/css">
-<script src="//use.edgefonts.net/source-code-pro.js"></script>
-<link rel="stylesheet" href="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.css">
-<link rel="stylesheet" href="//docs.brightcove.com/en/styles/template-less/css/bcls-doc.css">
-<link rel="stylesheet" href="/en/styles/foundation-fixes.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700" rel="stylesheet" type="text/css">
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link rel="stylesheet" href="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.css">
+    <link rel="stylesheet" href="//docs.brightcove.com/en/styles/template-less/css/bcls-doc.css">
+    <link rel="stylesheet" href="/en/styles/foundation-fixes.css">
 
-<script>
-    (function(i, s, o, g, r, a, m) {
-        i['GoogleAnalyticsObject'] = r;
-        i[r] = i[r] || function() {
-            (i[r].q = i[r].q || []).push(arguments)
-        }, i[r].l = 1 * new Date();
-        a = s.createElement(o),
-            m = s.getElementsByTagName(o)[0];
-        a.async = 1;
-        a.src = g;
-        m.parentNode.insertBefore(a, m)
-    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    <script>
+        (function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function() {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
-    ga('create', 'UA-2728311-29', 'auto');
-    ga('send', 'pageview');
-</script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
+        ga('create', 'UA-2728311-29', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
 
 </head>
 
@@ -69,6 +69,7 @@
                         <li>With start and end times defined relative to the start and end time of the whole live stream event</li>
                         <li>With start and end times defined in Epoch (Unix) time (in seconds)</li>
                     </ul>
+                    <p>You can also specify a <code>duration</code> of the clip with either a start or end position. If you specify just a duration without a start or end position, the clip will be taken from the end of the live stream job.</p>
                     <p>Clips can also be sent to multiple destinations:</p>
                     <ul>
                         <li>A Video Cloud account</li>
@@ -84,7 +85,7 @@
                 <section id="Request_body" class="bcls-section">
                     <h2>Request body</h2>
                     <p>The request body includes start and end times, and details about where to send the clip. Here is a sample request body that creates a clip of the third minute of a stream and sends it to a Video Cloud account:</p>
-<pre class="line-numbers"><code class="language-json">{
+                    <pre class="line-numbers"><code class="language-json">{
     "live_job_id":"<span class="bcls-input">PUT-LIVE-JOB-ID-HERE</span>",
     "outputs":[
         {
@@ -105,33 +106,183 @@
         }
     ]
 }</code></pre>
-                    <p>In this example, we are creating a clip of one-minute duration and sending it to Video Cloud. We're giving the clip a name and a couple of tags.</p>
+                    <p>In this example, we are creating a clip of one-minute duration and sending it to Video Cloud. We're giving the clip a name and a couple of tags, specifying the "high-resolution" <a href="//docs.brightcove.com/en/video-cloud/ingest-profiles-api/getting-started/api-overview.html">ingest profile</a> for retranscoding, and instructing Video Cloud to capture thumbnail and poster images from the clip during transcoding.</p>
+                    <p>To see what fields can be included in the <code>video</code> and <code>ingest</code> objects, see the <a href="//docs.brightcove.com/en/video-cloud/di-api/reference/versions/v1/index.html">Dynamic Ingest API Reference</a>.</p>
+                    <aside class="bcls-aside bcls-aside--warning">Do <strong>not</strong> include the <code>master</code> field in the <code>ingest</code> object, as that information will be provided by the Live API.</aside>
+                    <p>The <code>VC_CREDENTIALS</code> here is a reference to a set of client credentials for the Dynamic Ingest system, which are set up in your Live account.</p>
+                </section>
+                <section id="Request_body_fields" class="bcls-section">
+                    <h2>Request body fields</h2>
+                    <p>Here is a full table of the request body fields.</p>
+                    <table class="bcls-table">
+                        <caption class="bcls-caption--table">Request Body Fields</caption>
+                        <thead class="bcls-table__head">
+                            <tr>
+                                <th style="width: 30%">Field</th>
+                                <th style="width: 10%">Type</th>
+                                <th style="width: 70%">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bcls-table__body">
+                            <tr>
+                                <td class="code">live_job_id</td>
+                                <td>
+                                    String
+                                </td>
+                                <td>
+                                    <p>The id of Live Stream job to create the VOD clip from.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="code">outputs</td>
+                                <td>
+                                    Object[]
+                                </td>
+                                <td>
+                                    <p>Array of VOD outputs</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="code">&nbsp;&nbsp;label</td>
+                                <td>
+                                    String
+                                </td>
+                                <td>
+                                    <p>Label for the output</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="code">&nbsp;&nbsp;duration</td>
+                                <td>
+                                    Number
+                                </td>
+                                <td>
+                                    <p>Duration of the clip in seconds</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="code">&nbsp;&nbsp;stream_start_time</td>
+                                <td>
+                                    Number
+                                </td>
+                                <td>
+                                    <p>Start time in seconds for the clip relative to the start time of the live stream</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="code">&nbsp;&nbsp;stream_end_time</td>
+                                <td>
+                                    Number
+                                </td>
+                                <td>
+                                    <p>End time in seconds for the clip relative to the start time of the live stream</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="code">&nbsp;&nbsp;start_time</td>
+                                <td>
+                                    Number
+                                </td>
+                                <td>
+                                    <p>Start time for the clip in Epoch (Unix) time (seconds)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="code">&nbsp;&nbsp;end_time</td>
+                                <td>
+                                    Number
+                                </td>
+                                <td>
+                                    <p>End time for the clip in Epoch (Unix) time (seconds)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="code">&nbsp;&nbsp;url</td>
+                                <td>
+                                    String
+                                </td>
+                                <td>
+                                    <p>URL for the clip</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="code">&nbsp;&nbsp;credentials</td>
+                                <td>
+                                    String
+                                </td>
+                                <td>
+                                    <p>The name of the credentials configured in your account for this address</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="code">&nbsp;&nbsp;videocloud</td>
+                                <td>
+                                    Object
+                                </td>
+                                <td>
+                                    <p>An object containing inputs for Video Cloud ingestion</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="code">&nbsp;&nbsp;&nbsp;&nbsp;video</td>
+                                <td>
+                                    Object
+                                </td>
+                                <td>
+                                    <p>An object containing inputs for Video Cloud video object creation - see the <a href="http://docs.brightcove.com/en/video-cloud/di-api/reference/versions/v1/index.html#api-Video-Create_Video_Object">Dynamic Ingest Reference</a></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="code">&nbsp;&nbsp;&nbsp;&nbsp;ingest</td>
+                                <td>
+                                    Object
+                                </td>
+                                <td>
+                                    <p>An object containing inputs for Video Cloud video injestion - see the <a href="http://docs.brightcove.com/en/video-cloud/di-api/reference/versions/v1/index.html#api-Ingest-Ingest_Media_Asset">Dynamic Ingest Reference</a> - do <strong>not</strong> include the <code>master</code> field, as that information will be provided by the Live API</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+                <section id="API_response" class="bcls-section">
+                    <h2>API response</h2>
+                    <p>The response to a create clip request includes an id for the job and the label you set in the request body, as well as the live job id:</p>
+                    <pre class="line-numbers"><code class="language-json">{
+  "vod_jobs": [
+    {
+      "jvod_id": "9582606c50d84be5ad4bc104f2aa3360",
+      "label": "last 60 secs of live job"
+    }
+  ],
+  "live_job_id": "88ba5d87b61a4ef3a6dddabd0c38d319"
+}</code></pre>
                 </section>
             </article>
             <!-- end drupal content -->
         </div>
     </div>
     <!-- bcl scripts -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
-<script src="/en/scripts/docs-nav-data.min.js"></script>
-<script src="/en/scripts/bcls-doc-site-v2.js"></script>
-<script src="//learning-services-media.brightcove.com/doc-assets/js/bcls-utils.js"></script>
-<script src="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.js"></script>
-<script>
-    $(document).foundation();
-</script>
-<div style="text-align:center">
-    <iframe id="CSAT" src="//learning-services-media.brightcove.com/doc-assets/general/surveylink.html" style=" padding-bottom:20px;border:none"></iframe>
-</div>
-<div class="bcls-footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
-<script>
-var feedbackMail = document.getElementById("feedbackMail");
-feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
-</script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+    <script src="/en/scripts/docs-nav-data.min.js"></script>
+    <script src="/en/scripts/bcls-doc-site-v2.js"></script>
+    <script src="//learning-services-media.brightcove.com/doc-assets/js/bcls-utils.js"></script>
+    <script src="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.js"></script>
+    <script>
+        $(document).foundation();
+    </script>
+    <div style="text-align:center">
+        <iframe id="CSAT" src="//learning-services-media.brightcove.com/doc-assets/general/surveylink.html" style=" padding-bottom:20px;border:none"></iframe>
+    </div>
+    <div class="bcls-footer text-center"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+    <script>
+        var feedbackMail = document.getElementById("feedbackMail");
+        feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+    </script>
 </body>
+
 </html>
