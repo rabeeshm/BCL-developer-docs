@@ -3,7 +3,7 @@
 
 <head>
 	<!-- Begin Drupal Taxonomy Data -->
-	<meta name="products" content="Perform">
+	<meta name="products" content="Video Cloud">
 	<meta name="role" content="Device SDK Developer">
 	<meta name="task" content="Develop with the Native SDKs">
 	<meta name="topic" content="Code Samples">
@@ -68,7 +68,9 @@
           </aside>
 					<p class="video-cloud-only">To use the Playback API, you will need a Policy Key. If you are not familiar with Policy Keys, see the <a href="../../../policy-api/getting-started/api-overview.html">Policy API Overview</a>.</p>
 					<aside class="bcls-aside bcls-aside--information">
-            Because the Native SDK for tvOS does not currently support player controls, this sample uses the <code>AVPlayerViewController</code>. This allows your app to use the native Apple TV controls. For details and limitations, see the <a href="https://github.com/brightcove/brightcove-player-sdk-ios#using-an-avplayerviewcontroller-with-a-bcovplaybackcontroller">Using an AVPlayerViewController with a BCOVPlaybackController</a> notes.
+            Because the Native SDK for tvOS does not currently support player controls, this sample uses the <code>AVPlayerViewController</code>. This allows your app to use the native Apple TV controls. Although you get native controls, you will not be able to integrate with the advertising plugins. For details and limitations, see the <a href="https://github.com/brightcove/brightcove-player-sdk-ios#using-an-avplayerviewcontroller-with-a-bcovplaybackcontroller">Using an AVPlayerViewController with a BCOVPlaybackController</a> notes.
+						<br/><br/>
+						To use an advertising plugin, see the <a href="https://github.com/BrightcoveOS/ios-player-samples/tree/master/OUX/BasicOUXtvOSPlayer/objc">tvOS player with the Once UX plugin</a> sample to learn how to add your own playback controls.
           </aside>
 
 					<!-- <aside class="bcls-aside bcls-aside--information">
@@ -355,7 +357,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 								<ul>
 									<li>
 										<p>Line 12: Defines your Brightcove Playback API Policy Key</p>
-										<aside class="bcls-aside bcls-aside--tip">This sample calls the Playback API to get a video from a Video Cloud account. For this, you will need a Policy Key. Learn how to get a Policy Key in the <a href="../../../player-management/guides/OAuth.html">OAuth Guide</a>.</aside>
+										<aside class="bcls-aside bcls-aside--tip">This example plays a video returned from the <a href="../../../playback-api/index.html">Brightcove Playback API</a>, which is the latest and recommended API to retrieve content from your Video Cloud library. If you are not familiar with Policy Keys, see the <a href="../../../policy-api/getting-started/api-overview.html">Policy API Overview</a>.</aside>
 									</li>
 									<li>Line 13: Defines your Video Cloud Account ID</li>
 									<li>Line 14: Defines your Video Cloud Video ID</li>
@@ -384,11 +386,11 @@ let kViewControllerVideoID = &quot;3666678807001&quot;</code></pre>
 							<li>
 								<p>In the <code>ViewController</code> class, add the following :</p>
 								<ul>
-									<li>Line 17: defines a constant, which initializes the Brightcove playback service with your Account ID and Policy Key.</li>
-									<li>Line 18: defines a constant for the player view controller. Using this, the system makes its media content available for playback on an Apple TV and provides additional options for navigating the content. Using the <code>AVPlayerViewController</code> requires the <code>AVKit</code> framework. This is why you added this to the import directives in a previous step.
+									<li>Line 17: Defines a constant, which initializes the Brightcove playback service with your Account ID and Policy Key.</li>
+									<li>Line 18: Defines a constant for the player view controller. Using this, the system makes its media content available for playback on an Apple TV and provides additional options for navigating the content. Using the <code>AVPlayerViewController</code> requires the <code>AVKit</code> framework. This is why you added this to the import directives in a previous step.
 									</li>
 									<li><p>
-										Line 19: defines a constant for the Brightcove playback controller.
+										Line 19: Defines a constant for the Brightcove playback controller.
 									</p></li>
 									<!-- <li>
 										<p>Line 20: defines a variable for the view.</p>
@@ -411,17 +413,19 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate {
 						<ol class="bcls-tasklist">
 							<li>Create an <code>init</code>function as follows:
 								<ul>
-									<li>Lines 24-25: initializes a shared manager and creates the playback controller.</li>
+									<li>Lines 24-25: Initialize a shared manager and create the playback controller.</li>
 									<li>
 										<p>Line 29: <strong>Optional:</strong> Sends your Video Cloud Account ID to analytics. This is only needed if you override the <code>BCOVVideo</code> class or do not use the Brightcove Playback service or catalog.</p>
 										<aside class="bcls-aside bcls-aside--tip">For details about sending data to Video Cloud Analytics, see the <a href="//docs.brightcove.com/en/video-cloud/mobile-sdks/brightcove-player-sdk-for-android/guides/analytics/analytics.html">Using Brightcove Analytics</a> guide.</aside>
 									</li>
 									<li>
-										<p>Lines 31-33: set the delegate and turn on the auto-advance and autoplay features.</p>
+										<p>Lines 31-33: Set the delegate and turn on the auto-advance and autoplay features.</p>
 									</li>
 									<li>
-										<p>Lines 37-39: <strong>Optional:</strong> set a dictionary property to use the native <code>AVPlayerViewController</code>instead of the <code>BCOVPlaybackSession</code>'s AVPlayerLayer. This code is only needed if you want to test your app in the simulator. Your app should work correctly on an Apple TV device with or without this code.</p>
-										<aside class="bcls-aside bcls-aside--tip">For details and limitations, see the <a href="https://github.com/brightcove/brightcove-player-sdk-ios#using-an-avplayerviewcontroller-with-a-bcovplaybackcontroller">Using an AVPlayerViewController with a BCOVPlaybackController</a> notes.</aside>
+										<p>Lines 37-39: Set a dictionary property to use the native <code>AVPlayerViewController</code> instead of the <code>BCOVPlaybackSession</code>'s AVPlayerLayer. This code is needed so that there will not be two view controllers running in your app. Without this code, your app will freeze video playback in the simulator.</p>
+										<aside class="bcls-aside bcls-aside--information">For details and limitations, see the <a href="https://github.com/brightcove/brightcove-player-sdk-ios#using-an-avplayerviewcontroller-with-a-bcovplaybackcontroller">Using an AVPlayerViewController with a BCOVPlaybackController</a> notes.
+											<br/><br/>
+										To use an advertising plugin, see the <a href="https://github.com/BrightcoveOS/ios-player-samples/tree/master/OUX/BasicOUXtvOSPlayer/objc">Obj-C version of the Basic tvOS player with the Once UX plugin</a> sample to learn how to add your own playback controls.</aside>
 									</li>
 								</ul> <pre class="line-numbers" data-start="22"><code class="language-swift">required init?(coder aDecoder: NSCoder)
 {
@@ -537,7 +541,7 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate {
     let playbackService = BCOVPlaybackService(accountId: kViewControllerAccountID, policyKey: kViewControllerPlaybackServicePolicyKey)
     let avpvc = AVPlayerViewController()
     let playbackController :BCOVPlaybackController
-    
+
 
     required init?(coder aDecoder: NSCoder)
     {
@@ -660,8 +664,10 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate {
 										<p>Lines 27-29: set the delegate and turn on the auto-advance and autoplay features.</p>
 									</li>
 									<li>
-										<p>Lines 33-35: <strong>Optional:</strong> set a dictionary property to use the native <code>AVPlayerViewController</code>instead of the <code>BCOVPlaybackSession</code>'s AVPlayerLayer. This code is only needed if you want to test your app in the simulator. Your app should work correctly on an Apple TV device with or without this code.</p>
-										<aside class="bcls-aside bcls-aside--tip">For details and limitations, see the <a href="https://github.com/brightcove/brightcove-player-sdk-ios#using-an-avplayerviewcontroller-with-a-bcovplaybackcontroller">Using an AVPlayerViewController with a BCOVPlaybackController</a> notes.</aside>
+										<p>Lines 33-35: Set a dictionary property to use the native <code>AVPlayerViewController</code> instead of the <code>BCOVPlaybackSession</code>'s AVPlayerLayer. This code is needed so that there will not be two view controllers running in your app. Without this code, your app will freeze video playback in the simulator.</p>
+										<aside class="bcls-aside bcls-aside--information">For details and limitations, see the <a href="https://github.com/brightcove/brightcove-player-sdk-ios#using-an-avplayerviewcontroller-with-a-bcovplaybackcontroller">Using an AVPlayerViewController with a BCOVPlaybackController</a> notes.
+											<br/><br/>
+										To use an advertising plugin, see the <a href="https://github.com/BrightcoveOS/ios-player-samples/tree/master/OUX/BasicOUXtvOSPlayer/objc">Obj-C version of the Basic tvOS player with the Once UX plugin</a> sample to learn how to add your own playback controls.</aside>
 									</li>
 								</ul> <pre class="line-numbers" data-start="18"><code class="language-swift">required init?(coder aDecoder: NSCoder)
 {
