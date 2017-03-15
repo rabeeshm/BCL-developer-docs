@@ -159,7 +159,8 @@
                 </section>
                 <section id="Search_field" class="bcls-section">
                     <h2>Search field</h2>
-                    <p>For all the smart playlist types, the collection of videos is assembled dynamically based on the <code>search</code> field value for the playlist. The search field value may be any valid <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/search-videos.html">search string</a> for the CMS API. Below are some examples with explanations of the videos they will return.</p>
+                    <p>For all the smart playlist types, the collection of videos is assembled dynamically based on the <code>search</code> field value for the playlist. The search field value must be a valid search string for a tag <a href="//docs.brightcove.com/en/video-cloud/cms-api/guides/search-videos.html">search string</a> for the CMS API. Below are some examples with explanations of the videos they will return.</p>
+                    <aside class="bcls-aside bcls-aside--warning">Currently playlists can only be constructed out of a search for one or more tags (separated by commas). Also, you cannot search for videos that do <strong>not</strong> have a particular tag.</aside>
                     <table class="bcls-table">
                         <caption class="bcls-caption--table">Sample Search Strings</caption>
                         <thead class="bcls-table__head">
@@ -174,8 +175,8 @@
                                 <td>Returns videos that have the tag "bird"</td>
                             </tr>
                             <tr>
-                                <td><code>+tags:bird-tags:sea</code></td>
-                                <td>Returns videos that have the tag "bird" and do <strong>not</strong> have the tag "sea"</td>
+                                <td><code>+tags:bird,woodland</code></td>
+                                <td>Returns videos that have both the tags "bird" and "woodland"</td>
                             </tr>
                         </tbody>
                     </table>
@@ -185,11 +186,41 @@
                     <p>To create a new playlist, you make a <code>POST</code> request to:</p>
                     <pre class="line-numbers"><code class="language-http">https://cms.api.brightcove.com/v1/accounts/<span class="bcls-input">{account_id}</span>/playlists</code></pre>
                     <h3>Request body</h3>
-                    <p>You can inlude many (but not all!) of the video video metadata fields in your request. You <strong>must</strong> include at least a <code>name</code> and <code>type</code> for the playlist:</p>
+                    <p>You can inlude many (but not all!) of the video video metadata fields in your request. You <strong>must</strong> include at least a <code>name</code> and <code>type</code> for the playlist. Below are two examples, one creating an EXPLICIT playlist, the second creating a smart playlist of type ACTIVATED_NEWEST_TO_OLDEST, including videos that have two tags:</p>
+                    <h4>For EXPLICIT playlist</h4>
                     <pre class="line-numbers"><code class="language-json">{
-  "type": "ALPHABETICAL",
-  "name": "My playlist"
+  "type": "EXPLICIT",
+  "name": "My manual playlist",
+  "video_ids": [
+    "5289680419001",
+    "5289693763001",
+    "5289680417001",
+    "5288472314001"
+  ]
 }</code></pre>
+                    <h4>For smart playlist</h4>
+                    <pre class="line-numbers"><code class="language-json">{
+  "type": "ACTIVATED_NEWEST_TO_OLDEST",
+  "name": "My smart playlist",
+  "search": "+tags:bird-tags:sea"
+}</code></pre>
+                    <aside class="bcls-aside bcls-aside--information">Note that all playlists have a limit of 100 videos, but you can set that limit lower for smart playlists by using the <code>limit</code> field.</aside>
+                    <p>See the <a href="//docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html#api-playlistGroup-Create_Playlist">API Reference</a> for all fields that can be used in creating playlists.</p>
+                </section>
+                <section id="update" class="bcls-section">
+                    <h2>Update a playlist</h2>
+                    <p>Updating a playlist is very similar to creating one. The only differences are the request method (<code>PATCH</code> instead of POST) and the playlist id appended to the URL. The fields for the request body are exactly the same.</p>
+                    <h3>Request URL</h3>
+                    <pre class="line-numbers"><code class="language-http">https://cms.api.brightcove.com/v1/accounts/<span class="bcls-input">account_id</span>/playlists/<span class="bcls-input">playlist_id</span></code></pre>
+                    <p>Find the complete details in the <a href="//docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html#api-playlistGroup-Update_Playlist">API Reference</a>.</p>
+                </section>
+                <section id="delete" class="bcls-section">
+                    <h2>Delete a playlist</h2>
+                    <p>To delete a playlist, make a request using the <code>DELETE</code> method to:</p>
+                    <pre class="line-numbers"><code class="language-http">https://cms.api.brightcove.com/v1/accounts/<span class="bcls-input">account_id</span>/playlists/<span class="bcls-input">playlist_id</span></code></pre>
+                    <p>(This is the same URL used to update a playlist.)</p>
+                    <aside class="bcls-aside bcls-aside--warning">Note that deletes <strong>cannot</strong> be undone - think twice before you send that request! Deleting a playlist does <strong>not</strong> affect the videos contained in the playlist.</aside>
+                    <p>Find the complete details in the <a href="//docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html#api-playlistGroup-Delete_Playlists">API Reference</a>.</p>
                 </section>
             </article>
             <!-- end drupal content -->
@@ -197,9 +228,8 @@
             <div class="section" id="BCLreferences">
                 <h2>Related topics</h2>
                 <ul>
-                    <li><a href="//docs.brightcove.com/en/video-cloud/di-api/getting-started/overview-di.html">Dynamic Ingest API Overview</a></li>
-                    <li><a href="//docs.brightcove.com/en/video-cloud/di-api/getting-started/quick-start-di.html">Quick Start to Dynamic Ingest</a></li>
-                    <li><a href="//docs.brightcove.com/en/video-cloud/di-api/guides/faqs-di.html">Dynamic Ingest API FAQs</a></li>
+                    <li><a href="https://support.brightcove.com/en/video-cloud/docs/creating-and-managing-playlists">Creating and Managing Playlists</a></li>
+                    <li><a href="h//docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html">CMS API Reference</a></li>
                 </ul>
             </div>
         </div>
