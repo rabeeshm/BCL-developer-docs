@@ -52,7 +52,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
         bp,
         vcContent = document.getElementsByClassName('video-cloud-only'),
         bpContent = document.getElementsByClassName('perform-only'),
-        toggleStr = '<li><button id="vc" style="background-color:#293b70;">Video Cloud version</button> <button id="bp">Brightcove Player Version</button></li>',
+        toggleStr = '<li><button id="vc" style="background-color:#293b70;">Video Cloud version</button> <button id="bp">Brightcove Player Version</button> <a style="font-size:smaller;" href="//docs.brightcove.com/en/video-cloud/brightcove-player/getting-started/versions.html">(What\'s the difference?)</a><hr></li>',
         iMax, i;
 
     // Stuff for player docs only
