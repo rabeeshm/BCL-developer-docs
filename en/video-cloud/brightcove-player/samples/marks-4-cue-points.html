@@ -23,7 +23,9 @@
     <script type="text/javascript">
         videojs('myPlayerID').ready(function() {
             var myPlayer = this,
-                startTimesAra = [];
+                startTimesAra = [],
+                playheadWell = document.getElementsByClassName('.vjs-progress-control .vjs-progress-holder')[0],
+                videoDuration;
 
             myPlayer.on('loadstart', function() {
                 var cuePointsAra = [],
@@ -42,6 +44,10 @@
                     return a.startTime;
                 });
                 console.log('startTimesAra', startTimesAra);
+
+                // get the video duration
+                videoDuration = myPlayer.mediainfo.durartion;
+                console.log('video duration', videoDuration);
             })
         });
 
@@ -49,22 +55,21 @@
         function isAdCuePoint(cuePoint) {
             return cuePoint.type == 'AD';
         }
-
+        // function to add AD cue point markers
         function addAdMarkers() {
             var iMax = adCuePointsAra.length,
                 i;
             for (i = 0; i < iMax; i++) {
-                
+                var elem = document.createElement('div');
+                elem.className = 'vjs-marker';
+                elem.id = 'ad' + i;
+                elem.style.left = (adCuePointsAra[i].time / videoDuration) * 100 + '%';
+                playheadWell.appendChild(elem);
             }
         }
 
 
 
-        var elem = document.createElement('div');
-        elem.className = 'vjs-marker';
-        elem.id = 'changeme';
-        elem.style.left = '50%';
-        player.$('.vjs-progress-control .vjs-progress-holder').appendChild(elem);
     </script>
 
 </body>
