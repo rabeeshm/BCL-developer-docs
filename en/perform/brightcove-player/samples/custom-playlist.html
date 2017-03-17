@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <!-- Begin Drupal Taxonomy Data -->
-    <meta name="products" content="Perform">
+    <meta name="products" content="Video Cloud">
     <meta name="role" content="Player Developer">
     <meta name="task" content="">
     <meta name="topic" content="Playlists,Code Samples">
@@ -66,7 +66,7 @@
 
         <article class="bcls-article">
             <header id="bcls_header" class="bcls-header">
-                <p>In this topic, you will learn how to display a Video Cloud playlist as a row of thumbnails across the bottom of the player. The solution is created as a plugin that you can attach to any Brightcove player and use with the in-page or iframe embed code.</p>
+                <p>In this topic, you will learn how to display a Video Cloud playlist as a row of thumbnails across the bottom of the player. The solution is created as a plugin that you can attach to any Brightcove player and use with the in-page embed or iframe embed code.</p>
             </header>
 
             <section id="developmentsequence" class="bcls-section">
@@ -154,13 +154,7 @@
                 <p>To create a player and assign a playlist to it, follow these steps:</p>
                 <ol class="bcls-tasklist">
                     <li>In the
-                        <strong>Players</strong> module, create a new player or use an existing one.</li>
-                    <li>In the player settings, make sure that playlist display is
-                        <strong>disabled</strong> (because that option enables the default playlist display - the plugin will generate its own display):
-                        <figure class="bcls-figure">
-                            <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/playlists/sample-custom-playlist/no-playlist-display.png" alt="disable playlist display">
-                        </figure>
-                    </li>
+                        <strong>Players</strong> module, create a new player named <strong>Custom Playlist Player</strong> or use an existing one.</li>
                     <li>Go to the
                         <strong>Media</strong> module and select any playlist.</li>
                     <li>Click Publish to get the publishing code:
@@ -175,19 +169,16 @@
                       </figure>
                     </li>
                     <li>Copy the
-                        <strong>In-Page</strong> code and paste it into an HTML page:
+                        <strong>Advanced</strong> (also called in-page embed) code and paste it into an HTML page:
                         <figure class="bcls-figure">
                             <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/playlists/sample-custom-playlist/get-in-page-code.png" alt="get in-page code">
                         </figure>
-                        <p>Add an
-                            <code>id</code> attribute to the
-                            <code>video</code> tag with a value of
-                            <code>player</code>.</p>
+                        <p>Add an <code>id</code> attribute to the <code>video</code> tag with a value of <code>player</code>.</p>
                     </li>
                 </ol>
                 <aside class="bcls-aside bcls-aside--information">Your page will be need to saved under a local or remote web server. When you browse it in the steps below, you must browse it through a web server, not as a local file.</aside>
                 <h3>The player code</h3>
-                <p>Your In-Page embed code should look similar to this:</p>
+                <p>Your Advanced embed code should look similar to this:</p>
                 <pre class="line-numbers"><code class="language-html">&lt;video
   id=&quot;player&quot;
   data-playlist-id=&quot;4452341376001&quot;
@@ -207,7 +198,7 @@
 .bcls-playlist {
     background-color: #141B17;
     width: 100%;
-    max-height: 82px;
+    max-height: 95px;
     min-height: 82px;
     line-height: 76px;
     text-align: center;
@@ -395,10 +386,22 @@ videojs.plugin('customPlaylist', function (options) {
                 <li>Save the code in a new file called
                     <strong>custom-playlist.js</strong> and include it in your HTML page, after the player embed code, using a
                     <code>script</code> tag.</li>
+                <li>Now use the standard code to check the player is ready to communicate with in another <code>script</code> block following the one you added in the previous step.
+                  <pre class="line-numbers"><code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
+  videojs('player').ready(function(){
+    var player = this;
+  });
+&lt;/script&gt;</code></pre>
+                </li>
                 <li>Now initialize the plugin, passing a
-                    <code>width</code> option to it, by adding the following code in another
-                    <code>script</code> block following the one you added in the previous step:
-                    <pre class="line-numbers"><code class="language-html">&lt;script&gt; videojs('player').customPlaylist(options); &lt;/script&gt;</code></pre>
+                    <code>width</code> option to it.
+                    <pre class="line-numbers"><code class="language-html">  &lt;script type=&quot;text/javascript&quot;&gt;
+    videojs('player').ready(function(){
+      var player = this,
+        options = {&quot;width&quot;: 600};
+      player.customPlaylist(options);
+    });
+  &lt;/script&gt;</code></pre>
                 </li>
                 <li>Your HTML code should now look like this:
                   <pre class="line-numbers"><code class="language-html">&lt;!DOCTYPE html&gt;
@@ -421,9 +424,12 @@ videojs.plugin('customPlaylist', function (options) {
 
     &lt;script src=&quot;./custom-playlist.js&quot;&gt;&lt;/script&gt;
 
-    &lt;script&gt;
-        var options = {&quot;width&quot;: 600};
-        videojs('player').customPlaylist(options);
+    &lt;script type=&quot;text/javascript&quot;&gt;
+      videojs('player').ready(function(){
+        var player = this,
+          options = {&quot;width&quot;: 600};
+        player.customPlaylist(options);
+      });
     &lt;/script&gt;
 
     &lt;/body&gt;
@@ -474,7 +480,7 @@ videojs.plugin('customPlaylist', function (options) {
 
             <section id="useiframe" class="bcls-section">
                 <h2>Use iframe</h2>
-                <p>It is a best practice to use the iframe player implementation. If it is possible for this example, replace the In-Page embed implementation with the iframe implementation.</p>
+                <p>It is a best practice to use the iframe player implementation. If it is possible for this example, replace the Advanced implementation with the iframe implementation.</p>
                 <p>For this custom playlist player, the
                     <code>iframe</code> must be sized to accomodate the playlist along the bottom, which is 74 pixels high. So set the width to the width value you included in the plugin options (or 500px if you didn't include options). The height should be
                     set according to this formula:</p>
