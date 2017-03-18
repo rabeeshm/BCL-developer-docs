@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Begin Drupal Taxonomy Data -->
+    <meta name="products" content="Video Cloud">
+    <meta name="role" content="API Developer">
+    <meta name="task" content="Manage Videos">
+    <meta name="api" content="CMS">
+
+    <meta name="topic" content="Code Samples">
+    <meta name="keywords" content="">
+    <!-- End Drupal Taxonomy Data -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <!-- change title to match the h1 heading -->
+    <title>Code Sample: Add Cue Point</title>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
+<link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700" rel="stylesheet" type="text/css">
+<script src="//use.edgefonts.net/source-code-pro.js"></script>
+<link rel="stylesheet" href="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.css">
+<link rel="stylesheet" href="//docs.brightcove.com/en/styles/template-less/css/bcls-doc.css">
+<link rel="stylesheet" href="/en/styles/foundation-fixes.css">
+
+<script>
+    (function(i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function() {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-2728311-29', 'auto');
+    ga('send', 'pageview');
+</script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
+</head>
+
+<body>
+    <!-- header navbar -->
+    <div id="navWrapper" class="fixed"></div>
+    <!-- breadcrumbs -->
+    <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+    <!-- search -->
+    <div id="searchModal" class="reveal-modal" data-reveal></div>
+    <!-- content -->
+    <div class="row">
+        <div class="sidebar large-2 columns show-for-large-up">
+            <div id="sidenav" class="side-nav"></div>
+        </div>
+        <div id="main" class="large-10 small-12 columns">
+            <h1>Code Sample: Add Cue Point</h1>
+            <!-- begin drupal content -->
+            <article class="bcls-article">
+                <header id="bcls_header" class="bcls-header">
+                    <p>In this sample, you will learn how to add cue point to a video programmatically using the CMS API.</p>
+                    </header>
+                    <section id="introduction" class="bcls-section">
+                        <h2>Introduction</h2>
+                        <p>Cue points are specified places on the video timeline. When the video is played back, an event is automatically broadcast every time one of the cue point is reached - using the Player API, you can listen for these events and take whatever action you wish. In addition, you can read all the cuepoint information from the video metadata stored in the player <code>mediainfo</code> object, which allows you to mark the cue point on the video timeline in some way if you want to.</p>
+                        <p>There are two kinds of cue point:</p>
+                        <ul>
+                            <li>Ad cue point: these are used to mark places where an ad request should be made (if the video and player are enabled for advertising).</li>
+                            <li>Code cue point: these are used to take some action using the Player API - some typical uses are displaying some kind of call-to-action (CTA) or displaying some image or text relating to video content, perhaps as a video overlay or in the page around the player.</li>
+                        </ul>
+                    </section>
+                    <section id="implementation_overview" class="bcls-section">
+                        <h2>Implementation overview</h2>
+                        <p>You can add cue points in <a href="//support.brightcove.com/en/video-cloud/docs/working-cue-points-media-module">the Studio Media module</a>. You can also add them using the CMS API, which the method we will use in this sample.</p>
+                        <h3>HTTP method</h3>
+                        <p>Cue points cannot be added when you create the video. Instead, they must be added by making a <a href="//docs.brightcove.com/en/video-cloud/cms-api/references/cms-api/versions/v1/index.html#api-videoGroup-Update_Video">video update</a> request, which means you will use the <code>PATCH</code> method.</p>
+                        <h3>Endpoint</h3>
+                        <p>The endpoint for the update video request is:</p>
+                        <pre class="line-numbers"><code class="language-http">https://cms.api.brightcove.com/v1/accounts/<span class="bcls-input">account_id</span></code>/videos/<span class="bcls-input">video_id</span></pre>
+                        <h3>Request body</h3>
+                        <p>The request body is a JSON object that can contain many items of video metadata. Here we will just look at the <code>cue_points</code> field, which is set to an array of cue point objects, as in the following sample:</p>
+                        <pre class="line-numbers"><code class="language-json">{
+"cue_points": [
+    {
+      "name": "Ad Cue Point",
+      "type": "AD",
+      "time": 3.0,
+      "metadata": null,
+      "force_stop": false
+    },
+    {
+      "name": "Code Cue Point",
+      "type": "CODE",
+      "time": 5.0,
+      "metadata": "The metadata might be text or the url for an image to display",
+      "force_stop": false
+    }
+  ]
+}</code></pre>
+                        <h3>Cue point object fields</h3>
+                        <p>Below is a description of the fields for cue point objects.</p>
+                        <table class="bcls-table">
+                            <caption class="bcls-caption--table">Cue Point Object Fields</caption>
+                            <thead class="bcls-table__head">
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Required</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bcls-table__body">
+                                <tr>
+                                    <td><code>name</code></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td><code>type</code></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td><code>time</code></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td><code>metadata</code></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td><code>force_stop</code></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+                    <section class="bcls-section" id="getCredentials">
+                        <h2 class="bcls-expander-head">Get credentials</h2>
+                        <div class="bcls-expander-content">
+                            <p>To use the CMS API you will need proper credentials. Later in this quick start, you will use the credentials in a form when submitting requests to the API.</p>
+                            <ol>
+                                <li>To obtain proper credentials use your choice of the <strong>Get Client Credentials</strong> documents listed below. Whichever option you choose, you will need to ask for the correct operation permissions. In this quick start you will need <strong>video</strong> operations. The following can be used with curl or Postman to get the proper permissions:</li>
+                            </ol>
+                            <pre class="line-numbers"><code class="language-json">"operations": ["video-cloud/video/all"]</code></pre>
+                            <ul>
+                                <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html">OAuth: Get Client Credentials Using CURL</a></li>
+                                <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">OAuth: Get Client Credentials Using Postman</a></li>
+                            </ul>
+                        </div>
+                    </section>
+                    <section class="bcls-section" id="dataInput">
+                        <h2>Inputs for the cue point</h2>
+                        <fieldset class="bcls-fieldset">
+                            <legend>Inputs</legend>
+                            <p>
+                                Account ID:
+                                <input size="60" id="account_id" type="text" placeholder="57838016001">
+                            </p>
+                            <p>
+                                Client ID:
+                                <input size="60" id="client_id" type="text" placeholder="f05869d2-f201-47d1-9606-aaafa66fea6e">
+                            </p>
+                            <p>
+                                Client Secret:
+                                <input size="120" id="client_secret" type="text" placeholder="2F4CvF8DER1j3fmQr3TjKSmD6jMfvigM3HwCVkdhykvYOOUamFYeu9U8fRpks-EH7PCJcthc8Is">
+                            </p>
+                            <p>
+                                Video metadata for update:
+<textarea id="videoData" class="bcls-code" style="height:20em;">[
+     {
+          "name": "Tiger and Cub",
+          "id": "3851380732001",
+          "description": "Unbearably cute tiger and her cub"
+     },
+     {
+          "name": "Some Great Blue Herons",
+          "id": "4793962133001",
+          "description": "Nature video"
+     },
+     {
+          "name": "Sea Marvels",
+          "id": "4426931680001",
+          "description": "A collection of exotic fishes"
+     }
+]</textarea>
+                            </p>
+                            <p><button id="setRequest" class="bcls-button">Submit Request</button></p>
+                        </fieldset>
+                    </section>
+                    <section class="bcls-section" id="outputLog">
+                        <h2>Results</h2>
+                        <fieldset class="bcls-fieldset">
+                            <legend>Outputs</legend>
+                            <p>
+                                API request:
+                                <textarea id="apiRequest"></textarea>
+                            </p>
+                            <pre><code id="response"></code></pre>
+                        </fieldset>
+                    </section>
+                    <section class="bcls-section" id="sampleCode">
+                        <h2>Code for the sample</h2>
+                        <h3>HTML code:</h3>
+                        <p>To see the HTML code, view the source for this page.</p>
+                        <h3>JavaScript code:</h3>
+<pre data-src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/cms-api/code-samples/update-metadata/update-metadata.js?buster" class="line-numbers language-javascript"></pre>
+                        <h3>Proxy</h3>
+                        <aside class="bcls-aside bcls-aside--information">In order to build your own version the sample app on this page, you must create and host your own proxy. (The proxies used by Brightcove Learning Services only accept requests from Brightcove domains.) You can download two versions of our proxy code:
+                            <ul>
+                                <li><a href="//learning-services-media.brightcove.com/doc-assets/proxy/bcls-proxy-for-distribution.php.zip">This is a general version that expects client credentials to be passed with the request</a></li>
+                                <li><a href="//learning-services-media.brightcove.com/doc-assets/proxy/doc-samples-proxy.php.zip">This version allows you to save your client credentials in the proxy itself on lines 25-26 (recommended)</a></li>
+                            </ul>
+                        </aside>
+                    </section>
+            </article>
+                <script src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/cms-api/code-samples/update-metadata/creds.js"></script>
+                <script src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/cms-api/code-samples/update-metadata/update-metadata.js"></script>
+                <!-- end drupal content -->
+        </div>
+    </div>
+    <!-- bcl scripts -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+<script src="/en/scripts/docs-nav-data.min.js"></script>
+<script src="/en/scripts/bcls-doc-site-v2.js"></script>
+<script src="//learning-services-media.brightcove.com/doc-assets/js/bcls-utils.js"></script>
+<script src="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.js"></script>
+<script>
+    $(document).foundation();
+</script>
+<div style="text-align:center">
+    <iframe id="CSAT" src="//learning-services-media.brightcove.com/doc-assets/general/surveylink.html" style=" padding-bottom:20px;border:none"></iframe>
+</div>
+
+<br><br>
+<div class="bcls-footer"><a id="feedbackMail" href="mailto:docs@brightcove.com">Questions or comments?</a></div>
+<script>
+var feedbackMail = document.getElementById("feedbackMail");
+feedbackMail.setAttribute("href", "mailto:docs@brightcove.com?subject=question regarding " + encodeURI(document.location.href));
+</script>
+</body>
+
+</html>
