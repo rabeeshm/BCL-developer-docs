@@ -4,15 +4,15 @@
 <head>
   <meta charset="UTF-8">
   <!-- Begin Drupal Taxonomy Data -->
-  <meta name="products" content="">
-  <meta name="role" content="">
+  <meta name="products" content="Video Cloud">
+  <meta name="role" content="Player Developer">
   <meta name="task" content="">
-  <meta name="topic" content="">
+  <meta name="topic" content="Advertising,Code Samples">
   <meta name="api" content="">
   <!-- End Drupal Taxonomy Data -->
   <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
   <!-- change title to match the h1 heading -->
-  <title>Title</title>
+  <title>Ad Marks in Playback Bar</title>
   <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
   <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700" rel="stylesheet" type="text/css">
@@ -52,12 +52,12 @@
       <div id="sidenav" class="side-nav"></div>
     </div>
     <div id="main" class="large-10 small-12 columns">
-      <h1>Title</h1>
+      <h1>Ad Marks in Playback Bar</h1>
       <!-- begin drupal content -->
       <article class="bcls-article">
 
         <header id="bcls_header" class="bcls-header">
-          <p>In this topic, you will learn .</p>
+          <p>In this topic, you will learn how to marks appear in the playback bar indicating where ads will play. This example marks where ad cue points have been added to a video, thus indicating when ads will play.</p>
         </header>
 
         <section id="The_player" class="bcls-section">
@@ -114,34 +114,10 @@
           <h2>API/Plugin resources used</h2>
           <p>The following sections detail resources used from various APIs/plugins.</p>
 
-          <h3>Brightcove player API methods</h3>
-          <ul>
-            <li><code>catalog.getVideo()</code>
-            </li>
-          </ul>
-
-          <h3>Brightcove player API events</h3>
-          <ul>
-            <li><code>play</code>
-            </li>
-          </ul>
-
           <h3>Plugins used</h3>
           <ul>
-            <li><a href="https://github.com/brightcove/videojs-overlay">videojs-overlay</a> : For details, refer to the <a href="../../brightcove-player/guides/overlay-plugin.html">Display Overlay Plugin</a> document.</li>
+            <li><a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/ad-cue-points.html">IMA3 Plugin</a>: In this case, the document linked to shows the IMA3 plugin used specifically for ad cue points.</li>
           </ul>
-
-          <h3>APIs</h3>
-          <p>This sample uses the Analytics API via a <a href="#proxy">proxy</a> built in PHP.</p>
-
-          <aside class="bcls-aside bcls-aside--warning">
-            <h4>3rd party libraries used in this example</h4>
-            <p>Note: This example uses 3rd party libraries to simplify the JavaScript code. These libraries are not supported by Brightcove. All functionality can be reproduced in ordinary JavaScript.</p>
-            <ul>
-              <li><a href="//jquery.org">jQuery</a>
-              </li>
-            </ul>
-          </aside>
         </section>
 
         <section id="How_it_works" class="bcls-section">
@@ -150,7 +126,17 @@
 
           <h3>Create the player</h3>
           <p>The player has an <code>id</code> attribute and assigned the value <code>myPlayerID</code>. Also, the <code>width</code> and <code>height</code> are set.</p>
-          <pre class="line-numbers"><code class="language-html"></code></pre>
+          <pre class="line-numbers"><code class="language-html">&lt;video id=&quot;myPlayerID&quot;
+  data-video-id=&quot;5363246957001&quot;
+  data-account=&quot;1752604059001&quot;
+  data-player=&quot;SJXoGKYjg&quot;
+  data-embed=&quot;default&quot;
+  data-application-id
+  class=&quot;video-js&quot;
+  controls
+  width=&quot;640&quot;
+  height=&quot;360&quot;&gt;&lt;/video&gt;
+&lt;script src=&quot;//players.brightcove.net/1752604059001/SJXoGKYjg_default/index.min.js&quot;&gt;&lt;/script&gt;</code></pre>
 
           <h3 id="HTMLCode">The HTML code</h3>
           <p>No other HTML is required.</p>
@@ -158,21 +144,76 @@
           <h3>The JavaScript code</h3>
           <p>At a very high level the code performs the following tasks:</p>
           <ul>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
+            <li>Uses the <code>mediainfo</code> object to extract all cue points, then uses the JavaScript functions <code>filter()</code> and <code>map()</code> to build an array of the ad cue point times.</li>
+            <li>The custom function <code>addAdMarkers</code> is then called to add the markers to the playback bar.</li>
           </ul>
           <p>Key sections of the code are detailed here:</p>
           <ul>
-            <li>Lines -: </li>
-            <li>Lines -: </li>
+            <li>Lines 6-31: Event handler for the <code>loadstart</code> event. Processing is in this event handler as <code>mediainfo</code> is guaranteed to be populated only after <code>loadstart</code> is dispatched.</li>
+            <li>Line 12: Extract the cue points array from <code>mediainfo</code>.</li>
+            <li>Line 16: Use JavaScript's <code>filter()</code> function to to extract only <strong>AD</strong> cue points and disregard <strong>CODE</strong> cue points. Note that the filter function uses the <code>isAdCuePoint()</code> helper function defined in lines 34-36.</li>
+            <li>Lines 20-21: Extracts the values of <code>startTime</code> from the <code>adCuePointsAra</code>array of objects using JavaScript's <code>map()</code> function.</li>
+            <li>Line 25: Uses the <code>mediainfo</code> object to extract the video's duration.</li>
+            <li>Line 29: Calls the <code>addAdMarkers()</code> function.</li>
+            <li>Line 42: Uses JavaScript's <code>getElementsByClassName()</code> function to assign the playback bar element to the <code>playheadWell</code> variable.</li>
+            <li>Lines 44-47: Creates a <code>div</code> element and assigns it a <code>className</code>, <code>id</code> and <code>style</code>.</li>
+            <li>Line 48: Uses JavaScript's <code>appendChild()</code> function to place the newly created marker on the playback bar.</li>
           </ul>
-          <pre class="line-numbers"><code class="language-javascript"></code></pre>
+          <pre class="line-numbers"><code class="language-javascript">&lt;script type=&quot;text/javascript&quot;&gt;
+  videojs('myPlayerID').ready(function () {
+    var myPlayer = this,
+      startTimesAra = [];
+
+    myPlayer.on('loadstart', function () {
+      var cuePointsAra = [],
+        adCuePointsAra = [],
+        videoDuration;
+
+      // Extract cue points array from mediainfo
+      cuePointsAra = myPlayer.mediainfo.cuePoints;
+      console.log('cuePointsAra', cuePointsAra);
+
+      // Extract ad cue points from all cue points
+      adCuePointsAra = cuePointsAra.filter(isAdCuePoint);
+      console.log('adCuePointsAra', adCuePointsAra);
+
+      // Extract start times from ad cue points
+      startTimesAra = adCuePointsAra.map(function (a) {
+        return a.startTime;
+      });
+      console.log('startTimesAra', startTimesAra);
+      // get the video duration
+      videoDuration = myPlayer.mediainfo.duration;
+      console.log('video duration', videoDuration);
+
+      // add cuePoint markers for ad cue points
+      addAdMarkers(adCuePointsAra, videoDuration);
+    })
+  });
+
+  // Function used with array filter
+  function isAdCuePoint(cuePoint) {
+    return cuePoint.type == 'AD';
+  }
+
+  // function to add AD cue point markers
+  function addAdMarkers(adCuePointsAra, videoDuration) {
+    var iMax = adCuePointsAra.length,
+      i,
+      playheadWell = document.getElementsByClassName('vjs-progress-control vjs-control')[0];
+    for (i = 0; i &lt; iMax; i++) {
+      var elem = document.createElement('div');
+      elem.className = 'vjs-marker';
+      elem.id = 'ad' + i;
+      elem.style.left = (adCuePointsAra[i].time / videoDuration) * 100 + '%';
+      playheadWell.appendChild(elem);
+    }
+  }
+&lt;/script&gt;</code></pre>
 
           <h3 id="CSSCode">The stylesheet</h3>
-          <p>This example uses CSS styles for</p>
+          <p>This example uses CSS styles for ...</p>
+          <pre class="line-numbers"><code class="language-css"></code></pre>
         </section>
 
         <section id="plugin" class="bcls-section">
