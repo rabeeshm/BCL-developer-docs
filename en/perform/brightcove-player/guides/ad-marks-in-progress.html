@@ -57,12 +57,18 @@
       <article class="bcls-article">
 
         <header id="bcls_header" class="bcls-header">
-          <p>In this topic, you will learn how to marks appear in the playback bar indicating where ads will play. This example marks where ad cue points have been added to a video, thus indicating when ads will play.</p>
+          <p>In this topic, you will learn how to make marks appear in the playback bar indicating where ads will play. This example marks where ad cue points have been added to a video, thus indicating when ads will play.</p>
         </header>
 
         <section id="The_player" class="bcls-section">
           <h2>The player sample</h2>
-          <p>The following shows a player using ...</p>
+          <p>The following shows a player where the three ad cue points associated with the video are displayed in the playback bar as blue markers. Note that the same ad is displayed all three times in the video. This is simply because a static VAST tag is used rather than setting up an ad server that could randomly send different ads. When you play the video, the ad will appear at 3, 5 and 17 seconds.</p>
+          <iframe src="//players.brightcove.net/1752604059001/BJmCOqajx_default/index.html?videoId=5366012438001"
+            allowfullscreen
+            webkitallowfullscreen
+            mozallowfullscreen
+            width="640"
+            height="360"></iframe>
         </section>
 
         <section id="Development_sequence" class="bcls-section">
@@ -97,12 +103,6 @@
             </p>
           </div>
           <!-- class="bcls-expander-content" -->
-        </section>
-
-        <section id="Select_implementation_inpage" class="bcls-section">
-          <h2>Select implementation</h2>
-          <p>This sample uses the In-Page embed code. You can also move the CSS and JavaScript into a plugin. If you do that, be sure to add the <a href="../guides/overlay-plugin.html">overlay plugin</a> CSS and JavaScript before adding the custom plugin,
-            because this code depends on the overlay.</p>
         </section>
 
         <section id="Select_implementation_iframe" class="bcls-section">
@@ -152,11 +152,11 @@
             <li>Lines 6-31: Event handler for the <code>loadstart</code> event. Processing is in this event handler as <code>mediainfo</code> is guaranteed to be populated only after <code>loadstart</code> is dispatched.</li>
             <li>Line 12: Extract the cue points array from <code>mediainfo</code>.</li>
             <li>Line 16: Use JavaScript's <code>filter()</code> function to to extract only <strong>AD</strong> cue points and disregard <strong>CODE</strong> cue points. Note that the filter function uses the <code>isAdCuePoint()</code> helper function defined in lines 34-36.</li>
-            <li>Lines 20-21: Extracts the values of <code>startTime</code> from the <code>adCuePointsAra</code>array of objects using JavaScript's <code>map()</code> function.</li>
+            <li>Lines 20-21: Extracts the values of <code>startTime</code> from the <code>adCuePointsAra</code> array of objects using JavaScript's <code>map()</code> function.</li>
             <li>Line 25: Uses the <code>mediainfo</code> object to extract the video's duration.</li>
             <li>Line 29: Calls the <code>addAdMarkers()</code> function.</li>
             <li>Line 42: Uses JavaScript's <code>getElementsByClassName()</code> function to assign the playback bar element to the <code>playheadWell</code> variable.</li>
-            <li>Lines 44-47: Creates a <code>div</code> element and assigns it a <code>className</code>, <code>id</code> and <code>style</code>.</li>
+            <li>Lines 44-47: Creates a <code>div</code> element and assigns it a <code>className</code>, <code>id</code> and <code>style</code>. The style is what defines how far from the left the marker will be placed.</li>
             <li>Line 48: Uses JavaScript's <code>appendChild()</code> function to place the newly created marker on the playback bar.</li>
           </ul>
           <pre class="line-numbers"><code class="language-javascript">&lt;script type=&quot;text/javascript&quot;&gt;
@@ -212,8 +212,16 @@
 &lt;/script&gt;</code></pre>
 
           <h3 id="CSSCode">The stylesheet</h3>
-          <p>This example uses CSS styles for ...</p>
-          <pre class="line-numbers"><code class="language-css"></code></pre>
+          <p>This example uses CSS styles for the marker that appears on the playback bar.</p>
+          <pre class="line-numbers"><code class="language-html">&lt;style&gt;
+    .vjs-marker {
+        position: absolute;
+        opacity: 1;
+        height: 100%;
+        background-color: blue;
+        width: 4px;
+    }
+&lt;/style&gt;</code></pre>
         </section>
 
         <section id="plugin" class="bcls-section">
@@ -223,35 +231,99 @@
           <h3>Create the JavaScript file</h3>
           <p>Move the plugin's JavaScript code into a file and place it in an Internet accessible URL.</p>
           <ul>
-            <li>Lines 1, 130: Use the standard syntax to begin and end a Brightcove Player plugin.</li>
-            <li>Line 1: The first argument of the function call is the name of the function defined in the plugin code, in this case <code>newestVideosInPlaylist</code>.</li>
-            <li>Line 130: The trailing semicolon is required.</li>
+            <li>Lines 1, 48: Use the standard syntax to begin and end a Brightcove Player plugin.</li>
+            <li>Line 1: The first argument of the function call is the name of the function defined in the plugin code, in this case <code>marks4AdCuePoints</code>.</li>
+            <li>Line 48: The trailing semicolon is required.</li>
           </ul>
-          <aside class="bcls-aside bcls-aside--information">Note that the <code>ready</code> method is removed.</aside>
-          <pre class="line-numbers"><code class="language-javascript"></code></pre>
+          <pre class="line-numbers"><code class="language-javascript">videojs.plugin('marks4CuePoints', function () {
+  var myPlayer = this,
+    startTimesAra = [];
+  myPlayer.on('loadstart', function () {
+    var cuePointsAra = [],
+      adCuePointsAra = [],
+      videoDuration;
+
+    // Extract cue points array from mediainfo
+    cuePointsAra = myPlayer.mediainfo.cuePoints;
+    console.log('cuePointsAra', cuePointsAra);
+
+    // Extract ad cue points from all cue points
+    adCuePointsAra = cuePointsAra.filter(isAdCuePoint);
+    console.log('adCuePointsAra', adCuePointsAra);
+
+    // Extract start times from ad cue points
+    startTimesAra = adCuePointsAra.map(function (a) {
+      return a.startTime;
+    });
+    console.log('startTimesAra', startTimesAra);
+
+    // get the video duration
+    videoDuration = myPlayer.mediainfo.duration;
+
+    // add cuePoint markers for ad cue points
+    addAdMarkers(adCuePointsAra, videoDuration);
+  });
+
+  // Function used with array filter
+  function isAdCuePoint(cuePoint) {
+    return cuePoint.type == 'AD';
+  }
+
+  // function to add AD cue point markers
+  function addAdMarkers(adCuePointsAra, videoDuration) {
+    var iMax = adCuePointsAra.length,
+      i,
+      playheadWell = document.getElementsByClassName('vjs-progress-control vjs-control')[0];
+    for (i = 0; i &lt; iMax; i++) {
+      var elem = document.createElement('div');
+      elem.className = 'vjs-marker';
+      elem.id = 'ad' + i;
+      elem.style.left = (adCuePointsAra[i].time / videoDuration) * 100 + '%';
+      playheadWell.appendChild(elem);
+    }
+  }
+});</code></pre>
 
           <h3>Create the CSS file</h3>
           <p>Move the CSS into a file and place it in an Internet accessible URL.</p>
-          <pre class="line-numbers"><code class="language-css"></code></pre>
+          <pre class="line-numbers"><code class="language-css">.vjs-marker {
+  position: absolute;
+  opacity: 1;
+  height: 100%;
+  background-color: blue;
+  width: 4px;
+}</code></pre>
 
           <h3>Deploy plugin and CSS</h3>
           <p>You must load both the JavaScript and CSS files for the custom plugin.</p>
-          <p>To deploy the <strong>newestVideosInPlaylist</strong> plugin using the Players module, follow these steps:</p>
+          <p>To deploy the <strong>marks4AdCuePoints</strong> plugin using the Players module, follow these steps:</p>
           <ol class="bcls-tasklist__restart">
-            <li>In Video Cloud Studio, open the <strong>Players</strong> module and either locate a player to which you wish to add the plugin, or create a new player.</li>
+            <li>In Studio, open the <strong>Players</strong> module and either locate a player to which you wish to add the plugin, or create a new player.</li>
             <li>Click the link for the player to open the player properties.</li>
+            <li>The custom plugin shown in this document only functions correctly when used with the IMA3 plugin using ad cue points. You will need to enable IMA ads and provide a valid VAST tag for the <strong>Server URL</strong> and select <strong>On cue Point</strong> for the <strong>Request Ads</strong> form item. The resulting configuration displayed in Studio is shown here:
+              <figure class="bcls-figure">
+                  <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/markers-4-ad-cue-points/studio-enable-ima.png" alt="Configuration for ad cue points">
+              </figure>
+              <aside class="bcls-aside bcls-aside--information">See the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/guides/ad-cue-points.html">Display Ads Using Ad Cue Points</a> document for complete information on setting up advertising correctly.</aside>
+            </li>
             <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
             <li>For the <strong>JavaScript URL</strong>, enter the URL which specifies the location of where you saved your plugin's JavaScript.</li>
             <li>For the <strong>CSS URL</strong>, enter the URL which specifies the location of where you saved your plugin's CSS.</li>
-            <li>For the <strong>Name</strong>, enter <strong>newestVideosInPlaylist</strong>.</li>
+            <li>For the <strong>Name</strong>, enter <strong>marks4AdCuePoints</strong>.</li>
             <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
+            <li>Be sure you have created ad cue points for a video asset, then publish that video using your newly configured player.</li>
           </ol>
         </section>
 
         <section id="useiframe" class="bcls-section">
           <h2>Use iframe</h2>
           <p>It is a best practice to use the iframe player implementation. Since you can create this functionality as a plugin, replace the in-page embed implementation with the iframe implementation.</p>
-          <pre class="line-numbers"><code class="language-html"></code></pre>
+          <pre class="line-numbers"><code class="language-html">&lt;iframe src=&quot;//players.brightcove.net/1752604059001/SJXoGKYjg_default/index.html?videoId=5363246957001&quot;
+  allowfullscreen
+  webkitallowfullscreen
+  mozallowfullscreen
+  width=&quot;640&quot;
+  height=&quot;360&quot;&gt;&lt;/iframe&gt;</code></pre>
         </section>
 
       </article>
@@ -260,7 +332,7 @@
       <section id="Related_Topics" class="bcls-section">
         <h2>Related Topics</h2>
         <ul>
-          <li><a href="../../player-management/guides/player-configuration.html">Player Configuration Guide</a>
+          <li><a href="../../brightcove-player/guides/ad-cue-points.html">Display Ads Using Ad Cue Points</a>
           </li>
           <li><a href="../../brightcove-player/guides/plugin-guide.html">Plugin Guide</a>
           </li>
