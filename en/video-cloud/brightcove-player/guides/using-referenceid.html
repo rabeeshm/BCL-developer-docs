@@ -5,8 +5,8 @@
     <!-- Begin Drupal Taxonomy Data -->
     <meta name="products" content="Video Cloud">
     <meta name="role" content="Player Developer">
-    <meta name="task" content="">
-    <meta name="topic" content="Architecture">
+    <meta name="task" content="Publish Videos">
+    <meta name="topic" content="Playback">
     <!-- End Drupal Taxonomy Data -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
@@ -63,93 +63,204 @@
     <article class="bcls-article">
 			<header id="bcls_header" class="bcls-header">
 				<!-- Place document intro sentence(s) here -->
-				<p>In this topic, you will learn about publishing a video using a reference ID instead of the video ID.</p>
+				<p>In this topic, you will learn how to use reference IDs for videos and playlists when you publish to a Brightcove player.</p>
       </header>
 
-      <section id="overview" class="bcls-section">
-        <h2>Overview</h2>
-        <p>It is good practice to use reference IDs instead of video IDs in your player implementations. One reason would be if you accidentally delete a video from your account. Here's how you would fix it: </p>
+      <section id="Why_use_reference_IDs" class="bcls-section">
+        <h2>Why use reference IDs?</h2>
+        <p>It is good practice to use reference ID instead of video ID or playlist ID when you can. Some advantages include:</p>
         <ul>
-          <li>With video IDs, you would upload a new video, but you would also need to update every player page that uses that video. That could also include mobile apps.</li>
-          <li>With reference IDs, you would simply upload another video and assign it the same reference ID as the deleted video. That's it. You are done.</li>
+          <li>
+            You don't have to update all of your players if you accidentally delete a video or playlist. Instead, you simply upload another video or re-create a playlist and assign it the same reference ID as the deleted item.
+          </li>
+          <li>
+            It's easy to match up your reference IDs with content IDs when managing your videos and web pages with a content management system (CMS).
+          </li>
         </ul>
-
-        <p>By default, when you publish a video with a player in Video Cloud Studio, you will see that it uses the video ID. To use a reference ID, simply prepend the reference identifier with <strong>ref:</strong>.</p>
-        <aside class="bcls-aside bcls-aside--warning">Use special characters, like the forward slash (<strong>/</strong>), in a reference ID with caution. If you do you will need to escape them when using them or issues can arise.</aside>
       </section>
 
-      <section  id="addid" class="bcls-section">
-        <h2>Add reference ID</h2>
-            <p>First, add a reference ID to your video:</p>
-            <ol class="bcls-tasklist">
-              <li>In Studio, open the <strong>Media</strong> module, and select the video title link.</li>
-              <li>Locate the <strong>Video Information</strong> section and select <strong>Edit</strong>.</li>
-              <li>For the <strong>Ref ID</strong> property, enter a value for your reference ID.</li>
-              <li>Save your changes.</li>
-            </ol>
-            <figure class="bcls-figure">
-                <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/publishing/using-reference-ids/reference-id.png" alt="Studio adding a reference ID">
-            </figure>
+      <section  id="Overview" class="bcls-section">
+        <h2>Overview</h2>
+        <p>By default, when you publish a video with a player in Video Cloud Studio, you will see that it uses the video ID. To use a reference ID, simply prepend the reference identifier with <code>ref:</code>.</p>
+        <p>
+          So, instead of using a video ID like this:
+        </p>
+        <pre class="line-numbers"><code class="language-html">&lt;video data-video-id=&quot;4746402489001&quot;</code></pre>
+        <p>
+          You could use a reference ID like this:
+        </p>
+        <pre class="line-numbers"><code class="language-html">&lt;video data-video-id=&quot;ref:skivideo&quot;</code></pre>
+        <p>
+          The same applies for a playlist ID. For details, see the examples below.
+        </p>
+        <aside class="bcls-aside bcls-aside--warning">Use caution when using special characters, like the forward slash (<strong>/</strong>), in a reference ID. If you do, you will need to escape them to avoid problems.</aside>
       </section>
 
-      <section  id="iframe" class="bcls-section">
-        <h2>Use iframe</h2>
-            <p>To use the iframe implementation, do the following:</p>
-            <ol class="bcls-tasklist">
-              <li>In the <strong>Media</strong> module, publish your video with a player.</li>
-              <li>Copy the <strong>Standard</strong> embed code and paste it in your HTML page code.</li>
-              <li>Change the <code>videoId</code> value to the appropriate reference ID, prepended with the <strong>ref:</strong> term.</li>
-            </ol>
-            <pre class="line-numbers"><code class="language-html">&lt;!DOCTYPE html&gt;
+      <section  id="Adding_reference_ID" class="bcls-section">
+        <h2>Adding reference ID</h2>
+          <p>First, add a reference ID to your video:</p>
+          <ol class="bcls-tasklist">
+            <li>In Studio, open the <strong>Media</strong> module, and select the video title link.</li>
+            <li>Locate the <strong>Video Information</strong> section and select <strong>Edit</strong>.</li>
+            <li>For the <strong>Ref ID</strong> property, enter a value for your reference ID.</li>
+            <li>Save your changes.</li>
+          </ol>
+          <figure class="bcls-figure">
+              <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/publishing/using-reference-ids/reference-id.png" alt="Studio adding a reference ID">
+          </figure>
+      </section>
+
+      <section  id="Replacing_video_ID" class="bcls-section">
+        <h2>Replacing video ID</h2>
+        <p>
+          The video ID can be replaced with the reference ID.
+        </p>
+        <h3>iframe</h3>
+        <p>To use the iframe implementation, do the following:</p>
+          <ol class="bcls-tasklist">
+            <li>In the <strong>Media</strong> module, publish your video with a player.</li>
+            <li>Copy the <strong>Standard</strong> embed code and paste it in your HTML page code.</li>
+            <li>Change the <code>videoId</code> value to the appropriate reference ID, prepended with the <strong>ref:</strong> term.</li>
+          </ol>
+          <pre class="line-numbers"><code class="language-html">&lt;!doctype html&gt;
 &lt;html&gt;
 
 &lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;title&gt;Using Reference Id&lt;/title&gt;
-
+	&lt;meta charset=&quot;UTF-8&quot;&gt;
+	&lt;title&gt;Video Reference ID&lt;/title&gt;
 &lt;/head&gt;
 
 &lt;body&gt;
 
-    &lt;iframe style=&quot;width:640px;height:360px;&quot;
-    src='//players.brightcove.net/1752604059001/default_default/index.html<span class="bcls-highlight">?videoId=ref:4029697544001</span>'
-    allowfullscreen webkitallowfullscreen mozallowfullscreen&gt;&lt;/iframe&gt;
+  &lt;iframe src=&quot;//players.brightcove.net/1752604059001/default_default/index.html?<span class="bcls-highlight">videoId=ref:skivideo</span>&amp;muted&quot;
+  	allowfullscreen
+  	webkitallowfullscreen
+  	mozallowfullscreen
+  	width=&quot;640&quot;
+  	height=&quot;360&quot;&gt;&lt;/iframe&gt;
 
 &lt;/body&gt;
 &lt;/html&gt;</code></pre>
-      </section>
 
-      <section  id="embed" class="bcls-section">
-        <h2>Use In-Page embed</h2>
+          <h3>In-page embed</h3>
           <p>To use the In-Page embed implementation, do the following:</p>
             <ol class="bcls-tasklist">
               <li>In the <strong>Media</strong> module, publish your video with a player.</li>
               <li>Copy the <strong>Advanced</strong> embed code and paste it in your HTML page code.</li>
               <li>Change the <code>data-video-id</code> value to the appropriate reference ID, prepended with the <strong>ref:</strong> term.</li>
             </ol>
-            <pre class="line-numbers"><code class="language-html">&lt;!DOCTYPE html&gt;
+            <pre class="line-numbers"><code class="language-html">&lt;!doctype html&gt;
 &lt;html&gt;
 
 &lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;title&gt;Using Reference Id&lt;/title&gt;
-
+	&lt;meta charset=&quot;UTF-8&quot;&gt;
+	&lt;title&gt;Video Reference ID&lt;/title&gt;
 &lt;/head&gt;
 
 &lt;body&gt;
 
-    &lt;video
-      style=&quot;width:640px;height:360px;&quot;
-      <span class="bcls-highlight">data-video-id=&quot;ref:4029697544001&quot;</span>
-      data-account=&quot;1752604059001&quot;
-      data-player=&quot;default&quot;
-      data-embed=&quot;default&quot;
-      class=&quot;video-js&quot; controls&gt;&lt;/video&gt;
-    &lt;script src=&quot;//players.brightcove.net/1752604059001/default_default/index.min.js&quot;&gt;&lt;/script&gt;
+  &lt;video <span class="bcls-highlight">data-video-id=&quot;ref:skivideo&quot;</span>
+  	data-account=&quot;1752604059001&quot;
+  	data-player=&quot;default&quot;
+  	data-embed=&quot;default&quot;
+  	data-application-id
+  	class=&quot;video-js&quot;
+  	controls muted
+  	width=&quot;640&quot;
+  	height=&quot;360&quot;&gt;&lt;/video&gt;
+  &lt;script src=&quot;//players.brightcove.net/1752604059001/default_default/index.min.js&quot;&gt;&lt;/script&gt;
 
 &lt;/body&gt;
 &lt;/html&gt;</code></pre>
-        </section>
+      </section>
+
+      <section  id="Replacing_playlist_ID" class="bcls-section">
+        <h2>Replacing playlist ID</h2>
+        <p>
+          The playlist ID can be replaced with the reference ID.
+        </p>
+        <h3>iframe</h3>
+        <p>To use the iframe implementation, do the following:</p>
+          <ol class="bcls-tasklist">
+            <li>In the <strong>Media</strong> module, publish your video with a player.</li>
+            <li>Copy the <strong>Standard</strong> embed code and paste it in your HTML page code.</li>
+            <li>Change the <code>playlistId</code> value to the appropriate reference ID, prepended with the <strong>ref:</strong> term.</li>
+          </ol>
+          <pre class="line-numbers"><code class="language-html">&lt;!doctype html&gt;
+&lt;html&gt;
+
+&lt;head&gt;
+	&lt;meta charset=&quot;UTF-8&quot;&gt;
+	&lt;title&gt;Video Reference ID&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+
+  &lt;iframe src=&quot;//players.brightcove.net/1752604059001/H1EyAYN3_default/index.html?<span class="bcls-highlight">playlistId=ref:allTimePlaylist</span>&quot;
+  	allowfullscreen
+  	webkitallowfullscreen
+  	mozallowfullscreen
+  	width=&quot;640&quot;
+  	height=&quot;360&quot;&gt;&lt;/iframe&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+          <h3>In-page embed</h3>
+          <p>To use the In-Page embed implementation, do the following:</p>
+            <ol class="bcls-tasklist">
+              <li>In the <strong>Media</strong> module, publish your video with a player.</li>
+              <li>Copy the <strong>Advanced</strong> embed code and paste it in your HTML page code.</li>
+              <li>Change the <code>data-playlist-id</code> value to the appropriate reference ID, prepended with the <strong>ref:</strong> term.</li>
+            </ol>
+            <pre class="line-numbers"><code class="language-html">&lt;!doctype html&gt;
+&lt;html&gt;
+
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;title&gt;Video Reference ID&lt;/title&gt;
+  &lt;style type=&quot;text/css&quot;&gt;
+    .video-js {
+      float: left;
+    }
+    .vjs-playlist {
+      width: 280px;
+      height: 360px;
+      overflow-x: hidden;
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+
+  &lt;video <span class="bcls-highlight">data-playlist-id=&quot;ref:allTimePlaylist&quot;</span>
+  	data-account=&quot;1752604059001&quot;
+  	data-player=&quot;H1EyAYN3&quot;
+  	data-embed=&quot;default&quot;
+  	data-application-id
+  	class=&quot;video-js&quot;
+  	controls
+  	width=&quot;640&quot;
+  	height=&quot;360&quot;&gt;&lt;/video&gt;
+  &lt;script src=&quot;//players.brightcove.net/1752604059001/H1EyAYN3_default/index.min.js&quot;&gt;&lt;/script&gt;&lt;ol class=&quot;vjs-playlist&quot;&gt;&lt;/ol&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      </section>
+
+      <section  id="Example" class="bcls-section">
+        <h2>Example</h2>
+          <p>Here is an example of a playlist player with the iframe implementation which uses a reference Id instead of the playlist Id:</p>
+          <div>
+            <iframe src="//players.brightcove.net/1752604059001/H1EyAYN3_default/index.html?playlistId=ref:allTimePlaylist"
+        			allowfullscreen
+        			webkitallowfullscreen
+        			mozallowfullscreen
+        			width="640"
+        			height="360"></iframe>
+          </div>
+      </section>
+
       </article>
       <!-- end drupal content -->
       </div>
