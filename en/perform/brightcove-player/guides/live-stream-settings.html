@@ -55,13 +55,13 @@
       <!-- begin drupal content -->
       <article class="bcls-article">
         <header id="bcls_header" class="bcls-header">
-          <p>In this topic, you will learn how live stream configuration effects overhead bandwidth. The goal of the document is to make you aware how the incorrect configuration can make a video in Brightcove Player nearly unplayable.</p>
+          <p>In this topic, you will learn how live stream configuration affects the bandwidth available for media playback. The goal of the document is to make you aware how incorrect configuration can impact the user experience for a live stream, rendering it nearly unplayable.</p>
           <aside class="bcls-aside bcls-aside--information">The live stream configuration is done in conjunction with your CDN and/or encoder. Brightcove Player can only play what is sent, and there are no Brightcove Player adjustments that can compensate for incorrect live stream configuration.</aside>
         </header>
 
         <section id="Live_stream_configuration_terminology" class="bcls-section">
           <h2>Live stream configuration terminology</h2>
-          <p>The calculator in the next section provides a rough estimate of overhead bandwidth based on live stream configuration. To be sure a baseline knowledge exists of live streaming and information needed by the calculator, some terms are defined here:</p>
+          <p>The calculator at the bottom of this document provides a rough estimate of overhead bandwidth based on live stream configuration. To be sure a baseline knowledge exists of live streaming and information needed by the calculator, some terms are defined here:</p>
           <table class="bcls-table">
               <thead class="bcls-table__head">
                   <tr>
@@ -75,6 +75,10 @@
                   <td>Sends audio and video as a series of small files called media segment files.</td>
                 </tr>
                 <tr>
+                    <td>Target Duration</td>
+                    <td>A parameter within the Media Playlist that specifies a maximum duration for any of the media segments.</td>
+                </tr>
+                <tr>
                     <td>Media Playlist File</td>
                     <td>An index file that provides an ordered list of the URLs of the media segment files. Sometimes also referred to as the manifest file.</td>
                 </tr>
@@ -84,11 +88,11 @@
                 </tr>
                 <tr>
                     <td>Relative URLs</td>
-                    <td>The paths in the playlist file can use relative URLs, which saves significant space in the file, usually greater than 50%.</td>
+                    <td>The paths in the playlist file can use URLs relative to the playlist, which can save significant space in the file - usually greater than 50%.</td>
                 </tr>
                 <tr>
                     <td>Live Window</td>
-                    <td>The amount of time a viewer can go back in the live stream to view video. Under the hood, this means the number of segments that must be kept in the playlist file, so longer duration means bigger playlist file.</td>
+                    <td>The amount of time a viewer can go backwards in time in the live stream to view video. Under the hood, this translates into the number of segments that must be kept in the playlist file. So the longer the live window, the bigger the playlist file.</td>
                 </tr>
                 <tr>
                     <td>Segment Duration</td>
@@ -96,6 +100,16 @@
                 </tr>
               </tbody>
           </table>
+        </section>
+
+        <section id="How_HLS_Live_works" class="bcls-section">
+          <h2>How HLS Live works</h2>
+          <p>In a live stream, the player downloads the Media Playlist repeatedly at a set interval. That interval is an amount of time that is equal to the <strong>Target Duration</strong> of the Media Playlist.</p>
+          <p>For example, given a 100KB manifest with a 10 seconds target duration, the following calculation determines the bandwidth used just to download the Media Playlist:</p>
+          <ul>
+            <li>100 KB / 10 seconds * 8 bits per byte = <strong>80kbps</strong> of bandwidth downloading the Media Playlist to continue video playback</li>
+          </ul>
+          <p>Realize this bandwidth counts as overhead that takes away from the bandwidth available for the actual media.</p>
         </section>
 
         <section id="Calculator" class="bcls-section">
