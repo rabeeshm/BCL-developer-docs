@@ -74,7 +74,39 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData)
         createSubsectionLandingPageSections,
         getSection,
         init,
-        BCLhighlight;
+        BCLhighlight,
+        // for Player docs
+        vc,
+        bp,
+        vcContent = document.getElementsByClassName('video-cloud-only'),
+        bpContent = document.getElementsByClassName('perform-only'),
+        toggleStr = '<li><button id="vc" class="bcls-button__version" style="background-color:#293b70;">Video Cloud version</button> <button id="bp" class="bcls-button__version">Brightcove Player Version</button> <a style="font-size:smaller;" href="//docs.brightcove.com/en/video-cloud/brightcove-player/getting-started/versions.html">(What\'s the difference?)</a><hr></li>',
+        i, iMax;
+
+    // Stuff for player docs only
+    function hideElements(elements) {
+        var iMax = elements.length, i;
+        for (i = 0; i < iMax; i++) {
+            elements[i].setAttribute('style', 'display:none');
+        }
+    }
+    function showElements(elements) {
+        var iMax = elements.length, i;
+        for (i = 0; i < iMax; i++) {
+            elements[i].setAttribute('style', 'display:initial');
+        }
+    }
+    function addStyle(e) {
+        e.setAttribute('style', 'background-color:#293b70;');
+    }
+
+    function removeStyle(e) {
+        e.removeAttribute('style');
+    }
+
+
+    // end stuff for player docs
+
     // logging utility
     bclslog = function (context, message) {
         if (window.console && console.log) {
@@ -126,7 +158,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData)
      * @return {boolean}   [description]
      */
     exists = function (x) {
-        return (x !== undefined && x !== null && x !== "" && x !== NaN);
+        return (x !== undefined && x !== null && x !== "");
     };
     /*
     find index of an object in array of objects
@@ -176,6 +208,25 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData)
             $navElements.attr("style", "");
             $(this).attr("style", "background-color:" + productColors[product] + ";color:#ffffff");
         });
+
+        vc = document.getElementById('vc');
+        bp = document.getElementById('bp');
+
+        vc.addEventListener('click', function() {
+            showElements(vcContent);
+            hideElements(bpContent);
+            addStyle(vc);
+            removeStyle(bp);
+        });
+
+        bp.addEventListener('click', function() {
+            var j, jMax;
+            showElements(bpContent);
+            hideElements(vcContent);
+            addStyle(bp);
+            removeStyle(vc);
+        });
+
 
     };
     createInPageNav = function () {
@@ -284,7 +335,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData)
             }
         }
         if (exists(sectionName)) {
-            str += "<li class=\"current\">" + document.getElementsByTagName("title")[0].innerHTML + "</li>"
+            str += "<li class=\"current\">" + document.getElementsByTagName("title")[0].innerHTML + "</li>";
         }
         $breadCrumbWrapper.html(str);
     };
@@ -594,7 +645,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData)
                         section = "player-management";
                         sectionName = "player-management";
                     }  else if (section === "studio") {
-                        modulesIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", "Modules")
+                        modulesIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", "Modules");
                     } else {
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
                     }
@@ -917,7 +968,7 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
                     if (exists(subsection)) {
                         switch (subsection) {
                         case "brightcove-player-sdk-for-ios":
-                            var dataIndex;
+                            // var dataIndex;
                             subsectionName = "Brightcove Player SDK for iOS";
                             dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
                             if (pathArray[4] === "index.html") {
@@ -949,7 +1000,7 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
                             }
                             break;
                         case "brightcove-player-sdk-for-android":
-                            var dataIndex;
+                            // var dataIndex;
                             subsectionName = "Brightcove Player SDK for Android";
                             dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
                             if (pathArray[4] === "index.html") {
