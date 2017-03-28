@@ -209,24 +209,6 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData)
             $(this).attr("style", "background-color:" + productColors[product] + ";color:#ffffff");
         });
 
-        vc = document.getElementById('vc');
-        bp = document.getElementById('bp');
-
-        vc.addEventListener('click', function() {
-            showElements(vcContent);
-            hideElements(bpContent);
-            addStyle(vc);
-            removeStyle(bp);
-        });
-
-        bp.addEventListener('click', function() {
-            var j, jMax;
-            showElements(bpContent);
-            hideElements(vcContent);
-            addStyle(bp);
-            removeStyle(vc);
-        });
-
 
     };
     createInPageNav = function () {
