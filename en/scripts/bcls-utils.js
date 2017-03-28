@@ -65,7 +65,7 @@ var BCLS_player_fix = ( function (window, document) {
     }
 
     if (vc.length !== 0 || bp.length !== 0) {
-
+        sideNav.insertAdjacentHTML('afterBegin', toggleStr);
     }
 })(window, document);
 
