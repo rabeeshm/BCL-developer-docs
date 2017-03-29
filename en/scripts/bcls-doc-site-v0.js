@@ -392,7 +392,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData)
         $navWrapper.find("nav,ul,section,li,a").attr("style", "background-color:#333333;");
         $titleArea.find("ul,li,a,img").attr("style", "background-color:#333333;");
         if (product !== "index") {
-            titleStr += product + "/index.html\"><img src=\"" + bclsNavData[product].image + "\"/></a>";
+            titleStr += product + "/index.html\"><img src=\"" + bclsNavData[product].image + "\" style=\"height:30px;\"/></a>";
         } else {
             titleStr += "index.html\">" + bclsNavData[product].image + "</a>";
         }

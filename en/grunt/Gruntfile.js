@@ -29,7 +29,7 @@ module.exports = function (grunt) {
                         'source/player-management.json',
                         'source/media.json'
                     ],
-                    'working/temp-perform.json': ['source/perform.json',
+                    'working/temp-player.json': ['source/player.json',
                         'source/brightcove-player.json',
                         'source/player-management.json',
                         'source/mobile-sdks.json',
@@ -53,16 +53,16 @@ module.exports = function (grunt) {
                     to: '"Media API"}}'
                 }]
             },
-            onPerform: {
-                src: ['working/temp-perform.json'],
-                dest: 'working/temp-perform-replace.json',
+            onPlayer: {
+                src: ['working/temp-player.json'],
+                dest: 'working/temp-player-replace.json',
                 replacements: [{
                     from: '\/video-cloud\/',
-                    to: '\/perform\/'
+                    to: '\/video-cloud\/'
                 },
                 {
-                    from: '\[{"perform',
-                    to: '\{"perform'
+                    from: '\[{"player',
+                    to: '\{"player'
                 }, {
                     from: '\}\},\{',
                     to: '\},'
@@ -82,8 +82,8 @@ module.exports = function (grunt) {
                     'source/live-main.json',
                     'source/live.json',
                     'source/comma.txt',
-                    'source/perform-main.json',
-                    'working/temp-perform-replace.json',
+                    'source/player-main.json',
+                    'working/temp-player-replace.json',
                     'source/footer.json'
                 ],
                 dest: 'working/docs-nav-data.json'
@@ -118,5 +118,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
 
     // Default task.
-    grunt.registerTask('default', ['minjson', 'replace:onVC', 'replace:onPerform', 'concat:buildjson', 'jsonlint', 'concat:buildvar', 'uglify']);
+    grunt.registerTask('default', ['minjson', 'replace:onVC', 'replace:onPlayer', 'concat:buildjson', 'jsonlint', 'concat:buildvar', 'uglify']);
 }

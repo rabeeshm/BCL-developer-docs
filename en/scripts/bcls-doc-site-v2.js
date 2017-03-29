@@ -375,7 +375,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
         // set background color for title area elements
         setAttributeOnNodeList(titleArea, "style", "background-color:" + productColors.index + ";");
         if (product !== "index") {
-            titleStr += product + "/index.html\"><img src=\"" + bclsNavData[product].image + "\" /></a>";
+            titleStr += product + "/index.html\"><img src=\"" + bclsNavData[product].image + "\" style=\"height:30px;\"/></a>";
         } else {
             titleStr += "index.html\">" + bclsNavData[product].image + "</a>";
         }
