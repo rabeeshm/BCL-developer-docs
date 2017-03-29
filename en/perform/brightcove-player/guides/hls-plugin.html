@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <!-- Begin Drupal Taxonomy Data -->
-    <meta name="products" content="Perform">
+    <meta name="products" content="Video Cloud">
     <meta name="role" content="Player Developer">
     <meta name="task" content="">
     <meta name="topic" content="Playback,Plugins">
@@ -102,74 +102,161 @@
                 </section>
         <section id="options" class="bcls-section">
           <h2>Options</h2>
-          <p>There is one option you can use to configure the HLS plugin.</p>
-        <h4>withCredentials</h4>
-          <p>Type: <code>boolean</code></p>
-          <p>When the <code>withCredentials</code> property is set to <code>true</code>, all XHR requests for manifests and segments would have <code>withCredentials</code> set to <code>true</code> as well. This enables storing and passing cookies from the server that the manifests and segments live on. This has some implications on CORS because when set, the <code>Access-Control-Allow-Origin</code> header cannot be set to <code>*</code>, also, the response headers require the addition of <code>Access-Control-Allow-Credentials</code> header which is set to <code>true</code>. See the  <a href="http://www.html5rocks.com/en/tutorials/cors/">HTML5Rocks's article</a> for more info.</p>
-          <p>You can configure the plugin using the <a href="../../player-management/index.html">Player Management API</a> using an HTTP <code>PATCH</code> method, as shown here:</p>
-          <pre class="line-numbers"><code class="language-json">curl \
+          <p>In this section options you can use to configure the HLS plugin are detailed. They can be implemented in two ways, either as a <strong>source</strong> option or a <strong>initialization</strong> option.</p>
+          <h4>Source option</h4>
+          <p>When you are defining the source, you can also set an option, in this case <code>withCredentials</code> is used:</p>
+          <pre class="line-numbers"><code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
+  videojs('myPlayerID').ready(function(){
+    var myPlayer = this;
+    myPlayer.src({
+      src: 'https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8',
+      type: 'application/x-mpegURL',
+      <span class="bcls-highlight">withCredentials: true</span>
+    });
+  });
+&lt;/script&gt;</code></pre>
+            <h4>Initialization option</h4>
+            <p>You can also set options when initializing your player. In the following the <code>withCredentials</code> option is used in the examples.</p>
+            <pre class="line-numbers"><code class="language-javascript">// html5 for html HLS
+videojs(video, {html5: {
+  hls: {
+    withCredentials: true
+  }
+}});
+
+// or
+
+// Flash for Flash HLS
+videojs(video, {flash: {
+  hls: {
+    withCredentials: true
+  }
+}});
+
+// or
+
+var options = {hls: {
+  withCredentials: true;
+}};
+videojs(video, {flash: options, html5: options});</code></pre>
+            <p>You can configure the plugin using the <a href="../../player-management/index.html">Player Management API</a> using an HTTP <code>PATCH</code> method, as shown in the following code. Of course, this will apply at the player level.</p>
+            <pre class="line-numbers"><code class="language-json">curl \
   --header "Content-Type: application/json" \
   --user YOUR_EMAIL \
   --request PATCH \
   --data '{ "hls": { "withCredentials": true } }' \
-https://players.api.brightcove.com/v1/accounts/YOUR_ACCOUNT_ID/players/YOUR_PLAYER_ID/configuration</code></pre>
+  https://players.api.brightcove.com/v1/accounts/YOUR_ACCOUNT_ID/players/YOUR_PLAYER_ID/configuration</code></pre>
+          <h3><strong>withCredentials</strong></h3>
+          <p>Type: <code>boolean</code></p>
+          <ul>
+            <li><code>withCredentials</code> can be used as both a <strong>source</strong> and <strong>initialization</strong> option.</li>
+          </ul>
+          <p>When the <code>withCredentials</code> property is set to <code>true</code>, all XHR requests for manifests and segments would have <code>withCredentials</code> set to <code>true</code> as well. This enables storing and passing cookies from the server that the manifests and segments live on. This has some implications on CORS because when set, the <code>Access-Control-Allow-Origin</code> header cannot be set to <code>*</code>, also, the response headers require the addition of <code>Access-Control-Allow-Credentials</code> header which is set to <code>true</code>. See the  <a href="http://www.html5rocks.com/en/tutorials/cors/">HTML5Rocks's article</a> for more info.</p>
+          <aside class="bcls-aside bcls-aside--warning">Know Issue: <code>withCredentials</code> does NOT work with Desktop Safari and iPad (it does work on iPhone though).</aside>
           <p>You can also set the <code>withCredentials</code> option on a per source basis, rather than on a player basis as just shown. For instance, when setting the source you can include <code>withCredentials</code>, as shown here:</p>
           <pre class="line-numbers"><code class="language-json">curl \
-  --header "Content-Type: application/json" \
-  --user $EMAIL \
-  --request POST \
-  --data '{
-      "name": "MySamplePlayer",
-      "configuration": {
-        "media": {
-          "sources": [{
-            "src":"http://solutions.brightcove.com/bcls/assets/videos/Tiger.mp4",
-            "type":"video/mp4",
-            "withCredentials": true
-          }]
-        }
-      }
-    }' \
+--header "Content-Type: application/json" \
+--user $EMAIL \
+--request POST \
+--data '{
+"name": "MySamplePlayer",
+"configuration": {
+  "media": {
+    "sources": [{
+      "src":"http://solutions.brightcove.com/bcls/assets/videos/Tiger.mp4",
+      "type":"video/mp4",
+      "withCredentials": true
+    }]
+  }
+}
+}' \
 https://players.api.brightcove.com/v1/accounts/$ACCOUNT_ID/players</code></pre>
-          <aside class="bcls-aside bcls-aside--warning">Know Issue: <code>withCredentials</code> does NOT work with Desktop Safari and iPad (it does work on iPhone though).</aside>
+          <h3><strong>useCueTags</strong></h3>
+          <p>Type: <code>boolean</code></p>
+          <ul>
+            <li><code>useCueTags</code> must be used as <strong>initialization</strong> option.</li>
+          </ul>
+          <p>When the <code>useCueTags</code> property is set to <code>true</code>, a text track is created with the label <strong>ad-cues</strong> and kind <strong>metadata</strong>. The track is then added to <code>player.textTracks()</code>.</p>
         </section>
         <section id="runtimeproperties" class="bcls-section">
         <h2>Runtime properties</h2>
-          <h4>player.hls.playlists.master</h4>
-          <p>Type: <code>object</code></p>
-          <p>An object representing the parsed master playlist. If a media playlist is loaded directly, a master playlist with only one entry will be created.</p>
-          <h4>player.hls.playlists.media</h4>
-          <p>Type: <code>function</code></p>
-          <p>A function that can be used to retrieve or modify the currently active media playlist. The active media playlist is referred to when additional video data needs to be downloaded. Calling this function with no arguments returns the parsed playlist object for the active media playlist. Calling this function with a playlist object from the master playlist or a URI string as specified in the master playlist will kick off an asynchronous load of the specified media playlist. Once it has been retrieved, it will become the active media playlist.</p>
-          <h4>player.hls.mediaIndex</h4>
-          <p>Type: <code>number</code>
-          </p>
-          <p>The index of the next video segment to be downloaded from
-<code>player.hls.media</code>.</p>
-          <h4>player.hls.segmentXhrTime</h4>
-          <p>Type: <code>number</code></p>
-          <p>The number of milliseconds it took to download the last media segment. This value is updated after each segment download completes.</p>
-          <h4>player.hls.bandwidth</h4>
-          <p>Type: <code>number</code></p>
-          <p>The number of bits downloaded per second in the last segment download. This value is used by the default implementation of <code>selectPlaylist</code> to select an appropriate bitrate to play. Before the first video segment has been downloaded, it's hard to estimate bandwidth accurately. The HLS tech uses a heuristic based on the playlist download times to do this estimation by default. If you have a more accurate source of bandwidth information, you can override this value as soon as the HLS tech has loaded to provide an initial bandwidth estimate.</p>
-          <h4>player.hls.bytesReceived</h4>
-          <p>Type: <code>number</code></p>
-          <p>The total number of content bytes downloaded by the HLS tech.</p>
-
-          <h4 id="selectplaylist">player.hls.selectPlaylist</h4>
-          <p>Type: <code>function</code>
-          </p>
-          <p>A function that returns the media playlist object to use to download the next segment. It is invoked by the plugin immediately before a new segment is downloaded. You can override this function to provide your adaptive streaming logic. You must, however, be sure to return a valid media playlist object that is present in <code>player.hls.master</code>.</p>
+        <p>The properties listed in the table are either getters and/or setters that can be used with the HLS plugin. Following the table is code showing how to use the properties that can function as setters.</p>
+        <table class="bcls-table">
+          <thead class="bcls-table__head">
+            <tr>
+              <th>Property</th>
+              <th>Data Type</th>
+              <th>Getter and/or Setter</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody class="bcls-table__body">
+            <tr>
+              <td>hls.playlists.master</td>
+              <td>Object</td>
+              <td>Getter</td>
+              <td>An object representing the parsed master playlist. If a media playlist is loaded directly, a master playlist with only one entry will be created.</td>
+            </tr>
+            <tr>
+              <td>hls.playlists.media</td>
+              <td>Function</td>
+              <td>Getter & Setter</td>
+              <td>A function that can be used to retrieve or modify the currently active media playlist. The active media playlist is referred to when additional video data needs to be downloaded. Calling this function with no arguments returns the parsed playlist object for the active media playlist. Calling this function with a playlist object from the master playlist or a URI string as specified in the master playlist will kick off an asynchronous load of the specified media playlist. Once it has been retrieved, it will become the active media playlist.</td>
+            </tr>
+            <tr>
+              <td>hls.segmentXhrTime</td>
+              <td>Number</td>
+              <td>Getter</td>
+              <td>The number of milliseconds it took to download the last media segment. This value is updated after each segment download completes.</td>
+            </tr>
+            <tr>
+              <td>hls.bandwidth</td>
+              <td>Number</td>
+              <td>Getter & Setter</td>
+              <td>The number of bits downloaded per second in the last segment download. This value is used by the default implementation of <code>selectPlaylist</code> to select an appropriate bitrate to play. Before the first video segment has been downloaded, it's hard to estimate bandwidth accurately. The HLS tech uses a heuristic based on the playlist download times to do this estimation by default. If you have a more accurate source of bandwidth information, you can override this value as soon as the HLS tech has loaded to provide an initial bandwidth estimate.</td>
+            </tr>
+            <tr>
+              <td>hls.bytesReceived</td>
+              <td>Number</td>
+              <td>Getter</td>
+              <td>The total number of content bytes downloaded by the HLS tech.</td>
+            </tr>
+            <tr>
+              <td>hls.selectPlaylist</td>
+              <td>Function</td>
+              <td>Getter & Setter</td>
+              <td>A function that returns the media playlist object to use to download the next segment. It is invoked by the plugin immediately before a new segment is downloaded. You can override this function to provide your adaptive streaming logic. You must, however, be sure to return a valid media playlist object that is present in <code>player.hls.master</code>.</td>
+            </tr>
+            <tr>
+              <td>hls.representations</td>
+              <td>Function</td>
+              <td>Getter</td>
+              <td>It is recommended to include the <a href="https://github.com/videojs/videojs-contrib-quality-levels">videojs-contrib-quality-levels</a> plugin to your page so that <strong>videojs-contrib-hls</strong> will automatically populate the <code>QualityLevelList</code> exposed on the player by the plugin. You can access this list by calling <code>player.qualityLevels()</code>.</td>
+            </tr>
+            <tr>
+              <td>hls.xhr</td>
+              <td>Function</td>
+              <td>Getter</td>
+              <td>The xhr function that is used by HLS internally is exposed on the per-player <strong>hls</strong> object. While it is possible, Brightcove do not recommend replacing the function with your own implementation.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>As an example, the following code shows using <code>bandwidth</code> as a setter. You first create and <code>options</code> object, then initialize the player passing that object to the <code>videojs()</code> function.</p>
+        <pre class="line-numbers"><code class="language-javascript">&lt;script type=&quot;text/javascript&quot;&gt;
+  var options = {hls: {
+    bandwidth: 1
+  }};
+  videojs('myPlayerID', {flash: options, html5: options}).ready(function(){
+    var myPlayer = this;
+  });
+&lt;/script&gt;</code></pre>
         </section>
 
-        <section id="events" class="bcls-section">
-        <h2>Events</h2>
+        <section id="event" class="bcls-section">
+        <h2>Event</h2>
+        <p>There is one event associated with HLS content:</p>
           <h4>loadedmetadata</h4>
-          <p>Fired after the first media playlist is downloaded for a stream.</p>
-          <h4>loadedplaylist</h4>
-          <p>Fired immediately after a new master or media playlist has been downloaded. By default, the plugin only downloads playlists as they are needed.</p>
-          <h4>mediachange</h4>
-          <p>Fired when a new playlist becomes the active media playlist. Note that the actual rendering quality change does not occur simultaneously with this event; a new segment must be requested and the existing buffer depleted first.</p>
+          <p>Fired after the first segment is downloaded for a playlist. This will not happen until video playback, as opposed to a downloaded segment, if Video.js' <code>metadata</code> is set to <code>none</code>.</p>
       </section>
 
       <section id="Reload_source_on_error" class="bcls-section">
@@ -286,7 +373,7 @@ https://players.api.brightcove.com/v1/accounts/$ACCOUNT_ID/players</code></pre>
             <li>TXXX - User defined text information frame</li>
         </ul>
         <p> Cues are created for all other frame types and the data is attached to the generated cue:</p>
-        <pre class="line-numbers"><code class="language-javascript">cue.frame.data</code></pre>
+        <pre class="line-numbers"><code class="language-javascript">cue.value.data</code></pre>
         <p>For more information about text tracks in general see <a href="//www.html5rocks.com/en/tutorials/track/basics/">Getting Started With the Track Element</a>. For information on Brightcove Player and cue points see <a href="cue-points-guide.html">Using Cue Points</a>.</p>
       </section>
       <section id="608captions" class="bcls-section">
