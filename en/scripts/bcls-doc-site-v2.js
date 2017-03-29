@@ -583,19 +583,19 @@ var BCLSmain = (function (window, document, bclsNavData) {
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
                     }
                     // if section is brightcove-player, remove 'no-player' items from groups
-                    if (section === 'brightcove-player') {
-                        iMax = bclsNavData[product].sections[section].items.length;
-                        for (i = 0; i < iMax; i++) {
-                            item = bclsNavData[product].sections[section].items[i];
-                            j = item.groups.length;
-                            while (j > 0) {
-                                j--;
-                                if (item.groups[j] === "no-player") {
-                                    item.groups.splice(j, 1);
-                                }
-                            }
-                        }
-                    }
+                    // if (section === 'brightcove-player') {
+                    //     iMax = bclsNavData[product].sections[section].items.length;
+                    //     for (i = 0; i < iMax; i++) {
+                    //         item = bclsNavData[product].sections[section].items[i];
+                    //         j = item.groups.length;
+                    //         while (j > 0) {
+                    //             j--;
+                    //             if (item.groups[j] === "no-player") {
+                    //                 item.groups.splice(j, 1);
+                    //             }
+                    //         }
+                    //     }
+                    // }
 
                     // // if section is ingest profiles api, di api or cms api, set section to media management
                     // if (section === "ingest-profiles-api" || section === "di-api" || section === "cms-api") {
@@ -724,16 +724,16 @@ var BCLSmain = (function (window, document, bclsNavData) {
                         sectionName = bclsNavData[product].sections[section].name;
                     }
                     // if section is brightcove-player check for Video Cloud only items to remove from nav
-                    if (section === 'brightcove-player') {
-                        i = bclsNavData[product].sections[section].items.length;
-                        while (i > 0) {
-                            i--;
-                            if (isItemInArray(bclsNavData[product].sections[section].items[i].groups, 'no-player')) {
-                                bclsNavData[product].sections[section].items.splice(i, 1);
-                            }
-                        }
-                        bclslog('bclsNavData[product].sections[section]', bclsNavData[product].sections[section]);
-                    }
+                    // if (section === 'brightcove-player') {
+                    //     i = bclsNavData[product].sections[section].items.length;
+                    //     while (i > 0) {
+                    //         i--;
+                    //         if (isItemInArray(bclsNavData[product].sections[section].items[i].groups, 'no-player')) {
+                    //             bclsNavData[product].sections[section].items.splice(i, 1);
+                    //         }
+                    //     }
+                    //     bclslog('bclsNavData[product].sections[section]', bclsNavData[product].sections[section]);
+                    // }
                     // check to see if we're on the section landing page
                     if (pathArray[3] === "index.html") {
                         // we're on the section landing page
