@@ -39,7 +39,7 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
 </head>
 
-<body><script src="//docs.brightcove.com/en/scripts/redirect.js"></script>
+<body>
 	<!-- header navbar -->
 	<div id="navWrapper" class="fixed"></div>
 	<!-- breadcrumbs -->
@@ -75,11 +75,11 @@
     <article class="bcls-article">
 			<header id="bcls_header" class="bcls-header">
 				<!-- Place document intro sentence(s) here -->
-				<p>In this topic, you will learn how to use the FreeWheel plugin to enable advertisements with video playback, and how it can be implemented using Studio and through custom coding.</p>
+				<p>In this topic, you will learn how to use the FreeWheel plugin to enable advertisements with video playback, and how it can be implemented using <span class="video-cloud-only">Video Cloud Studio</span><span class="perform-only">Perform Studio</span> and through custom coding.</p>
 			</header>
       <section id="Overview" class="bcls-section">
         <h2>Overview</h2>
-        <p>This plugin enables FreeWheel ad technology, for either Flash or HTML5, in Brightcove Player. The default rendering option for the FreeWheel plugin is set to <strong>Flash</strong> first, <strong>Html5</strong> second (for more information see the <code>adTechOrder</code> option below). This does not ensure that FreeWheel renders Flash, as Flash will be selected only if Flash tech is supported, otherwise it will fallback to Html5.</p>
+        <p>This plugin enables FreeWheel ad technology, for either Flash or HTML5, in Brightcove Player. The plugin will attempt to select the best rendering option to be used for the lifetime of the player. The default rendering option for the FreeWheel plugin is set to <strong>Flash</strong> first, <strong>Html5</strong> second (for more information see the <code>adTechOrder</code> option below). This does not ensure that FreeWheel renders Flash, as Flash will be selected only if Flash tech is supported, otherwise it will fallback to Html5.</p>
       </section>
       <section id="usingversions" class="bcls-section">
         <h2>Using versions of the plugin</h2>
@@ -110,7 +110,7 @@
         </table>
         <aside class="bcls-aside bcls-aside--information">* Compatible with FreeWheel Flash Plugin version 6.4.6</aside>
         <p>If you happen to be using version 0.7.2 of the FreeWheel plugin (for use with Brightcove Player version 1.x), you will want to use the SWF located at <strong>//players.brightcove.net/videojs-freewheel/0.7.2/videojs.freewheel.swf</strong>.</p>
-        <p>For reference, the versions of the plugin and compatible SWFs are tracked in the <a href="//docs.brightcove.com/en/player/brightcove-player/reference/plugin-version-reference.html">Plugin Version Reference</a> document.</p>
+        <p>For reference, the versions of the plugin and compatible SWFs are tracked in the <a href="//docs.brightcove.com/en/video-cloud/brightcove-player/reference/plugin-version-reference.html">Plugin Version Reference</a> document.</p>
       </section>
 
       <section id="testadserver" class="bcls-section">
@@ -158,8 +158,8 @@
         <h2>Implement using code</h2>
           <p>To implement a plugin the player needs to know the location of the plugin code, a stylesheet if needed, the plugin name and plugin configuration options. The location of the plugin code and stylesheet are as follows:</p>
             <ul>
-              <li>//players.brightcove.net/videojs-freewheel/2/videojs-freewheel.min.js</li>
-              <li>//players.brightcove.net/videojs-freewheel/2/videojs-freewheel.min.css</li>
+              <li>//players.brightcove.net/videojs-freewheel/1/videojs-freewheel.min.js</li>
+              <li>//players.brightcove.net/videojs-freewheel/1/videojs-freewheel.min.css</li>
       </ul>
         <p>The name of the plugin is <code>FreeWheelPlugin</code>. The options configure playback technology where <code>Flash</code> and <code>Html5</code> configuration sections are provided by FreeWheel. A slightly altered (for security reasons) complete configuration is shown <a href="#exampleconfiguration">below</a> .  A stub example is shown here:</p>
         <pre class="line-numbers"><code class="language-javascript">{
@@ -181,7 +181,8 @@
               <li>Line 90: Uses a <code>link</code> tag to include the plugin's CSS in the <code>head</code> of the HTML page.</li>
               <li>Line 92: Gives the <code>video</code> tag an <code>id</code> attribute, with some value, in this case <strong>myPlayerID</strong>.</li>
               <li>Line 100: Uses a <code>script</code> tag to include the plugin's JavaScript in the <code>body</code> of the HTML page.</li>
-              <li>Lines 105-125: Initialize the plugin and pass in custom options.</li>
+              <li><p>Lines 105-125: Initialize the plugin and pass in custom options. Here, you listen for the first <code>loadedmetadata</code> event, which is fired when the player content, including ads, is loaded in the player.</p>
+                  <aside class="bcls-aside bcls-aside--tip">Note: While the <code>ready()</code> method is used to indicate that the player is loaded and ready, the <code>loadedmetadata</code> event is used to indicate that the player content, like ads, is ready to interact with. Here, you are also using the <code>one()</code> method so that our function is executed the first time the plugin is loaded and not every time a video is loaded. For details, see the <a href="../../brightcove-player/guides/events.html">Understanding Player Events</a> document.</aside></li>
               <li>Line 107: Creates a reference to the player.</li>
           </ul>
           <pre class="line-numbers" data-start="90"><code class="language-html">&lt;link href=&quot;//players.brightcove.net/videojs-freewheel/2/videojs-freewheel.min.css&quot; rel=&quot;stylesheet&quot;&gt;
@@ -199,7 +200,7 @@
 &lt;script&gt;
   var myPlayer;
 
-  videojs(&quot;myPlayerID&quot;).ready(function(){
+  videojs(&quot;myPlayerID&quot;).one('loadedmetadata',function(){
     // get a reference to the player
     myPlayer = this;
 
@@ -272,16 +273,31 @@
             <td>flash</td>
           </tr>
         </table>
-        <aside class="bcls-aside bcls-aside--information">Note: For the best user experience when delivering midrolls, you should use a segmented delivery format like HLS and deliver your content from a CDN that supports byte­range requests.</aside>
+        <p>The following table shows the supported ad types based on the Tech (playback technology) the FreeWheel plugin is using to render the ad.</p>
+        <table>
+          <tr>
+            <th>FreeWheel plugin Tech</th>
+            <th>Supported Ads</th>
+          </tr>
+          <tr>
+            <td>HTML5</td>
+            <td>pre-roll, mid-roll, post-roll, overlay</td>
+          </tr>
+          <tr>
+            <td>Flash</td>
+            <td>pre-roll, mid-roll, post-roll, overlay</td>
+          </tr>
+        </table>
+        <aside class="bcls-aside bcls-aside--information">Note: For the best user experience when delivering midrolls, you should use a segmented delivery format like HLS and deliver your content from a CDN that supports byte­range requests. See the <a href="//support.brightcove.com/en/video-cloud/docs/html5-mid-roll-ads">HTML5 Mid-roll Ads</a> document for more information on the complexities of delivering midrolls ads.</aside>
       </section>
       <section id="properties" class="bcls-section">
-        <h2>Configuration</h2>
-        <p>The following settings are used to configure the Freewheel plugin:</p>
+        <h2>Properties</h2>
+        <p>The following plugin properties are used to control the Freewheel plugin:</p>
     		<ul>
           <li><strong>adTechOrder</strong>:
             <ul>
               <li>Type: <code>Array</code> Default Value: <code>["flash","html5"]</code></li>
-              <li>The array contains the ad integration technologies to attempt to use, in order of descending precedence.</li>
+              <li>The array contains the ad integration technologies to attempt to use, in order of descending precedence. The FreeWheel plugin will test each ad tech in order on initialization and use the first supported one for the lifetime of the player.</li>
             </ul>
           </li>
           <li><strong>Flash</strong>:
@@ -290,7 +306,7 @@
               <li>An object for Tech specific FreeWheel configuration (provided by FreeWheel). The object contains the <code>swfurl</code> property, detailed here:</li>
               <li><strong>swfurl</strong>:
                 <ul>
-                  <li>Type: <code>String</code> Default Value: <code>//players.brightcove.net/videojs-freewheel/2/videojs.freewheel.swf</code> (compatible with FW Flash SDK v6.4.6)</li>
+                  <li>Type: <code>String</code> Default Value: <code>//players.brightcove.net/videojs-freewheel/1/videojs.freewheel.swf</code> (compatible with FW Flash SDK v6.4.6)</li>
                   <li>Must be a child property of the <code>Flash</code> object. The path to the Freewheel Flash plugin. This will be directly applied to the object element if the Flash ad tech is used.</li>
                   <li>
                     Optional values can be used based on FreeWheel Flash Plugin Version. Those values can be found in the <strong>Using versions of the plugin</strong> section near the top of this document.
@@ -328,7 +344,11 @@
                 </ul>
               </li>
             </ul>
-          <aside class="bcls-aside bcls-aside--warning">Note: When using cue point ads with the FreeWheel plugin, post-roll ads are not supported.
+          <aside class="bcls-aside bcls-aside--warning">There are a number of known issues to be aware of when using cue points ads with the FreeWheel plugin:
+            <ul>
+              <li>An ad cue point set at the end of the content duration does not always play on some platforms. This could be seen on the iPad 8, iPhone 9 and Safari desktop platforms.</li>
+              <li>When an ad cue point is set at the end of the content duration the ad will play, but content will replay. This will be seen on the Android 5 & 6, iPhone 8, iPad 9 and iOS 10 platforms.</li>
+            </ul>
           </aside>
         </li>
           <li><strong>useMediaCuePoints</strong>:
@@ -342,7 +362,7 @@
 
       <section id="adMacros" class="bcls-section">
           <h2>Ad macros</h2>
-          <p>There are ad macros available to make your job easier when configuring FreeWheel. The ad macros are replaced with corresponding values anywhere in your configuration.</p>
+          <p>There are ad macros available to make your job easier when configuring FreeWheel. They should be placed within the FreeWheel configuration's <strong>videoAssetId</strong>.</p>
           <p>The following is the complete list of variable for which substituted values will be used:</p>
           <table class="table-styles">
             <thead>
@@ -577,7 +597,7 @@
               </tr>
               <tr>
                 <td>fw-before-ad-request</td>
-                <td>This event is exposed on the player object and is triggered before submitting an ad request. Usually it is used in the context of playlists, to make updates to the FreeWheel Configuration settings via: <code>player.FreeWheelPlugin.settings.Html5</code> or <code>player.FreeWheelPlugin.settings.Flash</code></td>
+                <td>This event is exposed on the player object and is triggered before submiting an ad request. Usually it is used in the context of playlists, to make updates to the FreeWheel Configuration settings via: <code>player.FreeWheelPlugin.settings.Html5</code> or <code>player.FreeWheelPlugin.settings.Flash</code></td>
               </tr>
             </tbody>
           </table>
@@ -596,7 +616,7 @@
           allowfullscreen
           webkitallowfullscreen
           mozallowfullscreen></iframe>
-        <p>Following is the actual configuration used with the player. Note that this can be used for the <strong>options</strong> value in <span class="video-cloud-only">Video Cloud</span><span class="player-only">Perform</span> Studio.</p>
+        <p>Following is the actual configuration used with the player. Note that this can be used for the <strong>options</strong> value in <span class="video-cloud-only">Video Cloud</span><span class="perform-only">Perform</span> Studio.</p>
         <pre class="line-numbers"><code class="language-json">    {
       "Flash": {
         "networkId": 90750,
@@ -662,7 +682,7 @@
           allowfullscreen
           webkitallowfullscreen
           mozallowfullscreen></iframe>
-        <p>Following is the actual configuration used with the player. Note that this can be used for the <strong>options</strong> value in <span class="video-cloud-only">Video Cloud</span><span class="player-only">Perform</span> Studio.</p>
+        <p>Following is the actual configuration used with the player. Note that this can be used for the <strong>options</strong> value in <span class="video-cloud-only">Video Cloud</span><span class="perform-only">Perform</span> Studio.</p>
         <pre class="line-numbers"><code class="language-json">    {
       "Flash": {
         "networkId": 90750,
@@ -723,22 +743,15 @@
       "timeout": 5000
     }</code></pre>
         <h3>Playlist</h3>
-        <p>This demo uses the Flash first configuration with a playlist. You will see for each video in the playlist a pre-roll, a mid-roll at the 5 second mark, and a post-roll.</p>
-        <!-- <video data-playlist-id="4845949311001"
+        <p>This demo uses the Flash first configuration with a playlist. You will see for each video in the playlist a pre-roll and also a mid-roll at the 5 second mark.</p>
+        <video data-playlist-id="4845949311001"
           data-account="1752604059001"
           data-player="r1bhBb0Pe"
           data-embed="default"
           class="video-js"
           controls></video>
         <script src="//players.brightcove.net/1752604059001/r1bhBb0Pe_default/index.min.js"></script>
-        <ol class="vjs-playlist"></ol> -->
-
-        <iframe src="//players.brightcove.net/1752604059001/r1bhBb0Pe_default/index.html?playlistId=4845949311001"
-          allowfullscreen
-          webkitallowfullscreen
-          mozallowfullscreen
-          width="428.57"
-          height="150"></iframe>
+        <ol class="vjs-playlist"></ol>
       </section>
       <section id="knownissues" class="bcls-section">
         <h2>Known issues</h2>
@@ -748,7 +761,7 @@
             <li>FreeWheel ads in a live stream is not currently a supported use case.</li>
         </ul>
       </section>
-      <!-- <section id="contribads" class="bcls-section">
+      <section id="contribads" class="bcls-section">
         <h2>Player Ad Libraries</h2>
         <p>The <a href="https://github.com/videojs/videojs-contrib-ads">videojs/videojs-contrib-ads</a> GitHub repository contains a plugin which provides common functionality needed by video advertisement libraries working with Brightcove Player. The plugin provides common functionality needed by video ad integrations and takes care of a number of concerns for ad integrators, reducing the code you have to write for your ad integration.</p>
         <p>For instance, the functionality in <a href="https://github.com/videojs/videojs-contrib-ads">videojs/videojs-contrib-ads</a> allows you to check the current <strong>state</strong> property on a player to determine whether an ad is playing or not. States change frequently during the pre-roll "handshake"  but are otherwise usually one of <code>content-playback</code> or <code>ad-playback</code>, defined by:</p>
@@ -757,7 +770,7 @@
             <li><code>player.ads.state === 'content-playback'</code> (this is the state when <code>adend</code> is called)</li>
         </ul>
         <p>The readme for the repository contains a state diagram on the README which covers the details of the pre-roll states.</p>
-      </section> -->
+      </section>
       <section id="changelog" class="bcls-section">
         <h2>Changelog</h2>
 
