@@ -14,7 +14,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
             "video-cloud": "#dd712e",
             "once": "#85a93e",
             "live": "#85a93e",
-            "perform": "#35498D"
+            "player": "#35498D"
         },
         gettingStartedBlock = document.getElementById("getting-started"),
         pageIndexBlock = document.getElementById("page-index"),
@@ -35,7 +35,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
         path = window.location.pathname,
         section,
         subsection,
-        performOnly = document.getElementsByClassName("perform-only"),
+        playerOnly = document.getElementsByClassName("player-only"),
         videoCloudOnly = document.getElementsByClassName("video-cloud-only"),
         groupObj = {},
         alphaArr = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
@@ -268,14 +268,14 @@ var BCLSmain = (function (window, document, bclsNavData) {
             sectionEl = sectionElements[i];
             switch (product) {
             case "video-cloud":
-                if (!hasClass(sectionEl, "perform-only")) {
+                if (!hasClass(sectionEl, "player-only")) {
                     navObj = {};
                     navObj.link = sectionEl.getAttribute("id");
                     navObj.text = sectionEl.children[0].innerHTML;
                     navLabel.push(navObj);
                 }
                 break;
-            case "perform":
+            case "player":
                 if (!hasClass(sectionEl, "video-cloud-only")) {
                     navObj = {};
                     navObj.link = sectionEl.getAttribute("id");
@@ -316,8 +316,10 @@ var BCLSmain = (function (window, document, bclsNavData) {
             }
         }
         if (isDefined(sectionName)) {
-            if (section === "video-cloud" || section === "perform" || section === "player-management") {
+            if (section === "video-cloud" || section === "player" ) {
                 str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + sectionName.toLowerCase() + "/index.html\"><strong>" + sectionName.replace("-", " ") + "</strong></a></li>";
+            } else if (section === "player-management-api") {
+                str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + section + "/index.html\"><strong>" + sectionName.replace("-", " ") + "</strong></a></li>";
             } else {
                 str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + section + "/index.html\"><strong>" + section.replace("-", " ") + "</strong></a></li>";
             }
@@ -375,7 +377,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
         // set background color for title area elements
         setAttributeOnNodeList(titleArea, "style", "background-color:" + productColors.index + ";");
         if (product !== "index") {
-            titleStr += product + "/index.html\"><img src=\"" + bclsNavData[product].image + "\" /></a>";
+            titleStr += product + "/index.html\"><img src=\"" + bclsNavData[product].image + "\" style=\"height:30px;\"/></a>";
         } else {
             titleStr += "index.html\">" + bclsNavData[product].image + "</a>";
         }
@@ -542,8 +544,8 @@ var BCLSmain = (function (window, document, bclsNavData) {
                 searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script-video-cloud.js");
                 // append the search script to the appropriate div in the nav bar
                 searchBar.appendChild(searchScript);
-                // hide anything perform-only
-                setAttributeOnNodeList(performOnly, "style", "display:none");
+                // hide anything player-only
+                setAttributeOnNodeList(playerOnly, "style", "display:none");
                 productName = "Video Cloud";
                 if (pathArray[2] === "index.html") {
                     // on video cloud landing page
@@ -582,20 +584,20 @@ var BCLSmain = (function (window, document, bclsNavData) {
                     } else {
                         sectionName = bclsNavData["video-cloud"].sections[section].name;
                     }
-                    // if section is brightcove-player, remove 'no-perform' items from groups
-                    if (section === 'brightcove-player') {
-                        iMax = bclsNavData[product].sections[section].items.length;
-                        for (i = 0; i < iMax; i++) {
-                            item = bclsNavData[product].sections[section].items[i];
-                            j = item.groups.length;
-                            while (j > 0) {
-                                j--;
-                                if (item.groups[j] === "no-perform") {
-                                    item.groups.splice(j, 1);
-                                }
-                            }
-                        }
-                    }
+                    // if section is brightcove-player, remove 'no-player' items from groups
+                    // if (section === 'brightcove-player') {
+                    //     iMax = bclsNavData[product].sections[section].items.length;
+                    //     for (i = 0; i < iMax; i++) {
+                    //         item = bclsNavData[product].sections[section].items[i];
+                    //         j = item.groups.length;
+                    //         while (j > 0) {
+                    //             j--;
+                    //             if (item.groups[j] === "no-player") {
+                    //                 item.groups.splice(j, 1);
+                    //             }
+                    //         }
+                    //     }
+                    // }
 
                     // // if section is ingest profiles api, di api or cms api, set section to media management
                     // if (section === "ingest-profiles-api" || section === "di-api" || section === "cms-api") {
@@ -692,22 +694,22 @@ var BCLSmain = (function (window, document, bclsNavData) {
                 navMenuRight.innerHTML = menuRightBase + onceSupportNav;
                 // createNavigation();
                 break;
-            case "perform": // in perform
-                product = "perform";
+            case "player": // in player
+                product = "player";
                 // get a reference to search block
                 searchBar = document.getElementById("searchBar");
                 // set the source for the script that generates the search field
-                searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script-perform.js");
+                searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script-player.js");
                 // append the search script to the appropriate div in the nav bar
                 searchBar.appendChild(searchScript);
                 redirectArray = pathArray.slice(0, 3);
                 landingPagePath = "//docs.brightcove.com/" + redirectArray.join("/") + "/index.html";
-                // hide anything video-cloud-only
-                setAttributeOnNodeList(videoCloudOnly, "style", "display:none");
-                productName = "Perform";
+                // hide anything player-only
+                setAttributeOnNodeList(playerOnly, "style", "display:none");
+                productName = "Player";
                 if (pathArray[2] === "index.html") {
-                    // on perform landing page
-                    section = "perform";
+                    // on player landing page
+                    section = "player";
                     sectionName = null;
                     subsection = null;
                     createLandingPageSections(bclsNavData[product].sections[section]);
@@ -719,21 +721,21 @@ var BCLSmain = (function (window, document, bclsNavData) {
                     if (section === "concepts") {
                         sectionName = "Concepts";
                         subsection = null;
-                        section = "perform";
+                        section = "player";
                     } else {
                         sectionName = bclsNavData[product].sections[section].name;
                     }
                     // if section is brightcove-player check for Video Cloud only items to remove from nav
-                    if (section === 'brightcove-player') {
-                        i = bclsNavData[product].sections[section].items.length;
-                        while (i > 0) {
-                            i--;
-                            if (isItemInArray(bclsNavData[product].sections[section].items[i].groups, 'no-perform')) {
-                                bclsNavData[product].sections[section].items.splice(i, 1);
-                            }
-                        }
-                        bclslog('bclsNavData[product].sections[section]', bclsNavData[product].sections[section]);
-                    }
+                    // if (section === 'brightcove-player') {
+                    //     i = bclsNavData[product].sections[section].items.length;
+                    //     while (i > 0) {
+                    //         i--;
+                    //         if (isItemInArray(bclsNavData[product].sections[section].items[i].groups, 'no-player')) {
+                    //             bclsNavData[product].sections[section].items.splice(i, 1);
+                    //         }
+                    //     }
+                    //     bclslog('bclsNavData[product].sections[section]', bclsNavData[product].sections[section]);
+                    // }
                     // check to see if we're on the section landing page
                     if (pathArray[3] === "index.html") {
                         // we're on the section landing page

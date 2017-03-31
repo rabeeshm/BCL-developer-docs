@@ -13,7 +13,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             "index": "#333333",
             "video-cloud": "#dd712e",
             "once": "#85a93e",
-            "perform": "#35498D"
+            "player": "#35498D"
         },
         highlightBackgroundColor = "#000000",
         $this,
@@ -43,13 +43,13 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         menuRightBase = "<li class=\"search\"><a href=\"#\" data-reveal-id=\"searchModal\"><img src=\"//docs.brightcove.com/en/images/search-white.png\" alt=\"search_icon_small_white\" width=\"18\" height=\"18\"></a></li><li class=\"show-for-xlarge-up\"><a href=\"http://docs.brightcove.com/en/DeveloperDocumentationUpdates.xml\"><img src=\"//docs.brightcove.com/en/images/rss-feed-sm.png\" alt=\"rss-feed-sm\" width=\"14\" height=\"14\"></a></li>",
         vcSupportNav = "<li class=\"smaller show-for-xlarge-up\"><a href=\"//support.brightcove.com\">Support</a></li>",
         onceSupportNav = "<li class=\"smaller show-for-xlarge-up\"><a href=\"mailto:oncesupport@brightcove.com\">Support</a></li>",
-        performSupportNav = "vcSupportNav",
+        playerSupportNav = "vcSupportNav",
         navItemTemplate = "<li><a href=\"{{url}}\" title=\"{{name}}\">{{name}}</a></li>",
         navDropdownStartTemplate = "<li class=\"has-dropdown\"><a href=\"#\">{{name}}</a><ul class=\"dropdown\">",
         navDropdownEndTemplate = "</ul></li>",
         titleAreaTemplate = "<nav class=\"top-bar\" data-topbar><ul class=\"title-area\"><li class=\"name\" id=\"siteTitle\"><a href=\"//docs.brightcove.com/en/index.html\"><img class=\"bcls-logo bcls-float-left\" src=\"//docs.brightcove.com/en/images/bc-logo-small.png\" alt=\"Brightcove\">DEVELOPER DOCS</a></li><li class=\"toggle-topbar menu-icon\"><a href=\"#\"><span>Menu</span></a></li></ul><section class=\"top-bar-section\"><ul id=\"navMenuLeft\" class=\"left\"></ul></section><section class=\"top-bar-section\"><ul id=\"navMenuRight\" class=\"right\"></ul></section></nav>",
         videoCloudSearchTemplate = "<div class=\"container\"><div class=\"region region-search\"><section id=\"block-search-api-page-new\" class=\"block block-search-api-page\"><div><a class=\"close-reveal-modal\">&#215;</a></div><div id=\"searchBar\"><script> (function() { var cx = '017969773216783359937:o1ckbxwaxt4'; var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true; gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//cse.google.com/cse.js?cx=' + cx; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s); })(); </script> <gcse:search></gcse:search></div></section>",
-        performSearchTemplate = "<div class=\"container\"><div class=\"region region-search\"><section id=\"block-search-api-page-new\" class=\"block block-search-api-page\"><div><a class=\"close-reveal-modal\">&#215;</a></div><div id=\"searchBar\"><script> (function() { var cx = '017969773216783359937:r6x5xhtqr5w'; var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true; gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//cse.google.com/cse.js?cx=' + cx; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s); })(); </script> <gcse:search></gcse:search></div></section>",
+        playerSearchTemplate = "<div class=\"container\"><div class=\"region region-search\"><section id=\"block-search-api-page-new\" class=\"block block-search-api-page\"><div><a class=\"close-reveal-modal\">&#215;</a></div><div id=\"searchBar\"><script> (function() { var cx = '017969773216783359937:r6x5xhtqr5w'; var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true; gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//cse.google.com/cse.js?cx=' + cx; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s); })(); </script> <gcse:search></gcse:search></div></section>",
         onceSearchTemplate = "<div class=\"container\"><div class=\"region region-search\"><section id=\"block-search-api-page-new\" class=\"block block-search-api-page\"><div><a class=\"close-reveal-modal\">&#215;</a></div><div id=\"searchBar\"><script> (function() { var cx = '017969773216783359937:tzowaqv9txq'; var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true; gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//cse.google.com/cse.js?cx=' + cx; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s); })(); </script> <gcse:search></gcse:search></div></section>",
         submenuBlockStart = "<div class=\"large-3 small-12 columns\" style=\"overflow-x:hidden\"><h2>{{name}}</h2>",
         submenuBlockMiddle = "<h3 class=\"index-page\">{{name}}</h3><ul>{{#items}}<li><a href=\"{{url}}\">{{name}}</a></li>{{/items}}</ul>",
@@ -186,14 +186,14 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                 $this = $(this);
                 switch (product) {
                 case "video-cloud":
-                    if (!$this.hasClass("perform-only")) {
+                    if (!$this.hasClass("player-only")) {
                         navObj = {};
                         navObj.link = $this.attr("id");
                         navObj.text = $this.find("h2:first").text();
                         navLabel.push(navObj);
                     }
                     break;
-                case "perform":
+                case "player":
                     if (!$this.hasClass("video-cloud-only")) {
                         navObj = {};
                         navObj.link = $this.attr("id");
@@ -262,7 +262,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             }
         }
         if (exists(sectionName)) {
-            if (section === "video-cloud" || section === "perform" || section === "player-management") {
+            if (section === "video-cloud" || section === "player" || section === "player-management") {
                 str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + sectionName.toLowerCase() + "/index.html\"><strong>" + sectionName.replace("-", " ") + "</strong></a></li>";
             } else {
                 str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + section + "/index.html\"><strong>" + section.replace("-", " ") + "</strong></a></li>";
@@ -359,7 +359,7 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
         $navWrapper.find("nav,ul,section,li,a").attr("style", "background-color:#333333;");
         $titleArea.find("ul,li,a,img").attr("style", "background-color:#333333;");
         if (product !== "index") {
-            titleStr += product + "/index.html\"><img src=\"" + bclsNavData[product].image + "\"/></a>";
+            titleStr += product + "/index.html\"><img src=\"" + bclsNavData[product].image + "\" style=\"height:30px;\"/></a>";
         } else {
             titleStr += "index.html\">" + bclsNavData[product].image + "</a>";
         }
@@ -555,8 +555,8 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
             case "video-cloud": // in video cloud
                 product = "video-cloud";
                 $searchModal.html(videoCloudSearchTemplate);
-                // hide anything perform-only
-                $(".perform-only").hide();
+                // hide anything player-only
+                $(".player-only").hide();
                 productName = "Video Cloud";
                 if (pathArray[2] === "index.html") {
                     // on video cloud landing page
@@ -679,97 +679,6 @@ var BCLSmain = (function ($, window, console, document, Handlebars, bclsNavData,
                                 createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
                             }
                             break;
-                        case "players-module":
-                            subsectionName = "Players Module";
-
-dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modulesIndex].items, "name", subsectionName);
-                            bclslog("player data index", dataIndex);
-                            // check to see if on landing page
-                            if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section].items[modulesIndex].items[dataIndex]);
-                            } else {
-                                // we're in a subsubsection
-                                subsubsection = pathArray[4];
-                                // set subsubsection name
-                                switch (subsubsection) {
-                                case "creating-players":
-                                    subsubsectionName = "Create Players";
-                                    break;
-                                case "getting-started":
-                                    subsubsectionName = "Get Started";
-                                    break;
-                                case "managing-accounts":
-                                    subsubsectionName = "Manage Accounts";
-                                    break;
-                                case "publishing-players":
-                                    subsubsectionName = "Publish Player";
-                                    break;
-                                }
-                                // subsubsectionName = bclsNavData.studio.items[subsection].items[subsubsection].name;
-                                // bclslog("subsubsectionName", subsubsectionName);
-                                if (pathArray[5] === "index.html") {
-                                    // on subsubsection landing page
-                                    createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
-                                }
-                            }
-                            break;
-                        case "upload-module":
-                            subsectionName = "Upload Module";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modulesIndex].items, "name", subsectionName);
-                            bclslog("upload data index", dataIndex);
-                            // check to see if on landing page
-                            if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section].items[modulesIndex].items[dataIndex]);
-                            } else {
-                                // we're in a subsubsection
-                                subsubsection = pathArray[4];
-                                switch (subsubsection) {
-                                case "getting-started":
-                                    subsubsectionName = "Get Started";
-                                    break;
-                                }
-
-                                // subsubsectionName = bclsNavData.studio.items[subsection].items[subsubsection].name;
-                                // bclslog("subsubsectionName", subsubsectionName);
-                                if (pathArray[5] === "index.html") {
-                                    // on subsubsection landing page
-                                    createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
-                                }
-                            }
-                            break;
-                        case "media-module":
-                            subsectionName = "Media Module";
-                            dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modulesIndex].items, "name", subsectionName);
-                            // check to see if on landing page
-                            if (pathArray[4] === "index.html") {
-                                createLandingPageSections(bclsNavData[product].sections[section].items[modulesIndex].items[dataIndex]);
-                            } else {
-                                // we're in a subsubsection
-                                subsubsection = pathArray[4];
-                                switch (subsubsection) {
-                                case "getting-started":
-                                    subsubsectionName = "Get Started";
-                                    break;
-                                case "managing-videos":
-                                    subsubsectionName = "Manage Videos";
-                                    if (pathArray[5] === "index.html") {
-                                        createSubsectionLandingPageSections();
-                                    }
-                                    break;
-                                case "publishing-videos":
-                                    subsubsectionName = "Publish Videos";
-                                    if (pathArray[5] === "index.html") {
-                                        createSubsectionLandingPageSections();
-                                    }
-                                    break;
-                                }
-                                // bclslog("subsubsectionName", subsubsectionName);
-                                if (pathArray[5] === "index.html") {
-                                    // on subsubsection landing page
-                                    createLandingPageSections(bclsNavData[product].sections[section].items[dataIndex]);
-                                }
-                            }
-                            break;
                         case "references":
                             subsectionName = "API References";
                             dataIndex = findObjectInArray(bclsNavData[product].sections[section].items, "name", subsectionName);
@@ -877,15 +786,15 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
                 $navMenuRight.html(menuRightBase + onceSupportNav);
                 // createNavigation();
                 break;
-            case "perform": // in perform
-                product = "perform";
-                $searchModal.html(performSearchTemplate);
+            case "player": // in player
+                product = "player";
+                $searchModal.html(playerSearchTemplate);
                 // hide anything video-cloud-only
                 $(".video-cloud-only").hide();
-                productName = "Perform";
+                productName = "Player";
                 if (pathArray[2] === "index.html") {
-                    // on perform landing page
-                    section = "perform";
+                    // on player landing page
+                    section = "player";
                     sectionName = null;
                     subsection = null;
                     createLandingPageSections(bclsNavData[product].sections[section]);
@@ -897,11 +806,11 @@ dataIndex = findObjectInArray(bclsNavData[product].sections[section].items[modul
                     if (section === "concepts") {
                         sectionName = "Concepts";
                         subsection = null;
-                        section = "perform";
+                        section = "player";
                     } else if (section === "forums") {
                         sectionName = "Forums";
                         subsection = null;
-                        section = "perform";
+                        section = "player";
                     } else {
                         sectionName = bclsNavData[product].sections[section].name;
                     }

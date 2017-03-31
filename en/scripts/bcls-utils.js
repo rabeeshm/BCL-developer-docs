@@ -35,6 +35,40 @@ var BCLS_expander = (function(window, document) {
     }
 })(window, document);
 
+var BCLS_player_fix = ( function (window, document) {
+    var vc,
+        bp,
+        sideNav = document.getElementsByClassName('side-nav')[0],
+        vcContent = document.getElementsByClassName('video-cloud-only'),
+        bpContent = document.getElementsByClassName('perform-only'),
+        toggleStr = '<li><button id="vc" class="bcls-button__version" style="background-color:#293b70;">Video Cloud version</button> <button id="bp" class="bcls-button__version">Brightcove Player Version</button> <a style="font-size:smaller;" href="//docs.brightcove.com/en/video-cloud/brightcove-player/getting-started/versions.html">(What\'s the difference?)</a><hr></li>',
+        iMax, i;
+
+    function hideElements(elements) {
+        var iMax = elements.length, i;
+        for (i = 0; i < iMax; i++) {
+            elements[i].setAttribute('style', 'display:none');
+        }
+    }
+    function showElements(elements) {
+        var iMax = elements.length, i;
+        for (i = 0; i < iMax; i++) {
+            elements[i].setAttribute('style', 'display:initial');
+        }
+    }
+    function addStyle(e) {
+        e.setAttribute('style', 'background-color:#293b70;');
+    }
+
+    function removeStyle(e) {
+        e.removeAttribute('style');
+    }
+
+    if (vc.length !== 0 || bp.length !== 0) {
+        sideNav.insertAdjacentHTML('afterBegin', toggleStr);
+    }
+})(window, document);
+
 var BCLS_faq = (function (window, document) {
     'use strict';
     var // elements
