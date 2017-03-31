@@ -704,8 +704,8 @@ var BCLSmain = (function (window, document, bclsNavData) {
                 searchBar.appendChild(searchScript);
                 redirectArray = pathArray.slice(0, 3);
                 landingPagePath = "//docs.brightcove.com/" + redirectArray.join("/") + "/index.html";
-                // hide anything video-cloud-only
-                setAttributeOnNodeList(videoCloudOnly, "style", "display:none");
+                // hide anything player-only
+                setAttributeOnNodeList(playerOnly, "style", "display:none");
                 productName = "Player";
                 if (pathArray[2] === "index.html") {
                     // on player landing page
