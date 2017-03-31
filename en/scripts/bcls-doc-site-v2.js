@@ -316,8 +316,10 @@ var BCLSmain = (function (window, document, bclsNavData) {
             }
         }
         if (isDefined(sectionName)) {
-            if (section === "video-cloud" || section === "player" || section === "player-management") {
+            if (section === "video-cloud" || section === "player" ) {
                 str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + sectionName.toLowerCase() + "/index.html\"><strong>" + sectionName.replace("-", " ") + "</strong></a></li>";
+            } else if (section === "player-management-api") {
+                str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + section + "/index.html\"><strong>" + sectionName.replace("-", " ") + "</strong></a></li>";
             } else {
                 str += "<li><a href=\"//docs.brightcove.com/en/" + product + "/" + section + "/index.html\"><strong>" + section.replace("-", " ") + "</strong></a></li>";
             }
