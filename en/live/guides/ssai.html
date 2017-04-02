@@ -164,7 +164,7 @@ Content-Type: application/json</code></pre>
                 <h2>Create an ad configuration</h2>
                 <p>To create a new ad configuration, send a <code>POST</code> request to:</p>
                 <pre class="line-numbers"><code class="language-http">https://api.bcovlive.io/v1/ssai/application</code></pre>
-                <h4>Sample request body</h4>
+                <h3>Sample request body</h3>
 <pre class="line-numbers"><code class="language-json">{
     "application_ad_configuration": {
         "ad_configuration_description": "Human readable description of the configuration",
@@ -180,7 +180,7 @@ Content-Type: application/json</code></pre>
     "application_description": "Human readable description of the ad application",
     "account_id": <span class="bcls-input">"USER'S ACCOUNT ID" [Optional - When omitted, Account ID of requesting user is used]</span>
 }</code></pre>
-                <h4>Sample response</h4>
+                <h3>Sample response</h3>
 <pre class="line-numbers"><code class="language-json">{
   "application": {
     "account_id": "USER ACCOUNT ID",
@@ -206,7 +206,7 @@ Content-Type: application/json</code></pre>
                 <h3>Update an ad configuration</h3>
                 <p>Updating an ad configuration is very similar to creating one. Make a <code>PUT</code> request to:</p>
                 <pre class="line-numbers"><code class="language-http">https://api.bcovlive.io/v1/ssai/application/<span class="bcle-input">APPLICATION_ID</span></code></pre>
-                <h4>Sample request body</h4>
+                <h3>Sample request body</h3>
 <pre class="line-numbers"><code class="language-json">{
     "application_ad_configuration": {
         "ad_configuration_description": "Some Updated Description Value",
@@ -222,8 +222,8 @@ Content-Type: application/json</code></pre>
     "application_description": "Human readable description of the ad application",
     "account_id": <span class="bcls-input">"USER'S ACCOUNT ID" [Optional - When omitted, Account ID of requesting user is used]</span>
 }</code></pre>
-                <h4>Sample response</h4>
-<pre class="line-numbers">{
+                <h3>Sample response</h3>
+<pre class="line-numbers"><code class="language-json">{
     "account_id": "USER ACCOUNT ID",
     "application_description": "Human readable description of the ad application",
     "application_ad_configuration": {
@@ -239,7 +239,7 @@ Content-Type: application/json</code></pre>
         "ad_configuration_url_format": "https://updated-ad-provider-host.com/path/to/ad-handler?ip={{client.ipaddress}}&amp;num={{random.int32}}&amp;ses={{session.session_id}}"
     },
     "application_id": <span class="bcle-highlight">"APPLICATION ID"</span>
-}<code class="language-json"></code></pre>
+}</code></pre>
             </section>
             <section id="Get_all_ad_configurations" class="bcls-section">
                 <h2>Get all ad configurations</h2>
@@ -281,7 +281,35 @@ Content-Type: application/json</code></pre>
             <section id="Get_an_ad_configuration" class="bcls-section">
                 <h2>Get an ad configuration</h2>
                 <p>You can also retrieve a specific ad configuration by its <code>application_id</code> by sending <code>GET</code> request to:</p>
-                <pre class="line-numbers"><code class="language-http"></code></pre>
+                <pre class="line-numbers"><code class="language-http">https://api.bcovlive.io/v1/ssai/application/<span class="bcle-input">APPLICATION_ID</span></code></pre>
+                <h3>Sample response</h3>
+<pre class="line-numbers"><code class="language-json">{
+  "application_id": "APPLICATION_ID",
+  "application_description": "Test DFP Single Midroll",
+  "application_ad_configuration": {
+    "ad_configuration_description": "DFP Test Config Single Midroll",
+    "ad_configuration_strategy": "MultipleAdResponse",
+    "ad_configuration_transforms": [
+      {
+        "xslt": "&lt;xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:Det=\"http://Det.com\"&gt;&lt;xsl:output omit-xml-declaration=\"yes\"/&gt;&lt;xsl:template match=\"node()|@*\"&gt;&lt;xsl:copy&gt;&lt;xsl:apply-templates select=\"node()|@*\"/&gt;&lt;/xsl:copy&gt;&lt;/xsl:template&gt;&lt;/xsl:stylesheet&gt;",
+        "xpath": "/"
+      }
+    ],
+    "ad_configuration_url_format": "https://ad-provider-host.com/path/to/ad-handler?ip={{client.ipaddress}}&amp;num={{random.int32}}&amp;ses={{session.session_id}}",
+    "ad_configuration_expected_response_type": "Dfp"
+  },
+  "account_id": "ACCOUNT_ID"
+}</code></pre>
+            </section>
+            <section id="Delete_an_ad_configuration" class="bcls-section">
+                <h2>Delete an ad configuration</h2>
+                <p>To delete an ad configuration, send a <code>DELETE</code> request to:</p>
+                <pre class="line-numbers"><code class="language-http">https://api.bcovlive.io/v1/ssai/application/<span class="bcle-input">APPLICATION_ID</span></code></pre>
+                <h3>Sample response</h3>
+<pre class="line-numbers"><code class="language-json">{
+  "application_id": "APPLICATION_ID",
+  "deleted": true
+}</code></pre>
             </section>
             <section id="Cuepoints" class="bcls-section">
                 <h2>Cuepoints</h2>
@@ -305,14 +333,22 @@ Content-Type: application/json</code></pre>
                 <h3>Manual insertion</h3>
                 <p></p>
             </section>
-            <section id="Managing slates" class="bcls-section">
-                <h2>Managing slates</h2>
+            <section id="Manual_cue_point_insertion" class="bcls-section">
+                <h2>Manual cue point insertion</h2>
                 <p>You can also create immediate cuepoints using the Live API by sending a <code>POST</code> request to:</p>
                 <pre class="line-numbers"><code class="language-http">https://api.bcovlive.io/v1/jobs/:jobId/cuepoint</code></pre>
-                <p>Include a request body specifying the duration of the break:</p>
+                <p>Include a request body specifying the duration of the break in seconds:</p>
                 <pre class="line-numbers"><code class="language-json">{
    "duration":30
 }</code></pre>
+            </section>
+            <section id="Managing_slates" class="bcls-section">
+                <h2>Managing slates</h2>
+                <p>Slates are your own assets used to fill unused ad time. You can use slates to provide a "be right back" message or any content that you like.</p>
+                <p>Below are details of the API requests to add and manage slate assets.</p>
+                <h3>Ingest slate media source asset</h3>
+                <p>To add a new slate asset, submit a <code>POST</code> request to:</p>
+                <pre class="line-numbers"><code class="language-http"></code></pre>
             </section>
             <!-- end drupal content -->
         </div>
