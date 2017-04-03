@@ -348,7 +348,190 @@ Content-Type: application/json</code></pre>
                 <p>Below are details of the API requests to add and manage slate assets.</p>
                 <h3>Ingest slate media source asset</h3>
                 <p>To add a new slate asset, submit a <code>POST</code> request to:</p>
-                <pre class="line-numbers"><code class="language-http"></code></pre>
+                <pre class="line-numbers"><code class="language-http">https://api.bcovlive.io/v1/ssai/slate</code></pre>
+                <h4>Sample request body</h4>
+<pre class="line-numbers"><code class="language-json">{
+    "source_url": "https://somesourceasset.com/slate-to-ingest.mp4",
+    <em>"account_id": "ACCOUNT_ID", [Optional - When omitted, Account ID of the requesting user is used.</em>
+    <em>"source_description": "User identifiable description for the slate" [Optional]</em>
+}</code></pre>
+                <h4>Sample response</h4>
+<pre class="line-numbers"><code class="language-json">{
+  "media_source_asset_id": "NEW_UUID",
+  "account_id": "ACCOUNT_ID",
+  "media_source_asset_default": false,
+  "media_source_asset_type": "slate",
+  "media_source_asset_url": "https://somesourceasset.com/slate-to-ingest.mp4",
+  "media_source_asset_status": "transcoding"
+  "media_source_asset_description": "User identifiable description for the slate"
+}</code></pre>
+                <h3>Delete slate media source asset</h3>
+                <p>To delete a slate media asset, send a <code>DELETE</code> request to:</p>
+                <pre class="line-numbers"><code class="language-http">https://api.bcovlive.io/v1/ssai/slate/<span class="bcls-input">SLATE_MSA_ID</span></code></pre>
+                <h4>Sample response</h4>
+<pre class="line-numbers"><code class="language-json">{
+  "media_source_asset_id": "MSA_UUID",
+  "media_source_asset_type": "slate",
+  "media_source_asset_url": "http://someS3urlpath/media.mp4",
+  "media_source_asset_default": false,
+  "media_source_asset_status": "ready",
+  "account_id": "ACCOUNT_ID"
+}</code></pre>
+                <h3>Get slate media source assets</h3>
+                <p>You can retrieve an array of all the slate assets for an account by sending a <code>GET</code> request to:</p>
+                <pre class="line-numbers"><code class="language-http">https://api.bcovlive.io/v1/ssai/slates/<span class="bcls-input">ACCOUNT_ID</span></code></pre>
+                <h4>Sample response</h4>
+<pre class="line-numbers"><code class="language-json">[
+  {
+    "media_source_asset_id": "MSA_UUID_1",
+    "media_source_asset_type": "slate",
+    "media_source_asset_default": false,
+    "media_source_asset_url": "http://someS3urlpath.com/media.mp4",
+    "account_id": "ACCOUNT_ID",
+    "media_source_asset_status": "ready"
+  },
+  {
+    "media_source_asset_id": "MSA_UUID_2",
+    "media_source_asset_type": "slate",
+    "media_source_asset_default": true,
+    "media_source_asset_url": "http://someS3urlpath.com/media.mp4",
+    "account_id": "ACCOUNT_ID",
+    "media_source_asset_status": "ready"
+  }
+]</code></pre>
+            </section>
+            <section id="Beacons" class="bcls-section">
+                <h2>Beacons</h2>
+                <p>Beacons are data points on playback sent to ad servers to track whether and how much of ads were played. In this section we will look at the beacon types that can be set using the Live API, and variables that can be used to provide the data. The next section will detail the API requests use to create and manage beacon sets.</p>
+                <h3>Beacon types</h3>
+                <table class="bcls-table">
+                    <caption class="bcls-caption--table">Beacon Types</caption>
+                    <thead class="bcls-table__head">
+                        <tr>
+                            <th style="width:20%;">Beacon Type</th>
+                            <th style="width:60%;word-wrap:break-word">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bcls-table__body">
+                        <tr>
+                            <td style="width:20%">Load</td>
+                            <td style="text-align:left;width:60%;word-wrap:break-word">Fired once per session and only triggered when top level manifest is requested</td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">Play</td>
+                            <td style="text-align:left;width:60%;word-wrap:break-word">Content has been requested and the first segment returned</td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">Heartbeat</td>
+                            <td style="text-align:left;width:60%;word-wrap:break-word">Configurable on some interval</td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">AdStart</td>
+                            <td style="text-align:left;width:60%;word-wrap:break-word">Individual ad started</td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">AdFirstQuartile</td>
+                            <td style="text-align:left;width:60%;word-wrap:break-word">First ad quartile (25%)</td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">AdMidpoint</td>
+                            <td style="text-align:left;width:60%;word-wrap:break-word">Second ad quartile (50%)</td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">AdThirdQuartile</td>
+                            <td style="text-align:left;width:60%;word-wrap:break-word">Third ad quartile (75%)</td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">AdComplete</td>
+                            <td style="text-align:left;width:60%;word-wrap:break-word">Individual ad completed</td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">AdBreakStart</td>
+                            <td style="text-align:left;width:60%;word-wrap:break-word">Ad break has started</td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">AdBreakComplete</td>
+                            <td style="text-align:left;width:60%;word-wrap:break-word">ad break has ended</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Valid beacon variables</h3>
+                <p>The table below shows the variables you can use to provide data for the beacon URLs. To include a </p>
+                <table class="bcls-table">
+                    <caption class="bcls-caption--table">Beacon Variables</caption>
+                    <thead class="bcls-table__head">
+                        <tr>
+                            <th style="width:20%;">Variable</th>
+                            <th style="width:60%;"><div style="word-wrap:break-word;">Description</div></th>
+                        </tr>
+                    </thead>
+                    <tbody class="bcls-table__body">
+                        <tr>
+                            <td style="width:20%">session.session_id</td>
+                            <td style="text-align:left;width:60%;"><div style="word-wrap:break-word;">unique session id</div></td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">job.job_id</td>
+                            <td style="text-align:left;width:60%;"><div style="word-wrap:break-word;">unique job id</div></td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">application_ad_configuration.description</td>
+                            <td style="text-align:left;width:60%;"><div style="word-wrap:break-word;">description value of the application at session creation</div></td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">random.int32</td>
+                            <td style="text-align:left;width:60%;"><div style="word-wrap:break-word;">random 32-bit signed integer</div></td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">random.int64</td>
+                            <td style="text-align:left;width:60%;"><div style="word-wrap:break-word;">random 64-bit signed integer</div></td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">random.uint32</td>
+                            <td style="text-align:left;width:60%;"><div style="word-wrap:break-word;">random 32-bit unsigned integer</div></td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">random.uint64</td>
+                            <td style="text-align:left;width:60%;"><div style="word-wrap:break-word;">random 64-bit unsigned integer</div></td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">random.uuid</td>
+                            <td style="text-align:left;width:60%;"><div style="word-wrap:break-word;">random uuid</div></td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">server.timestamputc</td>
+                            <td style="text-align:left;width:60%;"><div style="word-wrap:break-word;">epoch time in ms when the call from the ads-api has been made</div></td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">client.useragent</td>
+                            <td style="text-align:left;width:60%;"><div style="word-wrap:break-word;">http user-agent header value at session creation</div></td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">client.ipaddress</td>
+                            <td style="text-align:left;width:60%;"><div style="word-wrap:break-word;">http x-forwarded-for header value at session creation, if provided, otherwise the remote address</div></td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">client.referrer</td>
+                            <td style="text-align:left;width:60%;"><div style="word-wrap:break-word;">http referer header value at session creation (correct spelling)</div></td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">client.referer</td>
+                            <td style="text-align:left;width:60%;"><div style="word-wrap:break-word;">http referer header value at session creation (http spelling)</div></td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">live.adbreak</td>
+                            <td style="text-align:left;width:60%;"><div style="word-wrap:break-word;">(currently unused)</div></td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">live.adbreakduration</td>
+                            <td style="text-align:left;width:60%;"><div style="word-wrap:break-word;">double-precision floating-point value in seconds</div></td>
+                        </tr>
+                        <tr>
+                            <td style="width:20%">live.adbreakdurationint</td>
+                            <td style="text-align:left;width:60%;"><div style="word-wrap:break-word;">integer value in seconds</div></td>
+                        </tr>
+                    </tbody>
+                </table>
             </section>
             <!-- end drupal content -->
         </div>
