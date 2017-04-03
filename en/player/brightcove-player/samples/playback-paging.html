@@ -203,7 +203,6 @@
                           firstTime = true,
                           requestURL,
                           eNextButton = document.getElementById("nextButton"),
-                          eApiRequest = document.getElementById('apiRequest'),
                           playlistLength;
 
                       videojs("myPlayerID").ready(function(){
@@ -252,7 +251,6 @@
                           requestURL = apiBaseURL +  accountId + '/playlists/' + playlistId;
                         } else {
                           requestURL = apiBaseURL +  accountId + '/playlists/' + playlistId + '?offset=' + offsetValue + '&limit=' + limitValue;
-                          eApiRequest.innerHTML = requestURL.trim();
                         }
 
                         return requestURL;
@@ -387,17 +385,17 @@
                       <li>Add the following JavaScript to your page code:
 
                     <ul>
-                        <li>Lines 2-18: Define variables. Use your own values for the Policy Key, Account Id and Playlist Id.</li>
-                        <li>Line 21: Gets a reference to the player when it is ready.</li>
-                        <li>Lines 23-27: Make a call to the Playback API to get the total number of videos in the playlist.</li>
-                        <li>Line 29: Makes a call to the Playback API to get the first set of videos in the playlist and loads them into the player.</li>
-                        <li>Lines 30-36: Add a listener to the <strong>Next Videos</strong> button. When selected, make a call to the Playback API to get the next set of videos in the playlist and load them into the player.</li>
-                        <li>Lines 42-46: Make a request to the Playback API to get a set of videos from the playlist.</li>
-                        <li>Line 49: Loads the first video object into the player.</li>
-                        <li>Line 50: Loads the current set of video objects into the playlist.</li>
-                        <li>Lines 61-67: Set the Playback API request URL. First time, all videos are returned for the playlist. After that, the next set of videos are returned from the playlist, using the <code>limit</code> and <code>offset</code> parameters.</li>
+                        <li>Lines 2-17: Define variables. Use your own values for the Policy Key, Account Id and Playlist Id.</li>
+                        <li>Line 20: Gets a reference to the player when it is ready.</li>
+                        <li>Lines 22: Makes a call to the Playback API to get the total number of videos in the playlist.</li>
+                        <li>Line 24: Makes a call to the Playback API to get the first set of videos in the playlist and loads them into the player.</li>
+                        <li>Lines 27-33: Add a listener to the <strong>Next Videos</strong> button. When selected, make a call to the Playback API to get the next set of videos in the playlist and load them into the player.</li>
+                        <li>Lines 37-47: Make a request to the Playback API to get a set of videos from the playlist.</li>
+                        <li>Line 44: Loads the first video object into the player.</li>
+                        <li>Line 45: Loads the current set of video objects into the playlist.</li>
+                        <li>Lines 52-63: Set the Playback API request URL. First time, all videos are returned for the playlist. After that, the next set of videos are returned from the playlist, using the <code>limit</code> and <code>offset</code> parameters.</li>
                         <li><p>
-                          Lines 75-111: Make the Playback API request using the request URL along with the Policy Key in the header.
+                          Lines 68-103: Make the Playback API request using the request URL along with the Policy Key in the header.
                         </p></li>
                     </ul>
 <pre class="line-numbers" data-start="1"><code class="language-javascript">&lt;script type=&quot;text/javascript&quot;&gt;
@@ -416,7 +414,6 @@
       firstTime = true,
       requestURL,
       eNextButton = document.getElementById(&quot;nextButton&quot;),
-      eApiRequest = document.getElementById('apiRequest'),
       playlistLength;
 
   videojs(&quot;myPlayerID&quot;).ready(function(){
@@ -425,9 +422,7 @@
       requestData = setRequestData();
       // make the Playback API request to get playlist data
       getMediaData('playlist', requestData, function (mediaData) {
-          // console.log(&quot;mediaData= &quot;,mediaData);
           playlistLength = mediaData.videos.length;
-          // console.log(&quot;playlistLength= &quot;,playlistLength);
           displayPlaylist();
           eNextButton.addEventListener(&quot;click&quot;,function(){
             offsetValue += 3;
@@ -442,11 +437,9 @@
   function displayPlaylist() {
     // set up data for Playback API request
     requestData = setRequestData();
-    // console.log(&quot;requestData= &quot;,requestData);
     mediaType = 'playlist';
     // make the Playback API request to get playlist data
     getMediaData(mediaType, requestData, function (mediaData) {
-        // console.log(&quot;mediaData= &quot;,mediaData);
         // add the newest videos list to the player as a playlist
         myPlayer.catalog.load(mediaData.videos[0]);
         myPlayer.playlist(mediaData.videos);
@@ -457,7 +450,6 @@
    * sets up the data for the API request
    */
   function setRequestData() {
-    console.log(&quot;setRequestData&quot;);
     var endPoint = '';
 
     if (firstTime) {
@@ -465,7 +457,6 @@
       requestURL = apiBaseURL +  accountId + '/playlists/' + playlistId;
     } else {
       requestURL = apiBaseURL +  accountId + '/playlists/' + playlistId + '?offset=' + offsetValue + '&amp;limit=' + limitValue;
-      eApiRequest.innerHTML = requestURL.trim();
     }
 
     return requestURL;
@@ -485,7 +476,6 @@
             if (httpRequest.status === 200) {
               responseData = httpRequest.responseText;
               parsedData = JSON.parse(responseData);
-              console.log(&quot;parsedData&quot;,parsedData);
               switch (mediaType) {
                 case 'video':
                   // do nothing
