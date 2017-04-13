@@ -97,7 +97,7 @@
 
             <section id="selectimplementation" class="bcls-section">
                 <h2>Select implementation</h2>
-                <p>In this example, you will test with the In-Page embed code and then add the CSS and JavaScript files to the player. Then, you will deploy the plugin. With the custom playlist plugin added to the player, you can use the in-page implementation.</p>
+                <p>In this sample, you will test with the Advanced (In_page) embed code and then move the CSS and JavaScript into a plugin. Since the playlist interacts with the page elements, the iframe implementation will not be used.</p>
             </section>
 
             <section id="resources" class="bcls-section">
@@ -189,6 +189,7 @@
     </code></pre>
                     <aside class="bcls-aside bcls-aside--tip">For details on how to get this embed code, see the <a href="../../brightcove-player/getting-started/quick-start-bc-player.html">Quick Start to Brightcove Player</a> document.</aside>
                   </li>
+                </ol>
 
                 <h3>The stylesheet</h3>
                 <p>This example plugin uses CSS styles for the playlist and the playlist items. Here is the CSS code:</p>
@@ -236,9 +237,7 @@
   }
   /*style for the thumbnail images*/
   .bcls-title {
-      /*background-color: #141B17;*/
       color: #fff;
-      /*opacity: .8;*/
       font-size: .7em;
       font-family: sans-serif;
       font-weight: bold;
@@ -267,186 +266,152 @@
             <h3 id="jscode">The JavaScript code</h3>
             <p>The JavaScript code for the plugin is shown below:</p>
             <pre class="line-numbers"><code class="language-javascript">/**
- * Brightcove player plugin that displays a playlist
- * as a row of thumbnail images along the bottom of the
- * player
- * @option {integer} width - the width of the player and playlist in pixels
- *
- * created by Robert Crooks, Brightcove Learning Services, rcrooks@brightcove.com
- * last modified: 2015-09-15
+ * Plugin to manage a custom playlist
  */
-videojs.plugin('customPlaylist', function (options) {
-    var myPlayer = this,
-        playlistItems;
+ /**
+  * Brightcove player plugin that displays a playlist
+  * as a row of thumbnail images along the bottom of the
+  * player
+  *
+  */
+  videojs.plugin('customPlaylist',function() {
+     var myPlayer = this,
+         playlistData,
+         playlistItems,
+         videoItem,
+         itemTitle,
+         itemInnerDiv,
+         playlistWrapper;
 
-    /**
-     * tests for all the ways a variable might be undefined or not have a value
-     * @param {*} x the variable to test
-     * @return {Boolean} true if variable is defined and has a value
-     */
-    function isDefined(x) {
-        if (x === &quot;&quot; || x === null || x === undefined || x === NaN) {
-            return false;
-        }
-        return true;
-    }
-    // handle loadedmetadata just once, it fires again with each video load
-    myPlayer.one('loadedmetadata', function () {
-        var playerEl = myPlayer.el(),
-            playerParent = playerEl.parentNode,
-            i,
-            iMax,
-            playerWrapper = document.createElement('div'),
-            playlistWrapper = document.createElement('div'),
-            playlistItem,
-            itemInnerDiv,
-            itemTitle,
-            playlistData = myPlayer.playlist(),
-            videoItem,
-            playerWidth = isDefined(options.width) ? options.width : myPlayer.width(),
-            playerHeight = (9 / 16) * playerWidth;
-        /**
-         * removes highlight from all playlist items
-         */
-        function clearHighlight() {
-            var i,
-                iMax = playlistItems.length;
-            for (i = 0; i &lt; iMax; i++) {
-                playlistItems[i].setAttribute('style', '2px solid #141B17');
-            }
-        }
+     myPlayer.one('loadstart', function() {
+         playlistWrapper = document.createElement('div');
+         playlistWrapper.className = &quot;bcls-playlist-wrapper&quot;;
+     });
 
-        /**
-         * highlights the current playlist item
-         */
-        function setHighlight() {
-            var index = myPlayer.playlist.currentItem();
-            // override the background color
-            playlistItems[index].setAttribute('style', 'border:2px solid #80CBC4;');
-        }
+     myPlayer.one('loadedmetadata', function() {
+         playlistData = myPlayer.playlist();
+         myPlayer.el().parentNode.appendChild(playlistWrapper);
 
-        /**
-         * loads a playlist item that was clicked on
-         */
-        function loadPlaylistItem() {
-            // item index in playlist array
-            var index = parseInt(this.getAttribute('data-playlist-index'), 10);
-            myPlayer.playlist.currentItem(index);
-            myPlayer.play();
-        }
-        // add styles to wrapper and player and playlist wrapper
-        playerWrapper.setAttribute('style', 'width:' + playerWidth + 'px;');
-        playerWrapper.setAttribute('class', 'bcls-player-wrapper');
-        playerEl.setAttribute('style', 'width:100%;height:' + playerHeight + 'px;');
-        playlistWrapper.setAttribute('class', 'bcls-playlist');
-        // the following needed for iframe embed only
-        playlistWrapper.setAttribute('style', 'top:' + playerHeight + 'px;');
-        // insert a div to wrap the player and playlist before the player
-        playerParent.insertBefore(playerWrapper, playerEl);
-        // now append the player to the new div
-        playerWrapper.appendChild(playerEl);
-        // append the playlist wrapper to the new div
-        playerWrapper.appendChild(playlistWrapper);
-        // build the playlist items
-        iMax = playlistData.length;
-        for (i = 0; i &lt; iMax; i++) {
-            videoItem = playlistData[i];
-            // create the playlist item and set its class and style
-            playlistItem = document.createElement('div');
-            playlistItem.setAttribute('data-playlist-index', i);
-            playlistItem.setAttribute('class', 'bcls-playlist-item');
-            // create the inner div and set class and style
-            itemInnerDiv = document.createElement('div');
-            itemInnerDiv.setAttribute('class', 'bcls-item-inner-div');
-            itemInnerDiv.setAttribute('style', 'background-image:url(' + videoItem.thumbnail + ');');
-            // create the title and set its class
-            itemTitle = document.createElement('span');
-            itemTitle.setAttribute('class', 'bcls-title');
-            // add the video name to the title element
-            itemTitle.appendChild(document.createTextNode(videoItem.name));
-            // now append the title to the innerdiv,
-            // the innerdiv to the item,
-            // and the item to the playlist
-            itemInnerDiv.appendChild(itemTitle);
-            playlistItem.appendChild(itemInnerDiv);
-            playlistWrapper.appendChild(playlistItem);
-        }
+         /**
+          * highlights the current playlist item
+          */
+         function clearHighlight() {
+             var i,
+                 iMax = playlistItems.length;
+             for (i = 0; i &lt; iMax; i++) {
+                 playlistItems[i].setAttribute('style', '2px solid #141B17');
+             }
+         }
 
-        // highlight playlist item when new video starts
-        myPlayer.on('play', function () {
-            clearHighlight();
-            setHighlight();
-        });
-        // set click listeners on playlist items
-        playlistItems = document.getElementsByClassName('bcls-playlist-item');
-        iMax = playlistItems.length;
-        for (i = 0; i &lt; iMax; i++) {
-            playlistItems[i].addEventListener('click', loadPlaylistItem);
-        }
-        // initially highlight the first item
-        // but make sure playlist isn't empty
-        if (iMax &gt; 0) {
-            setHighlight();
-        }
-    });
-});</code></pre>
+         function setHighlight() {
+             var index = myPlayer.playlist.currentItem();
+             // override the background color
+             playlistItems[index].setAttribute('style', 'border:2px solid #80CBC4;');
+         }
+
+         /**
+          * loads a playlist item that was clicked on
+          */
+         function loadPlaylistItem() {
+             // item index in playlist array
+             var index = parseInt(this.getAttribute('data-playlist-index'), 10);
+             myPlayer.playlist.currentItem(index);
+             myPlayer.play();
+         }
+
+         playlistWrapper.style.width = myPlayer.width() + &quot;px&quot;;
+
+         for (i = 0; i &lt; playlistData.length; i++) {
+             videoItem = playlistData[i];
+             // create the playlist item and set its class and style
+             playlistItem = document.createElement('div');
+             playlistItem.setAttribute('data-playlist-index', i);
+             playlistItem.setAttribute('class', 'bcls-playlist-item');
+             // create the inner div and set class and style
+             itemInnerDiv = document.createElement('div');
+             itemInnerDiv.setAttribute('class', 'bcls-item-inner-div');
+             itemInnerDiv.setAttribute('style', 'background-image:url(' + videoItem.thumbnail + ');');
+             // create the title and set its class
+             itemTitle = document.createElement('span');
+             itemTitle.setAttribute('class', 'bcls-title');
+             // add the video name to the title element
+             itemTitle.appendChild(document.createTextNode(videoItem.name));
+             // now append the title to the innerdiv,
+             // the innerdiv to the item,
+             // and the item to the playlist
+             itemInnerDiv.appendChild(itemTitle);
+             playlistItem.appendChild(itemInnerDiv);
+             playlistWrapper.appendChild(playlistItem);
+         }
+
+         myPlayer.on('play', function() {
+             clearHighlight();
+             setHighlight();
+         });
+         // set click listeners on playlist items
+         playlistItems = document.getElementsByClassName('bcls-playlist-item');
+         iMax = playlistItems.length;
+         for (i = 0; i &lt; iMax; i++) {
+             playlistItems[i].addEventListener('click', loadPlaylistItem);
+         }
+
+     });
+ });</code></pre>
             <ol class="bcls-tasklist">
                 <li>Save the code in a new file called
-                    <strong>custom-playlist.js</strong> and include it in your HTML page, after the player embed code, using a
-                    <code>script</code> tag.</li>
-                <li>Now use the standard code to check the player is ready to communicate with in another <code>script</code> block following the one you added in the previous step.
+                    <strong>custom-playlist.js</strong>.</li>
+                <li>After the player embed code, use a
+                    <code>&lt;script&gt;</code> tag to add the JavaScript to your HTML page.
+                  <pre class="line-numbers"><code class="language-html">
+&lt;script src=&quot;custom-playlist.js&quot;&gt;&lt;/script&gt;</code></pre>
+                    </li>
+
+                <li>Next, add another <code>&lt;script&gt;</code> block following the one you added in the previous step. Here, you will get a reference to the player once it is ready and initialize the <code>customPlaylist</code> plugin.
                   <pre class="line-numbers"><code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
   videojs('player').ready(function(){
     var player = this;
+    player.customPlaylist();
   });
 &lt;/script&gt;</code></pre>
                 </li>
-                <li>Now initialize the plugin, passing a
-                    <code>width</code> option to it.
-                    <pre class="line-numbers"><code class="language-html">  &lt;script type=&quot;text/javascript&quot;&gt;
-    videojs('player').ready(function(){
-      var player = this,
-        options = {&quot;width&quot;: 600};
-      player.customPlaylist(options);
-    });
-  &lt;/script&gt;</code></pre>
-                </li>
-                <li>Your HTML code should now look like this:
+                <li>Your complete HTML code should look similar to this:
                   <pre class="line-numbers"><code class="language-html">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
     &lt;head&gt;
         &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
-        &lt;title&gt;My Custom Playlist Player&lt;/title&gt;
+        &lt;title&gt;Custom Playlist Player&lt;/title&gt;
+        &lt;link rel=&quot;stylesheet&quot; href=&quot;custom-playlist.css&quot;&gt;
     &lt;/head&gt;
-    &lt;link rel=&quot;stylesheet&quot; href=&quot;./custom-playlist.css&quot;&gt;
-    &lt;body&gt;
-    &lt;h1&gt;My Custom Playlist Player&lt;/h1&gt;
-    &lt;video
-        id=&quot;player&quot;
-        data-playlist-id=&quot;4452341376001&quot;
-        data-account=&quot;1752604059001&quot;
-        data-player=&quot;45dcbbdf-2807-4422-8fc7-5a1eb04d3f38&quot;
-        data-embed=&quot;default&quot;
-        class=&quot;video-js&quot; controls&gt;&lt;/video&gt;
-    &lt;script src=&quot;//players.brightcove.net/1752604059001/45dcbbdf-2807-4422-8fc7-5a1eb04d3f38_default/index.min.js&quot;&gt;&lt;/script&gt;
 
-    &lt;script src=&quot;./custom-playlist.js&quot;&gt;&lt;/script&gt;
+    &lt;body&gt;
+    &lt;h1&gt;Custom Playlist Player&lt;/h1&gt;
+
+    &lt;video id=&quot;myPlayer&quot;
+      data-playlist-id=&quot;5282200243001&quot;
+      data-account=&quot;1752604059001&quot;
+      data-player=&quot;default&quot;
+      data-embed=&quot;default&quot;
+      data-application-id
+      class=&quot;video-js&quot;
+      controls
+      width=&quot;640&quot;
+      height=&quot;360&quot;&gt;&lt;/video&gt;
+    &lt;script src=&quot;//players.brightcove.net/1752604059001/default_default/index.min.js&quot;&gt;&lt;/script&gt;
+
+    &lt;script src=&quot;custom-playlist.js&quot;&gt;&lt;/script&gt;
 
     &lt;script type=&quot;text/javascript&quot;&gt;
-      videojs('player').ready(function(){
-        var player = this,
-          options = {&quot;width&quot;: 600};
-        player.customPlaylist(options);
+      videojs('myPlayer').ready(function(){
+        var player = this;
+        player.customPlaylist();
       });
     &lt;/script&gt;
 
     &lt;/body&gt;
-&lt;/html&gt;</code></pre>
+&lt;/html&gt;
+</code></pre>
                 </li>
-                <li>Now browse the page through your local or remote web server - you should see something like this:
-                  <figure class="bcls-figure">
-                      <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/playlists/sample-custom-playlist/test-page.png" alt="test page">
-                  </figure>
+                <li>Browse the page through your local or remote web server. You should see the player with the horizontal playlist below it.
                 </li>
             </ol>
           </section>
@@ -459,8 +424,8 @@ videojs.plugin('customPlaylist', function (options) {
                     <li>Place the CSS and JavaScript files in an Internet accessible URL. These could be public Dropbox URLs or any other public URLs.</li>
                 </ol>
 
-                <h3>Deploy plugin and CSS</h3>
-                <p>To deploy the overlay button Plugin using the Players module, follow these steps:</p>
+                <h3>Implement using Players module</h3>
+                <p>To implement your plugin using the Players module, follow these steps:</p>
                 <ol class="bcls-tasklist">
                     <li>In the new Video Cloud Studio, open the
                         <strong>Players</strong> module and locate the player.</li>
@@ -472,68 +437,49 @@ videojs.plugin('customPlaylist', function (options) {
                         <strong>JavaScript URL</strong>, enter the URL which specifies the location of where you saved your plugin's JavaScript.</li>
                     <li>For the
                         <strong>CSS URL</strong>, enter the URL which specifies the location of where you saved your plugin's CSS.</li>
-                    <li>For the
-                        <strong>Name</strong>, enter <strong>customPlaylist</strong>.</li>
-                    <li>For the <strong>Options</strong>, set the width to <strong>600</strong>:
-                      <pre class="line-numbers"><code class="language-json">{
-  "width": 600
-}</code></pre>
+                    <li>For the <strong>Name</strong>, enter your plugin name. In this example, we are using <strong>customPlaylist</strong>.
+
+                      <figure class="bcls-figure">
+                         <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/player-development/playlists/sample-custom-playlist/plugin-name.png" alt="custom playlist plugin name">
+                         <figcaption class="bcls-caption--image">custom playlist plugin name</figcaption>
+                      </figure>
                     </li>
-                    <li>Click
-                        <strong>Save</strong> and then
-                        <strong>Publish</strong> the player.</li>
+                    <li>Save and publish your changes.</li>
+            <li>Copy the <strong>Advanced</strong> (In-Page) embed code and place it within your HTML page. Your page should look similar to this:
+              <pre class="line-numbers" data-start="1"><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+        &lt;title&gt;Custom Playlist Player&lt;/title&gt;
+    &lt;/head&gt;
+
+    &lt;body&gt;
+    &lt;h1&gt;Custom Playlist Player&lt;/h1&gt;
+
+      &lt;video data-playlist-id=&quot;5282200243001&quot;
+        data-account=&quot;1752604059001&quot;
+        data-player=&quot;BJLVLPK6l&quot;
+        data-embed=&quot;default&quot;
+        data-application-id
+        class=&quot;video-js&quot;
+        controls
+        width=&quot;640&quot;
+        height=&quot;360&quot;&gt;&lt;/video&gt;
+      &lt;script src=&quot;//players.brightcove.net/1752604059001/BJLVLPK6l_default/index.min.js&quot;&gt;&lt;/script&gt;
+
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+            </li>
+            <li>Browse the HTML page and you should see the player with the plugin functioning correctly.</li>
                 </ol>
 
             </section>
 
             <section id="useiframe" class="bcls-section">
                 <h2>Use iframe</h2>
-                <p>It is a best practice to use the iframe player implementation. If it is possible for this example, replace the Advanced implementation with the iframe implementation.</p>
-                <p>For this custom playlist player, the
-                    <code>iframe</code> must be sized to accomodate the playlist along the bottom, which is 74 pixels high. So set the width to the width value you included in the plugin options (or 500px if you didn't include options). The height should be
-                    set according to this formula:</p>
-                <pre class="line-numbers"><code class="language-html">height = (width x (9/16)) + 82 (rounded to the nearest integer)</code></pre>
-                <p>Your style should look something like this:</p>
-                <pre class="line-numbers"><code class="language-html">&lt;style&gt; iframe { width: 600px; height: 420px; } &lt;/style&gt;</code></pre>
-                <aside class="bcls-aside bcls-aside--information">Note: because of differences in browser rendering, you may need to adjust the height value a little.</aside>
-                <ol class="bcls-tasklist">
-                    <li>Return to the
-                        <strong>Media</strong> module, select a playlist and publish it with this player.</li>
-                    <li>
-                        <p>Copy the iframe embed code and paste it into a new HTML file. Your code should look similar to this:</p>
-                        <pre class="line-numbers"><code class="language-html">&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-    &lt;head&gt;
-        &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
-        &lt;title&gt;My Custom Playlist Player&lt;/title&gt;
-        &lt;style&gt;
-            iframe {
-                width: 600px;
-                height: 412px;
-            }
-        &lt;/style&gt;
-    &lt;/head&gt;
-    &lt;body&gt;
-        &lt;h1&gt;My Custom Playlist Player&lt;/h1&gt;
-        &lt;iframe src='//players.brightcove.net/1752604059001/45dcbbdf-2807-4422-8fc7-5a1eb04d3f38_default/index.html?playlistId=4452341376001' allowfullscreen webkitallowfullscreen mozallowfullscreen&gt;&lt;/iframe&gt;
-    &lt;/body&gt;
-&lt;/html&gt;</code></pre>
-                    </li>
-                    <li>Browse the HTML page. You should see the plugin functioning correctly.</li>
-                </ol>
-            </section>
-            <section class="bcls-section" id="notesOnPlugin">
-                <h2>Notes on the plugin</h2>
-                <ul>
-                    <li>The plugin assumes that the aspect ratio of the video is 16:9 - if you are using something else, you will need to modify the math in the JavaScript file (line 40:
-                        <code>playerHeight = (9 / 16) * playerWidth;</code>)</li>
-                    <li>It would be pretty easy to modify the JavaScript to create additional options, such as the highlight color for the current video</li>
-                    <li>The player+playlist produced by the plugin is not responsive. With some work, you could make it so - to start with, you would need to change the
-                        <code>width</code> option to accept a string like "50%", and modify the JavaScript code accordingly.
-                        <p>In addition, you would likely need to wrap the player in an additional div tag - see <a href="./responsive-sizing.html">Responsive Sizing</a> for more detail on this. Finally, you might want to make the images responsive also by
-                            resizing their div wrappers - all-in-all, it will take some work.</p>
-                    </li>
-                </ul>
+                <p>It is a best practice to use the iframe player implementation. If it is possible for this example, replace the embed_in_page implementation with the iframe implementation.</p>
+                <p>Since this example uses JavaScript code that manipulates elements on the page, an iframe implementation will not work.</p>
             </section>
 
           </article>
