@@ -154,6 +154,7 @@
                     <ul>
                         <li><code class="language-javascript">addClass()</code></li>
                         <li><code class="language-javascript">close()</code></li>
+                        <li><code class="language-javascript">dispose()</code></li>
                         <li><code class="language-javascript">on()</code></li>
                         <li><code class="language-javascript">open()</code></li>
                     </ul>
@@ -190,6 +191,8 @@
                         options = {},
                         thumbs = [],
                         myModal,
+                        showOverlay,
+                        hideOverlay,
                         newElement = document.createElement('div'),
                         ePlayer = document.getElementById("myPlayerID");
 
@@ -207,21 +210,27 @@
                         // console.log("array: ",arr.thumbs[0].image);
                         buildModal(arr);
 
-                        ePlayer.addEventListener("mouseover", function(){
+                        showOverlay = function(){
                           // show the overlay
                           if (myModal) {
                             myModal.open();
                           }
-                        });
-                        ePlayer.addEventListener("mouseout", function(){
+                        }
+                        ePlayer.addEventListener("mouseover",showOverlay);
+
+                        hideOverlay = function(){
                           // hide the overlay
                           if (myModal) {
                             myModal.close();
                           }
-                        });
+                        }
+                        ePlayer.addEventListener("mouseout", hideOverlay);
 
                         myModal.on("click", function(){
+                          ePlayer.removeEventListener('mouseover',showOverlay);
+                          ePlayer.removeEventListener('mouseout',hideOverlay);
                           myModal.close();
+                          myModal.dispose();
                           myPlayer.play();
                         });
                       });
@@ -297,7 +306,6 @@
                       myPlayer.addChild(myModal);
                      }
                   </script>
-
                 </section>
                 <!-- id="player" -->
 
@@ -312,7 +320,7 @@
                         <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
                         <li><span class="video-cloud-only">In the <strong>Media</strong> module, select a video and publish it with this player.</span><span class="player-only">Assign video content to the player and publish it.</span></li>
                         <li><p>
-                          Copy the In-Page (Advanced) embed code and paste it into a new HTML file.
+                          Copy the <strong>Advanced</strong> (In-Page) embed code and paste it into a new HTML file.
                         </p>
                         <p class="bcls-aside bcls-aside--information">For details on how to get this embed code, see the <a href="../../brightcove-player/getting-started/quick-start-bc-player.html">Quick Start to Brightcove Player</a> document.</p></li>
                         <li>
@@ -321,16 +329,16 @@
                     </ol>
 
                     <p>The embed code should look similar to this:</p>
-                    <pre class="line-numbers video-cloud-only" data-start="1"><code class="language-html">&lt;video id=&quot;myPlayerID&quot;
-    data-video-id=&quot;4845831078001&quot;
-    data-account=&quot;1752604059001&quot;
-    data-player=&quot;default&quot;
-    data-embed=&quot;default&quot;
-    data-application-id
-    class=&quot;video-js&quot;
-    controls
-    width=&quot;640&quot;
-    height=&quot;340&quot;&gt;&lt;/video&gt;
+    <pre class="line-numbers video-cloud-only" data-start="1"><code class="language-html">&lt;video id=&quot;myPlayerID&quot;
+  data-video-id=&quot;<span class="bcls-input">your video id</span>&quot;
+  data-account=&quot;<span class="bcls-input">your account id</span>&quot;
+  data-player=&quot;<span class="bcls-input">your player id</span>&quot;
+  data-embed=&quot;default&quot;
+  data-application-id
+  class=&quot;video-js&quot;
+  controls muted
+  width=&quot;640&quot;
+  height=&quot;360&quot;&gt;&lt;/video&gt;
 &lt;script src=&quot;//players.brightcove.net/1752604059001/default_default/index.min.js&quot;&gt;&lt;/script&gt;</code></pre>
                     <pre class="line-numbers player-only" data-start="1"><code class="language-html">&lt;video id=&quot;myPlayerID&quot;
     data-account=&quot;1752604059001&quot;
