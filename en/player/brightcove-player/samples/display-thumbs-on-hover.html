@@ -55,30 +55,7 @@
         <div id="main" class="large-10 small-12 columns">
           <h1>Player Sample: Display Thumbnails on Hover</h1>
               <!-- begin drupal content -->
-              <!-- page styles -->
-              <style>
-                .vjs-my-custom-modal .vjs-modal-dialog-content {
-                  width: 100%;
-                  height: 100%;
-                  padding-top: 20%;
-                  cursor: pointer;
-                }
-                /* display the row of thumbnails */
-                #row {
-                  display: table;
-                  border-collapse: collapse;
-                  width: 100%;
-                }
-                #item {
-                  display: table-cell;
-                  vertical-align: top;
-                }
-                #item img {
-                  display: block;
-                  width: 100%;
-                  height: auto;
-                }
-              </style>
+
               <article class="bcls-article">
                 <header id="bcls_header" class="bcls-header">
                   <p>In this topic, you will learn how to display a set of four thumbnail images when the user hovers over the Brightcove player. These images are taken at different points in the video to give the user an idea of what to expect in the video. The thumbnails only appear before video playback begins.</p>
@@ -135,7 +112,7 @@
 
                 <section id="Select_implementation" class="bcls-section">
                     <h2>Select implementation</h2>
-                    <p>In this example, you will test with the <strong>Advanced </strong> (In_Page) embed code and then move the styles and scripts into separate files to test locally. Then, you will use Brightcove Studio to add the styles and script as a plugin to the player. With this player, you can run this example as an iframe implementation.</p>
+                    <p>In this example, you will test with the <strong>Advanced </strong> (In_Page) embed code and then move the styles and scripts into separate files to test locally. Then, you will use Brightcove Studio to add the styles and script as a plugin to the player.</p>
                 </section>
 
                 <section id="API_resources_used" class="bcls-section">
@@ -167,145 +144,15 @@
                   <video id="myPlayerID"
                     data-video-id="5352019498001"
                     data-account="1752604059001"
-                    data-player="default"
+                    data-player="HysvhqrCx"
                     data-embed="default"
                     data-application-id
                     class="video-js"
                     controls muted
                     width="640"
                     height="360"></video>
-                  <script src="//players.brightcove.net/1752604059001/default_default/index.min.js"></script>
+                  <script src="//players.brightcove.net/1752604059001/HysvhqrCx_default/index.min.js"></script>
 
-                  <script type="text/javascript">
-                    var myPlayer,
-                        requestData,
-                        mediaData,
-                        apiRequest,
-                        apiBaseURL = 'https://edge.api.brightcove.com/playback/v1/accounts/',
-                        policyKey = "BCpkADawqM3_9ax216PJYuUTLApMLkLJ3apjFlTRKHHS4q0DE33J0XsiDWmc6SfKwrwRAhejCZpTbwljz4-OlUwyqKi64L25Dwy4yhY1eSZ9ZduI-dO0mjSNVcR9C8nz0jtkimOOtzQgswCr",
-                        accountId = "1752604059001",
-                        videoId = "5352019498001",
-                        videoData = [],
-                        mediaType,
-                        requestURL,
-                        options = {},
-                        thumbs = [],
-                        myModal,
-                        showOverlay,
-                        hideOverlay,
-                        newElement = document.createElement('div'),
-                        ePlayer = document.getElementById("myPlayerID");
-
-                    newElement.setAttribute("id","row");
-
-                    videojs('myPlayerID').ready(function(){
-                      myPlayer = this;
-
-                      // set up data for Playback API request
-                      requestData = setRequestData();
-                      console.log("requestData: ",requestData);
-                      // make the Playback API request to get playlist data
-                      getMediaData('video', requestData, function (mediaData) {
-                        var arr = JSON.parse(mediaData.long_description);
-                        // console.log("array: ",arr.thumbs[0].image);
-                        buildModal(arr);
-
-                        showOverlay = function(){
-                          // show the overlay
-                          if (myModal) {
-                            myModal.open();
-                          }
-                        }
-                        ePlayer.addEventListener("mouseover",showOverlay);
-
-                        hideOverlay = function(){
-                          // hide the overlay
-                          if (myModal) {
-                            myModal.close();
-                          }
-                        }
-                        ePlayer.addEventListener("mouseout", hideOverlay);
-
-                        myModal.on("click", function(){
-                          ePlayer.removeEventListener('mouseover',showOverlay);
-                          ePlayer.removeEventListener('mouseout',hideOverlay);
-                          myModal.close();
-                          myModal.dispose();
-                          myPlayer.play();
-                        });
-                      });
-                    });
-
-                    /**
-                    * sets up the data for the API request
-                    */
-                    function setRequestData() {
-                      requestURL = apiBaseURL +  accountId + '/videos/' + videoId;
-
-                      return requestURL;
-                     }
-
-                    /**
-                    * request data from the Playback API
-                    */
-                    getMediaData = function(mediaType, requestURL, callback) {
-                    var httpRequest = new XMLHttpRequest(),
-                      responseData,
-                      parsedData,
-                      // response handler
-                      getResponse = function() {
-                        try {
-                          if (httpRequest.readyState === 4) {
-                            if (httpRequest.status === 200) {
-                              responseData = httpRequest.responseText;
-                              parsedData = JSON.parse(responseData);
-                              switch (mediaType) {
-                                case 'video':
-                                  callback(parsedData);
-                                  break;
-                                case 'playlist':
-                                  // do nothing
-                                  break;
-                              }
-                            } else {
-                              alert('There was a problem with the request. Request returned ' + httpRequest.status);
-                            }
-                          }
-                        } catch (e) {
-                          alert('Caught Exception: ' + e);
-                        }
-                      };
-                      // set response handler
-                      httpRequest.onreadystatechange = getResponse;
-                      // open the request
-                      httpRequest.open('GET', requestURL);
-                      // set headers
-                      httpRequest.setRequestHeader('Accept', 'application/json;pk=' + policyKey);
-                      // open and send request
-                      httpRequest.send();
-                    };
-
-                    /**
-                    * create the modal dialog
-                    */
-                    function buildModal(array) {
-                      // get the thumbnail URLs from the video Long Description field and add to modal dialog content
-                      newElement.innerHTML = '<div id="item"><img src="' + array.thumbs[0].image + '"></div><div id="item"><img src="' + array.thumbs[1].image + '"></div><div id="item"><img src="'+ array.thumbs[2].image + '"></div><div id="item"><img src="' + array.thumbs[3].image + '"></div>';
-                      console.log("newElement: ",newElement);
-                      options.content = newElement;
-                      // add a label text
-                      options.label = 'thumbnail images';
-                      // configure modal dialog settings
-                      options.temporary = false;
-                      options.uncloseable = true;
-
-                      // create the modal dialog and add it to the player
-                      var ModalDialog = videojs.getComponent('ModalDialog');
-                      myModal = new ModalDialog(myPlayer, options);
-                      myModal.addClass('vjs-my-custom-modal');
-                      myPlayer.addChild(myModal);
-                     }
-                  </script>
                 </section>
                 <!-- id="player" -->
 
@@ -341,14 +188,14 @@
   height=&quot;360&quot;&gt;&lt;/video&gt;
 &lt;script src=&quot;//players.brightcove.net/1752604059001/default_default/index.min.js&quot;&gt;&lt;/script&gt;</code></pre>
                     <pre class="line-numbers player-only" data-start="1"><code class="language-html">&lt;video id=&quot;myPlayerID&quot;
-    data-account=&quot;1752604059001&quot;
-    data-player=&quot;default&quot;
-    data-embed=&quot;default&quot;
-    data-application-id
-    class=&quot;video-js&quot;
-    controls
-    width=&quot;640&quot;
-    height=&quot;340&quot;&gt;&lt;/video&gt;
+  data-account=&quot;<span class="bcls-input">your account id</span>&quot;
+  data-player=&quot;<span class="bcls-input">your player id</span>&quot;
+  data-embed=&quot;default&quot;
+  data-application-id
+  class=&quot;video-js&quot;
+  controls muted
+  width=&quot;640&quot;
+  height=&quot;360&quot;&gt;&lt;/video&gt;
 &lt;script src=&quot;//players.brightcove.net/1752604059001/default_default/index.min.js&quot;&gt;&lt;/script&gt;</code></pre>
 
                     <h3>The HTML code</h3>
@@ -358,50 +205,114 @@
                     <p>Add the following JavaScript to your page code.</p>
                     <p>Here you will use the <strong>ModalDialog</strong> component's <code class="language-javascript">open()</code> and <code class="language-javascript">close()</code> methods to show and then hide the modal window.</p>
                     <ul>
-                        <li>Line 3: Gets a reference to the player when it is ready.</li>
-                        <li>Lines 4-9: Create an <code>options</code> object and set properties for the <strong>ModalDialog</strong> class. For details about this object, see the <a href="../../brightcove-player/guides/modal-dialog.html#The_options_object">Implementing the ModalDialog</a> document.</li>
-                        <li>Lines 11-12: Instantiate the <strong>ModalDialog</strong> class.</li>
-                        <li>Line 13: Adds a custom class to our modal window so that we can style the content. We will add styles in the next section.</li>
-                        <li>Line 14: Adds the <strong>ModalDialog</strong> to the player.</li>
-                        <li>Line 15: Opens the modal window.</li>
-                        <li>Lines 17-20: When the user selects the modal window text, the window is closed and the video playback is started.</li>
+                        <li>Line 60: Gets a reference to the player when it is ready.</li>
+                        <li>Line 61: Gets a reference to the player's DOM element.</li>
+                        <li>Line 63: Waits for the player's <code>loadstart</code> event. We have to wait for this to be sure that the <code>mediainfo</code> object has been populated.</li>
+                        <li><p>
+                          Line 64: Loads an array of thumbnail image URLs that are stored in the video's <strong>long_description</strong> field. You have access to the currently loaded video's metadata through the <code>mediainfo</code> object. For details, see the <a href="../../brightcove-player/guides/mediainfo.html">Video Metadata from mediainfo</a> document.</p>
+                        <aside class="bcls-aside bcls-aside--tip">Using the <code>mediainfo</code> object saves you from having to make a call to the Playback API.</aside></li>
+                        <li>Lines 67-73: Adds an event listener to the player, for the <code>mouseover</code> event. When the user mouses over the player, the <strong>ModalDialog</strong> will appear.</li>
+                        <li>Lines 75-81: Adds an event listener to the player, for the <code>mouseout</code> event. When the user mouses away from the player, the <strong>ModalDialog</strong> will hide.</li>
+                        <li>Lines 83-89: Adds an event listener to the <strong>ModalDialog</strong>, for the <code>click</code> event. When the user clicks on the <strong>ModalDialog</strong>, it will hide and the video will start playback.</li>
+                        <li>Lines 98-100: Builds a <code>&lt;div&gt;</code> container with the thumbnail URLs.</li>
+                        <li>Lines 102-105: Set properties on the <strong>ModalDialog</strong>. For this example, we are setting the <code>temporary</code> property to <strong>false</strong>. This allows us to open and close the dialog more than one time. For details about this object, see the <a href="../../brightcove-player/guides/modal-dialog.html#The_options_object">Implementing the ModalDialog</a> document.</li>
+                        <li>Lines 108-111: Instantiates the <strong>ModalDialog</strong> and adds it to the player.</li>
                     </ul>
-                    <pre class="line-numbers" data-start="1"><code class="language-javascript">&lt;script type=&quot;text/javascript&quot;&gt;
-  videojs('myPlayerID').ready(function(){
-    var myPlayer = this,
-        options = {};
+                    <pre class="line-numbers" data-start="47"><code class="language-javascript">&lt;script type=&quot;text/javascript&quot;&gt;
+  var myPlayer,
+      ePlayer,
+      options = {},
+      thumbs = [],
+      myModal,
+      showOverlay,
+      hideOverlay,
+      newElement = document.createElement('div');
 
-    options.content = 'By clicking here you certify that you are over 18 years old';
-    options.label = 'age gate text';
-    options.temporary = true;
+  newElement.setAttribute(&quot;id&quot;,&quot;row&quot;);
+
+  videojs('myPlayerID').ready(function(){
+    myPlayer = this;
+    ePlayer = myPlayer.el();
+
+    myPlayer.on('loadstart',function(){
+      var arr = JSON.parse(myPlayer.mediainfo.long_description);
+      buildModal(arr);
+
+      showOverlay = function(){
+        // show the overlay
+        if (myModal) {
+          myModal.open();
+        }
+      }
+      ePlayer.addEventListener(&quot;mouseover&quot;,showOverlay);
+
+      hideOverlay = function(){
+        // hide the overlay
+        if (myModal) {
+          myModal.close();
+        }
+      }
+      ePlayer.addEventListener(&quot;mouseout&quot;, hideOverlay);
+
+      myModal.on(&quot;click&quot;, function(){
+        ePlayer.removeEventListener('mouseover',showOverlay);
+        ePlayer.removeEventListener('mouseout',hideOverlay);
+        myModal.close();
+        myModal.dispose();
+        myPlayer.play();
+      });
+    })
+  });
+
+  /**
+  * create the modal dialog
+  */
+  function buildModal(array) {
+    // get the thumbnail URLs from the video Long Description field and add to modal dialog content
+    newElement.innerHTML = '&lt;div id=&quot;item&quot;&gt;&lt;img src=&quot;' + array.thumbs[0].image + '&quot;&gt;&lt;/div&gt;&lt;div id=&quot;item&quot;&gt;&lt;img src=&quot;' + array.thumbs[1].image + '&quot;&gt;&lt;/div&gt;&lt;div id=&quot;item&quot;&gt;&lt;img src=&quot;'+ array.thumbs[2].image + '&quot;&gt;&lt;/div&gt;&lt;div id=&quot;item&quot;&gt;&lt;img src=&quot;' + array.thumbs[3].image + '&quot;&gt;&lt;/div&gt;';
+    console.log(&quot;newElement: &quot;,newElement);
+    options.content = newElement;
+    // add a label text
+    options.label = 'thumbnail images';
+    // configure modal dialog settings
+    options.temporary = false;
     options.uncloseable = true;
 
+    // create the modal dialog and add it to the player
     var ModalDialog = videojs.getComponent('ModalDialog');
-    var myModal = new ModalDialog(myPlayer, options);
+    myModal = new ModalDialog(myPlayer, options);
     myModal.addClass('vjs-my-custom-modal');
     myPlayer.addChild(myModal);
-    myModal.open();
-
-    myModal.on(&quot;click&quot;, function(){
-      myModal.close();
-      myPlayer.play();
-    });
-  });
+   }
 &lt;/script&gt;</code></pre>
 
                     <h3>The stylesheet</h3>
                     <p>This example uses CSS styles for the <strong>ModalDialog</strong> content.</p>
                     <ul>
-                        <li>Line 3: Sets the content text color to red.</li>
-                        <li>Lines 4-5: Center the text horizontally and vertically.</li>
-                        <li>Line 6: Sets the cursor to use the hand pointer when over the text area.</li>
+                        <li>Lines 8-13: Set the size of the <strong>ModalDialog</strong>.</li>
+                        <li>Lines 15-28: Styles the row of thumbnail images.</li>
                     </ul>
-                    <pre class="line-numbers" data-start="1"><code class="language-html">&lt;style&gt;
+                    <pre class="line-numbers" data-start="7"><code class="language-html">&lt;style&gt;
   .vjs-my-custom-modal .vjs-modal-dialog-content {
-    color: red;
-    text-align: center;
-    top: 30%;
+    width: 100%;
+    height: 100%;
+    padding-top: 20%;
     cursor: pointer;
+  }
+  /* display the row of thumbnails */
+  #row {
+    display: table;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  #item {
+    display: table-cell;
+    vertical-align: top;
+  }
+  #item img {
+    display: block;
+    width: 100%;
+    height: auto;
   }
 &lt;/style&gt;</code></pre>
                     <p>
@@ -419,59 +330,109 @@
                       <li>
                         Move the plugin's JavaScript code to a file located on your machine for easy testing.
                         <ul>
-                            <li>Create a new file for your plugin JavaScript code. In this case, name it <code>age-gate-modal.js</code>.</li>
+                            <li>Create a new file for your plugin JavaScript code. In this case, name it <code>display-thumbs.js</code>.</li>
                             <li>Cut and paste the JavaScript code from your main HTML file into this new file.</li>
-                            <li>Lines 4,25: Wrap your JavaScript code using the <code class="language-javascript">videojs.plugin()</code> function. The first argument, <code class="language-javascript">ageGateModal</code>, is the plugin name.</li>
-                            <li>Line 5: Gets a reference to your player.</li>
-                            <li>The rest is your JavaScript code which was reviewed in a previous section.</li>
+                            <li>Lines 4,72: Wrap your JavaScript code using the <code class="language-javascript">videojs.plugin()</code> function. The first argument, <code class="language-javascript">displayThumbnails</code>, is the plugin name.</li>
+                            <li>Line 17: Gets a reference to your player.</li>
+                            <li><p>
+                              The rest is your JavaScript code which was reviewed in a previous section.
+                            </p></li>
                         </ul>
-                    <aside class="bcls-aside bcls-aside--warning">Line 25: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</aside>
+                    <aside class="bcls-aside bcls-aside--warning">Line 72: Has a trailing semicolon at the end of the plugin's JavaScript code which is required.</aside>
                     <pre class="line-numbers" data-start="1"><code class="language-javascript">/**
- * Age Gate Modal
+ * Plugin to display thumbnails on hover
  */
-videojs.plugin('ageGateModal', function() {
-  var myPlayer = this,
-      options = {};
+  videojs.plugin('displayThumbnails',function() {
+     var myPlayer = this,
+         ePlayer,
+         options = {},
+         thumbs = [],
+         myModal,
+         showOverlay,
+         hideOverlay,
+         newElement = document.createElement('div');
 
-  options.content = 'By clicking here you certify that you are over 18 years old';
-  options.label = 'age gate text';
-  options.temporary = true;
-  options.uncloseable = true;
+      newElement.setAttribute(&quot;id&quot;,&quot;row&quot;);
 
-  var ModalDialog = videojs.getComponent('ModalDialog');
-  var myModal = new ModalDialog(myPlayer, options);
-  myModal.addClass('vjs-my-custom-modal');
-  myPlayer.addChild(myModal);
+     videojs('myPlayerID').ready(function(){
+       myPlayer = this;
+       ePlayer = myPlayer.el();
 
-  myModal.open();
+       myPlayer.on('loadstart',function(){
+         ePlayer.addEventListener(&quot;mouseover&quot;,showOverlay);
 
-  myModal.on(&quot;click&quot;, function(){
-    console.log(&quot;made it inside the modal&quot;);
-    myModal.close();
-    myPlayer.play();
-  });
-});</code></pre>
+         var arr = JSON.parse(myPlayer.mediainfo.long_description);
+         buildModal(arr);
+
+         showOverlay = function(){
+           // show the overlay
+           if (myModal) {
+             myModal.open();
+           }
+         }
+         ePlayer.addEventListener(&quot;mouseover&quot;,showOverlay);
+
+         hideOverlay = function(){
+           // hide the overlay
+           if (myModal) {
+             myModal.close();
+           }
+         }
+         ePlayer.addEventListener(&quot;mouseout&quot;, hideOverlay);
+
+         myModal.on(&quot;click&quot;, function(){
+           ePlayer.removeEventListener('mouseover',showOverlay);
+           ePlayer.removeEventListener('mouseout',hideOverlay);
+           myModal.close();
+           myModal.dispose();
+           myPlayer.play();
+         });
+       })
+     });
+
+     /**
+     * create the modal dialog
+     */
+     function buildModal(array) {
+       // get the thumbnail URLs from the video Long Description field and add to modal dialog content
+       newElement.innerHTML = '&lt;div id=&quot;item&quot;&gt;&lt;img src=&quot;' + array.thumbs[0].image + '&quot;&gt;&lt;/div&gt;&lt;div id=&quot;item&quot;&gt;&lt;img src=&quot;' + array.thumbs[1].image + '&quot;&gt;&lt;/div&gt;&lt;div id=&quot;item&quot;&gt;&lt;img src=&quot;'+ array.thumbs[2].image + '&quot;&gt;&lt;/div&gt;&lt;div id=&quot;item&quot;&gt;&lt;img src=&quot;' + array.thumbs[3].image + '&quot;&gt;&lt;/div&gt;';
+       console.log(&quot;newElement: &quot;,newElement);
+       options.content = newElement;
+       // add a label text
+       options.label = 'thumbnail images';
+       // configure modal dialog settings
+       options.temporary = false;
+       options.uncloseable = true;
+
+       // create the modal dialog and add it to the player
+       var ModalDialog = videojs.getComponent('ModalDialog');
+       myModal = new ModalDialog(myPlayer, options);
+       myModal.addClass('vjs-my-custom-modal');
+       myPlayer.addChild(myModal);
+     }
+ });
+</code></pre>
                   </li>
                 </ol>
                     <ol class="bcls-tasklist">
                         <li>In the HTML file, add the following code just below the existing <code class="language-html">&lt;script&gt;</code> tags. This code includes the JavaScript file and then calls the method defined in that JavaScript.
-                        <pre class="line-numbers" data-start="1"><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;age-gate-modal.js&quot;&gt;&lt;/script&gt;
-&lt;script&gt;videojs('myPlayerID').ageGateModal();&lt;/script&gt;
+                        <pre class="line-numbers" data-start="13"><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;display-thumbs.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;videojs('myPlayerID').displayThumbnails();&lt;/script&gt;
 </code></pre></li>
                     </ol>
                     <ol class="bcls-tasklist">
-                        <li>Browse the HTML page. You should see that the age gate modal window still works, except now your JavaScript code has been removed from the HTML page.</li>
+                        <li>Browse the HTML page. You should see that the thumbnails <strong>ModalDialog</strong> still works, except now your JavaScript code has been removed from the HTML page.</li>
                     </ol>
 
                     <h3>Create the CSS file</h3>
                     <p>If you are using CSS, move styles to a file located on your machine for easy testing.</p>
                     <ol class="bcls-tasklist">
-                        <li>Create a new file for your CSS styles. In this case, name it <code>age-gate-modal.css</code>.</li>
+                        <li>Create a new file for your CSS styles. In this case, name it <code>display-thumbs.css</code>.</li>
                         <li>In the <code class="language-html">&lt;head&gt;</code> section of your HTML file, add the following link to include your newly created CSS file.
-                        <pre class="line-numbers" data-start="1"><code class="language-html">&lt;link href=&quot;age-gate-modal.css&quot; rel=&quot;stylesheet&quot;&gt;</code></pre></li>
+                        <pre class="line-numbers" data-start="6"><code class="language-html">&lt;link href=&quot;display-thumbs.css&quot; rel=&quot;stylesheet&quot;&gt;</code></pre></li>
                     </ol>
                     <ol class="bcls-tasklist">
-                        <li>Browse the HTML page. You should see that the age gate modal window still works, except now your styles have been removed from the HTML page.</li>
+                        <li>Browse the HTML page. You should see that the thumbnails <strong>ModalDialog</strong> still works, except now your styles have been removed from the HTML page.</li>
                     </ol>
                     <p>When you have finished testing the functionality of your plugin code, you are ready to implement the plugin in the player as described in the next step.</p>
 
@@ -483,70 +444,48 @@ videojs.plugin('ageGateModal', function() {
                         <li>Open the <strong>Players</strong> module and locate the player.</li>
                         <li>Click the link for the player to open the player properties.</li>
                         <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
-                        <li>For the <strong>JavaScript URL</strong>, enter the URL for the file you created in step 1.</li>
-                        <li>For the <strong>CSS URL</strong>, enter the URL for the file you created in step 2.</li>
-                        <li>For the <strong>Name</strong>, enter your plugin name. In this example, we are using <strong>ageGateModal</strong>.
+                        <li>For the <strong>JavaScript URL</strong>, enter the URL for the file you created in step 12.</li>
+                        <li>For the <strong>CSS URL</strong>, enter the URL for the file you created in step 13.</li>
+                        <li>For the <strong>Name</strong>, enter your plugin name. In this example, we are using <strong>displayThumbnails</strong>.
                             <figure class="bcls-figure">
-                                <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/player-customization/modal-dialog/age-gate/age-gate-modal-plugin.png" alt="Age Gate Modal Plugin">
-                                <figcaption class="bcls-caption--image">Age Gate Modal Plugin</figcaption>
+                                <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/player-customization/modal-dialog/display-thumbs-on-hover/display-thumbs-name.png" alt="Display thumbnails on hover">
+                                <figcaption class="bcls-caption--image">Display thumbnails on hover</figcaption>
                             </figure>
                         </li>
                         <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
                         <li class="video-cloud-only">In the <strong>Media</strong> module, select a video and publish it with this player.</li>
                         <li>Copy the In-Page embed code and paste it into a new HTML file. Your page should look similar to this:
-                        <pre class="line-numbers video-cloud-only" data-start="1"><code class="language-html">&lt;!doctype html&gt;
+                        <pre class="line-numbers video-cloud-only" data-start="1"><code class="language-html">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
+    &lt;head&gt;
+      &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+      &lt;title&gt;Display Modal on Hover&lt;/title&gt;
+    &lt;/head&gt;
 
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;title&gt;Age Gate Modal Plugin&lt;/title&gt;
-&lt;/head&gt;
+    &lt;body&gt;
+    &lt;h1&gt;Display Modal on Hover&lt;/h1&gt;
 
-&lt;body&gt;
+    &lt;video id=&quot;myPlayerID&quot;
+      data-video-id=&quot;5352019498001&quot;
+      data-account=&quot;1752604059001&quot;
+      data-player=&quot;HysvhqrCx&quot;
+      data-embed=&quot;default&quot;
+      data-application-id
+      class=&quot;video-js&quot;
+      controls muted
+      width=&quot;640&quot;
+      height=&quot;360&quot;&gt;&lt;/video&gt;
+    &lt;script src=&quot;//players.brightcove.net/1752604059001/HysvhqrCx_default/index.min.js&quot;&gt;&lt;/script&gt;
 
-    &lt;video data-video-id=&quot;4845831078001&quot;
-        data-account=&quot;1752604059001&quot;
-        data-player=&quot;BylLKWWNHg&quot;
-        data-embed=&quot;default&quot;
-        data-application-id
-        class=&quot;video-js&quot;
-        controls
-        width=&quot;640&quot;
-        height=&quot;360&quot;&gt;&lt;/video&gt;
-    &lt;script src=&quot;//players.brightcove.net/1752604059001/BylLKWWNHg_default/index.min.js&quot;&gt;&lt;/script&gt;
-
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
-                        <p>Browse the HTML page and you should see the player with the age gate modal window functioning correctly.</p>
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+                        <p>Browse the HTML page and you should see the player with the thumbnails <strong>ModalDialog</strong> functioning correctly.</p>
                       </li>
                     </ol>
-
-                    <pre class="line-numbers player-only" data-start="1"><code class="language-html">&lt;!doctype html&gt;
-&lt;html&gt;
-
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;title&gt;Age Gate Modal Plugin&lt;/title&gt;
-&lt;/head&gt;
-
-&lt;body&gt;
-
-    &lt;video
-        data-account=&quot;1752604059001&quot;
-        data-player=&quot;BylLKWWNHg&quot;
-        data-embed=&quot;default&quot;
-        data-application-id
-        class=&quot;video-js&quot;
-        controls
-        width=&quot;640&quot;
-        height=&quot;360&quot;&gt;&lt;/video&gt;
-    &lt;script src=&quot;//players.brightcove.net/1752604059001/BylLKWWNHg_default/index.min.js&quot;&gt;&lt;/script&gt;
-
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
                 </section>
 
-                <section id="Use_iframe" class="bcls-section">
+                <!-- <section id="Use_iframe" class="bcls-section">
                     <h2>Use iframe</h2>
                     <p>It is a best practice to use the iframe player implementation. If it is possible for this example, replace the embed_in_page implementation with the iframe implementation.</p>
                     <p>Your code should look similar to this:</p>
@@ -570,7 +509,7 @@ videojs.plugin('ageGateModal', function() {
 &lt;/body&gt;
 &lt;/html&gt;</code></pre>
                     <p>Browse the HTML page and you should see the player with the plugin functioning correctly.</p>
-                </section>
+                </section> -->
             </article>
             <!-- end drupal content -->
 
