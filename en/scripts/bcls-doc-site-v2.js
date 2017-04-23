@@ -14,6 +14,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
             "video-cloud": "#dd712e",
             "once": "#85a93e",
             "live": "#85a93e",
+            "zencoder": "#599AA7",
             "player": "#35498D"
         },
         gettingStartedBlock = document.getElementById("getting-started"),
@@ -666,6 +667,40 @@ var BCLSmain = (function (window, document, bclsNavData) {
 
                 // there is only one section
                 product = "live";
+                // get a reference to search block
+                searchBar = document.getElementById("searchBar");
+                // set the source for the script that generates the search field
+                searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script-once.js");
+                // append the search script to the appropriate div in the nav bar
+                searchBar.appendChild(searchScript);
+                section = "index";
+                if (pathArray[2] === "index.html") {
+                    // on once landing page
+                    isLandingPage = true;
+                    section = "index";
+                    sectionName = "Home";
+                    subsection = null;
+                    isLandingPage = true;
+                } else {
+                    section = 'index';
+                    sectionName = null;
+                    subsection = pathArray[2];
+                    console.log('section');
+                    // check to see if we're on the section or subsection landing page
+                    // and redirect to product landing page if so
+                    if (pathArray[3] === "index.html" && !isItemInArray(pathArray, "versions")) {
+                        window.location.href = landingPagePath;
+                    }
+                }
+                navMenuRight.innerHTML = menuRightBase + onceSupportNav;
+                // createNavigation();
+                break;
+            case "zencoder": // in zencoder
+                redirectArray = pathArray.slice(0, 3);
+                landingPagePath = "//docs.brightcove.com/" + redirectArray.join("/") + "/index.html";
+
+                // there is only one section
+                product = "zencoder";
                 // get a reference to search block
                 searchBar = document.getElementById("searchBar");
                 // set the source for the script that generates the search field

@@ -82,6 +82,9 @@ module.exports = function (grunt) {
                     'source/live-main.json',
                     'source/live.json',
                     'source/comma.txt',
+                    'source/zencoder-main.json',
+                    'source/zencoder.json',
+                    'source/comma.txt',
                     'source/player-main.json',
                     'working/temp-player-replace.json',
                     'source/footer.json'
@@ -119,4 +122,4 @@ module.exports = function (grunt) {
 
     // Default task.
     grunt.registerTask('default', ['minjson', 'replace:onVC', 'replace:onPlayer', 'concat:buildjson', 'jsonlint', 'concat:buildvar', 'uglify']);
-}
+};
