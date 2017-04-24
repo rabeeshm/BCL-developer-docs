@@ -63,7 +63,7 @@
           <p>To use the REST APIs you need to have a few pieces in place. Briefly, they are:</p>
           <ul>
             <li><strong>Client code</strong>: The client code asks for specific data then displays it according to application requirements. The client code will be discussed at some length in this document as it is what you will need to be writing most frequently.</li>
-            <li><strong>Proxy server</strong>: For security reasons the REST APIs will not accept data requests directly from the client as that would encourage sending confidential information, like as access token, from the client. This means that a proxy will act as an intermediary between the client and the REST API. The proxy used in the examples are written in PHP and detailed in the <a href="#">GET THIS</a> document.</li>
+            <li><strong>Proxy server</strong>: For security reasons the REST APIs will not accept data requests directly from the client as that would encourage sending confidential information, like as access token, from the client. This means that a proxy will act as an intermediary between the client and the REST API. The proxy used in the examples is written in PHP and detailed in the <a href="#">GET THIS</a> document. The proxy must be setup on a server under your control, and can be written in the language of your choice. The suggested configuration of the proxy enables it to be written once and used by any of the APIs.</li>
             <li><strong>REST APIs</strong>: Brightcove supplies a comprehensive set of APIs to customize, extend, and integrate with the Brightcove platform. See the <a href="http://docs.brightcove.com/en/video-cloud/concepts/api-overview/api-overview.html">Overview: Video Cloud APIs</a> document for more information.</li>
           </ul>
           <p>The following diagram shows the interaction between the three core entities of the process to retrieve data from one of Brightcove's REST APIs:</p>
@@ -74,7 +74,21 @@
 
         <section id="Client_functionality_overview" class="bcls-section">
           <h2>Client functionality overview</h2>
-          <p></p>
+          <p>The client side code changes significantly depending from which API you are requesting data. As mentioned above, the proxy is a write once and don't modify piece of code, and the APIs are maintained by Brightcove. This is why the emphasis in the document will be on learning how to alter the client code to retrieve the desired data from one of the APIs.</p>
+          <p>The diagram below focuses on key parts of the client code, those being:</p>
+          <ul>
+            <li>The function that makes the <code>HTTPRequest</code> to the proxy. To avoid ambiguity the function is named <code>makeRequest()</code>. It is pictured on the right side of the diagram.</li>
+            <li>The code that gathers required information for the request. It is pictured on the top-left of the diagram. This code is usually quite straight forward and uses concepts well know to even beginning programmers.</li>
+            <li>The call that executes the previously mentioned <code>makeRequest()</code> function. It is pictured on the bottom-left of the diagram. The call passes a function to <code>makeRequest()</code> as a parameter. Then in <code>makeRequest()</code> that function is called. This is an example of a <strong>callback</strong> function.</li>
+          </ul>
+          <p>You no doubt see the two sections in the diagram labeled <strong>Asynchronous Activity</strong>. Although represented in the diagram in two different places, this is actually the same asynchronous activity, and represents the unknown time it takes for:
+            <ul>
+              <li>The client to send the request to the proxy.</li>
+              <li>The proxy to request data from the API.</li>
+              <li>The API to build the result set and return it to the proxy.</li>
+              <li>The proxy to return the data to the client.</li>
+            </ul>
+            <p>Note that the logic flow arrows in the call to <code>makeRequest()</code> seem to indicate that the code is executed at two different times, which is exactly the case. The call to the function is made, but the callback function is not executed until <code>makeRequest()</code> has done its job and the callback function is executed, which returns the requested data to the function calling code.</p>
           <figure class="bcls-figure">
               <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/architecture/proxy-API-call/proxy-API-call.png" alt="Client functionality overview">
           </figure>
@@ -83,6 +97,17 @@
         <section id="Example_1_code_walkthough" class="bcls-section">
           <h2>Example 1 code walkthough</h2>
           <p>Rather than looking at the code as one piece, it will be presented and discussed in sections. Some of the sections will relate to the diagram in the section above.</p>
+          <h3>Getting ready</h3>
+          <p>This code section contains the basic player, initializes variables and gets ready to make the call to <code>makeRequest()</code>.</p>
+          <ul>
+            <li>Lines 11-21: Standard Brightcove Player code with the addition of a <code>id</code> added</li>
+            <li>Lines 24-26: Create global variable</li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+          </ul>
+
           <pre class="line-numbers"><code class="language-html">&lt;!doctype html&gt;
 &lt;html&gt;
 
@@ -104,127 +129,59 @@
     width=&quot;640&quot;
     height=&quot;360&quot;&gt;&lt;/video&gt;
   &lt;script src=&quot;//players.brightcove.net/1752604059001/HkAzSmB0l_default/index.min.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+<h3>Getting ready</h3>
+<p>This code section contains the basic player, initializes variables and gets ready to make the call to <code>makeRequest()</code>.</p>
+<ul>
+  <li>Lines 11-21: Standard Brightcove Player code with the addition of a <code>id</code> added</li>
+  <li>Lines 24-26: Create global variable</li>
+  <li>Lines : </li>
+  <li>Lines : </li>
+  <li>Lines : </li>
+  <li>Lines : </li>
+</ul>
 
-  &lt;script type=&quot;text/javascript&quot;&gt;
-    var myPlayer,
-      viewsCount,
-      viewsObject = [];
+<pre class="line-numbers"><code class="language-html">&lt;!doctype html&gt;
+&lt;html&gt;
 
-    videojs('myPlayerID').ready(function() {
-      myPlayer = this,
-      options = [],
-      options.requestType = 'GET',
-      options.proxyURL = 'http://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
-      options.requestBody = '';
-      // Wait for loadstart event so mediainfo is populated
-      // and the video ID and account ID can be retrieved
-      myPlayer.on('loadstart', function() {
-        var videoID = myPlayer.mediainfo.id,
-          accountID = myPlayer.mediainfo.accountId;
-        // Build the Analytics API endpoint
-        options.url = 'https://analytics.api.brightcove.com/v1/alltime/accounts/' + accountID + '/videos/' + videoID;
-        // Make the request to the Analytics API
-        // Extract views from data returned by Analytics API
-        makeRequest(options, function(viewsRaw) {
-          // Remove console.log command for production code
-          console.log('viewsRaw', viewsRaw);
-          viewsObject = JSON.parse(viewsRaw);
-          console.log('viewsObject', viewsObject);
-          viewsCount = viewsObject.alltime_video_views;
-          console.log('views', viewsCount);
-          // Call function to place data in controlbar
-          //placeCountInControlbar();
-        });
-      });
-    });
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;title&gt;Untitled Document&lt;/title&gt;
+&lt;/head&gt;
 
-    /**
-     * Dynamically built a div that is then
-     * placed in the controlbar's spacer element
-     */
-    function placeCountInControlbar() {
-      var spacer,
-        newElement = document.createElement('div');
-      //Place data in div
-      newElement.innerHTML = &quot;Total Views: &quot; + viewsCount;
-      //Get the spacer in the controlbar
-      spacer = document.getElementsByClassName('vjs-spacer')[0];
-      //Right justify content in the spacer and add top margin
-      spacer.setAttribute('style', 'justify-content: flex-end; margin-top: 10px');
-      //Add the dynacmially built div to the spacer in the controlbar
-      spacer.appendChild(newElement);
-    }
+&lt;body&gt;
 
-    /**
-     * send API request to the proxy
-     * @param  {Object} options for the request
-     * @param  {String} options.url the full API request URL
-     * @param  {String=&quot;GET&quot;,&quot;POST&quot;,&quot;PATCH&quot;,&quot;PUT&quot;,&quot;DELETE&quot;} requestData [options.requestType=&quot;GET&quot;] HTTP type for the request
-     * @param  {String} options.proxyURL proxyURL to send the request to
-     * @param  {String} options.client_id client id for the account (default is in the proxy)
-     * @param  {String} options.client_secret client secret for the account (default is in the proxy)
-     * @param  {JSON} [options.requestBody] Data to be sent in the request body in the form of a JSON string
-     * @param  {Function} [callback] callback function that will process the response
-     */
-    function makeRequest(options, callback) {
-      var httpRequest = new XMLHttpRequest(),
-        response,
-        requestParams,
-        dataString,
-        proxyURL = options.proxyURL,
-        /**
-         * set up request data
-         * the proxy used here takes the following params:
-         * url - the full API request (required)
-         * requestType - the HTTP request type (default: GET)
-         * clientId - the client id (defaults here to a Brightcove sample account value - this should always be stored on the server side if possible)
-         * clientSecret - the client secret (defaults here to a Brightcove sample account value - this should always be stored on the server side if possible)
-         * requestData - request body for write requests (optional JSON string)
-         */
-        requestParams = &quot;url=&quot; + encodeURIComponent(options.url) + &quot;&amp;requestType=&quot; + options.requestType;
-      // only add client id and secret if both were submitted
-      if (options.client_id &amp;&amp; options.client_secret) {
-        requestParams += '&amp;client_id=' + options.client_id + '&amp;client_secret=' + options.client_secret;
-      }
-      // add request data if any
-      if (options.requestData) {
-        requestParams += '&amp;requestBody=' + options.requestBody;
-      }
-      console.log('requestParams', requestParams);
-      // set response handler
-      httpRequest.onreadystatechange = getResponse;
-      // open the request
-      httpRequest.open('POST', proxyURL);
-      // set headers
-      httpRequest.setRequestHeader(&quot;Content-Type&quot;, &quot;application/x-www-form-urlencoded&quot;);
-      // open and send request
-      httpRequest.send(requestParams);
+&lt;video id=&quot;myPlayerID&quot;
+data-video-id=&quot;3851380732001&quot;
+data-account=&quot;1752604059001&quot;
+data-player=&quot;HkAzSmB0l&quot;
+data-embed=&quot;default&quot;
+data-application-id
+class=&quot;video-js&quot;
+controls
+width=&quot;640&quot;
+height=&quot;360&quot;&gt;&lt;/video&gt;
+&lt;script src=&quot;//players.brightcove.net/1752604059001/HkAzSmB0l_default/index.min.js&quot;&gt;&lt;/script&gt;
 
-      // response handler
-      function getResponse() {
-        try {
-          if (httpRequest.readyState === 4) {
-            if (httpRequest.status === 200 || httpRequest.status === 204) {
-              response = httpRequest.responseText;
-              // some API requests return '{null}' for empty responses - breaks JSON.parse
-              if (response === '{null}') {
-                response = null;
-              }
-              // return the response
-              callback(response);
-            } else {
-              alert('There was a problem with the request. Request returned ' + httpRequest.status);
-            }
-          }
-        } catch (e) {
-          alert('Caught Exception: ' + e);
-        }
-      };
-    }
-  &lt;/script&gt;
-&lt;/body&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+var myPlayer,
+viewsCount,
+viewsObject = [];
 
-&lt;/html&gt;&lt;/code&gt;</pre>
+videojs('myPlayerID').ready(function() {
+myPlayer = this,
+options = [],
+options.requestType = 'GET',
+options.proxyURL = 'http://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
+options.requestBody = '';
+// Wait for loadstart event so mediainfo is populated
+// and the video ID and account ID can be retrieved
+myPlayer.on('loadstart', function() {
+var videoID = myPlayer.mediainfo.id,
+accountID = myPlayer.mediainfo.accountId;
+// Build the Analytics API endpoint
+options.url = 'https://analytics.api.brightcove.com/v1/alltime/accounts/' + accountID + '/videos/' + videoID;
+</code></pre>
         </section>
 
         <section id="section-name1" class="bcls-section">
@@ -338,3 +295,164 @@
 </body>
 
 </html>
+
+
+
+
+
+
+<ul>
+  <li>Lines : </li>
+  <li>Lines : </li>
+  <li>Lines : </li>
+  <li>Lines : </li>
+  <li>Lines : </li>
+  <li>Lines : </li>
+</ul>
+
+
+
+
+
+<pre class="line-numbers"><code class="language-html">&lt;!doctype html&gt;
+&lt;html&gt;
+
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;title&gt;Untitled Document&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+
+&lt;video id=&quot;myPlayerID&quot;
+data-video-id=&quot;3851380732001&quot;
+data-account=&quot;1752604059001&quot;
+data-player=&quot;HkAzSmB0l&quot;
+data-embed=&quot;default&quot;
+data-application-id
+class=&quot;video-js&quot;
+controls
+width=&quot;640&quot;
+height=&quot;360&quot;&gt;&lt;/video&gt;
+&lt;script src=&quot;//players.brightcove.net/1752604059001/HkAzSmB0l_default/index.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;script type=&quot;text/javascript&quot;&gt;
+var myPlayer,
+viewsCount,
+viewsObject = [];
+
+videojs('myPlayerID').ready(function() {
+myPlayer = this,
+options = [],
+options.requestType = 'GET',
+options.proxyURL = 'http://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
+options.requestBody = '';
+// Wait for loadstart event so mediainfo is populated
+// and the video ID and account ID can be retrieved
+myPlayer.on('loadstart', function() {
+var videoID = myPlayer.mediainfo.id,
+accountID = myPlayer.mediainfo.accountId;
+// Build the Analytics API endpoint
+options.url = 'https://analytics.api.brightcove.com/v1/alltime/accounts/' + accountID + '/videos/' + videoID;
+// Make the request to the Analytics API
+// Extract views from data returned by Analytics API
+makeRequest(options, function(viewsRaw) {
+// Remove console.log command for production code
+console.log('viewsRaw', viewsRaw);
+viewsObject = JSON.parse(viewsRaw);
+console.log('viewsObject', viewsObject);
+viewsCount = viewsObject.alltime_video_views;
+console.log('views', viewsCount);
+// Call function to place data in controlbar
+//placeCountInControlbar();
+});
+});
+});
+
+/**
+* Dynamically built a div that is then
+* placed in the controlbar's spacer element
+*/
+function placeCountInControlbar() {
+var spacer,
+newElement = document.createElement('div');
+//Place data in div
+newElement.innerHTML = &quot;Total Views: &quot; + viewsCount;
+//Get the spacer in the controlbar
+spacer = document.getElementsByClassName('vjs-spacer')[0];
+//Right justify content in the spacer and add top margin
+spacer.setAttribute('style', 'justify-content: flex-end; margin-top: 10px');
+//Add the dynacmially built div to the spacer in the controlbar
+spacer.appendChild(newElement);
+}
+
+/**
+* send API request to the proxy
+* @param  {Object} options for the request
+* @param  {String} options.url the full API request URL
+* @param  {String=&quot;GET&quot;,&quot;POST&quot;,&quot;PATCH&quot;,&quot;PUT&quot;,&quot;DELETE&quot;} requestData [options.requestType=&quot;GET&quot;] HTTP type for the request
+* @param  {String} options.proxyURL proxyURL to send the request to
+* @param  {String} options.client_id client id for the account (default is in the proxy)
+* @param  {String} options.client_secret client secret for the account (default is in the proxy)
+* @param  {JSON} [options.requestBody] Data to be sent in the request body in the form of a JSON string
+* @param  {Function} [callback] callback function that will process the response
+*/
+function makeRequest(options, callback) {
+var httpRequest = new XMLHttpRequest(),
+response,
+requestParams,
+dataString,
+proxyURL = options.proxyURL,
+/**
+* set up request data
+* the proxy used here takes the following params:
+* url - the full API request (required)
+* requestType - the HTTP request type (default: GET)
+* clientId - the client id (defaults here to a Brightcove sample account value - this should always be stored on the server side if possible)
+* clientSecret - the client secret (defaults here to a Brightcove sample account value - this should always be stored on the server side if possible)
+* requestData - request body for write requests (optional JSON string)
+*/
+requestParams = &quot;url=&quot; + encodeURIComponent(options.url) + &quot;&amp;requestType=&quot; + options.requestType;
+// only add client id and secret if both were submitted
+if (options.client_id &amp;&amp; options.client_secret) {
+requestParams += '&amp;client_id=' + options.client_id + '&amp;client_secret=' + options.client_secret;
+}
+// add request data if any
+if (options.requestData) {
+requestParams += '&amp;requestBody=' + options.requestBody;
+}
+console.log('requestParams', requestParams);
+// set response handler
+httpRequest.onreadystatechange = getResponse;
+// open the request
+httpRequest.open('POST', proxyURL);
+// set headers
+httpRequest.setRequestHeader(&quot;Content-Type&quot;, &quot;application/x-www-form-urlencoded&quot;);
+// open and send request
+httpRequest.send(requestParams);
+
+// response handler
+function getResponse() {
+try {
+if (httpRequest.readyState === 4) {
+  if (httpRequest.status === 200 || httpRequest.status === 204) {
+    response = httpRequest.responseText;
+    // some API requests return '{null}' for empty responses - breaks JSON.parse
+    if (response === '{null}') {
+      response = null;
+    }
+    // return the response
+    callback(response);
+  } else {
+    alert('There was a problem with the request. Request returned ' + httpRequest.status);
+  }
+}
+} catch (e) {
+alert('Caught Exception: ' + e);
+}
+};
+}
+&lt;/script&gt;
+&lt;/body&gt;
+
+&lt;/html&gt;</code></pre>
