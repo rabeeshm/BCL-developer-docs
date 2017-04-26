@@ -193,7 +193,7 @@
             </li>
             <li>Lines 101-103: If client credentials are passed in, they are appended to the request URL.</li>
             <li>Lines 105-107: If data is needed for a request body, that value is set.</li>
-            <li>Line 110: The <code>XMLHttpRequest.onreadystatechange</code> is an EventHandler that is called whenever the <code>readyState</code> attribute changes. The value assigned to it is the event handler function code that you write. The next section of this document discusses this event handler code.
+            <li>Line 110: The <code>XMLHttpRequest.onreadystatechange</code> is an event handler that is called whenever the <code>readyState</code> attribute changes. The value assigned to it is the event handler function code that you write. The next section of this document discusses this event handler code.
               <p>The following table shows the values the <code>readyState</code> attribute can have, and what each value means:</p>
               <table class="bcls-table">
                 <thead class="bcls-table__head">
@@ -234,7 +234,7 @@
             </li>
             <li>Line 112: Initializes the request to the proxy.</li>
             <li>Line 114: Sets the value of the HTTP header that will be sent.</li>
-            <li>Line 116: Sends the request, which is asynchronous by default.</li>
+            <li>Line 116: Sends the request, which is asynchronous.</li>
           </ul>
           <pre class="line-numbers" data-start="84"><code class="language-javascript">function makeRequest(options, callback) {
   var httpRequest = new XMLHttpRequest(),
@@ -271,47 +271,206 @@
   httpRequest.send(requestParams);</code></pre>
 
 
-          <h3>Getting ready</h3>
-          <p>This code section contains the basic player, initializes variables and gets ready to make the call to <code>makeRequest()</code>.</p>
+          <h3>Actual <code>makeRequest()</code> function - Part 2</h3>
+          <p>This code defines the event handler for changes in the <code>readyState</code> attribute of the XMLHttpRequest. This is also roughly the second half of the definition of the <code>makeRequest()</code> function.</p>
           <ul>
-            <li>Lines 11-21: Standard Brightcove Player code with the addition of a <code>id</code> added</li>
+            <li>Lines 119 and 137: Define the function.</li>
+            <li>Lines 120, 134, 136: Use a <code>try-catch</code> in case the request fails at a high level.</li>
+            <li>Lines 121-122: Use <code>if</code> statements to be sure the request is finished (<code>readyState</code> is 4) and completed successfully [<code>status</code> is 200 (Done) or 204 (No content returned)]. The following shows console logging of the <code>readyState</code> and <code>status</code> values in the event handler definition:
+              <figure class="bcls-figure">
+                  <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/architecture/proxy-API-call/console-readystate-and-status.png" alt="Logging readyState and status">
+              </figure>
+            </li>
+            <li>Line 129: The callback function is executed. This passes the returned data from the API back to the callback function, defined in lines 43-52, displayed above.</li>
+          </ul>
+          <pre class="line-numbers" data-start="118"><code class="language-javascript">// response handler
+function getResponse() {
+  try {
+    if (httpRequest.readyState === 4) {
+      if (httpRequest.status === 200 || httpRequest.status === 204) {
+        response = httpRequest.responseText;
+        // some API requests return '{null}' for empty responses - breaks JSON.parse
+        if (response === '{null}') {
+          response = null;
+        }
+        // return the response
+        callback(response);
+      } else {
+        alert('There was a problem with the request. Request returned ' + httpRequest.status);
+      }
+    }
+  } catch (e) {
+    alert('Caught Exception: ' + e);
+  }
+};
+</code></pre>
+
+          <h3>Display the returned data</h3>
+          <p>This code shows how to place the returned data into the controlbar. This function is called at the end of the callback function, shown in line 51 above.</p>
+          <ul>
+            <li>Lines 60,71: Define the function.</li>
+            <li>Line 61: Create a variable for the <code>spacer</code> element in the controlbar.</li>
+            <li>Line 62: Dynamically create a <code>div</code> element.</li>
+            <li>Line 64: Place a label and the value of the views in the newly created <code>div</code> element.</li>
+            <li>Line 66: Use JavaScript's <code>document.getElementsByClassName()</code> method to get the controlbar's <code>spacer</code> element.</li>
+            <li>Line 68: Style the <code>spacer</code> to display the total views right-justified and down 10px from the top of the <code>spacer</code>.</li>
+            <li>Line 70: Add the new created, populated and styled element to the <code>spacer</code>.</li>
+          </ul>
+          <pre class="line-numbers" data-start="60"><code class="language-javascript">function placeCountInControlbar() {
+  var spacer,
+    newElement = document.createElement('div');
+  //Place data in div
+  newElement.innerHTML = "Total Views: " + viewsCount;
+  //Get the spacer in the controlbar
+  spacer = document.getElementsByClassName('vjs-spacer')[0];
+  //Right justify content in the spacer and add top margin
+  spacer.setAttribute('style', 'justify-content: flex-end; margin-top: 10px');
+  //Add the dynacmially built div to the spacer in the controlbar
+  spacer.appendChild(newElement);
+}</code></pre>
+
+
+        <section id="Proxy_code" class="bcls-section">
+          <h2>Proxy code</h2>
+          <p>As mentioned earlier, the proxy can be written in the language of your choice. These Brightcove examples use a proxy written in PHP. Since the implementation of the proxy is so language dependent, the PHP code below will not be analyzed in detail in this document, but highlights will be shown next.</p>
+          <p>The major features of the proxy code shown below are:</p>
+          <ul>
+            <li>Lines 19-20: Only requests from certain Brightcove internal domains are accepted. Of course, you would need to alter to accept requests from your domains.</li>
             <li>Lines 24-26: Create global variable</li>
             <li>Lines : </li>
             <li>Lines : </li>
             <li>Lines : </li>
             <li>Lines : </li>
           </ul>
-          <pre class="line-numbers"><code class="language-javascript"></code></pre>
+          <pre class="line-numbers"><code class="language-javascript">&lt;?php
+/**
+ * bcls-proxy.php - proxy for Brightcove RESTful APIs
+ * gets an access token, makes the request, and returns the response
+ * Accessing:
+ *         (note you should *always* access the proxy via HTTPS)
+ *     Method: POST
+ *
+ * @post {string} url - the URL for the API request
+ * @post {string} [requestType=GET] - HTTP method for the request
+ * @post {string} [requestBody=null] - JSON data to be sent with write requests
+ * @post {string} client_id - OAuth2 client id with sufficient permissions for the request
+ * @post {string} client_secret - OAuth2 client secret with sufficient permissions for the request
+ *
+ * @returns {string} $response - JSON response received from the API
+ */
 
+// security checks
+if (strpos($_SERVER['HTTP_REFERER'], 'solutions.brightcove.com') == false &amp;&amp; strpos($_SERVER['HTTP_REFERER'], 'docs.brightcove.com') == false &amp;&amp; strpos($_SERVER['HTTP_REFERER'], 's.codepen.io') == false &amp;&amp; strpos($_SERVER['HTTP_REFERER'], 'players.brightcove.net') == false &amp;&amp; strpos($_SERVER['HTTP_REFERER'], 'bcdocs.pronovix.net') == false) {
+    exit('{&quot;ERROR&quot;:&quot;Only requests from http://docs.brightcove.com or http:solutions.brightcove.com are accepted by this proxy&quot;}');
+}
+// CORS enablement and other headers
+header(&quot;Access-Control-Allow-Origin: *&quot;);
+header(&quot;Content-type: application/json&quot;);
+header(&quot;X-Content-Type-Options: nosniff&quot;);
+header(&quot;X-XSS-Protection&quot;);
 
+// set up request for access token
+$data = array();
 
-          <h3>Getting ready</h3>
-          <p>This code section contains the basic player, initializes variables and gets ready to make the call to <code>makeRequest()</code>.</p>
-          <ul>
-            <li>Lines 11-21: Standard Brightcove Player code with the addition of a <code>id</code> added</li>
-            <li>Lines 24-26: Create global variable</li>
-            <li>Lines : </li>
-            <li>Lines : </li>
-            <li>Lines : </li>
-            <li>Lines : </li>
-          </ul>
-          <pre class="line-numbers"><code class="language-javascript"></code></pre>
+if ($_POST["client_id"]) {
+    $client_id = $_POST["client_id"];
+} else {
+    $client_id = '123456789';
+}
+if ($_POST["client_secret"]) {
+    $client_secret = $_POST["client_secret"];
+} else {
+    $client_secret = '123456789123456789';
+}
+$auth_string   = &quot;{$client_id}:{$client_secret}&quot;;
+$request       = &quot;https://oauth.brightcove.com/v4/access_token?grant_type=client_credentials&quot;;
+$ch            = curl_init($request);
+curl_setopt_array($ch, array(
+        CURLOPT_POST           =&gt; TRUE,
+        CURLOPT_RETURNTRANSFER =&gt; TRUE,
+        CURLOPT_SSL_VERIFYPEER =&gt; FALSE,
+        CURLOPT_USERPWD        =&gt; $auth_string,
+        CURLOPT_HTTPHEADER     =&gt; array(
+            'Content-type: application/x-www-form-urlencoded',
+        ),
+        CURLOPT_POSTFIELDS =&gt; $data
+    ));
+$response = curl_exec($ch);
+curl_close($ch);
 
+// Check for errors
+if ($response === FALSE) {
+    die(curl_error($ch));
+}
 
+// Decode the response
+$responseData = json_decode($response, TRUE);
+$access_token = $responseData[&quot;access_token&quot;];
 
+// set up the API call
+// get data
+if ($_POST[&quot;requestBody&quot;]) {
+    $data = json_decode($_POST[&quot;requestBody&quot;]);
+} else {
+    $data = array();
+}
+// get request type or default to GET
+if ($_POST[&quot;requestType&quot;]) {
+    $method = $_POST[&quot;requestType&quot;];
+} else {
+    $method = &quot;GET&quot;;
+}
 
-          <h3>Getting ready</h3>
-          <p>This code section contains the basic player, initializes variables and gets ready to make the call to <code>makeRequest()</code>.</p>
-          <ul>
-            <li>Lines 11-21: Standard Brightcove Player code with the addition of a <code>id</code> added</li>
-            <li>Lines 24-26: Create global variable</li>
-            <li>Lines : </li>
-            <li>Lines : </li>
-            <li>Lines : </li>
-            <li>Lines : </li>
-          </ul>
-          <pre class="line-numbers"><code class="language-javascript"></code></pre>
+// more security checks
+$needle = '.com';
+$endapi = strpos($_POST[&quot;url&quot;], $needle) + 4;
+$nextChar = substr($_POST['url'], $endapi, 1);
+if (strpos($_POST[&quot;url&quot;], 'api.brightcove.com') == false) {
+    exit('{&quot;ERROR&quot;:&quot;Only requests to Brightcove APIs are accepted by this proxy&quot;}');
+} else if ($nextChar !== '/' &amp;&amp; $nextChar !== '?') {
+    exit('{&quot;ERROR&quot;: &quot;There was a problem with your API request - please check the URL&quot;}');
+}
+// get the URL and authorization info from the form data
+$request = $_POST[&quot;url&quot;];
+//send the http request
+$ch = curl_init($request);
+curl_setopt_array($ch, array(
+        CURLOPT_CUSTOMREQUEST  =&gt; $method,
+        CURLOPT_RETURNTRANSFER =&gt; TRUE,
+        CURLOPT_SSL_VERIFYPEER =&gt; FALSE,
+        CURLOPT_HTTPHEADER     =&gt; array(
+            'Content-type: application/json',
+            &quot;Authorization: Bearer {$access_token}&quot;,
+        ),
+        CURLOPT_POSTFIELDS =&gt; json_encode($data)
+    ));
+$response = curl_exec($ch);
+curl_close($ch);
 
+// Check for errors
+if ($response === FALSE) {
+    $logEntry = &quot;\nError:\n&quot;.
+    &quot;\n&quot;.date(&quot;Y-m-d H:i:s&quot;).&quot; UTC \n&quot;
+    .$response;
+    $logFileLocation = &quot;log.txt&quot;;
+    $fileHandle      = fopen($logFileLocation, 'a') or die(&quot;-1&quot;);
+    fwrite($fileHandle, $logEntry);
+    fclose($fileHandle);
+    echo &quot;Error: there was a problem with your API call&quot;+
+    die(curl_error($ch));
+}
+
+// Decode the response
+// $responseData = json_decode($response, TRUE);
+// return the response to the AJAX caller
+$responseDecoded = json_decode($response);
+if (!isset($responseDecoded)) {
+    $response = '{null}';
+}
+echo $response;
+?&gt;</code></pre>
+
+</section>
 
 
 
@@ -351,21 +510,6 @@
 
 
 
-          <p></p>
-        </section>
-
-        <section id="section-name2" class="bcls-section">
-          <h2>section-title</h2>
-          <p></p>
-        </section>
-
-        <section id="section-name3" class="bcls-section">
-          <h2>section-title</h2>
-          <p></p>
-        </section>
-
-        <section id="section-name4" class="bcls-section">
-          <h2>section-title</h2>
           <p></p>
         </section>
 
