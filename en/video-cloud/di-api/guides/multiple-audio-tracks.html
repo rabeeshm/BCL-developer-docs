@@ -67,7 +67,7 @@
                 </section>
                 <section class="bcls-section" id="setup">
                     <h2>Setup</h2>
-                    <p>The setup for Dynamic Ingest requests is the same, whether you are ingesting a video, images, a WebVTT file, or all of these:</p>
+                    <p>The setup for Dynamic Ingest requests is the same, whether you are ingesting a video, images, audio tracks, WebVTT files, or all of these:</p>
                     <dl>
                         <dt>Request URL</dt>
                         <dd>
@@ -76,209 +76,64 @@
                         <dt>Authentication</dt>
                         <dd>Authentication requires an access token passed as a <code>Bearer</code> token in an <code>Authorization</code> header:
 <pre class="line-numbers"><code class="language-bash">Authorization: Bearer {access_token}</code></pre>
+                        <p>To get access tokens, you will need <strong>client credentials</strong> (see below). For the process of obtaining an access token, see <a href="//docs.brightcove.com/en/video-cloud/oauth-api/guides/get-token.html">Get Access Tokens</a>.</p>
                         </dd>
                     </dl>
-                </section>
-                <section class="bcls-section" id="s3">
-                    <h2>Note on S3</h2>
+                    <h3 class="bcls-expander-head">Getting client credentials</h3>
+                    <div class="bcls-expander-content">
+                        <p>To get a <code>client_id</code> and <code>client_secret</code>, you will need to go to the OAuth UI and register this app:</p>
+                            <ul>
+                                <li>
+                                    <a href="https://studio.brightcove.com/products/videocloud/admin/oauthsettings">https://studio.brightcove.com/products/videocloud/admin/oauthsettings</a>
+                                </li>
+                            </ul>
+                        <p>You can also get your credentials via CURL or Postman - see:</p>
+                        <ul>
+                            <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html">Get Client Credentials Using CURL</a></li>
+                            <li><a href="http://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials-postman.html">Get Client Credentials Using Postman</a></li>
+                        </ul>
+                    </div>
+                    <h3>Note on S3</h3>
                     <p>If your images will be pulled from a protected S3 bucket, you will need to set a bucket policy to allow Video Cloud to access the files. See <a href="di-s3.html#setPolicy">Using Dynamic Ingest with S3</a> for details.</p>
                 </section>
-                <section class="bcls-section" id="capture-images">
-                    <h2>Capture images</h2>
-                    <p>During transcoding, Video Cloud can capture a snapshot from the video at the midpoint and save this as poster (video still) and thumbnail images.</p>
-                        <aside class="bcls-aside bcls-aside--information">The number of poster and thumbnail created by the Dynamic Ingest is one for each. You cannot create more than one poster and thumbnail renditions even if you have more than one image renditions in the profile.</aside>
-                        <p>For custom renditions, image capture requires that two special renditions be added to the ingest profile that you are using. The new renditions must have the following properties:</p>
-                        <table class="bcls-table">
-                            <thead class="bcls-table__head">
-                                <tr>
-                                    <th>Property</th>
-                                    <th>Value</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bcls-table__body">
-                                <tr>
-                                    <td><code>media_type</code></td>
-                                    <td>"image"</td>
-                                </tr>
-                                <tr>
-                                    <td><code>label</code></td>
-                                    <td>"poster" or "thumbnail" (you need a rendition for each)</td>
-                                </tr>
-                                <tr>
-                                    <td><code>format</code></td>
-                                    <td>"png" or "jpg"</td>
-                                </tr>
-                                <tr>
-                                    <td><code>width</code></td>
-                                    <td>number (pixels)</td>
-                                </tr>
-                                <tr>
-                                    <td><code>height</code></td>
-                                    <td>number (pixels)</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <p>Here is sample data for the two renditions:</p>
-<pre class="line-numbers"><code class="language-json">{
-  "media_type": "image",
-  "format": "jpg",
-  "label": "poster",
-  "width": 1280,
-  "height": 720
-},
-{
-  "media_type": "image",
-  "format": "jpg",
-  "label": "thumbnail",
-  "width": 160,
-  "height": 90
-}</code></pre>
-                        <aside class="bcls-aside bcls-aside--information">
-                            <p>You can specify png or jpg as the format - currently captured images are always output as jpg images.</p>
-                        <p>It is recommended that you use <strong>exactly</strong> the values shown below <em>if you are still using Smart Players</em>. If you have migrated to the new Brightcove Player, you can adjust width and height values to match your players.</p>
-<pre><code>{
-    "height": 360,
-    "label": "poster",
-    "width": 480,
-    "media_type": "image",
-    "format": "png"
-},
-{
-    "height": 90,
-    "label": "thumbnail",
-    "width": 160,
-    "media_type": "image",
-    "format": "png"
-}</code></pre>
-                        </aside>
-                        <p>You should also set the <code>capture-images</code> flag in your request data to <code>true</code>, but this is the default value <em>if</em> the selected profile includes image renditions. (If there are no image renditions in the profile, the default for <code>capture-images</code> is <code>false</code>.)</p>
-                        <h4>Sample request data:</h4>
-<pre class="line-numbers"><code class="language-json">{
-  "master": { "url": "http://learning-services-media.brightcove.com/videos/mp4/Bird_Titmouse.mp4" },
-  "profile": "high-resolution",
-  "capture-images": true
-}</code></pre>
-                <h4>Sample request data for adding an image after the video has been ingested</h4>
-<pre class="line-numbers"><code class="language-json">{
-    "profile": "high-resolution",
-    "thumbnail": {
-        "url": "http://bcls@solutions.brightcove.com/bcls/assets/images/great-blue-heron-thumbnail.png",
-        "width": 160,
-        "height": 90
-    },
-    "poster": {
-        "url": "http://bcls@solutions.brightcove.com/bcls/assets/images/great-blue-heron-poster.png",
-        "width": 1280,
-        "height": 720
-    }
-}</code></pre>
-                    <aside class="bcls-aside bcls-aside--information">Note that you must include the <code>profile</code> field and specify a profile with image renditions (all the standard profiles have them).</aside>
-                </section>
-                <section class="bcls-section" id="ingest_images">
-                    <h2>Ingest images</h2>
-                    <p>You can also include a custom poster and thumbnail for your video (or add them) by referencing their URLs in the JSON you use for the Dynamic Ingest request body:</p>
-<pre class="line-numbers"><code class="language-json">{
-    "poster": {
-        "url": "http://learning-services-media.brightcove.com/images/for_video/Water-In-Motion-poster.png",
-        "width": 1280,
-        "height": 720
-    },
-    "thumbnail": {
-        "url": "http://learning-services-media.brightcove.com/images/for_video/Water-In-Motion-thumbnail.png",
-        "width": 160,
-        "height": 90
-    }
-}</code></pre>
-                    <aside class="bcls-aside bcls-aside--information">
-                        <p>Notes:</p>
-                        <ul>
-                            <li>For images, only unprotected HTTP/HTTPS URLs or signed S3 URLs are currently supported</li>
-                            <li>The poster and thumbnail can be included with the ingestion of a <code>master</code>, or separately</li>
-                            <li>If you are uploading your own poster and thumbnail images along with a video master, and the ingest profile you are using includes image renditions, you should set <code>capture-images</code> to <code>false</code>:
-<pre class="line-numbers"><code class="language-json">{
-    "master": { "url": "http://learning-services-media.brightcove.com/videos/mp4/Bird_Titmouse.mp4" },
-    "profile": "high-resolution",
-    "poster": {
-        "url": "http://learning-services-media.brightcove.com/images/for_video/titmouse-poster.png",
-        "width": 1280,
-        "height": 720
-    },
-    "thumbnail": {
-        "url": "http://learning-services-media.brightcove.com/images/for_video/titmouse-thumbnail.png",
-        "width": 160,
-        "height": 90
-    },
-    "capture-images": false
-}</code></pre>
-                            </li>
-                        </ul>
-                    </aside>
-                </section>
-                <section id="Automatic_resizing" class="bcls-section">
-                    <h2>Automatic resizing</h2>
-                    <p>When you add custom poster and/or thumbnail images via Studio or the Dynamic Ingest API, by default Video Cloud will resize these to match the image sizes defined in the default Ingest Profile for the account.</p>
-                    <h3>Override auto-resizing</h3>
-                    <p>If you want to override this behavior and have Video Cloud retain actual image dimensions, follow these steps:</p>
-                    <ol class="bcls-tasklist">
-                        <li><a href="//support.brightcove.com/en/video-cloud/docs/managing-ingest-profiles">Create a new custom ingest profile</a> for your account (or modify an existing custom profile)</li>
-                        <li>Include image renditions for the post and thumbnail that have <strong>exactly</strong> these <code>width</code> and <code>height</code> values:
-<pre class="line-numbers"><code class="language-json">{
-  "media_type": "image",
-  "format": "jpg",
-  "label": "poster",
-  <span class="bcls-highlight">"width": 9999,</span>
-  <span class="bcls-highlight">"height": 9999</span>
-},
-{
-  "media_type": "image",
-  "format": "jpg",
-  "label": "thumbnail",
-  <span class="bcls-highlight">"width": 9999,</span>
-  <span class="bcls-highlight">"height": 9999</span>
-}</code></pre>
+                <section class="bcls-section" id="workflow">
+                    <h2>Workflow</h2>
+                    <p>There are two primary use cases:</p>
+                    <ul>
+                        <li>Ingest a new video with multiple audio tracks
+                            <figure class="bcls-figure">
+                                <img class="bcls-image" style="max-height:175px" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/di-api/guides/multiple-audio-tracks/new-video-workflow.svg" alt="New Video Workflow">
+                                <figcaption class="bcls-caption--image">New Video Workflow</figcaption>
+                            </figure>
                         </li>
-                        <li><a href="//support.brightcove.com/en/video-cloud/docs/managing-ingest-profiles#default">Make this the default profile</a> for the account if you always want images to be saved with their original sizes.</li>
-                    </ol>
-                    <p>Now when you add custom images via Studio or Dynamic Ingest, they will have the original dimensions of the source images.</p>
+                        <li>Add multiple audio tracks to an existing video
+                            <figure class="bcls-figure">
+                                <img class="bcls-image" style="max-height:175px" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/di-api/guides/multiple-audio-tracks/existing-video.svg" alt="Existing Video Workflow">
+                                <figcaption class="bcls-caption--image">Existing Video Workflow</figcaption>
+                            </figure>
+                        </li>
+                    </ul>
+                    <p>We will look at the details of the API requests in a section below.</p>
                 </section>
-                <!-- <section id="Use_Cases" class="bcls-section">
-                    <h2>Common use cases</h2>
-                    <p>To summarize the information above, some common use cases are listed below with recommended solutions.</p>
-                    <table class="bcls-table">
-                        <caption class="bcls-caption--table">Common Use Cases</caption>
-                        <thead class="bcls-table__head">
-                            <tr>
-                                <th>Use Case</th>
-                                <th>Solution</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bcls-table__body">
-                            <tr>
-                                <td>Always capture images from the video</td>
-                                <td>Use standard ingest profiles or create your own custom profiles, but include the two image renditions from one of the standard profiles.</td>
-                            </tr>
-                            <tr>
-                                <td>Never capture images from the video - you will always upload your own - but use the standard Video Cloud images sizes</td>
-                                <td>
-                                    <ul>
-                                        <li>If you will always ingest videos using the API (not Studio), then you can use the <code>"capture-images": false</code> field in the request body and use any profile you like</li>
-                                        <li>If you want to avoid having to include the <code>capture-images</code> flag everytime you ingest videos, or want the option of adding some videos using Studio, create one or more ingest profiles that have <stong>no</stong> image renditions, and use one of these profiles to ingest your videos whether through the API or the Studio Upload module.</li>
-                                    </ul>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Never capture images from the video - you will always upload your own and keep the original image sizes</td>
-                                <td>
-                                    <ol>
-                                        <li>Create a custom profile with image renditions that have the <code>width</code> and <code>height</code> of the images set to <code>9999</code> (as explained in the <a href="#Automatic_resizing">Automatic Resizing</a> section above) and make this the default profile for the account.</li>
-                                        <li>Ingest your videos via the API using the <code>"capture-images": false</code> flag, or use custom profiles with no image renditions, as explained in the previous use case.</li>
-                                    </ol>
+                <section id="Audio_track_metadata" class="bcls-section">
+                    <h2>Audio track metadata</h2>
+                    <p>There are some metadata fields attached to audio tracks - some of these are set when you ingest the tracks, while others are created by Video Cloud. Some of these fields are read-only, and others can be updated by you. The metadata fields will be detailed below in the context of the relevant API requests, but two particular ones requirse some explanation here, as they are crucial in determining how the Brightcove Player will handle the multiple audio tracks.</p>
+                    <h3><code>language</code></h3>
+                    <p>The <code>language</code> field, set for each track during ingestion, specifies the language for the track. This is important if the track is a dub of spoken words in the video. The value of this field will be a two-letter code like <code>en</code> or <code>hi</code>. For a full list of language codes, see the <code>Subtag</code> values in <a href="http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry">http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry</a>.</p>
+                    <h3><code>variant</code></h3>
+                    <p>The <code>variant</code> field describes the kind of audio track. The possible values, with standard meanings are:</p>
+                    <ul>
+                        <li><code>main</code> - the default track, usually the one muxed into the video file</li>
+                        <li><code>alternate</code> - an alternate audio track</li>
+                        <li><code>commentary</code> - an audio track that provides commentary on the video track</li>
+                        <li><code>dub</code> - a tracked containing a dubbed version of spoken words in a different language</li>
+                        <li><code>descriptive</code></li>
+                    </ul>
+                </section>
+                <section class="bcls-section" id="Ingest_audio_tracks">
+                    <h2>Ingest audio tracks</h2>
+                </section>
 
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </section> -->
             </article>
             <!-- end drupal content -->
             <section class="bcls-section" id="BCLreferences">
