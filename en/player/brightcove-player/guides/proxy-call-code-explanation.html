@@ -94,20 +94,14 @@
           </figure>
         </section>
 
-        <section id="Example_1_code_walkthough" class="bcls-section">
-          <h2>Example 1 code walkthough</h2>
+        <section id="Example_code_walkthough" class="bcls-section">
+          <h2>Example code walkthough</h2>
           <p>Rather than looking at the code as one piece, it will be presented and discussed in sections. Some of the sections will relate to the diagram in the section above.</p>
-          <h3>Getting ready</h3>
-          <p>This code section contains the basic player, initializes variables and gets ready to make the call to <code>makeRequest()</code>.</p>
+          <h3>Standard player code</h3>
+          <p>This code section contains the basic Brightcove Player in-page embed code.</p>
           <ul>
             <li>Lines 11-21: Standard Brightcove Player code with the addition of a <code>id</code> added</li>
-            <li>Lines 24-26: Create global variable</li>
-            <li>Lines : </li>
-            <li>Lines : </li>
-            <li>Lines : </li>
-            <li>Lines : </li>
           </ul>
-
           <pre class="line-numbers"><code class="language-html">&lt;!doctype html&gt;
 &lt;html&gt;
 
@@ -128,60 +122,172 @@
     controls
     width=&quot;640&quot;
     height=&quot;360&quot;&gt;&lt;/video&gt;
-  &lt;script src=&quot;//players.brightcove.net/1752604059001/HkAzSmB0l_default/index.min.js&quot;&gt;&lt;/script&gt;
-</code></pre>
-<h3>Getting ready</h3>
-<p>This code section contains the basic player, initializes variables and gets ready to make the call to <code>makeRequest()</code>.</p>
-<ul>
-  <li>Lines 11-21: Standard Brightcove Player code with the addition of a <code>id</code> added</li>
-  <li>Lines 24-26: Create global variable</li>
-  <li>Lines : </li>
-  <li>Lines : </li>
-  <li>Lines : </li>
-  <li>Lines : </li>
-</ul>
+  &lt;script src=&quot;//players.brightcove.net/1752604059001/HkAzSmB0l_default/index.min.js&quot;&gt;&lt;/script&gt;</code></pre>
 
-<pre class="line-numbers"><code class="language-html">&lt;!doctype html&gt;
-&lt;html&gt;
 
-&lt;head&gt;
-&lt;meta charset=&quot;UTF-8&quot;&gt;
-&lt;title&gt;Untitled Document&lt;/title&gt;
-&lt;/head&gt;
+          <h3>Preparing to make call</h3>
+          <p>This code section initializes variables and gets ready to make the call to <code>makeRequest()</code>.</p>
+          <ul>
+            <li>Lines 2-4: Create global variables</li>
+            <li>Lines 6: Standard code to wait until the player is ready to interact with.</li>
+            <li>Lines 7-11: Create the <code>options</code> object and assign values needed for HttpRequest.</li>
+            <li>Lines 14-16: Wait for the <code>loadstart</code> event so the <code>mediainfo</code> object is populated. Assign variables to hold values needed for the Analytics API endpoint.</li>
+            <li>Line 18: Build the nearly complete endpoint needed for this particular call to the Analytics API. Note that it will have the HTTP method appended later.</li>
+          </ul>
+          <pre class="line-numbers"><code class="language-javascript">  &lt;script type=&quot;text/javascript&quot;&gt;
+    var myPlayer,
+      viewsCount,
+      viewsObject = [];
 
-&lt;body&gt;
+    videojs('myPlayerID').ready(function() {
+      myPlayer = this,
+        options = [],
+        options.requestType = 'GET',
+        options.proxyURL = 'http://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
+        options.requestBody = '';
+      // Wait for loadstart event so mediainfo is populated
+      // and the video ID and account ID can be retrieved
+      myPlayer.on('loadstart', function() {
+        var videoID = myPlayer.mediainfo.id,
+          accountID = myPlayer.mediainfo.accountId;
+        // Build the Analytics API endpoint
+        options.url = 'https://analytics.api.brightcove.com/v1/alltime/accounts/' + accountID + '/videos/' + videoID;</code></pre>
 
-&lt;video id=&quot;myPlayerID&quot;
-data-video-id=&quot;3851380732001&quot;
-data-account=&quot;1752604059001&quot;
-data-player=&quot;HkAzSmB0l&quot;
-data-embed=&quot;default&quot;
-data-application-id
-class=&quot;video-js&quot;
-controls
-width=&quot;640&quot;
-height=&quot;360&quot;&gt;&lt;/video&gt;
-&lt;script src=&quot;//players.brightcove.net/1752604059001/HkAzSmB0l_default/index.min.js&quot;&gt;&lt;/script&gt;
 
-&lt;script type=&quot;text/javascript&quot;&gt;
-var myPlayer,
-viewsCount,
-viewsObject = [];
+          <h3>Call <code>makeRequest()</code></h3>
+          <p>This code section makes the call to <code>makeRequest()</code> function. Note that two parameters are passed. The first being the options object that holds info for the endpoint, and the second is the callback function. Remember, this is an asynchronous call so the callback function won't be called until data has been returned to the <code>makeRequest()</code> function. </p>
+          <ul>
+            <li>Line 1: Call the <code>makeRequest()</code> function.</li>
+            <li>Lines 1-10: The callback function is defined as an anonymous function. Remember that this function is a parameter and NOT called here but later in the code.</li>
+            <li>Lines 3, 5, 7: <code>console.log()</code> statements that display:
+              <ul>
+                <li>The raw JSON string that is returned by the API call.</li>
+                <li>The JSON object generated by the <code>JSON.parse()</code> method that does conversion from string to object.</li>
+                <li>The actual views count, extracted from the object by using simple <code>object.property</code> notation.</li>
+              </ul>
+            </li>
+            <li>Line 9: Calls the function that displays the number of views in the controlbar.</li>
+          </ul>
+            <p>The following screenshot from the console shows actual displayed data from the <code>console.log</code> statements:</p>
+              <figure class="bcls-figure">
+                  <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/architecture/proxy-API-call/console-data-process-callback-function.png" alt="Processing of data in callback function">
+              </figure>
+          <pre class="line-numbers"><code class="language-javascript">makeRequest(options, <span class="bcls-highlight">function(viewsRaw) {
+  // Remove console.log command for production code
+  console.log('viewsRaw', viewsRaw);
+  viewsObject = JSON.parse(viewsRaw);
+  console.log('viewsObject', viewsObject);
+  viewsCount = viewsObject.alltime_video_views;
+  console.log('views', viewsCount);
+  // Call function to place data in controlbar
+  placeCountInControlbar();
+}</span>);</code></pre>
 
-videojs('myPlayerID').ready(function() {
-myPlayer = this,
-options = [],
-options.requestType = 'GET',
-options.proxyURL = 'http://solutions.brightcove.com/bcls/bcls-proxy/doc-samples-proxy.php',
-options.requestBody = '';
-// Wait for loadstart event so mediainfo is populated
-// and the video ID and account ID can be retrieved
-myPlayer.on('loadstart', function() {
-var videoID = myPlayer.mediainfo.id,
-accountID = myPlayer.mediainfo.accountId;
-// Build the Analytics API endpoint
-options.url = 'https://analytics.api.brightcove.com/v1/alltime/accounts/' + accountID + '/videos/' + videoID;
-</code></pre>
+
+          <h3>Actual <code>makeRequest()</code> function - Part 1</h3>
+          <p>This is the about half of the code that actually defines the <code>makeRequest()</code> function.</p>
+          <ul>
+            <li>Lines 1-6: Function definition and variables creation.</li>
+            <li>Line 16: Creates the actual endpoint needed for the Analytics API call. It uses the partial endpoint built earlier and then appends the HTTP method. In this case the result would look similar to (remember it is URL encoded):
+              <pre class="line-numbers"><code class="language-javascript">url=https%3A%2F%2Fanalytics.api.brightcove.com%2Fv1%2Falltime%2Faccounts%2F1752604059001%2Fvideos%2F3851380732001&requestType=GET</code></pre>
+            </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+          </ul>
+          <pre class="line-numbers"><code class="language-javascript">function makeRequest(options, callback) {
+  var httpRequest = new XMLHttpRequest(),
+    response,
+    requestParams,
+    dataString,
+    proxyURL = options.proxyURL,
+    /**
+     * set up request data
+     * the proxy used here takes the following params:
+     * url - the full API request (required)
+     * requestType - the HTTP request type (default: GET)
+     * clientId - the client id (defaults here to a Brightcove sample account value - this should always be stored on the server side if possible)
+     * clientSecret - the client secret (defaults here to a Brightcove sample account value - this should always be stored on the server side if possible)
+     * requestData - request body for write requests (optional JSON string)
+     */
+    requestParams = "url=" + encodeURIComponent(options.url) + "&requestType=" + options.requestType;
+  // only add client id and secret if both were submitted
+  if (options.client_id && options.client_secret) {
+    requestParams += '&client_id=' + options.client_id + '&client_secret=' + options.client_secret;
+  }
+  // add request data if any
+  if (options.requestData) {
+    requestParams += '&requestBody=' + options.requestBody;
+  }
+  console.log('requestParams', requestParams);
+  // set response handler
+  httpRequest.onreadystatechange = getResponse;
+  // open the request
+  httpRequest.open('POST', proxyURL);
+  // set headers
+  httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  // open and send request
+  httpRequest.send(requestParams);</code></pre>
+
+
+          <h3>Getting ready</h3>
+          <p>This code section contains the basic player, initializes variables and gets ready to make the call to <code>makeRequest()</code>.</p>
+          <ul>
+            <li>Lines 11-21: Standard Brightcove Player code with the addition of a <code>id</code> added</li>
+            <li>Lines 24-26: Create global variable</li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+          </ul>
+          <pre class="line-numbers"><code class="language-javascript"></code></pre>
+
+
+
+          <h3>Getting ready</h3>
+          <p>This code section contains the basic player, initializes variables and gets ready to make the call to <code>makeRequest()</code>.</p>
+          <ul>
+            <li>Lines 11-21: Standard Brightcove Player code with the addition of a <code>id</code> added</li>
+            <li>Lines 24-26: Create global variable</li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+          </ul>
+          <pre class="line-numbers"><code class="language-javascript"></code></pre>
+
+
+
+
+          <h3>Getting ready</h3>
+          <p>This code section contains the basic player, initializes variables and gets ready to make the call to <code>makeRequest()</code>.</p>
+          <ul>
+            <li>Lines 11-21: Standard Brightcove Player code with the addition of a <code>id</code> added</li>
+            <li>Lines 24-26: Create global variable</li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+          </ul>
+          <pre class="line-numbers"><code class="language-javascript"></code></pre>
+
+
+
+
+          <h3>Getting ready</h3>
+          <p>This code section contains the basic player, initializes variables and gets ready to make the call to <code>makeRequest()</code>.</p>
+          <ul>
+            <li>Lines 11-21: Standard Brightcove Player code with the addition of a <code>id</code> added</li>
+            <li>Lines 24-26: Create global variable</li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+          </ul>
+          <pre class="line-numbers"><code class="language-javascript"></code></pre>
+
+
         </section>
 
         <section id="section-name1" class="bcls-section">
