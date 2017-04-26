@@ -202,62 +202,54 @@
                           offsetValue = 0,
                           limitValue = 3,
                           firstTime = true,
-                          requestURL,
                           eNextButton = document.getElementById("nextButton"),
                           eApiRequest = document.getElementById("apiRequest"),
                           playlistLength;
 
                       videojs("myPlayerID").ready(function(){
                           myPlayer = this;
-                          // set up data for Playback API request
-                          requestData = setRequestData();
-                          // make the Playback API request to get playlist data
-                          getMediaData('playlist', requestData, function (mediaData) {
-                              // console.log("mediaData= ",mediaData);
-                              playlistLength = mediaData.videos.length;
-                              // console.log("playlistLength= ",playlistLength);
-                              displayPlaylist();
-                              eNextButton.addEventListener("click",function(){
-                                offsetValue += 3;
-                                if (offsetValue >= playlistLength) {
-                                  offsetValue = 0;
-                                }
-                                displayPlaylist();
-                              });
-                          });
+                  				// use the catalog library to get the playlist length
+                  				myPlayer.catalog.getPlaylist(playlistId, function(error, playlist){
+                  		      //deal with error
+                  					playlistLength = playlist.length;
+                  					displayPlaylist();
+                  					eNextButton.addEventListener("click",function(){
+                  					  offsetValue += 3;
+                  						if (offsetValue >= playlistLength) {
+                  							offsetValue = 0;
+                  						}
+                  						displayPlaylist();
+                  					});
+                  		    })
                       });
 
                       function displayPlaylist() {
-                        // set up data for Playback API request
-                        requestData = setRequestData();
-                        // console.log("requestData= ",requestData);
-                        mediaType = 'playlist';
-                        // make the Playback API request to get playlist data
-                        getMediaData(mediaType, requestData, function (mediaData) {
-                            // console.log("mediaData= ",mediaData);
-                            // add the newest videos list to the player as a playlist
-                            myPlayer.catalog.load(mediaData.videos[0]);
-                            myPlayer.playlist(mediaData.videos);
-                        });
-                      }
+                  			// set up data for Playback API request
+                  			requestData = setRequestData();
+                  			mediaType = 'playlist';
+                  			// make the Playback API request to get playlist data
+                  			getMediaData(mediaType, requestData, function (mediaData) {
+                  					// load the first video of the current playlist to the player
+                  					myPlayer.catalog.load(mediaData.videos[0]);
+                  					// loop through video data and change duration from milliseconds to seconds
+                  					for (var i=0; i<limitValue; i++) {
+                  						mediaData.videos[i].duration = mediaData.videos[i].duration * .001;
+                  					}
+                  					// add the newest videos list to the playlist
+                  					myPlayer.playlist(mediaData.videos);
+                  			});
+                  		}
 
                       /**
                        * sets up the data for the API request
                        */
-                      function setRequestData() {
-                        console.log("setRequestData");
-                        var endPoint = '';
-
-                        if (firstTime) {
-                          firstTime = false;
-                          requestURL = apiBaseURL +  accountId + '/playlists/' + playlistId;
-                        } else {
-                          requestURL = apiBaseURL +  accountId + '/playlists/' + playlistId + '?offset=' + offsetValue + '&limit=' + limitValue;
+                       function setRequestData() {
+                         console.log("setRequestData");
+                         var requestURL = '';
+                   			 requestURL = apiBaseURL +  accountId + '/playlists/' + playlistId + '?offset=' + offsetValue + '&limit=' + limitValue;
+                         eApiRequest.innerHTML = requestURL;
+                         return requestURL;
                         }
-                        eApiRequest.innerHTML = requestURL;
-
-                        return requestURL;
-                       }
 
                        /**
                         * request data from the Playback API
@@ -273,7 +265,6 @@
                                 if (httpRequest.status === 200) {
                                   responseData = httpRequest.responseText;
                                   parsedData = JSON.parse(responseData);
-                                  console.log("parsedData",parsedData);
                                   switch (mediaType) {
                                     case 'video':
                                       // do nothing
@@ -390,17 +381,22 @@
                       <li>Add the following JavaScript to your page code:
 
                     <ul>
-                        <li>Lines 52-67: Define variables. Use your own values for the Policy Key, Account Id and Playlist Id.</li>
-                        <li>Line 70: Gets a reference to the player when it is ready.</li>
-                        <li>Lines 72: Makes a call to the Playback API to get the total number of videos in the playlist.</li>
+                        <li>Lines 52-66: Define variables. Use your own values for the Policy Key, Account Id and Playlist Id.</li>
+                        <li>Line 69: Gets a reference to the player when it is ready.</li>
+                        <li>Lines 71: Makes a call to the <code>catalog</code>'s <code>getPlaylist()</code> method to get the total number of videos in the playlist. You can also make a call to the Playback API to retrieve this information.</li>
                         <li>Line 74: Makes a call to the Playback API to get the first set of videos in the playlist and loads them into the player.</li>
-                        <li>Lines 77-83: Add a listener to the <strong>Next Videos</strong> button. When selected, make a call to the Playback API to get the next set of videos in the playlist and load them into the player.</li>
-                        <li>Lines 87-97: Make a request to the Playback API to get a set of videos from the playlist.</li>
-                        <li>Line 94: Loads the first video object into the player.</li>
-                        <li>Line 95: Loads the current set of video objects into the playlist.</li>
-                        <li>Lines 102-113: Set the Playback API request URL. First time, all videos are returned for the playlist. After that, the next set of videos are returned from the playlist, using the <code>limit</code> and <code>offset</code> parameters.</li>
+                        <li>Lines 75-81: Add a listener to the <strong>Next Videos</strong> button. When selected, make a call to the Playback API to get the next set of videos in the playlist and load them into the player.</li>
+                        <li>Lines 90-99: Make a request to the Playback API to get a set of videos from the playlist.</li>
+                        <li>Line 92: Loads the first video object into the player.</li>
                         <li><p>
-                          Lines 118-153: Make the Playback API request using the request URL along with the Policy Key in the header.
+                          Lines 94-96: Loop through the media data returned from the Playback API and change the <code>duration</code> from milliseconds to seconds.
+                        </p>
+                          <aside class="bcls-aside bcls-aside--information">The Playback API stores <code>duration</code> in milliseconds, but the <code>playlist()</code> method is expecting it in seconds.</aside>
+                        </li>
+                        <li>Line 98: Loads the current set of video objects into the playlist.</li>
+                        <li>Lines 105-109: Set the Playback API request URL. First time, all videos are returned for the playlist. After that, the next set of videos are returned from the playlist, using the <code>limit</code> and <code>offset</code> parameters.</li>
+                        <li><p>
+                          Lines 114-149: Make the Playback API request using the request URL along with the Policy Key in the header.
                         </p></li>
                     </ul>
 <pre class="line-numbers" data-start="51"><code class="language-javascript">&lt;script type=&quot;text/javascript&quot;&gt;
@@ -417,26 +413,24 @@
       offsetValue = 0,
       limitValue = 3,
       firstTime = true,
-      requestURL,
       eNextButton = document.getElementById(&quot;nextButton&quot;),
       playlistLength;
 
   videojs(&quot;myPlayerID&quot;).ready(function(){
-      myPlayer = this;
-      // set up data for Playback API request
-      requestData = setRequestData();
-      // make the Playback API request to get playlist data
-      getMediaData('playlist', requestData, function (mediaData) {
-          playlistLength = mediaData.videos.length;
-          displayPlaylist();
-          eNextButton.addEventListener(&quot;click&quot;,function(){
-            offsetValue += 3;
-            if (offsetValue &gt;= playlistLength) {
-              offsetValue = 0;
-            }
-            displayPlaylist();
-          });
+    myPlayer = this;
+    // use the catalog library to get the playlist length
+    myPlayer.catalog.getPlaylist(playlistId, function(error, playlist){
+      //deal with error
+      playlistLength = playlist.length;
+      displayPlaylist();
+      eNextButton.addEventListener(&quot;click&quot;,function(){
+        offsetValue += 3;
+      	if (offsetValue &gt;= playlistLength) {
+      		offsetValue = 0;
+      	}
+      	displayPlaylist();
       });
+    })
   });
 
   function displayPlaylist() {
@@ -445,27 +439,25 @@
     mediaType = 'playlist';
     // make the Playback API request to get playlist data
     getMediaData(mediaType, requestData, function (mediaData) {
-        // add the newest videos list to the player as a playlist
-        myPlayer.catalog.load(mediaData.videos[0]);
-        myPlayer.playlist(mediaData.videos);
+      // load the first video of the current playlist to the player
+      myPlayer.catalog.load(mediaData.videos[0]);
+      // loop through video data and change duration from milliseconds to seconds
+      for (var i=0; i&lt;limitValue; i++) {
+      	mediaData.videos[i].duration = mediaData.videos[i].duration * .001;
+      }
+      // add the newest videos list to the playlist
+      myPlayer.playlist(mediaData.videos);
     });
   }
 
   /**
    * sets up the data for the API request
    */
-  function setRequestData() {
-    var endPoint = '';
-
-    if (firstTime) {
-      firstTime = false;
-      requestURL = apiBaseURL +  accountId + '/playlists/' + playlistId;
-    } else {
-      requestURL = apiBaseURL +  accountId + '/playlists/' + playlistId + '?offset=' + offsetValue + '&amp;limit=' + limitValue;
+   function setRequestData() {
+     var requestURL = '';
+     requestURL = apiBaseURL +  accountId + '/playlists/' + playlistId + '?offset=' + offsetValue + '&amp;limit=' + limitValue;
+     return requestURL;
     }
-
-    return requestURL;
-   }
 
    /**
     * request data from the Playback API
