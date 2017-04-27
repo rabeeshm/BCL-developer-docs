@@ -55,7 +55,8 @@
       <!-- begin drupal content -->
       <article class="bcls-article">
         <header id="bcls_header" class="bcls-header">
-          <p>In this topic, you will first get a high level overview of using the REST APIs. Then later in the document a deeper dive will discuss example code. The first example uses the Analytics API to retrieve and display in the player's controlbar the number of views the video currently in the player has had. The second, and slightly more complex, example uses the CMS API to retrieve the most popular videos from an account and show them in a playlist. The code discussion in this document will center on retrieving the desired data from the correct REST API.</p>
+          <p>In this topic, you will first get a high level overview of using the REST APIs. Then later in the document a deeper dive will discuss example code. The first example uses the Analytics API to retrieve and display in the player's controlbar the number of views the video currently in the player has had. The second, and slightly more complex, example uses the Analytics and CMS APIs to retrieve the most popular videos from an account and show them in a playlist. The code discussion in this document will center on retrieving the desired data from the correct REST API.</p>
+          <aside class="bcls-aside bcls-aside--warning">For security reasons, the Brightcove REST APIs cannot be directly accessed from a client, and a proxy is needed (as detailed in this document). If using server to server communication a proxy is not needed.</aside>
         </header>
 
         <section id="High_level_view" class="bcls-section">
@@ -329,18 +330,27 @@ function getResponse() {
   spacer.appendChild(newElement);
 }</code></pre>
 
+          <h3>Complete code listing</h3>
+          <p>The complete, functioning code is located in this GitHub repository: <a href="https://github.com/BrightcoveLearning/learning-guide-using-rest-apis/blob/master/display-views-in-controlbar.html">display-views-in-controlbar.html</a>.</p>
+        </section>
 
         <section id="Proxy_code" class="bcls-section">
           <h2>Proxy code</h2>
-          <p>As mentioned earlier, the proxy can be written in the language of your choice. These Brightcove examples use a proxy written in PHP. Since the implementation of the proxy is so language dependent, the PHP code below will not be analyzed in detail in this document, but highlights will be shown next.</p>
-          <p>The major features of the proxy code shown below are:</p>
+          <p>As mentioned earlier, the proxy can be written in the language of your choice. The Brightcove API documentation examples use a proxy written in PHP. Since the implementation of the proxy is so language dependent, the PHP code below will not be analyzed in detail in this document.</p>
+          <p>The basic functionality provided by a proxy must include:</p>
+          <ol>
+            <li>Accept client request.</li>
+            <li>Get <strong>auth token</strong> from the OAuth API.</li>
+            <li>Send auth token and data request to a particular API.</li>
+            <li>Receive data back from API</li>
+            <li>Send data back to client</li>
+          </ol>
+          <p>Major code sections of the API are:</p>
           <ul>
-            <li>Lines 19-20: Only requests from certain Brightcove internal domains are accepted. Of course, you would need to alter to accept requests from your domains.</li>
-            <li>Lines 24-26: Create global variable</li>
-            <li>Lines : </li>
-            <li>Lines : </li>
-            <li>Lines : </li>
-            <li>Lines : </li>
+            <li>Lines 19-20: Screens requests so only certain Brightcove internal domains can use the proxy. Of course, you would need to alter to accept requests from your domains.</li>
+            <li>Lines 31-55: Makes request to the OAuth API for auth token.</li>
+            <li>Lines 89-104: Makes call to specified Brightcove API for data.</li>
+            <li>Line 126: Returns data to client.</li>
           </ul>
           <pre class="line-numbers"><code class="language-javascript">&lt;?php
 /**
@@ -470,7 +480,19 @@ if (!isset($responseDecoded)) {
 echo $response;
 ?&gt;</code></pre>
 
-</section>
+          <p>Although the entire code for the proxy server is shown above, it is also located in the GitHub repo: <a href="https://github.com/BrightcoveLearning/learning-guide-using-rest-apis/blob/master/proxy.php">proxy.php</a>.</p>
+        </section>
+
+        <section id="Example_2" class="bcls-section">
+          <h2>Example 2</h2>
+          <p>This second example is more complex than the one detailed earlier. The example displays the six most popular videos from an account as an overlay when the currently playing video is paused. The main steps of the code are:</p>
+          <ol>
+            <li>Request from the Analytics API the 6 videos with the most views in an account. This step involves an asynchronous call using a callback function.</li>
+            <li>From the returned data extract only the video IDs and place them in an array.</li>
+            <li>Request the complete video objects for each of the videos in the list of IDs in the array. This step involves looping over the array and requesting the video objects using <code>player.catalog.getVideo()</code>. Of course, this involves another asynchronous call.</li>
+            <li>Create an HTML <code>div</code> element and populate it with the video thumbnails. Make the thumbnails links so when clicked that video will load in the player.</li>
+            <li>Use the <code>player.overlay()</code> method to display the overlay only when the video is paused.</li>
+          </ol>
 
 
 
@@ -487,10 +509,6 @@ echo $response;
           <pre class="line-numbers"><code class="language-javascript"></code></pre>
 
 
-        </section>
-
-        <section id="section-name1" class="bcls-section">
-          <h2>section-title</h2>
           <ol>
             <li>Build the request</li>
             <li>Make the request, pass two arguments
