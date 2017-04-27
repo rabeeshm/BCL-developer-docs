@@ -55,7 +55,7 @@
       <!-- begin drupal content -->
       <article class="bcls-article">
         <header id="bcls_header" class="bcls-header">
-          <p>In this topic, you will first get a high level overview of using the REST APIs. Then later in the document a deeper dive will discuss example code. The first example uses the Analytics API to retrieve and display in the player's controlbar the number of views the video currently in the player has had. The second, and slightly more complex, example uses the Analytics and CMS APIs to retrieve the most popular videos from an account and show them in a playlist. The code discussion in this document will center on retrieving the desired data from the correct REST API.</p>
+          <p>In this topic, you will first get a high level overview of using the REST APIs. Then later in the document a deeper dive will discuss example code. The first example uses the Analytics API to retrieve and display in the player's controlbar the number of views the video currently in the player has had. The second, and slightly more complex, example uses the Analytics API in conjunctions with the Brightcove Player catalog to retrieve the most popular videos from an account and show them in a playlist. The code discussion in this document will center on retrieving the desired data from the correct REST API.</p>
           <aside class="bcls-aside bcls-aside--warning">For security reasons, the Brightcove REST APIs cannot be directly accessed from a client, and a proxy is needed (as detailed in this document). If using server to server communication a proxy is not needed.</aside>
         </header>
 
@@ -493,8 +493,58 @@ echo $response;
             <li>Create an HTML <code>div</code> element and populate it with the video thumbnails. Make the thumbnails links so when clicked that video will load in the player.</li>
             <li>Use the <code>player.overlay()</code> method to display the overlay only when the video is paused.</li>
           </ol>
+          <p>Since you are now familiar with many of the concepts and specific code on how to call the APIs, the code highlights for this example will be at a higher level.</p>
 
-
+          <h3>The controller</h3>
+          <p>Although at the bottom of the script block, the code defined as the event handler for the <code>loadstart</code> event is the first code that will be executed. The event handler directs the major actions that take place in the code, in essence acting as a controller.</p>
+          <ul>
+            <li>Lines 291, 323: Define event handler as an anonymous function.</li>
+            <li>Line 299: Sets the data needed for the call to the API.</li>
+            <li>Lines 301-322: Calls the <code>makeRequest()</code> function passing two parameters, the API call information and a callback function. This should sound familiar from above. Very importantly, the <code>makeRequest()</code> function that is called IS THE EXACT SAME FUNCTION USED IN THE PREVIOUS EXAMPLE. You can do the same in your code. The <code>makeRequest()</code> function was written to be reused with any calls to a Brightcove REST API.</li>
+            <li>Lines 301-322: Defines the callback function that is executed with the <code>makeRequest()</code> function. This is what is executed once the data from the Analytics API call has been returned.</li>
+            <li>Line 310: Assigns to the <code>videoIDs</code> variable an array of video IDs by calling the <code>extractVideoIds()</code> function.</li>
+            <li>Lines 308-321: Calls the <code>getVideoData</code> function which contains asynchronous calls to the player catalog to retrieve complete video objects based on the ID. As usual with the code used in this document, the asynchronous call uses an anonymously defined callback function.</li>
+            <li>Line 310: Assigns to the <code>videoList</code> variable an HTML <code>div</code> element containing video thumbnails by calling the <code>createVideoList()</code> function.</li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+          </ul>
+          <pre class="line-numbers" data-start="288"><code class="language-javascript">/**
+ * acts as a controller for the rest of the script
+ */
+player.one('loadstart', function () {
+  var requestData = {},
+    videoIds = [],
+    videoList,
+    overlayDiv = createEl('div'),
+    parsedData = "";
+  // add the overlay
+  // set up data for Analytics API request
+  requestData = setRequestData();
+  // make the Analytics API request
+  makeRequest(requestData, <span class="bcls-highlight">function (analyticsData) {
+    //Convert raw JSON then populate HTML page with response data
+    parsedData = JSON.parse(analyticsData);
+    responseData.textContent = JSON.stringify(parsedData, null, '  ');
+    // extract the video ids into an array
+    videoIds = extractVideoIds(analyticsData);
+    // use the catalog to get the video data
+    getVideoData(videoIds, function () {
+      // generate the HTML for the overlay
+      videoList = createVideoList(videoData);
+      // add the overlay
+      overlayDiv.appendChild(videoList);
+      player.overlay({
+        overlays: [{
+          align: 'top',
+          content: overlayDiv,
+          start: 'pause',
+          end: 'play'
+        }] //end overlays definition
+      }); //end call to overlay method
+    }); //end getVideoData function call
+  }</span>); //end makeRequest call
+}); //end loadstart event handler</code></pre>
 
           <h3>Getting ready</h3>
           <p>This code section contains the basic player, initializes variables and gets ready to make the call to <code>makeRequest()</code>.</p>
@@ -508,27 +558,30 @@ echo $response;
           </ul>
           <pre class="line-numbers"><code class="language-javascript"></code></pre>
 
+          <h3>Getting ready</h3>
+          <p>This code section contains the basic player, initializes variables and gets ready to make the call to <code>makeRequest()</code>.</p>
+          <ul>
+            <li>Lines 11-21: Standard Brightcove Player code with the addition of a <code>id</code> added</li>
+            <li>Lines 24-26: Create global variable</li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+          </ul>
+          <pre class="line-numbers"><code class="language-javascript"></code></pre>
 
-          <ol>
-            <li>Build the request</li>
-            <li>Make the request, pass two arguments
-              <ul>
-                <li>Argument 1: The request information </li>
-                <li>Pass the callback function, the argument of the callback function will contain desired data returned by the API call</li>
-                <li>Process the returned, raw JSON data</li>
-                <li>Display processed information as desired</li>
-              </ul>
-            </li>
-            <li></li>
-            <li></li>
-            <li>url=https://analytics.api.brightcove.com/v1/alltime/accounts/1752604059001/videos/3851380732001&requestType=GET</li>
-          </ol>
+          <h3>Getting ready</h3>
+          <p>This code section contains the basic player, initializes variables and gets ready to make the call to <code>makeRequest()</code>.</p>
+          <ul>
+            <li>Lines 11-21: Standard Brightcove Player code with the addition of a <code>id</code> added</li>
+            <li>Lines 24-26: Create global variable</li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+            <li>Lines : </li>
+          </ul>
+          <pre class="line-numbers"><code class="language-javascript"></code></pre>
 
-
-
-
-
-          <p></p>
         </section>
 
       </article>
