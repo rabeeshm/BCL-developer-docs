@@ -7,11 +7,11 @@
     <meta name="products" content="Zencoder">
     <meta name="role" content="API Developer">
     <meta name="task" content="">
-    <meta name="topic" content="Notifications">
+    <meta name="topic" content="">
     <meta name="API" content="Zencoder">
     <!-- End Drupal Taxonomy Data -->
     <title>
-        Getting Started: Getting Notifications When Videos Are Finished -- Zencoder
+        Getting Started: How Zencoder Saves Your Files When Uploads Fail
     </title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
@@ -55,255 +55,90 @@
             <div id="sidenav" class="side-nav"></div>
         </div>
         <div id="main" class="large-10 small-12 columns">
-            <h2>Getting Notifications When Videos Are Finished</h2>
+            <h1>How Zencoder Saves Your Files When Uploads Fail</h1>
             <!-- begin drupal content -->
             <article class="bcls-article">
                 <header id="bcls_header" class="bcls-header">
-                    <p>This topic shows you how to get nofications when your Zencoder job is complete.</p>
+                    <p>Beginning with version 2 of the API, Zencoder will recover any files that couldn't be uploaded to your server and make them available to you via Amazon S3.</p>
                 </header>
                 <section id="Overview" class="bcls-section">
                     <h2>Overview</h2>
-                    <p>After a job or an output file is complete, you can find out about it in several ways.</p>
-                    <ul>
-                        <li>We can POST an HTTP request to your application with the details.
-                            <ul>
-                                <li><a href="notifications.html#api_version_2">API Version 2 Notification Content</a></li>
-                            </ul>
-                        </li>
-                        <li>You can <a href="../guides/advanced-integration/getting-zencoder-notifications-while-developing-locally.html">request your notifications using the Zencoder Fetcher gem</a>. This is useful when you are developing locally and Zencoder
-                            can't reach your development server.</li>
-                        <li>We can send an email.</li>
-                        <li>You can check the Zencoder Dashboard for job status.</li>
-                    </ul>
+                    <p>If a transfer error is encountered while attempting to upload files that error will be captured and a Zencoder server will be used for the remainder of the files. Should this happen on your job there will be details in both the notifications that are posted to your application and on the Zencoder dashboard.</p>
                 </section>
-
-                <section id="http_email_notifications" class="bcls-section">
-                    <h2>Get HTTP/Email notifications</h2>
-                    <p>To receive HTTP or email notifications, add <a href="../encoding/notifications/notifications">Notification options</a> to your API request, like this:</p>
-<pre class="line-numbers"><code class="language-json">{
-  "api_key": "93h630j1dsyshjef620qlkavnmzui3",
-  "input": "s3://bucket-name/file-name.avi",
-  "notifications": [
-  "http://user:password@example.com/zencoder",
-  "admin@example.com"
-  ],
-  "outputs": [
-  {
-      "label": "web",
-      "url": "s3://output-bucket/web.mp4",
-      "size": "512x384",
-      "notifications": [
-      "http://user:password@example.com/zencoder",
-      "admin@example.com"
-      ]
-  },
-  {
-      "label": "iphone",
-      "url": "s3://output-bucket/iphone.m4v",
-      "size": "480x320",
-      "notifications": [
-      {"format": "xml", "url": "http://user:password@example.com/zencoder1"},
-      {"format": "json", "url": "http://user:password@example.com/zencoder2"},
-      "http://example.com/zencoder3",
-      "admin@example.com"
-      ]
-  }
-  ]
-}</code></pre>
-                    <p>In this example, when the first output file is completed, two notifications would be sent:
-                        <ul>
-                            <li>Email to <code>admin@example.com</code> with information about the output and the input/job.</li>
-                            <li>HTTP POST to <code>http://user:password@example.com/zencoder</code> with a Content-Type header set to 'application/json' with information about the output and the input/job.</li>
-                        </ul>
-                    </p>
-
-                    <p>When the second output file is complete, four more notifications would be sent:
-                        <ul>
-                            <li>HTTP POST to <code>http://example.com/zencoder1</code> with a Content-Type header set to 'application/xml' with information about the output and the input.</li>
-                            <li>HTTP POST to <code>http://example.com/zencoder2</code> with a Content-Type header set to 'application/json' with information about the output and the input/job.</li>
-                            <li>Email to <code>admin@example.com</code> with information about the output and the input/job.</li>
-                            <li>HTTP POST to <code>http://example.com/zencoder3</code> with a Content-Type header set to 'application/json' with information about the output and the input/job.</li>
-                        </ul>
-                    </p>
-
-                    <p>When the job is completed, two more notifications would be sent:
-                        <ul>
-                            <li>Email to <code>admin@example.com</code> with information about the output and the input.</li>
-                            <li>HTTP POST to <code>http://user:password@example.com/zencoder</code> with a Content-Type header set to 'application/json' with information about the output and the input.</li>
-                        </ul>
-                    </p>
-
-                    <p><strong>Note:</strong> If Zencoder is unable to succesfully connect to the target server when sending a notification, the notification will be queued to try again. The notification will be attempted up to 25 times, with the delay between
-                        attempts doubling each time.</p>
+                <section id="Dashboard_Information" class="bcls-section">
+                    <h2>Dashboard Information</h2>
+                    <figure class="bcls-figure">
+                        <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/zencoder/assets/docs/backup_job_banner-aeb10ef70e5693b0edab2ed47c06a47f.png" alt="Zencoder Dashboard">
+                        <figcaption class="bcls-caption--image">Zencoder Dashboard</figcaption>
+                    </figure>
+                    <p>When reviewing a job in the dashboard the banner above will appear at the top of the page, similar to the banner displayed for test jobs.</p>
+                    <figure class="bcls-figure">
+                        <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/zencoder/assets/docs/backup_output_flag-a2861f186e689d5765efb0abfae2d329.png" alt="Dashboard Message">
+                        <figcaption class="bcls-caption--image">Dashboard Message</figcaption>
+                    </figure>
+                    <p>The specific output that used the backup server is flagged under the progress bar, alongside similar notifications for any warnings on the job and notifications:</p>
+                    <figure class="bcls-figure">
+                        <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/zencoder/assets/docs/backup_output_error_banners-57893fcf1e70c9078ba2cd1f29687532.png" alt="Dashboard Notifications">
+                        <figcaption class="bcls-caption--image">Dashboard Notifications</figcaption>
+                    </figure>
+                    <p>When you view the output's record the error that was prevented Zencoder from uploading the video to your server will be displayed. A full <a href="../error-codes/error-codes.html">list of errors</a> is available.</p>
                 </section>
-                <section id="HTTP_Notifications" class="bcls-section">
-                    <h2>HTTP Notifications</h2>
-                    <p>Notifications contain rich content with much more information about the job and input and output files. The body of the notification can contain JSON or XML. If uploads fail, notifications will also contain information about <a href="file-backups.html">errors and backup servers used</a>.</p>
-
-                    <h3>Job Notification Example</h3>
+                <section id="Notifications" class="bcls-section">
+                    <h2>Notifications</h2>
+                    <p>API version 2 also includes rich notifications, which contain much more information than the basic notifications in version 1. Along with metadata and details about the files for a job, several attributes are also included if a backup server was used. If the backup server is not used, these attributes will not be passed.</p>
+                    <p><code>backup_server_used</code> will be set to true if any backup servers were used. If it is false or not present, your files were uploaded to the URL specified in your request or to the default S3 bucket.</p>
+                    <p><code>primary_upload_error_link</code> will contain a link to the documentation on Zencoder for the error that occurred when uploading the video.</p>
+                    <p><code>primary_upload_error_message</code> will contain a human-friendly message about the error that occurred when uploading the video.</p>
+                    <p>primary_thumbnail_upload_error_message will contain a link to the documentation on Zencoder for the error that occurred when uploading thumbnails.</p>
+                    <p><code>primary_thumbnail_upload_error_message</code> will contain a human-friendly message about the error that occurred when upload thumbnails.</p>
+                    <h3>Example</h3>
 <pre class="line-numbers"><code class="language-json">{
-  "outputs":[
-  {
-      "height":120,
-      "audio_sample_rate":8000,
-      "frame_rate":8.0,
-      "channels":"1",
-      "duration_in_ms":1920,
-      "video_bitrate_in_kbps":70,
-      "video_codec":"h264",
-      "format":"mpeg4",
-      "audio_codec":"aac",
-      "label":null,
-      "file_size_in_bytes":17938,
-      "width":160,
-      "audio_bitrate_in_kbps":9,
-      "id":235314,
-      "total_bitrate_in_kbps":79,
-      "state":"finished",
-      "url":"ftp://example.com/file.mp4",
-      "md5_checksum":"7f106918e02a69466afa0ee014172496",
-      "thumbnails": [
-      {
-          "label":"poster",
-          "images":
-          [
-          {
-              "url": "ftp://example.com/images/123.png",
-              "format": "PNG",
-              "file_size_bytes": 1273573,
-              "dimensions": "1280x720"
-          }
-          ]
-      }
-      ]
+"output":{
+    "backup_server_used":true,
+    "primary_upload_error_link":"https://app.zencoder.com/docs/errors/UnableToResolveHostError",
+    "primary_upload_error_message":"There was a problem resolving the host at ftp://example.com. Please check that it is correct.",
+    "height":120,
+    "audio_sample_rate":8000,
+    "frame_rate":8.0,
+    "channels":"1",
+    "duration_in_ms":1920,
+    "video_bitrate_in_kbps":70,
+    "video_codec":"h264",
+    "format":"mpeg4",
+    "audio_codec":"aac",
+    "label":null,
+    "file_size_in_bytes":17938,
+    "width":160,
+    "audio_bitrate_in_kbps":9,
+    "id":235314,
+    "total_bitrate_in_kbps":79,
+    "state":"finished",
+    "url":"https://zencoder-live.s3.amazonaws.com/2Faf653e6b5e9b4440081827be2dcd962c.mp4?Signature=0DhjHh1X%2FQxSk%&Expires=1317237305&AWSAccessKeyId=AKIA"
   },
-  {
-      "height":120,
-      "audio_sample_rate":8000,
-      "frame_rate":8.0,
-      "channels":"1",
-      "duration_in_ms":1920,
-      "video_bitrate_in_kbps":70,
-      "video_codec":"h264",
-      "format":"mpeg4",
-      "audio_codec":"aac",
-      "label":null,
-      "file_size_in_bytes":17938,
-      "width":160,
-      "audio_bitrate_in_kbps":9,
-      "id":235314,
-      "total_bitrate_in_kbps":79,
-      "state":"finished",
-      "url":"ftp://example.com/file.mp4",
-      "md5_checksum":"7f106918e02a69466afa0ee014172496",
-      "thumbnails": [
-      {
-          "label":"poster",
-          "images":
-          [
-          {
-              "url": "ftp://example.com/images/123.png",
-              "format": "PNG",
-              "file_size_bytes": 1273573,
-              "dimensions": "1280x720"
-          }
-          ]
-      }
-      ]
-  }
-  ],
-  "job":{
-      "created_at":"2011-09-27T04:20:10Z",
-      "pass_through":null,
-      "updated_at":"2011-09-27T04:21:18Z",
-      "submitted_at":"2011-09-27T04:20:10Z",
-      "id":172151,
-      "state":"finished"
+"job":{
+    "created_at":"2011-09-27T04:20:10Z",
+    "pass_through":null,
+    "updated_at":"2011-09-27T04:21:18Z",
+    "submitted_at":"2011-09-27T04:20:10Z",
+    "id":172151,
+    "state":"finished"
   },
-  "input":{
-      "height":120,
-      "audio_sample_rate":8000,
-      "frame_rate":8.0,
-      "channels":"1",
-      "duration_in_ms":1552,
-      "video_bitrate_in_kbps":32,
-      "video_codec":"mpeg4",
-      "format":"mpeg4",
-      "audio_codec":"aac",
-      "file_size_in_bytes":13960,
-      "width":160,
-      "audio_bitrate_in_kbps":9,
-      "id":172149,
-      "state":"finished",
-      "total_bitrate_in_kbps":41,
-      "md5_checksum":"7f106918e02a69466afa0ee014174143"
-  }
-}</code></pre>
-
-
-
-                    <h3>Output Notification Example</h3>
-<pre class="line-numbers"><code class="language-json">{
-  "output":{
-      "height":120,
-      "audio_sample_rate":8000,
-      "frame_rate":8.0,
-      "channels":"1",
-      "duration_in_ms":1920,
-      "video_bitrate_in_kbps":70,
-      "video_codec":"h264",
-      "format":"mpeg4",
-      "audio_codec":"aac",
-      "label":null,
-      "file_size_in_bytes":17938,
-      "width":160,
-      "audio_bitrate_in_kbps":9,
-      "id":235314,
-      "total_bitrate_in_kbps":79,
-      "state":"finished",
-      "url":"ftp://example.com/file.mp4",
-      "md5_checksum":"7f106918e02a69466afa0ee014172496",
-      "thumbnails":
-      [
-      {
-          "label":"poster",
-          "images":
-          [
-          {
-              "url": "ftp://example.com/images/123.png",
-              "format": "PNG",
-              "file_size_bytes": 1273573,
-              "dimensions": "1280x720"
-          }
-          ]
-      }
-      ]
-  },
-  "job":{
-      "created_at":"2011-09-27T04:20:10Z",
-      "pass_through":null,
-      "updated_at":"2011-09-27T04:21:18Z",
-      "submitted_at":"2011-09-27T04:20:10Z",
-      "id":172151,
-      "state":"finished"
-  },
-  "input":{
-      "height":120,
-      "audio_sample_rate":8000,
-      "frame_rate":8.0,
-      "channels":"1",
-      "duration_in_ms":1552,
-      "video_bitrate_in_kbps":32,
-      "video_codec":"mpeg4",
-      "format":"mpeg4",
-      "audio_codec":"aac",
-      "file_size_in_bytes":13960,
-      "width":160,
-      "audio_bitrate_in_kbps":9,
-      "id":172149,
-      "state":"finished",
-      "total_bitrate_in_kbps":41,
-      "md5_checksum":"7f106918e02a69466afa0ee014174143"
+"input":{
+    "height":120,
+    "audio_sample_rate":8000,
+    "frame_rate":8.0,
+    "channels":"1",
+    "duration_in_ms":1552,
+    "video_bitrate_in_kbps":32,
+    "video_codec":"mpeg4",
+    "format":"mpeg4",
+    "audio_codec":"aac",
+    "file_size_in_bytes":13960,
+    "width":160,
+    "audio_bitrate_in_kbps":9,
+    "id":172149,
+    "state":"finished",
+    "total_bitrate_in_kbps":41
   }
 }</code></pre>
                 </section>
