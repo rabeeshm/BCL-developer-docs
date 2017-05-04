@@ -149,19 +149,115 @@
   "format": "ts",
   "live_stream": true
 }</code></pre>
+        <p>Live HLS outputs can be uploaded to any compatible server supported by Zencoder, including S3 and FTP. They can also be transferred to Akamai for HLS Live Delivery via HTTP POST, using an output URL like <code>http://example.akamaihd.net/12355/1234567890/eventname_ios_300.m3u8</code>.</p>
+        <h3>File Outputs</h3>
+        <p> Output videos in any other <a href="../../encoding/format-and-codecs/format-and-codecs.html#format">format</a> or using any other <a href="../../encoding/format-and-codecs/format-and-codecs.html#video-codec">codecs</a> will be transcoded and uploaded after the input stream has completed. </p>
+<pre class="line-numbers"><code class="language-json">{
+  "label":"archive",
+  "url":"s3://example-bucket/eventname_archive.mp4"
+}</code></pre>
+        <p> <strong>NOTE:</strong> Setting <a href="/docs/api/encoding/job/live-stream">live_stream</a> with unsupported formats (non-HLS) will cause those outputs to fail. </p>
+    </section>
+    <section id="Full_Request" class="bcls-section">
+        <h2>Full Request</h2>
+        <p>A full request can create RTMP and HLS outputs, plus an HLS playlist to tell players the available streams for different bandwidths.</p>
+    <pre class="line-numbers"><code class="language-json">{
+    "live_stream": true,
+    "outputs": [
+        {
+            "label": "rtmp_300",
+            "size": "480x270",
+            "video_bitrate": 300,
+            "url": "rtmp://user:pass@server.akamaientrypoint.net/EntryPoint/eventname_01_300@63239"
+        },
+        {
+            "label": "rtmp_600",
+            "size": "640x360",
+            "video_bitrate": 600,
+            "url": "rtmp://user:pass@server.akamaientrypoint.net/EntryPoint/eventname_01_600@63239"
+        },
+        {
+            "label": "rtmp_1200",
+            "size": "1280x720",
+            "video_bitrate": 1200,
+            "url": "rtmp://user:pass@server.akamaientrypoint.net/EntryPoint/eventname_01_1200@63239"
+        },
+        {
+            "label": "hls_300",
+            "size": "480x270",
+            "video_bitrate": 300,
+            "url": "http://post.bcoveliveios-i.akamaihd.net/IOSSTREAM/PUBLISHERID/eventname_01_300.m3u8",
+            "type": "segmented",
+            "live_stream": true
+        },
+        {
+            "label": "hls_600",
+            "size": "640x360",
+            "video_bitrate": 600,
+            "url": "http://post.example.akamaihd.net/PATH/TO/eventname_ios_600.m3u8",
+            "type": "segmented",
+            "live_stream": true
+        },
+        {
+            "label": "hls_1200",
+            "size": "1280x720",
+            "video_bitrate": 120,
+            "url": "http://post.example.akamaihd.net/PATH/TO/eventname_01_1200.m3u8",
+            "type": "segmented",
+            "live_stream": true
+        },
+        {
+            "url": "http://post.example.akamaihd.net/PATH/TO/master.m3u8",
+            "type": "playlist",
+            "streams": [
+                {
+                    "bandwidth": 300,
+                    "path": "eventname_01_300.m3u8"
+                },
+                {
+                    "bandwidth": 600,
+                    "path": "eventname_01_600.m3u8"
+                },
+                {
+                    "bandwidth": 1200,
+                    "path": "eventname_01_1200.m3u8"
+                }
+            ]
+        },
+        {
+          "label":"archive",
+          "url":"s3://example-bucket/eventname_archive.mp4"
+        }
+    ]
+}</code></pre>
+    </section>
+    <section id="Notes" class="bcls-section">
+        <h2>Notes</h2>
+        <h3>S3 Permissions</h3>
+        <p>When creating HLS outputs on Amazon S3, you must set permissions in your API request to deal with the way AWS makes the file accessible. Not doing this can lead to delays in permissions being applied, and cause issues during playback. Add the settings below to any HLS outputs to ensure that permissions are set correctly.</p>
+        <p> <strong>NOTE:</strong> Due to S3's eventual consistency approach to redundancy, files uploaded there are not always immediately available. This could cause issues with live HLS playback on S3. </p>
+    <pre class="line-numbers"><code class="language-json">"headers": {
+  "x-amz-acl": "public-read"
+},
+"access_control": [
+  {
+    "permission": "FULL_CONTROL",
+    "grantee": "aws@zencoder.com"
+  },
+  {
+    "permission": "READ",
+    "grantee": "http://acs.amazonaws.com/groups/global/AllUsers"
+  }
+]</code></pre>
+        <h3>Akamai & HLS Playlists</h3>
+        <p>For the master playlist Akamai expects the filename will be index.m3u8, master.m3u8, or playlist.m3u8. If it is not you may get 404 responses when trying to access the playlist. This can be overridden in your Akamai configuration. See <a href="https://control.akamai.com/portal/kb/kbSearchDetails.jsf?articleId=6027">Akamai's documentation</a> for more information.</p>
+        <h3>Waiting Jobs Limit</h3>
+        <p>We have a defult limit of 5 waiting streams per account. If you reach this limit, you will need to cancel or start streaming to one of the waiting streams in order to create a new live job. If you need this limit increased, please contact <a href="https://support.brightcove.com/en/contact/create">support</a>.</p>
     </section>
 </article>
 <!-- end drupal content -->
       </div>
     </div>
-
-
-
-
-
-
-
-
       <!-- bcl scripts -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
