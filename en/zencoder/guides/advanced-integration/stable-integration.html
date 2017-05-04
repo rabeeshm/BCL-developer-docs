@@ -68,24 +68,24 @@
             <li>etc.</li>
             <p>When this happens and Zencoder is down, your application will typically get a '503 Service Unavailable' response from Zencoder, but you could get a different error (like a 500). If you have exceeded your API rate limit, you will get a '403 Rate Limit Exceeded' response.</p>
             <p>The good news: since video encoding is an asynchronous process, you can build your application to never experience downtime or problems related to our availability. If you do this, the worst case scenario is that your jobs take a bit longer. But no errors occur. We highly recommend that you do this.</p>
-            <p>To put it more strongly, <strong>if you care about reliability, you should follow this approach to integration</strong> &mdash; for Zencoder, or for any critical API that you integrate with.</p>
+            <p>To put it more strongly, <strong>if you care about reliability, you should follow this approach to integration</strong> - for Zencoder, or for any critical API that you integrate with.</p>
         </ul>
     </section>
     <section id="Reliable_app_integration" class="bcls-section">
         <h2>Reliable app integration</h2>
         <ol>
             <li>Include a <a href="../../encoding/general-output-settings/general-outpugeneral-output-settings.html#secondary-url">Secondary URL</a> as a backup in case upload to your primary location fails.</li>
-            <li>If you get a non-successful response code from Zencoder &mdash; basically, something other than a 200 or 201 &mdash; <strong>don't fail the job</strong>. A response code of 503 doesn't mean that your video can't be processed. It just means that Zencoder is temporarily unavailable.</li>
+            <li>If you get a non-successful response code from Zencoder - basically, something other than a 200 or 201 - <strong>don't fail the job</strong>. A response code of 503 doesn't mean that your video can't be processed. It just means that Zencoder is temporarily unavailable.</li>
             <li>If you get a <strong>connection error</strong> when trying to connect to Zencoder, do the same thing. </li>
             <li>Similarly, <strong>wrap your API requests in a timeout</strong>. We recommend a 30 second timeout; Zencoder usually responds in less than a second, so 30 seconds is usually plenty of time.</li>
-            <li>In all three of these cases &mdash; if you get a non-successful response code, can't connect, or the API request times out &mdash; <strong>flag the job as 'pending'.</strong></li>
+            <li>In all three of these cases - if you get a non-successful response code, can't connect, or the API request times out - <strong>flag the job as 'pending'.</strong></li>
             <li>Periodically, <strong>resubmit any jobs in the  'pending' state</strong>. You could use cron to do this every minute, for instance.</li>
         </ol>
         <p>Once the jobs are resubmitted, everything behaves like normal. This way, a failed job submission only makes the job take a little longer rather than causing trouble for your application or your users.</p>
     </section>
     <section id="Pseudocode" class="bcls-section">
         <h2>Pseudocode</h2>
-        <p>OK, so this isn't Pseudocode &mdash; it's Ruby. But Ruby is pretty easy to read.</p>
+        <p>OK, so this isn't Pseudocode - it's Ruby. But Ruby is pretty easy to read.</p>
         <ol>
             <li>Imagine a Videos table that includes these columns. (It will obviously have more, including columns to store a Zencoder job ID and a Zencoder output file ID.)
 <pre class="line-numbers"><code class="language-ruby">create_table :videos do |t|
@@ -139,45 +139,29 @@ submit_to_zencoder(video)</code></pre>
                     end</code></pre>
 
                 </li>
-        </ol>
-                    <li>Every so often &mdash; e.g. every minute &mdash; try to resubmit jobs that are in the 'pending' state.
-                    <div class="docs-code">
-                        <pre class="brush: ruby;">
-                            def resubmit_pending_jobs
-                            Video.where(:state =&gt; "pending").find_each do |video|
-                            begin
-                            video.state = "submitting"
-                            video.save!
+                <li>Every so often - e.g. every minute - try to resubmit jobs that are in the 'pending' state.
+<pre class="line-numbers"><code class="language-ruby">def resubmit_pending_jobs
+Video.where(:state =&gt; "pending").find_each do |video|
+begin
+video.state = "submitting"
+video.save!
 
-                            submit_to_zencoder(video)
-                            rescue ActiveRecord::StaleObjectError
-                            end
-                            end
-                            end</pre>
-                        </div>
+submit_to_zencoder(video)
+rescue ActiveRecord::StaleObjectError
+end
+end
+end
+</code></pre>
                         <p>Also, by adding a 'lock_version' column to the videos table, we introduce optimistic locking. This means that if the record gets updated between the <code>Video.find</code> query and <code>video.save</code>, it won't submit the job to Zencoder. This will prevent the job to be submitted to Zencoder twice accidentally. You could use pessimistic or database locking or some other lock method to accomplish the same thing.</p>
                         <h2>It's that easy&#8230;</h2>
-                        <p>All things considered, this is a pretty simple approach to ensuring 100% integration reliability between Zencoder and your application. It's a few more steps than just naively submitting a job; but it ensures that no matter what happens &mdash; whether it's an occasional timeout, or unexpected downtime at Zencoder, or scheduled maintenance &mdash; your app runs reliably.</p>
+                        <p>All things considered, this is a pretty simple approach to ensuring 100% integration reliability between Zencoder and your application. It's a few more steps than just naively submitting a job; but it ensures that no matter what happens - whether it's an occasional timeout, or unexpected downtime at Zencoder, or scheduled maintenance - your app runs reliably.</p>
                     </li>
+        </ol>
     </section>
 </article>
 <!-- end drupal content -->
-
-</div>
-
-    </div>
-  </div>
-
-        </div>
       </div>
     </div>
-
-
-
-
-
-
-
 
       <!-- bcl scripts -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
