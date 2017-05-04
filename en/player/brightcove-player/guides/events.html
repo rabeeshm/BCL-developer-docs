@@ -241,6 +241,22 @@
         <p>Confusion can occur about the differences between the <code>progress</code> and <code>timeupdate</code> events. The Brightcove Player builds on top of HTML5 video, and in that standard the <code>progress</code> event is dispatched when the browser is downloading data. The <code>timeupdate</code> event is dispatched when the current playback position has changed.</p>
         <p>This can be confusing to users of Brightcove's Smart Player, as in that API the <code>progress</code> event does what <code>timeudpate</code> does in the Brightcove Player API.</p>
       </section>
+
+      <section id="section-name" class="bcls-section">
+        <h2>Caution removing timeupdate listeners</h2>
+        <p>In some cases you might want to remove an event listener you have added to the <code>timeupdate</code> event. A use case is shown in the <a href="//docs.brightcove.com/en/player/brightcove-player/samples/register-to-play-preview.html">Brightcove Player Sample: Registering to Play after Preview</a> document. In this situation, you want the player to pause in some time range, and you are using <code>timeupdate</code> for the time check, then use an anonymous event handler function definition. You only want to pause once, so you need to remove the event listener. You don NOT want to simply do:</p>
+        <pre class="line-numbers"><code class="language-javascript">myPlayer.off('timeudpate');</code></pre>
+        <p>Of course, this removes ALL event listeners to <code>timeupdate</code>, and among other issues doing this will prevent the time scrubber from advancing. What needs to be done is create a function using normal function definition syntax (a function declaration), then remove JUST the one event listener. The abbreviated code is shown here:</p>
+        <pre class="line-numbers"><code class="language-javascript"> // Add the event handler
+myPlayer.on('timeupdate', timeupdateHandler);
+
+//Handle the event then remove JUST this event listener on timeupdate
+function timeupdateHandler(evt) {
+  ...
+  myPlayer.off('timeupdate', timeupdateHandler);
+}</code></pre>
+      </section>
+
     </article>
     <!-- end drupal content -->
     </div>
