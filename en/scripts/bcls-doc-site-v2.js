@@ -234,7 +234,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
      * create navigation for page sections
      */
     function createInPageNavMenu() {
-        var str = "<ul class=\"side-nav show-for-large-up\">",
+        var str = "<ul id=\"sideNavList\" class=\"side-nav show-for-large-up\">",
             i,
             max = navLabel.length,
             j,
@@ -260,7 +260,8 @@ var BCLSmain = (function (window, document, bclsNavData) {
      */
     function createInPageNav() {
         var navObj = {},
-            numSections = sectionElements.length,
+        sectionElements = document.querySelectorAll(".bcls-section"),
+        numSections = sectionElements.length,
             i,
             sectionEl;
         // set initial visibilities
@@ -861,6 +862,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
     // or want to use the product var for some purpose
     return {
         "createInPageNav": createInPageNav,
-        "product": product
+        "product": product,
+        "createInPageNavMenu": createInPageNavMenu
     };
 })(window, document, bclsNavData);
