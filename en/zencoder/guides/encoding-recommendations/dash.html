@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -40,20 +38,6 @@
         ga('send', 'pageview');
     </script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
-    
-
-
-    
-
-    
-
-    
-    
-
-    
-    
-
-    
   </head>
   <body>
     <!-- header navbar -->
@@ -68,882 +52,429 @@
             <div id="sidenav" class="side-nav"></div>
         </div>
         <div id="main" class="large-10 small-12 columns">
-  <p>
-    <a href="../../../docs.html">Home</a> &raquo; <a href="../../guides.html">Guides</a> &raquo; <a href="../encoding-settings.html">Encoding Recommendations</a> &raquo; DASH Streaming and Playlists
-  </p>
-
-  <h2>
-      
-    DASH Streaming and Playlists
- </h2>
-
-    <p>
-  Because DASH isn't a specific video format, codec, or data-agnostic packaging format (such as Zip), we've introduced a new option named <code><a href="https://app.zencoder.com/docs/api/encoding/segmented-streaming/streaming-delivery-format">streaming_delivery_format</a></code> to specify that the media files should be structured / formatted according
-  to a particular standard. Selecting "dash" as the <code>streaming_delivery_format</code> will modify some default options for compatibility with DASH, as well as put the output media files into a directory structure consistent with DASH requirements.
-  DASH media outputs must also have <code><a href="https://app.zencoder.com/docs/api/encoding/general-output-settings/type">type</a></code> set to "segmented", to ensure the media is prepared for DASH streaming.
-</p>
-<div class="docs-code">
-  <pre class="brush: js;">
+  <h1> DASH Streaming and Playlists </h1>
+  <!-- begin drupal content -->
+<article class="bcls-article">
+    <header id="bcls_header" class="bcls-header">
+        <p>This topic explains how to configure jobs for DASH output.</p>
+    </header>
+    <section id="Introduction" class="bcls-section">
+        <h2>Introduction</h2>
+        <p> Because DASH isn't a specific video format, codec, or data-agnostic packaging format (such as Zip), we've introduced a new option named <code><a href="https://app.zencoder.com/docs/api/encoding/segmented-streaming/streaming-delivery-format">streaming_delivery_format</a></code> to specify that the media files should be structured / formatted according to a particular standard. Selecting "dash" as the <code>streaming_delivery_format</code> will modify some default options for compatibility with DASH, as well as put the output media files into a directory structure consistent with DASH requirements. DASH media outputs must also have <code><a href="https://app.zencoder.com/docs/api/encoding/general-output-settings/type">type</a></code> set to "segmented", to ensure the media is prepared for DASH streaming. </p>
+        <pre class="line-numbers"><code class="language-json">{
+    "input": "http://s3.amazonaws.com/zencodertesting/test.mov",
+    "outputs": [
     {
-      "input": "http://s3.amazonaws.com/zencodertesting/test.mov",
-      "outputs": [
-        {
-          "streaming_delivery_format": "dash",
-          "video_bitrate": 700,
-          "type": "segmented",
-          "url": "s3://mybucket/dash-examples/sbr/rendition.mpd"
-        }
-      ]
+        "streaming_delivery_format": "dash",
+        "video_bitrate": 700,
+        "type": "segmented",
+        "url": "s3://mybucket/dash-examples/sbr/rendition.mpd"
     }
-  </pre>
-  <pre class="brush: xml;">
-    <api-request>
-      <input>http://s3.amazonaws.com/zencodertesting/test.mov&lt;/input>
-      <outputs type="array">
-        <output>
-          <streaming_delivery_format>dash</streaming_delivery_format>
-          <video_bitrate>700</video_bitrate>
-          <type>segmented</type>
-          <url>s3://mybucket/dash-examples/sbr/rendition.mpd</url>
-        </output>
-      </outputs>
-    </api-request>
-  </pre>
-</div>
-<p>Details for outputs with <code>streaming_delivery_format</code> set to "dash":</p>
-<ul>
-  <li><code><a href="https://app.zencoder.com/docs/api/encoding/frame-rate/fixed-keyframe-interval">fixed_keyframe_interval</a></code> will be set to true.</li>
-  <li><code><a href="https://app.zencoder.com/docs/api/encoding/segmented-streaming/segment-seconds">segment_seconds</a></code> will default to 2.</li>
-  <li>The default format will be m4f (with an mpd manifest file)</li>
-</ul>
-<p>File structure for segmented DASH outputs:</p>
-<ul>
-  <li>The mpd manifest file will be at the root level of the output.</li>
-  <li>The audio and video media will each have their own subdirectory -- &quot;audio/und&quot; and &quot;video/1&quot; respectively.</li>
-  <li>In each of these directories there will be an &quot;init.mp4&quot; with the initialization data.</li>
-  <li>The media data will be in files named &quot;seg-N.m4f&quot; (where N starts at zero and increases for each segment).</li>
-</ul>
-<p>DASH outputs with the <code><a href="https://app.zencoder.com/docs/api/encoding/segmented-streaming/streaming-delivery-profile">streaming_delivery_profile</a></code> set to "on_demand" will use fragmented media files rather than segments:</p>
-<ul>
-  <li>The mpd manifest file will be at the root level of the output.</li>
-  <li>The audio and video media will each be a single file in the same directory as the manifest.</li>
-  <li>The media files will be named similarly to the manifest, but with &quot;-audio&quot; or &quot;-video&quot; suffixes added, as appropriate.</li>
-</ul>
-<p>Supported DASH configurations:</p>
-<ul>
-  <li>Formats supported: m4f and webm</li>
-  <li>Video codecs supported: h264, hevc, vp8, and vp9</li>
-  <li>Audio codecs supported: aac, ac3, eac3, and vorbis</li>
-  <li>Outputs in "webm" format currently only support the "on_demand" <code>streaming_delivery_profile</code></li>
-  <li>Outputs in "webm" format currently do not support DRM</li>
-</ul>
+    ]
+}</code></pre>
 
-<h3>Multiple Bitrates</h3>
-<p>
-  Zencoder-generated DASH outputs will have the necessary structure to be played on their own, but to truly benefit from such streaming delivery options, you should generate multiple versions at different bitrates (renditions) along with a "playlist"
-  type output that lists the renditions so that a player can switch up / down bitrates as needed depending on the current network conditions. The playlist output is a dependent output - that is, it'll reference the other outputs by their label,
-  and will use data from those outputs to generate the final rendition of the playlist. Note that you must be careful to set the stream paths in the playlist output so that they are relative paths to the location of the rendition files.
-</p>
-<div class="docs-code">
-  <pre class="brush: js;">
+        <p>Details for outputs with <code>streaming_delivery_format</code> set to "dash":</p>
+        <ul>
+            <li><code><a href="../../encoding/frame-rate/frame-rate.html#fixed-keyframe-interval">fixed_keyframe_interval</a></code> will be set to true.</li>
+            <li><code><a href="../../encoding/segmented-streaming/segmented-streaming.html#segment-seconds">segment_seconds</a></code> will default to 2.</li>
+            <li>The default format will be m4f (with an mpd manifest file)</li>
+        </ul>
+        <p>File structure for segmented DASH outputs:</p>
+        <ul>
+            <li>The mpd manifest file will be at the root level of the output.</li>
+            <li>The audio and video media will each have their own subdirectory -- &quot;audio/und&quot; and &quot;video/1&quot; respectively.</li>
+            <li>In each of these directories there will be an &quot;init.mp4&quot; with the initialization data.</li>
+            <li>The media data will be in files named &quot;seg-N.m4f&quot; (where N starts at zero and increases for each segment).</li>
+        </ul>
+        <p>DASH outputs with the <code><a href="../../encoding/segmented-streaming/segmented-streaming.html#streaming-delivery-profile">streaming_delivery_profile</a></code> set to "on_demand" will use fragmented media files rather than segments:</p>
+        <ul>
+            <li>The mpd manifest file will be at the root level of the output.</li>
+            <li>The audio and video media will each be a single file in the same directory as the manifest.</li>
+            <li>The media files will be named similarly to the manifest, but with &quot;-audio&quot; or &quot;-video&quot; suffixes added, as appropriate.</li>
+        </ul>
+        <p>Supported DASH configurations:</p>
+        <ul>
+            <li>Formats supported: m4f and webm</li>
+            <li>Video codecs supported: h264, hevc, vp8, and vp9</li>
+            <li>Audio codecs supported: aac, ac3, eac3, and vorbis</li>
+            <li>Outputs in "webm" format currently only support the "on_demand" <code>streaming_delivery_profile</code></li>
+            <li>Outputs in "webm" format currently do not support DRM</li>
+        </ul>
+    </section>
+    <section id="Multiple_Bitrates" class="bcls-section">
+        <h2>Multiple Bitrates</h2>
+        <p>
+            Zencoder-generated DASH outputs will have the necessary structure to be played on their own, but to truly benefit from such streaming delivery options, you should generate multiple versions at different bitrates (renditions) along with a "playlist"
+            type output that lists the renditions so that a player can switch up / down bitrates as needed depending on the current network conditions. The playlist output is a dependent output - that is, it'll reference the other outputs by their label,
+            and will use data from those outputs to generate the final rendition of the playlist. Note that you must be careful to set the stream paths in the playlist output so that they are relative paths to the location of the rendition files.
+        </p>
+<pre class="line-numbers"><code class="language-json">{
+    "input": "http://s3.amazonaws.com/zencodertesting/test.mov",
+    "outputs": [
     {
-      "input": "http://s3.amazonaws.com/zencodertesting/test.mov",
-      "outputs": [
-        {
-          "label": "dash-1200",
-          "streaming_delivery_format": "dash",
-          "video_bitrate": 1200,
-          "type": "segmented",
-          "url": "s3://mybucket/dash-examples/mbr/1200k/rendition.mpd"
-        },
-        {
-          "label": "dash-700",
-          "streaming_delivery_format": "dash",
-          "video_bitrate": 700,
-          "type": "segmented",
-          "url": "s3://mybucket/dash-examples/mbr/700k/rendition.mpd"
-        },
-        {
-          "label": "dash-400",
-          "streaming_delivery_format": "dash",
-          "video_bitrate": 400,
-          "type": "segmented",
-          "url": "s3://mybucket/dash-examples/mbr/400k/rendition.mpd"
-        },
-        {
-          "streaming_delivery_format": "dash",
-          "type": "playlist",
-          "url": "s3://mybucket/dash-examples/mbr/manifest.mpd",
-          "streams": [
-            { "source": "dash-1200", "path": "1200k" },
-            { "source": "dash-700",  "path": "700k" },
-            { "source": "dash-400",  "path": "400k" }
-          ]
-        }
-      ]
+        "label": "dash-1200",
+        "streaming_delivery_format": "dash",
+        "video_bitrate": 1200,
+        "type": "segmented",
+        "url": "s3://mybucket/dash-examples/mbr/1200k/rendition.mpd"
+    },
+    {
+        "label": "dash-700",
+        "streaming_delivery_format": "dash",
+        "video_bitrate": 700,
+        "type": "segmented",
+        "url": "s3://mybucket/dash-examples/mbr/700k/rendition.mpd"
+    },
+    {
+        "label": "dash-400",
+        "streaming_delivery_format": "dash",
+        "video_bitrate": 400,
+        "type": "segmented",
+        "url": "s3://mybucket/dash-examples/mbr/400k/rendition.mpd"
+    },
+    {
+        "streaming_delivery_format": "dash",
+        "type": "playlist",
+        "url": "s3://mybucket/dash-examples/mbr/manifest.mpd",
+        "streams": [
+        { "source": "dash-1200", "path": "1200k" },
+        { "source": "dash-700",  "path": "700k" },
+        { "source": "dash-400",  "path": "400k" }
+        ]
     }
-  </pre>
-  <pre class="brush: xml;">
-    <api-request>
-      <input>http://s3.amazonaws.com/zencodertesting/test.mov&lt;/input>
-      <outputs type="array">
-        <output>
-          <label>dash-1200</label>
-          <streaming_delivery_format>dash</streaming_delivery_format>
-          <video_bitrate>1200</video_bitrate>
-          <type>segmented</type>
-          <url>s3://mybucket/dash-examples/mbr/1200k/rendition.mpd</url>
-        </output>
-        <output>
-          <label>dash-700</label>
-          <streaming_delivery_format>dash</streaming_delivery_format>
-          <video_bitrate>700</video_bitrate>
-          <type>segmented</type>
-          <url>s3://mybucket/dash-examples/mbr/700k/rendition.mpd</url>
-        </output>
-        <output>
-          <label>dash-400</label>
-          <streaming_delivery_format>dash</streaming_delivery_format>
-          <video_bitrate>400</video_bitrate>
-          <type>segmented</type>
-          <url>s3://mybucket/dash-examples/mbr/400k/rendition.mpd</url>
-        </output>
-        <output>
-          <streaming_delivery_format>dash</streaming_delivery_format>
-          <type>playlist</type>
-          <url>s3://mybucket/dash-examples/mbr/manifest.mpd</url>
-          <streams type="array">
-            <stream>
-              <source>dash-1200</source>
-              <path>1200k</path>
-            </stream>
-            <stream>
-              <source>dash-700</source>
-              <path>700k</path>
-            </stream>
-            <stream>
-              <source>dash-400</source>
-              <path>400k</path>
-            </stream>
-          </streams>
-        </output>
-      </outputs>
-    </api-request>
-  </pre>
-</div>
-
-<h3>Encryption</h3>
-<p>
-  Zencoder also supports generating CENC-encrypted DASH outputs, with necessary headers for integrating with Marlin or Playready license servers. For each output, simply specify a hash of drm options, including the <code><a href="https://app.zencoder.com/docs/api/encoding/drm/method">method</a></code>, <code><a href="https://app.zencoder.com/docs/api/encoding/drm/key-id">key_id</a></code>,
-  and <code><a href="https://app.zencoder.com/docs/api/encoding/drm/content-key">content_key</a></code>. The <code>key_id</code> and <code>content_key</code> should either be retrieved from your DRM vendor, or pre-generated and sent to your DRM vendor. Once you have those keys, the Zencoder API structure for a single rendition
-  is:
-</p>
-<div class="docs-code">
-  <pre class="brush: js;">
+    ]
+}</code></pre>
+    </section>
+    <section id="Encryption" class="bcls-section">
+        <h2>Encryption</h2>
+        <p>
+            Zencoder also supports generating CENC-encrypted DASH outputs, with necessary headers for integrating with Marlin or Playready license servers. For each output, simply specify a hash of drm options, including the <code><a href="https://app.zencoder.com/docs/api/encoding/drm/method">method</a></code>, <code><a href="https://app.zencoder.com/docs/api/encoding/drm/key-id">key_id</a></code>,
+            and <code><a href="https://app.zencoder.com/docs/api/encoding/drm/content-key">content_key</a></code>. The <code>key_id</code> and <code>content_key</code> should either be retrieved from your DRM vendor, or pre-generated and sent to your DRM vendor. Once you have those keys, the Zencoder API structure for a single rendition
+            is:
+        </p>
+<pre class="line-numbers"><code class="language-json">{
+    "input": "http://s3.amazonaws.com/zencodertesting/test.mov",
+    "outputs": [
     {
-      "input": "http://s3.amazonaws.com/zencodertesting/test.mov",
-      "outputs": [
-        {
-          "streaming_delivery_format": "dash",
-          "video_bitrate": 700,
-          "type": "segmented",
-          "url": "s3://mybucket/dash-examples/sbr/rendition.mpd",
-          "drm": {
+        "streaming_delivery_format": "dash",
+        "video_bitrate": 700,
+        "type": "segmented",
+        "url": "s3://mybucket/dash-examples/sbr/rendition.mpd",
+        "drm": {
             "method": "cenc",
             "key_id": "d57d416ccd454d5a08d05bff0742ee76",
             "content_key": "f15cae8f4e48a023056e1960ff2228b0"
-          }
         }
-      ]
     }
-  </pre>
-  <pre class="brush: xml;">
-    <api-request>
-      <input>http://s3.amazonaws.com/zencodertesting/test.mov&lt;/input>
-      <outputs type="array">
-        <output>
-          <streaming_delivery_format>dash</streaming_delivery_format>
-          <video_bitrate>700</video_bitrate>
-          <type>segmented</type>
-          <url>s3://mybucket/dash-examples/sbr/rendition.mpd</url>
-          <drm>
-            <method>cenc</method>
-            <key_id>d57d416ccd454d5a08d05bff0742ee76</key_id>
-            <content_key>f15cae8f4e48a023056e1960ff2228b0</content_key>
-          </drm>
-        </output>
-      </outputs>
-    </api-request>
-  </pre>
-</div>
-<p>The content will be encrypted with the <code>content_key</code>, and the .mpd manifest file will include the <code>key_id</code> in its headers. However, to ensure this output is playable, it also needs headers specifying how to retrieve the <code>content_key</code>.
-  On a multi-bitrate DASH encode, these headers only need to be added to the playlist output, but can also be added to each rendition, so the rendition is individually playable. This is done by adding one or more DRM schemas:</p>
-<div class="docs-code">
-  <pre class="brush: js;">
+    ]
+}</code></pre>
+        <p>The content will be encrypted with the <code>content_key</code>, and the .mpd manifest file will include the <code>key_id</code> in its headers. However, to ensure this output is playable, it also needs headers specifying how to retrieve the <code>content_key</code>. On a multi-bitrate DASH encode, these headers only need to be added to the playlist output, but can also be added to each rendition, so the rendition is individually playable. This is done by adding one or more DRM schemas:</p>
+        <pre class="brush: js;">
+            {
+                "input": "http://s3.amazonaws.com/zencodertesting/test.mov",
+                "outputs": [
+                {
+                    "streaming_delivery_format": "dash",
+                    "video_bitrate": 700,
+                    "type": "segmented",
+                    "url": "s3://mybucket/dash-examples/sbr/rendition.mpd",
+                    "drm": {
+                        "method": "cenc",
+                        "key_id": "d57d416ccd454d5a08d05bff0742ee76",
+                        "content_key": "f15cae8f4e48a023056e1960ff2228b0",
+                        "schemas": [
+                        { "type": "marlin" },
+                        { "type": "playready", "license_acquisition_url": "https://playready.example.com/license_server/" }
+                        ]
+                    }
+                }
+                ]
+            }
+        </pre>
+        <p>We can then put this together to create a multi-bitrate, DRM-encrypted DASH job:</p>
+<pre class="line-numbers"><code class="language-json">{
+    "input": "http://s3.amazonaws.com/zencodertesting/test.mov",
+    "outputs": [
     {
-      "input": "http://s3.amazonaws.com/zencodertesting/test.mov",
-      "outputs": [
-        {
-          "streaming_delivery_format": "dash",
-          "video_bitrate": 700,
-          "type": "segmented",
-          "url": "s3://mybucket/dash-examples/sbr/rendition.mpd",
-          "drm": {
+        "label": "dash-1200",
+        "streaming_delivery_format": "dash",
+        "video_bitrate": 1200,
+        "type": "segmented",
+        "url": "s3://mybucket/dash-examples/mbr/1200k/rendition.mpd",
+        "drm": {
+            "method": "cenc",
+            "key_id": "d57d416ccd454d5a08d05bff0742ee76",
+            "content_key": "f15cae8f4e48a023056e1960ff2228b0"
+        }
+    },
+    {
+        "label": "dash-700",
+        "streaming_delivery_format": "dash",
+        "video_bitrate": 700,
+        "type": "segmented",
+        "url": "s3://mybucket/dash-examples/mbr/700k/rendition.mpd",
+        "drm": {
+            "method": "cenc",
+            "key_id": "d57d416ccd454d5a08d05bff0742ee76",
+            "content_key": "f15cae8f4e48a023056e1960ff2228b0"
+        }
+    },
+    {
+        "label": "dash-400",
+        "streaming_delivery_format": "dash",
+        "video_bitrate": 400,
+        "type": "segmented",
+        "url": "s3://mybucket/dash-examples/mbr/400k/rendition.mpd",
+        "drm": {
+            "method": "cenc",
+            "key_id": "d57d416ccd454d5a08d05bff0742ee76",
+            "content_key": "f15cae8f4e48a023056e1960ff2228b0"
+        }
+    },
+    {
+        "streaming_delivery_format": "dash",
+        "type": "playlist",
+        "url": "s3://mybucket/dash-examples/mbr/manifest.mpd",
+        "streams": [
+        { "source": "dash-1200", "path": "1200k" },
+        { "source": "dash-700",  "path": "700k" },
+        { "source": "dash-400",  "path": "400k" }
+        ],
+        "drm": {
             "method": "cenc",
             "key_id": "d57d416ccd454d5a08d05bff0742ee76",
             "content_key": "f15cae8f4e48a023056e1960ff2228b0",
             "schemas": [
-              { "type": "marlin" },
-              { "type": "playready", "license_acquisition_url": "https://playready.example.com/license_server/" }
+            { "type": "marlin" },
+            { "type": "playready", "license_acquisition_url": "https://playready.example.com/license_server/" }
             ]
-          }
         }
-      ]
     }
-  </pre>
-  <pre class="brush: xml;">
-    <api-request>
-      <input>http://s3.amazonaws.com/zencodertesting/test.mov&lt;/input>
-      <outputs type="array">
-        <output>
-          <streaming_delivery_format>dash</streaming_delivery_format>
-          <video_bitrate>700</video_bitrate>
-          <type>segmented</type>
-          <url>s3://mybucket/dash-examples/sbr/rendition.mpd</url>
-          <drm>
-            <method>cenc</method>
-            <key_id>d57d416ccd454d5a08d05bff0742ee76</key_id>
-            <content_key>f15cae8f4e48a023056e1960ff2228b0</content_key>
-            <schemas type="array">
-              <schema>
-                <type>marlin</type>
-              </schema>
-              <schema>
-                <type>playready</type>
-                <license_acquisition_url>https://playready.example.com/license_server/</license_acquisition_url>
-              </schema>
-            </schemas>
-          </drm>
-        </output>
-      </outputs>
-    </api-request>
-  </pre>
-</div>
-<p>We can then put this together to create a multi-bitrate, DRM-encrypted DASH job:</p>
-<div class="docs-code">
-  <pre class="brush: js;">
+    ]
+}
+</code></pre>
+    </section>
+    <section id="Transmuxing" class="bcls-section">
+        <h2>Transmuxing</h2>
+        <p>
+            Of course, generating multiple formats of a video can get expensive and wasteful. So Zencoder supports repackaging the same encoded streams into different formats (called transmuxing), by using the <code><a href="../../encoding/transmuxing/transmuxing.html#copy-video">copy_video</a></code> and <code><a href="../../encoding/transmuxing/transmuxing.html#copy-audio">copy_audio</a></code> options.
+            Outputs for which the video is transmuxed rather than encoded are charged at 1/4 the regular duration. So if you're planning to make multiple formats of the same video (MP4, HLS, and DASH, for example), you can encode the MP4 version of each bitrate
+            first, and then transmux those outputs to create the HLS and DASH versions. (Note that we don't support transmuxing from a format that's segmented, since the video is no longer a single stream.)
+        </p>
+        <p>To ensure that the MP4 is prepared according to the constraints of the subsequent segmented streaming formats, also use the <code><a href="../../encoding/segmented-streaming/segmented-streaming.html#prepare-for-segmenting">prepare_for_segmenting</a></code> option on the MP4 output. This will control default values for keyframes and captions when encoding the video stream of the MP4 to ensure that it will be compatible with transmuxing to segmented formats afterward.</p>
+        <p>Using the MP4 as a source for the transmuxed outputs works similarly to the playlist ouputs. You specify a source option that matches the label of another output, but this time it's part of the main-level options for the output instead of in the streams hash.</p>
+<pre class="line-numbers"><code class="language-json">{
+    "input": "http://s3.amazonaws.com/zencodertesting/test.mov",
+    "outputs": [
     {
-      "input": "http://s3.amazonaws.com/zencodertesting/test.mov",
-      "outputs": [
-        {
-          "label": "dash-1200",
-          "streaming_delivery_format": "dash",
-          "video_bitrate": 1200,
-          "type": "segmented",
-          "url": "s3://mybucket/dash-examples/mbr/1200k/rendition.mpd",
-          "drm": {
+        "label": "mp4-700k",
+        "prepare_for_segmenting": ["hls", "dash"],
+        "video_bitrate": 700,
+        "url": "s3://mybucket/transmux-examples/sbr/video.mp4"
+    },
+    {
+        "source": "mp4-700k",
+        "copy_video": true,
+        "copy_audio": true,
+        "type": "segmented",
+        "url": "s3://mybucket/transmux-examples/sbr/hls/video.m3u8"
+    },
+    {
+        "source": "mp4-700k",
+        "copy_video": true,
+        "copy_audio": true,
+        "streaming_delivery_format": "dash",
+        "type": "segmented",
+        "url": "s3://mybucket/transmux-examples/sbr/dash/video.mpd"
+    }
+    ]
+}</code></pre>
+    </section>
+    <section id="Optimizing_for_delivery" class="bcls-section">
+        <h2>Optimizing for delivery</h2>
+        <p> Since DASH is intended for streaming delivery, we recommend controlling the peaks of the bitrates in each rendition to avoid having the player rebuffer or switch to lower bitrate encodes unnecessarily. The options that control the variability of the encoded stream according to what the decoder/player can handle are</p>
+        <ul>
+            <li><code><a href="../../encoding/rate-control/rate-control.html#decoder-bitrate-cap">decoder_bitrate_cap</a></code></li>
+            <li><code><a href="../../encoding/rate-control/rate-control.html#decoder-buffer-size">decoder_buffer_size</a></code></li>
+        </ul>
+        <aside class="bcls-aside bcls-aside--information">Note: <code><a href="../../encoding/rate-control/rate-control.html#max-video-bitrate">max_video_bitrate</a></code> is for controlling the maximum average bitrate over the entire stream, and is not suitable for use with streaming content.</aside>
+        <p>Our general recommendation is to set <code>decoder_bitrate_cap</code> to the maximum bitrate available for the video stream. Remember you need to take into account the audio, as well as a bit of overhead for the file format. The <code>decoder_buffer_size</code> is technically supposed to match the available video buffer memory on the decoding device, but is often better used to control how much content may be pre-buffered. It works as a multiple of the <code>decoder_bitrate_cap</code>, so that for example, if <code>decoder_bitrate_cap</code> was 500 (Kilobits per second), and <code>decoder_buffer_size</code> was 1000 (Kilobits), then the buffer could store 2 seconds worth of video. We also recommend setting the <code><a href="../../encoding/rate-control/rate-control.html#video-bitrate">video_bitrate</a></code> a little lower than the <code>decoder_bitrate_cap</code>, which allows the encoder to use more data to encode complex scenes and less data on simpler scenes. A decent starting point would be to assume up to 10% of overhead for the file format, setting the <code>video_bitrate</code> 10% lower than the <code>decoder_bitrate_cap</code>, and allowing about 1.5 seconds of video to be buffered.</p>
+            <p>Assuming a 1000 Kbps connection is available to the customer:</p>
+            <ul>
+                <li>1000 * 0.90 = 900 Kbps available after subtracting 10% for format overhead.</li>
+                <li>900 - 128 = 772 Kbps video <code>decoder_bitrate_cap</code> after subtracting 128 Kbps for the audio.</li>
+                <li>772 * 1.5 = 1158 Kb <code>decoder_buffer_size</code> (for 1.5 seconds worth of video).</li>
+                <li>772 * 0.90 = 695 Kbps target video bitrate (10% lower than the <code>decoder_bitrate_cap</code>).</li>
+            </ul>
+            <p>So, for a more correct streaming encode example:</p>
+<pre class="line-numbers"><code class="language-json">{
+    "input": "http://s3.amazonaws.com/zencodertesting/test.mov",
+    "outputs": [
+    {
+        "label": "mp4-1000k",
+        "prepare_for_segmenting": ["hls", "dash"],
+        "audio_bitrate": 128,
+        "decoder_bitrate_cap": 772,
+        "decoder_buffer_size": 1158,
+        "video_bitrate": 695,
+        "url": "s3://mybucket/transmux-examples/sbr/video.mp4"
+    },
+    {
+        "source": "mp4-1000k",
+        "copy_video": true,
+        "copy_audio": true,
+        "type": "segmented",
+        "url": "s3://mybucket/transmux-examples/sbr/hls/video.m3u8"
+    },
+    {
+        "source": "mp4-1000k",
+        "copy_video": true,
+        "copy_audio": true,
+        "streaming_delivery_format": "dash",
+        "type": "segmented",
+        "url": "s3://mybucket/transmux-examples/sbr/dash/video.mpd"
+    }
+    ]
+}</code></pre>
+        <aside class="bcls-aside bcls-aside--information">Note: The above is <strong>not</strong> sufficient to guarantee the HLS encode would pass Apple&#39;s validation. While it would stream seamlessly on a 1000 Kbps connection, Apple measures bitrates per-segment (including the final segment which may have a short duration), without accounting for the buffering aspects. To ensure HLS encodes pass Apple&#39;s validation, see our HLS guide.</aside>
+    </section>
+    <section id="Putting_it_all_together" class="bcls-section">
+        <h2>Putting it all together</h2>
+<pre class="line-numbers"><code class="language-json">{
+    "input": "http://s3.amazonaws.com/zencodertesting/test.mov",
+    "outputs": [
+    {
+        "label": "mp4-1500k",
+        "prepare_for_segmenting": ["hls", "dash"],
+        "audio_bitrate": 128,
+        "decoder_bitrate_cap": 1222,
+        "decoder_buffer_size": 1833,
+        "video_bitrate": 1100,
+        "size": "1280x720",
+        "url": "s3://mybucket/full-examples/mp4/1500.mp4"
+    },
+    {
+        "label": "mp4-1000k",
+        "prepare_for_segmenting": ["hls", "dash"],
+        "audio_bitrate": 128,
+        "decoder_bitrate_cap": 772,
+        "decoder_buffer_size": 1158,
+        "video_bitrate": 695,
+        "size": "960x540",
+        "url": "s3://mybucket/full-examples/mp4/1000.mp4"
+    },
+    {
+        "label": "mp4-500k",
+        "prepare_for_segmenting": ["hls", "dash"],
+        "audio_bitrate": 128,
+        "decoder_bitrate_cap": 322,
+        "decoder_buffer_size": 483,
+        "video_bitrate": 290,
+        "size": "640x360",
+        "url": "s3://mybucket/full-examples/mp4/500.mp4"
+    },
+    {
+        "label": "hls-1500k",
+        "source": "mp4-1500k",
+        "copy_video": true,
+        "copy_audio": true,
+        "type": "segmented",
+        "url": "s3://mybucket/full-examples/hls/1500.m3u8"
+    },
+    {
+        "label": "hls-1000k",
+        "source": "mp4-1000k",
+        "copy_video": true,
+        "copy_audio": true,
+        "type": "segmented",
+        "url": "s3://mybucket/full-examples/hls/1000.m3u8"
+    },
+    {
+        "label": "hls-500k",
+        "source": "mp4-500k",
+        "copy_video": true,
+        "copy_audio": true,
+        "type": "segmented",
+        "url": "s3://mybucket/full-examples/hls/500.m3u8"
+    },
+    {
+        "type": "playlist",
+        "url": "s3://mybucket/full-examples/hls/multi_bitrate_playlist.m3u8",
+        "streams": [
+        { "path": "1000.m3u8", "source": "hls-1000k" },
+        { "path": "1500.m3u8", "source": "hls-1500k" },
+        { "path": "500.m3u8", "source": "hls-500k" }
+        ]
+    },
+    {
+        "label": "dash-1500k",
+        "source": "mp4-1500k",
+        "copy_video": true,
+        "copy_audio": true,
+        "streaming_delivery_format": "dash",
+        "type": "segmented",
+        "url": "s3://mybucket/full-examples/dash/1500k/rendition.mpd",
+        "drm": {
             "method": "cenc",
             "key_id": "d57d416ccd454d5a08d05bff0742ee76",
             "content_key": "f15cae8f4e48a023056e1960ff2228b0"
-          }
-        },
-        {
-          "label": "dash-700",
-          "streaming_delivery_format": "dash",
-          "video_bitrate": 700,
-          "type": "segmented",
-          "url": "s3://mybucket/dash-examples/mbr/700k/rendition.mpd",
-          "drm": {
+        }
+    },
+    {
+        "label": "dash-1000k",
+        "source": "mp4-1000k",
+        "copy_video": true,
+        "copy_audio": true,
+        "streaming_delivery_format": "dash",
+        "type": "segmented",
+        "url": "s3://mybucket/full-examples/dash/1000k/rendition.mpd",
+        "drm": {
             "method": "cenc",
             "key_id": "d57d416ccd454d5a08d05bff0742ee76",
             "content_key": "f15cae8f4e48a023056e1960ff2228b0"
-          }
-        },
-        {
-          "label": "dash-400",
-          "streaming_delivery_format": "dash",
-          "video_bitrate": 400,
-          "type": "segmented",
-          "url": "s3://mybucket/dash-examples/mbr/400k/rendition.mpd",
-          "drm": {
+        }
+    },
+    {
+        "label": "dash-500k",
+        "source": "mp4-500k",
+        "copy_video": true,
+        "copy_audio": true,
+        "streaming_delivery_format": "dash",
+        "type": "segmented",
+        "url": "s3://mybucket/full-examples/dash/500k/rendition.mpd",
+        "drm": {
             "method": "cenc",
             "key_id": "d57d416ccd454d5a08d05bff0742ee76",
             "content_key": "f15cae8f4e48a023056e1960ff2228b0"
-          }
-        },
-        {
-          "streaming_delivery_format": "dash",
-          "type": "playlist",
-          "url": "s3://mybucket/dash-examples/mbr/manifest.mpd",
-          "streams": [
-            { "source": "dash-1200", "path": "1200k" },
-            { "source": "dash-700",  "path": "700k" },
-            { "source": "dash-400",  "path": "400k" }
-          ],
-          "drm": {
+        }
+    },
+    {
+        "streaming_delivery_format": "dash",
+        "type": "playlist",
+        "url": "s3://mybucket/full-examples/dash/manifest.mpd",
+        "streams": [
+        { "source": "dash-1500k", "path": "1500k" },
+        { "source": "dash-1000k", "path": "1000k" },
+        { "source": "dash-500k",  "path": "500k" }
+        ],
+        "drm": {
             "method": "cenc",
             "key_id": "d57d416ccd454d5a08d05bff0742ee76",
             "content_key": "f15cae8f4e48a023056e1960ff2228b0",
             "schemas": [
-              { "type": "marlin" },
-              { "type": "playready", "license_acquisition_url": "https://playready.example.com/license_server/" }
+            { "type": "marlin" },
+            { "type": "playready", "license_acquisition_url": "https://playready.example.com/license_server/" }
             ]
-          }
         }
-      ]
     }
-  </pre>
-  <pre class="brush: xml;">
-    <api-request>
-      <input>http://s3.amazonaws.com/zencodertesting/test.mov&lt;/input>
-      <outputs type="array">
-        <output>
-          <label>dash-1200</label>
-          <streaming_delivery_format>dash</streaming_delivery_format>
-          <video_bitrate>1200</video_bitrate>
-          <type>segmented</type>
-          <url>s3://mybucket/dash-examples/mbr/1200k/rendition.mpd</url>
-          <drm>
-            <method>cenc</method>
-            <key_id>d57d416ccd454d5a08d05bff0742ee76</key_id>
-            <content_key>f15cae8f4e48a023056e1960ff2228b0</content_key>
-          </drm>
-        </output>
-        <output>
-          <label>dash-700</label>
-          <streaming_delivery_format>dash</streaming_delivery_format>
-          <video_bitrate>700</video_bitrate>
-          <type>segmented</type>
-          <url>s3://mybucket/dash-examples/mbr/700k/rendition.mpd</url>
-          <drm>
-            <method>cenc</method>
-            <key_id>d57d416ccd454d5a08d05bff0742ee76</key_id>
-            <content_key>f15cae8f4e48a023056e1960ff2228b0</content_key>
-          </drm>
-        </output>
-        <output>
-          <label>dash-400</label>
-          <streaming_delivery_format>dash</streaming_delivery_format>
-          <video_bitrate>400</video_bitrate>
-          <type>segmented</type>
-          <url>s3://mybucket/dash-examples/mbr/400k/rendition.mpd</url>
-          <drm>
-            <method>cenc</method>
-            <key_id>d57d416ccd454d5a08d05bff0742ee76</key_id>
-            <content_key>f15cae8f4e48a023056e1960ff2228b0</content_key>
-          </drm>
-        </output>
-        <output>
-          <streaming_delivery_format>dash</streaming_delivery_format>
-          <type>playlist</type>
-          <url>s3://mybucket/dash-examples/mbr/manifest.mpd</url>
-          <streams type="array">
-            <stream>
-              <source>dash-1200</source>
-              <path>1200k</path>
-            </stream>
-            <stream>
-              <source>dash-700</source>
-              <path>700k</path>
-            </stream>
-            <stream>
-              <source>dash-400</source>
-              <path>400k</path>
-            </stream>
-          </streams>
-          <drm>
-            <method>cenc</method>
-            <key_id>d57d416ccd454d5a08d05bff0742ee76</key_id>
-            <content_key>f15cae8f4e48a023056e1960ff2228b0</content_key>
-            <schemas type="array">
-              <schema>
-                <type>marlin</type>
-              </schema>
-              <schema>
-                <type>playready</type>
-                <license_acquisition_url>https://playready.example.com/license_server/</license_acquisition_url>
-              </schema>
-            </schemas>
-          </drm>
-        </output>
-      </outputs>
-    </api-request>
-  </pre>
-</div>
+    ]
+}</code></pre>
+    </section>
+</article>
+<!-- end drupal content -->
 
-<h3>Transmuxing</h3>
-<p>
-  Of course, generating multiple formats of a video can get expensive and wasteful. So Zencoder supports repackaging the same encoded streams into different formats (called transmuxing), by using the <code><a href="https://app.zencoder.com/docs/api/encoding/transmuxing/copy-video">copy_video</a></code> and <code><a href="https://app.zencoder.com/docs/api/encoding/transmuxing/copy-audio">copy_audio</a></code> options.
-  Outputs for which the video is transmuxed rather than encoded are charged at 1/4 the regular duration. So if you're planning to make multiple formats of the same video (MP4, HLS, and DASH, for example), you can encode the MP4 version of each bitrate
-  first, and then transmux those outputs to create the HLS and DASH versions. (Note that we don't support transmuxing from a format that's segmented, since the video is no longer a single stream.)</li>
-</p>
-<p>To ensure that the MP4 is prepared according to the constraints of the subsequent segmented streaming formats, also use the <code><a href="https://app.zencoder.com/docs/api/encoding/segmented-streaming/prepare-for-segmenting">prepare_for_segmenting</a></code> option on the MP4 output. This will control default values for keyframes and captions when encoding
-  the video stream of the MP4 to ensure that it will be compatible with transmuxing to segmented formats afterward.</p>
-<p>Using the MP4 as a source for the transmuxed outputs works similarly to the playlist ouputs. You specify a source option that matches the label of another output, but this time it's part of the main-level options for the output instead of
-  in the streams hash.</p>
-<div class="docs-code">
-  <pre class="brush: js;">
-    {
-      "input": "http://s3.amazonaws.com/zencodertesting/test.mov",
-      "outputs": [
-        {
-          "label": "mp4-700k",
-          "prepare_for_segmenting": ["hls", "dash"],
-          "video_bitrate": 700,
-          "url": "s3://mybucket/transmux-examples/sbr/video.mp4"
-        },
-        {
-          "source": "mp4-700k",
-          "copy_video": true,
-          "copy_audio": true,
-          "type": "segmented",
-          "url": "s3://mybucket/transmux-examples/sbr/hls/video.m3u8"
-        },
-        {
-          "source": "mp4-700k",
-          "copy_video": true,
-          "copy_audio": true,
-          "streaming_delivery_format": "dash",
-          "type": "segmented",
-          "url": "s3://mybucket/transmux-examples/sbr/dash/video.mpd"
-        }
-      ]
-    }
-  </pre>
-  <pre class="brush: xml;">
-    <api-request>
-      <input>http://s3.amazonaws.com/zencodertesting/test.mov&lt;/input>
-      <outputs type="array">
-        <output>
-          <label>mp4-700k</label>
-          <prepare_for_segmenting type="array">
-            <value>hls</value>
-            <value>dash</value>
-          </prepare_for_segmenting>
-          <video_bitrate>700</video_bitrate>
-          <url>s3://mybucket/transmux-examples/sbr/video.mp4</url>
-        </output>
-        <output>
-          <source>mp4-700k</source>
-          <copy_video>true</copy_video>
-          <copy_audio>true</copy_audio>
-          <type>segmented</type>
-          <url>s3://mybucket/transmux-examples/sbr/hls/video.m3u8</url>
-        </output>
-        <output>
-          <source>mp4-700k</source>
-          <copy_video>true</copy_video>
-          <copy_audio>true</copy_audio>
-          <streaming_delivery_format>dash</streaming_delivery_format>
-          <type>segmented</type>
-          <url>s3://mybucket/transmux-examples/sbr/dash/video.mpd</url>
-        </output>
-      </outputs>
-    </api-request>
-  </pre>
-</div>
-
-<h3>Optimizing for delivery</h3>
-<p>
-  Since DASH is intended for streaming delivery, we recommend controlling the peaks of the bitrates in each rendition to avoid having the player rebuffer or switch to lower bitrate encodes unnecessarily. The options that control the variability of the
-  encoded stream according to what the decoder/player can handle are <code><a href="https://app.zencoder.com/docs/api/encoding/rate-control/decoder-bitrate-cap">decoder_bitrate_cap</a></code> and <code><a href="https://app.zencoder.com/docs/api/encoding/rate-control/decoder-buffer-size">decoder_buffer_size</a></code>. (Note: <code><a href="https://app.zencoder.com/docs/api/encoding/rate-control/max-video-bitrate">max_video_bitrate</a></code> is for controlling the maximum average bitrate over the entire stream, and is
-  not suitable for use with streaming content.)</li>
-</p>
-<p>Our general recommendation is to set <code>decoder_bitrate_cap</code> to the maximum bitrate available for the video stream. Remember you need to take into account the audio, as well as a bit of overhead for the file format. The <code>decoder_buffer_size</code> is
-  technically supposed to match the available video buffer memory on the decoding device, but is often better used to control how much content may be pre-buffered. It works as a multiple of the <code>decoder_bitrate_cap</code>, so that for example, if <code>decoder_bitrate_cap</code> was
-  500 (Kilobits per second), and <code>decoder_buffer_size</code> was 1000 (Kilobits), then the buffer could store 2 seconds worth of video. We also recommend setting the <code><a href="https://app.zencoder.com/docs/api/encoding/rate-control/video-bitrate">video_bitrate</a></code> a little lower than the <code>decoder_bitrate_cap</code>,
-  which allows the encoder to use more data to encode complex scenes and less data on simpler scenes. A decent starting point would be to assume up to 10% of overhead for the file format, setting the <code>video_bitrate</code> 10% lower than the <code>decoder_bitrate_cap</code>,
-  and allowing about 1.5 seconds of video to be buffered.</p>
-<p>Assuming a 1000 Kbps connection is available to the customer:</p>
-<ul>
-  <li>1000 * 0.90 = 900 Kbps available after subtracting 10% for format overhead.</li>
-  <li>900 - 128 = 772 Kbps video <code>decoder_bitrate_cap</code> after subtracting 128 Kbps for the audio.</li>
-  <li>772 * 1.5 = 1158 Kb <code>decoder_buffer_size</code> (for 1.5 seconds worth of video).</li>
-  <li>772 * 0.90 = 695 Kbps target video bitrate (10% lower than the <code>decoder_bitrate_cap</code>).</li>
-</ul>
-<p>So, for a more correct streaming encode example:</p>
-<div class="docs-code">
-  <pre class="brush: js;">
-    {
-      "input": "http://s3.amazonaws.com/zencodertesting/test.mov",
-      "outputs": [
-        {
-          "label": "mp4-1000k",
-          "prepare_for_segmenting": ["hls", "dash"],
-          "audio_bitrate": 128,
-          "decoder_bitrate_cap": 772,
-          "decoder_buffer_size": 1158,
-          "video_bitrate": 695,
-          "url": "s3://mybucket/transmux-examples/sbr/video.mp4"
-        },
-        {
-          "source": "mp4-1000k",
-          "copy_video": true,
-          "copy_audio": true,
-          "type": "segmented",
-          "url": "s3://mybucket/transmux-examples/sbr/hls/video.m3u8"
-        },
-        {
-          "source": "mp4-1000k",
-          "copy_video": true,
-          "copy_audio": true,
-          "streaming_delivery_format": "dash",
-          "type": "segmented",
-          "url": "s3://mybucket/transmux-examples/sbr/dash/video.mpd"
-        }
-      ]
-    }
-  </pre>
-  <pre class="brush: xml;">
-    <api-request>
-      <input>http://s3.amazonaws.com/zencodertesting/test.mov&lt;/input>
-      <outputs type="array">
-        <output>
-          <label>mp4-1000k</label>
-          <prepare_for_segmenting type="array">
-            <value>hls</value>
-            <value>dash</value>
-          </prepare_for_segmenting>
-          <decoder_bitrate_cap>772</decoder_bitrate_cap>
-          <decoder_buffer_size>1158</decoder_buffer_size>
-          <video_bitrate>695</video_bitrate>
-          <url>s3://mybucket/transmux-examples/sbr/video.mp4</url>
-        </output>
-        <output>
-          <label>mp4-1000k</label>
-          <copy_video>true</copy_video>
-          <copy_audio>true</copy_audio>
-          <type>segmented</type>
-          <url>s3://mybucket/transmux-examples/sbr/hls/video.m3u8</url>
-        </output>
-        <output>
-          <label>mp4-1000k</label>
-          <copy_video>true</copy_video>
-          <copy_audio>true</copy_audio>
-          <streaming_delivery_format>dash</streaming_delivery_format>
-          <type>segmented</type>
-          <url>s3://mybucket/transmux-examples/sbr/dash/video.mpd</url>
-        </output>
-      </outputs>
-    </api-request>
-  </pre>
-</div>
-<p>Note: The above is <strong>not</strong> sufficient to guarantee the HLS encode would pass Apple&#39;s validation. While it would stream seamlessly on a 1000 Kbps connection, Apple measures bitrates per-segment (including the final segment which may have
-  a short duration), without accounting for the buffering aspects. To ensure HLS encodes pass Apple&#39;s validation, see our HLS guide.</p>
-
-<h3>Putting it all together</h3>
-<div class="docs-code">
-  <pre class="brush: js;">
-    {
-      "input": "http://s3.amazonaws.com/zencodertesting/test.mov",
-      "outputs": [
-        {
-          "label": "mp4-1500k",
-          "prepare_for_segmenting": ["hls", "dash"],
-          "audio_bitrate": 128,
-          "decoder_bitrate_cap": 1222,
-          "decoder_buffer_size": 1833,
-          "video_bitrate": 1100,
-          "size": "1280x720",
-          "url": "s3://mybucket/full-examples/mp4/1500.mp4"
-        },
-        {
-          "label": "mp4-1000k",
-          "prepare_for_segmenting": ["hls", "dash"],
-          "audio_bitrate": 128,
-          "decoder_bitrate_cap": 772,
-          "decoder_buffer_size": 1158,
-          "video_bitrate": 695,
-          "size": "960x540",
-          "url": "s3://mybucket/full-examples/mp4/1000.mp4"
-        },
-        {
-          "label": "mp4-500k",
-          "prepare_for_segmenting": ["hls", "dash"],
-          "audio_bitrate": 128,
-          "decoder_bitrate_cap": 322,
-          "decoder_buffer_size": 483,
-          "video_bitrate": 290,
-          "size": "640x360",
-          "url": "s3://mybucket/full-examples/mp4/500.mp4"
-        },
-        {
-          "label": "hls-1500k",
-          "source": "mp4-1500k",
-          "copy_video": true,
-          "copy_audio": true,
-          "type": "segmented",
-          "url": "s3://mybucket/full-examples/hls/1500.m3u8"
-        },
-        {
-          "label": "hls-1000k",
-          "source": "mp4-1000k",
-          "copy_video": true,
-          "copy_audio": true,
-          "type": "segmented",
-          "url": "s3://mybucket/full-examples/hls/1000.m3u8"
-        },
-        {
-          "label": "hls-500k",
-          "source": "mp4-500k",
-          "copy_video": true,
-          "copy_audio": true,
-          "type": "segmented",
-          "url": "s3://mybucket/full-examples/hls/500.m3u8"
-        },
-        {
-          "type": "playlist",
-          "url": "s3://mybucket/full-examples/hls/multi_bitrate_playlist.m3u8",
-          "streams": [
-            { "path": "1000.m3u8", "source": "hls-1000k" },
-            { "path": "1500.m3u8", "source": "hls-1500k" },
-            { "path": "500.m3u8", "source": "hls-500k" }
-          ]
-        },
-        {
-          "label": "dash-1500k",
-          "source": "mp4-1500k",
-          "copy_video": true,
-          "copy_audio": true,
-          "streaming_delivery_format": "dash",
-          "type": "segmented",
-          "url": "s3://mybucket/full-examples/dash/1500k/rendition.mpd",
-          "drm": {
-            "method": "cenc",
-            "key_id": "d57d416ccd454d5a08d05bff0742ee76",
-            "content_key": "f15cae8f4e48a023056e1960ff2228b0"
-          }
-        },
-        {
-          "label": "dash-1000k",
-          "source": "mp4-1000k",
-          "copy_video": true,
-          "copy_audio": true,
-          "streaming_delivery_format": "dash",
-          "type": "segmented",
-          "url": "s3://mybucket/full-examples/dash/1000k/rendition.mpd",
-          "drm": {
-            "method": "cenc",
-            "key_id": "d57d416ccd454d5a08d05bff0742ee76",
-            "content_key": "f15cae8f4e48a023056e1960ff2228b0"
-          }
-        },
-        {
-          "label": "dash-500k",
-          "source": "mp4-500k",
-          "copy_video": true,
-          "copy_audio": true,
-          "streaming_delivery_format": "dash",
-          "type": "segmented",
-          "url": "s3://mybucket/full-examples/dash/500k/rendition.mpd",
-          "drm": {
-            "method": "cenc",
-            "key_id": "d57d416ccd454d5a08d05bff0742ee76",
-            "content_key": "f15cae8f4e48a023056e1960ff2228b0"
-          }
-        },
-        {
-          "streaming_delivery_format": "dash",
-          "type": "playlist",
-          "url": "s3://mybucket/full-examples/dash/manifest.mpd",
-          "streams": [
-            { "source": "dash-1500k", "path": "1500k" },
-            { "source": "dash-1000k", "path": "1000k" },
-            { "source": "dash-500k",  "path": "500k" }
-          ],
-          "drm": {
-            "method": "cenc",
-            "key_id": "d57d416ccd454d5a08d05bff0742ee76",
-            "content_key": "f15cae8f4e48a023056e1960ff2228b0",
-            "schemas": [
-              { "type": "marlin" },
-              { "type": "playready", "license_acquisition_url": "https://playready.example.com/license_server/" }
-            ]
-          }
-        }
-      ]
-    }
-  </pre>
-  <pre class="brush: xml;">
-    <api-request>
-      <input>http://s3.amazonaws.com/zencodertesting/test.mov&lt;/input>
-      <outputs type="array">
-        <output>
-          <label>mp4-1500k</label>
-          <prepare_for_segmenting type="array">
-            <value>hls</value>
-            <value>dash</value>
-          </prepare_for_segmenting>
-          <audio_bitrate>128</audio_bitrate>
-          <decoder_bitrate_cap>1222</decoder_bitrate_cap>
-          <decoder_buffer_size>1833</decoder_buffer_size>
-          <video_bitrate>1100</video_bitrate>
-          <url>s3://mybucket/full-examples/mp4/1500.mp4</url>
-        </output>
-        <output>
-          <label>mp4-1000k</label>
-          <prepare_for_segmenting type="array">
-            <value>hls</value>
-            <value>dash</value>
-          </prepare_for_segmenting>
-          <audio_bitrate>128</audio_bitrate>
-          <decoder_bitrate_cap>772</decoder_bitrate_cap>
-          <decoder_buffer_size>1158</decoder_buffer_size>
-          <video_bitrate>695</video_bitrate>
-          <size>960x540</size>
-          <url>s3://mybucket/full-examples/mp4/1000.mp4</url>
-        </output>
-        <output>
-          <label>mp4-500k</label>
-          <prepare_for_segmenting type="array">
-            <value>hls</value>
-            <value>dash</value>
-          </prepare_for_segmenting>
-          <audio_bitrate>128</audio_bitrate>
-          <decoder_bitrate_cap>322</decoder_bitrate_cap>
-          <decoder_buffer_size>483</decoder_buffer_size>
-          <video_bitrate>290</video_bitrate>
-          <size>640x360</size>
-          <url>s3://mybucket/full-examples/mp4/500.mp4</url>
-        </output>
-        <output>
-          <label>hls-1500k</label>
-          <source>mp4-1500k</source>
-          <copy_video>true</copy_video>
-          <copy_audio>true</copy_audio>
-          <type>segmented</type>
-          <url>s3://mybucket/full-examples/hls/1500.m3u8</url>
-        </output>
-        <output>
-          <label>hls-1000k</label>
-          <source>mp4-1000k</source>
-          <copy_video>true</copy_video>
-          <copy_audio>true</copy_audio>
-          <type>segmented</type>
-          <url>s3://mybucket/full-examples/hls/1000.m3u8</url>
-        </output>
-        <output>
-          <label>hls-500k</label>
-          <source>mp4-500k</source>
-          <copy_video>true</copy_video>
-          <copy_audio>true</copy_audio>
-          <type>segmented</type>
-          <url>s3://mybucket/full-examples/hls/500.m3u8</url>
-        </output>
-        <output>
-          <type>playlist</type>
-          <url>s3://mybucket/full-examples/hls/multi_bitrate_playlist.m3u8</url>
-          <streams type="array">
-            <stream>
-              <path>1000.m3u8</path>
-              <source>hls-1000k</source>
-            </stream>
-            <stream>
-              <path>1500.m3u8</path>
-              <source>hls-1500k</source>
-            </stream>
-            <stream>
-              <path>500.m3u8</path>
-              <source>hls-500k</source>
-            </stream>
-          </streams>
-        </output>
-        <output>
-          <label>dash-1500k</label>
-          <source>mp4-1500k</source>
-          <copy_video>true</copy_video>
-          <copy_audio>true</copy_audio>
-          <streaming_delivery_format>dash</streaming_delivery_format>
-          <type>segmented</type>
-          <url>s3://mybucket/full-examples/dash/1500k/rendition.mpd</url>
-          <drm>
-            <method>cenc</method>
-            <key_id>d57d416ccd454d5a08d05bff0742ee76</key_id>
-            <content_key>f15cae8f4e48a023056e1960ff2228b0</content_key>
-          </drm>
-        </output>
-        <output>
-          <label>dash-1000k</label>
-          <source>mp4-1000k</source>
-          <copy_video>true</copy_video>
-          <copy_audio>true</copy_audio>
-          <streaming_delivery_format>dash</streaming_delivery_format>
-          <type>segmented</type>
-          <url>s3://mybucket/full-examples/dash/1000k/rendition.mpd</url>
-          <drm>
-            <method>cenc</method>
-            <key_id>d57d416ccd454d5a08d05bff0742ee76</key_id>
-            <content_key>f15cae8f4e48a023056e1960ff2228b0</content_key>
-          </drm>
-        </output>
-        <output>
-          <label>dash-500k</label>
-          <source>mp4-500k</source>
-          <copy_video>true</copy_video>
-          <copy_audio>true</copy_audio>
-          <streaming_delivery_format>dash</streaming_delivery_format>
-          <type>segmented</type>
-          <url>s3://mybucket/full-examples/dash/500k/rendition.mpd</url>
-          <drm>
-            <method>cenc</method>
-            <key_id>d57d416ccd454d5a08d05bff0742ee76</key_id>
-            <content_key>f15cae8f4e48a023056e1960ff2228b0</content_key>
-          </drm>
-        </output>
-        <output>
-          <streaming_delivery_format>dash</streaming_delivery_format
-          <type>playlist</type>
-          <url>s3://mybucket/full-examples/dash/manifest.mpd</url>
-          <streams type="array">
-            <stream>
-              <source>dash-1500k</source>
-              <path>1500k</path>
-            </stream>
-            <stream>
-              <source>dash-1500k</source>
-              <path>1000k</path>
-            </stream>
-            <stream>
-              <source>dash-500k</source>
-              <path>500k</path>
-            </stream>
-          </streams>
-          <drm>
-            <method>cenc</method>
-            <key_id>d57d416ccd454d5a08d05bff0742ee76</key_id>
-            <content_key>f15cae8f4e48a023056e1960ff2228b0</content_key>
-            <schemas type="array">
-              <schema>
-                <type>marlin</type>
-              </schema>
-              <schema>
-                <type>playready</type>
-                <license_acquisition_url>https://playready.example.com/license_server/</license_acquisition_url>
-              </schema>
-            </schemas>
-          </drm>
-        </output>
-      </outputs>
-    </api-request>
-  </pre>
-</div>
-
-</div>
-
-    </div>
-  </div>
-
-        </div>
       </div>
     </div>
-    
-
-    
-    
-      
-  
-
-
       <!-- bcl scripts -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
@@ -969,4 +500,3 @@
 
   <!-- Version: 3.325.1 -->
 </html>
-
