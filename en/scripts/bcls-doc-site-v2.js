@@ -207,7 +207,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
         }
         // assign items to functional and alpha groups
         if (isDefined(navData.items)) {
-            bclslog('navData', navData);
+            // bclslog('navData', navData);
             iMax = navData.items.length;
             for (i = 0; i < iMax; i++) {
                 item = navData.items[i];
@@ -219,7 +219,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
                     jMax = item.groups.length;
                     for (j = 0; j < jMax; j++) {
                         group = item.groups[j];
-                        bclslog('group', group);
+                        // bclslog('group', group);
                         groupObj[group].items.push(item);
                     }
                 } else {
@@ -239,7 +239,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
             max = navLabel.length,
             j,
             jMax;
-        bclslog('navLabel', navLabel);
+        // bclslog('navLabel', navLabel);
         if (isDefined(sidenav)) {
             for (i = 0; i < max; i++) {
                 str += "<li style=\"padding:.2em\"><a href=\"#" + navLabel[i].link + "\">" + navLabel[i].text + " </a></li>";
@@ -305,11 +305,11 @@ var BCLSmain = (function (window, document, bclsNavData) {
      */
     function buildBreadCrumbs() {
         var str = "<li><a href=\"//docs.brightcove.com/en/index.html\">Developer Docs</li>";
-        bclslog("product: ", product);
-        bclslog("section: ", section);
-        bclslog("sectionName: ", sectionName);
+        // bclslog("product: ", product);
+        // bclslog("section: ", section);
+        // bclslog("sectionName: ", sectionName);
         // currently don't need subsection, but might for sections like SDKs
-        bclslog("subsection: ", subsection);
+        // bclslog("subsection: ", subsection);
         if (isDefined(product)) {
             if (product === "index") {
                 str += "<li><a href=\"//docs.brightcove.com/en/index.html\">" + bclsNavData[product].name + "</a></li>";
@@ -407,7 +407,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
             buildGetStartedGroup,
             buildPageIndexGroup,
             buildPageIndexAlpha;
-        bclslog('groupObj', groupObj);
+        // bclslog('groupObj', groupObj);
         buildGetStartedGroup = function (itemGroup) {
             str += "<li><fieldset id=\"gettingStartedBlock\" style=\"border: 1px solid " + productColors[product] + ";border-radius:1em;\"><legend>" + groupObj[itemGroup].header + "</legend><ul style=\"list-style:none;\">";
             jMax = groupObj[itemGroup].items.length;
@@ -481,13 +481,13 @@ var BCLSmain = (function (window, document, bclsNavData) {
         //add event listeners for index type selector
         indexTypeSelectorGroup.addEventListener("change", function () {
             setPageIndexType(indexTypeSelectorGroup.options[indexTypeSelectorGroup.selectedIndex].value);
-            bclslog("g selected index", indexTypeSelectorGroup.selectedIndex);
+            // bclslog("g selected index", indexTypeSelectorGroup.selectedIndex);
                 indexTypeSelectorAlpha.selectedIndex = 1;
 
         });
         indexTypeSelectorAlpha.addEventListener("change", function () {
             setPageIndexType(indexTypeSelectorAlpha.options[indexTypeSelectorAlpha.selectedIndex].value);
-            bclslog("a selected index", indexTypeSelectorGroup.selectedIndex);
+            // bclslog("a selected index", indexTypeSelectorGroup.selectedIndex);
                 indexTypeSelectorGroup.selectedIndex = 0;
 
         });
