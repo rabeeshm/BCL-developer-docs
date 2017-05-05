@@ -630,7 +630,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
                 navMenuRight.innerHTML = menuRightBase + vcSupportNav;
                 break;
             case "once": // in once
-                redirectArray = pathArray.slice(0, 3);
+                redirectArray = pathArray.slice(0, 2);
                 landingPagePath = "//docs.brightcove.com/" + redirectArray.join("/") + "/index.html";
 
                 // there is only one section
@@ -663,7 +663,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
                 // createNavigation();
                 break;
             case "live": // in once
-                redirectArray = pathArray.slice(0, 3);
+                redirectArray = pathArray.slice(0, 2);
                 landingPagePath = "//docs.brightcove.com/" + redirectArray.join("/") + "/index.html";
 
                 // there is only one section
@@ -697,7 +697,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
                 // createNavigation();
                 break;
             case "zencoder": // in zencoder
-                redirectArray = pathArray.slice(0, 3);
+                redirectArray = pathArray.slice(0, 2);
                 landingPagePath = "//docs.brightcove.com/" + redirectArray.join("/") + "/index.html";
 
                 // there is only one section
