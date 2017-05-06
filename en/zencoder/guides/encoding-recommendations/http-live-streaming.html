@@ -40,20 +40,6 @@
         ga('send', 'pageview');
     </script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
-    
-
-
-    
-
-    
-
-    
-    
-
-    
-    
-
-    
   </head>
   <body>
     <!-- header navbar -->
@@ -68,452 +54,244 @@
             <div id="sidenav" class="side-nav"></div>
         </div>
         <div id="main" class="large-10 small-12 columns">
-  <p>
-    <a href="../../../docs.html">Home</a> &raquo; <a href="../../guides.html">Guides</a> &raquo; <a href="../encoding-settings.html">Encoding Recommendations</a> &raquo; HTTP Live (Segmented) Streaming and Playlists
-  </p>
-
-  <h2>
-      
-    HTTP Live (Segmented) Streaming and Playlists
- </h2>
-
-    <p><a name="introduction"></a>
-  HTTP Live Streaming make it easy to adapt your video or audio stream to a user based on their available bandwidth, switching between streams in mid-play as the transfer speed changes. Pulling all of the pieces
-  can be confusing, so we'll show you how to create a few simple segmented files for different bandwidths and a playlist to provide to users on iOS devices so that they can play them.
-</p>
-
-<h2>The Segmented Files</h2>
-<p><a name="segmented-files"></a>
-  We'll start off by making several segmented files, each targeted at a given bandwidth. With these outputs Zencoder creates a manifest file and segmented video files, which allow the player to download each file
-  individually as it plays the video.
-</p>
-<div class="docs-code">
-  <pre class="brush: js;">{
-  "audio_bitrate": 56,
-  "audio_sample_rate": 22050,
-  "base_url": "s3://my-bucket/",
-  "decoder_bitrate_cap": 900,
-  "decoder_buffer_size": 2400,
-  "filename": "file-640k.m3u8",
-  "max_frame_rate": 30,
-  "public": 1,
-  "type": "segmented",
-  "video_bitrate": 600,
-  "width": 400,
-  "format": "ts"
-}</pre>
-  <pre class="brush: xml;"><output>
-  <audio_bitrate>56</audio_bitrate>
-  <audio_sample_rate>22050</audio_sample_rate>
-  <base_url>s3://my-bucket</base_url>
-  <decoder_bitrate_cap>900</decoder_bitrate_cap>
-  <decoder_buffer_size>2400</decoder_buffer_size>
-  <filename>file-640k.m3u8</filename>
-  <max_frame_rate>30</max_frame_rate>
-  <public>1</public>
-  <type>segmented</type>
-  <video_bitrate>600</video_bitrate>
-  <width>400</width>
-  <format>ts</format>
-</output></pre>
-</div>
-
+  <h1> HTTP Live (Segmented) Streaming and Playlists </h1>
+  <!-- begin drupal content -->
+<article class="bcls-article">
+    <header id="bcls_header" class="bcls-header">
+        <p> HTTP Live Streaming make it easy to adapt your video or audio stream to a user based on their available bandwidth, switching between streams in mid-play as the transfer speed changes. Pulling all of the pieces can be confusing, so we'll show you how to create a few simple segmented files for different bandwidths and a playlist to provide to users on iOS devices so that they can play them. </p>
+    </header>
+    <section id="Segmented_Files" class="bcls-section">
+        <h2>Segmented Files</h2>
+        <p>
+            We'll start off by making several segmented files, each targeted at a given bandwidth. With these outputs Zencoder creates a manifest file and segmented video files, which allow the player to download each file
+            individually as it plays the video.
+        </p>
+<pre class="line-numbers"><code class="language-json">{
+    "audio_bitrate": 56,
+    "audio_sample_rate": 22050,
+    "base_url": "s3://my-bucket/",
+    "decoder_bitrate_cap": 900,
+    "decoder_buffer_size": 2400,
+    "filename": "file-640k.m3u8",
+    "max_frame_rate": 30,
+    "public": 1,
+    "type": "segmented",
+    "video_bitrate": 600,
+    "width": 400,
+    "format": "ts"
+}</code></pre>
 <p>
-  The <code>m3u8</code> file created by the above output is a segmented file. Requesting this output, plus the others described below, will create multiple segmented files targeted at different bandwidths.
+    The <code>m3u8</code> file created by the above output is a segmented file. Requesting this output, plus the others described below, will create multiple segmented files targeted at different bandwidths.
 </p>
 
 <p>
-  This output has a type of "segmented", a format of "ts", and defaults to a video codec of "h264". Each segmented output will have a manifest file in M3U8 format created as its main output, and the segments will be
-  named like the filename of the output. The segmented files will be uploaded along-side the manifest, and named with "-00001" suffixes before the extension. These outputs can be used as-is for standard streaming, simply
-  by referencing the .m3u8 file from the client, and ensuring the segment files are available from the same location as the manifest. Multiple .m3u8 file can also be referenced by a playlist to support adaptive streaming.
+    This output has a type of "segmented", a format of "ts", and defaults to a video codec of "h264". Each segmented output will have a manifest file in M3U8 format created as its main output, and the segments will be
+    named like the filename of the output. The segmented files will be uploaded along-side the manifest, and named with "-00001" suffixes before the extension. These outputs can be used as-is for standard streaming, simply
+    by referencing the .m3u8 file from the client, and ensuring the segment files are available from the same location as the manifest. Multiple .m3u8 file can also be referenced by a playlist to support adaptive streaming.
 </p>
+    </section>
+    <section id="The_Playlist" class="bcls-section">
+        <h2>The Playlist</h2>
+        <p>
+            You can create adaptive-bitrate playlists yourself, or have Zencoder do it as part of a job. To have us create the playlist, just add another output to your job with a type of "playlist" and specify one or more
+            streams with a path (that is relative to the playlist file's location) and the source of the stream, which is the label of the corresponding output. Bandwidth, resolution, and codec can also be specified,
+            but by default these are inferred from the source. The stream information will be formatted into a playlist and uploaded just like any other output.
+        </p>
 
+        <p>
+            This playlist file references the segmented outputs created above, specifying the bandwidth at which each should be played. Loading this file with a device that supports HLS will allow the stream to be adjusted as
+            available bandwidth changes.
+        </p>
 
-<h3>The Playlist</h3>
+        <p>The first entry in the streams will be used when a user opens the file and is used as part of a test to determine which stream is most appropriate. The order of the other entries is irrelevant.</p>
 
-<p>
-  You can create adaptive-bitrate playlists yourself, or have Zencoder do it as part of a job. To have us create the playlist, just add another output to your job with a type of "playlist" and specify one or more
-  streams with a path (that is relative to the playlist file's location) and the source of the stream, which is the label of the corresponding output. Bandwidth, resolution, and codec can also be specified,
-  but by default these are inferred from the source. The stream information will be formatted into a playlist and uploaded just like any other output.
-</p>
+        <p>
+            HLS outputs (with video) that have <a href="../../encoding/segmented-streaming/segmented-streaming.html#max-hls-protocol-version">max_hls_protocol_version</a> of 4 or greater will now generate an I-Frame playlist, also known as a "keyframe manifest".  By default, the filename is the same as the main manifest
+            file, but with "-iframe-index" appended. For example, for a manifest with the filename "master.m3u8", the keyframe manifest would be named "master-iframe-index.m3u8". This can be overridden using
+            <a href="../../encoding/segmented-streaming/segmented-streaming.html#keyframe-manifest-filename">keyframe_manifest_filename</a>. If an HLS playlist output specifies a "source" stream that has a keyframe manifest, then that keyframe manifest will automatically be included into the playlist as an EXT-X-I-FRAMES-ONLY stream.
+        </p>
 
-<p>
-  This playlist file references the segmented outputs created above, specifying the bandwidth at which each should be played. Loading this file with a device that supports HLS will allow the stream to be adjusted as
-  available bandwidth changes.
-</p>
+<pre class="line-numbers"><code class="language-json">{
+    "base_url": "s3://my-bucket/",
+    "filename": "playlist.m3u8",
+    "public": 1,
+    "streams": [
+    {
+        "bandwidth": 440,
+        "path": "file-440k.m3u8"
+    },
+    {
+        "bandwidth": 640,
+        "path": "file-640k.m3u8"
+    },
+    {
+        "bandwidth": 240,
+        "path": "file-240k.m3u8"
+    },
+    {
+        "bandwidth": 150,
+        "path": "file-150k.m3u8"
+    },
+    {
+        "bandwidth": 64,
+        "path": "file-64k.m3u8"
+    }
+    ],
+    "type": "playlist"
+}</code></pre>
+    </section>
+    <section id="The_Whole_Picture" class="bcls-section">
+        <h2>The Whole Picture</h2>
+        <p>Multiple outputs of different bitrates may be specified and referenced by the playlist. These settings match the guidelines given in our <a href="ios-and-mobile.html">iOS encoding guide</a>.</p>
 
-<p>The first entry in the streams will be used when a user opens the file and is used as part of a test to determine which stream is most appropriate. The order of the other entries is irrelevant.</p>
-
-<p>
-  HLS outputs (with video) that have <a href="https://app.zencoder.com/docs/api/encoding/segmented-streaming/max-hls-protocol-version">max_hls_protocol_version</a> of 4 or greater will now generate an I-Frame playlist, also known as a "keyframe manifest".  By default, the filename is the same as the main manifest
-  file, but with "-iframe-index" appended. For example, for a manifest with the filename "master.m3u8", the keyframe manifest would be named "master-iframe-index.m3u8". This can be overridden using
-  <a href="https://app.zencoder.com/docs/api/encoding/segmented-streaming/keyframe-manifest-filename">keyframe_manifest_filename</a>. If an HLS playlist output specifies a "source" stream that has a keyframe manifest, then that keyframe manifest will automatically be included into the playlist as an EXT-X-I-FRAMES-ONLY stream.
-</p>
-
-<div class="docs-code">
-  <pre class="brush: js;">{
-  "base_url": "s3://my-bucket/",
-  "filename": "playlist.m3u8",
-  "public": 1,
-  "streams": [
-      {
-          "bandwidth": 440,
-          "path": "file-440k.m3u8"
-      },
-      {
-          "bandwidth": 640,
-          "path": "file-640k.m3u8"
-      },
-      {
-          "bandwidth": 240,
-          "path": "file-240k.m3u8"
-      },
-      {
-          "bandwidth": 150,
-          "path": "file-150k.m3u8"
-      },
-      {
-          "bandwidth": 64,
-          "path": "file-64k.m3u8"
-      }
-  ],
-  "type": "playlist"
-}</pre>
-  <pre class="brush: xml;"><output>
-    <base_url>s3://my-bucket</base_url>
-    <filename>playlist.m3u8</filename>
-    <public>1</public>
-    <type>playlist</type>
-    <streams type='array'>
-      <stream>
-        <bandwidth>440</bandwidth>
-        <path>file-440k.m3u8</path>
-      </stream>
-      <stream>
-        <bandwidth>640</bandwidth>
-        <path>file-640k.m3u8</path>
-      </stream>
-      <stream>
-        <bandwidth>240</bandwidth>
-        <path>file-240k.m3u8</path>
-      </stream>
-      <stream>
-        <bandwidth>150</bandwidth>
-        <path>file-150k.m3u8</path>
-      </stream>
-      <stream>
-        <bandwidth>64</bandwidth>
-        <path>file-64k.m3u8</path>
-      </stream>
-    </streams>
-  </output></pre>
-</div>
-
-<h3>The Whole Picture</h3>
-
-<p>Multiple outputs of different bitrates may be specified and referenced by the playlist. These settings match the guidelines given in our <a href="ios-and-mobile.html">iOS encoding guide</a>.</p>
-
-<div class="docs-code">
-  <pre class="brush: js;">{
-  "input": "s3://zencodertesting/test.mov",
-  "output": [
-      {
-          "label": "hls-64",
-          "audio_bitrate": 56,
-          "audio_sample_rate": 22050,
-          "base_url": "s3://my-bucket/",
-          "filename": "file-64k.m3u8",
-          "format": "aac",
-          "public": 1,
-          "type": "segmented"
-      },
-      {
-          "label": "hls-240",
-          "audio_bitrate": 56,
-          "audio_sample_rate": 22050,
-          "base_url": "s3://my-bucket/",
-          "decoder_bitrate_cap": 300,
-          "decoder_buffer_size": 800,
-          "filename": "file-240k.m3u8",
-          "max_frame_rate": 15,
-          "public": 1,
-          "type": "segmented",
-          "video_bitrate": 200,
-          "width": 400,
-          "format": "ts"
-      },
-      {
-          "label": "hls-440",
-          "audio_bitrate": 56,
-          "audio_sample_rate": 22050,
-          "base_url": "s3://my-bucket/",
-          "decoder_bitrate_cap": 600,
-          "decoder_buffer_size": 1600,
-          "filename": "file-440k.m3u8",
-          "public": 1,
-          "type": "segmented",
-          "video_bitrate": 400,
-          "width": 400,
-          "format": "ts"
-      },
-      {
-          "label": "hls-640",
-          "audio_bitrate": 56,
-          "audio_sample_rate": 22050,
-          "base_url": "s3://my-bucket/",
-          "decoder_bitrate_cap": 900,
-          "decoder_buffer_size": 2400,
-          "filename": "file-640k.m3u8",
-          "public": 1,
-          "type": "segmented",
-          "video_bitrate": 600,
-          "width": 480,
-          "format": "ts"
-      },
-      {
-          "label": "hls-1040",
-          "audio_bitrate": 56,
-          "audio_sample_rate": 22050,
-          "base_url": "s3://my-bucket/",
-          "decoder_bitrate_cap": 1500,
-          "decoder_buffer_size": 4000,
-          "filename": "file-1040k.m3u8",
-          "public": 1,
-          "type": "segmented",
-          "video_bitrate": 1000,
-          "width": 640,
-          "format": "ts"
-      },
-      {
-          "label": "hls-1540",
-          "audio_bitrate": 56,
-          "audio_sample_rate": 22050,
-          "base_url": "s3://my-bucket/",
-          "decoder_bitrate_cap": 2250,
-          "decoder_buffer_size": 6000,
-          "filename": "file-1540k.m3u8",
-          "public": 1,
-          "type": "segmented",
-          "video_bitrate": 1500,
-          "width": 960,
-          "format": "ts"
-      },
-      {
-          "label": "hls-2040",
-          "audio_bitrate": 56,
-          "audio_sample_rate": 22050,
-          "base_url": "s3://my-bucket/",
-          "decoder_bitrate_cap": 3000,
-          "decoder_buffer_size": 8000,
-          "filename": "file-2040k.m3u8",
-          "public": 1,
-          "type": "segmented",
-          "video_bitrate": 2000,
-          "width": 1024,
-          "format": "ts"
-      },
-      {
-          "base_url": "s3://my-bucket/",
-          "filename": "playlist.m3u8",
-          "public": 1,
-          "streams": [
-              {
-                  "source": "hls-2040",
-                  "path": "file-2040k.m3u8"
-              },
-              {
-                  "source": "hls-1540",
-                  "path": "file-1540k.m3u8"
-              },
-              {
-                  "source": "hls-1040",
-                  "path": "file-1040k.m3u8"
-              },
-              {
-                  "source": "hls-640",
-                  "path": "file-640k.m3u8"
-              },
-              {
-                  "source": "hls-440",
-                  "path": "file-440k.m3u8"
-              },
-              {
-                  "source": "hls-240",
-                  "path": "file-240k.m3u8"
-              },
-              {
-                  "source": "hls-64",
-                  "path": "file-64k.m3u8"
-              }
-          ],
-          "type": "playlist"
-      }
-  ]
-}
-  </pre>
-  <pre class="brush: xml;"><api-request>
-  <input>s3://zencodertesting/test.mov&lt;/input>
-  <outputs type="array">
-    <output>
-      <label>hls-64&lt;/label>
-      <audio_bitrate>56</audio_bitrate>
-      <audio_sample_rate>22050</audio_sample_rate>
-      <base_url>s3://my-bucket/</base_url>
-      <filename>file-64k.m3u8</filename>
-      <format>aac</format>
-      <public>1</public>
-      <type>segmented</type>
-    </output>
-    <output>
-      <label>hls-240&lt;/label>
-      <audio_bitrate>56</audio_bitrate>
-      <audio_sample_rate>22050</audio_sample_rate>
-      <base_url>s3://my-bucket/</base_url>
-      <decoder_bitrate_cap>300</decoder_bitrate_cap>
-      <decoder_buffer_size>800</decoder_buffer_size>
-      <filename>file-240k.m3u8</filename>
-      <max_frame_rate>15</max_frame_rate>
-      <public>1</public>
-      <type>segmented</type>
-      <video_bitrate>200</video_bitrate>
-      <width>400</width>
-      <format>ts</format>
-    </output>
-    <output>
-      <label>hls-440&lt;/label>
-      <audio_bitrate>56</audio_bitrate>
-      <audio_sample_rate>22050</audio_sample_rate>
-      <base_url>s3://my-bucket/</base_url>
-      <decoder_bitrate_cap>600</decoder_bitrate_cap>
-      <decoder_buffer_size>1600</decoder_buffer_size>
-      <filename>file-440k.m3u8</filename>
-      <public>1</public>
-      <type>segmented</type>
-      <video_bitrate>400</video_bitrate>
-      <width>400</width>
-      <format>ts</format>
-    </output>
-    <output>
-      <label>hls-640&lt;/label>
-      <audio_bitrate>56</audio_bitrate>
-      <audio_sample_rate>22050</audio_sample_rate>
-      <base_url>s3://my-bucket/</base_url>
-      <decoder_bitrate_cap>900</decoder_bitrate_cap>
-      <decoder_buffer_size>2400</decoder_buffer_size>
-      <filename>file-640k.m3u8</filename>
-      <public>1</public>
-      <type>segmented</type>
-      <video_bitrate>600</video_bitrate>
-      <width>480</width>
-      <format>ts</format>
-    </output>
-    <output>
-      <label>hls-1040&lt;/label>
-      <audio_bitrate>56</audio_bitrate>
-      <audio_sample_rate>22050</audio_sample_rate>
-      <base_url>s3://my-bucket/</base_url>
-      <decoder_bitrate_cap>1500</decoder_bitrate_cap>
-      <decoder_buffer_size>4000</decoder_buffer_size>
-      <filename>file-1040k.m3u8</filename>
-      <public>1</public>
-      <type>segmented</type>
-      <video_bitrate>1000</video_bitrate>
-      <width>640</width>
-      <format>ts</format>
-    </output>
-    <output>
-      <label>hls-1540&lt;/label>
-      <audio_bitrate>56</audio_bitrate>
-      <audio_sample_rate>22050</audio_sample_rate>
-      <base_url>s3://my-bucket/</base_url>
-      <decoder_bitrate_cap>2250</decoder_bitrate_cap>
-      <decoder_buffer_size>6000</decoder_buffer_size>
-      <filename>file-1540k.m3u8</filename>
-      <public>1</public>
-      <type>segmented</type>
-      <video_bitrate>1500</video_bitrate>
-      <width>960</width>
-      <format>ts</format>
-    </output>
-    <output>
-      <label>hls-2040&lt;/label>
-      <audio_bitrate>56</audio_bitrate>
-      <audio_sample_rate>22050</audio_sample_rate>
-      <base_url>s3://my-bucket/</base_url>
-      <decoder_bitrate_cap>3000</decoder_bitrate_cap>
-      <decoder_buffer_size>8000</decoder_buffer_size>
-      <filename>file-2040k.m3u8</filename>
-      <public>1</public>
-      <type>segmented</type>
-      <video_bitrate>2000</video_bitrate>
-      <width>1024</width>
-      <format>ts</format>
-    </output>
-    <output>
-      <base_url>s3://my-bucket/</base_url>
-      <filename>playlist.m3u8</filename>
-      <public>1</public>
-      <type>playlist</type>
-      <streams type="array">
-        <stream>
-          <source>hls-2040&lt;/source>
-          <path>file-2040k.m3u8</path>
-        </stream>
-        <stream>
-          <source>hls-1540&lt;/source>
-          <path>file-1540k.m3u8</path>
-        </stream>
-        <stream>
-          <source>hls-1040&lt;/source>
-          <path>file-1040k.m3u8</path>
-        </stream>
-        <stream>
-          <source>hls-640&lt;/source>
-          <path>file-640k.m3u8</path>
-        </stream>
-        <stream>
-          <source>hls-440&lt;/source>
-          <path>file-440k.m3u8</path>
-        </stream>
-        <stream>
-          <source>hls-240&lt;/source>
-          <path>file-240k.m3u8</path>
-        </stream>
-        <stream>
-          <source>hls-64&lt;/source>
-          <path>file-64k.m3u8</path>
-        </stream>
-      </streams>
-    </output>
-  </outputs>
-</api-request></pre>
-
-</div>
-
+<pre class="line-numbers"><code class="language-json">{
+    "input": "s3://zencodertesting/test.mov",
+    "output": [
+    {
+        "label": "hls-64",
+        "audio_bitrate": 56,
+        "audio_sample_rate": 22050,
+        "base_url": "s3://my-bucket/",
+        "filename": "file-64k.m3u8",
+        "format": "aac",
+        "public": 1,
+        "type": "segmented"
+    },
+    {
+        "label": "hls-240",
+        "audio_bitrate": 56,
+        "audio_sample_rate": 22050,
+        "base_url": "s3://my-bucket/",
+        "decoder_bitrate_cap": 300,
+        "decoder_buffer_size": 800,
+        "filename": "file-240k.m3u8",
+        "max_frame_rate": 15,
+        "public": 1,
+        "type": "segmented",
+        "video_bitrate": 200,
+        "width": 400,
+        "format": "ts"
+    },
+    {
+        "label": "hls-440",
+        "audio_bitrate": 56,
+        "audio_sample_rate": 22050,
+        "base_url": "s3://my-bucket/",
+        "decoder_bitrate_cap": 600,
+        "decoder_buffer_size": 1600,
+        "filename": "file-440k.m3u8",
+        "public": 1,
+        "type": "segmented",
+        "video_bitrate": 400,
+        "width": 400,
+        "format": "ts"
+    },
+    {
+        "label": "hls-640",
+        "audio_bitrate": 56,
+        "audio_sample_rate": 22050,
+        "base_url": "s3://my-bucket/",
+        "decoder_bitrate_cap": 900,
+        "decoder_buffer_size": 2400,
+        "filename": "file-640k.m3u8",
+        "public": 1,
+        "type": "segmented",
+        "video_bitrate": 600,
+        "width": 480,
+        "format": "ts"
+    },
+    {
+        "label": "hls-1040",
+        "audio_bitrate": 56,
+        "audio_sample_rate": 22050,
+        "base_url": "s3://my-bucket/",
+        "decoder_bitrate_cap": 1500,
+        "decoder_buffer_size": 4000,
+        "filename": "file-1040k.m3u8",
+        "public": 1,
+        "type": "segmented",
+        "video_bitrate": 1000,
+        "width": 640,
+        "format": "ts"
+    },
+    {
+        "label": "hls-1540",
+        "audio_bitrate": 56,
+        "audio_sample_rate": 22050,
+        "base_url": "s3://my-bucket/",
+        "decoder_bitrate_cap": 2250,
+        "decoder_buffer_size": 6000,
+        "filename": "file-1540k.m3u8",
+        "public": 1,
+        "type": "segmented",
+        "video_bitrate": 1500,
+        "width": 960,
+        "format": "ts"
+    },
+    {
+        "label": "hls-2040",
+        "audio_bitrate": 56,
+        "audio_sample_rate": 22050,
+        "base_url": "s3://my-bucket/",
+        "decoder_bitrate_cap": 3000,
+        "decoder_buffer_size": 8000,
+        "filename": "file-2040k.m3u8",
+        "public": 1,
+        "type": "segmented",
+        "video_bitrate": 2000,
+        "width": 1024,
+        "format": "ts"
+    },
+    {
+        "base_url": "s3://my-bucket/",
+        "filename": "playlist.m3u8",
+        "public": 1,
+        "streams": [
+        {
+            "source": "hls-2040",
+            "path": "file-2040k.m3u8"
+        },
+        {
+            "source": "hls-1540",
+            "path": "file-1540k.m3u8"
+        },
+        {
+            "source": "hls-1040",
+            "path": "file-1040k.m3u8"
+        },
+        {
+            "source": "hls-640",
+            "path": "file-640k.m3u8"
+        },
+        {
+            "source": "hls-440",
+            "path": "file-440k.m3u8"
+        },
+        {
+            "source": "hls-240",
+            "path": "file-240k.m3u8"
+        },
+        {
+            "source": "hls-64",
+            "path": "file-64k.m3u8"
+        }
+        ],
+        "type": "playlist"
+    }
+    ]
+}</code></pre>
 <p><strong>NOTES</strong></p>
 <ul>
-  <li>The playlist generation currently uses no information from the other outputs in the job, but is simply a way to easily generate a correctly formatted adaptive-bitrate playlist and have it uploaded along with the other files.</li>
-  <li>While iOS devices will play the adaptive bitrate playlist created, VLC won't, due to errors in handling relative URLs. It will look for the segment files in the same directory as the playlist file, rather than the directory of the manifest file.</li>
-  <li><a href="https://app.zencoder.com/docs/api/encoding/rate-control/decoder-bitrate-cap">decoder_bitrate_cap</a> is set to 1.5x the target bitrate of the file. <a href="https://app.zencoder.com/docs/api/encoding/rate-control/decoder-buffer-size">decoder_buffer_size</a> is set to 3.5x to 5x the target bitrate of the file. These settings will help keep a consistent bitrate throughout the file, so that the segmented segments won't vary too much in size and bitrate.</li>
-  <li>If a segmented output is uploaded to temporary storage, it will be uploaded as a <a href="https://app.zencoder.com/docs/api/encoding/general-output-settings/package-format">ZIP archive</a>.</li>
+    <li>The playlist generation currently uses no information from the other outputs in the job, but is simply a way to easily generate a correctly formatted adaptive-bitrate playlist and have it uploaded along with the other files.</li>
+    <li>While iOS devices will play the adaptive bitrate playlist created, VLC won't, due to errors in handling relative URLs. It will look for the segment files in the same directory as the playlist file, rather than the directory of the manifest file.</li>
+    <li><a href="../../encoding/rate-control/decoder-bitrate-cap">decoder_bitrate_cap</a> is set to 1.5x the target bitrate of the file. <a href="../../encoding/rate-control/decoder-buffer-size">decoder_buffer_size</a> is set to 3.5x to 5x the target bitrate of the file. These settings will help keep a consistent bitrate throughout the file, so that the segmented segments won't vary too much in size and bitrate.</li>
+    <li>If a segmented output is uploaded to temporary storage, it will be uploaded as a <a href="../../encoding/general-output-settings/package-format">ZIP archive</a>.</li>
 </ul>
-
-</div>
-
-    </div>
-  </div>
-
-        </div>
+    </section>
+</article>
+<!-- end drupal content -->
       </div>
     </div>
-    
-
-    
-    
-      
-  
-
-
       <!-- bcl scripts -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
@@ -539,4 +317,3 @@
 
   <!-- Version: 3.325.1 -->
 </html>
-
