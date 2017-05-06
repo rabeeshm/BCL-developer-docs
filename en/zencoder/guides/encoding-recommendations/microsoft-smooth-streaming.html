@@ -40,20 +40,6 @@
         ga('send', 'pageview');
     </script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
-    
-
-
-    
-
-    
-
-    
-    
-
-    
-    
-
-    
   </head>
   <body>
     <!-- header navbar -->
@@ -68,281 +54,151 @@
             <div id="sidenav" class="side-nav"></div>
         </div>
         <div id="main" class="large-10 small-12 columns">
-  <p>
-    <a href="../../../docs.html">Home</a> &raquo; <a href="../../guides.html">Guides</a> &raquo; <a href="../encoding-settings.html">Encoding Recommendations</a> &raquo; Microsoft Smooth Streaming
-  </p>
+  <h1> Microsoft Smooth Streaming </h1>
+  <!-- begin drupal content -->
+<article class="bcls-article">
+    <header id="bcls_header" class="bcls-header">
+        <p> Microsoft Smooth Streaming (MSS) is a collection of technologies that make it possible to stream video and audio content to platforms such as Microsoft's Silverlight, the XBox 360, Windows Phone 7, and some connected TV platforms. Multi-bitrate Smooth Streaming enables adaptive streaming of content to allow on-the-fly compensation for changes in available bandwidth during playback. </p>
+    </header>
+    <section id="Overview" class="bcls-section">
+        <h2>Overview</h2>
+        <p> To take advantage of MSS your video and audio need to be encoded in a special segmented format, plus client and server manifests must be generated containing information about the files. Zencoder can generate all the necessary files for both single- and multi-bitrate Smooth Streaming. </p>
+    </section>
+    <section id="basic_request" class="bcls-section">
+        <h2>Basic request</h2>
+        <p> Creating a Smooth Streaming video is easy to do with Zencoder. There are only a few options that need to be set to create the necessary files for a single-bitrate encode. </p>
 
-  <h2>
-      
-    Microsoft Smooth Streaming
- </h2>
-
-    <ul>
-  <li><a href="microsoft-smooth-streaming.html#basic-request">Basic Request</a></li>
-  <li><a href="microsoft-smooth-streaming.html#full-request">Full Request</a></li>
-  <li><a href="microsoft-smooth-streaming.html#requirements">Requirements</a></li>
-</ul>
-
-<p>
-  Microsoft Smooth Streaming (MSS) is a collection of technologies that make it possible to stream video and audio content to platforms such as Microsoft's Silverlight, the XBox 360, Windows Phone 7, and some connected TV platforms. Multi-bitrate Smooth Streaming enables adaptive streaming of content to allow on-the-fly compensation for changes in available bandwidth during playback.
-</p>
-
-<p>
-  To take advantage of MSS your video and audio need to be encoded in a special segmented format, plus client and server manifests must be generated containing information about the files. Zencoder can generate all the necessary files for both single- and multi-bitrate Smooth Streaming.
-</p>
-
-<a name="basic-request"></a>
-<p>
-  Creating a Smooth Streaming video is easy to do with Zencoder. There are only a few options that need to be set to create the necessary files for a single-bitrate encode.
-</p>
-
-<div class="docs-code">
-  <pre class="brush: js;">{
-  "api_key": "asdf1234",
-  "input": "s3://my-input-bucket/input-file.mp4",
-  "outputs": [
+<pre class="line-numbers"><code class="language-json">{
+    "api_key": "asdf1234",
+    "input": "s3://my-input-bucket/input-file.mp4",
+    "outputs": [
     {
-      "audio_bitrate": 56,
-      "audio_sample_rate": 22050,
-      "url": "s3://my-bucket/medium/file.ism",
-      "decoder_bitrate_cap": 900,
-      "decoder_buffer_size": 2400,
-      "max_frame_rate": 30,
-      "segment_seconds": 2,
-      "type": "segmented",
-      "video_bitrate": 600,
-      "width": 400,
-      "format": "ism"
+        "audio_bitrate": 56,
+        "audio_sample_rate": 22050,
+        "url": "s3://my-bucket/medium/file.ism",
+        "decoder_bitrate_cap": 900,
+        "decoder_buffer_size": 2400,
+        "max_frame_rate": 30,
+        "segment_seconds": 2,
+        "type": "segmented",
+        "video_bitrate": 600,
+        "width": 400,
+        "format": "ism"
     }
-  ]
-}</pre>
-  <pre class="brush: xml;"><api-request>
-  <api_key>asdf1234</api_key>
-  <input>s3://my-input-bucket/input-file.mp4&lt;/input>
-  <outputs type="array">
-    <output>
-      <audio_bitrate>56</audio_bitrate>
-      <audio_sample_rate>22050</audio_sample_rate>
-      <url>s3://my-bucket/medium/file.ism</url>
-      <decoder_bitrate_cap>900</decoder_bitrate_cap>
-      <decoder_buffer_size>2400</decoder_buffer_size>
-      <max_frame_rate>30</max_frame_rate>
-      <segment_seconds>2</segment_seconds>
-      <type>segmented</type>
-      <video_bitrate>600</video_bitrate>
-      <width>400</width>
-      <format>ism</format>
-    </output>
-  </outputs>
-</api-request></pre>
-</div>
-
+    ]
+}</code></pre>
 
 <p>The relevant portions of the above API request are the "type", "format", and "url" options.</p>
 
 <ul>
-  <li>"type" should be "segmented"</li>
-  <li>"format" should be "ism"</li>
-  <li>"url" should have an extension of "ism"</li>
+    <li>"type" should be "segmented"</li>
+    <li>"format" should be "ism"</li>
+    <li>"url" should have an extension of "ism"</li>
 </ul>
 
 
 <p>In Smooth Streaming parlance, an "ism" file is a Smooth Streaming server manifest. This isn't the only file that will be generated, however. In the same directory as the "ism" file we will also create an "ismc" file, otherwise known as a Smooth Streaming client manifest, and an "ismv" file, which is the encoded video. <!-- If the created file is audio-only, it will end in "isma" instead of "ismv". --></p>
-
-<a name="full-request"></a>
-<p>Creating a multi-bitrate Smooth Streaming job with Zencoder doesn't require much more in your API request, just outputs for the different transfer speeds plus a playlist that references them.</p>
-
-<div class="docs-code">
-  <pre class="brush: js;">
-{
-  "api_key": "asdf1234",
-  "input": "s3://my-input-bucket/input-file.mp4",
-  "outputs": [
+    </section>
+    <section id="Full_request" class="bcls-section">
+        <h2>Full request</h2>
+        <p>Creating a multi-bitrate Smooth Streaming job with Zencoder doesn't require much more in your API request, just outputs for the different transfer speeds plus a playlist that references them.</p>
+<pre class="line-numbers"><code class="language-json">{
+    "api_key": "asdf1234",
+    "input": "s3://my-input-bucket/input-file.mp4",
+    "outputs": [
     {
-      "type": "playlist",
-      "format": "ism",
-      "url": "s3://my-output-bucket/file.ism",
-      "streams": [
+        "type": "playlist",
+        "format": "ism",
+        "url": "s3://my-output-bucket/file.ism",
+        "streams": [
         {
-          "source": "low-output",
-          "path": "low/file.ismv"
+            "source": "low-output",
+            "path": "low/file.ismv"
         },
         {
-          "source": "medium-output",
-          "path": "medium/file.ismv"
+            "source": "medium-output",
+            "path": "medium/file.ismv"
         },
         {
-          "source": "high-output",
-          "path": "high/file.ismv"
+            "source": "high-output",
+            "path": "high/file.ismv"
         }
-      ]
+        ]
     },
     {
-      "label": "low-output",
-      "audio_bitrate": 56,
-      "audio_sample_rate": 22050,
-      "url": "s3://my-bucket/low/file.ism",
-      "decoder_bitrate_cap": 165,
-      "decoder_buffer_size": 440,
-      "max_frame_rate": 30,
-      "segment_seconds": 2,
-      "public": 1,
-      "type": "segmented",
-      "video_bitrate": 110,
-      "width": 320,
-      "format": "ism"
+        "label": "low-output",
+        "audio_bitrate": 56,
+        "audio_sample_rate": 22050,
+        "url": "s3://my-bucket/low/file.ism",
+        "decoder_bitrate_cap": 165,
+        "decoder_buffer_size": 440,
+        "max_frame_rate": 30,
+        "segment_seconds": 2,
+        "public": 1,
+        "type": "segmented",
+        "video_bitrate": 110,
+        "width": 320,
+        "format": "ism"
     },
     {
-      "label": "medium-output",
-      "audio_bitrate": 56,
-      "audio_sample_rate": 22050,
-      "url": "s3://my-bucket/medium/file.ism",
-      "decoder_bitrate_cap": 600,
-      "decoder_buffer_size": 1600,
-      "max_frame_rate": 30,
-      "segment_seconds": 2,
-      "public": 1,
-      "type": "segmented",
-      "video_bitrate": 400,
-      "width": 400,
-      "format": "ism"
+        "label": "medium-output",
+        "audio_bitrate": 56,
+        "audio_sample_rate": 22050,
+        "url": "s3://my-bucket/medium/file.ism",
+        "decoder_bitrate_cap": 600,
+        "decoder_buffer_size": 1600,
+        "max_frame_rate": 30,
+        "segment_seconds": 2,
+        "public": 1,
+        "type": "segmented",
+        "video_bitrate": 400,
+        "width": 400,
+        "format": "ism"
     },
     {
-      "label": "high-output",
-      "audio_bitrate": 56,
-      "audio_sample_rate": 22050,
-      "url": "s3://my-bucket/high/file.ism",
-      "decoder_bitrate_cap": 900,
-      "decoder_buffer_size": 2400,
-      "max_frame_rate": 30,
-      "segment_seconds": 2,
-      "public": 1,
-      "type": "segmented",
-      "video_bitrate": 600,
-      "width": 400,
-      "format": "ism"
+        "label": "high-output",
+        "audio_bitrate": 56,
+        "audio_sample_rate": 22050,
+        "url": "s3://my-bucket/high/file.ism",
+        "decoder_bitrate_cap": 900,
+        "decoder_buffer_size": 2400,
+        "max_frame_rate": 30,
+        "segment_seconds": 2,
+        "public": 1,
+        "type": "segmented",
+        "video_bitrate": 600,
+        "width": 400,
+        "format": "ism"
     }
-  ]
-}
-  </pre>
-  <pre class="brush: xml;">
-<api-request>
-  <api_key>asdf1234</api_key>
-  <input>s3://my-input-bucket/input-file.mp4&lt;/input>
-  <outputs type=&quot;array&quot;>
-    <output>
-      <type>playlist</type>
-      <format>ism</format>
-      <url>s3://my-output-bucket/file.ism</url>
-      <streams type=&quot;array&quot;>
-        <stream>
-          <source>low-output</source>
-          <path>low/file.ismv</path>
-        </stream>
-        <stream>
-          <source>medium-output</source>
-          <path>medium/file.ismv</path>
-        </stream>
-        <stream>
-          <source>high-output</source>
-          <path>high/file.ismv</path>
-        </stream>
-      </streams>
-    </output>
-    <output>
-      <label>low-output</label>
-      <audio_bitrate>56</audio_bitrate>
-      <audio_sample_rate>22050</audio_sample_rate>
-      <url>s3://my-bucket/low/file.ism</url>
-      <decoder_bitrate_cap>165</decoder_bitrate_cap>
-      <decoder_buffer_size>440</decoder_buffer_size>
-      <max_frame_rate>30</max_frame_rate>
-      <segment_seconds>2</segment_seconds>
-      <public>1</public>
-      <type>segmented</type>
-      <video_bitrate>110</video_bitrate>
-      <width>320</width>
-      <format>ism</format>
-    </output>
-    <output>
-      <label>medium-output</label>
-      <audio_bitrate>56</audio_bitrate>
-      <audio_sample_rate>22050</audio_sample_rate>
-      <url>s3://my-bucket/medium/file.ism</url>
-      <decoder_bitrate_cap>600</decoder_bitrate_cap>
-      <decoder_buffer_size>1600</decoder_buffer_size>
-      <max_frame_rate>30</max_frame_rate>
-      <segment_seconds>2</segment_seconds>
-      <public>1</public>
-      <type>segmented</type>
-      <video_bitrate>400</video_bitrate>
-      <width>400</width>
-      <format>ism</format>
-    </output>
-    <output>
-      <label>high-output</label>
-      <audio_bitrate>56</audio_bitrate>
-      <audio_sample_rate>22050</audio_sample_rate>
-      <url>s3://my-bucket/high/file.ism</url>
-      <decoder_bitrate_cap>900</decoder_bitrate_cap>
-      <decoder_buffer_size>2400</decoder_buffer_size>
-      <max_frame_rate>30</max_frame_rate>
-      <segment_seconds>2</segment_seconds>
-      <public>1</public>
-      <type>segmented</type>
-      <video_bitrate>600</video_bitrate>
-      <width>400</width>
-      <format>ism</format>
-    </output>
-  </outputs>
-</api-request>
-  </pre>
-</div>
+    ]
+}</code></pre>
+        <p>
+            The individual single-bitrate Smooth Streaming outputs (labeled "low-output", "medium-output", and "high-output") are similar to the output in the previous example request, and could be played on their own if needed. The important difference is the first output, which creates the playlist that references the videos. The device playing the video will use this playlist to determine the appropriate file to load based on available bandwidth.
+        </p>
 
-<p>
-  The individual single-bitrate Smooth Streaming outputs (labeled "low-output", "medium-output", and "high-output") are similar to the output in the previous example request, and could be played on their own if needed. The important difference is the first output, which creates the playlist that references the videos. The device playing the video will use this playlist to determine the appropriate file to load based on available bandwidth.
-</p>
+        <p>The relevant portions to notice for the playlist are:</p>
+        <ul>
+            <li><code>type</code> should be "playlist"</li>
+            <li><code>format</code> should be "ism"</li>
+            <li><code>url</code> should have an extension of "ism"</li>
+            <li><code>streams</code> should be an array of JSON objects which each have the keys "source" and "path"
+                <ul>
+                    <li><code>source</code> should be the label of the output to use for the given stream</li>
+                    <li><code>path</code> should be the relative path to the "source" output's "ismv" or "isma" file as it will be served by your server</li>
+                </ul>
+            </li>
+        </ul>
+        <p> Playlists for multi-bitrate Smooth Streaming and their videos must be created within a single Zencoder job, they cannot be created in separate jobs or after the videos have been created in other jobs. Certain information from the videos and their manifests is required in order to generate the multi-bitrate Smooth Streaming manifests. This includes the client manifests from the single-bitrate Smooth Streaming outputs along with the relative path to the single-bitrate video or audio files as they will be served from their final destination. Once the segmented outputs have finished transcoding, their client manifests are used to generate the multi-bitrate Smooth Streaming manifests and place them at the location specified by "url". </p>
 
-<p>The relevant portions to notice for the playlist are:
-  <ul>
-    <li><code>type</code> should be "playlist"</li>
-    <li><code>format</code> should be "ism"</li>
-    <li><code>url</code> should have an extension of "ism"</li>
-    <li><code>streams</code> should be an array of JSON objects which each have the keys "source" and "path"
-      <ul>
-        <li><code>source</code> should be the label of the output to use for the given stream</li>
-        <li><code>path</code> should be the relative path to the "source" output's "ismv" or "isma" file as it will be served by your server</li>
-      </ul>
-    </li>
-  </ul>
-</p>
-
-<p>
-  Playlists for multi-bitrate Smooth Streaming and their videos must be created within a single Zencoder job, they cannot be created in separate jobs or after the videos have been created in other jobs. Certain information from the videos and their manifests is required in order to generate the multi-bitrate Smooth Streaming manifests. This includes the client manifests from the single-bitrate Smooth Streaming outputs along with the relative path to the single-bitrate video or audio files as they will be served from their final destination. Once the segmented outputs have finished transcoding, their client manifests are used to generate the multi-bitrate Smooth Streaming manifests and place them at the location specified by "url".
-</p>
-
-<a name="requirements"></a>
-<h3>Requirements</h3>
-<p>
-  An IIS Smooth Streaming server is required to deliver Smooth Streaming files to players. This guide on <a href="http://www.iis.net/learn/media/on-demand-smooth-streaming/getting-started-with-iis-smooth-streaming">getting started with IIS Smooth Streaming</a> is a good place to start setting up an IIS Smoth Streaming server.
-</p>
-
-</div>
-
-    </div>
-  </div>
-
-        </div>
+    </section>
+    <section id="Requirements" class="bcls-section">
+        <h2>Requirements</h2>
+        <p> An IIS Smooth Streaming server is required to deliver Smooth Streaming files to players. This guide on <a href="http://www.iis.net/learn/media/on-demand-smooth-streaming/getting-started-with-iis-smooth-streaming">getting started with IIS Smooth Streaming</a> is a good place to start setting up an IIS Smoth Streaming server. </p>
+    </section>
+</article>
+<!-- end drupal content -->
       </div>
     </div>
-    
-
-    
-    
-      
-  
-
-
       <!-- bcl scripts -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
@@ -368,4 +224,3 @@
 
   <!-- Version: 3.325.1 -->
 </html>
-
