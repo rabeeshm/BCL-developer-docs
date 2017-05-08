@@ -79,7 +79,7 @@
 
           <section id="getstarted" class="bcls-section">
         <h2>Get started</h2>
-              <p>It is best practice to update your player using the Brightcove Players module from <span class="video-cloud-only">Video Cloud</span><span class="player-only">Perform</span> Studio. This approach is used in the following sections to update the error messages plugin for your player. This will update all instances of your player. If you choose to update this plugin from a page of code, it will only affect that instance of your player</p>
+              <p>It is best practice to update your player using the Brightcove Players module from Studio. This approach is used in the following sections to update the error messages plugin for your player. This will update all instances of your player. If you choose to update this plugin from a page of code, it will only affect that instance of your player</p>
                 <p>To update the plugin from your page code, first get a reference to the Brightcove player. In this example, in the JavaScript we are creating a variable named <code>myPlayer</code> and assigning it a reference to the player.</p>
             <aside class="bcls-aside bcls-aside--information">Note: you do not need to do this if you are updating your Brightcove player using the Players module.</aside>
         <pre class="line-numbers"><code class="language-html">	&lt;video <span class="bcls-highlight">id=&quot;myPlayerID&quot;</span>
@@ -110,8 +110,8 @@
                 <ul>
                     <li><strong>Type</strong>: MEDIA_ERR_NETWORK</li>
                     <li><strong>Headline</strong>: The video connection was lost, please confirm you're connected to the internet</li>
-          <li><strong>Message</strong>: A network error caused the media download to fail part-way.<li>
-                </ul></li>
+                    <li><strong>Message</strong>: A network error caused the media download to fail part-way.</li>
+                </ul>
                 <li>Error code: 3
                 <ul>
                     <li><strong>Type</strong>: MEDIA_ERR_DECODE</li>
@@ -191,28 +191,50 @@
                 <li>Custom error code values can be alphanumeric. We recommend using a negative integer or a text value to keep from colliding with the standard code values.</li>
                 <li>Custom error messages can be named anything you want. We recommend that they begin with <code>PLAYER_ERR</code> versus the standardized <code>MEDIA_ERR</code> to avoid confusion.</li>
             </ul>
-        <p>Two custom error messages have been added as a reference:</p>
+        <p>Five custom error messages have been added as a reference:</p>
             <ul>
-                <li>Error code: -1
+              <li>Error code: -1
                 <ul>
                     <li>Message: PLAYER_ERR_NO_SRC</li>
                     <li>Description: No video has been loaded</li>
-                </ul></li>
+                </ul>
+              </li>
                 <li>Error code: -2
                 <ul>
                     <li>Message: PLAYER_ERR_TIMEOUT</li>
                     <li>Description: Could not download the video <br />
-          <aside class="bcls-aside bcls-aside--information">Note: In general, PLAYER_ERR_TIMEOUT happens when the player expects to be playing video but <strong>can't make any progress for 45 seconds</strong>. This can be the final result of many things that happen earlier, including the suspension of the browser when a tab is put in the background, for instance. But it can be a sort of catch-all condition for network or platform conditions that prevent playback from continuing.</aside>
-        </li>
-                </ul></li>
+                      <aside class="bcls-aside bcls-aside--information">Note: In general, PLAYER_ERR_TIMEOUT happens when the player expects to be playing video but <strong>can't make any progress for 45 seconds</strong>. This can be the final result of many things that happen earlier, including the suspension of the browser when a tab is put in the background, for instance. But it can be a sort of catch-all condition for network or platform conditions that prevent playback from continuing.</aside>
+                    </li>
+                </ul>
+              </li>
+              <li>Error code: -3
+                <ul>
+                    <li>Message: PLAYER_ERR_DOMAIN_RESTRICTED</li>
+                    <li>Description: The player is domain restricted</li>
+                </ul>
+              </li>
+              <li>Error code: -4
+                <ul>
+                    <li>Message: PLAYER_ERR_IP_RESTRICTED</li>
+                    <li>Description: The player is IP restricted</li>
+                </ul>
+              </li>
+              <li>Error code: -5
+                <ul>
+                    <li>Message: PLAYER_ERR_GEO_RESTRICTED</li>
+                    <li>Description: The player is geo-restricted</li>
+                </ul>
+              </li>
+
             </ul>
 
         <h3>Adding custom errors</h3>
           <p>Refer to the <a href="#overridetext">Override text</a> section for details about the message parts. When adding a custom error message, use the <strong>Plugins</strong> section of the <strong>Players</strong> module with a JSON object to set property values.</p>
-          <p>This example creates a new custom message with an error code value of <code>-3</code> and includes text based on an age gate test.</p>
+          <p>This example creates a new custom message with an error code value of <code>-100</code> and includes text based on an age gate test.</p>
+          <aside class="bcls-aside bcls-aside--tip">You can use any negative number, but it is best not to overwrite suggested custom errors that use -1 to -5. In the following example -100 is used, which is simply a convention to use three digit negative numbers for your own custom errors.</aside>
       <pre class="line-numbers"><code class="language-json">{
     "errors": {
-        "-3": {
+        "-100": {
             "headline": "You must be at least 18 years of age.",
             "type": "PLAYER_ERR_AGE_GATE",
             "message": "Content may be considered inappropriate for some users."
@@ -225,7 +247,7 @@
   //custom error
   myPlayer.errors({
     "errors": {
-      "-3": {
+      "-100": {
           "headline": "You must be at least 18 years of age.",
           "type": "PLAYER_ERR_AGE_GATE",
           "message": "Content may be considered inappropriate for some users."
@@ -239,7 +261,7 @@ var age_appropriate = false;
 
 myPlayer.on("loadstart", function () {
   if(!age_appropriate) {
-    myPlayer.error({code:'-3'});
+    myPlayer.error({code:'-100'});
   }
 });</code></pre>
           <p>Here we set the <code>age_appropriate</code> variable to <code>false</code>, but you would add your own code to determine when to display your custom error messages.</p>
@@ -284,9 +306,37 @@ myPlayer.on("loadstart", function () {
 
       <section id="Localize_errors" class="bcls-section">
         <h2>Localize errors</h2>
-        <p>Although there is no specialized functionality built in to the errors plugin to localize error messages, you can use the standard Video.js approach to add add localized content (through the <code>addLanguage()</code> method) and then display the content (through the <code>localize()</code> method). This functionality is documented in the <a href="//docs.brightcove.com/en/player/brightcove-player/guides/localization.html#alteraddlanguage">Alter/Add to language</a> section of the <a href="//docs.brightcove.com/en/player/brightcove-player/guides/localization.html">Localizing Brightcove Player</a> document.</p>
+        <p>The errors plugin supports multiple languages. To add language support, after the plugin has loaded load the particular language file you wish to use:</p>
+        <pre class="line-numbers"><code class="language-html">&lt;script src=&quot;lang/es.js&quot;&gt;&lt;/script&gt;</code></pre>
+        <p>You can then use the techniques shown in the the <a href="//docs.brightcove.com/en/player/brightcove-player/guides/localization.html">Localizing Brightcove Player</a> document to localize error messages.</p>
       </section>
 
+      <section id="section-name" class="bcls-section">
+        <h2>bc-catalog-error</h2>
+        <p>It is possible that handling errors in the normal <code>ready()</code> section in the script block can cause issues. For instance, it can happen that the bc-catalog-error event could be dispatched before the player is ready, and if you listen for the error in the <code>ready()</code> section, you will not be able to handle the error. This issue can occur when using geo-filtering, a video is inactive, a video is out of scheduling range, or in a different account. You may find that there is not a problem in your code, but the issue can browser dependent, so use caution.</p>
+        <p>For example, here is plugin code that displays a message when a video is inactive:</p>
+        <pre class="line-numbers"><code class="language-javascript">videojs.plugin('inactiveErrorCheck', function() {
+  var myPlayer = this;
+  myPlayer.one('bc-catalog-error', function(){
+    var specificError;
+    myPlayer.errors({
+      'errors': {
+        '-10': {
+          'headline': 'The video you are trying to watch is inactive.',
+          'dismiss': false
+        }
+      }
+    });
+    if (typeof(myPlayer.catalog.error) !== 'undefined') {
+      specificError = myPlayer.catalog.error.data[0];
+      if (specificError !== 'undefined' & specificError.error_code == "VIDEO_NOT_PLAYABLE") {
+        myPlayer.error({code:'-10'});
+      };
+    };
+  });
+});</code></pre>
+        <aside class="bcls-aside bcls-aside--tip">For full details on handling catalog errors see the <a href="//docs.brightcove.com/en/player/brightcove-player/guides/player-catalog.html#catalog-error">Handle bc-catalog-error</a> section of the <strong>Player Catalog</strong> document.</aside>
+      </section>
 
       <section id="knownissues" class="bcls-section">
         <h2>Known issues</h2>
