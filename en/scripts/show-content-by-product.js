@@ -1,54 +1,44 @@
 var BCLSshowContentByProduct = ( function (window, document) {
-    var path = window.location.href,
-        hideContent,
-        doesContain,
-        hasClass;
+    var pathArr = window.location.pathname.split('/'),
+        bpContent = document.querySelectorAll('.perform-only'),
+        vcContent = document.querySelectorAll('.video-cloud-only');
 
     /**
-     * determines whether element has a class
-     * @param {object|node} elem the element
-     * @param {string} cls the name of the class you’re looking for
-     * @return {boolean} true if the element has that class, false if not
+     * determines whether specified item is in an array
+     *
+     * @param {array} array to check
+     * @param {string} item to check for
+     * @return {boolean} true if item is in the array, else false
      */
-    function hasClass( elem, cls ) {
-        return (" " + elem.className + " " ).indexOf( " " + cls + " " ) > -1;
-    };
-
-    /**
-     * determines if one string contains another string
-     * @param  {string} str1 - containing string
-     * @param  {string} str2 - string to look for
-     * @return {boolean} - returns true if str1 contains str2
-     */
-    doesContain = function (str1, str2) {
-        if (str1.indexOf(str2) === -1) {
-            return false;
+    function arrayContains(arr, item) {
+        var i,
+            iMax = arr.length;
+        for (i = 0; i < iMax; i++) {
+            if (arr[i] === item) {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
     /**
      * sets style attribute display:none for each element in a nodeset
-     * @param  {array|collection of nodes} nodeSet [description]
+     * @param  {array|collection of nodes} nodeCollection elements to hide
      */
-    hideContent = function(excludeClass) {
-        var i, iMax, item,
-            nodeSet = document.querySelectorAll('a, div, h1, h2, h3, h4, h5, p, span, pre, code, ul, ol, li, img, table, thead, tbody, tr, th, td, dl, dt, dd');
+    function hideContent(nodeCollection) {
+        var i, iMax, item;
 
-        iMax = nodeSet.length;
+        iMax = nodeCollection.length;
         for (i = 0; i < iMax; i++) {
-            item = nodeSet[i];
-            if (hasClass(item, excludeClass)) {
-                item.setAttribute('style', 'display:none');
-            }
+            nodeCollection[i].setAttribute('style', 'display:none');
         }
     }
 
     // if product = perform, hide video cloud content and vice-versa
-    if (doesContain(path, 'perform')) {
-        hideContent('video-cloud-only');
-    } else if (doesContain(path, 'video-cloud')) {
-        hideContent('perform-only');
+    if (arrayContains(pathArr, 'video-cloud')) {
+        hideContent(pbContent);
+    } else {
+        hideContent(vcContent);
     }
 
 })(window, document);
