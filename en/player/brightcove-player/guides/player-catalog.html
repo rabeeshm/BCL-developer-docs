@@ -323,6 +323,53 @@
       console.log('in ready');
     });
   &lt;/script&gt;  </code></pre>
+
+        <h3>Using custom error</h3>
+        <p>The best solution to handle a specific <strong>bc-catalog-error</strong> maybe using a custom error. The following code shows a plugin that uses a custom error to notify a viewer of an inactive video why the video won't play:</p>
+        <pre class="line-numbers"><code class="language-javascript">videojs.plugin('inactiveErrorCheck', function(options) {
+  var myPlayer = this;
+  myPlayer.one('bc-catalog-error', function(){
+    var specificError;
+    myPlayer.errors({
+      'errors': {
+        'inactive-error': {
+          'headline': options.inactiveMessage,
+          'dismiss': false
+        }
+      }
+    });
+    if (typeof(myPlayer.catalog.error) !== 'undefined') {
+      specificError = myPlayer.catalog.error.data[0];
+      if (specificError !== 'undefined' & specificError.error_code == "VIDEO_NOT_PLAYABLE") {
+        myPlayer.error({code:'inactive-error'});
+      };
+    };
+  });
+});</code></pre>
+        <p>The code to use the plugin, utilizing an in-page embed player implementation, follows:</p>
+        <pre class="line-numbers"><code class="language-html">&lt;video id=&quot;myPlayerID&quot; data-video-id=&quot;5350958927001&quot;
+  data-account=&quot;1507807800001&quot;
+  data-player=&quot;default&quot;
+  data-embed=&quot;default&quot;
+  data-application-id
+  class=&quot;video-js&quot;
+  controls&gt;&lt;/video&gt;
+&lt;script src=&quot;//players.brightcove.net/1507807800001/default_default/index.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;script type=&quot;text/javascript&quot; src=&quot;inactive-error-check.js&quot;&gt;&lt;/script&gt;
+
+&lt;script type=&quot;text/javascript&quot;&gt;
+  videojs('myPlayerID').ready(function(){
+    var myPlayer = this,
+    options =[];
+    options.inactiveMessage = &quot;This is the message to display for inactive videos.&quot;;
+    myPlayer.inactiveErrorCheck(options);
+});&lt;/script&gt;</code></pre>
+        <p>If you are adding the plugin via the <strong>PLUGINS</strong> section in Studio, you would supply the correct URL where you stored your JavaScript code, then in the <strong>Name, Option (JSON)</strong> entry supply:</p>
+        <ul>
+          <li>Name: <strong>inactiveErrorCheck</strong></li>
+          <li>Options: <strong>{ "inactiveMessage": "This is the message to display for inactive videos." }</strong></li>
+        </ul>
       </section>
       <section id="requestlimit" class="bcls-section">
         <h2>Request limit</h2>
