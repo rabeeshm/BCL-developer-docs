@@ -230,11 +230,11 @@
 
         <h3>Adding custom errors</h3>
           <p>Refer to the <a href="#overridetext">Override text</a> section for details about the message parts. When adding a custom error message, use the <strong>Plugins</strong> section of the <strong>Players</strong> module with a JSON object to set property values.</p>
-          <p>This example creates a new custom message with an error code value of <code>-100</code> and includes text based on an age gate test.</p>
-          <aside class="bcls-aside bcls-aside--tip">You can use any negative number, but it is best not to overwrite suggested custom errors that use -1 to -5. In the following example -100 is used, which is simply a convention to use three digit negative numbers for your own custom errors.</aside>
+          <p>This example creates a new custom message with an error code value of <code>age-gate-error</code> and includes text based on an age gate test.</p>
+          <aside class="bcls-aside bcls-aside--tip">Brightcove uses negative numbers for the error code value for added custom errors. As a suggested best practice, it is recommended customers use strings for error codes to avoid confusion with Brightcove created custom errors.</aside>
       <pre class="line-numbers"><code class="language-json">{
     "errors": {
-        "-100": {
+        "age-gate-error": {
             "headline": "You must be at least 18 years of age.",
             "type": "PLAYER_ERR_AGE_GATE",
             "message": "Content may be considered inappropriate for some users."
@@ -247,7 +247,7 @@
   //custom error
   myPlayer.errors({
     "errors": {
-      "-100": {
+      "age-gate-error": {
           "headline": "You must be at least 18 years of age.",
           "type": "PLAYER_ERR_AGE_GATE",
           "message": "Content may be considered inappropriate for some users."
@@ -261,7 +261,7 @@ var age_appropriate = false;
 
 myPlayer.on("loadstart", function () {
   if(!age_appropriate) {
-    myPlayer.error({code:'-100'});
+    myPlayer.error({code:'age-gate-error'});
   }
 });</code></pre>
           <p>Here we set the <code>age_appropriate</code> variable to <code>false</code>, but you would add your own code to determine when to display your custom error messages.</p>
@@ -273,7 +273,7 @@ myPlayer.on("loadstart", function () {
         <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/playback/troubleshooting/errors-plugin/dismissible.png" alt="dismissible error message">
       </figure>
       <p>If you wish to NOT permit the video viewer to dismiss the error message, you can do that. When you call the <code>error()</code> method, you can set the <code>dismiss</code> property to <code>false</code>.</p>
-      <pre class="line-numbers"><code class="language-javascript">myPlayer.error({code:'-3', <span class="bcls-highlight">dismiss: false</span>});</code></pre>
+      <pre class="line-numbers"><code class="language-javascript">myPlayer.error({code:'age-gate-error', <span class="bcls-highlight">dismiss: false</span>});</code></pre>
       <p>When you do this the error message will appear as follows, with no way to dismiss the error.</p>
       <figure class="bcls-figure">
         <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/playback/troubleshooting/errors-plugin/not-dismissible.png" alt="not dismissible error message">
@@ -321,7 +321,7 @@ myPlayer.on("loadstart", function () {
     var specificError;
     myPlayer.errors({
       'errors': {
-        '-10': {
+        'inactive-video-error': {
           'headline': 'The video you are trying to watch is inactive.',
           'dismiss': false
         }
@@ -330,7 +330,7 @@ myPlayer.on("loadstart", function () {
     if (typeof(myPlayer.catalog.error) !== 'undefined') {
       specificError = myPlayer.catalog.error.data[0];
       if (specificError !== 'undefined' & specificError.error_code == "VIDEO_NOT_PLAYABLE") {
-        myPlayer.error({code:'-10'});
+        myPlayer.error({code:'inactive-video-error'});
       };
     };
   });
