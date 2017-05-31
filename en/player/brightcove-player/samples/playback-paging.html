@@ -229,12 +229,12 @@
                   			mediaType = 'playlist';
                   			// make the Playback API request to get playlist data
                   			getMediaData(mediaType, requestData, function (mediaData) {
-                  					// load the first video of the current playlist to the player
-                  					myPlayer.catalog.load(mediaData.videos[0]);
                   					// loop through video data and change duration from milliseconds to seconds
                   					for (var i=0; i<limitValue; i++) {
-                  						mediaData.videos[i].duration = mediaData.videos[i].duration * .001;
+                  						mediaData.videos[i] = myPlayer.catalog.transformVideoResponse (mediaData.videos[i], myPlayer);
                   					}
+                            // load the first video of the current playlist to the player
+                  					myPlayer.catalog.load(mediaData.videos[0]);
                   					// add the newest videos list to the playlist
                   					myPlayer.playlist(mediaData.videos);
                   			});
@@ -387,12 +387,12 @@
                         <li>Line 74: Makes a call to the Playback API to get the first set of videos in the playlist and loads them into the player.</li>
                         <li>Lines 75-81: Add a listener to the <strong>Next Videos</strong> button. When selected, make a call to the Playback API to get the next set of videos in the playlist and load them into the player.</li>
                         <li>Lines 90-99: Make a request to the Playback API to get a set of videos from the playlist.</li>
-                        <li>Line 92: Loads the first video object into the player.</li>
                         <li><p>
-                          Lines 94-96: Loop through the media data returned from the Playback API and change the <code>duration</code> from milliseconds to seconds.
+                          Lines 92-94: Loop through the media data returned from the Playback API and change the <code>duration</code> from milliseconds to seconds.
                         </p>
-                          <aside class="bcls-aside bcls-aside--information">The Playback API stores <code>duration</code> in milliseconds, but the <code>playlist()</code> method is expecting it in seconds.</aside>
+                          <aside class="bcls-aside bcls-aside--tip">The Playback API stores <code>duration</code> in milliseconds. Using <code>transformVideoResponse()</code> converts the API response into a format compatible with the player's <code>playlist()</code> function.</aside>
                         </li>
+                        <li>Line 92: Loads the first video object into the player.</li>
                         <li>Line 98: Loads the current set of video objects into the playlist.</li>
                         <li>Lines 105-109: Set the Playback API request URL. First time, all videos are returned for the playlist. After that, the next set of videos are returned from the playlist, using the <code>limit</code> and <code>offset</code> parameters.</li>
                         <li><p>
@@ -405,9 +405,9 @@
       mediaData,
       apiRequest,
       apiBaseURL = 'https://edge.api.brightcove.com/playback/v1/accounts/',
-      policyKey = <span class="bcls-input">your policy key</span>,
-      accountId = <span class="bcls-input">your account Id</span>,
-      playlistId = <span class="bcls-input">your playlist Id</span>,
+      policyKey = &lt;span class=&quot;bcls-input&quot;&gt;your policy key&lt;/span&gt;,
+      accountId = &lt;span class=&quot;bcls-input&quot;&gt;your account Id&lt;/span&gt;,
+      playlistId = &lt;span class=&quot;bcls-input&quot;&gt;your playlist Id&lt;/span&gt;,
       videoData = [],
       mediaType,
       offsetValue = 0,
@@ -439,12 +439,12 @@
     mediaType = 'playlist';
     // make the Playback API request to get playlist data
     getMediaData(mediaType, requestData, function (mediaData) {
-      // load the first video of the current playlist to the player
-      myPlayer.catalog.load(mediaData.videos[0]);
       // loop through video data and change duration from milliseconds to seconds
       for (var i=0; i&lt;limitValue; i++) {
-      	mediaData.videos[i].duration = mediaData.videos[i].duration * .001;
+      	mediaData.videos[i] = myPlayer.catalog.transformVideoResponse (mediaData.videos[i], myPlayer);
       }
+      // load the first video of the current playlist to the player
+      myPlayer.catalog.load(mediaData.videos[0]);
       // add the newest videos list to the playlist
       myPlayer.playlist(mediaData.videos);
     });
@@ -470,7 +470,7 @@
       getResponse = function() {
         try {
           if (httpRequest.readyState === 4) {
-            if (httpRequest.status >= 200 && httpRequest.status < 300) {
+            if (httpRequest.status &gt;= 200 &amp;&amp; httpRequest.status &lt; 300) {
               responseData = httpRequest.responseText;
               parsedData = JSON.parse(responseData);
               switch (mediaType) {
