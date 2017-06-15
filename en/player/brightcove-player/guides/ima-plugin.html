@@ -206,6 +206,15 @@
                         <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/ima3-plugin/console-debug.png" alt="debug output in console">
                     </figure>
 
+                  <h3 id="setDisableCustomPlaybackForIOS10Plus">setDisableCustomPlaybackForIOS10Plus</h3>
+                  <p>Type: <code>boolean</code> Default Value: <code>false</code></p>
+                  <p>Sets whether to disable custom playback on iOS 10+ browsers. Behavior is as follows:</p>
+                  <ul>
+                    <li>When true, ads will play inline if the content video is inline, which enables skippable ads. However, the ad will stay inline and not support iOS's native fullscreen.</li>
+                    <li>When false, ads will play in the same player as your content.</li>
+                  </ul>
+                  <p>See the <a href="#skippable-ads">iOS skippable ads</a> section of this document for an example of usage of this setting.</p>
+
                   <h3>hardTimeouts</h3>
                   <p>Type: <code>boolean</code> Default Value: <code>true</code></p>
                   <p>Abandon ads that finish loading after they have timed out. This will prevent slow preroll ads from interrupting after the content video has begun playing. The <code>timeout</code> value will be used.</p>
@@ -699,8 +708,10 @@ player.ima3.setAdsRenderingSettings(adsRenderingSettings);</code></pre>
             </ul>
             <p>To avoid this, setup the event listener for <code>ended</code> after the IMA3 plugin is initialized.</p>
             <h3>Ad cue points skipped or fail</h3>
+            <ul>
             <li>Currently a viewer can use the scrubber to skip over ad breaks that are defined by ad cue points. The intended behavior is that the viewer will watch the last ad defined before the point to which the viewer scrubs.</li>
             <li>In Brightcove Player version 5.20.0 and later, it is possible ad cue points will fail to function at all depending on browser and video format.</li>
+          </ul>
             <h3>Content playing before pre-roll</h3>
             <p>It was possible for the following issues to occur when using the IMA3 plugin with Brightcove Player:</p>
             <ul>
@@ -763,10 +774,14 @@ Pi.I bridge3.1.33.html:121
                     <p>Midrolls play immediately if they are configured for live streams. The reason this occurs is that in live video time is relative. If a midroll says 10 seconds, it's not clear what 10 seconds is relative to. Is it 10 seconds from the start of the stream, or 10 seconds from the start of the time the user started playback? A better solution for a live streams is using ID3 metadata that gives unambiguous cue points when an ad should be played.</p>
                     <h3>Control bars</h3>
                     <p>You will see that the advertisement and video that plays after advertisement completion can have different control bars. IMA creates a separate video element under most circumstances and exposes information about the ad playback state through non-standard methods. The control bar in the Brightcove Player is associated with different playback technology, and it is non-trivial to have the same control bar for both technologies.</p>
-                    <h3>Skippable ads on iOS devices</h3>
+                    <h3 id="skippable-ads">Skippable ads on iOS devices</h3>
                     <p>
-                      With the IMA3 plugin, skippable ads can be played on iPhones when the <code>playsinline</code> attribute is present on the <code>video</code> element. For example:
-                    </p>
+                      With the IMA3 plugin, skippable ads can be played on iPhones when the following conditions are met:
+                      <ul>
+                        <li>The <code>playsinline</code> attribute is present on the <code>video</code> element</li>
+                        <li>The <code>setDisableCustomPlaybackForIOS10Plus</code> setting is passed to the plugin, and set to <code>true</code></li>
+                      </ul>
+                      <p>For the <code>playsinline</code> attribute, simply include it as an attribute in the <code>video</code> tag:</p>
                     <pre class="line-numbers"><code class="language-html">&lt;video id=&quot;player&quot;
    width=&quot;640&quot;
    height=&quot;360&quot;
@@ -778,13 +793,21 @@ Pi.I bridge3.1.33.html:121
    <span class="bcls-highlight">playsinline</span>
    controls&gt;
 &lt;/video&gt;</code></pre>
+                    <p>For the <code>setDisableCustomPlaybackForIOS10Plus</code> setting, assign it as a property of <code>ima3SdkSettings</code>: </p>
+                    <pre class="line-numbers"><code class="language-javascript">player.ima3({
+  ima3SdkSettings: {
+    "disableCustomPlaybackForIOS10Plus": true
+  }
+})</code></pre>
+                    <p>For full details of this setting, see the <a href="#setDisableCustomPlaybackForIOS10Plus">setDisableCustomPlaybackForIOS10Plus</a> entry in the <code>ima3SdkSettings</code> section of this document.</p>
                     <p><strong>Skippable ad limitations:</strong></p>
                     <ul>
+                      <li>The <strong>Skip Ad</strong> button <em>may be partially covered by the ad control bar</em> on some mobile devices. This makes it difficult for end users to actually skip the ad. The user can pinch to zoom to make the <strong>Skip Ad</strong> button bigger on mobile devices to be able to click it.</li>
                       <li>
-                        <strong>iPhone</strong> without <code>playsinline</code> - Ads are not played.
+                        <strong>iPhone</strong> without <code>playsinline</code> and <code>setDisableCustomPlaybackForIOS10Plus</code> - Skippable ads are not played.
                       </li>
                       <li>
-                        <strong>iPhone</strong> with <code>playsinline</code> - Ads are played inline but skip is not available in fullscreen mode. This is best supported on iOS 10+.
+                        <strong>iPhone</strong> with <code>playsinline</code> and and <code>setDisableCustomPlaybackForIOS10Plus</code> - Ads are played inline but skip is not available in fullscreen mode. This is best supported on iOS 10+.
                       </li>
                       <li>
                         <strong>iPad</strong> - Ads are played inline but skip is not available in fullscreen mode
@@ -952,7 +975,7 @@ Pi.I bridge3.1.33.html:121
             <p>v2.19.0</p>
             <ul>
               <li>Volume settings persist when skipping ads
-              <li>Updated to use <strong>videojs-contrib-ads</strong> 5.0.0</li>
+              <li>Updated to use <strong>videojs-contrib-ads</strong> 5.0.0
                 <ul>
                   <li>Cross-compatibility between Video.js 5 and 6</li>
                   <li>Bugfix regarding Flash of content on iOS</li>
