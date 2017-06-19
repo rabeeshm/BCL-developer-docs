@@ -53,13 +53,100 @@
       <h1>Player/Plugin Version Testing</h1>
 
       <!-- begin drupal content -->
-      <article class="bcls-article">
+      <!-- <article class="bcls-article"> -->
         <header id="bcls_header" class="bcls-header">
-          <p>In this topic, you will learn how to create a player of a specified version and then test that version of the player with a plugin. The plugins can be your own creations, or Brightcove supplied plugins. Note that this document uses a tool called <strong>curl</strong> which is a command line tool. For an introduction to using curl, see the <a href="//docs.brightcove.com/en/player/player-management/getting-started/player-mgmt-quick-start.html">Quick Start to Player Management</a> document. If you are familiar with HTTP client tools, like <a href="//www.getpostman.com/">Postman</a>, they can also be used.</p>
+          <p>In this topic, you will learn how to create a player of a specified version and then test that version of the player with a plugin. The plugins can be your own creations, or Brightcove supplied plugins. You will be given three options for testing:</p>
+          <ul>
+            <li>Using Studio to create a player and add the plugin and configurations.</li>
+            <li>Using Studio to create the player, then in HTML programmatically add the plugin.</li>
+            <li>Using the Player Management API and <strong>curl</strong>. The <strong>curl</strong>  tool is used at the command line to leverage the Player Management API. For an introduction to using curl, see the <a href="//docs.brightcove.com/en/player/player-management/getting-started/player-mgmt-quick-start.html">Quick Start to Player Management</a> document. If you are familiar with HTTP client tools, like <a href="//www.getpostman.com/">Postman</a>, they can also be used. The advantage of this approach is that you can choose any version of the player you wish, not only those that are available in Studio.</li>
+          </ul>
         </header>
 
-        <section id="Creating_a_player" class="bcls-section">
-          <h2>Create a player</h2>
+        <section id="Testing_Brightcove_plugin_pre_releases" class="bcls-section">
+          <h2>Testing Brightcove plugin pre-releases</h2>
+          <p>At times Brightcove will make available pre-releases of certain plugins. You can use the instructions in this document to be sure your Brightcove Player and other plugins work with the pre-release.</p>
+        </section>
+
+        <section id="Using_Studio" class="bcls-section">
+          <h2>Using Studio</h2>
+          <p>In the following steps you will be guided through the process of using Studio to create a player and add a plugin to the player for testing.</p>
+          <aside class="bcls-aside bcls-aside--warning">You can test on an existing Brightcove Player, but testing on a production player should be done with great care and caution.</aside>
+          <ol class="bcls-tasklist">
+            <li>In Studio, select the <strong>PLAYERS</strong> module.</li>
+            <li>Create a new player, using the desired version from the dropdown.</li>
+            <li>Click on the new player to edit its properties.</li>
+            <li>Locate the <strong>PLUGINS</strong> section, and click its <strong>Edit</strong> button.</li>
+            <li>Here you will have to first enter the URLs for the JavaScript and CSS.
+              <aside class="bcls-aside bcls-aside--information">If you are testing a Brightcove pre-release plugin, the URLs will be provided.</aside>
+            </li>
+            <li>Next enter the plugin name and any configuration options.</li>
+            <li>Save and publish the player.</li>
+          </ol>
+          <p>You are now ready to publish a video using the newly configured player and test the plugin.</p>
+        </section>
+
+        <section id="Programmatically_add_the_plugin" class="bcls-section">
+          <h2>Programmatically add the plugin</h2>
+          <p>In this section of the document you will create the player in Studio, and then add the plugin using code in an HTML page.</p>
+          <aside class="bcls-aside bcls-aside--warning">You can test on an existing Brightcove Player, but testing on a production player should be done with great care and caution.</aside>
+          <ol class="bcls-tasklist">
+            <li>In Studio, select the <strong>PLAYERS</strong> module.</li>
+            <li>Create a new player, using the desired version from the dropdown.</li>
+            <li>Go to the <strong>MEDIA</strong> module and publish a video.</li>
+            <li>Copy the <strong>Advanced</strong> (in-page embed) implementation code.</li>
+            <li>Paste the player code into an HTML page.</li>
+            <li>Add the path to the CSS file using an HTML <code>&lt;link&gt;</code> tag.</li>
+            <li>Add the path to the JavaScript file using an HTML <code>&lt;script&gt;</code> tag.</li>
+            <li>Once the player is ready, call the plugin and pass any options.</li>
+            <li>The following shows a generic outline of the needed code:
+              <pre class="line-numbers"><code class="language-javascript">&lt;!doctype html&gt;
+  &lt;html&gt;
+
+  &lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;title&gt;Testing a plugin&lt;/title&gt;
+    &lt;link href=&quot;//url_to_my_css/my.css&quot; rel=&quot;stylesheet&quot;&gt;
+  &lt;/head&gt;
+
+  &lt;body&gt;
+
+    &lt;video id=&quot;myPlayerID&quot;
+      data-video-id=&quot;5350958927001&quot;
+      data-account=&quot;1507807800001&quot;
+      data-player=&quot;rJeuIHdbmW&quot;
+      data-embed=&quot;default&quot;
+      data-application-id
+      class=&quot;video-js&quot;
+      controls&gt;&lt;/video&gt;
+    &lt;script src=&quot;//players.brightcove.net/1507807800001/rJeuIHdbmW_default/index.min.js&quot;&gt;&lt;/script&gt;
+
+    &lt;script src=&quot;//url_to_my_js/my.js&quot;&gt;&lt;/script&gt;
+
+    &lt;script type=&quot;text/javascript&quot;&gt;
+      videojs('myPlayerID').ready(function(){
+        var myPlayer = this,
+        options = {};
+        options.prop1 = &quot;value1&quot;;
+        options.prop2 = &quot;value2&quot;;
+
+        myPlayer.pluginName(options);
+      });
+    &lt;/script&gt;
+
+  &lt;/body&gt;
+
+  &lt;/html&gt;</code></pre>
+            </li>
+          </ol>
+          <aside class="bcls-aside bcls-aside--information">If you are testing a Brightcove pre-release plugin, the URLs will be provided.</aside>
+          <p>You are now ready to browse this page to test your plugin.</p>
+        </section>
+
+        <section id="Using_curl_and_the_Player_Management_API" class="bcls-section">
+          <h2>Using curl and the Player Management API</h2>
+          <p>In this section of the document you will see how you can use curl and leverage the Player Management API to test a plugin with a player. The advantage of this approach is that you can choose any version of the player you wish, not only those that are available in Studio.</p>
+          <h3>Create a player</h3>
           <ol  class="bcls-tasklist">
           <li><p>As mentioned in the <a href="//docs.brightcove.com/en/player/player-management/getting-started/player-mgmt-quick-start.html">Quick Start to Player Management</a> document, you will want to set up environment variables for the following:</p>
           <ul>
@@ -105,14 +192,10 @@
   &quot;preview_embed_code&quot;: &quot;&lt;iframe src='//preview-players.brightcove.net/v1/accounts/1507807800001/players/B1JOH9o0e/preview/embeds/default/master/index.html' allowfullscreen webkitallowfullscreen mozallowfullscreen&gt;&lt;/iframe&gt;&quot;
 }</code></pre>
 </li>
-        </ol>
         <p>You have now successfully created a player of a specified version.</p>
-        </section>
 
-        <section id="Create_a_testing_page" class="bcls-section">
-          <h2>Create a testing page</h2>
+          <h3>Create a testing page</h3>
           <p>Now that your player is created, you will want to test your plugin with it. The steps in this section guide you to get the advanced player code implementation and test with your plugin.</p>
-          <ol  class="bcls-tasklist">
           <li>Now that the player is created, you can go into Studio and use the player to publish a video. For instance, the <strong>Advanced</strong> player code would look something like this, but of course using your account information.
           <pre class="line-numbers"><code class="language-html">&lt;video data-video-id=&quot;5350958927001&quot;
   data-account=&quot;1507807800001&quot;
@@ -179,10 +262,8 @@
           </li>
           <li>You can now test your player and, if needed, interactively debug.</li>
         </ol>
-        </section>
 
-        <section id="Permanently_add_plugin_to_player" class="bcls-section">
-          <h2>Permanently add plugin to player</h2>
+          <h3>Permanently add plugin to player</h3>
           <p>Once all is working well, and you want to include the plugin with the player whenever that player is used, you can assign the plugin to the player using curl and the Player Management API. The following curl statement is an example and you will need to add your specific configuration options and plugin name.</p>
           <pre class="line-numbers"><code class="language-bash">curl \
   --header "Content-Type: application/json" \
@@ -214,7 +295,7 @@ https://players.api.brightcove.com/v1/accounts/$ACCOUNT_ID/players/$PLAYER_ID/co
   https://players.api.brightcove.com/v1/accounts/$ACCOUNT_ID/players/$PLAYER_ID/publish</code></pre>
         </section>
 
-      </article>
+      <!-- </article> -->
       <!-- end drupal content -->
 
       <div class="bcls-section" id="BCLreferences">
