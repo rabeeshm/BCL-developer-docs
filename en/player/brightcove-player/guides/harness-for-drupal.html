@@ -63,7 +63,7 @@
     <p>A custom display image is displayed when the live event is not available or has not started yet.</p>
     <p data-height="525" data-theme-id="dark" data-slug-hash="WEpVpZ" data-default-tab="result" data-user="bcls" data-embed-version="2" data-pen-title="18384-brightcove-player-sample-live-custom-error-message" class="codepen">See the Pen <a href="https://codepen.io/team/bcls/pen/WEpVpZ/">18384-brightcove-player-sample-live-custom-error-message</a> by Brightcove Learning Services (<a href="https://codepen.io/bcls">@bcls</a>) on <a href="https://codepen.io">CodePen</a>.</p>
     <script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script>
-    <aside class="bcls-aside bcls-aside--information">Note: Later in this document the logic, flow and styling used in the application will be discussed in the <a href="#Applicaton_flow">Application flow</a> and <a href="#Application_styling">Application styling</a> sections. The best way to follow along with the information in those sections is to click the <strong>EDIT ON CODEPEN</strong> button and have the code available in one browser via CodePen and the code discussions open in another. In CodePen you can adjust what code is displayed and the width of the displayed code.</aside>
+    <aside class="bcls-aside bcls-aside--information">Note: Later in this document the logic, flow and styling used in the application will be discussed in the <a href="#Applicaton_flow">Application flow</a> and <a href="#Application_styling">Application styling</a> sections. The best way to follow along with the information in those sections is to click the <strong>EDIT ON CODEPEN</strong> button and have the code available in one browser/browser tab via CodePen, and the code discussions open in another. In CodePen you can adjust what code is displayed and the width of the displayed code.</aside>
   </section>
 
   <section class="bcls-section">
@@ -149,13 +149,63 @@
     <h3>Plugins used</h3>
 
     <ul>
-      <li><a href="https://github.com/brightcove/videojs-overlay">videojs-overlay</a> : For details, refer to the <a href="/node/18075">Display Overlay Plugin</a> document.</li>
+      <li>videojs-overlay: For details, refer to the <a href="/node/18075">Display Overlay Plugin</a> document.</li>
     </ul>
   </section>
 
   <section class="bcls-section">
     <h2 id="Application_flow">Application flow</h2>
-    <p></p>
+    <p>The basic logic behind this application is:</p>
+    <ul>
+      <li>Listen for a certain kind of error that indicates not video is playing.</li>
+      <li>If conditions are met, display the <strong>Please Stand By</strong> image.</li>
+      <li>The image displayed in specified in the <strong>content</strong> value when configuring the overlay.</li>
+    </ul>
+    <h3>HTML code</h3>
+    <p>In addition to the standard in-page embed player implementation code, the CSS and JavaScript for the Overlay plugin is linked into the page. Of course, if you wish these could be added using Studio in the <strong>PLAYERS > PLUGINS</strong> section.</p>
+    <h3>JavaScript code</h3>
+    <ul>
+      <li>
+        <p>Find the code where the event handler is defined, which is labeled:</p>
+        <p><strong>// ### Listen for an error event ###</strong></p>
+        <p>In the event handler the error code and duration of the video are assigned to variables. If the error is either <strong>2 (MEDIA_ERR_NETWORK)</strong> or <strong>4 (MEDIA_ERR_SRC_NOT_SUPPORTED)</strong>, AND the duration is returned as <strong>NaN (not a number)</strong>, you know the live feed is not playing. At this point you complete the steps needed to suppress the normal error being displayed and display the overlay by removing the <code>hide-ovelay</code> class from the player.</p>
+      </li>
+      <li>
+        <p>Find the code where the overlay is configured, which is labeled:</p>
+        <p><strong>// ### Overlay definition ###</strong></p>
+        <p>When the <strong>start</strong> value is assigned the event <strong>loadstart</strong> it means the overlay will be displayed immediately. In this case, we are controlling if the overlay should appear using classes and initially it is NOT displayed until the error is detected.</p>
+      </li>
+      <li>
+        <p>Find the code where the default error message is updated, which is labeled:</p>
+        <p><strong>// ### Modify default error message ###</strong></p>
+        <p>It is VERY important to understand that if all works as it should you will not see this customized error message. It will only appear if you don't implement the overlay or if the overlay fails to load the image for some reason.</p>
+        <p>The default values are changed as follows to make the error more specific to the live feed:</p>
+        <table class="bcls-table">
+          <thead class="bcls-table__head">
+            <tr>
+              <th>Error Element</th>
+              <th>Default</th>
+              <th>Custom Value</th>
+            </tr>
+          </thead>
+          <tbody class="bcls-table__body">
+            <tr>
+              <td>Type</td>
+              <td>MEDIA_ERR_SRC_NOT_SUPPORTED</td>
+              <td>MEDIA_UNAVAILABLE</td>
+            </tr>
+            <tr>
+              <td>Headline</td>
+              <td>This video is either unavailable or not supported in this browser</td>
+              <td>The Live Event you are trying to watch is either unavailable or has not started</td>
+            </tr>
+          </tbody>
+        </table>
+      </li>
+      <li></li>
+      <li></li>
+    </ul>
+
   </section>
 
   <section class="bcls-section">
@@ -176,7 +226,10 @@
   var myPlayer = this;
   ...
 });</code></pre>
-    <p>As mentioned earlier, you can see the plugin's JavaScript code by looking a the <strong>plugin/pluginName.js</strong> file in this document's corresponding GitHub repo: <a href="https://github.com/BrightcoveLearning/18384-brightcove-player-sample-live-custom-error-message">https://github.com/BrightcoveLearning/18384-brightcove-player-sample-live-custom-error-message</a></p>
+    <p>As mentioned earlier, you can see the plugin's JavaScript code in this document's corresponding GitHub repo: <a href="https://github.com/BrightcoveLearning/18384-brightcove-player-sample-live-custom-error-message/blob/master/plugin/liveCustomError.js">liveCustomError.js</a>.</p>
+    <h3>Using the plugin with a player</h3>
+    <p>Once you have the plugin's CSS and JavaScript files stored in an Internet accessible location, you can use the plugin with a player. In Studio's <strong>PLAYERS</strong> module you can choose a player, then in the <strong>PLUGINS</strong> section add the URLs to the CSS and JavaScript files, and also add the <strong>Name</strong> and <strong>Options</strong>, if options are needed.</p>
+    <aside class="bcls-aside bcls-aside--tip">For more information on using Studio to assign plugins to players see the <a href="14053">Configuring Player Plugins</a> document.</aside>
   </section>
 
 </article>
