@@ -69,8 +69,14 @@
             To debug server-side ads with your video content stored in Video Cloud, follow these steps:
           </p>
           <ol>
-            <li><a href="#Initiating_a_trace">Initiating a trace</a></li>
-            <li><a href="#Reviewing_trace_information">Reviewing trace information</a></li>
+            <li>
+              Initiate a trace
+            </li>
+            <li>
+              Retrieve detailed trace information from the Storage API
+            </li>
+            <!-- <li><a href="#Initiating_a_trace">Initiating a trace</a></li>
+            <li><a href="#Retrieving_trace_information">Retrieving trace information</a></li> -->
           </ol>
       </section>
 
@@ -88,20 +94,38 @@
           </li>
           <li>
             Initiate a trace by appending an X-Trace token to the URL:
-            <pre class="line-numbers"><code class="language-http">?trace_token=<span class="bcls-input">{token}</span></code></pre>
+            <pre class="line-numbers"><code class="language-http">?trace_token=<span class="bcls-input">{xtrace_token}</span></code></pre>
           </li>
           <li>
             <p>
-              Select the <code>session_id</code> from the contentURI within the VMAP response.
+              Select the <code>session_id</code> from the <code>contentURI</code> within the VMAP response. The <code>session_id</code> is the third UUID within the <code>contentURI</code>.
             </p>
-            <aside class="bcls-aside bcls-aside--tip">The <code>session_id</code> is the third UUID from the contentURI.</aside>
+            <pre class="line-numbers"><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;vmap:VMAP xmlns:uo=&quot;uo&quot; xmlns:vmap=&quot;http://www.iab.net/vmap-1.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; version=&quot;1.0&quot;&gt;
+    &lt;vmap:Extensions&gt;
+        &lt;uo:unicornOnce ttl=&quot;1800&quot;
+        <span class="bcls-highlight">contenturi</span>=&quot;...hls/v3/clear/accountid/
+        58dea85e-a79d-4db8-be24-7bec49fe184b/
+        36ed81a5-f5b7-4977-a1a0-2ab19ccab44a/
+        <span class="bcls-highlight">24ff03dc-9a94-4979-8cfb-e3951f6a707a</span>/content.m3u8...&quot;
+        contentlength=&quot;146.1760&quot; payloadlength=&quot;236.5660&quot;
+        contenttype=&quot;application/x-mpegURL&quot;&gt;
+        &lt;/uo:unicornOnce&gt;
+    &lt;/vmap:Extensions&gt;
+    &lt;vmap:AdBreak breakType=&quot;linear&quot; breakId=&quot;PreRoll_0_0&quot; timeOffset=&quot;start&quot;&gt;
+        &lt;vmap:AdSource allowMultipleAds=&quot;true&quot; followRedirects=&quot;true&quot; id=&quot;0&quot;&gt;
+            &lt;vmap:VASTData&gt;
+...
+</code></pre>
+          </li>
+          <li>
+            If you haven't already done so, follow <a href="http://docs.brightcove.com/en/staging/ssai-bcplayer.html">these steps</a> to confugire your Brightcove player with an ad configuration and the Once UX plugin.
           </li>
         </ol>
       </section>
 
       <section class="bcls-section">
-        <h2 id="Reviewing_trace_information">Reviewing trace information</h2>
-        <h3>General information</h3>
+        <h2 id="Understanding_trace_retrieval">Understanding trace retrieval</h2>
         <p>
           The following information pertains to all Storage API requests.
         </p>
@@ -122,101 +146,107 @@
 
         <h4>Authentication</h4>
 
-        <p>Authentication for requests requires an Authorization header:</p>
+        <p>Authentication for requests requires a token header:</p>
 
         <pre class="line-numbers">
-        <code class="language-http">Authorization: X-Trace-Token : <span class="bcls-input">{xtrace_token}</span></code></pre>
+        <code class="language-http">X-Trace-Token : <span class="bcls-input">{xtrace_token}</span></code></pre>
 
-        <p>The <code>xtrace_token</code> is a temporary OAuth2 access token that must be obtained from the Brightcove OAuth service. For details on how to obtain client credentials and use them to retrieve access tokens, see the <a href="/node/17928">Brightcove OAuth Overview</a>.</p>
+        <p>The <code>X-Trace-Token</code> value is a static string used across all accounts. Here is the value for Read-Only and Rate limited access:</p>
+        <pre class="line-numbers"><code class="language-json">69263d4f-df43-4fee-9cf3-b27d3f19f936</code></pre>
 
-        <h4>Operations</h4>
-
-        <p>When you request client credentials, you will need to specify the type of account access or operations that you want. The following is a list of the currently supported operations for the Storage API:</p>
-
-        <ul>
-          <li>Video data:
-          <p><code>video-cloud/video/read</code><br />
-            <code>video-cloud/video/all</code><br />
-            <!-- <code>video-cloud/video/update</code><br />
-            <code>video-cloud/video/delete</code><br />
-            <code>video-cloud/video/all</code><br />
-            <code>video-cloud/video/assets/read</code><br />
-            <code>video-cloud/video/assets/create</code><br />
-            <code>video-cloud/video/assets/update</code><br />
-            <code>video-cloud/video/assets/delete</code> -->
-          </p>
-          </li>
-        </ul>
     </section>
 
     <section class="bcls-section">
-<h2 id="Manage_ad_configurations">List storage information</h2>
-<p>The API supports the following GET requests:</p>
+      <h2 id="Retrieving_ad-call_trace_info">Retrieving ad-call trace info</h2>
+      <p>
+        Retrieve ad-call trace information, including headers, made against the ad server. This GET request is used with No Authentication, but does require the X-Trace-Token in the header.
+      </p>
 
-<ul>
-  <li><a href="#Tracing_ad_calls">Tracing ad-calls</a></li>
-  <li><a href="#Tracing_beacons">Tracing beacons</a></li>
-</ul>
-
-<h3 id="Tracing_ad_calls">Tracing ad-calls</h3>
-<p>
-  Request information, including headers, made against the ad server.
-</p>
-
-<table class="bcls-table">
-  <tbody class="bcls-table__body">
-    <tr>
-      <th>Method</th>
-      <td>GET</td>
-    </tr>
-    <tr>
-      <th>URL</th>
-      <td>https://ssaiplayback.prod.boltdns.net/storage-api/v1/ad-calls/<span class="bcls-input">{account_id}</span>/<span class="bcls-input">{session_id}</span></td>
-    </tr>
-    <tr>
-      <th rowspan="2">Headers</th>
-      <td>Authorization: X-Trace-Token : <span class="bcls-input">{xtrace_token}</span></td>
-    </tr>
-    <tr>
-      <td>Content-Type: application/json</td>
-    </tr>
-    <tr>
-			<th>Sample Body</th>
-			<td>
-			<pre><code>{
-&quot;name&quot;: &quot;VMAP Ad Server - updated&quot;
+      <table class="bcls-table">
+        <tbody class="bcls-table__body">
+          <tr>
+            <th>Method</th>
+            <td>GET</td>
+          </tr>
+          <tr>
+            <th>URL</th>
+            <td>https://ssaiplayback.prod.boltdns.net/storage-api/v1/ad-calls/<span class="bcls-input">{account_id}</span>/<span class="bcls-input">{session_id}</span></td>
+          </tr>
+          <tr>
+            <th rowspan="2">Headers</th>
+            <td>X-Trace-Token : <span class="bcls-input">{xtrace_token}</span></td>
+          </tr>
+          <tr>
+            <td>Content-Type: application/json</td>
+          </tr>
+          <!-- <tr>
+      			<th>Sample Body</th>
+      			<td>
+      			<pre><code>{
+      &quot;name&quot;: &quot;VMAP Ad Server - updated&quot;
+      }</code></pre>
+              <p>
+                Base 64 encoded payload of the ad server response that would include the VAST or ad server equivalent response body.
+              </p>
+      			</td>
+      		</tr> -->
+        </tbody>
+      </table>
+      <p>
+        Sample response:
+      </p>
+      <pre class="line-numbers"><code class="language-json">{
+	&quot;ad_calls&quot;: null
 }</code></pre>
+
+         <br />
+      </section>
+
+      <section class="bcls-section">
+        <h2 id="Retrieving_beacon_trace_info">Retrieving beacon trace info</h2>
         <p>
-          Base 64 encoded payload of the ad server response that would include the VAST or ad server equivalent response body.
+          Retrieve beacon trace information, including headers, made against the ad server. This GET request is used with No Authentication, but does require the X-Trace-Token in the header.
         </p>
-			</td>
-		</tr>
-  </tbody>
-</table>
-<p>
-  Sample response:
-</p>
-<pre class="line-numbers"><code class="language-json">[
-{
-  &quot;name&quot;: &quot;VMAP Ad Server&quot;,
-  &quot;vmap_response_namespace&quot;: &quot;uo&quot;,
-  &quot;config_id&quot;: &quot;2ecc6beb-d6a4-4deb-a78e-37ac27e0f883&quot;,
-  &quot;account_id&quot;: &quot;57838016001&quot;,
-  &quot;created_timestamp&quot;: &quot;2017-07-24T19:28:34.976878586Z&quot;,
-  &quot;updated_timestamp&quot;: &quot;2017-07-24T19:28:34.976878586Z&quot;,
-  &quot;ad_config&quot;: {
-      &quot;expected_ad_response&quot;: &quot;dfp_ad_rules&quot;,
-      &quot;disable_server_beacons&quot;: false,
-      &quot;template_url&quot;: {
-          &quot;template&quot;: &quot;https://8sgl4oo6of.execute-api.us-west-2.amazonaws.com/qa/ads/dfp-ad-rules-new?ip={{ system.ip_address }}&amp;vid={{ metadata.video_id }}&amp;ppid={{ system.unique_user_id }}&amp;p_vmap={{ url.p_vmap }}&quot;
-      }
-  }
-}
-]</code></pre>
 
+        <table class="bcls-table">
+          <tbody class="bcls-table__body">
+            <tr>
+              <th>Method</th>
+              <td>GET</td>
+            </tr>
+            <tr>
+              <th>URL</th>
+              <td>https://ssaiplayback.prod.boltdns.net/storage-api/v1/beacons/<span class="bcls-input">{account_id}</span>/<span class="bcls-input">{session_id}</span></td>
+            </tr>
+            <tr>
+              <th rowspan="2">Headers</th>
+              <td>X-Trace-Token : <span class="bcls-input">{xtrace_token}</span></td>
+            </tr>
+            <tr>
+              <td>Content-Type: application/json</td>
+            </tr>
+            <!-- <tr>
+              <th>Sample Body</th>
+              <td>
+              <pre><code>{
+        &quot;name&quot;: &quot;VMAP Ad Server - updated&quot;
+        }</code></pre>
+                <p>
+                  Base 64 encoded payload of the ad server response that would include the VAST or ad server equivalent response body.
+                </p>
+              </td>
+            </tr> -->
+          </tbody>
+        </table>
+        <p>
+          Sample response:
+        </p>
+        <pre class="line-numbers"><code class="language-json">{
+	&quot;beacons&quot;: null
+}</code></pre>
 
-   <br />
-</section>
+           <br />
+        </section>
 
 
 			</article>
