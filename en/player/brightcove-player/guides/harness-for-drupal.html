@@ -61,7 +61,7 @@
           <h2 id="Player_example">Player example</h2>
 
           <!-- UPDATE description -->
-          <p>Very brief description of what the customer should see the player do ...</p>
+          <p>The player will be playing a video from the array of video objects in an infinite loop.</p>
 
           <!-- UPDATE codepen here -->
           <p data-height="416" data-theme-id="dark" data-slug-hash="brzorG" data-default-tab="result" data-user="rcrooks1969" data-embed-version="2" data-pen-title="18186-kiosk-app" class="codepen">See the Pen <a href="https://codepen.io/team/rcrooks1969/pen/brzorG/">18186-kiosk-app</a> by Brightcove Learning Services (<a href="https://codepen.io/rcrooks1969">@rcrooks1969</a>) on <a href="https://codepen.io">CodePen</a>.</p>
@@ -141,38 +141,24 @@
             <thead class="bcls-table__head">
               <tr>
                 <th>API Methods</th>
-                <th>API Events</th>
-                <th>API Properties</th>
-                <th>Brightcove Player Plugins</th>
               </tr>
             </thead>
             <tbody class="bcls-table__body">
               <tr>
                 <td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/Player.html#event:play">play()</a></td>
-                <td><a href=""></a></td>
-                <td><a href=""></a></td>
-                <td><a href=""></a></td>
               </tr>
               <tr>
                 <td><a href="/node/18108#getVideo">catalog.getVideo()</a></td>
-                <td><a href=""></a></td>
-                <td><a href=""></a></td>
-                <td><a href=""></a></td>
               </tr>
               <tr>
                 <td><a href="/node/18108#load">catalog.load()</a></td>
-                <td><a href=""></a></td>
-                <td><a href=""></a></td>
-                <td><a href=""></a></td>
               </tr>
               <tr>
                 <td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/module-events.html#.on">on()</a></td>
-                <td><a href=""></a></td>
-                <td><a href=""></a></td>
-                <td><a href=""></a></td>
               </tr>
             </tbody>
           </table>
+          <aside class="bcls-aside bcls-aside--tip">This code sample uses the CMS API. To understand retrieving video data from this API it is vital you read and understand the <a href="/node/18132">Learning Guide: Using the REST APIs</a> document.</aside>
         </section>
 
         <!-- UPDATE player and HTML configuration -->
@@ -193,15 +179,33 @@
         <!-- UPDATE application flow -->
         <section class="bcls-section">
           <h2 id="Application_flow">Application flow</h2>
-
           <p>The basic logic behind this application is:</p>
 
           <ul>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
+            <li>Use the CMS API to get a total count of videos in the targeted account</li>
+            <li>Since it it a best practice to retrieve information on no more than 25 videos at a time (the CMS API does NOT return video objects, but information on the videos), calculate the number of calls needed from the total count.</li>
+            <li>On retrieving the information for 25 videos, extract the IDs and then use the Video Cloud catalog to retrieve the video objects.</li>
+            <li>Once all the video objects are returned, play the first video.</li>
+            <li>Whe the last video plays, start from the beginning of the list again.</li>
           </ul>
+
+          <p>More details are added in this description:</p>
+
+          <ol>
+          	<li>Prepare to make the call to the CMS API that returns the count of total videos in the account.</li>
+          	<li>Make the actual request using the CMS API for the count. This step will use a callback function, which means the callback function is passed as a parameter to another, second, function. The callback function is then called inside the second function's logic. In this case the callback function simply extracts the count property from an object returned by the CMS API.</li>
+          	<li>Determine the number of calls needed to the CMS API to retrieve all the videos. This code follows the best practice of asking for 25 videos per call. This is done by dividing the count of all the videos by 25.</li>
+          	<li>Create a <code>do-while</code> loop that iterates for the required number of calls determined in the previous step. This loop must be in the callback function of the request for the video count.</li>
+          	<li>In the loop, prepare to make the call to the CMS API that will return 25 videos from the account.</li>
+          	<li>Still in the loop, make the actual request using the CMS API for the video data. This step will use a callback function, which means the callback function is passed as a parameter to another, second, function. The callback function is then called inside the second function's logic. In this case the callback function will perform these tasks:</li>
+
+          <ul>
+          	<li>Extract data to build an array of video IDs for the returned video information.</li>
+          	<li>The array of video IDs is then passed as a parameter to another function which retrieves the complete video object for for each ID. The returned objects are stored in an array of all video objects. A callback function is used in this step also.</li>
+          	<li>Check when all videos are returned (when the number of returned videos matches the previously returned count). When the condition is met, call a function that plays the first video in the array (zeroth element).</li>
+          	<li>Setup an event listener to listen for the <code>ended</code> event. When each video ends play the next video, or if it is the last video in the array, play the first video.</li>
+          </ul>
+        </ol>
 
           <!-- UPDATE task 1 -->
           <h3>Task1 (start with verb if possible)</h3>
