@@ -139,6 +139,41 @@
       	<li>Start video playback with your specified ads.
       	<pre class="line-numbers">
             <code class="language-objectivec">if (error == nil)
+ {
+     // play it.
+     [self.playbackController setVideos: @[ video ]];
+ }
+ else
+ {
+     NSLog (@"Error! Playback Service says: %@",
+error.localizedDescription);
+ }
+            </code></pre>
+      	</li>
+      </ol>
+
+      <p>Here is the complete code block:</p>
+
+      <pre class="line-numbers">
+            <code class="language-objectivec">- (void)playVideo
+  {
+      NSDictionary *queryParameters = @{
+          @"ad_config_id" : adConfigId
+      };
+
+      if (_playbackService == nil) {
+          self.playbackService = [[BCOVPlaybackService alloc]
+              initWithAccountId:accountId
+               policyKey:policyKey];
+      }
+
+      [_playbackService findVideoWithReferenceID:videoReferenceId
+              parameters:queryParameters
+              completion:^(BCOVVideo *video,
+                   NSDictionary *jsonResponse,
+                   NSError *error)
+       {
+           if (error == nil)
            {
                // play it.
                [self.playbackController setVideos: @[ video ]];
@@ -148,43 +183,8 @@
                NSLog (@"Error! Playback Service says: %@",
   error.localizedDescription);
            }
-            </code></pre>
-      	</li>
-      </ol>
-
-      <p>Here is the complete code block:</p>
-
-      <pre class="line-numbers">
-            <code class="language-objectivec">- (void)playVideo
-            {
-                NSDictionary *queryParameters = @{
-                    @"ad_config_id" : adConfigId
-                };
-
-                if (_playbackService == nil) {
-                    self.playbackService = [[BCOVPlaybackService alloc]
-                        initWithAccountId:accountId
-                         policyKey:policyKey];
-                }
-
-                [_playbackService findVideoWithReferenceID:videoReferenceId
-                        parameters:queryParameters
-                        completion:^(BCOVVideo *video,
-                             NSDictionary *jsonResponse,
-                             NSError *error)
-                 {
-                     if (error == nil)
-                     {
-                         // play it.
-                         [self.playbackController setVideos: @[ video ]];
-                     }
-                     else
-                     {
-                         NSLog (@"Error! Playback Service says: %@",
-            error.localizedDescription);
-                     }
-                }];
-            }
+      }];
+  }
             </code></pre>
       </section>
 
