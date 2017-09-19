@@ -22,12 +22,12 @@ For more information about this sample see: https://support.brightcove.com/brigh
       <td>The browsable HTML page that contains the HTML code, and the link to the CSS and the include to the JavaScript.</td>
     </tr>
     <tr>
-      <td>plugin/pluginName.js</td>
-      <td>The JavaScript for the plugin. An example, actual filename could be <strong>liveCustomError.js</strong>.</td>
+      <td>plugin/plugin-name.js</td>
+      <td>The JavaScript for the plugin. An example, actual filename could be <strong>live-custom-error.js</strong>.</td>
     </tr>
     <tr>
-      <td>plugin/pluginName.css</td>
-      <td>The CSS for the plugin. An example, actual filename could be <strong>liveCustomError.css</strong>.</td>
+      <td>plugin/plugin-name.css</td>
+      <td>The CSS for the plugin. An example, actual filename could be <strong>live-custom-error.css</strong>.</td>
     </tr>
   </tbody>
 </table>
