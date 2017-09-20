@@ -100,15 +100,19 @@
             <aside class="bcls-aside bcls-aside--warning">This can not be a URL returned from a VMAP response.</aside>
             <ol type="a">
               <li>
-                In the Chrome browser, load a player configured with an SSAI video.
+                Open a new tab in the Chrome browser.
               </li>
               <li>
                 Open the Chrome Developer Tools.
               </li>
               <li>
-                <p>
-                  Select the <strong>Network</strong> tab. Find the request name similar to <code>content.vmap?bc_token</code>, and copy the request URL.
-                </p>
+                Select the <strong>Network</strong> tab.
+              </li>
+              <li>
+                Load a video in a Brightcove player configured with SSAI.
+              </li>
+              <li>
+                  Find the request name similar to <code>content.vmap?bc_token</code>, and copy the request URL.
                 <figure class="bcls-figure">
   <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/ssai-api/vmap-url.png" alt="VMAP URL">
   <figcaption class="bcls-caption--image">VMAP URL</figcaption>
@@ -118,23 +122,23 @@
           </li>
           <li>
             <p>
-              Initiate a trace by appending an <a href="#Authentication">X-Trace token</a> to the request URL that you copied in the previous step:
+              Append an <a href="#Authentication">X-Trace-Token (trace_token)</a> to the request URL you copied in the last step.
             </p>
             <pre class="line-numbers"><code class="language-http">?trace_token=<span class="bcls-input">{xtrace_token}</span></code></pre>
             <p>
-              In most cases, you will append the following:
+              In most cases, you will append the trace_token token as follows:
             </p>
             <pre class="line-numbers"><code class="language-http">http://ssaiplayback.prod.boltdns.net/playback/once/v1/vmap/hls/v4/clear/
   5446914905001/90672786-c40b-4216-828f-b74bd247f48b/853313fc-0287-4afc-a37b-2a1ef80b26eb/
-  content.vmap?bc_token=NTlhNmU0NjVfZDcwMzU4MDQzMGQ3NjA2NzI0MDZjOGU4ZWRiYjg1MTAxZjRlNjI5M2M0Y2YxODAzZDVkMzg3MGNlZmVkODczZg%3D%3D
-  <span class="bcls-highlight">&amp;trace_token=69263d4f-df43-4fee-9cf3-b27d3f19f936</span></code></pre>
+  content.vmap?bc_token=1234567abcdefg
+  <span class="bcls-highlight">&amp;trace_token=1234567abcdefg</span></code></pre>
           </li>
           <li>
-            Paste the request URL with the appended X-Trace token in a browser.
+            Paste the request URL with the appended trace_token in a browser to initiate a trace.
           </li>
           <li>
             <p>
-              Select the <code>session_id</code> from the <code>contentURI</code> within the VMAP response. The <code>session_id</code> is the third UUID within the <code>contentURI</code>.
+              Copy the <code>session_id</code> from the <code>contentURI</code> within the VMAP response. The <code>session_id</code> is the third UUID within the <code>contentURI</code>.
             </p>
             <pre class="line-numbers"><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;vmap:VMAP xmlns:uo=&quot;uo&quot; xmlns:vmap=&quot;http://www.iab.net/vmap-1.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; version=&quot;1.0&quot;&gt;
@@ -179,20 +183,27 @@
 
         <h4 id="Authentication">Authentication</h4>
 
-        <p>The API requests are used with No Authentication, but do require the X-Trace-Token in the header:</p>
+        <p>The API requests are used with no authentication, but do require the X-Trace-Token in the header:</p>
 
         <pre class="line-numbers">
         <code class="language-http">X-Trace-Token : <span class="bcls-input">{xtrace_token}</span></code></pre>
 
-        <p>The <code>X-Trace-Token</code> value is a static string used across all accounts. Here is the value for Read-Only and Rate limited access:</p>
+        <p>The <code>X-Trace-Token</code> value is a static string used across all of your accounts. Contact your account manager to get your token.</p>
+
+        <aside class="bcls-aside bcls-aside--information">
+          <p>
+          For internal Brightcove purposes, you can use the following: (this will be removed when this document goes public - it is for Read-Only and Rate limited access)
+        </p>
         <pre class="line-numbers"><code class="language-json">69263d4f-df43-4fee-9cf3-b27d3f19f936</code></pre>
+        </aside>
+
 
     </section>
 
     <section class="bcls-section">
       <h2 id="Retrieving_ad-call_trace_info">Retrieving ad-call trace info</h2>
       <p>
-        Retrieve ad-call trace information, including headers, made against the ad server. This GET request is used with No Authentication, but does require the X-Trace-Token in the header.
+        Retrieve ad-call trace information, including headers, made against the ad server. This GET request is used with no authentication, but does require the X-Trace-Token in the header.
       </p>
 
       <table class="bcls-table">
@@ -225,6 +236,7 @@
       		</tr> -->
         </tbody>
       </table>
+      <aside class="bcls-aside bcls-aside--information">Be sure to validate any server-side macros that they are correctly inserting values to that URL.</aside>
       <h3>Response</h3>
       <p>The response <code>body</code> consists of a base 64 encoded payload of the ad server response that would include the VAST or ad server equivalent response.</p>
       <p>
@@ -234,26 +246,6 @@
   &quot;ad_calls&quot;: [
     {
       &quot;timestamp&quot;: &quot;2017-05-27T16:31:11.040748479Z&quot;,
-      &quot;request&quot;: {
-        &quot;content_length&quot;: 0,
-        &quot;event&quot;: &quot;request&quot;,
-        &quot;headers&quot;: {
-          &quot;Referer&quot;: [
-            &quot;&quot;
-          ],
-          &quot;User-Agent&quot;: [
-            &quot;PostmanRuntime/3.0.11-hotfix.2&quot;
-          ],
-          &quot;X-Device-User-Agent&quot;: [
-            &quot;PostmanRuntime/3.0.11-hotfix.2&quot;
-          ],
-          &quot;X-Forwarded-For&quot;: [
-            &quot;70.166.121.212, 34.207.165.93&quot;
-          ]
-        },
-        &quot;method&quot;: &quot;GET&quot;,
-        &quot;url&quot;: &quot;https://8sgl4oo6of.execute-api.us-west-2.amazonaws.com/qa/ads/dfp-ad-rules?sz=640x480&amp;ciu_szs=728x90&amp;impl=s&amp;gdfp_req=1&amp;env=vp&amp;output=xml_vast3&amp;unviewed_position_start=1&amp;url=&amp;description_url=&amp;correlator=5497028088504884149&amp;vid=&amp;xfp_ip=&amp;ss_req=&amp;ip=70.166.121.212&amp;scor=6173901243174914049&amp;ppid=&quot;
-      },
       &quot;response&quot;: {
         &quot;content_length&quot;: 576,
         &quot;event&quot;: &quot;response&quot;,
@@ -324,7 +316,7 @@
       <section class="bcls-section">
         <h2 id="Retrieving_beacon_trace_info">Retrieving beacon trace info</h2>
         <p>
-          Retrieve beacon trace information, including headers, made against the ad server. This GET request is used with No Authentication, but does require the X-Trace-Token in the header.
+          Retrieve beacon trace information, including headers, made against the ad server. This GET request is used with no authentication, but does require the X-Trace-Token in the header.
         </p>
 
         <table class="bcls-table">
@@ -357,6 +349,7 @@
             </tr> -->
           </tbody>
         </table>
+        <aside class="bcls-aside bcls-aside--information">Be sure to validate any server-side macros that they are correctly inserting values to that URL.</aside>
         <h3>Response</h3>
         <p>The response <code>body</code> consists of a base 64 encoded payload of the ad server response that would include the VAST or ad server equivalent response.</p>
         <p>
@@ -369,26 +362,6 @@
   &quot;beacons&quot;: [
     {
       &quot;timestamp&quot;: &quot;2017-05-27T16:31:45.321117406Z&quot;,
-      &quot;request&quot;: {
-        &quot;content_length&quot;: 0,
-        &quot;event&quot;: &quot;request&quot;,
-        &quot;headers&quot;: {
-          &quot;Referer&quot;: [
-            &quot;https://ssaiplayback.us-east-1.qa.boltdns.net/playback/once/v1/hls/v4/clear/cwelsh/c4008ca8-cc0f-40a2-bfe9-c732e079f07b/36ed81a5-f5b7-4977-a1a0-2ab19ccab44a/6751a4db-9b62-44bb-81aa-4d392fa08b65/content.m3u8?bc_token=NTkyNDgxOGNfNjQxYjNlNjhjZDBlZTQyYWFhY2I3MDAxY2VhOGE4OGU5MTBiZWY4NTAzYzlkNDE4NGZhMDgzYTExZTg5N2M3Yg%3D%3D&quot;
-          ],
-          &quot;User-Agent&quot;: [
-            &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/602.4.8 (KHTML, like Gecko) Version/10.0.3 Safari/602.4.8&quot;
-          ],
-          &quot;X-Device-User-Agent&quot;: [
-            &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/602.4.8 (KHTML, like Gecko) Version/10.0.3 Safari/602.4.8&quot;
-          ],
-          &quot;X-Forwarded-For&quot;: [
-            &quot;70.166.121.212,52.91.157.80&quot;
-          ]
-        },
-        &quot;method&quot;: &quot;GET&quot;,
-        &quot;url&quot;: &quot;https://8sgl4oo6of.execute-api.us-west-2.amazonaws.com/qa/ads/impression?event=impression_unknown&amp;request_id=20590825&amp;ad_id=mila&quot;
-      },
       &quot;response&quot;: {
         &quot;content_length&quot;: 15,
         &quot;event&quot;: &quot;response&quot;,
