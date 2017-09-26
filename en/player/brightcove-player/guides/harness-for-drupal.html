@@ -58,197 +58,333 @@
 
 
       <article class="bcls-article">
-        <section class="bcls-section">
-          <h2 id="Player_example">Player example</h2>
+    <section class="bcls-section">
+    <h2 id="What_is_the_Plugin_Registry">What is the Plugin Registry?</h2>
 
-          <!-- UPDATE description -->
-          <p>When you start this video playing you will see in the right hand side of the controlbar a label and number for the number of times this video has been viewed. There may be a slight delay before the views information displays as the Analytics API is asynchronously queried for the data.</p>
+    <p>The Plugin Registry is a section of the Player Management API devoted to storing information about Brightcove plugins. The registry serves as a reference for all versions of each stored plugin, as well as the scripts and stylesheets associated with each. Player configuration leverages the Plugin Registry, displaying the current plugin version, and also allowing you to specify a plugin version.</p>
 
-          <!-- UPDATE codepen here -->
-          <p data-height="432" data-theme-id="dark" data-slug-hash="dVoaOe" data-default-tab="result" data-user="rcrooks1969" data-embed-version="2" data-pen-title="18170-display-views-controlbar" class="codepen">See the Pen <a href="https://codepen.io/team/rcrooks1969/pen/dVoaOe/">18170-display-views-controlbar</a> by Brightcove Learning Services (<a href="https://codepen.io/rcrooks1969">@rcrooks1969</a>) on <a href="https://codepen.io">CodePen</a>.</p>
-          <script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script>
+    <aside class="bcls-aside bcls-aside--information">The Plugin Registry is implemented in version 2 of the Player Management API.</aside>
+    </section>
 
-          <!-- UPDATE link to GitHub source -->
-          <p>View the <a href="https://github.com/BrightcoveLearning/18170-display-views-controlbar">source code</a>.</p>
-        </section>
+    <section class="bcls-section">
+    <h2 id="Advantages">Advantages</h2>
 
-        <section class="bcls-section">
-          <h2 id="Using_the_CodePen" class="bcls-expander-head">Using the CodePen</h2>
+    <p>The advantages of the Plugin Registry for Brightcove Player users are three fold:</p>
 
-          <div class="bcls-expander-content">
-            <p>Here are some tips to effectively use the above CodePen:</p>
+    <ul>
+    	<li>You can see exactly what version of plugin is being used with your player, as well as the specific JavaScript and CSS files associated with that specific plugin version.</li>
+    	<li>You can configure plugins to be automatically updated when new versions are released that are compatible with your player version.</li>
+    	<li>If for some reason you choose to keep a player on a specific player version, you can configure plugins to remain on specific versions for that player. You do not have to worry about a plugin being upgraded to a version that is not compatible with your player version.</li>
+    </ul>
+    </section>
 
-            <ul>
-              <li>Toggle the actual display of the player by clicking the <strong>Result</strong> button.</li>
-              <li>Click the <strong>HTML/CSS/JS</strong> buttons to display ONE of the code types.</li>
-              <li>Later in this document the logic, flow and styling used in the application will be discussed in the <a href="#Player/HTML_configuration">Player/HTML configuration</a>, <a href="#Applicaton_flow">Application flow</a> and <a href="#Application_styling">Application styling</a> sections. The best way to follow along with the information in those sections is to:
-                <ol>
-                  <li>Click the <strong>EDIT ON CODEPEN</strong> button in the CodePen and have the code available in one browser/browser tab.</li>
-                  <li>In CodePen, adjust what code you want displayed. You can change the width of different code sections within CodePen.</li>
-                  <li>View the <a href="#Player/HTML_configuration">Player/HTML configuration</a>, <a href="#Applicaton_flow">Application flow</a> and/or <a href="#Application_styling">Application styling</a> sections in another browser/browser tab. You will now
-                    be able to follow the code explanations and at the same time view the code.</li>
-                </ol>
-              </li>
-            </ul>
-          </div>
-        </section>
+    <section class="bcls-section">
+    <h2 id="Current_eligible_plugins">Current eligible plugins</h2>
 
-        <section class="bcls-section">
-          <h2 id="developmentsequence" class="bcls-expander-head">Development sequence</h2>
+    <p>The following table shows the Brightcove supplied plugins that work with the Plugin Registry. The <strong>Plugin Registry ID</strong> will be used with player configuration in conjunction with the Player Management API. Numerous examples will be shown in this document.</p>
 
-          <div class="bcls-expander-content">
-            <p>Here is the recommended development sequence:</p>
+    <table class="bcls-table">
+    	<thead class="bcls-table__head">
+    		<tr>
+    			<th>Plugin Name</th>
+    			<th>Plugin Registry ID</th>
+    		</tr>
+    	</thead>
+    	<tbody class="bcls-table__body">
+    		<tr>
+    			<td>Custom Endscreen</td>
+    			<td>@brightcove/videojs-custom-endscreen</td>
+    		</tr>
+    		<tr>
+    			<td>IMA3 Advertising</td>
+    			<td>@brightcove/videojs-ima3</td>
+    		</tr>
+    		<tr>
+    			<td>Quality Selection</td>
+    			<td>@brightcove/videojs-quality-menu</td>
+    		</tr>
+    		<tr>
+    			<td>Overlay</td>
+    			<td>@brightcove/videojs-overlay</td>
+    		</tr>
+    		<tr>
+    			<td>Playlist UI</td>
+    			<td>@brightcove/videojs-bc-playlist-ui</td>
+    		</tr>
+    		<tr>
+    			<td>Social</td>
+    			<td>@brightcove/videojs-social</td>
+    		</tr>
+    	</tbody>
+    </table>
+    </section>
 
-            <ol>
-              <li>Use the In-Page embed player implementation to test the functionality of your player, plugin and CSS (if CSS is needed)</li>
-              <li>Put the plugin's JavaScript and CSS into separate files for local testing</li>
-              <li>Deploy the plugin code and CSS to your server once you have worked out any errors</li>
-              <li>Use Studio to add the plugin and CSS to your player</li>
-              <li>Replace the In-Page embed player implementation if you determine that the iframe implementation is a better fit (detailed in next section)</li>
-            </ol>
+    <section class="bcls-section">
+    <h2 id="Specify_use_of_a_plugin">Specify use of a plugin</h2>
 
-            <p>For details about these steps, review the <a href="/node/18081">Quick Start: Plugin Development</a> guide.</p>
+    <p>To specify the use of a plugin, in your player creation you simply supply the registry ID for the desired plugin. You must specify a specific version number, or specify the plugin to auto update, as detailed in a <a href="#Specify_auto_update"> later section</a> of this doc.</p>
 
-            <h3>iframe or In-Page embed</h3>
+    <pre class="line-numbers">
+    <code class="language-bash">curl \
+      --header "Content-Type: application/json" \
+      --user $EMAIL \
+      --request POST \
+      --data '{
+          "name": "Video Cloud CURL 10 March",
+          "configuration": {
+            "video_cloud": {
+              "video": "4093372393001"
+            },
+            <span class="bcls-highlight">"plugins": [
+              {
+                "registry_id": "@brightcove/videojs-overlay",
+                "version": "auto"
+              }
+            ]</span>
+          }
+      }' \
+      https://players.api.brightcove.com/v2/accounts/$ACCOUNT_ID/players</code></pre>
 
-            <p>When developing enhancements for the Brightcove player you will need to decide if the code is a best fit for the iframe or In-Page embed implementation. The best practice recommendation is to build a plugin for use with an iframe implementation.
-              The advantages of using the iframe player are:</p>
+    <p>Information on the created player is returned by the Player Management API. You can use the <strong>url</strong> value returned, change the <strong>index.html</strong> to <strong>config.json</strong> and browse that URL to see the configuration of the published player.</p>
 
-            <ul>
-              <li>No collisions with existing JavaScript and/or CSS</li>
-              <li>Automatically responsive</li>
-              <li>The iframe eases use in social media apps (or whenever the video will need to "travel" into other apps)</li>
-            </ul>
+    <pre class="line-numbers">
+    <code class="language-json">{
+      "id": "rkGD9W22Ob",
+      "url": "<span class="bcls-highlight">http://players.brightcove.net/1507807800001/rkGD9W22Ob_default/index.html</span>",
+      "embed_code": "&lt;iframe src='//players.brightcove.net/1507807800001/rkGD9W22Ob_default/index.html' allowfullscreen webkitallowfullscreen mozallowfullscreen&gt;&lt;/iframe&gt;",
+      "embed_in_page": "http://players.brightcove.net/1507807800001/rkGD9W22Ob_default/in_page.embed",
+      "preview_url": "http://preview-players.brightcove.net/v2/accounts/1507807800001/players/rkGD9W22Ob/preview/embeds/default/master/index.html",
+      "preview_embed_code": "&lt;iframe src='//preview-players.brightcove.net/v2/accounts/1507807800001/players/rkGD9W22Ob/preview/embeds/default/master/index.html' allowfullscreen webkitallowfullscreen mozallowfullscreen&gt;&lt;/iframe&gt;"
+    }</code></pre>
 
-            <p>Although integrating the In-Page embed player can be more complex, there are times when you will plan your code around that implementation. To generalize, this approach is best when the containing page needs to communicate to the player. Specifically,
-              here are some examples:</p>
+    <p>In the configuration of the published player you see the information on the plugin. Note that specific version of the plugin are displayed, along with the corresponding values for the JavaScript and CSS files.</p>
 
-            <ul>
-              <li>Code in the containing page needs to listen for and act on player events</li>
-              <li>The player uses styles from the containing page</li>
-              <li>The iframe will cause app logic to fail, like a redirect from the containing page</li>
-            </ul>
+    <pre class="line-numbers">
+    <code class="language-json">{
+  "account_id": "1507807800001",
+  "compatibility": true,
+  "embed_id": "default",
+  "player": {
+    "template": {
+      "name": "single-video-template",
+      "version": "6.7.0"
+    }
+  },
+  "player_id": "Hy6Gv0Uib",
+  "player_name": "Video Cloud CURL 10 March",
+  <span class="bcls-highlight">"plugins": [{
+    "injected_version": "1.1.4",
+    "name": "overlay",
+    "registry_id": "@brightcove/videojs-overlay",
+    "version": "auto"
+  }],
+  "scripts": [
+    "//players.brightcove.net/videojs-overlay/1.1.4/videojs-overlay.min.js"
+  ],
+  "stylesheets": [
+    "//players.brightcove.net/videojs-overlay/1.1.4/videojs-overlay.css"
+  ],</span>
+  "updated_at": "2017-09-25T19:20:52.850Z",
+  "video_cloud": {
+    "policy_key": "BCpkADawqM37pCnESsTeQFwX4yCBf0lh5fRYb49NVUdD_TaWoC1AKee7wOdKXi0hqfxLU8ptm1rpT-HT4riy4dXCkPVzMMT1J2QoznegHpu1k9clbuNHvOdOypJ1FG1yKLEIuKLML6WwER3p",
+    "video": "4093372393001"
+  }
+}</code></pre>
 
-            <p>Even if your final implementation does not use the iframe code, you can still use the In-Page embed code with a plugin for your JavaScript and a separate file for your CSS. This encapsulates your logic so that you can easily use it in multiple players.</p>
-          </div>
-          <!-- id="expanderContent" -->
-        </section>
+    <aside class="bcls-aside bcls-aside--information">Depending on the template version your player is using, the scripts and stylesheets that get injected may either appear at the top level of the player configuration or nested in the <strong>plugins</strong> object.</aside>
+    </section>
 
-        <section class="bcls-section">
-          <h2 id="API/Plugin_resources_used">API/Plugin resources used</h2>
+    <section class="bcls-section">
+    <h2 id="Specify_auto_update">Specify auto update</h2>
 
-          <!-- UPDATE table, remove unneeded columns -->
-          <table class="bcls-table">
-            <thead class="bcls-table__head">
-              <tr>
-                <th>API Methods</th>
-                <th>API Events</th>
-                <th>API Properties</th>
-              </tr>
-            </thead>
-            <tbody class="bcls-table__body">
-              <tr>
-                <td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/module-events.html#.on">on()</a></td>
-                <td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/Player.html#event:loadstart">loadstart</a></td>
-                <td><a href="/node/18085">mediainfo</a></td>
-              </tr>
-            </tbody>
-          </table>
-          <aside class="bcls-aside bcls-aside--tip">This code sample uses Brightcove's REST based Analytics API. To understand working with this API it is vital you read and understand the <a href="/node/18132">Learning Guide: Using the REST APIs</a> document.</aside>
-        </section>
+    <p>If you wish the plugin to be updated whenever a version is released that is compatible with your player version, you need to specify that. To do this, you add <code>"version": "auto"</code> to your player configuration information in the curl statement.</p>
 
-        <!-- UPDATE player and HTML configuration -->
-        <section class="bcls-section">
-          <h2 id="Player/HTML_configuration">Player/HTML configuration</h2>
+    <aside class="bcls-aside bcls-aside--tip">If you have locked your player version, as described in the <a href="/node/16130">Setting the Player Update Mode and Version</a> document, the plugins associated with that player will also be version locked.</aside>
 
-          <p>This section details any special configuration needed during player creation. In addition, other HTML elements that must be added to the page, beyond the in-page embed player implementation code, are described.</p>
+    <pre class="line-numbers">
+    <code class="language-bash">curl \
+      --header "Content-Type: application/json" \
+      --user $EMAIL \
+      --request POST \
+      --data '{
+          "name": "Video Cloud CURL 10 March",
+          "configuration": {
+            "video_cloud": {
+              "video": "4093372393001"
+            },
+            "plugins": [
+              {
+                "registry_id": "@brightcove/videojs-overlay",
+                <span class="bcls-highlight">"version": "auto"</span>
+              }
+            ]
+          }
+      }' \
+      https://players.api.brightcove.com/v2/accounts/$ACCOUNT_ID/players</code></pre>
 
-          <h3>Player configuration</h3>
+    <p>The resulting player configuration appears as follows:</p>
 
-          <p>No special configuration is required for the Brightcove Player you create for this sample.</p>
+    <pre class="line-numbers">
+    <code class="language-json">"plugins": [{
+      "injected_version": "1.1.4",
+      "name": "overlay",
+      "registry_id": "@brightcove/videojs-overlay",
+      <span class="bcls-highlight">"version": "auto"</span>
+    }],
+    "scripts": [
+      "//players.brightcove.net/videojs-overlay/1.1.4/videojs-overlay.min.js"
+    ],
+    "stylesheets": [
+      "//players.brightcove.net/videojs-overlay/1.1.4/videojs-overlay.css"
+    ],</code></pre>
 
-          <h3>Other HTML</h3>
+    <aside class="bcls-aside bcls-aside--tip">In the section above, you created a player using only the <code>registry_id</code>. If you do not specify a specific version for the plugin, the plugin will be treated as if <code>"version": "auto"</code> was used. For a plugin to remain at a specific version you must specify the version, as shown in the next section of this document.</aside>
+    </section>
 
-          <p>No other HTML elements are added to the page.</p>
-        </section>
+    <section class="bcls-section">
+    <h2 id="Specify_specific_version">Specify specific version</h2>
 
-        <!-- UPDATE application flow -->
-        <section class="bcls-section">
-          <h2 id="Application_flow">Application flow</h2>
+    <p>You can specify a specific version of the plugin to use. If you do this the plugin will NOT be automatically updated under any circumstances, so you will have to manually update if needed.</p>
 
-          <p>The basic logic behind this application is:</p>
+    <aside class="bcls-aside bcls-aside--tip">If you have locked your player version, as described in the <a href="/node/16130">Setting the Player Update Mode and Version</a> document, the plugins associated with that player will also be version locked.</aside>
 
-          <ul>
-            <li>Creates and populates an <code>options</code> object that is passed to the <code>makeRequest()</code> function that calls the Analytics API.</li>
-          	<li>Uses properties of the <code>mediainfo</code> object to dynamically build the proper endpoint needed by the Analytics API. Note that the <code>loadstart</code> event must be dispatched before <code>mediainfo</code> is populated.</li>
-          	<li>Calls the <code>makeRequest()</code> function, with a callback function that extracts the actual views value.</li>
-          	<li>Performs a request to the Analytics API. When the data is returned it is passed to the callback function.</li>
-          	<li>Calls the <code>placeCountInControlbar()</code> function at the end of the callback function. This function places the views data in the control bar.</li>
-          </ul>
+    <p>To lock a version of the plugin simply specify the version when creating the player:</p>
 
-          <!-- UPDATE task 1 -->
-          <h3>Build the URL for the Analytics API request</h3>
-          <p>Find the code which is labeled:</p>
-          <pre><code class="language-javascript">// ### Setup for video views Analytics API request ###</code></pre>
-          <p>Use information from the <code>mediainfo</code> object to build the proper endpoint.</p>
+    <pre class="line-numbers">
+    <code class="language-bash">curl \
+      --header "Content-Type: application/json" \
+      --user $EMAIL \
+      --request POST \
+      --data '{
+          "name": "Video Cloud CURL 10 March",
+          "configuration": {
+            "video_cloud": {
+              "video": "4093372393001"
+            },
+            "plugins": [
+              {
+                "registry_id": "@brightcove/videojs-overlay",
+                <span class="bcls-highlight">"version": "1.0.2"</span>
+              }
+            ]
+          }
+      }' \
+      https://players.api.brightcove.com/v2/accounts/$ACCOUNT_ID/players</code></pre>
 
-          <!-- UPDATE task 2 -->
-          <h3>Request the views data from the Analytics API</h3>
-          <p>Find the code which is labeled:</p>
-          <pre><code class="language-javascript">// ### Make the request to the Analytics API ###</code></pre>
-          <p>They key point here is that the anonymous function is the callback function used where the actual request to the Analytics API is used. At the end of this function the returned value of video views is passed to the <code>placeCountInControlbar</code> method for display in the controlbar.</p>
+    <p>The player configuration will reflect the specific version, as well as in the JavaScript and CSS files:</p>
 
-          <!-- UPDATE task 3 -->
-          <h3>Place count in controlbar</h3>
-          <p>Find the code which is labeled:</p>
-          <pre><code class="language-javascript">// ### Build and place count in controlbar ###</code></pre>
-          <p>Here an HTML <code>div</code> element is created and populated with the view inforamtion. Lastly, that <code>div</code> is placed in the controlbar's <code>spacer</code> element.</p>
+    <pre class="line-numbers">
+    <code class="language-json">"plugins": [{
+      "name": "overlay",
+      "registry_id": "@brightcove/videojs-overlay",
+      <span class="bcls-highlight">"version": "1.0.2"</span>
+    }],
+    "scripts": [
+      <span class="bcls-highlight">"//players.brightcove.net/videojs-overlay/1.0.2/videojs-overlay.min.js"</span>
+    ],
+    "stylesheets": [
+      <span class="bcls-highlight">"//players.brightcove.net/videojs-overlay/1.0.2/videojs-overlay.css"</span>
+    ],</code></pre>
+    </section>
 
-          <!-- UPDATE task 3 -->
-          <h3>Make call to Analytics API</h3>
-          <p>Find the code which is labeled:</p>
-          <pre><code class="language-javascript">// ### Standard functionality for Analytics API call ###</code></pre>
-          <p>This mostly standard code that make calls to Brightcove's REST APIs. See the <a href="/node/18132">Learning Guide: Using the REST APIs</a> document for details.</p>
-        </section>
+    <section class="bcls-section">
+    <h2 id="Studio_configured_plugin">Studio configured plugin</h2>
 
-        <!-- UPDATE CSS description -->
-        <section class="bcls-section">
-          <h2 id="Application_styling">Application styling</h2>
-          <p>No CSS is needed for this code sample.</p>
-        </section>
+    <p>If a plugin is loaded via Studio, the plugin will reflect new functionality in the Plugin Registry:</p>
 
-        <section class="bcls-section">
-          <h2 id="Plugin_code">Plugin code</h2>
+    <pre class="line-numbers">
+    <code class="language-json">{
+      "account_id": "1507807800001",
+      "compatibility": true,
+      "embed_id": "default",
+      "player": {
+        "template": {
+          "name": "single-video-template",
+          "version": "6.5.0"
+        }
+      },
+      "player_id": "BkYmd2hOZ",
+      "player_name": "Test Player",
+      <span class="bcls-highlight">"plugins": [{
+        "injected_version": "2.0.10",
+        "name": "customEndscreen",
+        "options": {
+          "content": "&lt;h3&gt;This is the endscreen content&lt;/h3&gt;"
+        },
+        "registry_id": "@brightcove/videojs-custom-endscreen",
+        "version": "auto"
+      }],
+      "scripts": [
+        "//players.brightcove.net/videojs-custom-endscreen/2.0.10/videojs-custom-endscreen.min.js"
+      ],
+      "stylesheets": [
+        "//players.brightcove.net/videojs-custom-endscreen/2.0.10/videojs-custom-endscreen.css"
+      ]</span>,
+      "updated_at": "2017-08-24T20:34:18.812Z",
+      "video_cloud": {
+        "policy_key": "BCpkADawqM0IlrueZk1TUBqxtkT6u3okUlVcA-RntmaEzPXHQpacpxtZnZK04WR1TVFLLqAWX6zps86N2swYK25NKL_g5GjQn3vXZ3SaWDAialkNsXzfGw-_CFhYpoaldoStK_1ez4aEr33G",
+        "video": null
+      }
+    }</code></pre>
 
-          <p>Normally when converting the JavaScript into a Brightcove Player plugin nominal changes are needed. One required change is to replace the standard use of the <code>ready()</code> method with the code that defines a plugin.</p>
-
-          <p>Here is the very commonly used start to JavaScript code that will work with the player:</p>
-
-          <pre class="line-numbers">
-                  <code class="language-javascript">videojs('myPlayerID').ready(function(){
-                    var myPlayer = this;
-                    ...
-                  });</code></pre>
-
-          <p>You will change the first line to use the standard syntax to start a Brightcove Player plugin:</p>
-
-          <pre class="line-numbers">
-                  <code class="language-javascript">videojs.registerPlugin('pluginName', function(options) {
-                    var myPlayer = this;
-                    ...
-                  });</code></pre>
-
-          <!-- UPDATE path to plugin's JavaScript -->
-          <p>As mentioned earlier, you can see the plugin's JavaScript code in this document's corresponding GitHub repo: <a href="https://github.com/BrightcoveLearning/18170-display-views-controlbar/blob/master/plugin/views-in-controlbar.js">views-in-controlbar.js</a>.</p>
-
-          <h3>Using the plugin with a player</h3>
-
-          <p>Once you have the plugin's CSS and JavaScript files stored in an Internet accessible location, you can use the plugin with a player. In Studio's <strong>PLAYERS</strong> module you can choose a player, then in the <strong>PLUGINS</strong> section
-            add the URLs to the CSS and JavaScript files, and also add the <strong>Name</strong> and <strong>Options</strong>, if options are needed.</p>
-
-          <aside class="bcls-aside bcls-aside--tip">For more information on using Studio to assign plugins to players see the <a href="14053">Configuring Player Plugins</a> document.</aside>
-        </section>
-      </article>
+    <p>As you can see in the player configuration, a plugin loaded in Studio will be updated as new versions compatible with the player version are released (auto update).</p>
+    </section>
+    <section class="bcls-section">
+      <h2 id="Plugin_registry_API">Plugin registry API</h2>
+      <p>Two new endpoints have been added to the Player Management API that enable retrieval of plugin information from the registry, which provide functionality for you to:</p>
+      <ul>
+        <li>Retrieve all plugins in the registry.</li>
+        <li>Retrieve information on a specific plugin.</li>
+      </ul>
+      <h3>Get all plugins</h3>
+      <p>Use the following to retrieve information about the plugins currently in the registry.</p>
+      <pre class="line-numbers"><code class="language-bash">curl \
+  --header "Content-Type: application/json" \
+  --user $EMAIL \
+  --request GET \
+  https://players.api.brightcove.com/v2/plugins</code></pre>
+      <p>The returned information will appear as follows:</p>
+      <pre class="line-numbers"><code class="language-json">[{
+  "documentation": "https://support.brightcove.com/playlist-ui-plugin",
+  "description": "Brightcove customizations to videojs-playlist-ui",
+  "id": "@brightcove/videojs-bc-playlist-ui",
+  "name": "bcPlaylistUi",
+  "current_version": "2.x"
+}, {
+  "documentation": "https://support.brightcove.com/custom-endscreen-plugin",
+  "description": "Custom endscreens for video.js.",
+  "id": "@brightcove/videojs-custom-endscreen",
+  "name": "customEndscreen",
+  "current_version": "2.x"
+}, {
+  "documentation": "https://support.brightcove.com/advertising-ima3-plugin",
+  "description": "Google Interactive Media Ads (IMA) v3 support for video.js",
+  "id": "@brightcove/videojs-ima3",
+  "name": "ima3",
+  "current_version": "2.x"
+}, {
+  "documentation": "https://support.brightcove.com/display-overlay-plugin",
+  "description": "Overlay for video.js.",
+  "id": "@brightcove/videojs-overlay",
+  "name": "overlay",
+  "current_version": "1.x"
+}, {
+  "documentation": "https://support.brightcove.com/manual-rendition-selection-plugin",
+  "description": "Quality Selection Menu UI",
+  "id": "@brightcove/videojs-quality-menu",
+  "name": "qualityMenu",
+  "current_version": "1.x"
+}, {
+  "documentation": "https://support.brightcove.com/social-media-plugin",
+  "description": "Social sharing integrations for video.js.",
+  "id": "@brightcove/videojs-social",
+  "name": "social",
+  "current_version": "3.x"
+}]</code></pre>
+      <h3>Get specific plugin information</h3>
+      <p></p>
+    </section>
+    </article>
 
 
 
