@@ -137,6 +137,120 @@ player.src({
 });</code></pre>
 </section>
 
+<section class="bcls-section">
+<h2 id="Options">Options</h2>
+
+<ul>
+	<li><code>debug</code>
+	<ul>
+		<li>If true, sets up debug messages in contrib-ads and logs extra information in the presence of videojs-bc-analytics-logger.</li>
+	</ul>
+	</li>
+  <li><code>hideOverlays</code>
+	<ul>
+		<li>If true, the countdown timer and "Learn More" click through overlays will not be shown while ads are playing.</li>
+	</ul>
+  </li>
+  <li><code>trackingBeacons</code>
+	<ul>
+		<li>If false, the tracking beacons parsed from the VMAP for ad view, impression, quartiles, etc. will not be sent.</li>
+	</ul>
+  </li>
+  <li><code>timeout</code>
+	<ul>
+		<li>The number of milliseconds after which an XHR to fetch a VMAP will time out.</li>
+	</ul>
+  </li>
+  <li><code>vmapXML</code>
+	<ul>
+		<li>Used to provide an initial VMAP XML document, which will be loaded into the player. See: Setting an SSAI Source.</li>
+	</ul>
+  </li>
+  <li><code>vmapURL</code>
+	<ul>
+		<li>Used to provide an initial URL to a VMAP, which will be fetched and loaded into the player. See: Setting from a URL.</li>
+	</ul>
+  </li>
+</ul>
+
+</section>
+
+<section class="bcls-section">
+<h2 id="Setting_an_SSAI_source">Setting an SSAI source</h2>
+
+<p>To set the SSAI source, you will use the <code>player.src()</code> method as follows:</p>
+<pre class="line-numbers"><code class="language-javascript">
+player.src({
+  type: 'video/vnd.bcov.ssai',
+  src: vmapXML
+});</code></pre>
+<p>
+  where:
+</p>
+<ul>
+  <li>
+    The <code>src</code> value should be an XMLDocument containing a VMAP element (i.e. a valid VMAP).
+  </li>
+  <li><p>
+    The <code>type</code> value should always be <code>video/vnd.bcov.ssai</code>. This value is available as a constant:
+  </p>
+    <pre class="line-numbers"><code class="language-javascript">
+    videojs.getPlugin('ssai').MIME_TYPE</code></pre>
+  </li>
+</ul>
+
+<h3>Setting from a URL</h3>
+<p>
+  The SSAI plugin also supports setting a source from a URL to a VMAP, like this:
+</p>
+<pre class="line-numbers"><code class="language-javascript">
+  player.src({
+    type: 'video/vnd.bcov.ssai',
+    src: 'https://path/to/vmap.xml'
+  });</code></pre>
+  <p>
+    The plugin will attempt to fetch a VMAP from the given URL via XMLHttpRequest and re-set the source using the resulting responseXML data.
+  </p>
+
+  <h3>Using the catalog</h3>
+  <p>
+    The <a href="/node/18108">player catalog</a> works with SSAI as follows. Notice that it makes two requests:
+  </p>
+  <ul>
+    <li>
+      Request video data from the player catalog. This will include a VMAP URL.
+    </li>
+    <li>
+      The player source is set with the VMAP URL, triggering a request for a VMAP document from Dynamic Delivery.
+    </li>
+    <li>
+      The player source is set again with a valid VMAP XML document.
+    </li>
+  </ul>
+</section>
+
+<section class="bcls-section">
+<h2 id="Absolute_Time_vs_Content_Time">Absolute Time vs Content Time</h2>
+
+<p><i>Absolute time</i> refers to any given point in the total timeline of an SSAI stream. For example, a <strong>2:00</strong> video with a <strong>0:30</strong> pre-roll ad has a total absolute time of <strong>2:30</strong>. The absolute time of <strong>0:15</strong> is in the pre-roll and the absolute time of <strong>0:31</strong> is the first second of content.</p>
+<p>
+  <i>Content time</i> refers to the time relative to the current block of media - either content or ad. Expanding on the above, during the pre-roll, the content time <strong>0:15</strong> is synonymous with the absolute time of <strong>0:15</strong>, but the absolute time <strong>0:31</strong> would equate to a content time of <strong>0:01</strong>.
+</p>
+<p>
+  Generally, content time is what you see in the player UI and much of the job of this plugin and associated middleware is translating from absolute time to content time.
+</p>
+
+</section>
+
+<section class="bcls-section">
+<h2 id="Seeking_and_Ads">Seeking and Ads</h2>
+
+<p>One of the primary roles of this plugin is to enforce certain behaviors around seeking and ads.</p>
+
+</section>
+
+
+
 <!-- <section class="bcls-section">
 <h2 id="player">The player</h2>
 
@@ -333,57 +447,6 @@ player.src({
 </div>
 </section> -->
 
-<section class="bcls-section">
-<h2 id="Usage">Usage</h2>
-
-<p>The SSAI plugin differentiates between being initialized and being enabled.</p>
-<p>
-  Users and integrators will initialize the plugin, but the internal middleware will manage its enabled/disabled state, depending on whether or not an SSAI source is being played.
-</p>
-
-<ul>
-	<li><code>player.onceux.absoluteTimeAt(timeInSeconds)</code>
-
-	<ul>
-		<li>A function that takes the content time and returns the absolute time in the entire stream, including ads.</li>
-		<li>Parameters: A Number for the content time in seconds.</li>
-		<li>Returns: <code>Number</code></li>
-		<li>Example: You can use the following code to seek 5 seconds into the video content.
-		<pre class="line-numbers">
-      <code class="language-javascript">myPlayer.currentTime(myPlayer.onceux.absoluteTimeAt(5)))</code></pre>
-		</li>
-	</ul>
-	</li>
-	<li><code>player.onceux.currentTime()</code>
-	<ul>
-		<li>A function that returns the current time within the playing ad or content.</li>
-		<li>Parameters: none</li>
-		<li>Returns: <code>Number</code></li>
-	</ul>
-	</li>
-	<li><code>player.onceux.duration()</code>
-	<ul>
-		<li>A function that returns the current duration of the playing ad or content.</li>
-		<li>Parameters: none</li>
-		<li>Returns: <code>Number</code></li>
-	</ul>
-	</li>
-	<li><code>player.onceux.timeline.pathAtAbsoluteTime(timeInSeconds)</code>
-	<ul>
-		<li>A function which takes a Number and provides a "path" into the timeline at any given point between <code>0</code> and the <code>absoluteDuration</code> of the stream.</li>
-		<li>Parameters: A Number for the absolute time in seconds to provide a "path" for.</li>
-		<li>Returns: A JSON object for the <code>path</code> representing the timeline. For details, see the <a href="#pathproperties">path object properties</a>.</li>
-	</ul>
-	</li>
-	<li><code>player.onceux.seekAds(timeInSeconds)</code>
-	<ul>
-		<li>A function that takes a time (in seconds) to seek to without the default seek handling behavior enforcing that ads are not skipped.</li>
-		<li>Parameters: A Number for the absolute time in seconds to seek to.</li>
-		<li>Returns: None</li>
-	</ul>
-	</li>
-</ul>
-</section>
 
 <section id="methods" class="bcls-section">
 <h2>Methods</h2>
