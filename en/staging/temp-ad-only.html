@@ -50,13 +50,27 @@
 	    <!-- BEGIN DRUPAL CONTENT -->
 
       <article class="bcls-article">
+        <section class="bcls-section">
+            <h2 id="Overview">Overview</h2>
+            <aside class="bcls-aside bcls-aside--information"><p>Currently, to use the ad only plugin you need to set and then lock your player on version 5.8.1. This needs to be done using the Player Management API.</p>
+
+<p>The ad only plugin also has a compatibility issue with the IMA3 plugin. If you wish to use the ad only plugin with IMA3 you need to be using version 2.11.0 of the IMA plugin. The JavaScript and CSS files for this plugins are located here:</p>
+
+<ul><li>//players.brightcove.net/videojs-ima3/2.11.0/videojs.ima3.min.js</li>
+	<li>//players.brightcove.net/videojs-ima3/2.11.0/videojs.ima3.min.css</li>
+</ul><p>The plugin can be added to the player in normal plugin adding ways using Studio (<a href="/node/18093#Adding_plugins_in_Studio">Brightcove Player Plugins</a>).</p>
+
+<aside class="bcls-aside bcls-aside--warning">In Studio, you must add the IMA3 plugin manually, not using the <strong>ADVERTISING</strong> section. If you use the <strong>ADVERTISING</strong> section to add the IMA3 plugin, you will not be using a compatible version of the IMA3 plugin, as just mentioned. The steps below detail how to manually add the correct version of the IMA3 plugin.</aside>
+<p>You can also use the Player Management API (<a href="/node/18269">Player Management API Overview</a>).</p>
+</aside>
+        </section>
 
         <section class="bcls-section">
           <h2 id="Player_example">Player example</h2>
 
           <!-- UPDATE description -->
           <p>
-            This example displays a company logo in the player's control bar. Selecting the logo will redirect you to the company's website.
+            The sample video demonstrates the use of a player that appears, plays an ad and then disappears. The ad that plays is configured in a VAST XML document. The player is set to autoplay and muted by default, which is the only way it will work in some browsers. You can change these settings if you choose.
           </p>
 
           <!-- UPDATE codepen here -->
@@ -181,43 +195,52 @@
           <p>The basic logic behind this application is:</p>
 
           <ul>
-            <li>Create a new element in the DOM for the company logo.</li>
-            <li>Add attributes to the logo element, including image and hyperlink.</li>
+            <li>The script expands the div defined within the text block, named <code>adPlayerDiv</code> and dynamically loads a Brightcove player. </li>
+            <li>The player uses in-line VAST to play an ad. You can comment this out and un-comment the ad tag section if you want to use an ad tag adsResponse.</li>
             <li>
-              Add the company logo to the player's control bar.
+              When the ads are finished playing, the player is unloaded and removed from the DOM.
             </li>
           </ul>
+        </section>
 
-          <!-- UPDATE task 1 -->
-          <h3>Add elements to the DOM</h3>
-          <p>Find the code which is labeled:</p>
-          <pre><code class="language-javascript">// +++ Add elements to the DOM +++</code></pre>
-          <p>Create new <code>&lt;div&gt;</code>, <code>a</code> and <code>img</code> elements in the DOM.</p>
+        <section class="bcls-section">
+          <h2 id="Options">Options</h2>
 
-          <!-- UPDATE task 2 -->
-          <h3>Assign attributes to the new elements</h3>
-          <p>Find the code which is labeled:</p>
-          <pre><code class="language-javascript">// +++ Assign attributes +++</code></pre>
-          <p>To the new DOM elements created in the previous step, add attributes including <code>id</code>, <code>className</code>, <code>src</code> and <code>href</code>. Add the child elements to the parent elements.</p>
-
-          <!-- UPDATE task 3 -->
-          <h3>Add company logo to the control bar</h3>
-          <p>Find the code which is labeled:</p>
-          <pre><code class="language-javascript">// +++ Add company logo to the control bar +++</code></pre>
-          <p>Get a reference to the player's control bar and use the <code>appendChild</code> method to add the company logo element.</p>
-
+          <ul>
+            <li><code>muted</code>
+          	<ul><li>Optional. Values: <strong>true</strong>, <strong>false</strong>. Default: <strong>true</strong></li>
+          	</ul></li>
+            <li><code>autoplay</code>
+          	<ul><li>Optional. Values: <strong>true</strong>, <strong>false</strong>. Default: <strong>true</strong></li>
+          	</ul></li>
+            <li><code>adTag</code>
+          	<ul><li>The ad tag</li>
+          	</ul></li>
+            <li><code>adsResponse</code>
+          	<ul><li>In-line VAST string - if provided it overrides the ad tag</li>
+          	</ul></li>
+            <li><code>height</code>
+          	<ul><li>The height in pixels you want to expand the div</li>
+          	</ul></li>
+            <li><code>animationDuration</code>
+          	<ul><li>How long in ms to take to animate the expansion of the div height</li>
+          	</ul></li>
+          </ul>
         </section>
 
         <!-- UPDATE CSS description -->
         <section class="bcls-section">
           <h2 id="Application_styling">Application styling</h2>
-          <p>CSS is used to size the player and to position and size the compnay logo image in the control bar.</p>
+          <p>See above for the CSS file associated with the IMA3 plugin.</p>
         </section>
 
         <section class="bcls-section">
           <h2 id="Plugin_code">Plugin code</h2>
+          <p>
+            This sample uses JavaScript code that is already built as a plugin. You can see this code in this document's corresponding GitHub repo: <a href="https://github.com/BrightcoveLearning/18065-ad-only-plugin/blob/master/plugin/adonly.js">adonly.js</a>.
+          </p>
 
-          <p>Normally when converting the JavaScript into a Brightcove Player plugin nominal changes are needed. One required change is to replace the standard use of the <code>ready()</code> method with the code that defines a plugin.</p>
+          <!-- <p>Normally when converting the JavaScript into a Brightcove Player plugin nominal changes are needed. One required change is to replace the standard use of the <code>ready()</code> method with the code that defines a plugin.</p>
 
           <p>Here is the very commonly used start to JavaScript code that will work with the player:</p>
 
@@ -235,8 +258,14 @@
                     ...
                   });</code></pre>
 
-          <!-- UPDATE path to plugin's JavaScript -->
-          <p>As mentioned earlier, you can see the plugin's JavaScript code in this document's corresponding GitHub repo: <a href="https://github.com/BrightcoveLearning/18190-hyperlinked-company-logo/blob/master/plugin/company-logo.js">company-logo.js</a>.</p>
+          <p>As mentioned earlier, you can see the plugin's JavaScript code in this document's corresponding GitHub repo: <a href="https://github.com/BrightcoveLearning/18190-hyperlinked-company-logo/blob/master/plugin/company-logo.js">company-logo.js</a>.</p> -->
+        </section>
+
+        <section class="bcls-section"><h2 id="changelog">Changelog</h2>
+
+          <h4>27 Jan 2016</h4>
+
+          <p>Initial commit</p>
         </section>
 
       </article>
