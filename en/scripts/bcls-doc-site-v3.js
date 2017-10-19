@@ -260,7 +260,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
      */
     function createInPageNav() {
         var navObj = {},
-        sectionElements = document.querySelectorAll(".bcls-section"),
+        sectionElements = document.getElementsByTagName("h2"),
         numSections = sectionElements.length,
             i,
             sectionEl;
