@@ -538,6 +538,18 @@ var BCLSmain = (function (window, document, bclsNavData) {
                 productName = null;
                 navMenuRight.innerHTML = menuRightBase + vcSupportNav;
                 break;
+            case 'staging':
+                product = "video-cloud";
+                // get a reference to search block
+                searchBar = document.getElementById("searchBar");
+                // set the source for the script that generates the search field
+                searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script-video-cloud.js");
+                // append the search script to the appropriate div in the nav bar
+                searchBar.appendChild(searchScript);
+                // hide anything player-only
+                setAttributeOnNodeList(playerOnly, "style", "display:none");
+                productName = "Video Cloud";
+                break;
             case "video-cloud": // in video cloud
                 product = "video-cloud";
                 // get a reference to search block
