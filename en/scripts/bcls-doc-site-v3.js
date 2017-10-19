@@ -549,6 +549,10 @@ var BCLSmain = (function (window, document, bclsNavData) {
                 // hide anything player-only
                 setAttributeOnNodeList(playerOnly, "style", "display:none");
                 productName = "Video Cloud";
+                section = "video-cloud";
+                sectionName = "Video Cloud";
+                subsection = null;
+
                 break;
             case "video-cloud": // in video cloud
                 product = "video-cloud";
@@ -708,100 +712,6 @@ var BCLSmain = (function (window, document, bclsNavData) {
                 navMenuRight.innerHTML = menuRightBase + onceSupportNav;
                 // createNavigation();
                 break;
-            case "zencoder": // in zencoder
-                redirectArray = pathArray.slice(0, 2);
-                landingPagePath = "//docs.brightcove.com/" + redirectArray.join("/") + "/index.html";
-
-                // there is only one section
-                product = "zencoder";
-                // get a reference to search block
-                searchBar = document.getElementById("searchBar");
-                // set the source for the script that generates the search field
-                searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script-once.js");
-                // append the search script to the appropriate div in the nav bar
-                searchBar.appendChild(searchScript);
-                section = "index";
-                if (pathArray[2] === "index.html") {
-                    // on once landing page
-                    isLandingPage = true;
-                    section = "index";
-                    sectionName = "Home";
-                    subsection = null;
-                    isLandingPage = true;
-                } else {
-                    section = 'index';
-                    sectionName = null;
-                    subsection = pathArray[2];
-                    console.log('section');
-                    // check to see if we're on the section or subsection landing page
-                    // and redirect to product landing page if so
-                    if (pathArray[3] === "index.html" && !isItemInArray(pathArray, "versions")) {
-                        window.location.href = landingPagePath;
-                    }
-                }
-                navMenuRight.innerHTML = menuRightBase + onceSupportNav;
-                // createNavigation();
-                break;
-            case "player": // in player
-                product = "player";
-                // get a reference to search block
-                searchBar = document.getElementById("searchBar");
-                // set the source for the script that generates the search field
-                searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script-player.js");
-                // append the search script to the appropriate div in the nav bar
-                searchBar.appendChild(searchScript);
-                redirectArray = pathArray.slice(0, 3);
-                landingPagePath = "//docs.brightcove.com/" + redirectArray.join("/") + "/index.html";
-                // hide anything player-only
-                setAttributeOnNodeList(playerOnly, "style", "display:none");
-                productName = "Player";
-                if (pathArray[2] === "index.html") {
-                    // on player landing page
-                    section = "player";
-                    sectionName = null;
-                    subsection = null;
-                    createLandingPageSections(bclsNavData[product].sections[section]);
-                } else {
-                    section = pathArray[2];
-                    /**
-                     * special cases
-                     */
-                    if (section === "concepts") {
-                        sectionName = "Concepts";
-                        subsection = null;
-                        section = "player";
-                    } else {
-                        sectionName = bclsNavData[product].sections[section].name;
-                    }
-                    // if section is brightcove-player check for Video Cloud only items to remove from nav
-                    // if (section === 'brightcove-player') {
-                    //     i = bclsNavData[product].sections[section].items.length;
-                    //     while (i > 0) {
-                    //         i--;
-                    //         if (isItemInArray(bclsNavData[product].sections[section].items[i].groups, 'no-player')) {
-                    //             bclsNavData[product].sections[section].items.splice(i, 1);
-                    //         }
-                    //     }
-                    //     bclslog('bclsNavData[product].sections[section]', bclsNavData[product].sections[section]);
-                    // }
-                    // check to see if we're on the section landing page
-                    if (pathArray[3] === "index.html") {
-                        // we're on the section landing page
-                        isLandingPage = true;
-                    } else {
-                        subsection = pathArray[3];
-                    }
-                    // check to see if we're on a subsection landing page
-                    if (isDefined(subsection)) {
-                        // check to see if we're on the section or subsection landing page
-                        // and redirect to product landing page if so
-                        if (pathArray[3] === "index.html" && !isItemInArray(pathArray, "versions")) {
-                            window.location.href = landingPagePath;
-                        }
-                    }
-                }
-                navMenuRight.innerHTML = menuRightBase + vcSupportNav;
-                break;
             default:
                 section = "index";
                 sectionName = null;
@@ -809,19 +719,6 @@ var BCLSmain = (function (window, document, bclsNavData) {
                 productName = "";
                 navMenuRight.innerHTML = menuRightBase + vcSupportNav;
             }
-        } else if (server === "solutions") {
-            product = "video-cloud";
-            // get a reference to search block
-            searchBar = document.getElementById("searchBar");
-            // set the source for the script that generates the search field
-            searchScript.setAttribute("src", "//docs.brightcove.com/en/scripts/search-script-video-cloud.js");
-            // append the search script to the appropriate div in the nav bar
-            searchBar.appendChild(searchScript);
-
-            subsection = "solutions";
-            section = pathArray[1];
-            sectionName = section;
-            navMenuRight.innerHTML = menuRightBase + vcSupportNav;
         } else {
             // don't know where we are
             product = null;
