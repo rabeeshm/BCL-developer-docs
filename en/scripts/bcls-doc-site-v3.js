@@ -273,7 +273,7 @@ var BCLSmain = (function (window, document, bclsNavData) {
                 if (!hasClass(sectionEl, "player-only")) {
                     navObj = {};
                     navObj.link = sectionEl.getAttribute("id");
-                    navObj.text = sectionEl.children[0].innerHTML;
+                    navObj.text = sectionEl.innerHTML;
                     navLabel.push(navObj);
                 }
                 break;
