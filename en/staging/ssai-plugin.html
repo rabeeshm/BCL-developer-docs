@@ -194,7 +194,7 @@
 
         player.src({
           type: 'video/vnd.bcov.ssai',
-          src: vmapXML
+          src: <span class="bcls-input">your vmap element</span>
         });</code></pre>
         </section>
 
@@ -237,14 +237,52 @@
 
         <section class="bcls-section">
         <h2 id="Setting_an_SSAI_source">Setting an SSAI source</h2>
+        <p>
+          There are two ways to set the SSAI source:
+        </p>
+        <ul>
+          <li>
+            Use the <code>player catalog</code>, which will call the <code>src()</code> method for you.
+          </li>
+          <li>
+            Use the <code>player.src()</code> method
+          </li>
+        </ul>
 
-        <p>To set the SSAI source, you will use the <code>player.src()</code> method as follows:</p>
+        <h3>Using the catalog</h3>
+        <p>
+          To use the <a href="/node/18108">player catalog</a> with SSAI, you can append your ad configuration id to the <code>getVideo()</code> call to the Playback API as follows:
+        </p>
+        <pre class="line-numbers">
+        <code class="language-javascript">var adConfigId = &quot;<span class="bcls-input">your ad config id</span>&quot;;
+var myPlayer = videojs('myPlayerId');
+myPlayer.ssai();
+
+myPlayer.catalog.getVideo(&quot;<span class="bcls-input">your video id</span>&quot;, function(error, video) {
+	if (error) {
+		myPlayer.error(error);
+	} else {
+		myPlayer.catalog.load(video);
+	}
+}, adConfigId);</code></pre>
+
+        <p>The <code>player catalog</code> works by making two requests:</p>
+
+        <ol class="bcls-tasklist__restart">
+          <li>Request video data from the player catalog. This will include a VMAP URL.</li>
+          <li>The player source is set with the VMAP URL, triggering a request for a VMAP document from Dynamic Delivery.</li>
+          <li>The player source is set again with a valid VMAP XML document.</li>
+        </ol>
+
+        <h3>Using the src() method</h3>
+
+        <p>To set the SSAI source, you can use the <code>player.src()</code> method as follows:</p>
 
         <pre class="line-numbers">
         <code class="language-javascript">
         player.src({
           type: 'video/vnd.bcov.ssai',
-          src: vmapXML
+          src: <span class="bcls-input">your vmap element</span>
         });</code></pre>
 
         <p>where:</p>
@@ -260,7 +298,7 @@
         	</li>
         </ul>
 
-        <h3 id="Setting_from_a_URL">Setting from a URL</h3>
+        <h4 id="Setting_from_a_URL">Setting from a URL</h4>
 
         <p>The SSAI plugin also supports setting a source from a URL to a VMAP, like this:</p>
 
@@ -268,20 +306,11 @@
         <code class="language-javascript">
           player.src({
             type: 'video/vnd.bcov.ssai',
-            src: 'https://path/to/vmap.xml'
+            src: '<span class="bcls-input">https://path/to/vmap.xml</span>'
           });</code></pre>
 
         <p>The plugin will attempt to fetch a VMAP from the given URL via XMLHttpRequest and re-set the source using the resulting responseXML data.</p>
 
-        <h3>Using the catalog</h3>
-
-        <p>The <a href="/node/18108">player catalog</a> works with SSAI as follows. Notice that it makes two requests:</p>
-
-        <ul>
-        	<li>Request video data from the player catalog. This will include a VMAP URL.</li>
-        	<li>The player source is set with the VMAP URL, triggering a request for a VMAP document from Dynamic Delivery.</li>
-        	<li>The player source is set again with a valid VMAP XML document.</li>
-        </ul>
         </section>
 
         <section class="bcls-section">
