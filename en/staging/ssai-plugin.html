@@ -54,18 +54,17 @@
         <section class="bcls-section">
           <h2 id="Overview">Overview</h2>
 
+          <p>
+            Server-Side Ad Insertion (SSAI) allows you to embed ads into your videos so that they can't be blocked by ad blockers in the browser. <a href="https://www.brightcove.com/en/blog/2017/03/digital-rights-management-drm-dynamic-delivery">Dynamic Delivery</a> is the next generation ingest and delivery system which reduces your storage footprint and dynamically packages media.
+          </p>
           <p>By default, the plugin enforces that all advertisements are watched and displays an ad count-down timer while they play. You can easily customize this plugin to skip advertisements.</p>
 
           <aside class="bcls-aside bcls-aside--information">
             <p>Notes:</p>
-
             <ul>
               <li>To use this plugin, your Video Cloud account will need to be configured for <a href="https://www.brightcove.com/en/blog/2017/03/digital-rights-management-drm-dynamic-delivery">Dynamic Delivery</a>. Contact your account manager if you are
                 interested in converting your account to Dynamic Delivery.</li>
-              <li>The SSAI plugin is compatible only with Brightcove Player v6.8.0 and newer. No support will be offered for v5.</li>
-              <li>
-                SSAI is not yet supported when using <a href="https://support.brightcove.com/node/18353">Context Aware Encoding (CAE)</a> with your videos.
-              </li>
+              <li>To use SSAI with IE (using Flash-based HLS playback), you need to enable HLSv3 for your account. Please contact your account manager to enable this feature.</li>
             </ul>
           </aside>
         </section>
@@ -74,8 +73,7 @@
           <h2 id="Player_example">Player example</h2>
           <!-- UPDATE description -->
 
-          <p>This example uses IMA ads defined in a VMAP file to deliver server-side ads in the video stream. You should see that there is a pre-roll, mid-roll and post-roll ad. The VMAP file is defined in the ad configuration. To learn how to create an
-            ad configuration for your account, see the <a href="http://docs.brightcove.com/en/staging/ssai-api.html">Dynamic Delivery and SSAI Ad Config API</a> document.</p>
+          <p>This example uses IMA ads defined in a VMAP file to deliver server-side ads in the video stream. You should see that there is a pre-roll, mid-roll and post-roll ad. The VMAP file is defined in the ad configuration.</p>
           <!-- UPDATE codepen here -->
 
           <p data-height="475" data-theme-id="dark" data-slug-hash="YEKXWx" data-default-tab="result" data-user="bcls1969" data-embed-version="2" data-pen-title="18468-advertising-ssai-plugin" class="codepen">See the Pen <a href="https://codepen.io/team/bcls1969/pen/YEKXWx/">18468-advertising-ssai-plugin</a> by Brightcove Learning Services (<a href="https://codepen.io/bcls1969">@bcls1969</a>) on <a href="https://codepen.io">CodePen</a>.</p>
@@ -83,33 +81,66 @@
 
           <!-- UPDATE link to GitHub source -->
           <p>View the <a href="https://github.com/BrightcoveLearning/18468-advertising-ssai-plugin">source code</a>.</p>
+          <!-- <p>
+            To learn how to create an
+              ad configuration for your account, see the <a href="http://docs.brightcove.com/en/staging/ssai-api.html">Dynamic Delivery and SSAI Ad Config API</a> document.
+          </p> -->
         </section>
 
         <section class="bcls-section">
           <h2 id="Features">Features</h2>
 
-          <p>The SSAI plugin is a modern replacement for OnceUX ad serving.</p>
-
-          <p>Features:</p>
+          <p>The SSAI plugin is a modern replacement for Once UX ad serving. The features include:</p>
 
           <ul>
-            <li>All features of OnceUX are supported</li>
-            <li>Dual support for legacy OnceUX VMAPs (using the uo namespace) and new Dynamic Delivery VMAPs (using the bc namespace)</li>
+            <li>All features of Once UX are supported</li>
+            <li>Dual support for legacy Once UX VMAPs (using the uo namespace) and new Dynamic Delivery VMAPs (using the bc namespace)</li>
             <li>More complete VMAP/VAST parsing</li>
             <li>Full support for VAST companion ads</li>
             <li>New APIs for interacting with the timeline and linear ad rolls</li>
             <li>Support for playlists (see Known Issues, though), ad macros, and FairPlay</li>
+            <li>
+              SSAI works with both DRM and non-DRM content.
+            </li>
+            <li>One of the primary roles of this plugin is to enforce certain behaviors around seeking and ads.</li>
           </ul>
         </section>
 
         <section class="bcls-section">
-          <h2 id="implementplayersmodule">Implement using Players module</h2>
+          <h2 id="Implementing_SSAI">Implementing SSAI</h2>
 
-          <p>To implement the SSAI Plugin using the Players module, follow these steps:</p>
+          <p>To play server-side ads with your video content, follow these steps:</p>
+          <ol>
+            <li><a href="#Create_an_ad_configuration">Create an ad configuration</a></li>
+            <li><a href="#Create_a_Brightcove_player">Create a Brightcove player</a></li>
+            <li><a href="#Add_the_SSAI_plugin">Add the SSAI plugin</a></li>
+            <li><a href="#Associate_ads_with_your_player">Associate ads with your player</a></li>
+            <li><a href="#Play_a_video_with_ads">Play a video with ads</a></li>
+          </ol>
+
+          <h3 id="Create_an_ad_configuration">Create an ad configuration</h3>
+          <p>
+            The ad configuration defines various aspects of SSAI playback, including a URL to your Video Multiple Ad Playlist (VMAP) file, beacons, and other configurations. For now, you must contact your Brightcove account manager to create your ad configuration.
+          </p>
+          <h4>Client-side ad macros</h4>
+          <p>
+            When your ad configuration includes an ad template that has macros of the form <code>{{page.pageVariable.param1}}</code>, then the value for the JavaScript variable named <code>param1</code> on the page where your player is embedded will be passed-through to the ad call.
+          </p>
+          <p>
+            For more details, see the <a href="http://docs.brightcove.com/en/staging/ssai-api.html#Client_side_macros">Dynamic Delivery and SSAI Ad Config API</a> document.
+          </p>
+
+          <h3 id="Create_a_Brightcove_player">Create a Brightcove player</h3>
+          <p>Create a new Brightcove player using Video Cloud Studio. For details, see the <a href="https://support.brightcove.com/node/15488">Quick Start: Creating and Styling a Player</a> document.</p>
+          <aside class="bcls-aside bcls-aside--information">The Brightcove player must be version 6+.</aside>
+
+          <h3 id="Add_the_SSAI_plugin">Add the SSAI plugin</h3>
+          <p>
+            You can either add the SSAI plugin files to your HTML code, or you can add it to your player's configuration as shown here:
+          </p>
 
           <ol class="bcls-tasklist">
-            <li>Open the <strong>Players</strong> module and locate the player.</li>
-            <li>Click the link for the player to open the player properties.</li>
+            <li>Open the <strong>Players</strong> module and locate the player. Click the link for the player to open the player properties.</li>
             <li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
             <li>The JavaScript for the plugin is provided and will not change for different plugin implementations. For the <strong>JavaScript URL</strong>, enter:
               <pre class="line-numbers">
@@ -120,7 +151,7 @@
               <code class="language-html">//players.brightcove.net/videojs-ssai/1/videojs-ssai.css</code></pre>
             </li>
             <li>For the plugin name, enter <strong>ssai</strong>.</li>
-            <li>No <strong>Options</strong> are needed to use this plugin.</li>
+            <li>No <strong>Options</strong> are needed to use this plugin. Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
             <!-- <li>The <strong>Options</strong> provided in the form specifies the URI to call to get your Once VMAP data. A stub example is shown here:
         	<pre class="line-numbers">
               <code class="language-json">{
@@ -129,77 +160,200 @@
 
         	<figure class="bcls-figure"><img class="bcls-image" alt="onceux plugin configuration in Studio" src="//learning-services-media.brightcove.com/doc-assets/player-development/advertising/onceux-plugin/onceux-options.png" /></figure>
         	</li> -->
-            <li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
           </ol>
           <!-- <h3>Initialize options</h3>
 
-        <p>When you add the OnceUX plugin to your player, as shown above, you must pass an <code>options</code> object to the plugin to initialize it. This object must contain a <code>metadataUri</code> string or a VMAP object, along with any of the other optional properties:</p>
-
-        <ul>
-        	<li><code>metadataUri</code>
-
-        	<ul>
-        		<li>Required</li>
-        		<li>Type: String</li>
-        		<li>Default: undefined</li>
-        		<li>Description: The URI to call for the VMAP data.</li>
-        		<li>Example: "http://onceux.unicornmedia.com/now/ads/vmap/od/auto/1234"</li>
-        	</ul>
-        	</li>
-        	<li><code>vmap</code>
-        	<ul>
-        		<li>Optional</li>
-        		<li>Type: Object</li>
-        		<li>Default: none</li>
-        		<li>Description: If supplied, the plugin will use this VMAP object instead of calling the metadata URL to get the VMAP data.</li>
-        		<li>Example: see this <a href="//solutions.brightcove.com/bcls/brightcove-player/onceux-plugin/vmap-example.json">VMAP object</a></li>
-        	</ul>
-        	</li>
-        	<li><code>hideOverlay</code>
-        	<ul>
-        		<li>Optional</li>
-        		<li>Type: Boolean</li>
-        		<li>Default: false</li>
-        		<li>Description: If true, the countdown timer and the <strong>Learn More</strong> click through overlays will not be shown while ads are playing.</li>
-        		<li>Example: true (hides default overlays)</li>
-        	</ul>
-        	</li>
-        	<li><code>timeout</code>
-        	<ul>
-        		<li>Optional</li>
-        		<li>Type: Number</li>
-        		<li>Default: 45000</li>
-        		<li>Description: The time in milliseconds to wait for the Once URI to respond.</li>
-        		<li>Example: 10000 (wait 10 seconds)</li>
-        	</ul>
-        	</li>
-        </ul> --></section>
-
-        <section class="bcls-section">
-          <h2 id="Usage">Usage</h2>
-
-          <p>The SSAI plugin differentiates between being initialized and being enabled.</p>
-
-          <p>Once you initialize the plugin, then the plugin will manage the enabled/disabled state, depending on whether an SSAI source is being played.</p>
-
-          <p>The SSAI plugin must be initialized before a source is set. If not, the plugin will ignore any matching sources.</p>
-
-          <p>Here is an example:</p>
+          <p>When you add the OnceUX plugin to your player, as shown above, you must pass an <code>options</code> object to the plugin to initialize it. This object must contain a <code>metadataUri</code> string or a VMAP object, along with any of the other optional properties:</p>
 
           <ul>
-            <li>Line 3: Initializes the SSAI plugin.</li>
-            <li>Lines 5-8: Set the SSAI source.</li>
+          	<li><code>metadataUri</code>
+
+          	<ul>
+          		<li>Required</li>
+          		<li>Type: String</li>
+          		<li>Default: undefined</li>
+          		<li>Description: The URI to call for the VMAP data.</li>
+          		<li>Example: "http://onceux.unicornmedia.com/now/ads/vmap/od/auto/1234"</li>
+          	</ul>
+          	</li>
+          </ul> -->
+
+          <h3 id="Associate_ads_with_your_player">Associate ads with your player</h3>
+          <p>
+            Next, you will associate either your ad configuration to your Brightcove player. You can do this one of three ways:
+          </p>
+          <ul>
+            <li>
+              <a href="#Using_the_catalog">Using the catalog</a>
+            </li>
+            <li>
+              <a href="#Updating_your_player_configuration">Updating your player configuration</a>
+            </li>
+            <li>
+              <a href="#Using_the_src_method">Using the src method</a>
+            </li>
           </ul>
 
+          <h4 id="Using_the_catalog">Using the catalog</h4>
+          <p>
+            One way to associate ads is to use the <a href="//support.brightcove.com/node/18108">player catalog</a> to pass your ad configuration id to the server. When using the <code>catalog</code> with SSAI, append your ad configuration id to the <code>getVideo()</code> call to the Playback API as follows:
+          </p>
           <pre class="line-numbers">
-        <code class="language-javascript">var player = videojs('my-player-id');
+        <code class="language-javascript">var adConfigId = &quot;<span class="bcls-input">your ad config id</span>&quot;;
+var myPlayer = videojs('myPlayerId');
+// If you added the SSAI plugin using the Players module, then the initialization
+// step is performed automatically. Uncomment the next line if you
+// did not use the Players module.
+//myPlayer.ssai();
 
-        player.ssai();
+myPlayer.catalog.getVideo(&quot;<span class="bcls-input">your video id</span>&quot;, function(error, video) {
+	if (error) {
+		myPlayer.error(error);
+	} else {
+		myPlayer.catalog.load(video);
+	}
+}, adConfigId);</code></pre>
 
-        player.src({
-          type: 'video/vnd.bcov.ssai',
-          src: <span class="bcls-input">your vmap element</span>
-        });</code></pre>
+          <p>The <code>player catalog</code> works by making two requests:</p>
+
+          <ol class="bcls-tasklist__restart">
+            <li>Request video data from the player catalog. This will include a VMAP URL.</li>
+            <li>The player source is set with the VMAP URL, triggering a request for a VMAP document from Dynamic Delivery. The player source is set again with a valid VMAP XML document.</li>
+          </ol>
+
+          <h4 id="Updating_your_player_configuration">Updating your player configuration</h4>
+          <p>
+            Another way to associate ads is to include your ad config id in your Brightcove player configuration. To do this, you can use the <a href="//support.brightcove.com/node/18378">Player Management API</a> as follows:
+          </p>
+          <ol class="bcls-tasklist__restart">
+            <li>
+              <p>
+                Use the <code>PATCH</code> command to include your <code>ad_config_id</code>. Here is an example of updating your player using cURL:
+              </p>
+              <pre class="line-numbers" data-start="1"><code class="language-json">curl \
+    --header &quot;Content-Type: application/json&quot; \
+    --user <span class="bcls-input">$EMAIL</span> \
+    --request PATCH \
+    --data '{
+        &quot;ad_config_id&quot; : &quot;<span class="bcls-input">$CONFIG_ID</span>&quot;
+    }' \
+    https://players.api.brightcove.com/v1/accounts/<span class="bcls-input">$ACCOUNT_ID</span>/players/<span class="bcls-input">$PLAYER_ID</span>/configuration
+  </code></pre>
+            </li>
+            <li>
+              <p>
+                You can then publish your changes as follows:
+              </p>
+              <pre class="line-numbers" data-start="1"><code class="language-json">curl \
+    --header &quot;Content-Type: application/json&quot; \
+    --user <span class="bcls-input">$EMAIL</span> \
+    --request POST \
+    https://players.api.brightcove.com/v1/accounts/<span class="bcls-input">$ACCOUNT_ID</span>/players/<span class="bcls-input">$PLAYER_ID</span>/publish
+  </code></pre>
+            </li>
+            <li>
+              <p>
+                Verify that the configuration for your Brightcove player includes <code>ad_config_id</code> set to your config id value and the ssai plugin with the associated plugin files. To do this, follow these steps:
+              </p>
+              <ol>
+              	<li>Navigate to your player in the Studio Players module. Click on the player name link to see details.</li>
+                <li>Select the <strong>Embed Code & URL</strong> (either Preview or Published will work). Click on the <srong>Player URL</srong> link.</li>
+                <li>In the browser address bar, change the <strong>index.html</strong> to <strong>config.json</strong>, and browse the new URL.</li>
+              </ol>
+
+              <p>
+                Your player configuration should look similar to this:
+              </p>
+
+              <pre class="line-numbers"><code class="language-json">{
+  &quot;account_id&quot;: &quot;1752604059001&quot;,
+<span class="bcls-highlight">  &quot;ad_config_id&quot;: &quot;d6190656-2095-4ff3-8afe-123abcde&quot;,</span>
+  &quot;compatibility&quot;: true,
+  &quot;embed_id&quot;: &quot;default&quot;,
+  &quot;player&quot;: {
+    &quot;template&quot;: {
+      &quot;name&quot;: &quot;single-video-template&quot;,
+      &quot;version&quot;: &quot;6.9.0&quot;
+    }
+  },
+  &quot;player_id&quot;: &quot;rJCECV0RZ&quot;,
+  &quot;player_name&quot;: &quot;SSAI Player&quot;,
+<span class="bcls-highlight">  &quot;plugins&quot;: [
+    {
+      &quot;name&quot;: &quot;ssai&quot;
+    }
+  ],
+  &quot;scripts&quot;: [
+    &quot;//players.brightcove.net/videojs-ssai/1/videojs-ssai.js&quot;
+  ],
+  &quot;stylesheets&quot;: [
+    &quot;//players.brightcove.net/videojs-ssai/1/videojs-ssai.css&quot;
+  ],</span>
+  &quot;updated_at&quot;: &quot;2017-11-07T16:03:47.161Z&quot;,
+  &quot;video_cloud&quot;: {
+    &quot;policy_key&quot;: &quot;ABCDE123456789&quot;,
+    &quot;video&quot;: null
+  }
+}</code></pre>
+            </li>
+          </ol>
+
+          <h4 id="Using_the_src_method">Using the src method</h4>
+          <p>
+            To associate ads, you can also use the <a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/Player.html#src">player src()</a> method. The SSAI plugin differentiates between being initialized and being enabled. Once you initialize the plugin, then the plugin will manage the enabled/disabled state, depending on whether an SSAI source is being played.
+          </p>
+          <aside class="bcls-aside bcls-aside--information">When you do NOT use the Players module to add the SSAI plugin, then you must initialize it before a source is set. If not, the plugin will ignore any matching sources.</aside>
+
+          <p>
+            Here is an example of using a VMAP element:
+          </p>
+          <pre class="line-numbers">
+        <code class="language-javascript">
+          var myPlayer = videojs('myPlayerID');
+
+// initialize the ssai plugin
+myPlayer.ssai();
+
+var mime_type_value = videojs.getPlugin('ssai').MIME_TYPE;
+...
+myPlayer.src({
+  type: mime_type_value,
+  src: <span class="bcls-input">your vmap element</span>
+});</code></pre>
+
+          <p>where:</p>
+
+          <ul>
+            <li>The <code>src</code> value should be an XMLDocument containing a VMAP element (i.e. a valid VMAP).</li>
+            <li>
+              <p>The <code>MIME_TYPE</code> value will always be <code>video/vnd.bcov.ssai</code>.</p>
+            </li>
+          </ul>
+
+          <p>You can also use a VMAP URL with the SSAI plugin like this:</p>
+
+          <pre class="line-numbers">
+        <code class="language-javascript">
+          var myPlayer = videojs('myPlayerID');
+
+// initialize the ssai plugin
+myPlayer.ssai();
+
+var mime_type_value = videojs.getPlugin('ssai').MIME_TYPE;
+...
+myPlayer.src({
+  type: mime_type_value,
+  src: '<span class="bcls-input">https://path/to/vmap.xml</span>'
+});</code></pre>
+
+          <p>The plugin will attempt to fetch a VMAP from the given URL via XMLHttpRequest and re-set the source using the resulting responseXML data.</p>
+
+          <h4 id="Play_a_video_with_ads">Playing a video with ads</h4>
+          <p>
+          Any video that you retrieve from Video Cloud that has been ingested with Dynamic Delivery, will include the ads specified in the VMAP file in your ad configuration.
+        </p>
+        <aside class="bcls-aside bcls-aside--information">Currently, Server-side ad insertion will not respect the Advertising property (Free or Ad Supported) set in Video Cloud's Media module.</aside>
+
         </section>
 
         <section class="bcls-section">
@@ -238,90 +392,6 @@
               </ul>
             </li>
           </ul>
-        </section>
-
-        <section class="bcls-section">
-          <h2 id="Setting_an_SSAI_source">Setting an SSAI source</h2>
-          <p>
-            There are two ways to set the SSAI source:
-          </p>
-          <ul>
-            <li>
-              Use the <code>player catalog</code>, which will call the <code>src()</code> method for you.
-            </li>
-            <li>
-              Use the <code>player.src()</code> method
-            </li>
-          </ul>
-
-          <h3>Using the catalog</h3>
-          <p>
-            To use the <a href="/node/18108">player catalog</a> with SSAI, you can append your ad configuration id to the <code>getVideo()</code> call to the Playback API as follows:
-          </p>
-          <pre class="line-numbers">
-        <code class="language-javascript">var adConfigId = &quot;<span class="bcls-input">your ad config id</span>&quot;;
-var myPlayer = videojs('myPlayerId');
-myPlayer.ssai();
-
-myPlayer.catalog.getVideo(&quot;<span class="bcls-input">your video id</span>&quot;, function(error, video) {
-	if (error) {
-		myPlayer.error(error);
-	} else {
-		myPlayer.catalog.load(video);
-	}
-}, adConfigId);</code></pre>
-
-          <p>The <code>player catalog</code> works by making two requests:</p>
-
-          <ol class="bcls-tasklist__restart">
-            <li>Request video data from the player catalog. This will include a VMAP URL.</li>
-            <li>The player source is set with the VMAP URL, triggering a request for a VMAP document from Dynamic Delivery.</li>
-            <li>The player source is set again with a valid VMAP XML document.</li>
-          </ol>
-
-          <h3 id="Using_the_src_method">Using the src() method</h3>
-
-          <p>To set the SSAI source, you can use the <code>player.src()</code> method as follows:</p>
-
-          <pre class="line-numbers">
-        <code class="language-javascript">
-        player.src({
-          type: 'video/vnd.bcov.ssai',
-          src: <span class="bcls-input">your vmap element</span>
-        });</code></pre>
-
-          <p>where:</p>
-
-          <ul>
-            <li>The <code>src</code> value should be an XMLDocument containing a VMAP element (i.e. a valid VMAP).</li>
-            <li>
-              <p>The <code>type</code> value should always be <code>video/vnd.bcov.ssai</code>. This value is available as a constant:</p>
-
-              <pre class="line-numbers">
-        <code class="language-javascript">
-            videojs.getPlugin('ssai').MIME_TYPE</code></pre>
-            </li>
-          </ul>
-
-          <h4 id="Setting_from_a_URL">Setting from a URL</h4>
-
-          <p>The SSAI plugin also supports setting a source from a URL to a VMAP, like this:</p>
-
-          <pre class="line-numbers">
-        <code class="language-javascript">
-          player.src({
-            type: 'video/vnd.bcov.ssai',
-            src: '<span class="bcls-input">https://path/to/vmap.xml</span>'
-          });</code></pre>
-
-          <p>The plugin will attempt to fetch a VMAP from the given URL via XMLHttpRequest and re-set the source using the resulting responseXML data.</p>
-
-        </section>
-
-        <section class="bcls-section">
-          <h2 id="Seeking_and_Ads">Seeking and Ads</h2>
-
-          <p>One of the primary roles of this plugin is to enforce certain behaviors around seeking and ads.</p>
         </section>
 
         <section class="bcls-section">
@@ -412,8 +482,8 @@ myPlayer.catalog.getVideo(&quot;<span class="bcls-input">your video id</span>&qu
         <section id="glossary" class="bcls-section">
           <h2>Glossary</h2>
 
-          <p>This plugin distinguishes the concepts of <strong>absolute</strong> and <strong>content</strong> time within a OnceUX stream. Traditional video players only have a concept of <strong>content</strong> time; times between start and end of the
-            URI it is currently playing. Because a OnceUX stream is essentially a number of <strong>content</strong> streams stiched together we've introduced the concept of <strong>absolute</strong> time which takes into account the complete stitched
+          <p>This plugin distinguishes the concepts of <strong>absolute</strong> and <strong>content</strong> time within a Once UX stream. Traditional video players only have a concept of <strong>content</strong> time; times between start and end of the
+            URI it is currently playing. Because a Once UX stream is essentially a number of <strong>content</strong> streams stiched together we've introduced the concept of <strong>absolute</strong> time which takes into account the complete stitched
             stream including the video advertisements.</p>
 
           <p>When you see the prefix <strong>absolute</strong> on a property or method, the times expected/returned are relative to the entire stitched stream. When you see the prefix <strong>content</strong>, the times expected/returned are relative only
@@ -425,20 +495,37 @@ myPlayer.catalog.getVideo(&quot;<span class="bcls-input">your video id</span>&qu
                 absolute time of <strong>0:15</strong> is in the pre-roll and the absolute time of <strong>0:31</strong> is the first second of content.</p>
             </li>
             <li>
-              <p><strong>Content time</strong> : Refers to the time relative to the current block of media - either content or ad. Expanding on the above, during the pre-roll, the content time <strong>0:15</strong> is synonymous with the absolute time of
-                <strong>0:15</strong>, but the absolute time <strong>0:31</strong> would equate to a content time of <strong>0:01</strong>.</p>
+              <p><strong>Relative time</strong> : Refers to the time relative to the current block of media - either content or ad. Expanding on the above, during the pre-roll, the relative time <strong>0:15</strong> is synonymous with the absolute time of
+                <strong>0:15</strong>, but the absolute time <strong>0:31</strong> would equate to a relative time of <strong>0:01</strong>.</p>
 
-              <p>Generally, content time is what you see in the player UI and much of the job of this plugin and associated middleware is translating from absolute time to content time.</p>
+              <p>Generally, relative time is what you see in the player UI and much of the job of this plugin and associated middleware is translating from absolute time to relative time.</p>
+            </li>
+          </ul>
+        </section>
+
+        <section class="bcls-section">
+          <h2 id="Limitations">Limitations</h2>
+          <p>
+            Be aware of the following limitations when using the SSAI plugin:
+          </p>
+
+          <ul>
+            <li>The SSAI plugin is compatible only with Brightcove Player v6.8.0 and newer. No support will be offered for v5.</li>
+            <li>Currently, Video Cloud SSAI is only available for Video-on-Demand (VOD), and it does not support <a href="https://support.brightcove.com/multiple-audio-tracks">Multiple Audio Tracks</a>.</li>
+            <li>
+              SSAI is not yet supported when using <a href="https://support.brightcove.com/node/18353">Context Aware Encoding (CAE)</a> with your videos.
             </li>
           </ul>
         </section>
 
         <section class="bcls-section">
           <h2 id="Known_issues">Known issues</h2>
+          <p>
+            Here are the known issues for using the SSAI plugin:
+          </p>
 
           <ul>
             <li>Playlists are buggy, but we are working on fixes and hope to have better support in the coming weeks.</li>
-            <li>Dragging on the seek bar while paused during ad playback causes the content video to play.</li>
             <li>Safari 10/11 sometimes show the last frame of the postroll at the end of the video.</li>
           </ul>
         </section>
