@@ -460,33 +460,61 @@
       <aside class="bcls-aside bcls-aside--tip">The parameter name used is the same as the one used for the built-in functionality, but need not be so. The code on the HTML page would need to be adjusted if you wish to use a different parameter name.</aside>
       <h4>Code on HTML page<h4>
       <p>The key concept for understanding this code is that a value is passed to the iframe using JavaScript <code>postMessage()</code> method. (For a thorough discussion of this method see the <a href="https://support.brightcove.com/brightcove-player-sample-playpause-video-iframe-parent">Brightcove Player Sample: Play/Pause Video from iframe Parent</a> document.)</p>
-      <pre class="line-numbers"><code class="language-javascript">// Match the protocol of the of the parent's page
-var theParamValue,
-  theProtocol = location.protocol,
-  theURL = theProtocol + "//players.brightcove.net",
-  // Get a reference to the iframe element
-  iframeTag = document.querySelector("iframe"),
-  // Retrieve window object needed for postMessage
-  win = iframeTag.contentWindow;
+      <pre class="line-numbers"><code class="language-javascript">&lt;!doctype html&gt;
+&lt;html&gt;
 
-// Use the helper function below to get the value of the parameter
-theParamValue = getURLparam("playlistVideoId");
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;title&gt;Untitled Document&lt;/title&gt;
+  &lt;style&gt;
+  iframe {
+    height: 344px;
+    width: 610px;
+  }
+&lt;/style&gt;
 
-// When the iframe is loaded, use JavaScript's postMessage method to pass it the desired video's ID
-iframeTag.addEventListener("load", function() {
-  win.postMessage(theParamValue, theURL);
-});
+&lt;/head&gt;
 
-// Helper function to get value for a specific URL parameter
-function getURLparam(name) {
-  var regex, results;
-  name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-  regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
-  results = regex.exec(location.search);
-  return results === null
-    ? ""
-  : decodeURIComponent(results[1].replace(/\+/g, " "));
-}</code></pre>
+&lt;body&gt;
+
+  &lt;iframe src=&quot;//players.brightcove.net/1752604059001/H1HpIEcCb_default/index.html?playlistId=5541484620001&quot;
+    allowfullscreen
+    webkitallowfullscreen
+    mozallowfullscreen&gt;&lt;/iframe&gt;
+
+  &lt;script type=&quot;text/javascript&quot;&gt;
+  <span class="bcls-highlight">// Match the protocol of the of the parent's page
+  var theParamValue,
+    theProtocol = location.protocol,
+    theURL = theProtocol + &quot;//players.brightcove.net&quot;,
+    // Get a reference to the iframe element
+    iframeTag = document.querySelector(&quot;iframe&quot;),
+    // Retrieve window object needed for postMessage
+    win = iframeTag.contentWindow;
+
+  // Use the helper function below to get the value of the parameter
+  theParamValue = getURLparam(&quot;playlistVideoId&quot;);
+
+  // When the iframe is loaded, use JavaScript's postMessage method to pass it the desired video's ID
+  iframeTag.addEventListener(&quot;load&quot;, function() {
+    win.postMessage(theParamValue, theURL);
+  });
+
+  // Helper function to get value for a specific URL parameter
+  function getURLparam(name) {
+    var regex, results;
+    name = name.replace(/[\[]/, &quot;\\[&quot;).replace(/[\]]/, &quot;\\]&quot;);
+    regex = new RegExp(&quot;[\\?&amp;]&quot; + name + &quot;=([^&amp;#]*)&quot;);
+    results = regex.exec(location.search);
+    return results === null
+      ? &quot;&quot;
+    : decodeURIComponent(results[1].replace(/\+/g, &quot; &quot;));
+  }</span>
+  &lt;/script&gt;
+
+&lt;/body&gt;
+
+&lt;/html&gt;</code></pre>
         <p>Details of the code follow, based on comment:</p>
         <ul>
           <li><strong>// Match the protocol of the of the parent's page</strong>: The <code>postMessage()</code> method requires both context of where the <code>iframe</code> tag is located, as well as where the iframe content's are from (the latter for security reasons), and both are derived in this section of the code.</li>
@@ -494,12 +522,35 @@ function getURLparam(name) {
           <li><strong>// When the iframe is loaded, use JavaScript's postMessage method to pass it the desired video's ID</strong>: This is the call to the <code>postMessage()</code> method. Note that you need to wait for the iframe tag to be completely loaded before calling the function, hence the use of using the event handler for JavaScript's <code>load</code> event.</li>
           <li><strong>// Helper function to get value for a specific URL parameter</strong>: This is a JavaScript function that reads the URL, then grabs the value associated with a particular query parameter.</li>
         </ul>
+        <p>The player you use must have a plugin associated with it. You would use the code that follows, save it in an Internet accessible location, then in the <strong>PLAYERS</strong>, <strong>PLUGINS</strong> section associate the plugin with the player. Here is the plugin code:</p>
+        <pre class="line-numbers"><code class="language-javascript">videojs.registerPlugin('controlFirstVideo', function() {
+  var myPlayer = this,
+    passedVideoID;
+
+  // This method called when postMessage sends data into the iframe
+  function playVideo(evt){
+    var videoIndex;
+    // Retrieve data stored in the object passed via postMessage
+    passedVideoID = evt.data;
+    console.log('passedVideoID - with playlist control 358', passedVideoID);
+    // Retrieve desired video object using Video Cloud catalog
+    myPlayer.catalog.getVideo(passedVideoID, function(error, video){
+      //deal with error
+      // Use the Playlist API to find location of the video in the playlist, then load into the player and play it
+      videoIndex = myPlayer.playlist.indexOf(video);
+      myPlayer.playlist.currentItem(videoIndex);
+      myPlayer.play();
+    });
+  };
+  // Listen for the message, then call playVideo() method when received
+  window.addEventListener("message",playVideo);
+});</code></pre>
 
 
 
         <p>Details of the code follow, based on comment:</p>
         <ul>
-          <li><strong></strong>: </li>
+          <li><strong>// Listen for the message, then call playVideo() method when received</strong> (bottom of code): This event listener waits for <code>postMessage</code> to send data. The event with <code>postMessage</code> is always <code>message</code>. When the event is received the <code>playVideo()</code> method is called.</li>
           <li><strong></strong>: </li>
           <li><strong></strong>: </li>
           <li><strong></strong>: </li>
