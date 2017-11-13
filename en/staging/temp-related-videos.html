@@ -44,7 +44,7 @@
 		<div id="main" class="large-10 small-12 columns">
 			<h1>Brightcove Player Sample: Related Videos via Tags (Playback API)</h1>
       <aside class="bcls-aside bcls-aside--warning">This is a temporary STAGING document for review only. For the official Brightcove documentation site, go to <a href="https://support.brightcove.com/">support.brightcove.com</a></aside>
-      <p>In this topic, you will learn how to retrieve data from the Playback API and display it in an overlay for the Brightcove player. This overlay displays a set of related videos (via tags/metadata) in your account when playback is paused or ends. Also see the Popular Videos Overlay sample.</p>
+      <p>In this topic, you will learn how to retrieve data from the Playback API and display it in an overlay for the Brightcove player.</p>
       <aside class="bcls-aside bcls-aside--information">The content in this document applies to Video Cloud only.</aside>
 
 
@@ -52,10 +52,30 @@
 
       <article class="bcls-article">
         <section class="bcls-section">
+        <h2 id="Overview">Overview</h2>
+          <p>
+            This sample calls the Playback API and searches for related videos in the same account, that have the same tag value as the video loaded in the player. These related videos are then displayed as interactive thumbnails in an overlay when video playback is paused or has ended. Selecting a thumbnail in the overlay, loads the associated video in the player and starts playback.
+          </p>
+          <aside class="bcls-aside bcls-aside--information">Search requests with the Playback API require a Policy Key that is <a href="https://support.brightcove.com/node/18003#Search_videos">search-enabled</a>.</aside>
+          <p>
+            If you are new to using the Playback API, start by reviewing the following documents:
+          </p>
+          <ul>
+            <li>
+              <a href="https://support.brightcove.com/node/17906">Playback API Overview</a>
+            </li>
+            <li>
+              <a href="https://support.brightcove.com/node/18005">Searching videos with the Playback API</a>
+            </li>
+          </ul>
+
+        </section>
+
+        <section class="bcls-section">
         <h2 id="Player_example">Player example</h2>
         <!-- UPDATE description -->
 
-        <p>This example displays an interactive video poster image that opens a lightbox with the Brightcove player. Select the poster image to play the video in a lightbox container. With the lightbox displayed, select the <strong>Close</strong> button to hide the lightbox container.</p>
+        <p>This example displays an interactive overlay of related video thumbnails when playback is paused or has ended. Start playback for the video below. When you pause playback or when the video ends, an overlay of related videos will appear.</p>
         <!-- UPDATE codepen here -->
 
         <p data-height="475" data-theme-id="dark" data-slug-hash="POWyeR" data-default-tab="result" data-user="bcls1969" data-embed-version="2" data-pen-title="18485-related-videos-tags-playback-api" class="codepen">See the Pen <a href="https://codepen.io/team/bcls1969/pen/POWyeR/">18485-related-videos-tags-playback-api</a> by Brightcove Learning Services (<a href="https://codepen.io/bcls1969">@bcls1969</a>) on <a href="https://codepen.io">CodePen</a>.</p>
@@ -63,7 +83,7 @@
 
         <!-- UPDATE link to GitHub source -->
 
-        <p>View the <a href="https://github.com/BrightcoveLearning/18163-simple-lightbox">source code</a>.</p>
+        <p>View the <a href="https://github.com/BrightcoveLearning/18485-related-videos-tags-playback-api">source code</a>.</p>
         </section>
 
         <section class="bcls-section">
@@ -139,11 +159,16 @@
         	<tbody class="bcls-table__body">
         		<tr>
         			<td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/Player.html#play">play()</a></td>
-        			<td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/Player.html#event:loadstart">loadstart</a></td>
-              <td><a href="https://support.brightcove.com/node/18085">mediainfo.posterSources[0].src</a></td>
+        			<td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/Player.html#event:loadedmetadata">loadedmetadata</a></td>
+              <td><a href="https://support.brightcove.com/node/18085">mediainfo.account_id</a></td>
         		</tr>
             <tr>
-        			<td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/Player.html#pause">pause()</a></td>
+        			<td><a href="https://support.brightcove.com/node/18108#load">catalog.load()</a></td>
+        			<td></td>
+              <td><a href="https://support.brightcove.com/node/18085">mediainfo.tags[0]</a></td>
+        		</tr>
+            <tr>
+        			<td><a href="https://support.brightcove.com/node/18108#getVideo">catalog.getVideo()</a></td>
         			<td></td>
               <td><a href="https://support.brightcove.com/node/18085">mediainfo.name</a></td>
         		</tr>
@@ -155,13 +180,13 @@
         <section class="bcls-section">
         <h2 id="Player/HTML_configuration">Player/HTML configuration</h2>
 
-        <p>No special configuration is required for the Brightcove Player you create for this sample.</p>
-        <h3>Other HTML</h3>
+        <p>The <a href="https://support.brightcove.com/node/18075">Overlay plugin</a> is defined and initalized in the JavaScript code for this example. The reason it is done here, is that we need to get the related videos metadata before initializing the overlay.</p>
         <p>
-          This sample uses HTML around the Brightcove player embed code to create a container for the video poster image, a container for the lightbox player and a container to wrap everything.
+          If you want to include the Overlay plugin in your player configuration, you can add the Overlay JavaScript and CSS files in Video Cloud Studio's Players module. In the <a href="https://support.brightcove.com/node/14053"><strong>Plugins</strong> section</a>, leave the <strong>Name</strong> property blank, so that you can initialize the plugin within the code.
         </p>
+        <h3>Other HTML</h3>
 
-        <p>Remember to also add the <code>id</code> attribute to the <code>video</code> tag in the player embed code.</p>
+        <p>Remember to add the <code>id</code> attribute to the <code>video</code> tag in the player embed code.</p>
    <pre><code class="language-html">&lt;video <span class="bcls-highlight">id="myPlayerID"</span>
 ...</code></pre>
         </section>
@@ -186,42 +211,42 @@
         </ul>
         <!-- UPDATE task 1 -->
 
-        <h3>Get DOM references</h3>
+        <h3>Define values</h3>
 
-        <p>Get a reference to the Brightcove player, the video poster image and the lightbox.</p>
+        <p>Create variables that define values for the base Playback API URL and your Policy key.</p>
 
         <!-- UPDATE task 2 -->
 
-        <h3>Wait for loadstart</h3>
+        <h3>Wait for loadedmetadata</h3>
 
         <p>Find the code which is labeled:</p>
 
         <pre>
-        <code class="language-javascript">// +++ Wait for loadstart +++</code></pre>
+        <code class="language-javascript">// +++ Wait for loadedmetadata +++</code></pre>
 
-        <p>Wait for the video to begin loading by listening for the <code>loadstart</code> event. This ensures that the video metadata, like the poster source and video name, will be available in the <code>mediainfo</code> object. Load the video poster image.</p>
+        <p>Wait for the video to begin loading by listening for the <code>loadedmetadata</code> event. This ensures that the video metadata, like the account id, name and tag values will be available in the <code>mediainfo</code> object.</p>
 
         <!-- UPDATE task 3 -->
 
-        <h3>Listen for poster click</h3>
+        <h3>Setup the API request</h3>
 
         <p>Find the code which is labeled:</p>
 
         <pre>
-        <code class="language-javascript">// +++ Listen for poster click +++</code></pre>
+        <code class="language-javascript">// +++ Setup the API request +++</code></pre>
 
-        <p>Add a listener for the <code>onclick</code> event. When a user clicks on the poster image, then display the lightbox and start video playback.</p>
+        <p>Using the information from the video currently loaded in the player, create a Playback API search request for videos in the same account. The search will look for videos which have the same value as the first tag in the current video. It will exclude any video with the same name as the current video, and it will limit the number of videos returned to 9. That is how many will fit in our overlay layout.</p>
 
         <!-- UPDATE task 4 -->
 
-        <h3>Close the lightbox</h3>
+        <h3>Make the Playback API request</h3>
 
         <p>Find the code which is labeled:</p>
 
         <pre>
-        <code class="language-javascript">// +++ Close the lightbox +++</code></pre>
+        <code class="language-javascript">// +++ Make the Playback API request +++</code></pre>
 
-        <p>When the user selects the <strong>Close</strong> button, then pause video playback and hide the lightbox.</p>
+        <p>Send an HTTP GET request to the Playback API RESTful web service. If an error occurs, display an error message. Otherwise, parse the returned data into JSON format.</p>
         </section>
         <!-- UPDATE CSS description -->
 
