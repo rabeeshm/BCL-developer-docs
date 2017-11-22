@@ -135,24 +135,18 @@
         		<tr>
         			<th>API Methods</th>
         			<th>API Events</th>
-              <th>API Properties</th>
+              <th>Plugins</th>
         		</tr>
         	</thead>
         	<tbody class="bcls-table__body">
         		<tr>
-        			<td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/Player.html#play">play()</a></td>
+        			<td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/Player.html#addClass">addClass()</a></td>
         			<td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/Player.html#event:loadedmetadata">loadedmetadata</a></td>
-              <td><a href="https://support.brightcove.com/node/18085">mediainfo.account_id</a></td>
+              <td><a href="https://support.brightcove.com/display-overlay-plugin">Overlay plugin</a></td>
         		</tr>
             <tr>
-        			<td><a href="https://support.brightcove.com/node/18108#load">catalog.load()</a></td>
+        			<td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/Player.html#removeClass">removeClass()</a></td>
         			<td></td>
-              <td><a href="https://support.brightcove.com/node/18085">mediainfo.tags[0]</a></td>
-        		</tr>
-            <tr>
-        			<td><a href="https://support.brightcove.com/node/18108#getVideo">catalog.getVideo()</a></td>
-        			<td></td>
-              <td><a href="https://support.brightcove.com/node/18085">mediainfo.name</a></td>
         		</tr>
         	</tbody>
         </table>
@@ -162,11 +156,12 @@
         <section class="bcls-section">
         <h2 id="Player/HTML_configuration">Player/HTML configuration</h2>
 
-        <p>The <a href="https://support.brightcove.com/node/18075">Overlay plugin</a> is defined and initalized in the JavaScript code for this example. The reason it is done here, is that we need to get the related videos metadata before initializing the overlay.</p>
-        <p>
-          If you want to include the Overlay plugin in your player configuration, you can add the Overlay JavaScript and CSS files in Video Cloud Studio's Players module. In the <a href="https://support.brightcove.com/node/14053"><strong>Plugins</strong> section</a>, leave the <strong>Name</strong> property blank, so that you can initialize the plugin within the code.
-        </p>
+        <p>In this example, the <a href="https://support.brightcove.com/node/18075">Overlay plugin</a> is defined and initalized in the JavaScript code. You can also add it to the player in the <a href="https://support.brightcove.com/node/14053">Video Cloud Players module</a>.</p>
+
         <h3>Other HTML</h3>
+        <p>
+          Define the <strong>Toggle Overlay</strong> button to show and hide the overlay.
+        </p>
 
         <p>Remember to add the <code>id</code> attribute to the <code>video</code> tag in the player embed code.</p>
    <pre><code class="language-html">&lt;video <span class="bcls-highlight">id="myPlayerID"</span>
@@ -174,101 +169,56 @@
         </section>
 
         <!-- UPDATE application flow -->
-        <section class="bcls-section">
+        < class="bcls-section">
         <h2 id="Application_flow">Application flow</h2>
 
         <p>The basic logic behind this application is:</p>
 
         <ul>
-        	<li>Create variables that define values for the base Playback API URL and your Policy key.</li>
+        	<li>Initialize the Overlay.</li>
           <li>
-            Wait for the video to begin loading to retrieve the video metadata.
+            Hide the overlay.
           </li>
           <li>
-            Setup the request for the Playback API.
-          </li>
-          <li>
-            Make the request to the Playback API to get the first 9 related videos.
-          </li>
-          <li>
-            Format the overlay content to show the thumbnails for each of the related videos.
-          </li>
-          <li>
-            When a user selects one of the related video thumbnails, then load it into the player and start playback.
+            Listen for the <code>click</code> event on the <strong>Toggle Overlay</strong> button.
           </li>
         </ul>
-        <!-- UPDATE task 1 -->
-        <h3>Define values</h3>
 
-        <p>Create variables that define values for the base Playback API URL and your Policy key.</p>
+        <!-- UPDATE task 1 -->
+        <h3>Initialize the Overlay</h3>
+
+        <p>Find the code which is labeled:</p>
+
+<pre>
+<code class="language-javascript">// +++ Initialize the Overlay +++</code></pre>
+
+        <p>Initialize the Overlay to start when the video metadata has been loaded (<code>loadedmetadata</code>). Define a clickable image to display in the overlay.</p>
 
         <!-- UPDATE task 2 -->
-        <h3>Wait for loadedmetadata</h3>
+        <h3>Hide the overlay</h3>
 
         <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Wait for loadedmetadata +++</code></pre>
+<code class="language-javascript">// +++ Hide the overlay +++</code></pre>
 
-        <p>Wait for the video to begin loading by listening for the <code>loadedmetadata</code> event. This ensures that the video metadata, like the account id, name and tag values will be available in the <code>mediainfo</code> object.</p>
+        <p>Use the <code>addClass()</code> method to hide the overlay.</p>
 
         <!-- UPDATE task 3 -->
-        <h3>Setup the API request</h3>
+        <h3>Listen for the click event</h3>
 
         <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Setup the API request +++</code></pre>
+<code class="language-javascript">// +++ Listen for the click event +++</code></pre>
 
-        <p>Using the information from the video currently loaded in the player, create a Playback API search request for videos in the same account. The search will look for videos which have the same value as the first tag in the current video. It will exclude any video with the same name as the current video, and it will limit the number of videos returned to 9. That is how many will fit in our overlay layout.</p>
-
-        <!-- UPDATE task 4 -->
-        <h3>Make the Playback API request</h3>
-
-        <p>Find the code which is labeled:</p>
-
-<pre>
-<code class="language-javascript">// +++ Make the Playback API request +++</code></pre>
-
-        <p>Send an HTTP GET request to the Playback API RESTful web service. Parse the returned data into JSON format. If an error occurs, display an error message.</p>
-
-        <!-- UPDATE task 5 -->
-        <h3>Format the overlay content</h3>
-
-        <p>Find the code which is labeled:</p>
-
-<pre>
-<code class="language-javascript">// +++ Format the overlay content +++</code></pre>
-
-        <p>To format the overlay content, you will do the following:</p>
-        <ul>
-          <li>
-            Extract the id, name and thumbnail for each related video returned from the Playback API, and store it in an array.
-          </li>
-          <li>
-            Looping through the related video array, create a video list <code>&lt;div&gt;</code> wrapper which holds a <code>&lt;div&gt;</code> element for each related video. This will become the overlay content.
-          </li>
-          <li>
-            Initialize the Overlay plugin with the newly created related videos content. You will see a grid of related video thumnails when the overlay is displayed. Show the overlay when video playback is paused or has ended. Hide the overlay when the main video is playing.
-          </li>
-        </ul>
-
-        <!-- UPDATE task 4 -->
-        <h3>Load and play related video</h3>
-
-        <p>Find the code which is labeled:</p>
-
-<pre>
-<code class="language-javascript">// +++ Load and play related video +++</code></pre>
-
-        <p>Create a function that loads and starts playback for the related video that is selected by the user.</p>
-        </section>
+        <p>Listen for the <code>click</code> event on the <strong>Toggle Overlay</strong> button to show and hide the overlay.</p>
 
         <!-- UPDATE CSS description -->
         <section class="bcls-section">
         <h2 id="Application_styling">Application styling</h2>
 
-        <p>The CSS styles the related videos thumbnail grid for the overlay.</p>
+        <p>The CSS styles the overlay and its contents.</p>
         </section>
 
         <section class="bcls-section">
@@ -293,7 +243,7 @@
 });</code></pre>
         <!-- UPDATE path to plugin's JavaScript -->
 
-        <p>As mentioned earlier, you can see the plugin's JavaScript code in this document's corresponding GitHub repo: <a href="https://github.com/BrightcoveLearning/18485-related-videos-tags-playback-api/blob/master/plugin/related-videos.js">related-videos.js</a>.</p>
+        <p>As mentioned earlier, you can see the plugin's JavaScript code in this document's corresponding GitHub repo: <a href="https://github.com/BrightcoveLearning/18187-toggling-overlay/blob/master/plugin/toggle-overlay.js">toggle-overlay.js</a>.</p>
 
         <h3>Using the plugin with a player</h3>
 
