@@ -60,26 +60,38 @@
 
             <p></p>
 
-            <div class="form-wrapper">
-              <fieldset class="bcls-fieldset">
-                <legend>Inputs for </legend>
 
-                <p>Account: <input id="account_id_form" type="text" value="" name="account_id_form" /></p>
+            <div id="inputFields" class="input-fields">
+            <fieldset class="bcls-fieldset"><legend>Account Information</legend>
 
-                <p>Video URL: (HLS or MP4) <input id="video_url_form" type="text" value="" name="video_url_form" /></p>
-
-                <p>Ad Server URL: (defaults to Brightcove sample account) <input id="ad_server_url_form" type="text" value="" name="ad_server_url_form" /></p>
-
-                <p><input id="form_Submit" type="submit" value="Play Video" /></p>
-              </fieldset>
+            <div id="accountInfo">
+            <table class="bcls-table">
+            	<tbody class="bcls-table__body">
+            		<tr>
+            			<td>Video Cloud Account ID:</td>
+            			<td><input id="accountID" type="text" size="60" /></td>
+            		</tr>
+            		<tr>
+            			<td>HLS Video URL:</td>
+            			<td><input id="videoURL" type="text" size="200" placeholder="//learning-services-media.brightcove.com/videos/hls/wildlife_tiger/wildlife_tiger.m3u8"/></td>
+            		</tr>
+            		<tr>
+            			<td>Ad Server URL:</td>
+            			<td><input id="adServerURL" type="text" size="200" placeholder="//solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vast.xml" /></td>
+            		</tr>
+            	</tbody>
+            </table>
             </div>
+            </fieldset>
+            </div>
+            <br />
+            <button id="generatePlayer" class="bcls-button">Generate Player</button>
+
           </section>
 
-          <section class="bcls-section" id="logger">
-            <h2>Results Log</h2>
-
-            <pre class="line-numbers">
-      <code id="response" class="language-json">Response will appear here... </code></pre>
+          <section class="bcls-section" >
+            <h2 id="Player">Player</h2>
+            <div id="placeHolder"></div>
           </section>
 
           <section class="bcls-section" id="pageCode">
@@ -99,10 +111,52 @@
       </article>
       <script type="text/javascript">
         var
+        accountID = document.getElementById('accountID'),
+        videoURL = document.getElementById('videoURL'),
+        adServerURL = document.getElementById('adServerURL'),
+        generatePlayer = document.getElementById('generatePlayer'),
         defaults = {
-          video_url_form: '//solutions.brightcove.com/bcls/assets/videos/Tiger.mp4',
-          ad_server_url_form: '//solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vast.xml'
+          videoURL: '//learning-services-media.brightcove.com/videos/hls/wildlife_tiger/wildlife_tiger.m3u8',
+          adServerURL: '//solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vast.xml'
+        };
+
+        /**
+         * determines whether a var has value
+         * @param  {*}  x var to evaluate - note that if x = {} or [], true will be returned
+         * @return {Boolean}   whether var has a value
+         */
+        function isDefined(x) {
+            if (x === '' || x === null || x === undefined) {
+                return false;
+            }
+            return true;
         }
+
+        generatePlayer.addEventListener("click", function () {
+          account_id = (isDefined(accountID.value)) ? accountID.value : defaults.account_id;
+          video_url = (isDefined(videoURL.value)) ? videoURL.value : defaults.videoURL;
+          ad_server_url = (isDefined(adServerURL.value)) ? adServerURL.value : defaults.adServerURL;
+          console.log('****account_id:',account_id);
+          console.log('****video_url:',video_url);
+          console.log('****ad_server_url:',ad_server_url);
+          playerHTML = '<video id=\"myPlayerID\" data-video-id=\"' + video_url + '\"  data-account=\"' + account_id + '\" data-player=\"default\" data-embed=\"default\" class=\"video-js\" controls></video>';
+            // Inject the player code into the DOM
+            document.getElementById('placeHolder').innerHTML = playerHTML;
+            // Add and execute the player script tag
+            var s = document.createElement('script');
+            s.src = "//players.brightcove.net/" + playerData.accountId + "/" + playerData.playerId + "_default/index.min.js";
+            // Add the script tag to the document
+            document.body.appendChild(s);
+            // Call a function to play the video once player's JavaScropt loaded
+            s.onload = callback;
+          }
+
+          // +++ Initialize the player and start the video +++
+          function callback() {
+            myPlayer = videojs('myPlayerID');
+            myPlayer.play();
+          }
+        });
       </script>
 
       <!-- END DRUPAL CONTENT -->
