@@ -134,8 +134,15 @@
           account_id = (isDefined(accountID.value)) ? accountID.value : defaults.accountID;
           video_url = (isDefined(videoURL.value)) ? videoURL.value : defaults.videoURL;
           ad_server_url = (isDefined(adServerURL.value)) ? adServerURL.value : defaults.adServerURL;
+          // do stuff
+          console.log('****account_id:', account_id);
+          console.log('****video_url:', video_url);
+          console.log('****ad_server_url:', ad_server_url);
+          playerHTML = '<video id=\"myPlayerID\" data-video-id=\"' + video_url + '\"  data-account=\"' + account_id + '\" data-player=\"default\" data-embed=\"default\" class=\"video-js\" controls></video>';
           var s = document.createElement('script');
           s.src = "//players.brightcove.net/" + account_id + "/default_default/index.min.js";
+          // Inject the player code into the DOM
+          document.getElementById('placeHolder').innerHTML = playerHTML;
           // Add the script tag to the document
           document.body.appendChild(s);
           // Call a function to play the video once player's JavaScript loaded
@@ -147,26 +154,21 @@
             ima.src = '//players.brightcove.net/videojs-ima3/2/videojs.ima3.min.js';
             document.body.appendChild(ima);
             ima.onload = function() {
-              // do stuff
-              console.log('****account_id:', account_id);
-              console.log('****video_url:', video_url);
-              console.log('****ad_server_url:', ad_server_url);
-              playerHTML = '<video id=\"myPlayerID\" data-video-id=\"' + video_url + '\"  data-account=\"' + account_id + '\" data-player=\"default\" data-embed=\"default\" class=\"video-js\" controls></video>';
-              // Inject the player code into the DOM
-              document.getElementById('placeHolder').innerHTML = playerHTML;
               myPlayer = videojs('myPlayerID');
               console.log('****myPlayer', myPlayer);
               console.log('get player element', document.getElementById('myPlayerID'));
 
-              // myPlayer.ima3({
-              //   // only use HTML5 mode
-              //   adTechOrder: ["html5"],
-              //   // you can increase or decrease the max amount of time to wait for an ad
-              //   timeout: 5000,
-              //   // this is where your ad tag goes
-              //   serverUrl: "//solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vast.xml"
-              // });
-              //myPlayer.play();
+                myPlayer.ready(function(){
+                  myPlayer.ima3({
+                    // only use HTML5 mode
+                    adTechOrder: ["html5"],
+                    // you can increase or decrease the max amount of time to wait for an ad
+                    timeout: 5000,
+                    // this is where your ad tag goes
+                    serverUrl: "//solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vast.xml"
+                  });
+                  //myPlayer.play();
+                });
             };
             // now load the video - you can also comment this part out and use a video id
             // (supplied in the video element above as data-video-id)
