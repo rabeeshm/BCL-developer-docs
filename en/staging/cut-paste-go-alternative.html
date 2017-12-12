@@ -110,7 +110,7 @@
 
       <script type="text/javascript">
         var
-          myPlayer,
+          player,
           accountID = document.getElementById('accountID'),
           videoURL = document.getElementById('videoURL'),
           adServerURL = document.getElementById('adServerURL'),
@@ -150,27 +150,23 @@
             console.log('****account_id:', account_id);
             console.log('****video_url:', video_url);
             console.log('****ad_server_url:', ad_server_url);
-            playerHTML = '<video id=\"myPlayerID\" data-video-id=\"' + video_url + '\"  data-account=\"' + account_id + '\" data-player=\"default\" data-embed=\"default\" class=\"video-js\" controls></video>';
+            playerHTML = '<video id=\"player\" data-video-id=\"' + video_url + '\"  data-account=\"' + account_id + '\" data-player=\"default\" data-embed=\"default\" class=\"video-js\" controls></video>';
             var ima = document.createElement('script');
             ima.src = '//players.brightcove.net/videojs-ima3/2/videojs.ima3.min.js';
             document.body.appendChild(ima);
             ima.onload = function() {
+              var options = {};
+                options.serverUrl = "//solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vast.xml";
+              	options.timeout = 5000;
+              	options.requestMode = "onload";
+              	options.debug = true;
               document.getElementById('placeHolder').innerHTML = playerHTML;
               // instantiate player
-              bc(document.getElementById('myPlayerID'));
-
-              videojs('myPlayerID').on('loadedmetadata',function() {
-                myPlayer = this;
-                console.log('myPlayer.ima3',myPlayer.ima3);
-                myPlayer.ima3({
-                  // only use HTML5 mode
-                  adTechOrder: ["html5"],
-                  // you can increase or decrease the max amount of time to wait for an ad
-                  timeout: 5000,
-                  // this is where your ad tag goes
-                  serverUrl: "//solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vast.xml"
-                });
-                //myPlayer.play();
+              //console.log('player.ima3',player.ima3);
+              player = bc(document.getElementById('player'));
+              player.ima3(options);
+              videojs('player').ready(function() {
+                player.play();
               }); // end player ready
             }; // end ima script load
           }; // end player script load
