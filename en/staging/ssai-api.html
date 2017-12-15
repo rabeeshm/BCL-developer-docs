@@ -334,6 +334,42 @@
       			<td>Human readable description</td>
       		</tr>
           <tr>
+      			<td>discontinuities.dash</td>
+      			<td>[]String</td>=
+      			<td>
+              <p>
+                Controls which versions of dash to deliver Multi Period Dash manifests.
+              </p>
+              <p>
+                  Set to <code>["*"]</code> to deliver multi-period dash for all versions
+              </p>
+              <p>
+                Empty list for never
+              </p>
+              <p>
+                Example: <code>["live-timeline"]</code> to deliver for live-timeline but not for hbbtv
+              </p>
+            </td>
+      		</tr>
+          <tr>
+      			<td>discontinuities.hls</td>
+      			<td>[]String</td>
+      			<td>
+              <p>
+                Controls which versions of hls to deliver with discontinuities.
+              </p>
+              <p>
+                Set to <code>["*"]</code> to delivery with discontinuities in all versions of HLS
+              </p>
+              <p>
+                Empty list for never
+              </p>
+              <p>
+                Example: <code>["v4","v5"]</code> to deliver for v4 & v5 but not for v3
+              </p>
+            </td>
+      		</tr>
+          <tr>
       			<td>ad_config.expected_ad_response</td>
       			<td>String</td>
       			<td>Which tech to use to parse the response. Values:
@@ -370,6 +406,21 @@
       			<td>Ad tag template. Available variables described in a later section.</td>
       		</tr>
           <tr>
+      			<td>ad_config.template_url.defaults</td>
+      			<td>Object</td>
+      			<td>
+              <p>
+                Map of String to String defining the default to use in the case where a url param is not provided.
+              </p>
+              <p>
+                Can be a literal <code>{ "url.foo": "SomeString" }</code>
+              </p>
+              <p>
+                Or reference another variable <code>{ "url.foo": "{{ metadata.title_id }}" }</code>
+              </p>
+            </td>
+      		</tr>
+          <tr>
       			<td>beacon_templates</td>
       			<td>Array</td>
       			<td>An array of beacons to fire (example: 3rd-party beacons)</td>
@@ -399,7 +450,6 @@
       				<li><code>segment_start</code></li>
       				<li><code>segment_end</code></li>
       				<li><code>on_load</code></li>
-      				<li><code>ad_request</code></li>
       			</ul>
       			</td>
       		</tr>
@@ -562,7 +612,37 @@
     </section>
 
     <section class="bcls-section">
-      <h2 id="configuration_notes">Configuration notes</h2>
+      <h2 id="Entrypoint_URL_parameters">Entrypoint URL parameters</h2>
+      <p>
+        There are a handful of query parameters that can be added to the SSAI entry point URL (VMAP or manifest) in order to tweak some behaviors:
+      </p>
+      <table class="bcls-table">
+      	<thead class="bcls-table__head">
+      		<tr>
+      			<th width="25%">Parameter</th>
+      			<th>Description</th>
+      		</tr>
+      	</thead>
+      	<tbody class="bcls-table__body">
+      		<tr>
+      			<td>?rule=sd-only</td>
+      			<td>Filters out any video rendition that has a height less than the threshold set in the Account Configuration</td>
+      		</tr>
+          <tr>
+      			<td>?rule=discos-enabled</td>
+      			<td>Enable Playback with Discontinuities in HLS & MultiPeriods in Dash. Takes precedence over discontinuities setting in Playback Config</td>
+      		</tr>
+          <tr>
+      			<td>?rule=discos-disabled</td>
+      			<td>Disable Playback with Discontinuities in HLS & MultiPeriods in Dash. Takes precedence over discontinuities setting in Playback Config</td>
+      		</tr>
+
+      	</tbody>
+      </table>
+    </section>
+
+    <section class="bcls-section">
+      <h2 id="Configuration_notes">Configuration notes</h2>
       <ol>
         <li>Preloading ads should not be done with SSAI. The reason for this is that if you preload the player will report an ad impression and probably the first quartile beacons before the video is played. This could lead to inaccurate ad analytics.
           If you configure SSAI in Studio, this will automatically be done, but if you happen to setup SSAI manually you need to be aware of this issue.</li>
