@@ -558,75 +558,42 @@ echo $response;
         <section class="bcls-section">
           <h2 id="Example_2">Example 2</h2>
 
-          <p>This second example is more complex than the one detailed earlier. This example displays the six most popular videos from an account as an overlay when the currently playing video is paused. The main steps of the code are:</p>
+          <p>This second example is more complex than the one detailed earlier. This example displays the 10 most popular videos from an account in a playlist. The main steps of the code are:</p>
 
           <ol>
-            <li>Request from the Analytics API the 6 videos with the most views in an account. This step involves an asynchronous call using a callback function.</li>
-            <li>From the returned Analytics API data, extract only the video IDs and place them in an array.</li>
-            <li>Request the complete video objects for each of the videos in the list of IDs in the array. This step involves looping over the array and requesting the video objects using <code>player.catalog.getVideo()</code>. Of course, this involves multiple
-              asynchronous calls.</li>
-            <li>Create an HTML <code>div</code> element and populate it with the video thumbnails. Make the thumbnails links so when clicked that video will load in the player.</li>
-            <li>Use the <code>player.overlay()</code> method to display the overlay only when the video is paused.</li>
+            <li>Request from the Analytics API the 10 videos with the most views in an account. This step involves an asynchronous call using a callback function.</li>
+            <li>From the returned Analytics API data, extract only the video IDs and place them in an array. A helper function is written to do the extraction of IDs from the returned data.</li>
+            <li>Request the complete video objects for each of the videos in the list of IDs in the array. This step involves looping over the array and requesting the video objects using <code>player.catalog.getVideo()</code>. Of course, this involves multiple asynchronous calls using the <code>catalog</code>. A helper function is written to retrieve the video objects based on IDs and place the objects into an array.</li>
+            <li>Place the array of video objects into the playlist for a playlist-enabled player.</li>
           </ol>
 
-          <p>Since you are now familiar with many of the concepts and specific code on how to call the APIs, the code highlights for this example will be at a higher level.</p>
-
-          <h3>The controller</h3>
-
-          <p>Although at the bottom of the script block, the code defined as the event handler for the <code>loadstart</code> event is the first code that will be executed. The event handler directs the major actions that take place in the code, in essence
-            acting as a controller.</p>
+          <p>Since you are now familiar with many of the concepts and specific code on how to call the APIs, only the code that calls the <code>makeRequest()</code> function is detailed.</p>
 
           <ul>
-            <li>Lines 291, 323: Define an event handler as an anonymous function.</li>
-            <li>Line 299: Sets the data needed for the call to the API.</li>
-            <li>Lines 301-322: Calls the <code>makeRequest()</code> function passing two parameters, the API call information and a callback function. This should sound familiar from above. Very importantly, the <code>makeRequest()</code> function that is
-              called IS THE EXACT SAME FUNCTION USED IN THE PREVIOUS EXAMPLE. You can do the same in your code. The <code>makeRequest()</code> function was written to be reused with any calls to a Brightcove REST API.</li>
-            <li>Lines 301-322: Defines the callback function that is executed with the <code>makeRequest()</code> function. This is what is executed once the data from the Analytics API call has been returned to the proxy, then sent back to the client.</li>
-            <li>Line 310: Assigns to the <code>videoIDs</code> variable an array of video IDs by calling the <code>extractVideoIds()</code> function.</li>
-            <li>Lines 308-321: Calls the <code>getVideoData()</code> function which contains asynchronous calls to the player catalog to retrieve complete video objects based on the ID. As usual with the code used in this document, the asynchronous call uses
-              an anonymously defined callback function.</li>
-            <li>Line 310: Assigns to the <code>videoList</code> variable an HTML <code>div</code> element containing video thumbnails by calling the <code>createVideoList()</code> function.</li>
-            <li>Line 312: Appends the newly created element to the overlay <code>div</code>.</li>
-            <li>Lines 313-319: Defines the overlay behavior by calling the <code>player.overlay()</code> method.</li>
+            <li>Line 2: Call the <code>makeRequest()</code> function passing as arguments the options required for a successful REST API call, along with an anonymously defined callback function (highlighted in yellow). This should sound familiar from above. Very importantly, the <code>makeRequest()</code> function that is called IS THE EXACT SAME FUNCTION USED IN THE PREVIOUS EXAMPLE. You can do the same in your code. The <code>makeRequest()</code> function was written to be reused with any calls to a Brightcove REST API.
+              <aside class="bcls-aside bcls-aside--tip">The <code>mostWatchedVideos</code> parameter will have the retrieved value assigned to when the callback function is used in the <code>makeRequest()</code> function.</aside>
+            </li>
+            <li>Line 3: Create a variable to hold the JSON parsed returned data.</li>
+            <li>Line 5: Parse the returned data to convert if from a string to an object.</li>
+            <li>Line 7: Use the helper function to extract video IDs from returned data. Unfortunately, the Analytics API does not return the full video objects, so IDs are needed to access the full objects.</li>
+            <li>Lines 9-12: Call the <code>getVideoData</code> helper function that uses a callback function to populate the <code>videoObjects</code> array based on IDs passed.</li>
+            <li>Line 11: Populate the playlist with the array of video objects.</li>
           </ul>
 
-          <pre class="line-numbers" data-start="288">
-      <code class="language-javascript">/**
-       * acts as a controller for the rest of the script
-       */
-      player.one('loadstart', function () {
-        var requestData = {},
-          videoIds = [],
-          videoList,
-          overlayDiv = createEl('div'),
-          parsedData = "";
-        // add the overlay
-        // set up data for Analytics API request
-        requestData = setRequestData();
-        // make the Analytics API request
-        makeRequest(requestData, <span class="bcls-highlight">function (analyticsData) {
-          //Convert raw JSON then populate HTML page with response data
-          parsedData = JSON.parse(analyticsData);
-          responseData.textContent = JSON.stringify(parsedData, null, '  ');
-          // extract the video ids into an array
-          videoIds = extractVideoIds(analyticsData);
-          // use the catalog to get the video data
-          getVideoData(videoIds, function () {
-            // generate the HTML for the overlay
-            videoList = createVideoList(videoData);
-            // add the overlay
-            overlayDiv.appendChild(videoList);
-            player.overlay({
-              overlays: [{
-                align: 'top',
-                content: overlayDiv,
-                start: 'pause',
-                end: 'play'
-              }] //end overlays definition
-            }); //end call to overlay method
-          }); //end getVideoData function call
-        }</span>); //end makeRequest call
-      }); //end loadstart event handler</code></pre>
+          <pre class="line-numbers">
+      <code class="language-javascript">// +++ Make the CMS API request to get matching video IDs +++
+      makeRequest(options, <span class="bcls-highlight">function(mostWatchedVideos) {
+        var JSONmostWatchedVideos;
+        // Convert response string into JSON
+        JSONmostWatchedVideos = JSON.parse(mostWatchedVideos);
+        // Extract the needed video IDs into an array
+        videoData = extractVideoData(JSONmostWatchedVideos);
+        // Get video objects based on array of video IDs
+        getVideoData(videoData, function(videoObjects) {
+          // Add the most watched videos list to the player as a playlist
+          myPlayer.playlist(videoObjects);
+        });</span>
+      });</code></pre>
 
           <h3>Complete code listing</h3>
 
