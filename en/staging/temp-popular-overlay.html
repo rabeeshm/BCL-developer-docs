@@ -169,18 +169,6 @@
 <aside class="bcls-aside bcls-aside--tip">Even though the overlay will be displayed on pause <strong>and</strong> end, you will only need to listen for the <code>pause</code> event, because this event is also dispatched when <code>ended</code> is dispatched.</aside>
 </section>
 
-<section class="bcls-section">
-  <h2 id="Modal_advantages">Modal advantages</h2>
-
-<p>Some advantages of using the <strong>ModalDialog</strong> component include the following:</p>
-
-<ul><li>It covers the entire player by default</li>
-	<li>It has methods to easily open and close the modal window</li>
-</ul>
-<aside class="bcls-aside bcls-aside--tip">This example uses the <strong>ModalDialog</strong> component of the Brightcove Player. For more details, see the <a href="https://support.brightcove.com/node/18074">Implementing the ModalDialog</a> document.
-</aside>
-</section>
-
 <!-- UPDATE player and HTML configuration -->
 <section class="bcls-section">
 <h2 id="Player/HTML_configuration">Player/HTML configuration</h2>
@@ -189,31 +177,7 @@
 
 <h3>Player configuration</h3>
 
-<p>No special configuration is required for the Brightcove Player you create for this sample.</p>
-
-<h3 id="Video_configuration">Video configuration</h3>
-
-<p>This sample uses an array of thumbnail image URLs that are stored in the video's <a href="https://support.brightcove.com/editing-video-properties-using-media-module#videoinfo">Long Description</a> field. We will then access the currently loaded video's metadata through the <a href="https://support.brightcove.com/node/18085">mediainfo</a> object. Alternatively, you can create a <a href="https://support.brightcove.com/node/1050">custom field</a> to store the URL array.</p>
-<p>
-  Here is the thumbnail array added to the Long Description property in <a href="https://support.brightcove.com/node/15482">Video Cloud Studio's Media module</a>:
-</p>
-<figure class="bcls-figure">
-  <img class="bcls-image" alt="Thumbnail array" src="//learning-services-media.brightcove.com/doc-assets/player-development/samples/thumbnail-hover/thumbnail-array.png" /><figcaption class="bcls-caption--image">Thumbnail array</figcaption>
-</figure>
-<p>
-  Here is the complete thumbnail array code:
-</p>
-<pre><code class="language-json">{
-  &quot;thumbs&quot;: [{
-    &quot;image&quot;: &quot;http://learning-services-media.brightcove.com/doc-assets/player-development/player-customization/modal-dialog/display-thumbnails/thumb1.png&quot;
-  }, {
-    &quot;image&quot;: &quot;http://learning-services-media.brightcove.com/doc-assets/player-development/player-customization/modal-dialog/display-thumbnails/thumb2.png&quot;
-  }, {
-    &quot;image&quot;: &quot;http://learning-services-media.brightcove.com/doc-assets/player-development/player-customization/modal-dialog/display-thumbnails/thumb3.png&quot;
-  }, {
-    &quot;image&quot;: &quot;http://learning-services-media.brightcove.com/doc-assets/player-development/player-customization/modal-dialog/display-thumbnails/thumb4.png&quot;
-  }]
-}</code></pre>
+<p>This sample uses a responsive player, but you can use the embed code for a fixed player as well.</p>
 
 <h3>Other HTML</h3>
 
@@ -231,37 +195,42 @@
 <p>The basic logic behind this application is:</p>
 
 <ul>
-	<li>Get the player DOM element.</li>
-  <li>Get the thumbnail array.</li>
-	<li>Format the overlay content with the thumbnails for different sections within the video content.</li>
-	<li>Show the thumbnails on user hover.</li>
-  <li>Hide the thumbnails on user mouseout.</li>
-  <li>Play the video when the user clicks on the thumbnails ModalDialog.</li>
+	<li>Get the page DOM elements.</li>
+  <li>Setup the request for the Analytics API.</li>
+  <li>Call the proxy code to make the request to the Analytics API.</li>
+	<li>Format the overlay content.</li>
+	<li>Load and play popular video.</li>
 </ul>
 
 <!-- UPDATE task 1 -->
 
-<h3>Get the player DOM element</h3>
+<h3>Get the page DOM elements</h3>
 
-<p>Find the code which is labeled:</p>
-
-<pre>
-<code class="language-javascript">// +++ Get the player DOM element +++</code></pre>
-
-<p>Get a reference to the player's DOM element. We will use this to add the ModalDialog to the player.</p>
+<p>Get a reference to the page's DOM elements. We will use these to display the Analytics API request and response. Also, set the values for the proxy URL and the Analytics API base URL.</p>
 
 <!-- UPDATE task 2 -->
 
-<h3>Get the thumbnail array</h3>
+<h3>Setup the request for the Analytics API</h3>
 
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Get the thumbnail array +++</code></pre>
+<code class="language-javascript">// +++ Setup API request +++</code></pre>
 
-<p>Get the thumbnail URL array from the video's Long Description property. For details about adding this metadata to your video, see the <a href="#Video_configuration">Video configuration</a> section.</p>
+<p>This sample will return 6 videos which have the most video views from yesterday.</p>
 
 <!-- UPDATE task 3 -->
+
+<h3>Make a request to the Analytics API</h3>
+
+<p>Find the code which is labeled:</p>
+
+<pre>
+<code class="language-javascript">// +++ Make a request to the Analytics API +++</code></pre>
+
+<p>Use the proxy code to send an HTTP GET request to the Analytics API RESTful web service. Parse the returned data into JSON format. If an error occurs, display an error message.</p>
+
+<!-- UPDATE task 4 -->
 
 <h3>Format the overlay content</h3>
 
@@ -273,44 +242,22 @@
 <p>To format the overlay content, do the following:</p>
 
 <ol class="bcls-tasklist">
-  <li>Get the thumbnail URLs from the video Long Description field and add to modal dialog content.</li>
-	<li>Configure and create the Modal Dialog.</li>
-  <li>Add the Modal Dialog to the player.</li>
+  <li>Extract the video ids from the response from the Analytics API.</li>
+	<li>Use the <a href="https://support.brightcove.com/node/18108">player catalog</a> to get the video objects for each video id returned from the Analytics API.</li>
+  <li>Generate the HTML for the overlay.</li>
+  <li>Initialize the Overlay plugin with the newly created related videos content. You will see a grid of popular video thumbnails when the overlay is displayed. Show the overlay when video playback is paused or has ended. Hide the overlay when the main video is playing.</li>
 </ol>
-
-<!-- UPDATE task 4 -->
-
-<h3>Show the thumbnails</h3>
-
-<p>Find the code which is labeled:</p>
-
-<pre>
-<code class="language-javascript">// +++ Show the thumbnails +++</code></pre>
-
-<p>Listen for the <code>mouseover</code> event on the player. When triggered, display the Modal Dialog with the video section thumbnail images.</p>
 
 <!-- UPDATE task 5 -->
 
-<h3>Hide the thumbnails</h3>
+<h3>Load and play popular video</h3>
 
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Hide the thumbnails +++</code></pre>
+<code class="language-javascript">// +++ Load and play popular video +++</code></pre>
 
-<p>Listen for the <code>mouseout</code> event on the player. When triggered, hide the Modal Dialog with the video section thumbnail images.</p>
-
-<!-- UPDATE task 6 -->
-
-<h3>Play the video</h3>
-
-<p>Find the code which is labeled:</p>
-
-<pre>
-<code class="language-javascript">// +++ Play the video +++</code></pre>
-
-<p>When the thumbnail ModalDialog is clicked, remove the event listeners, close and dispose of the ModalDialog and start video playback.</p>
-
+<p>Create a function that loads and starts playback for the popular video that is selected by the user.</p>
 </section>
 
 <!-- UPDATE CSS description -->
@@ -318,7 +265,7 @@
 <section class="bcls-section">
 <h2 id="Application_styling">Application styling</h2>
 
-<p>The CSS styles the videos thumbnail images in the ModalDialog.</p>
+<p>The CSS styles the videos thumbnail images in the overlay.</p>
 </section>
 
 <section class="bcls-section">
@@ -342,8 +289,7 @@
   ...
 });</code></pre>
 <!-- UPDATE path to plugin's JavaScript -->
-
-<p>As mentioned earlier, you can see the plugin's JavaScript code in this document's corresponding GitHub repo: <a href="https://github.com/BrightcoveLearning/18148-display-thumbnails-hover/blob/master/plugin/thumbnails-hover.js">thumbnail-hover.js</a>.</p>
+<p>As mentioned earlier, you can see the plugin's JavaScript code in this document's corresponding GitHub repo: <a href="https://github.com/BrightcoveLearning/18161-popular-videos-overlay/blob/master/plugin/popular-videos-overlay.js">popular-videos-overlay.js</a>.</p>
 
 <h3>Using the plugin with a player</h3>
 
