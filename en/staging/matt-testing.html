@@ -91,7 +91,7 @@
           <ul>
             <li>Line 14: You can add a single <code>style</code> tag, but it must include the <code>amp-custom</code> attribute.</li>
             <li>Line 26: DO NOT beautify the code. The boilerplate CSS is needed as supplied by AMP.</li>
-            <li>Line 42: The URL to the external video is passed here. Remember that since the name will be retrieved from an iframe's <code>src</code> URL, then name to </li>
+            <li>Line 42: The URL to the external video is passed here. Remember that since the name will be retrieved from an iframe's <code>src</code> URL, the name will be <code>videoUrl</code>.</li>
             <li>Line 43: The <code>width</code> and <code>height</code> attributes determine the aspect ratio of the player embedded in responsive layouts.</li>
           </ul>
 
@@ -156,7 +156,57 @@
           <figure class="bcls-figure">
               <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/playback/AMP/amp-url.png" alt="AMP iframe source">
           </figure>
+          <p>Notice that the query string name is <code>videoUrl</code>. Also note that the URL has been URL encoded. Both of these issues will reflected in the plugin code, shown here:</p>
+          <ul>
+            <li>Lines 21-38: A helper function that finds the value associated with a query string, passed to the function as a parameter.</li>
+            <li>Line 7: Retrieve the value of the <code>videoUrl</code> query string using the helper function.</li>
+            <li>Line 8: Use JavaScript's <code>decodeURIComponent()</code> method to get a valid URL for the video.</li>
+            <li>Lines 11-14: Use the decoded URL and place the video in the player. If you are going to use formats of video other than MP4, you would either need to pass the correct <code>type</code> value, or write logic to read the video's extension and assign the correct value.</li>
+            <li>Lines 17-19: Of course not required, but if you want the video to play on startup you could use this code.</li>
+          </ul>
 
+          <pre class="line-numbers">
+<code class="language-javascript">videojs.registerPlugin('ampPassVideo', function() {
+  var myPlayer = this,
+    encodedVideoQueryParam,
+    decodedVideoQueryParam;
+
+  // Get the query string and un-URL encode it
+  encodedVideoQueryParam = getQuerystring('videoUrl');
+  decodedVideoQueryParam = decodeURIComponent(encodedVideoQueryParam);
+
+  // Load the video into the player
+  myPlayer.src({
+    'type': 'video/mp4',
+    'src': decodedVideoQueryParam
+  });
+
+  // On loadedmetadata event, play the video
+  myPlayer.on('loadedmetadata', function(){
+    myPlayer.play();
+  });
+
+  /*
+   * usage: foo = getQuerystring("bctid", null);
+   * foo will be equal to value of query param bctid
+   * note that the default_ parameter is what you will get back
+   * if the key isn’t found
+   */
+  function getQuerystring(key, default_) {
+    var regex, qs;
+    if (default_ == null) default_ = "";
+    key = key.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+    regex = new RegExp("[\\?&]" + key + "=([^&#]*)");
+    qs = regex.exec(window.location.href);
+    if (qs === null) {
+      return default_;
+    } else {
+      return qs[1];
+    }
+  }
+});</code></pre>
+
+          <p>You would assign this plugin to your player either using <a href="/node/14053"> Studio or the Player Management API.</p>
 
         </section>
 
