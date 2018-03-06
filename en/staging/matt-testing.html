@@ -49,17 +49,32 @@
       <article class="bcls-article">
         <section class="bcls-section">
           <section class="bcls-section">
+            <aside class="bcls-aside bcls-aside--warning">This document details a special case of using AMP with Brightcove Player and OnceUX. For an introduction to using AMP see either:
+              <ul>
+                <li><a href="/node/18160">AMP Using a Video Cloud Video</a></li>
+                <li><a href="/node/18555">AMP Using an External (non-Video Cloud) Video</a></li>
+              </ul>
+            </aside>
+
             <h2 id="Overview">Overview</h2>
 
-            <p>Accelerated Mobile Pages is a Google project that aims to enable "the creation of websites and ads that are consistently fast, beautiful and high-performing across devices and distribution platforms." You can use Brightcove Player with AMP because the project includes an <code>amp-brightcove</code> component which allows publishers to embed Brightcove Players within AMP HTML documents. This example uses a custom plugin that accepts a URL to an external (non-video cloud) video passed to it via the <code>amp-brightcove</code> component using the custom <code>data-param-video-url</code> attribute.</p>
+            <p>This document details the steps needed to use Once UX technology (server-side ad insertion) with AMP and Brightcove Player (non-Video Cloud customer version, although if you are a Video Cloud customer the steps are the same). The broad steps are listed here, then detailed in the rest of the document:</p>
+            <ul>
+              <li>Configure your Once UX implementation. You will need at least a <code>metadataUri</code>. For more details on Once UX see the <a href="/node/17776">Brightcove Once UX Implementation Guide</a>.</li>
+              <li>Create the JavaScript needed to correctly play the Once UX asset using a custom Brightcove Player plugin.</li>
+              <li>Add the Once UX plugin and the custom plugin to the player configuration usign Studio.</li>
+              <li>Use the configured player in an AMP page.</li>
+            </ul>
+
           </section>
 
           <h2 id="Sample">Sample</h2>
 
           <p>The following is a sample AMP HTML page that includes a Brightcove Player. The player functions normally, so the HTML is the interesting part of this sample. The HTML code is examined later in this document.</p>
 
-          <p data-height="416" data-theme-id="dark" data-slug-hash="XZGQza" data-default-tab="html,result" data-user="rcrooks1969" data-embed-version="2" data-pen-title="AMP-Brightcove Player-External Video" class="codepen">See the Pen <a href="https://codepen.io/team/rcrooks1969/pen/XZGQza/">AMP-Brightcove Player-External Video</a> by Brightcove Learning Services (<a href="https://codepen.io/rcrooks1969">@rcrooks1969</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+          <p data-height="412" data-theme-id="dark" data-slug-hash="oEVVNx" data-default-tab="html,result" data-user="rcrooks1969" data-embed-version="2" data-pen-title="AMP-Brightcove Player-OnceUX" class="codepen">See the Pen <a href="https://codepen.io/team/rcrooks1969/pen/oEVVNx/">AMP-Brightcove Player-OnceUX</a> by Brightcove Learning Services (<a href="https://codepen.io/rcrooks1969">@rcrooks1969</a>) on <a href="https://codepen.io">CodePen</a>.</p>
           <script async src="https://static.codepen.io/assets/embed/ei.js"></script>
+
           <aside class="bcls-aside bcls-aside--warning">Note that because of the way AMP works, you must carefully consider its limitations before use. For example:
             <ul>
               <li>AMP has very strict rules on what HTML can and cannot be used on a page. Details on this can be viewed in the <a href="https://www.ampproject.org/docs/reference/spec">AMP HTML Specification</a>.</li>
@@ -86,7 +101,8 @@
         <section class="bcls-section">
           <h2 id="HTML_page_code_examination">HTML page code examination</h2>
 
-          <p>The HTML page code from the CodePen sample above is shown below (plugin code is detailed in the next section). A complete explanation of the code is provided by AMP in the documents linked to above. In the following list are a few tricks/traps to be aware of:</p>
+          <p>The HTML page code from the CodePen sample above is shown below (plugin code is detailed in the next section). A complete explanation of the code is provided by AMP in the documents linked to above. In the following list are a few tricks/traps
+            to be aware of:</p>
 
           <ul>
             <li>Line 14: You can add a single <code>style</code> tag, but it must include the <code>amp-custom</code> attribute.</li>
@@ -96,118 +112,122 @@
           </ul>
 
           <pre class="line-numbers" data-start="1">
-<code class="language-html">&lt;!--
-  ## Introduction
+      <code class="language-html">&lt;!--
+        ## Introduction
 
-  The `amp-brightcove` component allows embedding a Brightcove
-  [Video Cloud](https://www.brightcove.com/en/online-video-platform) or
-  [Perform](https://www.brightcove.com/en/perform) player.
---&gt;
-&lt;!-- --&gt;
-&lt;!doctype html&gt;
-&lt;html ⚡&gt;
-&lt;head&gt;
-  &lt;meta charset=&quot;utf-8&quot;&gt;
-  &lt;title&gt;amp-brightcove&lt;/title&gt;
-  &lt;style amp-custom&gt;
-    .player-container {
-      width: 640px;
-      height: 360px;
-    }
-  &lt;/style&gt;
-  &lt;script async src=&quot;https://cdn.ampproject.org/v0.js&quot;&gt;&lt;/script&gt;
-  &lt;!-- ## Setup --&gt;
-  &lt;!-- Import the Brightcove component in the header. --&gt;
-  &lt;script async custom-element=&quot;amp-brightcove&quot; src=&quot;https://cdn.ampproject.org/v0/amp-brightcove-0.1.js&quot;&gt;&lt;/script&gt;
-  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,minimum-scale=1,initial-scale=1&quot;&gt;
-  &lt;link rel=&quot;canonical&quot; href=&quot;https://ampbyexample.com/components/amp-brightcove/&quot;&gt;
-  &lt;style amp-boilerplate&gt;body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}&lt;/style&gt;&lt;noscript&gt;&lt;style amp-boilerplate&gt;body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}&lt;/style&gt;&lt;/noscript&gt;
-
-
-&lt;/head&gt;
-&lt;body&gt;
-
-  &lt;!-- ## Basic Usage --&gt;
-  &lt;!--
-    A responsive brightcove video. The required data is `data-account` and `data-video-id`. Other
-    supported parameters are `data-player-id`, `data-embed` and `data-playlist-id`.
-  --&gt;
-  &lt;div class=&quot;player-container&quot;&gt;
-    &lt;amp-brightcove
-      data-account=&quot;3676484087001&quot;
-      data-player-id=&quot;ByrhJWAPf&quot;
-      layout=&quot;responsive&quot;
-      data-param-video-url=&quot;//solutions.brightcove.com/bcls/videos/calm-day-oregon-coast.mp4&quot;
-      width=&quot;16&quot; height=&quot;9&quot;&gt;
-    &lt;/amp-brightcove&gt;
-  &lt;/div&gt;
+        The `amp-brightcove` component allows embedding a Brightcove
+        [Video Cloud](https://www.brightcove.com/en/online-video-platform) or
+        [Perform](https://www.brightcove.com/en/perform) player.
+      --&gt;
+      &lt;!-- --&gt;
+      &lt;!doctype html&gt;
+      &lt;html ⚡&gt;
+      &lt;head&gt;
+        &lt;meta charset="utf-8"&gt;
+        &lt;title&gt;amp-brightcove&lt;/title&gt;
+        &lt;style amp-custom&gt;
+          .player-container {
+            width: 640px;
+            height: 360px;
+          }
+        &lt;/style&gt;
+        &lt;script async src="https://cdn.ampproject.org/v0.js"&gt;&lt;/script&gt;
+        &lt;!-- ## Setup --&gt;
+        &lt;!-- Import the Brightcove component in the header. --&gt;
+        &lt;script async custom-element="amp-brightcove" src="https://cdn.ampproject.org/v0/amp-brightcove-0.1.js"&gt;&lt;/script&gt;
+        &lt;meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1"&gt;
+        &lt;link rel="canonical" href="https://ampbyexample.com/components/amp-brightcove/"&gt;
+        &lt;style amp-boilerplate&gt;body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}&lt;/style&gt;&lt;noscript&gt;&lt;style amp-boilerplate&gt;body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}&lt;/style&gt;&lt;/noscript&gt;
 
 
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
+      &lt;/head&gt;
+      &lt;body&gt;
+
+        &lt;!-- ## Basic Usage --&gt;
+        &lt;!--
+          A responsive brightcove video. The required data is `data-account` and `data-video-id`. Other
+          supported parameters are `data-player-id`, `data-embed` and `data-playlist-id`.
+        --&gt;
+        &lt;div class="player-container"&gt;
+          &lt;amp-brightcove
+            data-account="3676484087001"
+            data-player-id="ByrhJWAPf"
+            layout="responsive"
+            data-param-video-url="//solutions.brightcove.com/bcls/videos/calm-day-oregon-coast.mp4"
+            width="16" height="9"&gt;
+          &lt;/amp-brightcove&gt;
+        &lt;/div&gt;
+
+
+      &lt;/body&gt;
+      &lt;/html&gt;</code></pre>
         </section>
 
         <section class="bcls-section">
           <h2 id="Plugin_code_examination">Plugin code examination</h2>
-          <p>The way AMP functions is that the <code>amp-brightcove</code> component creates an iframe implementation of the Brightcove Player. In the URL for the iframe will be the custom attribute, as shown here: </p>
+
+          <p>The way AMP functions is that the <code>amp-brightcove</code> component creates an iframe implementation of the Brightcove Player. In the URL for the iframe will be the custom attribute, as shown here:</p>
+
           <pre class="line-numbers">
-<code class="language-html">&lt;iframe frameborder=&quot;0&quot; allowfullscreen=&quot;true&quot; src=&quot;https://players.brightcove.net/3676484087001/ByrhJWAPf_default/index.html?<span class="bcls-highlight">videoUrl=%2F%2Fsolutions.brightcove.com%2Fbcls%2Fvideos%2Fcalm-day-oregon-coast.mp4&quot</span>; class=&quot;i-amphtml-fill-content&quot; kwframeid=&quot;1&quot;&gt;&lt;/iframe&gt;</code></pre>
+      <code class="language-html">&lt;iframe frameborder="0" allowfullscreen="true" src="https://players.brightcove.net/3676484087001/ByrhJWAPf_default/index.html?<span class="bcls-highlight">videoUrl=%2F%2Fsolutions.brightcove.com%2Fbcls%2Fvideos%2Fcalm-day-oregon-coast.mp4"</span>; class="i-amphtml-fill-content" kwframeid="1"&gt;&lt;/iframe&gt;</code></pre>
+
           <p>If you scroll over in the iframe code, you will see the query string shown here:</p>
-          <figure class="bcls-figure">
-              <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/playback/AMP/amp-url.png" alt="AMP iframe source">
-          </figure>
+
+          <figure class="bcls-figure"><img class="bcls-image" alt="AMP iframe source" src="//learning-services-media.brightcove.com/doc-assets/player-development/playback/AMP/amp-url.png" /></figure>
+
           <p>Notice that the query string name is <code>videoUrl</code>. Also note that the URL has been URL encoded. Both of these issues will reflected in the plugin code, shown here:</p>
+
           <ul>
             <li>Lines 21-38: A helper function that finds the value associated with a query string, passed to the function as a parameter.</li>
             <li>Line 7: Retrieve the value of the <code>videoUrl</code> query string using the helper function.</li>
             <li>Line 8: Use JavaScript's <code>decodeURIComponent()</code> method to get a valid URL for the video.</li>
-            <li>Lines 11-14: Use the decoded URL and place the video in the player. If you are going to use formats of video other than MP4, you would either need to pass the correct <code>type</code> value, or write logic to read the video's extension and assign the correct value.</li>
+            <li>Lines 11-14: Use the decoded URL and place the video in the player. If you are going to use formats of video other than MP4, you would either need to pass the correct <code>type</code> value, or write logic to read the video's extension and
+              assign the correct value.</li>
             <li>Lines 17-19: Of course not required, but if you want the video to play on startup you could use this code.</li>
           </ul>
 
           <pre class="line-numbers">
-<code class="language-javascript">videojs.registerPlugin('ampPassVideo', function() {
-  var myPlayer = this,
-    encodedVideoQueryParam,
-    decodedVideoQueryParam;
+      <code class="language-javascript">videojs.registerPlugin('ampPassVideo', function() {
+        var myPlayer = this,
+          encodedVideoQueryParam,
+          decodedVideoQueryParam;
 
-  // Get the query string and un-URL encode it
-  encodedVideoQueryParam = getQuerystring('videoUrl');
-  decodedVideoQueryParam = decodeURIComponent(encodedVideoQueryParam);
+        // Get the query string and un-URL encode it
+        encodedVideoQueryParam = getQuerystring('videoUrl');
+        decodedVideoQueryParam = decodeURIComponent(encodedVideoQueryParam);
 
-  // Load the video into the player
-  myPlayer.src({
-    'type': 'video/mp4',
-    'src': decodedVideoQueryParam
-  });
+        // Load the video into the player
+        myPlayer.src({
+          'type': 'video/mp4',
+          'src': decodedVideoQueryParam
+        });
 
-  // On loadedmetadata event, play the video
-  myPlayer.on('loadedmetadata', function(){
-    myPlayer.play();
-  });
+        // On loadedmetadata event, play the video
+        myPlayer.on('loadedmetadata', function(){
+          myPlayer.play();
+        });
 
-  /*
-   * usage: foo = getQuerystring("bctid", null);
-   * foo will be equal to value of query param bctid
-   * note that the default_ parameter is what you will get back
-   * if the key isn’t found
-   */
-  function getQuerystring(key, default_) {
-    var regex, qs;
-    if (default_ == null) default_ = "";
-    key = key.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-    regex = new RegExp("[\\?&]" + key + "=([^&#]*)");
-    qs = regex.exec(window.location.href);
-    if (qs === null) {
-      return default_;
-    } else {
-      return qs[1];
-    }
-  }
-});</code></pre>
+        /*
+         * usage: foo = getQuerystring("bctid", null);
+         * foo will be equal to value of query param bctid
+         * note that the default_ parameter is what you will get back
+         * if the key isn’t found
+         */
+        function getQuerystring(key, default_) {
+          var regex, qs;
+          if (default_ == null) default_ = "";
+          key = key.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+          regex = new RegExp("[\\?&amp;]" + key + "=([^&amp;#]*)");
+          qs = regex.exec(window.location.href);
+          if (qs === null) {
+            return default_;
+          } else {
+            return qs[1];
+          }
+        }
+      });</code></pre>
 
-          <p>You would assign this plugin to your player either using <a href="/node/14053"> Studio or the Player Management API.</p>
-
+          <p>You would assign this plugin to your player either using <a href="/node/14053">Studio</a> or the Player Management API.</p>
         </section>
 
         <section class="bcls-section">
