@@ -195,6 +195,125 @@ completion:^(BCOVVideo *video,
 }
 </code></pre>
 
+<h3 id="Complete_code_using_video_Id" class="bcls-expander-head">ViewController code using video Id</h3>
+<div class="bcls-expander-content">
+  <pre class="line-numbers"><code class="language-objectivec">//
+//  ViewController.m
+//  SSAI with Video Id
+//
+//  Created on 3/8/18.
+//  Copyright &copy; 2018 Brightcove. All rights reserved.
+//
+
+#import &quot;ViewController.h&quot;
+
+@import BrightcovePlayerSDK;
+@import BrightcoveOUX;
+
+NSString *accountId = @&quot;<span class="bcls-input">your account Id</span>&quot;;
+NSString *policyKey = @&quot;<span class="bcls-input">your policy key</span>&quot;;
+NSString *videoId = @&quot;<span class="bcls-input">your video Id</span>&quot;;
+NSString *adConfigId = @&quot;<span class="bcls-input">your ad configuration Id</span>&quot;;
+
+@interface ViewController () &lt;BCOVPlaybackControllerDelegate&gt;
+@property (nonatomic, strong) id&lt;BCOVPlaybackController&gt; playbackController;
+@property (nonatomic, strong) BCOVPlaybackService *playbackService;
+@property (nonatomic) BCOVPUIPlayerView *playerView;
+@property (weak, nonatomic) IBOutlet UIView *videoContainerView;
+@property (weak, nonatomic) IBOutlet UIView *companionSlotContainerView;
+
+@end
+
+@implementation ViewController
+
+- (void)viewDidLoad {
+  [super viewDidLoad];
+  // Do any additional setup after loading the view, typically from a nib.
+  BCOVPlayerSDKManager *manager = [BCOVPlayerSDKManager sharedManager];
+
+  // Create a companion slot.
+  BCOVOUXCompanionSlot *companionSlot = [[BCOVOUXCompanionSlot alloc] initWithView:self.companionSlotContainerView width:500 height:61];
+
+  // In order to display an ad progress banner on the top of the view, we create this display container.  This object is also responsible for populating the companion slots.
+  BCOVOUXAdComponentDisplayContainer *adComponentDisplayContainer = [[BCOVOUXAdComponentDisplayContainer alloc]   initWithCompanionSlots:@[companionSlot]];
+
+  self.playbackController = [manager createOUXPlaybackControllerWithViewStrategy:nil];
+
+  // In order for the ad display container to receive ad information, we add it as a session consumer.
+  [self.playbackController addSessionConsumer:adComponentDisplayContainer];
+
+  self.playbackController.delegate = self;
+  self.playbackController.autoPlay = YES;
+
+  BCOVPUIBasicControlView *controlView = [BCOVPUIBasicControlView basicControlViewWithVODLayout];
+  // Set playback controller later.
+  self.playerView = [[BCOVPUIPlayerView alloc] initWithPlaybackController:nil options:nil controlsView:controlView];
+  self.playerView.frame = self.videoContainerView.bounds;
+  self.playerView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+  [self.videoContainerView addSubview:self.playerView];
+
+  self.playerView.playbackController = self.playbackController;
+
+  NSDictionary *queryParameters = @{
+                                @&quot;ad_config_id&quot; : adConfigId
+                                };
+
+  self.playbackService = [[BCOVPlaybackService alloc]
+                      initWithAccountId:accountId
+                      policyKey:policyKey];
+
+  [self.playbackService findVideoWithVideoID:videoId parameters:queryParameters completion:^(BCOVVideo *video, NSDictionary *jsonResponse, NSError *error) {
+    {
+        if (error == nil)
+        {
+            // play it.
+            [self.playbackController setVideos: @[ video ]];
+        }
+        else
+        {
+            NSLog (@&quot;Error! Playback Service says: %@&quot;,
+                   error.localizedDescription);
+        }
+    }
+  }];
+}
+
+#pragma mark BCOVPlaybackControllerBasicDelegate
+
+- (void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller didAdvanceToPlaybackSession:(id&lt;BCOVPlaybackSession&gt;)session
+{
+  NSLog(@&quot;ViewController Debug - Advanced to new session.&quot;);
+}
+
+#pragma mark BCOVPlaybackControllerAdsDelegate
+
+- (void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller playbackSession:(id&lt;BCOVPlaybackSession&gt;)session didEnterAdSequence:(BCOVAdSequence *)adSequence
+{
+  NSLog(@&quot;ViewController Debug - Entering ad sequence&quot;);
+}
+
+- (void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller playbackSession:(id&lt;BCOVPlaybackSession&gt;)session didExitAdSequence:(BCOVAdSequence *)adSequence
+{
+  NSLog(@&quot;ViewController Debug - Exiting ad sequence&quot;);
+}
+
+- (void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller playbackSession:(id&lt;BCOVPlaybackSession&gt;)session didEnterAd:(BCOVAd *)ad
+{
+  NSLog(@&quot;ViewController Debug - Entering ad&quot;);
+}
+
+- (void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller playbackSession:(id&lt;BCOVPlaybackSession&gt;)session didExitAd:(BCOVAd *)ad
+{
+  NSLog(@&quot;ViewController Debug - Exiting ad&quot;);
+}
+
+- (void)didReceiveMemoryWarning {
+  [super didReceiveMemoryWarning];
+  // Dispose of any resources that can be recreated.
+}
+@end</code></pre>
+</div>
+
           <aside class="bcls-aside bcls-aside--tip">
             <p>
               Events associated with Server-side ad insertion include the following:
