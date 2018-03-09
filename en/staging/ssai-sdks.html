@@ -172,13 +172,15 @@ static NSString *adConfigId = @&quot;<span class="bcls-input">your ad configurat
       	</li>
       </ol>
 
-<h3 id="Complete_ViewController_m_code" class="bcls-expander-head">Complete ViewController.m code</h3>
+<h3 id="Complete_ViewController_using_Objective-C" class="bcls-expander-head">Complete ViewController using Objective-C</h3>
 <div class="bcls-expander-content">
+  <p>
+    Your <strong>ViewController.m</strong> file should look similar to this:
+  </p>
   <pre class="line-numbers"><code class="language-objectivec">//
 //  ViewController.m
 //  SSAI with Video Id
 //
-//  Created on 3/8/18.
 //  Copyright &copy; 2018 Brightcove. All rights reserved.
 //
 
@@ -289,6 +291,99 @@ NSString *adConfigId = @&quot;<span class="bcls-input">your ad configuration Id<
   // Dispose of any resources that can be recreated.
 }
 @end</code></pre>
+</div>
+
+<h3 id="Complete_ViewController_using_Swift" class="bcls-expander-head">Complete ViewController using Swift</h3>
+<div class="bcls-expander-content">
+  <p>
+    Your <strong>ViewController.swift</strong> file should look similar to this:
+  </p>
+  <pre class="line-numbers"><code class="language-objectivec">//
+//  ViewController.swift
+//  SSAI with Video Id
+//
+//  Copyright &copy; 2018 Brightcove. All rights reserved.
+//
+
+import UIKit
+import BrightcovePlayerSDK
+import BrightcoveOUX
+
+// ** Customize these values with your own account information **
+let kAccountId = &quot;4800266849001&quot;;
+let kPolicyKey = &quot;BCpkADawqM3n0ImwKortQqSZCgJMcyVbb8lJVwt0z16UD0a_h8MpEYcHyKbM8CGOPxBRp0nfSVdfokXBrUu3Sso7Nujv3dnLo0JxC_lNXCl88O7NJ0PR0z2AprnJ_Lwnq7nTcy1GBUrQPr5e&quot;;
+let kVideoId = &quot;5255514387001&quot;;
+let kAdConfigId = &quot;f04590df-9fc0-4dd0-84de-d80f2c865410&quot;;
+
+class ViewController: UIViewController, BCOVPlaybackControllerDelegate {
+    let sharedSDKManager = BCOVPlayerSDKManager.shared()
+    let playbackService = BCOVPlaybackService(accountId: kAccountId, policyKey: kPolicyKey)
+    var playbackController :BCOVPlaybackController
+    @IBOutlet weak var videoContainerView: UIView!
+    @IBOutlet weak var companionSlotContainerView: UIView!
+
+    required init?(coder aDecoder: NSCoder) {
+        playbackController = (sharedSDKManager?.createOUXPlaybackController(viewStrategy: nil))!
+
+        super.init(coder: aDecoder)
+
+        playbackController.delegate = self
+        playbackController.isAutoAdvance = true
+        playbackController.isAutoPlay = true
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view, typically from a nib.
+        // Set up our player view. Create with a standard VOD layout.
+        let playerView = BCOVPUIPlayerView(playbackController: self.playbackController, options: nil, controlsView: BCOVPUIBasicControlView.withVODLayout())
+
+        // Create a companion slot.
+        let companionSlot = BCOVOUXCompanionSlot(view: self.companionSlotContainerView, width: 500, height: 61)
+
+        // In order to display an ad progress banner on the top of the view, we create this display container.  This object is also responsible for populating the companion slots.
+        let adComponentDisplayContainer = BCOVOUXAdComponentDisplayContainer(companionSlots: [companionSlot])
+
+        // In order for the ad display container to receive ad information, we add it as a session consumer.
+        playbackController.add(adComponentDisplayContainer)
+
+        // Install in the container view and match its size.
+        playerView?.frame = self.videoContainerView.bounds
+        playerView?.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        self.videoContainerView.addSubview(playerView!)
+
+        // Associate the playerView with the playback controller.
+        playerView?.playbackController = playbackController
+
+        requestContentFromPlaybackService()
+    }
+
+    func requestContentFromPlaybackService() {
+        let queryParameters = [&quot;ad_config_id&quot;: kAdConfigId]
+
+        playbackService?.findVideo(withVideoID: kVideoId, parameters: queryParameters) { (video: BCOVVideo?, jsonResponse: [AnyHashable: Any]?, error: Error?) -&gt; Void in
+
+            if let v = video {
+                self.playbackController.setVideos([v] as NSArray)
+            } else {
+                print(&quot;ViewController Debug - Error retrieving video: \(error?.localizedDescription ?? &quot;unknown error&quot;)&quot;)
+            }
+        }
+    }
+
+    func playbackController(_ controller: BCOVPlaybackController!, didAdvanceTo session: BCOVPlaybackSession!) {
+        print(&quot;Advanced to new session&quot;)
+    }
+
+    func playbackController(_ controller: BCOVPlaybackController!, playbackSession session: BCOVPlaybackSession!, didProgressTo progress: TimeInterval) {
+        print(&quot;Progress: \(progress) seconds&quot;)
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+}</code></pre>
 </div>
 <br />
 
