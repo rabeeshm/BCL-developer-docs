@@ -109,7 +109,7 @@
       <ol class="bcls-tasklist__restart">
       	<li>Include the Once UX plugin in your app, as shown in the <a href="https://github.com/BrightcoveOS/ios-player-samples/tree/master/OUX">Basic Once UX Player</a> sample. This will be the starting point for your app. Notice that the storyboard contains the definitions for the <code>videoContainerView</code> and the <code>companionSlotContainerView</code>.</li>
         <li>
-          In Xcode, open the <strong>ViewController.m</strong> file.
+          In Xcode, open your <strong>ViewController.m</strong> file.
         </li>
         <li>
           Comment out or delete the following code:
@@ -409,83 +409,177 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate {
       <p>Follow these steps within your app to get your ad configuration and play your video:</p>
 
         <ol class="bcls-tasklist__restart">
-        	<li>Include the Once UX plugin in your app. For details, see the <a href="https://github.com/BrightcoveOS/android-player-samples/tree/master/brightcove-exoplayer/BasicOnceUxSampleApp">Basic Once UX Player</a> sample.</li>
-        	<li>Define constants for your account id, policy key, video id or video reference id, and your ad configuration id.
+          <li>Include the Once UX plugin in your app, as shown in the <a href="https://github.com/BrightcoveOS/android-player-samples/tree/master/brightcove-exoplayer/BasicOnceUxSampleApp">Basic Once UX Player</a> sample. This will be the starting point for your app. Notice that the plugin uses a companion ad container.</li>
+          <li>
+          In Android Studio, open your <strong>MainActivity.java</strong> file.
+        </li>
+        <li>
+          Comment out or delete the following code:
+<pre class="line-numbers"><code class="language-java">private String onceUxAdDataUrl = &quot;http://once.unicornmedia.com/now/ads/vmap/od/auto/c501c3ee-7f1c-4020-aa6d-0b1ef0bbd4a9/202ef8bb-0d9d-4f6f-bd18-f45aa3010fe6/8a146f45-9fac-462e-a111-de60ec96198b/content.once&quot;;
+...
+plugin.processVideo(onceUxAdDataUrl);</code></pre>
+        </li>
+
+        	<li>Define constants for your account id, policy key, video id, and your ad configuration id.
 <pre class="line-numbers">
-<code class="language-java">String accountId = "&lt;accountId&gt;";
-String policyKey = "&lt;policyKey&gt;";
-String videoRef = "&lt;videoRef&gt;";
-String adConfigId = "&lt;adConfigId&gt;";
-</code></pre>
+<code class="language-java">private String accountId = &quot;<span class="bcls-input">your account id</span>&quot;;
+private String policyKey = &quot;<span class="bcls-input">your policy key</span>&quot;;
+private String videoId = &quot;<span class="bcls-input">your video id</span>&quot;;
+private String adConfigId = &quot;<span class="bcls-input">your ad configuration id</span>&quot;;</code></pre>
 
         	<aside class="bcls-aside bcls-aside--information">Learn how to get or generate a policy key in the <a href="https://support.brightcove.com/node/18125">Policy Keys</a> document.</aside>
         	</li>
-        	<li>Set the query parameter value to your ad configuration id.
+        	<li>In the <code>onCreate</code> method, set the query parameter value to your ad configuration id.
 <pre class="line-numbers">
 <code class="language-java">Map&lt;String, String&gt; parameters = new HashMap&lt;&gt;();
 parameters.put("ad_config_id", adConfigId);
 </code></pre>
         	</li>
-        	<li>Create an instance of the catalog service.
+        	<li>Create an instance of the catalog service, which provides asynchronous methods for retrieving data from the Playback API..
 <pre class="line-numbers">
 <code class="language-java">Catalog catalog = new Catalog(brightcoveVideoView.getEventEmitter(), accountId, policyKey);
 </code></pre>
         	</li>
-        	<li>Call the catalog service to retrieve your video along with your ad configuration from the Playback API.
+        	<li>Call the catalog service to retrieve your video along with your ad configuration from the Playback API. Start video playback with your specified ads.
 <pre class="line-numbers">
-<code class="language-java">catalog.findVideoByReferenceID(videoRef, null, parameters, new VideoListener() {
-  ...
-});
-</code></pre>
-        	</li>
-        	<li>Start video playback with your specified ads.
-<pre class="line-numbers">
-<code class="language-java">@Override
-public void onVideo(Video video) {
-  try {
-    // The OnceUX plugin will look for a VMAP URL in the video object properties.
-    // If valid, it will play the video.
-    plugin.processVideo(video);
-  } catch (NoSourceFoundException e) {
-    // If NoSourceFoundException is thrown it means a suitable VMAP URL was not found.
-    // You can try to play it on a regular view
-    brightcoveVideoView.add(video);
+<code class="language-java">catalog.findVideoByID(videoId, null, parameters, new VideoListener() {
+  @Override
+  public void onVideo(Video video) {
+    try {
+      // The OnceUX plugin will look for a VMAP URL in the video object properties.
+      // If valid, it will play the video.
+      plugin.processVideo(video);
+    } catch (NoSourceFoundException e) {
+      // If NoSourceFoundException is thrown it means a suitable VMAP URL was not found.
+      // You can try to play it on a regular view,
+      brightcoveVideoView.add(video);
+    }
   }
-}
-</code></pre>
+});</code></pre>
         	</li>
         </ol>
 
-        <p>Here is the complete code block:</p>
+        <h3 id="Complete_MainActivity_file" class="bcls-expander-head">Complete MainActivity file</h3>
+        <div class="bcls-expander-content">
+          <p>
+            Your <strong>MainActivity.java</strong> file should look similar to this:
+          </p>
+<pre class="line-numbers"><code class="language-java">package com.brightcove.player.samples.onceux.basic;
 
-<pre class="line-numbers">
-<code class="language-java">@Override
-protected void onCreate(Bundle savedInstanceState) {
-  setContentView(R.layout.activity_main);
-  brightcoveVideoView = (BrightcoveVideoView) findViewById(R.id.brightcove_video_view);
-  super.onCreate(savedInstanceState);
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 
-  final OnceUxComponent plugin = new OnceUxComponent(this, brightcoveVideoView);
-  Catalog catalog = new Catalog(brightcoveVideoView.getEventEmitter(), accountId, policyKey);
+import com.brightcove.onceux.OnceUxComponent;
+import com.brightcove.onceux.event.OnceUxEventType;
+import com.brightcove.player.controller.NoSourceFoundException;
+import com.brightcove.player.edge.Catalog;
+import com.brightcove.player.edge.VideoListener;
+import com.brightcove.player.event.Event;
+import com.brightcove.player.event.EventEmitter;
+import com.brightcove.player.event.EventListener;
+import com.brightcove.player.model.Video;
+import com.brightcove.player.view.BrightcoveExoPlayerVideoView;
+import com.brightcove.player.view.BrightcovePlayer;
 
-  Map&lt;String, String&gt; parameters = new HashMap&lt;&gt;();
-  parameters.put("ad_config_id", adConfigId);
-  catalog.findVideoByReferenceID(videoRef, null, parameters, new VideoListener() {
-    @Override
-    public void onVideo(Video video) {
-      try {
-        // The OnceUX plugin will look for a VMAP URL in the video object properties.
-        // If valid, it will play the video.
-        plugin.processVideo(video);
-      } catch (NoSourceFoundException e) {
-        // If NoSourceFoundException is thrown it means a suitable VMAP URL was not found.
-        // You can try to play it on a regular view,
-        brightcoveVideoView.add(video);
-      }
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * This app illustrates how to use the Once UX plugin to ensure that:
+ *
+ * - player controls are hidden during ad playback,
+ *
+ * - tracking beacons are fired from the client side,
+ *
+ * - videos are clickable during ad playback and visit the appropriate website,
+ *
+ * - the companion banner is shown on page switched appropriately as new ads are played
+ */
+public class MainActivity extends BrightcovePlayer {
+
+    // Private class constants
+
+    private final String TAG = this.getClass().getSimpleName();
+
+    private String accountId = &quot;1752604059001&quot;;
+    private String policyKey = &quot;BCpkADawqM1Ep9jz6MbEgjY3qS2UzsYjTKFmHSuVs6DuIlXK0OkZll40fYM0CEcKXBhD7Lnb2ndra5kjOweSbsIWU0zU8lhnqnwLjlpuTP3Q4wHuVz0jfRxYK0s0qPLbEgq7OKzhYZk30VE0&quot;;
+    private String videoId = &quot;5718453946001&quot;;
+    private String adConfigId = &quot;d6190656-2095-4ff3-8afe-1a0b60d67ed2&quot;;
+
+    // Private instance variables
+
+    private OnceUxComponent plugin;
+    public OnceUxComponent getOnceUxPlugin() {
+        return plugin;
     }
-  });
-}
-</code></pre>
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        // When extending the BrightcovePlayer, we must assign brightcoveVideoView before
+        // entering the superclass.  This allows for some stock video player lifecycle
+        // management.
+        setContentView(R.layout.onceux_activity_main);
+        brightcoveVideoView = (BrightcoveExoPlayerVideoView) findViewById(R.id.brightcove_video_view);
+        brightcoveVideoView.getAnalytics().setAccount(&quot;1752604059001&quot;);
+        super.onCreate(savedInstanceState);
+
+        // Setup the event handlers for the OnceUX plugin, set the companion ad container,
+        // register the VMAP data URL inside the plugin and start the video.  The plugin will
+        // detect that the video has been started and pause it until the ad data is ready or an
+        // error condition is detected.  On either event the plugin will continue playing the
+        // video.
+        registerEventHandlers();
+        plugin = new OnceUxComponent(this, brightcoveVideoView);
+        View view = findViewById(R.id.ad_frame);
+        if (view != null &amp;&amp; view instanceof ViewGroup) {
+            plugin.addCompanionContainer((ViewGroup) view);
+        }
+
+        Map&lt;String, String&gt; parameters = new HashMap&lt;&gt;();
+        parameters.put(&quot;ad_config_id&quot;, adConfigId);
+
+        Catalog catalog = new Catalog(brightcoveVideoView.getEventEmitter(), accountId, policyKey);
+
+        catalog.findVideoByID(videoId, null, parameters, new VideoListener() {
+            @Override
+            public void onVideo(Video video) {
+                try {
+                    // The OnceUX plugin will look for a VMAP URL in the video object properties.
+                    // If valid, it will play the video.
+                    plugin.processVideo(video);
+                } catch (NoSourceFoundException e) {
+                    // If NoSourceFoundException is thrown it means a suitable VMAP URL was not found.
+                    // You can try to play it on a regular view,
+                    brightcoveVideoView.add(video);
+                }
+            }
+        });
+   }
+
+    // Private instance methods
+
+    /**
+     * Procedural abstraction used to setup event handlers for the OnceUX plugin.
+     */
+    private void registerEventHandlers() {
+        // Handle the case where the ad data URL has not been supplied to the plugin.
+        EventEmitter eventEmitter = brightcoveVideoView.getEventEmitter();
+        eventEmitter.on(OnceUxEventType.NO_AD_DATA_URL, new EventListener() {
+            @Override
+            public void processEvent(Event event) {
+                // Log the event and display a warning message (later)
+                Log.e(TAG, event.getType());
+                // TODO: throw up a stock Android warning widget.
+            }
+        });
+    }
+}</code></pre>
+        </div>
+        <br />
+
+
 
               <aside class="bcls-aside bcls-aside--tip">
                 <p>
