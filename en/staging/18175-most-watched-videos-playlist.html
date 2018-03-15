@@ -54,7 +54,7 @@
           <h2 id="Player_example">Player example</h2>
 
           <!-- UPDATE description -->
-          <p>In the following CodePen you will see the player with a playlist appearing to the right. The playlist is populated by retrieving the most popular videos, based on analytics, via the CMS API.</p>
+          <p>In the following CodePen you will see the player with a playlist appearing to the right. The playlist is populated by retrieving the most popular videos, based on most number of plays, via the CMS API.</p>
 
           <!-- UPDATE codepen here -->
           <p data-height="349" data-theme-id="dark" data-slug-hash="zRzZNG" data-default-tab="result" data-user="rcrooks1969" data-embed-version="2" data-pen-title="Most Watched Videos in a Playlist" class="codepen">See the Pen <a href="https://codepen.io/team/rcrooks1969/pen/zRzZNG/">Most Watched Videos in a Playlist</a> by Brightcove Learning Services (<a href="https://codepen.io/rcrooks1969">@rcrooks1969</a>) on <a href="https://codepen.io">CodePen</a>.</p>
@@ -73,12 +73,12 @@
             <ul>
               <li>Toggle the actual display of the player by clicking the <strong>Result</strong> button.</li>
               <li>Click the <strong>HTML/CSS/JS</strong> buttons to display ONE of the code types.</li>
-              <li>Later in this document the logic, flow and styling used in the application will be discussed in the <a href="#Player/HTML_configuration">Player/HTML configuration</a>, <a href="#Applicaton_flow">Application flow</a> and <a href="#Application_styling">Application styling</a> sections. The best way to follow along with the information in those sections is to:
+              <li>Later in this document the logic, flow and styling used in the application will be discussed in the <a href="#Player/HTML_configuration">Player/HTML configuration</a>, <a href="#Applicaton_flow">Application flow</a> and <a href="#Application_styling">Application styling</a>                sections. The best way to follow along with the information in those sections is to:
                 <ol>
                   <li>Click the <strong>EDIT ON CODEPEN</strong> button in the CodePen and have the code available in one browser/browser tab.</li>
                   <li>In CodePen, adjust what code you want displayed. You can change the width of different code sections within CodePen.</li>
-                  <li>View the <a href="#Player/HTML_configuration">Player/HTML configuration</a>, <a href="#Applicaton_flow">Application flow</a> and/or <a href="#Application_styling">Application styling</a> sections in another browser/browser tab. You will now
-                    be able to follow the code explanations and at the same time view the code.</li>
+                  <li>View the <a href="#Player/HTML_configuration">Player/HTML configuration</a>, <a href="#Applicaton_flow">Application flow</a> and/or <a href="#Application_styling">Application styling</a> sections in another browser/browser tab. You will
+                    now be able to follow the code explanations and at the same time view the code.</li>
                 </ol>
               </li>
             </ul>
@@ -121,7 +121,8 @@
               <li>The iframe will cause app logic to fail, like a redirect from the containing page</li>
             </ul>
 
-            <p>Even if your final implementation does not use the iframe code, you can still use the In-Page embed code with a plugin for your JavaScript and a separate file for your CSS. This encapsulates your logic so that you can easily use it in multiple players.</p>
+            <p>Even if your final implementation does not use the iframe code, you can still use the In-Page embed code with a plugin for your JavaScript and a separate file for your CSS. This encapsulates your logic so that you can easily use it in multiple
+              players.</p>
           </div>
           <!-- id="expanderContent" -->
         </section>
@@ -134,35 +135,18 @@
             <thead class="bcls-table__head">
               <tr>
                 <th>API Methods</th>
-                <th>API Events</th>
-                <th>API Properties</th>
-                <th>Brightcove Player Plugins</th>
               </tr>
             </thead>
             <tbody class="bcls-table__body">
               <tr>
-                <!-- <td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/Player.html#play">play()</a></td> -->
-                <td><a href=""></a></td>
-                <td><a href=""></a></td>
-                <td><a href=""></a></td>
-                <td><a href=""></a></td>
+                <td><a href="/node/18108#getVideo">player.catalog.getVideo()</a></td>
               </tr>
               <tr>
-                <!-- <td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/module-events.html#.on">on()</a></td> -->
-                <td><a href=""></a></td>
-                <td><a href=""></a></td>
-                <td><a href=""></a></td>
-                <td><a href=""></a></td>
-              </tr>
-              <tr>
-                <td><a href=""></a></td>
-                <td><a href=""></a></td>
-                <td><a href=""></a></td>
-                <td><a href=""></a></td>
+                <td><a href="/node/18099#playlist">player.playlist()</a></td>
               </tr>
             </tbody>
           </table>
-          <!-- <aside class="bcls-aside bcls-aside--tip">This code sample uses one of the Brightcove REST APIs. To understand working with this API it is vital you read and understand the <a href="/node/18132">Learning Guide: Using the REST APIs</a> document.</aside> -->
+          <aside class="bcls-aside bcls-aside--tip">This code sample uses one of the Brightcove REST APIs. To understand working with this API it is vital you read and understand the <a href="/node/18132">Learning Guide: Using the REST APIs</a> document.</aside>
         </section>
 
         <!-- UPDATE player and HTML configuration -->
@@ -177,7 +161,9 @@
 
           <h3>Other HTML</h3>
 
-          <p>No other HTML elements are added to the page.</p>
+          <p>A <code>div</code> element is added to specify the location of the playlist:</p>
+          <pre class="line-numbers">
+<code class="language-html">&lt;div class=&quot;vjs-playlist&quot;&gt;&lt;/div&gt;</code></pre>
         </section>
 
         <!-- UPDATE application flow -->
@@ -187,29 +173,50 @@
           <p>The basic logic behind this application is:</p>
 
           <ul>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
+            <li>Build an object with info for API call.</li>
+            <li>Call the CMS API to return the 10 most watched videos.</li>
+            <li>Extract the video IDs from the returned data.</li>
+            <li>For each ID, use the Video Cloud catalog to get the corresponding video object. Store the video objects in an array.</li>
+            <li>Assign the array of video objects to the player as a playlist.</li>
           </ul>
 
           <!-- UPDATE task 1 -->
-          <h3>Task1 (start with verb if possible)</h3>
+          <h3>Create object with API call info</h3>
           <p>Find the code which is labeled:</p>
-          <pre><code class="language-javascript">// ###  ###</code></pre>
-          <p>Conversational explanation of code block</p>
+          <pre><code class="language-javascript">// +++ Initialize variables and option object for CMS API call +++</code></pre>
+          <p>The key information needed for the API call are:</p>
+          <ul>
+            <li>Account ID</li>
+            <li>Base URL</li>
+            <li>End point</li>
+            <li>HTTP method</li>
+          </ul>
+          <p>Variables and then concatenated to create properly formed values for the API call.</p>
+
 
           <!-- UPDATE task 2 -->
-          <h3>Task2 (start with verb if possible)</h3>
+          <h3>Make the CMS API request</h3>
           <p>Find the code which is labeled:</p>
-          <pre><code class="language-javascript">// ###  ###</code></pre>
-          <p>Conversational explanation of code block</p>
+          <pre><code class="language-javascript">// +++ Make the CMS API request to get matching video IDs +++</code></pre>
+          <p>Note that the <code>makeRequest()</code> method is called and the options object, built earlier, and a callback function are passed to the method. The information returned by the CMS API will be returned in the <code>mostWatchedVideos</code> parameter. The data is returned as a string, so it needs to be JSON parsed to be usable.</p>
 
           <!-- UPDATE task 3 -->
-          <h3>Task3 (start with verb if possible)</h3>
+          <h3>Extract  video IDs from returned data</h3>
           <p>Find the code which is labeled:</p>
-          <pre><code class="language-javascript">// ###  ###</code></pre>
-          <p>Conversational explanation of code block</p>
+          <pre><code class="language-javascript">// +++ Helper Function: Extract video IDs from data CMS API response +++</code></pre>
+          <p>The <code>extractVideoData</code> loops over the data returned from the CMS API and extracts the IDs, and pushign them into an array.</p>
+
+          <!-- UPDATE task 2 -->
+          <h3>Retrieve video objects based on extracted IDs</h3>
+          <p>Find the code which is labeled:</p>
+          <pre><code class="language-javascript">// +++ Helper Function: Retrieve video objects from video IDs +++</code></pre>
+          <p>The <code>catalog.getVideo()</code> method is used to get the video object, then the objects are pushed into another array, this one containing the video objects.</p>
+
+          <!-- UPDATE task 3 -->
+          <h3>Assign array of video objects to the player's playlist</h3>
+          <p>Find the code which is labeled:</p>
+          <pre><code class="language-javascript">// Add the most watched videos list to the player as a playlist</code></pre>
+          <p>The Playlist API's <code>playlist()</code> method is used to assign the array of video objects to the the player's playlist.</p>
 
         </section>
 
