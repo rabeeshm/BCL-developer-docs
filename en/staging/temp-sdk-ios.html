@@ -15,7 +15,7 @@
   	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
     <meta name="robots" content="noindex">
   	<!-- change title to match the h1 heading -->
-  	<title>Running the Sample Apps: Native SDK for Android</title>
+  	<title>Running Sample Apps for the Native SDK for iOS/tvOS</title>
 
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
@@ -42,9 +42,9 @@
 			<div id="sidenav" class="side-nav"></div>
 		</div>
 		<div id="main" class="large-10 small-12 columns">
-			<h1>Running the Sample Apps: Native SDK for Android</h1>
+			<h1>Running the Sample Apps: Native SDK for iOS/tvOS</h1>
       <aside class="bcls-aside bcls-aside--warning">This is a temporary STAGING document for review only. For the official Brightcove documentation site, go to <a href="https://support.brightcove.com/">support.brightcove.com</a></aside>
-      <p>In this topic, you will learn how to run the sample apps associated with the Brightcove Native SDK for Android and iOS. These are a good starting point for creating your own apps that use the Native SDKs.</p>
+      <p>In this topic, you will learn how to run the sample apps associated with the Brightcove Native SDK for iOS/tvOS. These samples provide a good starting point for creating your own apps.</p>
 
 
 	    <!-- BEGIN DRUPAL CONTENT -->
@@ -53,206 +53,162 @@
   <section class="bcls-section">
   <h2 id="Overview">Overview</h2>
 
-  <p>The Brightcove Native SDKs provide a variety of sample apps to help you get started with your own implementations. For a complete list of samples, see the following:</p>
+  <p>The Brightcove Native SDK for iOS/tvOS provides a variety of sample apps to help you get started with your own implementations. For a complete list of samples, see the following:</p>
   <ul>
     <li>
-      <a href="https://github.com/BrightcoveOS/android-player-samples">Player samples for Android</a>
-    </li>
-    <li>
-      <a href="https://github.com/BrightcoveOS/ios-player-samples">Player samples for iOS and tvOS</a>
+      <a href="https://github.com/BrightcoveOS/ios-player-samples">Player samples for iOS/tvOS</a>
     </li>
   </ul>
+  <aside class="bcls-aside bcls-aside--tip">In addition to the sample apps, there is also a collection of code snippets that you may find helpful. They can be found in the <a href="https://support.brightcove.com/code-snippets-using-native-sdk-ios">Code Snippets using the Native SDK for iOS</a> document.</aside>
   <p>
-    This topic shows you how to run the sample apps mentioned above. There is also a collection of code snippets that you may find helpful:
+  	If you are new to the Brightcove Native SDKs, check out the <a href="/node/18481">Getting Started with the Native SDKs</a> videos.
   </p>
-  <ul>
-    <li>
-      <a href="https://support.brightcove.com/code-snippets-using-native-sdk-android">Code Snippets using the Native SDK for Android</a>
-    </li>
-    <li>
-      <a href="https://support.brightcove.com/code-snippets-using-native-sdk-ios">Code Snippets using the Native SDK for iOS</a>
-    </li>
-  </ul>
 
   </section>
 
   <section class="bcls-section">
-  <h2 id="Key_concepts">Key concepts</h2>
+  <h2 id="Framework">Framework</h2>
 
-  <p><span class="video-cloud-only">A few concepts must be understood to effectively use cue points in Brightcove Player. These concepts are explained in this section of the document.</span><span class="player-only">The following concept must be understood to effectively use cue points in Brightcove Player.</span></p>
+  <p>The Android sample apps support the latest version of the Brightcove Native SDK and plugins.</p>
+  <p>
+    It is recommended that you use the ExoPlayer 2 framework for your apps to implement the latest features available with the Native SDK. If you are not currently using this framework, see the <a href="/node/18467">Migrating to ExoPlayer 2 Framework</a> document.
+  </p>
 
-  <div class="video-cloud-only">
-  <h3>Video Cloud catalog cue points</h3>
-
-  <p>The first concept to understand has to do with terminology. In Brightcove Player, cue points are stored as text track elements, per the HTML standard. This means that when a Video Cloud video is used, any "Video Cloud style" cue points are converted into text tracks.</p>
-
-  <p>These "Video Cloud style" cue points can also be referred to as "catalog" cue points since they are read from the Video Cloud catalog (See the <a href="/node/18108">Player Catalog</a> document for more information on the catalog). When this conversion takes place, some of the information in the catalog cue point, like type and cue point time, are converted into the text track.</p>
-
-  <h3>Catalog cue point structure</h3>
-
-  <p>The next concept to understand is that there is significant difference between catalog cue points and the HTML standard in structure. The difference is that an HTML cue point can have a duration. This means for every cue point, two cue point change events will be dispatched: one on start of the cue point and one on end of the cue point.</p>
-
-  <p>In the conversion process, every catalog cue point is converted into a cue point with identical start and stop times. This means that for every catalog cue point, two cue point events will be dispatched and has to be accounted for in code.</p>
-  </div>
-
-  <h3><code>activecues</code> array</h3>
-
-  <p><span class="video-cloud-only">Another</span><span class="player-only">An</span> important conceptual point to understand when dealing with HTML cue points is the <code>activeCues</code> array. All the cue points are defined in an array. There is another array, <code>activeCues</code>, which holds the cue points which are "active", meaning the playback time is between the cue point's start and stop times.</p>
-
-  <p>When using catalog cue points, the start and stop times are identical, so they will be active only for the second defined. Also, with catalog cue points, it is highly unlikely two cue points will be active at the same time since they will not overlap.</p>
-
-  <aside class="bcls-aside bcls-aside--information">Note: There can be multiple sets of text tracks, for instance one set for cue points and another for video captions. In the example code in this document, the cue points text tracks are located in both the first and second elements in the TextTracks array. You will see this reflected in code.</aside>
-
-  <h3>Cue point types</h3>
-
-  <p>In this document you will see cue points with a <code>type</code> property assigned a value. These type values are assigned when creating cue points in the Studio user interface. There are two types of cue points, but both simply supply a string value to the <code>type</code> property. The appropriate value is helpful only if used in custom JavaScript while processing the cue point information. The types are detailed here:</p>
-
-  <ul>
-  	<li><strong>Ad</strong> - Assigns the string value of <code>AD</code> to the <code>type</code> property</li>
-  	<li><strong>Code</strong> - Assigns the string value of <code>CODE</code> to the <code>type</code> property</li>
-  </ul>
   </section>
 
-  <section class="bcls-section video-cloud-only">
-  <h2 id="Video_Cloud_cue_points">Video Cloud cue points</h2>
+  <section class="bcls-section">
+  <h2 id="Installing_the_sample_apps">Installing the sample apps</h2>
 
-  <p>In this section of the document, you will learn to set catalog cue points and listen for catalog cue point event dispatches.</p>
+  <p>The Android sample apps support the latest version of the Brightcove Native SDK and plugins.</p>
+  <p>
+    Currently, all of the Android samples apps must be installed together as a bundle. The easiest way to get started is to import the sample apps into Android Studio. That's what we will do in the following steps.
+  </p>
+  <aside class="bcls-aside bcls-aside--tip">For more details about the samples and to learn about the Version Control option for installation, see the <a href="https://github.com/BrightcoveOS/android-player-samples/blob/master/README.md">Android player samples readme</a> file.</aside>
 
-  <h3>Setting Video Cloud cue points</h3>
-
-  <p>Video Cloud cue points can be associated with a video using the Video Cloud Studio, and a number of other ways, detailed in this document: <a href="/node/15151">Adding Cue Points to Videos</a>.</p>
-
-  <h3>Acting on Video Cloud cue points - video statically bound to the player</h3>
-
-  <p>In this section of the document, you will learn to process catalog cue points when the video has been statically bound to the player, meaning the video has been loaded in the player either in Studio or using the Player Management API directly.</p>
-
-  <p>To prevent a race condition of trying to process cue points before they are loaded, you need to use the <code>loadedmetadata</code> event to be dispatched before dealing with the cue points. Once the proper text track has been read, use the <code>oncuechange</code> event to listen for cue points events to be dispatched.</p>
-
-  <p>The following code shows listening for cue points and displaying the data from the cue point. Note that in this example the video is statically bound to the Player.</p>
-
-  <ul>
-  	<li>Line 24: Create a paragraph element as a location in which to inject dynamically created HTML.</li>
-  	<li>Lines 31,43: Use the <code>one()</code> method to add an event listener for the <code>loadedmetadata</code> event only once. The event handler function is defined here anonymously.</li>
-  	<li>Line 32: Retrieve the TextTracks array using the <code>textTracks()</code> method, then assign the zeroth element, which holds the cue points, to the variable <code>tt</code>. Note that it may be possible in some implementations that the cue points could be in a different array element. See the <a href="#findtrack">Find correct track</a> section below for more information.</li>
-  	<li>Lines 33,41: Sets the event handler function for when the <code>oncuechange</code>event is dispatched.</li>
-  	<li>Line 34: Check to be sure the you are getting the first (zeroth array element) cue point dispatch. Without this condition, you would see that each cue point would be acted upon twice. Note that if you are using cue points that have durations that overlap this condition would have to be different.</li>
-  	<li>Lines 35-39: Dynamically create HTML using information from the cue point and inject into the HTML page.</li>
-  	<li>Line 42: Play the video.</li>
-  </ul>
-
-  <pre class="line-numbers" data-start="17">
-  <code class="language-html">  &lt;video id="myPlayerID"
-      data-account="1507807800001"
-      data-player="6aac508a-741e-41a2-bc7a-5805644cf089"
-      data-embed="default"
-      data-video-id="1507781667001"
-      class="video-js" controls&gt;&lt;/video&gt;
-
-    &lt;p id="insertionPoint"&gt;&lt;/p&gt;
-
-    &lt;script src="//players.brightcove.net/1507807800001/6aac508a-741e-41a2-bc7a-5805644cf089_default/index.min.js"&gt;&lt;/script&gt;
-
-    &lt;script&gt;
-      videojs("myPlayerID").ready(function(){
-        var player = this;
-        player.one("loadedmetadata",function(){
-          var tt = player.textTracks()[0];
-          tt.oncuechange = function() {
-            if(tt.activeCues[0] !== undefined){
-              var dynamicHTML = "id: " + tt.activeCues[0].id + ", ";
-              dynamicHTML += "text: " + tt.activeCues[0].text + ", ";
-              dynamicHTML += "startTime: " + tt.activeCues[0].startTime + ",  ";
-              dynamicHTML += "endTime: " + tt.activeCues[0].endTime;
-              document.getElementById("insertionPoint").innerHTML += dynamicHTML + "&lt;br/&gt;";
-            }
-          }
-          player.play();
-        });
-      });
-    &lt;/script&gt;</code></pre>
-
-  <h3>Acting on Video Cloud cue points - dynamically load video in the player</h3>
-
-  <p>In this section of the document, you will learn to process catalog cue points when the video is dynamically loaded into the player using the <code>catalog.getVideo()</code> and <code>catalog.load()</code> methods.</p>
-
-  <p>When you use the player catalog to get and load the video, processing cue points is bit easier than when you use a statically bound video, as you do not need to use the <code>loadedmetadata</code> event.</p>
-
-  <h3 id="allvcinfo">Retrieve all Video Cloud cue point info</h3>
-
-  <p>As you may have noticed not all Video Cloud cue point information is directly available to you from the <code>activecues</code> array. This is easily remedied by retrieving the desired info from the <code>mediainfo</code> property.</p>
-
-  <p>The basic approach of this solution is:</p>
-
-  <ol>
-  	<li>Wait for the <code>loadstart</code> event for the <code>mediainfo</code> property to be populated.</li>
-  	<li>Assign the <code>cue_points</code> array from the <code>mediainfo</code> property to a variable. This variable contains complete Video Cloud cue point information.</li>
-  	<li>On a cue point event, retrieve the corresponding cue point data based on the <code>time</code> property value. This will be done using a helper function that grabs an object out of an array based on a property value in the object.</li>
-  	<li>Use the data from the cue point.</li>
+  <p>
+    To import the sample apps, follow these steps:
+  </p>
+  <ol class="bcls-tasklist">
+  	<li>If you don't already have it, download and install the latest version of <a href="https://developer.android.com/studio/index.html">Android Studio</a>.</li>
+    <li>
+      Clone the <a href="https://github.com/BrightcoveOS/android-player-samples">Player samples for Android</a> to your computer.
+    </li>
+    <li>
+      In Android Studio, select <strong>Import project</strong>.
+      <figure class="bcls-figure">
+        <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/android/samples/import-project.png" alt="Import project">
+        <figcaption class="bcls-caption--image">Import project</figcaption>
+      </figure>
+    </li>
+    <li>
+      In the file selection dialog, select the top level <strong>build.gradle</strong> file from your local cloned repository.
+      <figure class="bcls-figure">
+        <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/android/samples/build-gradle.png" alt="File selection">
+        <figcaption class="bcls-caption--image">File selection</figcaption>
+      </figure>
+    </li>
+    <li>
+      In Android Studio, you should see all of the sample app projects.
+      <figure class="bcls-figure">
+        <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/android/samples/project-files.png" alt="Sample app projects">
+        <figcaption class="bcls-caption--image">Sample app projects</figcaption>
+      </figure>
+    </li>
   </ol>
 
-  <p>The following image shows the entire cue point array (top-left), the single cue point data collection (top-right), and one property from that single cue point data collection (bottom-right).</p>
-
-  <figure class="bcls-figure"><img class="bcls-image" alt="cue point data" src="//learning-services-media.brightcove.com/doc-assets/player-development/player-customization/cue-points/using-cue-points/cue-point-all-vc-data.png" /></figure>
-
-  <p>In the snippet below only the new/changed code from examples above will be explained.</p>
-
-  <ul>
-  	<li>Lines 452-463: Include the function that will be used to extract a single cue point data collection from the array of all cue points. Note that you pass it the array of all cue points, the property in which you are searching for a specific value, and lastly the the value you are searching for.</li>
-  	<li>Line 432: Listens for the <code>loadstart</code> event. When your video starts to load, then the <code>mediainfo</code> property is populated.</li>
-  	<li>Line 434: Assign the array of all Video Cloud cue points to a variable.</li>
-  	<li>Line 443: In the cue point dispatch event handler, assign the specific cue point's data collection to a variable. This is where the function mentioned in the first bullet point is called. The arguments used are:
-  	<ul>
-  		<li><code>cuePointAra</code>: The entire collection of Video Cloud cue points.</li>
-  		<li><code>'time'</code>: The property in which to search for a value.</li>
-  		<li><code>tt.activeCues[0].startTime</code>: The start time of the cue point currently being handled in the cue point dispatch event handler.</li>
-  	</ul>
-  	</li>
-  	<li>Lines 444-445: Debugging <code>console.log()</code> method calls, which should be removed in production code.</li>
-  </ul>
-
-  <pre class="line-numbers" data-start="426">
-  <code class="language-html">&lt;script&gt;
-      videojs("myPlayerID").ready(function(){
-        var myPlayer = this,
-          cuePointAra=[],
-          allCuePointData;
-
-        myPlayer.on('loadstart',function(){
-          //console.log('mediainfo', myPlayer.mediainfo);
-          cuePointAra = myPlayer.mediainfo.cue_points;
-          var tt = myPlayer.textTracks()[0];
-          tt.oncuechange = function() {
-            if(tt.activeCues[0] !== undefined){
-              var dynamicHTML = "id: " + tt.activeCues[0].id + ", ";
-              dynamicHTML += "text: " + tt.activeCues[0].text + ", ";
-              dynamicHTML += "startTime: " + tt.activeCues[0].startTime + ",  ";
-              dynamicHTML += "endTime: " + tt.activeCues[0].endTime;
-              document.getElementById("insertionPoint").innerHTML += dynamicHTML + "&lt;br/&gt;";
-              allCuePointData = getSubArray(cuePointAra,'time',tt.activeCues[0].startTime);
-              console.log('cue point data:', allCuePointData);
-              console.log('cue point metadata:', allCuePointData[0].metadata);
-            }
-          }
-          myPlayer.play();
-          myPlayer.muted(true);
-        });
-
-        function getSubArray(targetArray, objProperty, value) {
-          var i, totalItems = targetArray.length,
-            objFound = false,
-            idxArr = [];
-          for (i = 0; i &lt; totalItems; i++) {
-            if (targetArray[i][objProperty] === value) {
-              objFound = true;
-              idxArr.push(targetArray[i]);
-            }
-          }
-          return idxArr;
-        };
-      });
-    &lt;/script&gt;</code></pre>
   </section>
 
+  <section class="bcls-section">
+  <h2 id="Running_the_sample_apps">Running the sample apps</h2>
+
+  <p>The sample apps can be run using the following:</p>
+  <ul>
+    <li>
+      Android Studio emulator
+    </li>
+    <li>
+      Android Studio using a physical device connected to your computer
+      <ul>
+        <li>
+          The device must have Android OS 4.4.4 or later
+        </li>
+        <li>
+          On your device, make sure USB debugging is enabled
+        </li>
+      </ul>
+    </li>
+  </ul>
+  <ol class="bcls-tasklist__restart">
+    <li>In Android Studio, in the left-side project list, expand the <strong>BasicSampleApp</strong> project. </li>
+    <li>
+      Expand the <strong>java</strong> folder and open the <strong>MainActivity.java</strong> file.
+      <figure class="bcls-figure">
+        <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/android/samples/main-activity.png" alt="MainActivity.java file">
+        <figcaption class="bcls-caption--image">MainActivity.java file</figcaption>
+      </figure>
+    </li>
+    <li>
+      In the project selection dropdown, select the <strong>BasicSampleApp</strong>.
+      <figure class="bcls-figure">
+        <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/android/samples/project-selection.png" alt="Project selection">
+        <figcaption class="bcls-caption--image">Project selection</figcaption>
+      </figure>
+    </li>
+    <li>
+      To the right of the project selection dropdown, select the <strong>Run</strong> button.
+      <figure class="bcls-figure">
+        <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/android/samples/run-button.png" alt="Run button">
+        <figcaption class="bcls-caption--image">Run button</figcaption>
+      </figure>
+    </li>
+    <li>
+      If you have a device connected to your computer, you should see it listed in the <strong>Select Deployment Target</strong> dialog. Otherwise, after you create a virtual device, you will also see it listed here. Select your device and select <strong>OK</strong>.
+      <figure class="bcls-figure">
+        <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/android/samples/deploy-target.png" alt="Select Deployment Target">
+        <figcaption class="bcls-caption--image">Select Deployment Target</figcaption>
+      </figure>
+    </li>
+    <li>
+      You should see the app running on your device or in the emulator.
+      <figure class="bcls-figure">
+        <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/android/samples/emulator.png" alt="Android Studio emulator">
+        <figcaption class="bcls-caption--image">Android Studio emulator</figcaption>
+      </figure>
+    </li>
+  </ol>
+
+  </section>
+
+  <section class="bcls-section">
+  <h2 id="Debugging">Debugging</h2>
+
+  <p>Android Studio has a debugger that allows you to set breakpoints, examine variables and evaluate expressions at runtime. To debug your app in the emulator, do the following:</p>
+  <ol class="bcls-tasklist__restart">
+    <li>
+      In Android Studio, locate the line of code where you would like to pause execution.
+    </li>
+    <li>
+      In the left gutter for the line of code, click to add a breakpoint.
+      <figure class="bcls-figure">
+        <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/android/samples/breakpoint.png" alt="Breakpoint">
+        <figcaption class="bcls-caption--image">Breakpoint</figcaption>
+      </figure>
+    </li>
+    <li>
+      Select the <strong>debug</strong> button to start execution.
+      <figure class="bcls-figure">
+        <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/android/samples/debug.png" alt="Start debugging">
+        <figcaption class="bcls-caption--image">Start debugging</figcaption>
+      </figure>
+    </li>
+    <li>
+      <p>
+        When execution pauses at your breakpoint, you will have several options to inspect variables and expressions, as well as stepping through/over/into lines of code.
+      </p>
+      <aside class="bcls-aside bcls-aside--tip">For details about debugging your apps, see <a href="https://developer.android.com/studio/debug/index.html">Android Studio's User Guide for Debugging</a>.</aside>
+    </li>
+  </ol>
+  </section>
 
   </article>
 
