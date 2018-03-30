@@ -184,9 +184,62 @@
           <h2 id="Using_the_middleware_function">Using the middleware function</h2>
           <p>Once the middleware function has been written you want to use it. Two ways were mentioned earlier, and will be detailed now.</p>
           <h3>Code on same page as player</h3>
-          <p></p>
+          <p>Here you simply define the middleware function then register it.</p>
+          <pre class="line-numbers">
+<code class="language-html">&lt;video id=&quot;myPlayerID&quot;
+  data-video-id=&quot;5686632029001&quot;
+  data-account=&quot;1752604059001&quot;
+  data-player=&quot;default&quot;
+  data-embed=&quot;default&quot;
+  data-application-id
+  class=&quot;video-js&quot;
+  controls&gt;&lt;/video&gt;
+&lt;script src=&quot;//players.brightcove.net/1752604059001/default_default/index.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;script type=&quot;text/javascript&quot;&gt;
+<span class="bcls-highlight">  // +++ Define the middleware function+++
+  var disableForwardScrubbbing = function(player) {
+    return {
+      // +++ Set the course to use any tech +++
+      setSource: function setSource(srcObj, next) {
+        next(null, srcObj);
+      },
+      // +++ Alter the setCurrentTime function +++
+      setCurrentTime: function setCurrentTime(ct) {
+        // Check if the time scrubbed to is less than the current time
+        if ( ct &lt; player.currentTime() ) {
+          // If time scrubbed to less than current time go back to the spot
+          return ct;
+        } else {
+          // If time scrubbed to is past current time, leave playhead at current time
+          return player.currentTime();
+        }
+      }
+    };
+  };
+
+  // Register the middleware with the player
+  videojs.use('*', disableForwardScrubbbing);</span>
+
+&lt;/script&gt;</code></pre>
           <h3>Code included on player page</h3>
-          <p></p>
+          <p>Here the JavaScript for the middleware function is simply included in the page.</p>
+          <pre class="line-numbers">
+<code class="language-html">&lt;video id=&quot;myPlayerID&quot;
+  data-video-id=&quot;5686632029001&quot;
+  data-account=&quot;1752604059001&quot;
+  data-player=&quot;default&quot;
+  data-embed=&quot;default&quot;
+  data-application-id
+  class=&quot;video-js&quot;
+  controls&gt;&lt;/video&gt;
+&lt;script src=&quot;//players.brightcove.net/1752604059001/default_default/index.min.js&quot;&gt;&lt;/script&gt;
+
+<span class="bcls-highlight">&lt;script src=&quot;disable-forward-scrubbing.js&quot;&gt;&lt;/script&gt;
+
+&lt;script type=&quot;text/javascript&quot;&gt;
+  videojs.use('*', disableForwardScrubbbing);</span>
+&lt;/script&gt;</code></pre>
         </section>
       </article>
 
