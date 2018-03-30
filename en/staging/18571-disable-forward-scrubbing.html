@@ -54,7 +54,7 @@
           <h2 id="Player_example">Player example</h2>
 
           <!-- UPDATE description -->
-          <p>When the video is playing you will NOT be able to scrub forward, but it is possible to scrub backward.</p>
+          <p>Initially you will NOT be able to scrub forward, but it is possible to scrub backward. Once the the video reaches 50% played you can scrub either forward or backward. The percentage of when to allow forward scrubbing is easily set in the code.</p>
 
           <!-- UPDATE codepen here -->
           <p data-height="412" data-theme-id="dark" data-slug-hash="OvzyMN" data-default-tab="result" data-user="rcrooks1969" data-embed-version="2" data-pen-title="Disable Forward Scrubbing" class="codepen">See the Pen <a href="https://codepen.io/team/rcrooks1969/pen/OvzyMN/">Disable Forward Scrubbing</a> by Brightcove Learning Services (<a href="https://codepen.io/rcrooks1969">@rcrooks1969</a>) on <a href="https://codepen.io">CodePen</a>.</p>
@@ -128,8 +128,8 @@
           <p>The basic logic behind this application is:</p>
 
           <ul>
-            <li>Implement the basic syntax for a middleware function, naming the function <code>disableForwardScrubbbing</code>. </li>
-            <li>Set the source so any video type can be used with the middleware function.</li>
+            <li>Implement the basic syntax for a middleware function, naming the function <code>disableForwardScrubbing</code>. </li>
+            <li>Implement the required <code>setSource()</code> method.</li>
             <li>Check to see if the time to which the viewer is trying to scrub is less than the current time in the player. If true, move the playhead to that time. If false, keep the video playing at the current time.</li>
           </ul>
 
@@ -139,16 +139,16 @@
           <pre><code class="language-javascript">// +++ Define the middleware function+++</code></pre>
           <p>The basic syntax for creating a middleware function is as follows:</p>
           <pre class="line-numbers">
-<code class="language-javascript">var disableForwardScrubbbing = function(player) {
+<code class="language-javascript">var disableForwardScrubbing = function(player) {
   return {
   ...
 };</code></pre>
           <p>Note that the <code>player</code> object is passed to the function.</p>
 
           <!-- UPDATE task 2 -->
-          <h3>Set the source to use any tech</h3>
+          <h3>Implement the <code>setSource()</code> method</h3>
           <p>Find the code which is labeled:</p>
-          <pre><code class="language-javascript">// ### Set the source to use any tech ###</code></pre>
+          <pre><code class="language-javascript">// ### Implement setSource() ###</code></pre>
           <p>This is a required method for everywhere middleware function. By setting the first argument of the <code>next</code> method to <code>null</code> it implies you are not manipulating, redirecting or rejecting any source:</p>
           <pre class="line-numbers">
 <code class="language-javascript">setSource: function setSource(srcObj, next) {
@@ -156,22 +156,25 @@
 },</code></pre>
 
           <!-- UPDATE task 3 -->
-          <h3>Overwrite the setCurrentTime() method</h3>
+          <h3>Alter the setCurrentTime() method</h3>
           <p>Find the code which is labeled:</p>
           <pre><code class="language-javascript">// ### Alter the setCurrentTime method ###</code></pre>
-          <p>This code block is where the actual <code>setCurrentTime()</code> method is altered. To understand this, the first point to know is that the <code>ct</code> value passed to the function reflects the value to which the viewer is scrubbing. The <code>if</code> statement checks to see if the new value is smaller than the player's current time. If it is, the new value is returned, which causes the playhead to be moved to the new value. If the condition is false, which means the viewer is trying to scrub forward, the players current time is returned and playback is not altered.</p>
+          <p>This code block is where the actual <code>setCurrentTime()</code> method is altered. To understand this, the first point to know is that the <code>ct</code> value passed to the function reflects the value to which the viewer is scrubbing. The <code>if</code> statement checks to see if the new value is smaller than the player's current time or exceeds the percentage to allow forward scrubbing. If it is wither, the new value is returned, which causes the playhead to be moved to the new value. If the condition is false, which means the viewer is trying to scrub forward before being allowed, the player's current time is returned and playback is not altered.</p>
           <pre class="line-numbers">
 <code class="language-javascript">setCurrentTime: function setCurrentTime(ct) {
-  // Check if the time scrubbed to is less than the current time
-  if ( ct &lt; player.currentTime() ) {
-    // If time scrubbed to less than current time go back to the spot
+  var percentAllowForward = 50,
+   // Determine percentage of video played
+   percentPlayed = player.currentTime() / player.duration() * 100;
+   // Check if the time scrubbed to is less than the current time
+   // or if passed scrub forward percentage
+  if ( ct &lt; player.currentTime() || percentPlayed &gt; percentAllowForward ) {
+    // If true, move playhead to desired time
     return ct;
-  } else {
-    // If time scrubbed to is past current time, leave playhead at current time
-    return player.currentTime();
   }
+  // If time scrubbed to is past current time and not passed percentage
+  // leave playhead at current time
+  return player.currentTime();
 }</code></pre>
-
         </section>
 
         <!-- UPDATE CSS description -->
@@ -187,7 +190,7 @@
           <p>Here you simply define the middleware function then register it.</p>
           <pre class="line-numbers">
 <code class="language-html">&lt;video id=&quot;myPlayerID&quot;
-  data-video-id=&quot;5686632029001&quot;
+  data-video-id=&quot;5701202551001&quot;
   data-account=&quot;1752604059001&quot;
   data-player=&quot;default&quot;
   data-embed=&quot;default&quot;
@@ -196,37 +199,41 @@
   controls&gt;&lt;/video&gt;
 &lt;script src=&quot;//players.brightcove.net/1752604059001/default_default/index.min.js&quot;&gt;&lt;/script&gt;
 
-&lt;script type=&quot;text/javascript&quot;&gt;
-<span class="bcls-highlight">  // +++ Define the middleware function+++
-  var disableForwardScrubbbing = function(player) {
+<span class="bcls-highlight">&lt;script type=&quot;text/javascript&quot;&gt;
+  // +++ Define the middleware function+++
+  var disableForwardScrubbing = function(player) {
     return {
-      // +++ Set the course to use any tech +++
+      // +++ Implement setSource() +++
       setSource: function setSource(srcObj, next) {
         next(null, srcObj);
       },
-      // +++ Alter the setCurrentTime function +++
+      // +++ Alter the setCurrentTime method +++
       setCurrentTime: function setCurrentTime(ct) {
-        // Check if the time scrubbed to is less than the current time
-        if ( ct &lt; player.currentTime() ) {
-          // If time scrubbed to less than current time go back to the spot
+        var percentAllowForward = 50,
+         // Determine percentage of video played
+         percentPlayed = player.currentTime() / player.duration() * 100;
+         // Check if the time scrubbed to is less than the current time
+         // or if passed scrub forward percentage
+        if ( ct &lt; player.currentTime() || percentPlayed &gt; percentAllowForward ) {
+          // If true, move playhead to desired time
           return ct;
-        } else {
-          // If time scrubbed to is past current time, leave playhead at current time
-          return player.currentTime();
         }
+        // If time scrubbed to is past current time and not passed percentage
+        // leave playhead at current time
+        return player.currentTime();
       }
-    };
+    }
   };
 
   // Register the middleware with the player
-  videojs.use('*', disableForwardScrubbbing);</span>
+  videojs.use('*', disableForwardScrubbing);</span>
 
 &lt;/script&gt;</code></pre>
           <h3>Code included on player page</h3>
           <p>Here the JavaScript for the middleware function is simply included in the page.</p>
           <pre class="line-numbers">
 <code class="language-html">&lt;video id=&quot;myPlayerID&quot;
-  data-video-id=&quot;5686632029001&quot;
+  data-video-id=&quot;5701202551001&quot;
   data-account=&quot;1752604059001&quot;
   data-player=&quot;default&quot;
   data-embed=&quot;default&quot;
@@ -235,12 +242,13 @@
   controls&gt;&lt;/video&gt;
 &lt;script src=&quot;//players.brightcove.net/1752604059001/default_default/index.min.js&quot;&gt;&lt;/script&gt;
 
-<span class="bcls-highlight">&lt;script src=&quot;disable-forward-scrubbing.js&quot;&gt;&lt;/script&gt;
+<span class="bcls-highlight">&lt;script src=&quot;disable-forward-scrubbing.js&quot;&gt;&lt;/script&gt;</span>
 
 &lt;script type=&quot;text/javascript&quot;&gt;
-  videojs.use('*', disableForwardScrubbbing);</span>
+  <span class="bcls-highlight">videojs.use('*', disableForwardScrubbing);</span>
 &lt;/script&gt;</code></pre>
         </section>
+
       </article>
 
 
