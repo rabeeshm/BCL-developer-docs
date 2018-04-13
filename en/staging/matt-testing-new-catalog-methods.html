@@ -253,9 +253,8 @@
 &lt;script type=&quot;text/javascript&quot;&gt;
   videojs('myPlayerID').ready(function(){
     var myPlayer = this,
-    queryObject = {};
-    <span class="bcls-highlight">queryObject.accountId = '1752604059001';
-    queryObject.policyKey = 'BCpkADawqM...fj0vsWCv8-nlTX';
+      queryObject = {};
+    <span class="bcls-highlight">queryObject.policyKey = 'BCpkADawqM...fj0vsWCv8-nlTX';
     queryObject.q = 'name:desert';</span>
     console.log('queryObject',queryObject);
     <span class="bcls-highlight">myPlayer.catalog.getSearch(queryObject,function(errorObj,videosReturned){
@@ -283,7 +282,7 @@
           <h2 id="getSequences_method">getSequences() method</h2>
 
           <p>The <code>getSequence(sequences, callback, adConfigId)</code> method permits passing multiple catalog operations and retrieve all video objects from the multiple catalog operations. You can have three types of operations, those being:</p>
-          <ol class="bcls-tasklist">
+          <ol>
             <li>search</li>
             <li>video</li>
             <li>playlist</li>
@@ -298,31 +297,96 @@
 
           <h3>Parameters</h3>
 
-          <ul>
-            <li><code>options</code>: Any of the follow options are recognized:
+          <p>Any of the follow options are recognized:</p>
 
               <ul>
-                <li><code></code> (number): .</li>
-                <li><code></code> (boolean): .</li>
-                <li><code></code> (string): .</li>
+                <li><code>sequences</code> (object or array of objects):  An object or an array of objects representing the sequence of catalog operations that are to be performed.</li>
+                <li><code>sequences[].type</code> (string): The type of operation to be performed. This can be <code>search</code>, <code>playlist</code> or <code>video</code>.</li>
+                <li><code>sequences[].id</code> (string or object): The identifier/options for the operation. For <code>playlist</code> and <code>video</code> this will be the media's ID. For searches, this can be a string representing <code>q</code> or an object with all of the options from the search function.</li>
+                <li><code>callback</code> (function): A function that will be called when the request completes, whether it's successful or not. It is invoked with two arguments. It is invoked with two arguments:
+                    <ul>
+                      <li>The first argument will contain an error object, if an an error occurs. This object contains details of the error. If no error occurs, this object is <strong>null</strong>.</li>
+                      <li>If no error occurs, the second argument is the requested video object(s). If an error occurs, this value contains the empty string.</li>
+                    </ul>
+                </li>
+                <li><code>adConfigId</code> (string): A numeric value for an ad configuration that will be passed along to the playback API. This value Will be called <code>ad_config_id</code> when the actual call is made.</li>
               </ul>
-            </li>
-          </ul>
 
-          <h3>Returned value</h3>
-          <p>The catalog call itself returns an object of type <strong>XMLHttpRequest</strong>. The exact structure of the returned data will vary depending what was searched for.</p>
+              <h3>Returned value</h3>
+              <p>The catalog call itself returns an object of type <strong>XMLHttpRequest</strong>. The exact structure of the returned data will vary depending what was searched for.</p>
+
 
           <h3>Example</h3>
-          <p>The following example gets the video object based on the <code>videoId</code> and loads it into the player:</p>
+          <p>The following example uses a sequence of three catalog operations. The first is a search for the 10 oldest videos in the catalog, the second an individual video is added, and lastly a playlist's videos are added to the result.</p>
 
           <pre class="line-numbers">
-<code class="language-javascript">&lt;script type="text/javascript"&gt;
-  videojs('myPlayerID').ready(function(){
-    var myPlayer = this,
-		options = {};
-    options.videoId = '5141730843001';
-    myPlayer.catalog.autoFindAndLoadMedia(options);
-  });
+<code class="language-javascript">&lt;style type=&quot;text/css&quot;&gt;
+    .video-js {
+      height: 360px;
+      width: 640px;
+      float: left;
+    }
+    .vjs-playlist {
+      width: 280px;
+      height: 350px;
+    }
+&lt;/style&gt;
+...
+&lt;video id=&quot;myPlayerID&quot;
+  data-account=&quot;1752604059001&quot;
+  data-player=&quot;Sk5m8XYoG&quot;
+  data-embed=&quot;default&quot;
+  data-application-id
+  class=&quot;video-js&quot;
+  controls&gt;&lt;/video&gt;
+
+&lt;div class=&quot;vjs-playlist&quot;&gt;&lt;/div&gt;
+
+&lt;script src=&quot;//players.brightcove.net/1752604059001/Sk5m8XYoG_default/index.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;script type=&quot;text/javascript&quot;&gt;
+  videojs('myPlayerID').ready(function(){
+    var myPlayer = this,
+      // Declare object for catalog search
+      queryObject = {};
+      // Declare mySequences array which will hold
+      // three different types of catalog operations
+      mySequences = [];
+
+    // Declare 3 objects for different catalog operations
+    mySequences[0]={};
+    mySequences[1]={};
+    mySequences[2]={};
+
+    // Define the object for catalog search
+    // Search will retrieve 10 oldest videos in catalog
+    queryObject.accountId = '1752604059001';
+    queryObject.policyKey = 'BCpkADawqM3dv_RjQyLQPx8i9GgLSGU2K_L_uIFTCZAvfvUd25ExGIbIMkFttfuqWQijLVMC6eGG42530ej9nTtHUHo2l5xOL48_pQFqkUFozgp2Azfvdf3s-rSSaDpwCVfj0vsWCv8-nlTX';
+    queryObject.q = 'type:*';
+    queryObject.sort = 'created_at';
+    queryObject.limit = 10;
+    <span class="bcls-highlight">mySequences[0].type = 'search';
+    mySequences[0].id=queryObject;</span>
+
+    // Create a video retrieval catalog operation
+    <span class="bcls-highlight">mySequences[1].type = 'video';
+    mySequences[1].id = '5755775186001';</span>
+
+    // Create a playlist retrieval catalog operation
+    <span class="bcls-highlight">mySequences[2].type = 'playlist';
+    mySequences[2].id = '5531423971001';</span>
+
+    // Display mySequences array
+    console.log('mySequences',mySequences);
+
+    // Perform sequence of catalog operations
+    <span class="bcls-highlight">myPlayer.catalog.getSequence(mySequences,function(errorObj,videosReturned)</span>{
+      // Display video objects returned
+      console.log('videosReturned',videosReturned);
+      // Assign video objects as a playlist
+      myPlayer.playlist(videosReturned);
+    });
+  });
 &lt;/script&gt;</code></pre>
         </section>
 
