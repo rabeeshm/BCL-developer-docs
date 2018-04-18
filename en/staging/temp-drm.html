@@ -71,14 +71,7 @@
   </ul>
 
   <aside class="bcls-aside bcls-aside--tip">
-    <p>
-      It is recommended to use the Brightcove player version 6.18.1+ because <code>videojs-drm 5</code> uses the player's built-in DASH capability through VHS (the next and renamed version of the built-in <code>videojs-contrib-hls</code> plugin).
-    </p>
-    <p>
-      If you still want to uses Shaka Player for DASH playback, you can include the following script along with <code>videojs-drm 5</code>: 
-    </p>
-    <pre>
-<code class="language-html">http://players.brightcove.net/videojs-shaka/1/videojs-shaka.js</code></pre>
+      It is recommended to use the Brightcove player version <strong>6.18.1+</strong>.
   </aside>
 
   <aside class="bcls-aside bcls-aside--warning">Note: the DRM plugin will not function correctly if you have <strong>both</strong> DRM and HLSe enabled for your account. There is no need to have both, as HLSe is redundant if you have DRM. If you see issues in playback of DRM-protected videos, <a href="https://help.brightcove.com/en/contact">contact Brightcove Support</a> and have HLSe disabled if it is enabled.</aside>
@@ -122,17 +115,30 @@
   <section class="bcls-section">
   <h2 id="DRM_plugin_architecture">DRM plugin architecture</h2>
 
-  <p>The DRM plugin is a wrapper around three plugins:</p>
+  <p>The DRM plugin (<strong>videojs-drm</strong>) is a wrapper around two plugins:</p>
 
   <ul>
-  	<li>videojs-contrib-dash</li>
   	<li>videojs-silverlight</li>
   	<li>videojs-contrib-eme</li>
   </ul>
 
-  <p>The <strong>videojs-shaka</strong> and <strong>videojs-silverlight</strong> plugins allow for playback of DASH content. The <strong>videojs-contrib-eme</strong> plugin allows for playback of FairPlay HLS content.</p>
+  <p>
+    The <strong>videojs-drm</strong> plugin version 5 uses the player's built-in DASH playback capabilities. This utilizes VHS, which is the next and renamed version of the built-in <strong>videojs-contrib-hls</strong> plugin.
+  </p>
+  <p>
+    If you want to use the Shaka Player for DASH playback, like it did in version 4, you can include the following script along with <strong>videojs-drm</strong> version 5 script:
+  </p>
+    <pre><code class="language-html">http://players.brightcove.net/videojs-shaka/1/videojs-shaka.js</code></pre>
+  <br/>
 
-  <aside class="bcls-aside bcls-aside--information">When specifying FairPlay options, the plugin name reflects <strong>videojs-contrib-eme</strong>'s plugin name, <code>eme</code>.</aside>
+  <p>The <strong>videojs-silverlight</strong> plugin allows for playback of DASH content on certain Internet Explorer browsers.</p>
+  <p>
+    The <strong>videojs-contrib-eme</strong> plugin allows for playback of FairPlay HLS content.
+  </p>
+
+  <aside class="bcls-aside bcls-aside--information">
+    When specifying FairPlay options, the plugin name reflects <strong>videojs-contrib-eme</strong>'s plugin name, <code>eme</code>.
+    </aside>
   </section>
 
   <section class="bcls-section">
@@ -211,7 +217,7 @@
   <div class="video-cloud-only">
   <p>There are two steps you must perform to create DRM enabled content:</p>
 
-  <ol>
+  <ol class="bcls-tasklist__restart">
   	<li>Contact your account manager to have your account(s) DRM-enabled. You can then configure your account with the proper licensing keys and ingest profiles to enable the creation of DRM protected content.</li>
   	<li>
   	<p>Produce DRM protected content. You can choose to either upload new content or re-encode existing content as DRM. This is done by selecting the <strong>Ingest Profile</strong> that produces your desired encryption technology.</p>
@@ -232,7 +238,7 @@
   <div class="video-cloud-only">
   <p>Follow these steps to use the DRM Plugin with FairPlay protected content:</p>
 
-  <ol>
+  <ol class="bcls-tasklist__restart">
   	<li>In Studio, open the <strong>Players</strong> module and locate the desired player.</li>
   	<li>Click the link for the player to open the player properties.</li>
   	<li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
@@ -242,17 +248,15 @@
   	<li>For the <strong>CSS URL</strong>, enter:
   	<pre><code class="language-html">//players.brightcove.net/videojs-drm/5/videojs-drm.css</code></pre>
   	</li>
-  	<li>Enter the plugin <strong>Name</strong> to be <code>eme</code> and the <strong>Options</strong> must supply your FairPlay license credentials.
-  	<figure class="bcls-figure"><img class="bcls-image" alt="Supply options" src="//learning-services-media.brightcove.com/doc-assets/player-development/content-protection-drm/bcp-and-drm/fairplay-plugin-configuration.png" /></figure>
+  	<li>Enter the plugin <strong>Name</strong> to be <code>eme</code>. If your account is set up for <a href="/node/17949">Dynamic Delivery</a>, you do NOT need to enter any configuration data in the <strong>plugin options</strong> section.
+  	<figure class="bcls-figure"><img class="bcls-image" alt="Supply options" src="//learning-services-media.brightcove.com/doc-assets/player-development/content-protection-drm/bcp-and-drm/fairplay-plugin.png" /></figure>
 
-  	<p>Here is the JSON for the options:</p>
+  	<p>If your account is NOT set up for <a href="/node/17949">Dynamic Delivery</a>, then you need to supply your FairPlay license credentials as <strong>plugin options</strong>. Here is the JSON for the options:</p>
 
   	<pre class="line-numbers"><code class="language-json">{
     "applicationId": "<span class="bcls-input">YOUR_APPLICATION_ID</span>",
     "publisherId": "<span class="bcls-input">YOUR_ACCOUNT_ID</span>"
 }</code></pre>
-
-  	<aside class="bcls-aside bcls-aside--information">Note that if your account is set up for <a href="/node/17949">Dynamic Delivery</a>, you need NOT enter the <code>applicationId</code> or <code>publisherId</code> JSON. The only item you must enter is the plugin name, <code>eme</code>.</aside>
   	</li>
   	<li>Click <strong>Save</strong> and then <strong>Publish</strong> the player.</li>
   </ol>
@@ -271,7 +275,19 @@
   	<li>Include the plugin's JavaScript:
   	<pre><code class="language-html">&lt;script src="//players.brightcove.net/videojs-drm/5/videojs-drm.min.js"&gt;&lt;/script&gt;</code></pre>
   	</li>
-  	<li>In a JavaScript block in the page, call and configure the EME plugin with FairPlay credential information:
+  	<li>
+      <p>
+        If your account is set up for <a href="/node/17949">Dynamic Delivery</a>, simply call the EME plugin to initialize it.
+      </p>
+      <pre class="line-numbers"><code class="language-html">&lt;script type="text/javascript"&gt;
+  videojs('myPlayerID').ready(function(){
+      var myPlayer = this;
+      myPlayer.eme();
+  });
+  &lt;/script&gt;</code></pre>
+  <p>
+    <p>If your account is NOT set up for <a href="/node/17949">Dynamic Delivery</a>, then you need to call and configure the EME plugin with FairPlay credential information.
+  </p>
   	<pre class="line-numbers"><code class="language-html">&lt;script type="text/javascript"&gt;
 videojs('myPlayerID').ready(function(){
     var myPlayer = this;
@@ -289,7 +305,7 @@ videojs('myPlayerID').ready(function(){
   <div class="player-only">
   <p>Follow these steps to use the DRM Plugin with FairPlay protected content:</p>
 
-  <ol>
+  <ol class="bcls-tasklist__restart">
   	<li>In the header of your HTML page, include the plugin's stylesheet:
   	<pre><code class="language-html">&lt;link href="//players.brightcove.net/videojs-drm/5/videojs-drm.css" rel="stylesheet"&gt;</code></pre>
   	</li>
@@ -453,7 +469,7 @@ player.src({
 
   <p>Follow these steps to use the DRM Plugin with PlayReady protected content:</p>
 
-  <ol>
+  <ol class="bcls-tasklist__restart">
   	<li>In Studio, open the <strong>Players</strong> module and locate the desired player.</li>
   	<li>Click the link for the player to open the player properties.</li>
   	<li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
@@ -476,7 +492,7 @@ player.src({
   <div class="video-cloud-only">
   <p>Follow these steps to use the DRM Plugin with Widevine protected content:</p>
 
-  <ol>
+  <ol class="bcls-tasklist__restart">
   	<li>In Studio, open the <strong>Players</strong> module and locate the desired player.</li>
   	<li>Click the link for the player to open the player properties.</li>
   	<li>Locate the <strong>Plugins</strong> section and click <strong>Edit</strong>.</li>
@@ -582,16 +598,38 @@ player.ready(function(){
     }</span>
   });
 });</code></pre>
+
+<p>This example loads Widevine and PlayReady sources:</p>
+
+<pre class="line-numbers"><code class="language-javascript">player.src({
+   type: 'application/dash+xml',
+   src: '&lt;some src&gt;',
+<span class="bcls-highlight">   keySystems: {
+    'com.widevine.alpha': '&lt;license url&gt;',
+    'com.microsofth.playready': '&lt;license url&gt;'
+  }</span>
+});</code></pre>
   </section>
 
   <section class="bcls-section">
   <h2 id="Enable_debugging">Enable debugging</h2>
 
-  <aside class="bcls-aside bcls-aside--information">Note: The debugger functions only with DASH content. The debugger does NOT support FairPlay HLS content.</aside>
+  <aside class="bcls-aside bcls-aside--information">
+    <p>
+      Note: The debugger works only with DASH content. The debugger does NOT support FairPlay HLS content.
+    </p>
+      To test HLS content, you can use the same methods as found in the <a href="/node/18087#Debugging">Debugging section of the HLS plugin</a> document.
+   </aside>
 
-  <p>You can debug the playback of the DRM content by using Brightcove Player's debugger. To do this use this URL for the plugin's JavaScript instead of the one mentioned numerous times above:</p>
+  <p>To enable debugging for your DRM DASH content, add the following shaka scripts to your Brightcove Player:</p>
 
-  <pre><code class="language-javascript">//players.brightcove.net/videojs-drm/5/videojs-drm.debug.js</code></pre>
+  <pre><code class="language-javascript">&lt;!-- Script for the drm plugin --&gt;
+&lt;script src=&quot;//players.brightcove.net/videojs-drm/5/videojs-drm.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;!-- Script for the shaka plugin --&gt;
+<span class="bcls-highlight">&lt;script src=&quot;//players.brightcove.net/videojs-shaka/1/videojs-shaka.js&quot;&gt;&lt;/script&gt;</span>
+&lt;!-- Script for shaka debug plugin  --&gt;
+<span class="bcls-highlight">&lt;script src=&quot;//players.brightcove.net/videojs-shaka/1/videojs-shaka.debug.js&quot;&gt;&lt;/script&gt;</span></code></pre>
 
   <p>The following is an example of the debugging at player load:</p>
 
