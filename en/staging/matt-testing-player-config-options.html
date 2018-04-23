@@ -1293,6 +1293,61 @@
         </section>
 
         <section class="bcls-section">
+          <h2 id="query_string_to_window">query_string_to_window</h2>
+          <p><code>query_string_to_window</code> information:</p>
+          <aside class="bcls-aside bcls-aside--information">Supported for Advanced (iframe) player implementations only.</aside>
+
+            Used to control the population of the global namespace (window) from query string parameters. This is useful particularly in cases of embedded players, such as Google's AMP components or Facebook Instant Articles. The parsing of query strings is done using the <a href="//nodejs.org/api/querystring.html#querystring_querystring_parse_str_sep_eq_options">Node.js querystring module</a>. Use of this configuration object requires at least one of the following sub-properties. Both can be used simultaneously.
+            <ol class="bcls-tasklist">
+              <li>
+                <ul>
+                  <li>Name: <code>query_string_to_window.target</code></li>
+                  <li>Type: string</li>
+                  <li>Description:
+                    A destination object to create on the window, which will be populated with the entire parsed query string. For example, a use of <code>query_string_to_window.target</code> given the following in a player config:
+<pre class="line-numbers"><code class="language-json">{
+"query_string_to_window": {"target": "queryStringParams"}
+}</code></pre>
+                    and given the following query string:
+<pre class="line-numbers"><code class="language-html">?foo=bar&nums=1&nums=2</code></pre>
+                    would yield the following <code>window.queryStringParams</code> global object would be available to the player and plugins:
+<pre class="line-numbers"><code class="language-json">{
+foo: 'bar',
+nums: ['1', '2']
+}</code></pre>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <ul>
+                  <li>Name: <code>query_string_to_window.globals</code></li>
+                  <li>Type: array</li>
+                  <li>Description: An array of property names of the window object, which will be populated from values found in the query string. Any matching properties that already exist on the <code>window</code> object or its prototype chain will not be set. For example, a use of <code>query_string_to_window.globals</code> given the following in a player config:
+<pre class="line-numbers"><code class="language-json">{
+"query_string_to_window": {
+  "globals": [
+    "foo",
+    "nums",
+    "self"
+  ]
+}
+}</code></pre>
+                    and give the following query string:
+<pre class="line-numbers"><code class="language-html">?foo=bar&nums=1&nums=2&self=not-allowed</code></pre>
+                    would yield the following <code>window</code> global object with the following properties added:
+<pre class="line-numbers"><code class="language-javascript">window.foo; // 'bar'
+window.nums; // ['1', '2']
+
+// Because `self` already exists on the `window` object, it will not be set
+// and a warning will be logged to the browser console.
+window.self; // window</code></pre></li>
+                </ul>
+
+              </li>
+            </ol>
+        </section>
+
+        <section class="bcls-section">
           <h2 id="repeat">repeat</h2>
 
           <p><code>repeat</code> information:</p>
