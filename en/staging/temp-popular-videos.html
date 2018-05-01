@@ -15,7 +15,7 @@
   	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
     <meta name="robots" content="noindex">
   	<!-- change title to match the h1 heading -->
-  	<title>Brightcove Player Sample: Multiple Session Playback</title>
+  	<title>Brightcove Player Sample: Popular Videos Playlist</title>
 
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
@@ -42,10 +42,10 @@
 			<div id="sidenav" class="side-nav"></div>
 		</div>
 		<div id="main" class="large-10 small-12 columns">
-			<h1>Brightcove Player Sample: Multiple Session Playback</h1>
+			<h1>Brightcove Player Sample: Popular Videos Playlist</h1>
       <aside class="bcls-aside bcls-aside--warning">This is a temporary STAGING document for review only. For the official Brightcove documentation site, go to <a href="https://support.brightcove.com/">support.brightcove.com</a></aside>
-      <p>In this topic, you will learn how to use the new Brightcove player to update a session cookie during playback to maintain the current position.</p>
-      <aside class="bcls-aside bcls-aside--warning">This sample adds and updates a cookie in the user's web browser. This may be a potential privacy concern in certain geographic areas.</aside>
+      <p>In this topic, you will learn how to use the Analytics API and a Brightcove player to display a playlist of the most popular videos in the account today. Also see the Popular Videos Overlay sample.</p>
+      <aside class="bcls-aside bcls-aside--information">The content in this document applies to Video Cloud only.</aside>
 
 
 	    <!-- BEGIN DRUPAL CONTENT -->
@@ -56,19 +56,39 @@
 <h2 id="Player_example">Player example</h2>
 <!-- UPDATE description -->
 
-<p>When the player initially loads, a cookie will be checked for the last watched position of the video. If the cookie is present, the video will begin playing at that point. When the video finishes playing, the cookie will be set to zero.</p>
-<p>
-  Play the video and stop it at some point during playback. When you refresh the page, the video will resume playing where you left off.
-</p>
+<p>The playlist will appear automatically as soon as the video data is retrieved. The request to the Analytics API to get the 6 most viewed videos in the past 24 hours is shown, along with the API response.</p>
+
 <!-- UPDATE codepen here -->
-<p data-height="525" data-theme-id="dark" data-slug-hash="LmNJda" data-default-tab="result" data-user="bcls1969" data-embed-version="2" data-pen-title="Multiple Session Playback" class="codepen">See the Pen <a href="https://codepen.io/team/bcls1969/pen/LmNJda/">Multiple Session Playback</a> by Brightcove Learning Services (<a href="https://codepen.io/bcls1969">@bcls1969</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+<p data-height="711" data-theme-id="dark" data-slug-hash="ELWVXr" data-default-tab="result" data-user="bcls1969" data-embed-version="2" data-pen-title="18183-popular-videos-playlist" class="codepen">See the Pen <a href="https://codepen.io/team/bcls1969/pen/ELWVXr/">18183-popular-videos-playlist</a> by Brightcove Learning Services (<a href="https://codepen.io/bcls1969">@bcls1969</a>) on <a href="https://codepen.io">CodePen</a>.</p>
 <script async src="https://static.codepen.io/assets/embed/ei.js"></script>
 
 <!-- UPDATE link to GitHub source -->
-<p>View the <a href="https://github.com/BrightcoveLearning/18198-multiple-session-playback">source code</a>.</p>
+<p>View the <a href="https://github.com/BrightcoveLearning/18183-popular-videos-playlist">source code</a>.</p>
 
-<aside class="bcls-aside bcls-aside--information">The Codepen above should work as expected on this page. If you choose to edit the code  on the Codepen site, be aware that most of their Pen views use a sandboxed iframe and cannot set cookies. To test the cookie behavior, either switch to <a href="https://blog.codepen.io/documentation/views/debug-view/">Codepen's Debug View</a>, or copy the code into your web page.
-</aside>
+</section>
+
+<section class="bcls-section">
+<h2 id="Overview">Overview</h2>
+<p>This example returns the most viewed videos within the past day, from your account, using the Analytics API. It is similar to the <a href="/node/18175">Most Watched Video Playlist</a> example, which uses data from the Playback API. There are few differences to keep in mind:</p>
+<h3>Analytics API</h3>
+<ul>
+  <li>
+    If you don't specify the <code>from</code> parameter and value, the default is the past 30 days.
+  </li>
+  <li>
+    To retrieve the same results from the Analytics API that you would get from the Playback API, use the <code>?alltime</code> URL parameter in the API request.
+  </li>
+</ul>
+<h3>Playback API</h3>
+<ul>
+  <li>
+    The <code>plays_total</code> field is the all time video views for a video.
+  </li>
+  <li>
+    You can use the <a href="/node/18108#getSearch_method">catalog.getSearch()</a> method to easily retrieve data from the Playback API.
+  </li>
+</ul>
+
 </section>
 
 <section class="bcls-section">
@@ -92,7 +112,7 @@
 </section>
 
 <section class="bcls-section">
-<h2 id="developmentsequence" class="bcls-expander-head">Development sequence</h2>
+<h2 id="Development_sequence" class="bcls-expander-head">Development sequence</h2>
 
 <div class="bcls-expander-content">
 <p>Here is the recommended development sequence:</p>
@@ -130,6 +150,34 @@
 <!-- id="expanderContent" --></section>
 
 <section class="bcls-section">
+  <h2 id="Getting_Credentials" class="bcls-expander-head">Getting Credentials</h2>
+
+  <div class="bcls-expander-content">
+  <p>To get a <code>client_id</code> and <code>client_secret</code>, you will need to go to the OAuth UI and register this app:</p>
+
+  <ul>
+    <li><a href="/managing-api-authentication-credentials">Managing API Authentication Credentials</a></li>
+  </ul>
+  <p>These are the permissions you will need:</p>
+
+  <figure class="bcls-figure"><img class="bcls-image" alt="Analytics API Permissions" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/analytics-api/aapi-permissions.png" /><figcaption class="bcls-caption--image">Analytics API Permissions</figcaption></figure>
+  <p>You can also get your credentials via CURL or Postman - see:</p>
+
+  <ul>
+    <li><a href="/oauth-get-client-credentials-using-curl">Get Client Credentials Using CURL</a></li>
+  	<li><a href="/oauth-get-client-credentials-using-postman">Get Client Credentials Using Postman</a></li>
+  </ul>
+  <p>If you are getting credentials directly from the API, these are the permissions you need:</p>
+
+  <pre class="line-numbers">
+  <code class="language-json">[
+    "video-cloud/analytics/read",
+    "video-cloud/video/read"
+  ]</code></pre>
+  </div>
+</section>
+
+<section class="bcls-section">
 <h2 id="API/Plugin_resources_used">API/Plugin resources used</h2>
 <!-- UPDATE table, remove unneeded columns -->
 
@@ -137,24 +185,21 @@
 	<thead class="bcls-table__head">
 		<tr>
 			<th>Player API Methods</th>
-			<th>Player API Events</th>
+			<th>REST API's</th>
 		</tr>
 	</thead>
 	<tbody class="bcls-table__body">
-    <tr>
-			<td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/Player.html#ready">ready()</a></td>
-			<td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/Player.html#event:loadedmetadata">loadedmetadata</a></td>
-		</tr>
-    <tr>
-			<td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/module-events.html#.on">on()</a></td>
-			<td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/Player.html#event:timeupdate">timeupdate</a></td>
+		<tr>
+			<td><a href="https://support.brightcove.com/node/18108#getVideo">catalog.getVideo()</a></td>
+			<td>This sample uses the <a href="https://support.brightcove.com/node/18370">Analytics API</a> via a <a href="#Proxy_code">proxy built in PHP</a>.</td>
 		</tr>
 		<tr>
-			<td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/Player.html#currentTime">currentTime()</a></td>
-			<td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/Player.html#event:play">play</a></td>
+			<td><a href="/node/18099#playlist">playlist()</a></td>
+			<td>&nbsp;</td>
 		</tr>
 	</tbody>
 </table>
+
 
 </section>
 
@@ -169,6 +214,11 @@
 <p>No special configuration is required for the Brightcove Player you create for this sample.</p>
 
 <h3>Other HTML</h3>
+<p>
+  When using the Advanced (in-page embed) player, you need to add an HTML element to specify the location of the playlist. For details, see the <a href="/node/18055#inpageembed">Implementing Playlists</a> document.
+</p>
+<pre>
+<code class="language-html">&lt;div class=&quot;vjs-playlist&quot;&gt;&lt;/div&gt;</code></pre>
 
 <p>Remember to add the <code>id</code> attribute to the <code>video</code> tag in the player embed code.</p>
 
@@ -177,11 +227,18 @@
 ...</code></pre>
 
 <p>
-  For testing purposes, we've added two HTML elements below the player to display the initial value of the session cookie and the current value of the cookie as the video plays.
+  For testing purposes, we've added HTML elements below the player to display the Analytics API request and response.
 </p>
 <pre class="line-numbers">
-<code class="language-html">&lt;p&gt;video start cookie value = &lt;span id=&quot;cookieDisplay1&quot;&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;current cookie value = &lt;span id=&quot;cookieDisplay2&quot;&gt;&lt;/span&gt;&lt;/p&gt;</code></pre>
+<code class="language-html">&lt;p&gt;
+  &lt;strong&gt;Analytics API request:&lt;/strong&gt;
+&lt;/p&gt;
+&lt;pre id=&quot;apiRequest&quot;&gt;&lt;/pre&gt;
+&lt;p&gt;
+  &lt;strong&gt;Analytics Response data&lt;/strong&gt;
+&lt;/p&gt;
+&lt;pre id=&quot;responseData&quot;&gt;&lt;/pre&gt;</code></pre>
+
 </section>
 
 <!-- UPDATE application flow -->
@@ -191,68 +248,68 @@
 <p>The basic logic behind this application is:</p>
 
 <ul>
-	<li>Read the browser cookie.</li>
-  <li>Check the cookie value.</li>
-  <li>Start video playback.</li>
-  <li>Increment the cookie.</li>
-  <li>Reset the cookie.</li>
+	<li>Set up the Analytics API request</li>
+  <li>Get data from the Analytics API</li>
+  <li>Extract the video ids</li>
+  <li>Get the video objects</li>
+  <li>Load the playlist</li>
 </ul>
 
 <!-- UPDATE task 1 -->
 
-<h3>Read the browser cookie</h3>
+<h3>Set up the Analytics API request</h3>
 
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Read browser cookie +++</code></pre>
+<code class="language-javascript">// +++ Set up Analytics API request +++</code></pre>
 
-<p>Initialize variables and read the browser cookie associated with the Brightcove video position. The cookie is named <code>BC_position</code>.</p>
+<p>Set up the URL parameters for the Analytics API request. This request will return 6 videos from our Brightcove account that have the most video views in the last 24 hours. They will be sorted in descending order.</p>
 
 <!-- UPDATE task 2 -->
 
-<h3>Check the cookie value</h3>
+<h3>Get data from the Analytics API</h3>
 
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Check the cookie value +++</code></pre>
+<code class="language-javascript">// +++ Get data from Analytics API +++</code></pre>
 
-<p>If the cookie exists, then set the video start position to this value. Otherwise, start from the beginning of the video.</p>
+<p>This example calls a <a href="#Proxy_code">server-side proxy</a> written in PHP to send your HTTP request to the Analytics API.</p>
 
 <!-- UPDATE task 3 -->
 
-<h3>Start video playback</h3>
+<h3>Extract the video ids</h3>
 
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Start video playback +++</code></pre>
+<code class="language-javascript">// +++ Extract the video ids +++</code></pre>
 
-<p>If video position is greater than zero, than start playback at that point. Otherwise, let the user start video playback from the beginning.</p>
+<p>Extract the video ids from the API response data, and store them in an array.</p>
 
 
 <!-- UPDATE task 4 -->
 
-<h3>Increment the cookie</h3>
+<h3>Get the video objects</h3>
 
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Increment the cookie +++</code></pre>
+<code class="language-javascript">// +++ Get the video objects +++</code></pre>
 
-<p>Listen for when the current playback position has changed. This should be every 15-250 milliseconds. When the integer value for the current playback position changes, then update the cookie.</p>
+<p>For each video id returned from the Analytics API, use the <code>catalog.getVideo()</code> method to get the video object.</p>
 
 <!-- UPDATE task 5 -->
 
-<h3>Reset the cookie</h3>
+<h3>Load the playlist</h3>
 
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Reset the cookie +++</code></pre>
+<code class="language-javascript">// +++ Load the playlist +++</code></pre>
 
-<p>When video playback reaches the end, then reset the cookie value to zero.</p>
+<p>Using the video object array, use the <code>playlist()</code> method to load the videos into the player's playlist.</p>
 
 </section>
 
@@ -285,13 +342,30 @@
   ...
 });</code></pre>
 <!-- UPDATE path to plugin's JavaScript -->
-<p>As mentioned earlier, you can see the plugin's JavaScript code in this document's corresponding GitHub repo: <a href="https://github.com/BrightcoveLearning/18198-multiple-session-playback/blob/master/plugin/multiple-session.js">multiple-session.js</a>.</p>
+<p>As mentioned earlier, you can see the plugin's JavaScript code in this document's corresponding GitHub repo: <a href="https://github.com/BrightcoveLearning/18183-popular-videos-playlist/blob/master/plugin/popular-videos.js">popular-videos.js</a>.</p>
 
 <h3>Using the plugin with a player</h3>
 
 <p>Once you have the plugin's CSS and JavaScript files stored in an Internet accessible location, you can use the plugin with a player. In Studio's <strong>PLAYERS</strong> module you can choose a player, then in the <strong>PLUGINS</strong> section add the URLs to the CSS and JavaScript files, and also add the <strong>Name</strong> and <strong>Options</strong>, if options are needed.</p>
 
 <aside class="bcls-aside bcls-aside--tip">For more information on using Studio to assign plugins to players see the <a href="//support.brightcove.com/node/14053">Configuring Player Plugins</a> document.</aside>
+</section>
+<section class="bcls-section">
+  <h2 id="Proxy_code">Proxy code</h2>
+
+  <aside class="bcls-aside bcls-aside--information">In order to build your own version the sample app on this page, you must create and host your own proxy. (The proxies used by Brightcove Learning Services only accept requests from Brightcove domains.) You can download two versions of our proxy code:
+  <ul>
+    <li>
+      <a href="//learning-services-media.brightcove.com/doc-assets/proxy/bcls-proxy-for-distribution.php.zip">This is a general version that expects client credentials to be passed with the request</a>
+    </li>
+  	<li>
+      <a href="//learning-services-media.brightcove.com/doc-assets/proxy/doc-samples-proxy.php.zip">This version allows you to save your client credentials in the proxy itself on lines 25-26 (recommended)</a>
+    </li>
+  </ul>
+  <p>
+    For details about buiding the proxy code, see the <a href="https://support.brightcove.com/node/18132">Using the REST APIs</a> learning guide.
+  </p>
+  </aside>
 </section>
 </article>
 
