@@ -205,9 +205,12 @@
 <ul>
   <li>Define a supporting middleware function to calculate playback time ranges</li>
 	<li>Define the middleware function</li>
-  <li>Extract the video ids</li>
-  <li>Get the video objects</li>
-  <li>Load the playlist</li>
+  <li>Listen for the ratechange event</li>
+  <li>Implement the setSource() and setTech methods</li>
+  <li>Override methods using current playback rate</li>
+  <li>Register the middleware with the player</li>
+  <li>Define the playback rate options</li>
+  <li>Initialize the playback rate button</li>
 </ul>
 
 <!-- UPDATE task 1 -->
@@ -242,37 +245,73 @@
 
 <!-- UPDATE task 3 -->
 
-<h3>Extract the video ids</h3>
+<h3>Listen for the ratechange event</h3>
 
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Extract the video ids +++</code></pre>
+<code class="language-javascript">// +++ Listen for ratechange event +++</code></pre>
 
-<p>Extract the video ids from the API response data, and store them in an array.</p>
+<p>When the playback rate is changed, then trigger the <code>durationchange</code> and <code>timeupdate</code> events.</p>
 
 
 <!-- UPDATE task 4 -->
 
-<h3>Get the video objects</h3>
+<h3>Implement the setSource() and setTech() methods</h3>
 
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Get the video objects +++</code></pre>
+<code class="language-javascript">// +++ Implement setSource() and setTech() +++</code></pre>
 
-<p>For each video id returned from the Analytics API, use the <code>catalog.getVideo()</code> method to get the video object.</p>
+<p>This is a required method for every middleware function. By using the syntax shown means the middleware will always be selected, irregardless of the video type:.</p>
+<pre><code class="language-javascript">setSource(srcObj, next) {
+  next(null, srcObj);
+},</code></pre>
 
 <!-- UPDATE task 5 -->
 
-<h3>Load the playlist</h3>
+<h3>Override methods using current playback rate</h3>
 
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Load the playlist +++</code></pre>
+<code class="language-javascript">// +++ Override methods +++</code></pre>
 
-<p>Using the video object array, use the <code>playlist()</code> method to load the videos into the player's playlist.</p>
+<p>Override the methods for <code>duration</code>, <code>currentTime</code>, <code>buffered</code>, <code>seekable</code> and <code>played</code> with values calculated using the current playback rate.</p>
+
+<!-- UPDATE task 5 -->
+
+<h3>Register the middleware with the player</h3>
+
+<p>Find the code which is labeled:</p>
+
+<pre>
+<code class="language-javascript">// +++ Register the middleware with the player +++</code></pre>
+
+<p>Override the methods for <code>duration</code>, <code>currentTime</code>, <code>buffered</code>, <code>seekable</code> and <code>played</code> with values calculated using the current playback rate.</p>
+
+<!-- UPDATE task 6 -->
+
+<h3>Define the playback rate options</h3>
+
+<p>Find the code which is labeled:</p>
+
+<pre>
+<code class="language-javascript">// +++ Define the playback rate options +++</code></pre>
+
+<p>Define the playback rates that you want displayed in the playback rate menu button.</p>
+
+<!-- UPDATE task 7 -->
+
+<h3>Initialize the playback rate button</h3>
+
+<p>Find the code which is labeled:</p>
+
+<pre>
+<code class="language-javascript">// +++ Initialize the playback rate button +++</code></pre>
+
+<p>Add the playback rate menu button to the player control bar, and initialize it with the values specified in the options object.</p>
 
 </section>
 
@@ -285,51 +324,34 @@
 </section>
 
 <section class="bcls-section">
-<h2 id="Plugin_code">Plugin code</h2>
+<h2 id="Using_the_middleware_function">Using the middleware function</h2>
 
-<p>Normally when converting the JavaScript into a Brightcove Player plugin nominal changes are needed. One required change is to replace the standard use of the <code>ready()</code> method with the code that defines a plugin.</p>
+<p>Once the middleware function has been written you want to use it. Two ways were mentioned earlier, and will be detailed now.</p>
 
-<p>Here is the very commonly used start to JavaScript code that will work with the player:</p>
+<h3>Code on same page as player</h3>
 
-<pre class="line-numbers">
-<code class="language-javascript">videojs('myPlayerID').ready(function(){
-  var myPlayer = this;
-  ...
-});</code></pre>
+<p>This is where you define the middleware function on the same page as the player, and then register it. The <a href="#Player_example">player example</a> in the Codepen above uses this method.</p>
 
-<p>You will change the first line to use the standard syntax to start a Brightcove Player plugin:</p>
+<h3>Code in a separate JavaScript file</h3>
+
+<p>In the following code, the JavaScript for the middleware function and the <code>use()</code> method to register it are simply included in the page.</p>
 
 <pre class="line-numbers">
-<code class="language-javascript">videojs.registerPlugin('pluginName', function(options) {
-  var myPlayer = this;
-  ...
-});</code></pre>
-<!-- UPDATE path to plugin's JavaScript -->
-<p>As mentioned earlier, you can see the plugin's JavaScript code in this document's corresponding GitHub repo: <a href="https://github.com/BrightcoveLearning/18183-popular-videos-playlist/blob/master/plugin/popular-videos.js">popular-videos.js</a>.</p>
+<code class="language-html">&lt;video id="myPlayerID"
+  data-video-id="5701202551001"
+  data-account="1752604059001"
+  data-player="default"
+  data-embed="default"
+  data-application-id
+  class="video-js"
+  controls&gt;&lt;/video&gt;
+&lt;script src="//players.brightcove.net/1752604059001/default_default/index.min.js"&gt;&lt;/script&gt;
 
-<h3>Using the plugin with a player</h3>
+<span class="bcls-highlight">&lt;script src="disable-forward-scrubbing.js"&gt;&lt;/script&gt;</span></code></pre>
 
-<p>Once you have the plugin's CSS and JavaScript files stored in an Internet accessible location, you can use the plugin with a player. In Studio's <strong>PLAYERS</strong> module you can choose a player, then in the <strong>PLUGINS</strong> section add the URLs to the CSS and JavaScript files, and also add the <strong>Name</strong> and <strong>Options</strong>, if options are needed.</p>
-
-<aside class="bcls-aside bcls-aside--tip">For more information on using Studio to assign plugins to players see the <a href="//support.brightcove.com/node/14053">Configuring Player Plugins</a> document.</aside>
+<p>See the <a href="https://github.com/BrightcoveLearning/18571-disable-forward-scrubbing/tree/master/function-in-separate-file">function-in-separate-file</a> section in the GitHub repo for full code.</p>
 </section>
-<section class="bcls-section">
-  <h2 id="Proxy_code">Proxy code</h2>
 
-  <aside class="bcls-aside bcls-aside--information">In order to build your own version the sample app on this page, you must create and host your own proxy. (The proxies used by Brightcove Learning Services only accept requests from Brightcove domains.) You can download two versions of our proxy code:
-  <ul>
-    <li>
-      <a href="//learning-services-media.brightcove.com/doc-assets/proxy/bcls-proxy-for-distribution.php.zip">This is a general version that expects client credentials to be passed with the request</a>
-    </li>
-  	<li>
-      <a href="//learning-services-media.brightcove.com/doc-assets/proxy/doc-samples-proxy.php.zip">This version allows you to save your client credentials in the proxy itself on lines 25-26 (recommended)</a>
-    </li>
-  </ul>
-  <p>
-    For details about buiding the proxy code, see the <a href="https://support.brightcove.com/node/18132">Using the REST APIs</a> learning guide.
-  </p>
-  </aside>
-</section>
 </article>
 
 
