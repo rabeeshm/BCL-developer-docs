@@ -15,7 +15,7 @@
   	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
     <meta name="robots" content="noindex">
   	<!-- change title to match the h1 heading -->
-  	<title>Brightcove Player Sample: Popular Videos Playlist</title>
+  	<title>Brightcove Player Sample: Playback Rate Adjuster</title>
 
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
@@ -42,9 +42,9 @@
 			<div id="sidenav" class="side-nav"></div>
 		</div>
 		<div id="main" class="large-10 small-12 columns">
-			<h1>Brightcove Player Sample: Popular Videos Playlist</h1>
+			<h1>Brightcove Player Sample: Playback Rate Adjuster</h1>
       <aside class="bcls-aside bcls-aside--warning">This is a temporary STAGING document for review only. For the official Brightcove documentation site, go to <a href="https://support.brightcove.com/">support.brightcove.com</a></aside>
-      <p>In this topic, you will learn how to use the Analytics API and a Brightcove player to display a playlist of the most popular videos in the account today. Also see the Popular Videos Overlay sample.</p>
+      <p>In this topic, you will learn how to add a playback rate button to the Brightcove Player control bar, and use a middleware function to properly display the current time and video duration as you switch between playback speeds.</p>
       <aside class="bcls-aside bcls-aside--information">The content in this document applies to Video Cloud only.</aside>
 
 
@@ -56,38 +56,14 @@
 <h2 id="Player_example">Player example</h2>
 <!-- UPDATE description -->
 
-<p>The playlist will appear automatically as soon as the video data is retrieved. The request to the Analytics API to get the 6 most viewed videos in the past 24 hours is shown, along with the API response.</p>
+<p>Start video playback and select the playback rate button in the control bar (default is 1x). Choose a different rate to see how video playback speed changes. Notice that when you change the playback rate, the duration time displayed is re-calculated based on the selected rate.</p>
 
 <!-- UPDATE codepen here -->
-<p data-height="711" data-theme-id="dark" data-slug-hash="ELWVXr" data-default-tab="result" data-user="bcls1969" data-embed-version="2" data-pen-title="18183-popular-videos-playlist" class="codepen">See the Pen <a href="https://codepen.io/team/bcls1969/pen/ELWVXr/">18183-popular-videos-playlist</a> by Brightcove Learning Services (<a href="https://codepen.io/bcls1969">@bcls1969</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+<p data-height="490" data-theme-id="dark" data-slug-hash="aGEVYZ" data-default-tab="result" data-user="bcls1969" data-embed-version="2" data-pen-title="Playback Rate Adjuster" class="codepen">See the Pen <a href="https://codepen.io/team/bcls1969/pen/aGEVYZ/">Playback Rate Adjuster</a> by Brightcove Learning Services (<a href="https://codepen.io/bcls1969">@bcls1969</a>) on <a href="https://codepen.io">CodePen</a>.</p>
 <script async src="https://static.codepen.io/assets/embed/ei.js"></script>
 
 <!-- UPDATE link to GitHub source -->
-<p>View the <a href="https://github.com/BrightcoveLearning/18183-popular-videos-playlist">source code</a>.</p>
-
-</section>
-
-<section class="bcls-section">
-<h2 id="Overview">Overview</h2>
-<p>This example returns the most viewed videos within the past day, from your account, using the Analytics API. It is similar to the <a href="/node/18175">Most Watched Video Playlist</a> example, which uses data from the Playback API. There are few differences to keep in mind:</p>
-<h3>Analytics API</h3>
-<ul>
-  <li>
-    If you don't specify the <code>from</code> parameter and value, the default is the past 30 days.
-  </li>
-  <li>
-    To retrieve the same results from the Analytics API that you would get from the Playback API, use the <code>?alltime</code> URL parameter in the API request.
-  </li>
-</ul>
-<h3>Playback API</h3>
-<ul>
-  <li>
-    The <code>plays_total</code> field is the all time video views for a video.
-  </li>
-  <li>
-    You can use the <a href="/node/18108#getSearch_method">catalog.getSearch()</a> method to easily retrieve data from the Playback API.
-  </li>
-</ul>
+<p>View the <a href="https://github.com/BrightcoveLearning/18597-playback-rate-adjuster">source code</a>.</p>
 
 </section>
 
@@ -150,31 +126,30 @@
 <!-- id="expanderContent" --></section>
 
 <section class="bcls-section">
-  <h2 id="Getting_Credentials" class="bcls-expander-head">Getting Credentials</h2>
+<h2 id="Middleware_functions">Middleware functions</h2>
 
-  <div class="bcls-expander-content">
-  <p>To get a <code>client_id</code> and <code>client_secret</code>, you will need to go to the OAuth UI and register this app:</p>
+<p>This sample uses Video.js middleware to implement the code solution. At a very high level, the use cases where middleware is of most value is when you want to intercept and alter core behaviors of the player, such as setting the source or current time. Video.js middleware in general is not discussed at length in this document, but the actual code used for the middleware function is explained. Here are documents from Video.js sources that do detail middleware:</p>
 
-  <ul>
-    <li><a href="/managing-api-authentication-credentials">Managing API Authentication Credentials</a></li>
-  </ul>
-  <p>These are the permissions you will need:</p>
+<ul>
+	<li><a href="http://docs.videojs.com/tutorial-middleware.html">Middleware (from the Video.js documentation set)</a></li>
+	<li><a href="http://blog.videojs.com/feature-spotlight-middleware/">Feature Spotlight: Middleware (from the Video.js blog)</a></li>
+	<li><a href="https://github.com/videojs/videojs-playbackrate-adjuster">videojs-playbackrate-adjuster (a sample app)</a></li>
+</ul>
 
-  <figure class="bcls-figure"><img class="bcls-image" alt="Analytics API Permissions" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/analytics-api/aapi-permissions.png" /><figcaption class="bcls-caption--image">Analytics API Permissions</figcaption></figure>
-  <p>You can also get your credentials via CURL or Postman - see:</p>
+<h3>Implementing middleware functions with Brightcove Player</h3>
 
-  <ul>
-    <li><a href="/oauth-get-client-credentials-using-curl">Get Client Credentials Using CURL</a></li>
-  	<li><a href="/oauth-get-client-credentials-using-postman">Get Client Credentials Using Postman</a></li>
-  </ul>
-  <p>If you are getting credentials directly from the API, these are the permissions you need:</p>
+<p>The simplest way to use a middleware function is to:</p>
 
-  <pre class="line-numbers">
-  <code class="language-json">[
-    "video-cloud/analytics/read",
-    "video-cloud/video/read"
-  ]</code></pre>
-  </div>
+<ol>
+	<li>Write the middleware function.</li>
+	<li>Place the middleware function either on the page with the player in a <code>script</code> tag, or include the middleware function using the <code>src</code> attribute with a <code>script</code> tag. Both implementations will be shown in this document.</li>
+	<li>Register the middleware function with the player using the <code>use()</code> method, as shown here:
+	<pre class="line-numbers">
+<code class="language-javascript">videojs.use('mimeType', functionName);</code></pre>
+
+	<p>For the <strong>mimetype</strong> you can use a standard video mimetype, like <strong>video/mp4</strong>, or use an <strong>*</strong> if you wish the middleware function to act on all mimetypes.</p>
+	</li>
+</ol>
 </section>
 
 <section class="bcls-section">
@@ -182,22 +157,21 @@
 <!-- UPDATE table, remove unneeded columns -->
 
 <table class="bcls-table">
-	<thead class="bcls-table__head">
-		<tr>
-			<th>Player API Methods</th>
-			<th>REST API's</th>
+  <thead class="bcls-table__head">
+    <tr>
+      <th>API Classes</th>
+			<th>API Methods</th>
 		</tr>
-	</thead>
-	<tbody class="bcls-table__body">
-		<tr>
-			<td><a href="https://support.brightcove.com/node/18108#getVideo">catalog.getVideo()</a></td>
-			<td>This sample uses the <a href="https://support.brightcove.com/node/18370">Analytics API</a> via a <a href="#Proxy_code">proxy built in PHP</a>.</td>
+  </thead>
+  <tbody class="bcls-table__body">
+    <tr>
+      <td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/ControlBar.html">ControlBar</a></td>
+			<td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/ControlBar.html#addChild">controlBar.addChild()</a></td>
 		</tr>
-		<tr>
-			<td><a href="/node/18099#playlist">playlist()</a></td>
-			<td>&nbsp;</td>
+    <tr><td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/PlaybackRateMenuButton.html">PlaybackRateMenuButton</a></td>
+			<td></td>
 		</tr>
-	</tbody>
+  </tbody>
 </table>
 
 
@@ -214,30 +188,11 @@
 <p>No special configuration is required for the Brightcove Player you create for this sample.</p>
 
 <h3>Other HTML</h3>
-<p>
-  When using the Advanced (in-page embed) player, you need to add an HTML element to specify the location of the playlist. For details, see the <a href="/node/18055#inpageembed">Implementing Playlists</a> document.
-</p>
-<pre>
-<code class="language-html">&lt;div class=&quot;vjs-playlist&quot;&gt;&lt;/div&gt;</code></pre>
 
 <p>Remember to add the <code>id</code> attribute to the <code>video</code> tag in the player embed code.</p>
 
-<pre>
-<code class="language-html">&lt;video <span class="bcls-highlight">id="myPlayerID"</span>
+<pre><code class="language-html">&lt;video <span class="bcls-highlight">id="myPlayerID"</span>
 ...</code></pre>
-
-<p>
-  For testing purposes, we've added HTML elements below the player to display the Analytics API request and response.
-</p>
-<pre class="line-numbers">
-<code class="language-html">&lt;p&gt;
-  &lt;strong&gt;Analytics API request:&lt;/strong&gt;
-&lt;/p&gt;
-&lt;pre id=&quot;apiRequest&quot;&gt;&lt;/pre&gt;
-&lt;p&gt;
-  &lt;strong&gt;Analytics Response data&lt;/strong&gt;
-&lt;/p&gt;
-&lt;pre id=&quot;responseData&quot;&gt;&lt;/pre&gt;</code></pre>
 
 </section>
 
@@ -248,8 +203,8 @@
 <p>The basic logic behind this application is:</p>
 
 <ul>
-	<li>Set up the Analytics API request</li>
-  <li>Get data from the Analytics API</li>
+  <li>Define a supporting middleware function to calculate playback time ranges</li>
+	<li>Define the middleware function</li>
   <li>Extract the video ids</li>
   <li>Get the video objects</li>
   <li>Load the playlist</li>
@@ -257,25 +212,33 @@
 
 <!-- UPDATE task 1 -->
 
-<h3>Set up the Analytics API request</h3>
+<h3>Define a supporting middleware function</h3>
 
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Set up Analytics API request +++</code></pre>
+<code class="language-javascript">// +++ Calculate playback time ranges +++</code></pre>
 
-<p>Set up the URL parameters for the Analytics API request. This request will return 6 videos from our Brightcove account that have the most video views in the last 24 hours. They will be sorted in descending order.</p>
+<p>Create a supporting middleware function that will re-calculate the playback start and end times based on the selected playback rate.</p>
 
 <!-- UPDATE task 2 -->
 
-<h3>Get data from the Analytics API</h3>
+<h3>Define the middleware function</h3>
 
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Get data from Analytics API +++</code></pre>
+<code class="language-javascript">// +++ Define the middleware function +++</code></pre>
 
-<p>This example calls a <a href="#Proxy_code">server-side proxy</a> written in PHP to send your HTTP request to the Analytics API.</p>
+<p>Create a middleware function that will update the start time, duration and even current time when seeking.</p>
+<p>The basic syntax for creating a middleware function is as follows:</p>
+<pre class="line-numbers">
+<code class="language-javascript">const playbackrateAdjuster = function(player) {
+  return {
+  ...
+};</code></pre>
+
+<p>Note that the <code>player</code> object is passed to the function.</p>
 
 <!-- UPDATE task 3 -->
 
