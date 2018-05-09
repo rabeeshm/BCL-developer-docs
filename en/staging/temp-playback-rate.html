@@ -57,6 +57,7 @@
 <!-- UPDATE description -->
 
 <p>Start video playback and select the playback rate button in the control bar (default is 1x). Choose a different rate to see how video playback speed changes. Notice that when you change the playback rate, the duration time displayed is re-calculated based on the selected rate.</p>
+<aside class="bcls-aside bcls-aside--tip">If you don't want to code the middleware functions, you can use a plug and play solution. For details, see the  <a href="#Code_in_a_separate_JavaScript_file">Code in a separate JavaScript file</a> section.</aside>
 
 <!-- UPDATE codepen here -->
 <p data-height="490" data-theme-id="dark" data-slug-hash="aGEVYZ" data-default-tab="result" data-user="bcls1969" data-embed-version="2" data-pen-title="Playback Rate Adjuster" class="codepen">See the Pen <a href="https://codepen.io/team/bcls1969/pen/aGEVYZ/">Playback Rate Adjuster</a> by Brightcove Learning Services (<a href="https://codepen.io/bcls1969">@bcls1969</a>) on <a href="https://codepen.io">CodePen</a>.</p>
@@ -140,7 +141,7 @@
 
 <p>The simplest way to use a middleware function is to:</p>
 
-<ol>
+<ol class="bcls-tasklist__restart">
 	<li>Write the middleware function.</li>
 	<li>Place the middleware function either on the page with the player in a <code>script</code> tag, or include the middleware function using the <code>src</code> attribute with a <code>script</code> tag. Both implementations will be shown in this document.</li>
 	<li>Register the middleware function with the player using the <code>use()</code> method, as shown here:
@@ -148,6 +149,7 @@
 <code class="language-javascript">videojs.use('mimeType', functionName);</code></pre>
 
 	<p>For the <strong>mimetype</strong> you can use a standard video mimetype, like <strong>video/mp4</strong>, or use an <strong>*</strong> if you wish the middleware function to act on all mimetypes.</p>
+  <aside class="bcls-aside bcls-aside--tip">Plugins and middleware may be set up to automatically register themselves when their scripts are included. In this case, you would not need to use the <code>videojs.use()</code> method.</aside>
 	</li>
 </ol>
 </section>
@@ -203,82 +205,60 @@
 <p>The basic logic behind this application is:</p>
 
 <ul>
-  <li>Define a supporting middleware function to calculate playback time ranges</li>
-	<li>Define the middleware function</li>
-  <li>Listen for the ratechange event</li>
-  <li>Implement the setSource() and setTech methods</li>
-  <li>Override methods using current playback rate</li>
+	<li>Define the middleware functions</li>
   <li>Register the middleware with the player</li>
   <li>Define the playback rate options</li>
   <li>Initialize the playback rate button</li>
 </ul>
 
+
 <!-- UPDATE task 1 -->
 
-<h3>Define a supporting middleware function</h3>
+<h3>Define the middleware functions</h3>
 
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Calculate playback time ranges +++</code></pre>
+<code class="language-javascript">// +++ Define the middleware functions +++</code></pre>
 
-<p>Create a supporting middleware function that will re-calculate the playback start and end times based on the selected playback rate.</p>
+<p>
+  Create the following middleware functions:
+</p>
+<ol class="bcls-tasklist__restart">
+    <li>Create a supporting middleware function that will re-calculate the playback start and end times based on the selected playback rate.</li>
+    <li>
+      <p>
+        Create a middleware function that will update the start time, duration and even current time when seeking.
+      </p>
+      <p>The basic syntax for creating a middleware function is as follows:</p>
+      <pre class="line-numbers">
+      <code class="language-javascript">const playbackrateAdjuster = function(player) {
+        return {
+        ...
+      };</code></pre>
 
-<!-- UPDATE task 2 -->
-
-<h3>Define the middleware function</h3>
-
-<p>Find the code which is labeled:</p>
-
-<pre>
-<code class="language-javascript">// +++ Define the middleware function +++</code></pre>
-
-<p>Create a middleware function that will update the start time, duration and even current time when seeking.</p>
-<p>The basic syntax for creating a middleware function is as follows:</p>
-<pre class="line-numbers">
-<code class="language-javascript">const playbackrateAdjuster = function(player) {
-  return {
-  ...
-};</code></pre>
-
-<p>Note that the <code>player</code> object is passed to the function.</p>
-
-<!-- UPDATE task 3 -->
-
-<h3>Listen for the ratechange event</h3>
-
-<p>Find the code which is labeled:</p>
-
-<pre>
-<code class="language-javascript">// +++ Listen for ratechange event +++</code></pre>
-
-<p>When the playback rate is changed, then trigger the <code>durationchange</code> and <code>timeupdate</code> events.</p>
-
-
-<!-- UPDATE task 4 -->
-
-<h3>Implement the setSource() and setTech() methods</h3>
-
-<p>Find the code which is labeled:</p>
-
-<pre>
-<code class="language-javascript">// +++ Implement setSource() and setTech() +++</code></pre>
-
-<p>This is a required method for every middleware function. By using the syntax shown means the middleware will always be selected, irregardless of the video type:.</p>
-<pre><code class="language-javascript">setSource(srcObj, next) {
+      <p>Note that the <code>player</code> object is passed to the function.</p>
+      <p>
+        This middleware function does the following:
+      </p>
+      <ol>
+        <li>
+          <strong>Listen for the ratechange event</strong>: When the playback rate is changed, then trigger the <code>durationchange</code> and <code>timeupdate</code> events.
+        </li>
+        <br />
+        <li>
+            <strong>Implement the setSource() method</strong>: This is a required method for every middleware function. By using the syntax shown means the middleware will always be selected, irregardless of the video type:
+          <pre><code class="language-javascript">setSource(srcObj, next) {
   next(null, srcObj);
 },</code></pre>
-
-<!-- UPDATE task 5 -->
-
-<h3>Override methods using current playback rate</h3>
-
-<p>Find the code which is labeled:</p>
-
-<pre>
-<code class="language-javascript">// +++ Override methods +++</code></pre>
-
-<p>Override the methods for <code>duration</code>, <code>currentTime</code>, <code>buffered</code>, <code>seekable</code> and <code>played</code> with values calculated using the current playback rate.</p>
+        </li>
+        <br />
+        <li>
+          <strong>Override methods using current playback rate</strong>: Override the methods for <code>duration</code>, <code>currentTime</code>, <code>buffered</code>, <code>seekable</code> and <code>played</code> with values calculated using the current playback rate.
+        </li>
+      </ol>
+    </li>
+</ol>
 
 <!-- UPDATE task 5 -->
 
@@ -289,7 +269,7 @@
 <pre>
 <code class="language-javascript">// +++ Register the middleware with the player +++</code></pre>
 
-<p>Override the methods for <code>duration</code>, <code>currentTime</code>, <code>buffered</code>, <code>seekable</code> and <code>played</code> with values calculated using the current playback rate.</p>
+<p>Register the middleware function with the player using the <code>use()</code> method.</p>
 
 <!-- UPDATE task 6 -->
 
@@ -332,9 +312,9 @@
 
 <p>This is where you define the middleware function on the same page as the player, and then register it. The <a href="#Player_example">player example</a> in the Codepen above uses this method.</p>
 
-<h3>Code in a separate JavaScript file</h3>
+<h3 id="Code_in_a_separate_JavaScript_file">Code in a separate JavaScript file</h3>
 
-<p>In the following code, the JavaScript for the middleware function and the <code>use()</code> method to register it are simply included in the page.</p>
+<p>In the following code, the JavaScript for the middleware functions and the <code>use()</code> method to register it are simply included in the page.</p>
 
 <pre class="line-numbers">
 <code class="language-html">&lt;video id=&quot;myPlayerID&quot;
@@ -348,24 +328,25 @@
 	  controls muted&gt;&lt;/video&gt;
 	&lt;script src=&quot;//players.brightcove.net/1752604059001/default_default/index.min.js&quot;&gt;&lt;/script&gt;
 
-  &lt;!-- Include the rate adjuster middleware function --&gt;
-	&lt;script src=&quot;rate-adjuster.js&quot;&gt;&lt;/script&gt;
+  &lt;!-- Include the rate adjuster middleware functions --&gt;
+  &lt;script src=&quot;//unpkg.com/videojs-playbackrate-adjuster@1.0.0/dist/browser/videojs-playbackrate-adjuster.min.js&quot;&gt;&lt;/script&gt;
 
-	&lt;script type=&quot;text/javascript&quot;&gt;
-		videojs.getPlayer(&quot;myPlayerID&quot;).ready(function(){
-			// When the player is ready, get a reference to it
-			var myPlayer = this;
-			console.log(&quot;myPlayer&quot;,myPlayer)
-			// Define the playback rate options
-			options = {&quot;playbackRates&quot;:[0.5, 1, 1.5, 2, 4]};
-			// Initialize the playback rate button
-			myPlayer.controlBar.playbackRateMenuButton = myPlayer.controlBar.addChild('PlaybackRateMenuButton', {
+  &lt;script type=&quot;text/javascript&quot;&gt;
+  	videojs.getPlayer(&quot;myPlayerID&quot;).ready(function(){
+  		// When the player is ready, get a reference to it
+  		var myPlayer = this;
+  		console.log(&quot;myPlayer&quot;,myPlayer)
+  		// Define the playback rate options
+  		options = {&quot;playbackRates&quot;:[0.5, 1, 1.5, 2, 4]};
+  		// Initialize the playback rate button
+  		myPlayer.controlBar.playbackRateMenuButton = myPlayer.controlBar.addChild('PlaybackRateMenuButton', {
       	playbackRates: options.playbackRates
-		  });
+  	  });
     });
   &lt;/script&gt;</code></pre>
 
-<p>For the complete code, see the <a href="https://github.com/BrightcoveLearning/18597-playback-rate-adjuster/tree/master/plugin">plugin section</a> in the GitHub repo.</p>
+<aside class="bcls-aside bcls-aside--tip">The <strong>videojs-playbackrate-adjuster</strong> middleware is published to <strong>npm</strong> and available to include in your project:  <a href="//unpkg.com/videojs-playbackrate-adjuster@1.0.0/dist/browser/videojs-playbackrate-adjuster.min.js">//unpkg.com/videojs-playbackrate-adjuster@1.0.0/dist/browser/videojs-playbackrate-adjuster.min.js</a></aside>
+<p>You can also host the middleware code yourself. For the complete code, see the <a href="https://github.com/BrightcoveLearning/18597-playback-rate-adjuster/tree/master/plugin">plugin section</a> in the GitHub repo.</p>
 </section>
 
 </article>
