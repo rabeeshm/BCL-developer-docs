@@ -1,0 +1,147 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>IMA3 Plugin Live Demo</title>
+  <style type="text/css">
+    /* * The body style is just for the
+     * background color of the codepen.
+     * Do not include in your code.
+     */
+
+    body {
+      background-color: #111;
+      color: #fff;
+    }
+
+    /*
+     * Styles essential to the sample
+     * are below
+     */
+
+    .video-js {
+      height: 344px;
+      width: 610px;
+    }
+  </style>
+  <link href="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <section class="bcls-section" id="Overview">
+    <h2>Overview</h2>
+
+    <p>In this document you will input your account ID, a URL to an HLS video and an add server URL and after clicking submit the player is built dynamically and the ad will play before the video.</p>
+  </section>
+
+
+  <section class="bcls-section">
+    <h2 id="video_data">Video data</h2>
+
+    <div id="inputFields" class="input-fields">
+      <fieldset class="bcls-fieldset">
+        <legend>Account Information</legend>
+
+        <div id="accountInfo">
+          <table class="bcls-table">
+            <tbody class="bcls-table__body">
+              <tr>
+                <td>Video Cloud Account ID:</td>
+                <td><input id="accountID" type="text" size="60" /></td>
+              </tr>
+              <tr>
+                <td>HLS Video URL:</td>
+                <td><input id="videoURL" type="text" size="200" placeholder="//learning-services-media.brightcove.com/videos/hls/wildlife_tiger/wildlife_tiger.m3u8" /></td>
+              </tr>
+              <tr>
+                <td>Ad Server URL:</td>
+                <td><input id="adServerURL" type="text" size="200" placeholder="//solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vast.xml" /></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </fieldset>
+    </div>
+    <br />
+    <button id="generatePlayer" class="bcls-button">Generate Player</button>
+
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="Player">Player</h2>
+    <div id="placeHolder"></div>
+    <br />
+    <br />
+    <br />
+  </section>
+  <script>
+    var
+      myPlayer,
+      accountID = document.getElementById('accountID'),
+      videoURL = document.getElementById('videoURL'),
+      adServerURL = document.getElementById('adServerURL'),
+      generatePlayer = document.getElementById('generatePlayer'),
+      defaults = {
+        //videoURL: '//learning-services-media.brightcove.com/videos/hls/wildlife_tiger/wildlife_tiger.m3u8',
+        // accountID: '1752604059001',
+        // videoURL: '4093643993001',
+        accountID: '3450462642001',
+        videoURL: '3989814763001',
+        adServerURL: 'https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator='
+      };
+
+    /**
+     * determines whether a var has value
+     * @param  {*}  x var to evaluate - note that if x = {} or [], true will be returned
+     * @return {Boolean}   whether var has a value
+     */
+    function isDefined(x) {
+      if (x === '' || x === null || x === undefined) {
+        return false;
+      }
+      return true;
+    }
+
+    generatePlayer.addEventListener("click", function() {
+      account_id = (isDefined(accountID.value)) ? accountID.value : defaults.accountID;
+      video_url = (isDefined(videoURL.value)) ? videoURL.value : defaults.videoURL;
+      ad_server_url = (isDefined(adServerURL.value)) ? adServerURL.value : defaults.adServerURL;
+      var s = document.createElement('script');
+      s.src = "//players.brightcove.net/" + account_id + "/default_default/index.js";
+      // Add the script tag to the document
+      document.body.appendChild(s);
+      // Call a function to play the video once player's JavaScript loaded
+      s.onload = callback;
+
+      // +++ Initialize the player and start the video +++
+      function callback() {
+        console.log('****account_id:', account_id);
+        console.log('****video_url:', video_url);
+        console.log('****ad_server_url:', ad_server_url);
+        playerHTML = '<video id=\"myPlayerID\" data-video-id=\"' + video_url + '\"  data-account=\"' + account_id + '\" data-player=\"default\" data-embed=\"default\" class=\"video-js\" controls></video>';
+        var ima = document.createElement('script');
+        ima.src = '//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.js';
+        document.body.appendChild(ima);
+        ima.onload = function() {
+          document.getElementById('placeHolder').innerHTML = playerHTML;
+          // instantiate player
+          myPlayer = bc(document.getElementById('myPlayerID'));
+          myPlayer.ima3({
+            // debug to true to see console messages
+            debug: true,
+            // only use HTML5 mode
+            adTechOrder: ["html5"],
+            // set the requestMode to onload
+            requestMode: "onload",
+            // this is where your ad tag goes
+            serverUrl: ad_server_url
+          });
+        }; // end ima script load
+      }; // end player script load
+    }); // end click event handler
+  </script>
+
+</body>
+
+</html>

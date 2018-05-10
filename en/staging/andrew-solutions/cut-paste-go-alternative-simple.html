@@ -35,10 +35,7 @@
     generatePlayer.addEventListener("click", function() {
       account_id = '1752604059001';
       video_url = '4093643993001';
-      console.log('****account_id:', account_id);
-      console.log('****video_url:', video_url);
-      playerHTML = '<video id=\"player\" data-video-id=\"' + video_url + '\"  data-account=\"' + account_id + '\" data-player=\"default\" data-embed=\"default\" class=\"video-js\" controls></video>';
-      document.getElementById('placeHolder').innerHTML = playerHTML;
+      ad_server_url = 'https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=';
       var s = document.createElement('script');
       s.src = "//players.brightcove.net/" + account_id + "/default_default/index.min.js";
       // Add the script tag to the document
@@ -46,24 +43,30 @@
       // Call a function to play the video once player's JavaScript loaded
       s.onload = callback;
 
+
       // +++ Initialize the player and start the video +++
       function callback() {
+        console.log('****account_id:', account_id);
+        console.log('****video_url:', video_url);
+        console.log('****ad_server_url:', ad_server_url);
+        playerHTML = '<video id=\"myPlayerID\" data-video-id=\"' + video_url + '\"  data-account=\"' + account_id + '\" data-player=\"default\" data-embed=\"default\" class=\"video-js\" controls></video>';
         var ima = document.createElement('script');
-        ima.src = '//players.brightcove.net/videojs-ima3/2/videojs.ima3.min.js';
+        ima.src = '//players.brightcove.net/videojs-ima3/2/videojs.ima3.js';
         document.body.appendChild(ima);
         ima.onload = function() {
-          var options = {};
-          options.serverUrl = "//solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vast.xml";
-          options.timeout = 5000;
-          options.requestMode = "onload";
-          options.debug = true;
-          player = bc(document.getElementById('player'));
-          player.ima3(options);
-        	videojs('player').ready(function() {
-        		var player = this;
-            player.play();
-        		console.log('player loaded and ready');
-          }); // end player ready
+          document.getElementById('placeHolder').innerHTML = playerHTML;
+          // instantiate player
+          myPlayer = bc(document.getElementById('myPlayerID'));
+          myPlayer.ima3({
+            // debug to true to see console messages
+            debug: true,
+            // only use HTML5 mode
+            adTechOrder: ["html5"],
+            // set the requestMode to onload
+            requestMode: "onload",
+            // this is where your ad tag goes
+            serverUrl: ad_server_url
+          });
         }; // end ima script load
       }; // end player script load
     }); // end click event handler
