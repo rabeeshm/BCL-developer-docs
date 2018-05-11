@@ -212,7 +212,7 @@
 
           <p>Type: <code>boolean </code> Default Value: <code>true </code></p>
 
-          <p>Abandon ads that finish loading after they have timed out. This will prevent slow preroll ads from interrupting after the content video has begun playing. The <code>timeout </code> value will be used.</p>
+          <p>Abandon ads that finish loading after they have timed out. This will prevent slow preroll ads from interrupting after the <code>timeout</code> has elapsed and content video has begun playing.</p>
 
           <p>This option is part of the ad framework and is configured as follows:</p>
 
@@ -221,7 +221,7 @@
   hardTimeouts: true
 });</code></pre>
 
-          <p>In some configurations, setting the value of this opton to <code>false </code> will cause flashing of content before preroll ads.</p>
+          <p>Setting this option to <code>false</code> will result in content flash before ads.</p>
 
           <h3>ima3SdkSettings</h3>
 
@@ -238,8 +238,6 @@
     'ppid': 'publisher-provided-id'
   }
 }</code></pre>
-
-          <aside class="bcls-aside bcls-aside--warning">Note: When using the Flash playback technology, the <code>numRedirects </code> value is not settable, and defaults to Google's default value of 4 permissible redirects.</aside>
 
           <p>Then the video.js IMA plugin would run code that looks something like this when IMA had loaded:</p>
 
@@ -260,19 +258,6 @@ window.google.ima.ImaSdkSettings.setPpid('publisher-provided-id');</code></pre>
 
           <p>See the <a href="#skippable-ads">iOS skippable ads</a> section of this document for an example of usage of this setting.</p>
 
-          <h3>loadingSpinner</h3>
-
-          <p>Type: <code>boolean </code> Default Value: <code>false </code></p>
-
-          <p>When set to true, the <code>vjs-loading-spinner </code> is displayed while an ad loads.</p>
-
-          <p>This option is part of the ad framework and is configured as follows:</p>
-
-          <pre class="line-numbers">
-<code class="language-javascript">player.ima3({
-  loadingSpinner: true
-});</code></pre>
-
           <h3 id="requestMode">requestMode</h3>
 
           <p>Type: <code>string </code> Default Value: <code>onload </code></p>
@@ -286,22 +271,19 @@ window.google.ima.ImaSdkSettings.setPpid('publisher-provided-id');</code></pre>
 
           <p>There are four possible values for this option:</p>
 
-          <p>Note the following when using when NOT using <code>useMediaCuePoints</code>:</p>
-
           <ul>
             <li><code>onload </code>: Ads are requested immediately when the player loads. This is normally the best experience for DFP / VPAID.</li>
             <li><code>onplay </code>: The first ad request is delayed until playback is initiated. This is important for ad networks which consider ad requests made without corresponding ad plays, which can happen on a poorly performing site. This will cause
               ads trafficked to eventually drop, or the customer will receive less for the ads shown.</li>
             <li><code>ondemand </code>: Ads will only play when initiated using the <code>player.ima3.adrequest() </code> method manually. This mode does not support preroll or postroll ads.
-              <aside class="bcls-aside bcls-aside--information">Note: All <code>requestMode </code> values make <code>ondemand </code> requests immediately.</aside>
             </li>
             <li><code>oncue </code>:This option behaves differently depending upon if it is use with the <code>useMediaCuePoints </code> option.
-              <h4>Using <code>useMediaCuePoints </code> set to true</h4>
+              <h4>Using  cue points with Video Cloud</h4>
 
-              <p>You can create ad cue points for a video in Studio, then have an advertisement played when the cue point is triggered. For full details see the <a href="/node/18131">Display Ads Using Ad Cue Points</a> document. Note that postrolls are NOT
-                supported when using <code>oncue</code>.</p>
+              <p>You can create ad cue points for a video in Studio, then have an advertisement played when the cue point is triggered. For full details see the <a href="/node/18131">Display Ads Using Ad Cue Points</a> document.</p>
 
-              <h4>NOT using <code>useMediaCuePoints </code></h4> Ads are requested based on ID3 cue points in a live stream. For this type of request to function correctly, the ID3 TXXX frame received must contain JSON data with the following fields:
+              <h4>Using cue points in a live stream</h4>
+              <p>Ads are requested based on ID3 cue points in a live stream. For this type of request to function correctly, the ID3 TXXX frame received must contain JSON data with the following fields:</p>
 
               <ul>
                 <li><code>name </code>: Required; must be the string value <code>adCue </code></li>
@@ -331,11 +313,22 @@ window.google.ima.ImaSdkSettings.setPpid('publisher-provided-id');</code></pre>
 
           <h3>serverUrl</h3>
 
-          <p>Type: <code>string </code> Default Value: <code>undefined </code></p>
+          <p>Type: <code>string </code> or <code>function</code> Default Value: <code>undefined </code></p>
 
-          <p>This is the only option that is <strong>required</strong>. Here, you will provide the URL to your ad server. Remember, you can <a href="#testadserver">test the ad tag</a> on your server before trying to use it in the plugin.</p>
-
-          <p>This option is part of the <code>ima3 </code> plugin and can be configured in Brightcove Studio as shown <a href="#playersmodule">above</a>, or in the embed-in-page code as follows:</p>
+          <p>This is the only option that is <strong>required</strong>. Here, you will provide the URL to your ad server. Remember, you can <a href="#Testing_the_ad_server">test the ad tag</a> on your server before trying to use it in the plugin.</p>
+          <p>If the value is a string, it represents the ad server URL from where ads are requested.</p>
+          <p>If the value is a function, the function parameter is a <code>done</code> function that should be called with your server URL as the argument. This provides support for asynchronous processes such as header bidding. For example:</p>
+<pre class="line-numbers"><code class="language-javascript">player.ima3({
+  serverUrl: function(done) {
+    // Here you would perform some asynchronous task such as header bidding.
+    // In this example we just use a timeout to demonstrate the usage pattern.
+    setTimeout(() => {
+      done('http://www.example.com/empty.xml');
+    }, 1000);
+  }
+});</code></pre>
+          <h4>Setting the <code>serverUrl</code> in Studio </h4>
+          <p>This option is part of the <code>ima3 </code> plugin and can be configured in Brightcove Studio as shown <a href="#Implement_using_Players_module">above</a>, or in the embed-in-page code as follows:</p>
 
           <pre class="line-numbers">
 <code class="language-javascript">player.ima3({
