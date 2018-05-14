@@ -315,38 +315,37 @@ window.google.ima.ImaSdkSettings.setPpid('publisher-provided-id');</code></pre>
 
           <p>Type: <code>string </code> or <code>function</code> Default Value: <code>undefined </code></p>
 
-          <p>This is the only option that is <strong>required</strong>. Here, you will provide the URL to your ad server. Remember, you can <a href="#Testing_the_ad_server">test the ad tag</a> on your server before trying to use it in the plugin.</p>
-          <p>If the value is a string, it represents the ad server URL from where ads are requested.</p>
-          <p>If the value is a function, the function parameter is a <code>done</code> function that should be called with your server URL as the argument. This provides support for asynchronous processes such as header bidding. For example:</p>
-<pre class="line-numbers"><code class="language-javascript">player.ima3({
-  serverUrl: function(done) {
-    // Here you would perform some asynchronous task such as header bidding.
-    // In this example we just use a timeout to demonstrate the usage pattern.
-    setTimeout(() => {
-      done('http://www.example.com/empty.xml');
-    }, 1000);
-  }
-});</code></pre>
-          <h4>Setting the <code>serverUrl</code> in Studio </h4>
-          <p>This option is part of the <code>ima3 </code> plugin and can be configured in Brightcove Studio as shown <a href="#Implement_using_Players_module">above</a>, or in the embed-in-page code as follows:</p>
-
+          <p>This is the only option that is <strong>required</strong>. Here, you will provide the URL to your ad server. This option can be configured in Brightcove Studio as shown <a href="#Implement_using_Players_module">above</a>. You can also set the value in code. Two examples are shown next. (Remember, you should <a href="#Testing_the_ad_server">test the ad tag</a> on your server before trying to use it in the plugin.)</p>
+          <p>If the value is a string, it represents the ad server URL from where ads are requested and can be set in code as follows:</p>
           <pre class="line-numbers">
 <code class="language-javascript">player.ima3({
   serverUrl: 'your ad server'
 });</code></pre>
+          <p>If the value is a function, the function parameter is a <code>callback</code> function that should be called with your server URL as the argument. This provides support for asynchronous processes such as header bidding. In the following example you see information from the <code>mediainfo</code> object used to determine which ads URL should be used based on an account ID:</p>
+<pre class="line-numbers"><code class="language-javascript">// Initialize IMA plugin
+myPlayer.ima3({
+  serverUrl: function(callback) {
+    if (myPlayer.mediainfo.id === '4034552795001') {
+      callback(
+        'https://pubads.g.doubleclick.net/.../url1'
+      );
+    } else {
+      callback(
+        'https://pubads.g.doubleclick.net/.../url2'
+      );
+    }
+  },
+  requestMode: 'onload',
+  debug: true,
+  debugContribAds: true
+});</code></pre>
 
-          <aside class="bcls-aside bcls-aside--tip">Note: If the IMA3 plugin has already instantiated, for instance if the plugin is configured in Studio but the server URL is set to <code>null </code>, you must set the <code>serverURL </code> in the following manner:
-
-            <pre class="line-numbers">
-<code class="language-javascript">player.ima3.settings.serverUrl = your_ad_server;</code></pre>
-          </aside>
 
           <h3>timeout</h3>
 
-          <p>Type: <code>number </code> Default Value: <code>5000 </code></p>
+          <p>Type: <code>number </code> Default Value: <code>4000 </code></p>
 
-          <p>The maximum amount of time to wait, in milliseconds, for an ad implementation to initialize before playback. If the viewer has requested playback and the ad implementation does not dispatch the <code>adsready </code> event before this timeout
-            expires the content video will begin playback. It's still possible for an ad implementation to play ads after this waiting period has finished, but video playback will already be in progress.</p>
+          <p>The maximum amount of time, in milliseconds, to wait for ads to play before an ad break is skipped.</p>
 
           <p>This option is part of the ad framework is configured as follows:</p>
 
@@ -355,23 +354,9 @@ window.google.ima.ImaSdkSettings.setPpid('publisher-provided-id');</code></pre>
   timeout: 5000
 });</code></pre>
 
-          <p>Once the ad plugin starts waiting for the <code>adsready </code> event, one of these things will happen:</p>
+          <p>In internal Brightcove testing it was found that four seconds seemed to be long enough to accommodate slow initialization in most cases, but still short enough that failures to initialize didn't look like failures of the player or content video.</p>
 
-          <ul>
-            <li>Integration ready within the timeout: This is the best case, preroll(s) will play without the user seeing any content video first.</li>
-            <li>Integration ready, but after timeout has expired: Preroll(s) still play, but the user will see a bit of content video.</li>
-            <li>Integration never becomes ready: Content video starts playing after timeout.</li>
-          </ul>
-
-          <p>This timeout is necessary to ensure a good viewer experience in cases where the ad implementation suffers an unexpected or irreparable error and never fires an <code>adsready </code> event. Without this timeout, the ads plugin would wait forever,
-            and neither the content video nor ads would ever play.</p>
-
-          <p>If the ad implementation takes a long time to initialize and this timeout is too short, then the content video will begin playing before the first preroll opportunity. This has the jarring effect that the viewer would see a little content before
-            the preroll cuts in.</p>
-
-          <p>In internal Brightcove testing it was found that five seconds seemed to be long enough to accommodate slow initialization in most cases, but still short enough that failures to initialize didn't look like failures of the player or content video.</p>
-
-          <aside class="bcls-aside bcls-aside--tip">Note: If you set the timeout in both Studio and in the plugin configuration in the HTML page using JavaScript, the JavaScript configuration will have precedence. Ideally, the settings for timeout would be the same in both locations.</aside>
+          <aside class="bcls-aside bcls-aside--tip">Note: If you set the timeout in both Studio and in the plugin configuration in the HTML page using JavaScript, the JavaScript configuration will have precedence.</aside>
 
           <h3>useMediaCuePoints</h3>
 
