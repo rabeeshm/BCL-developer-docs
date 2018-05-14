@@ -410,7 +410,6 @@ myPlayer.ima3({
 <code class="language-json">{"serverUrl": "http://myadserver.com/ad?video=12340001&amp;duration=60"}</code></pre>
 
           <p>The following is the complete list of variables for which substituted values will be used:</p>
-          <code class="language-javascript">cust_params={mediainfo.ad_keys} </code>
 
           <table class="bcls-table">
             <thead class="bcls-table__head">
@@ -542,8 +541,6 @@ myPlayer.ima3({
           <p>Although the <strong>Dynamic macros</strong> technique described just above is the much preferred method to access specific information via macros, you may have defined custom values you use when requesting ads from your ad server that you cannot
             reach via dynamic macros. In this case, you can utilize your values by overriding the <code>adMacroReplacement() </code> method. When you override this method it allows you to pass your specialized values for the ad request.</p>
 
-          <aside class="bcls-aside bcls-aside--tip">To override a method in JavaScript, you simply place the altered method in your JavaScript for the page or plugin.</aside>
-
           <p>The following is an example of overriding the <code>adMacroReplacement() </code> method. In this example, the custom values are defined as part of the page DOM, thus enabling ad requests to be customized on a per page basis. In this example,
             <code>window.parent.adConfig.category </code> is the location where the ad request information is stored.</p>
 
@@ -577,14 +574,18 @@ myPlayer.ima3({
 
           <h3>player.ima3.adrequest( )</h3>
 
-          <p>Calling this method will create an on-demand adrequest immediately upon receiving an ad response. Invoking this method creates a new IMA adManager which means that any previous ad response information (for instance, a postroll ad returned in
-            a previous VAST response) will be lost. Brightcove recommends that you only use this method in cases where up-front knowledge of ad timings isn't known or you will be making all ad calls on-demand. In all other cases, it makes sense to put
-            all ad data in the initial VAST call on plugin initialization.</p>
+          <p>Calling this method will create an on-demand adrequest immediately upon receiving an ad response. Invoking this method creates a new IMA adManager which means that any previous ad response information (for instance, a postroll ad returned in a previous VAST response) will be lost. Brightcove recommends that you only use this method in cases where up-front knowledge of ad timings isn't known or you will be making all ad calls on-demand. In all other cases, it makes sense to put all ad data in the initial VAST call on plugin initialization.</p>
+          <p>The following are two important points to consider when using <code>player.ima3.adrequest( )</code>:</p>
+          <ul>
+            <li>The method is for use with the <strong>ondemand</strong> request mode only.</li>
+            <li>The method is not recommended for prerolls as content will play before the ad request completes, resulting in a flash of content.</li>
+          </ul>
+
 
           <h5>Parameters</h5>
 
           <ul>
-            <li><strong>adRequestUrl</strong> <code>String </code> Path to a VAST ad tag. You can and should pass relative URLs.</li>
+            <li><strong>adRequestUrl</strong> <code>String </code> Path to a VAST ad tag. You can and should pass relative URLs. This parameter is optional and the configured <code>serverUrl</code> is used if no parameter is passed.</li>
           </ul>
 
           <h5>Returns:</h5>
@@ -598,7 +599,7 @@ myPlayer.ima3({
           <pre class="line-numbers">
 <code class="language-javascript">player.ima3.adrequest('http://pubads.g.doubleclick.net/gampad/ads?sz=640x360&amp;iu=/6062/iab_vast_samples/skippable&amp;ciu_szs=300x250,728x90&amp;impl=s&amp;gdfp_req=1&amp;env=vp&amp;output=xml_vast2&amp;unviewed_position_start=1&amp;url=[referrer_url]&amp;correlator=[timestamp]');</code></pre>
 
-          <h3>player.ima3.ready()</h3>
+          <!-- <h3>player.ima3.ready()</h3>
 
           <p>Similar to the <code>vjs.ready() </code> method, any callbacks passed into this method will only be invoked when the ima3 plugin is ready. Since the loading of the ima3 swf can take some time, it is sometimes desirable to use this function to
             delay calling your methods until the swf is ready to handle them. For example, you use this method to delay and calls to <code>player.ima3.adrequest() </code> that might be made before the the player can handle them.</p>
@@ -613,7 +614,7 @@ myPlayer.ima3({
 
           <ul>
             <li>Nothing</li>
-          </ul>
+          </ul> -->
 
           <h3>player.ima3.setAdsRenderingSettings()</h3>
 
@@ -655,13 +656,13 @@ player.ima3.setAdsRenderingSettings(adsRenderingSettings);</code></pre>
 
           <p>Usage: <code>myPlayer.ima3.adsManager.getRemainingTime() </code></p>
 
-          <p>Calling this method returns the amount of time remaining for the current ad. If an ad isn't available or has finished playing, it returns -1. For more information see Google's <a href="//developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.AdsManager.getRemainingTime">document</a>            on the method.</p>
+          <p>Calling this method returns the amount of time remaining for the current ad. If an ad isn't available or has finished playing, it returns -1. For more information see Google's <a href="//developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.AdsManager.getRemainingTime">documentumentation</a> on the method.</p>
         </section>
 
         <section class="bcls-section">
-          <h2 id="HTML5_settings">HTML5 settings</h2>
+          <h2 id="Accessing_the_IMA_SDK_directly">Accessing the IMA SDK directly</h2>
 
-          <p>If the HTML5 ad tech is in use, a number of IMA settings are available on the plugin object at runtime. For instance, to determine the ad ID you you would use:</p>
+          <p>A number of IMA settings are available on the plugin object at runtime. For instance, to determine the ad ID you you would use:</p>
 
           <pre class="line-numbers">
 <code class="language-javascript">var adId = player.ima3.currentAd.getAdId();</code></pre>
@@ -672,7 +673,7 @@ player.ima3.setAdsRenderingSettings(adsRenderingSettings);</code></pre>
 
           <p>Type: <code>google.ima.AdsLoader </code></p>
 
-          <p>The object used to create ads requests. See ima.AdsLoader. The Ads Loader may not be available until adsready has been fired by the plugin.</p>
+          <p>The object used to create ads requests. See <a href="https://developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.AdsLoader">ima.AdsLoader</a>. The Ads Loader may not be available until <code>adsready</code> has been fired by the plugin.</p>
 
           <h3>adsManager</h3>
 
