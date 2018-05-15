@@ -15,7 +15,7 @@
   	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
     <meta name="robots" content="noindex">
   	<!-- change title to match the h1 heading -->
-  	<title>Video Cloud SSAI Ad Tag Validation</title>
+  	<title>Video Cloud SSAI and Server-Side Beacon Debugging</title>
 
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
@@ -42,9 +42,9 @@
 			<div id="sidenav" class="side-nav"></div>
 		</div>
 		<div id="main" class="large-10 small-12 columns">
-			<h1>Video Cloud SSAI Ad Tag Validation</h1>
+			<h1>Video Cloud SSAI and Server-Side Beacon Debugging</h1>
       <aside class="bcls-aside bcls-aside--warning">This is a INTERNAL document for review only. For the official Brightcove documentation site, go to <a href="https://support.brightcove.com/">support.brightcove.com</a></aside>
-      <p>In this topic, you will learn how to setup and validate SSAI ad tags, tracking all of the ad calls specified in the requests.
+      <p>In this topic, you will learn how to setup and debug Server-Side Ad Insertion (SSAI) with Dynamic Delivery and the Brightcove player.
       </p>
 
 
@@ -54,7 +54,7 @@
         <section id="top" class="bcls-section">
           <aside class="bcls-aside bcls-aside--information">Notes:
             <ul>
-              <li>To use SSAI, your Video Cloud account will need to be configured for <a href="https://www.brightcove.com/en/blog/2017/03/digital-rights-management-drm-dynamic-delivery">Dynamic Delivery</a>. Contact your account manager if you are
+              <li>To use this plugin, your Video Cloud account will need to be configured for <a href="https://www.brightcove.com/en/blog/2017/03/digital-rights-management-drm-dynamic-delivery">Dynamic Delivery</a>. Contact your account manager if you are
                 interested in converting your account to Dynamic Delivery.</li>
                 <li>
                   This debugging interface is for VOD SSAI only.
@@ -67,101 +67,27 @@
         </section>
 
         <section class="bcls-section">
-          <h2 id="General_information">General information</h2>
+          <h2 id="Overview">Overview</h2>
           <p>
-            The following information pertains to all SSAI API requests.
+            Dynamic Delivery with Server-Side Ad Insertion (SSAI) offers a Storage API for tracking specific playback sessions to validate ad variable replacements, request/response, beacons, ad processing, and the transformations of an ad response.
           </p>
-
-          <h3>Base URL</h3>
-
-          <p>The base URL for the SSAI API is:</p>
-
-<pre class="line-numbers">
-<code class="language-http">https://ssai.api.brightcove.com/v1</code></pre>
-
-          <h4>Account path</h4>
-
-          <p>In all cases, requests will be made for a specific Video Cloud Account. So, you will always add the term <code>accounts</code> followed by your account id to the base URL:</p>
-
-<pre class="line-numbers">
-<code class="language-http">https://ssai.api.brightcove.com/v1<strong>/accounts/</strong><span class="bcls-input">your account id</span></code></pre>
-
-          <h3>Authentication</h3>
-
-          <p>Authentication for requests requires an Authorization header:</p>
-
-<pre class="line-numbers">
-<code class="language-http">Authorization: Bearer <span class="bcls-input">your access token</span></code></pre>
-
-          <p>The <code>access_token</code> is a temporary OAuth2 access token that must be obtained from the Brightcove OAuth service. For details on how to obtain client credentials and use them to retrieve access tokens, see the <a href="https://support.brightcove.com/overview-oauth-api-v4">Brightcove OAuth Overview</a>.</p>
-
-          <h3>Operations</h3>
-
-          <p>When you request client credentials, you will need to specify the type of account access or operations that you want. The following is a list of the currently supported operations for the SSAI API:</p>
-
-          <ul>
-          	<li>Video data:
-          	<p><code>video-cloud/video/read</code><br />
-            	<code>video-cloud/video/all</code><br />
-            </p>
-          	</li>
-          </ul>
-      </section>
-
-      <section class="bcls-section">
-          <h2 id="URL_parameters">URL parameters</h2>
           <p>
-            The following URL parameters can be used with your requests to the SSAI API:
+            Due to large amounts of data, enabling tracing requires a tracing token to be appended to specific playback requests for logging.
           </p>
-          <table class="bcls-table">
-            <thead class="bcls-table__head">
-                <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody class="bcls-table__body">
-              <tr>
-                  <td><code>account_id</code></td>
-                  <td>String</td>
-                  <td>User account id</td>
-              </tr>
-                <tr>
-                    <td><code>session_id</code></td>
-                    <td>String</td>
-                    <td>Session id can be retrieved under <code>&lt;Extensions&gt;/&lt; BrightcoveDebug&gt;/&lt;SessionID&gt;</code>, it specifies which caching session it is, each session has its own length based on the video content length.</td>
-                </tr>
-                <tr>
-                    <td><code>body</code></td>
-                    <td>String</td>
-                    <td>Base64 encoded string from ad provider</td>
-                </tr>
-                <tr>
-                    <td><code>creatives</code></td>
-                    <td>Array</td>
-                    <td>Creatives are the ads returned by the ad provider:
-                      <ul>
-                        <li>
-                          <code>creative.url</code>: the url to download ad
-                        </li>
-                        <li>
-                          <code>creative.foreign_key</code>: the name of the ad
-                        </li>
-                        <li>
-                          <code>creative.state</code>: the state of title
-                        </li>
-                      </ul>
-                    </td>
-                </tr>
-                <tr>
-                    <td><code>errors</code></td>
-                    <td>String</td>
-                    <td>Errors received from ad calls</td>
-                </tr>
-
-            </tbody>
-        </table>
+          <aside class="bcls-aside bcls-aside--information">SSAI logging is session based and uses parameters for a particular session. It’s critical to test in an environment that best represents your needs to debug including, geography, page variables, playback device, etc.</aside>
+          <p>
+            To debug server-side ads with your video content stored in Video Cloud, follow these steps:
+          </p>
+          <ol>
+            <li>
+              Initiate a trace
+            </li>
+            <li>
+              Retrieve detailed trace information from the Storage API
+            </li>
+            <!-- <li><a href="#Initiating_a_trace">Initiating a trace</a></li>
+            <li><a href="#Retrieving_trace_information">Retrieving trace information</a></li> -->
+          </ol>
       </section>
 
       <section class="bcls-section">
