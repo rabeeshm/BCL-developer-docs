@@ -109,7 +109,7 @@
       </section>
 
       <section class="bcls-section">
-          <h2 id="URL_parameters">URL parameters</h2>
+          <h2 id="URL_parameters">Parameters</h2>
           <p>
             The following URL parameters can be used with your requests to the SSAI API:
           </p>
@@ -164,239 +164,135 @@
         </table>
       </section>
 
-      <section class="bcls-section">
-      	<h2 id="Initiating_a_trace">Initiating a trace</h2>
-        <p>
-          To initiate a trace on your server-side ads, do the following:
-        </p>
-        <ol class="bcls-tasklist">
-          <li>
-            If you haven't already done so, follow <a href="http://docs.brightcove.com/en/staging/ssai-bcplayer.html">these steps</a> to configure your Brightcove player with an ad configuration and the Once UX plugin.
-          </li>
-          <li>
-            <p>
-              Select a VMAP or direct SSAI URL.
-            </p>
-            <aside class="bcls-aside bcls-aside--warning">This can not be a URL returned from a VMAP response.</aside>
-            <ol type="a">
-              <li>
-                Open a new tab in the Chrome browser.
-              </li>
-              <li>
-                Open the Chrome Developer Tools.
-              </li>
-              <li>
-                Select the <strong>Network</strong> tab.
-              </li>
-              <li>
-                Load a video in a Brightcove player configured with SSAI.
-              </li>
-              <li>
-                  Find the request name similar to <code>content.vmap?bc_token</code>, and copy the request URL.
-                <figure class="bcls-figure">
-  <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/ssai-api/vmap-url.png" alt="VMAP URL">
-  <figcaption class="bcls-caption--image">VMAP URL</figcaption>
-</figure>
-              </li>
-            </ol>
-          </li>
-          <li>
-            <p>
-              Append an <a href="#Authentication">X-Trace-Token (trace_token)</a> to the request URL you copied in the last step.
-            </p>
-<pre class="line-numbers"><code class="language-http">?trace_token=<span class="bcls-input">{xtrace_token}</span></code></pre>
-            <p>
-              In most cases, you will append the trace_token token as follows:
-            </p>
-<pre class="line-numbers"><code class="language-http">http://ssaiplayback.prod.boltdns.net/playback/once/v1/vmap/hls/v4/clear/
-5446914905001/90672786-c40b-4216-828f-b74bd247f48b/853313fc-0287-4afc-a37b-2a1ef80b26eb/
-content.vmap?bc_token=1234567abcdefg
-<span class="bcls-highlight">&amp;trace_token=1234567abcdefg</span></code></pre>
-          </li>
-          <li>
-            Paste the request URL with the appended trace_token in a browser to initiate a trace.
-          </li>
-          <li>
-            <p>
-              Copy the <code>session_id</code> from the <code>contentURI</code> within the VMAP response. The <code>session_id</code> is the third UUID within the <code>contentURI</code>.
-            </p>
-<pre class="line-numbers"><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;vmap:VMAP xmlns:uo=&quot;uo&quot; xmlns:vmap=&quot;http://www.iab.net/vmap-1.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; version=&quot;1.0&quot;&gt;
-  &lt;vmap:Extensions&gt;
-    &lt;uo:unicornOnce ttl=&quot;1800&quot;
-    <span class="bcls-highlight">contenturi</span>=&quot;...hls/v3/clear/accountid/
-    58dea85e-a79d-4db8-be24-7bec49fe184b/
-    36ed81a5-f5b7-4977-a1a0-2ab19ccab44a/
-    <span class="bcls-highlight">24ff03dc-9a94-4979-8cfb-e3951f6a707a</span>/content.m3u8...&quot;
-    contentlength=&quot;146.1760&quot; payloadlength=&quot;236.5660&quot;
-    contenttype=&quot;application/x-mpegURL&quot;&gt;
-    &lt;/uo:unicornOnce&gt;
-  &lt;/vmap:Extensions&gt;
-  &lt;vmap:AdBreak breakType=&quot;linear&quot; breakId=&quot;PreRoll_0_0&quot; timeOffset=&quot;start&quot;&gt;
-    &lt;vmap:AdSource allowMultipleAds=&quot;true&quot; followRedirects=&quot;true&quot; id=&quot;0&quot;&gt;
-      &lt;vmap:VASTData&gt;
-...
-</code></pre>
-          </li>
-        </ol>
-      </section>
-
-      <section class="bcls-section">
-        <h2 id="Understanding_trace_retrieval">Understanding trace retrieval</h2>
-        <p>
-          The following information pertains to all Storage API requests.
-        </p>
-
-        <h4>Base URL</h4>
-
-        <p>The base URL for the Storage API is:</p>
-
-<pre class="line-numbers">
-<code class="language-http">https://ssaiplayback.prod.boltdns.net/storage-api/v1/</code></pre>
-
-        <!-- <h4>Account path</h4>
-
-        <p>In all cases, requests will be made for a specific Video Cloud Account. So, you will always add the term <code>accounts</code> followed by your account id to the base URL:</p>
-
-        <pre class="line-numbers">
-        <code class="language-http">https://ssai.api.brightcove.com/v1<strong>/accounts/{account_id}</strong></code></pre> -->
-
-        <h4 id="Authentication">Authentication</h4>
-
-        <p>The API requests are used with no authentication, but do require the X-Trace-Token in the header:</p>
-
-<pre class="line-numbers">
-<code class="language-http">X-Trace-Token : <span class="bcls-input">{xtrace_token}</span></code></pre>
-
-        <p>The <code>X-Trace-Token</code> value is a static string used across all of your accounts. Contact your account manager to get your token.</p>
-
-        <aside class="bcls-aside bcls-aside--information">
-          <p>
-          For internal Brightcove purposes, you can use the following: (this will be removed when this document goes public - it is for Read-Only and Rate limited access)
-        </p>
-<pre class="line-numbers"><code class="language-json">69263d4f-df43-4fee-9cf3-b27d3f19f936</code></pre>
-        </aside>
-
-
-    </section>
-
     <section class="bcls-section">
-      <h2 id="Retrieving_ad-call_trace_info">Retrieving ad-call trace info</h2>
+      <h2 id="Tracing_without_an_ad_config_id">Tracing without an ad config id</h2>
       <p>
-        Retrieve ad-call trace information, including headers, made against the ad server. This GET request is used with no authentication, but does require the X-Trace-Token in the header.
+        To retrieve ad-call trace information without supplying an ad config id, use a POST request similar to the following:
       </p>
+      <aside class="bcls-aside bcls-aside--information">For data definitions within the <code>videocloud_metadata</code> object, see the <a href="http://docs.brightcove.com/en/staging/ssai-api.html#Metadata_variables">Metadata variables</a> section of the Video Cloud SSAI Ad Config API document.</aside>
 
       <table class="bcls-table">
         <tbody class="bcls-table__body">
           <tr>
             <th>Method</th>
-            <td>GET</td>
+            <td>POST</td>
           </tr>
           <tr>
             <th>URL</th>
-            <td>https://ssaiplayback.prod.boltdns.net/storage-api/v1/ad-calls/<span class="bcls-input">{account_id}</span>/<span class="bcls-input">{session_id}</span></td>
+            <td>https://ssai.api.brightcove.com/v1/accounts/<span class="bcls-input">{account_id}</span>/<span class="bcls-input">{ssai_debug_vmap}</span>/<span class="bcls-input">{debug.xml}</span> </td>
           </tr>
           <tr>
             <th rowspan="2">Headers</th>
-            <td>X-Trace-Token : <span class="bcls-input">{xtrace_token}</span></td>
+            <td>Authorization: Bearer <span class="bcls-input">access_token</span> (see <a href="https://support.brightcove.com/node/17925">Getting Access Tokens</a>)</td>
           </tr>
           <tr>
             <td>Content-Type: application/json</td>
           </tr>
-          <!-- <tr>
+          <tr>
       			<th>Sample Body</th>
       			<td>
       			<pre><code>{
-      &quot;name&quot;: &quot;VMAP Ad Server - updated&quot;
-      }</code></pre>
-              <p>
-                Base 64 encoded payload of the ad server response that would include the VAST or ad server equivalent response body.
-              </p>
+  &quot;playback_config&quot;:{
+    &quot;name&quot;: &quot;<span class="bcls-input">config_name</span>&quot;,
+    &quot;vmap_response_namespace&quot;: &quot;<span class="bcls-input">config_namespace</span>&quot;,
+    &quot;account_id&quot;: &ldquo;<span class="bcls-input">account_id</span>&rdquo;,
+    &quot;ad_config&quot;: {
+      &quot;enable_ads&quot;: true,
+      &quot;expected_ad_response&quot;: &quot;dfp_ad_rules&quot;,
+      &quot;disable_server_beacons&quot;: false,
+      &quot;round_up_cue_points&quot;: false,
+      &quot;template_url&quot;: {
+      &quot;template&quot;: &quot;<span class="bcls-input">vmap_url</span>&quot;
+      }
+    },
+    &quot;extend_beacon_guard_ttl&quot;: false
+  },
+  &quot;title_metadata&quot;:{
+    &quot;duration&quot;: &quot;10s&quot;
+  },
+ &ldquo;videocloud_metadata&rdquo;: {
+    &quot;name&quot;: &quot;<span class="bcls-input">ad_name</span>&quot;,
+    &quot;tags&quot;: [ &quot;<span class="bcls-input">tag1:tag1_value</span>&quot;, &quot;<span class="bcls-input">tag2:tag2_value</span>&quot; ],
+    &quot;ad_keys&quot;:&quot;a=1&amp;b=2&quot;,
+    &quot;cue_points&quot;: [{
+      &quot;name&quot;:&quot;Pre-roll&quot;,
+      &quot;type&quot;:&quot;AD&quot;,
+      &quot;time&quot;:0,
+      &quot;metadata&quot;:&quot;type:pre-roll,a=b&quot;,
+    },
+    {
+      &quot;name&quot;:&quot;Mid-roll&quot;,
+      &quot;type&quot;:&quot;AD&quot;,
+      &quot;time&quot;:10,
+      &quot;metadata&quot;:&quot;type=mid-roll,x=y&quot;,
+     } ]
+    }
+}</code></pre>
+
       			</td>
-      		</tr> -->
+      		</tr>
         </tbody>
       </table>
-      <aside class="bcls-aside bcls-aside--information">Be sure to validate any server-side macros that they are correctly inserting values to that URL.</aside>
+      <!-- <aside class="bcls-aside bcls-aside--information">Be sure to validate any server-side macros that they are correctly inserting values to that URL.</aside> -->
       <h3>Response</h3>
-      <p>The response <code>body</code> consists of a base 64 encoded payload of the ad server response that would include the VAST or ad server equivalent response.</p>
+      <p>The response <code>body</code> consists of the ad server response that would include the VAST or ad server equivalent response.</p>
       <p>
         Sample response:
       </p>
-<pre class="line-numbers"><code class="language-json">{
-  &quot;ad_calls&quot;: [
-    {
-      &quot;timestamp&quot;: &quot;2017-05-27T16:31:11.040748479Z&quot;,
-      &quot;response&quot;: {
-        &quot;content_length&quot;: 576,
-        &quot;event&quot;: &quot;response&quot;,
-        &quot;headers&quot;: {
-          &quot;Connection&quot;: [
-            &quot;keep-alive&quot;
-          ],
-          &quot;Content-Length&quot;: [
-            &quot;576&quot;
-          ],
-          &quot;Content-Type&quot;: [
-            &quot;text/xml&quot;
-          ],
-          &quot;Date&quot;: [
-            &quot;Sat, 27 May 2017 16:31:11 GMT&quot;
-          ],
-          &quot;Via&quot;: [
-            &quot;1.1 e74f6a762a10013d708a25452cd645de.cloudfront.net (CloudFront)&quot;
-          ],
-          &quot;X-Amz-Cf-Id&quot;: [
-            &quot;c3s4b-p_UJGaVmxpDfrtA93Hw8y5guLatV3Ya_Ui6fvfogF-naVrzw==&quot;
-          ],
-          &quot;X-Amzn-Requestid&quot;: [
-            &quot;e4ce61ed-42f9-11e7-ace4-030feacfbcd9&quot;
-          ],
-          &quot;X-Amzn-Trace-Id&quot;: [
-            &quot;sampled=0;root=1-5929a9cf-73b558898fbaa8c08669a118&quot;
-          ],
-          &quot;X-Cache&quot;: [
-            &quot;Miss from cloudfront&quot;
-          ]
-        },
-        &quot;status_code&quot;: 200
-      },
-      &quot;body&quot;: &quot;PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPFBsYXlsaXN0PgogIDxQcmVyb2xsPgogICAgPEFkPiA8IVtDREFUQVsgaHR0cHM6Ly84c2dsNG9vNm9mLmV4ZWN1dGUtYXBpLnVzLXdlc3QtMi5hbWF6b25hd3MuY29tL3FhL2Fkcy92YXN0P3BhcmVudF9yZXF1ZXN0X2lkPTM5OTI0OTkzNCZraW5kPXByZXJvbGwmcG9zPTAgXV0+IDwvQWQ+CiAgICA8QWQ+IDwhW0NEQVRBWyBodHRwczovLzhzZ2w0b282b2YuZXhlY3V0ZS1hcGkudXMtd2VzdC0yLmFtYXpvbmF3cy5jb20vcWEvYWRzL3Zhc3Q/cGFyZW50X3JlcXVlc3RfaWQ9Mzk5MjQ5OTM0JmtpbmQ9cHJlcm9sbCZwb3M9MSBdXT4gPC9BZD4KICA8L1ByZXJvbGw+CiAgPE1pZHJvbGwgdGltZU9mZnNldD0iMDA6MDA6MTUiPgogICAgPEFkPiA8IVtDREFUQVsgaHR0cHM6Ly84c2dsNG9vNm9mLmV4ZWN1dGUtYXBpLnVzLXdlc3QtMi5hbWF6b25hd3MuY29tL3FhL2Fkcy92YXN0P3BhcmVudF9yZXF1ZXN0X2lkPTM5OTI0OTkzNCZraW5kPW1pZHJvbGwmcG9zPTAgXV0+IDwvQWQ+CiAgPC9NaWRyb2xsPgogIDxQb3N0cm9sbC8+CjwvUGxheWxpc3Q+&quot;,
-      &quot;creatives&quot;: null
-    },
-  ...</code></pre>
-        <p>
-          You can use a tool like <a href="https://www.base64decode.org/">BASE64</a> to make the response body readable.
-        </p>
-        <p>
-          Sample decoded response body:
-        </p>
-<pre class="line-numbers"><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;VAST xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&quot;vast.xsd&quot; version=&quot;3.0&quot;&gt;
- &lt;Ad id=&quot;697203496&quot;&gt;
-  &lt;InLine&gt;
-   &lt;AdSystem&gt;GDFP&lt;/AdSystem&gt;
-   &lt;AdTitle&gt;External NCA1C1L1 Linear Inline&lt;/AdTitle&gt;
-   &lt;Description&gt;&lt;![CDATA[External NCA1C1L1 Linear Inline ad]]&gt;&lt;/Description&gt;
-   &lt;Error&gt;&lt;![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BfibujemdWbCVB5eKMO7CooAN8NiP6wYAAAAQASCo3bsmOABY2MayxdcBYMmumY3spIAQugEKNzI4eDkwX3htbMgBBcACAuACAOoCJS8xMjQzMTkwOTYvZXh0ZXJuYWwvc2luZ2xlX2FkX3NhbXBsZXP4AvfRHoADAZAD4AOYA6wCqAMB4AQB0gUGEKj2ucwCkAYBoAYj2AcB4AcL0ggHCIBhEAEYAQ&amp;sigh=ITRaiISh3zc&amp;label=videoplayfailed[ERRORCODE]]]&gt;&lt;/Error&gt;
-   &lt;Impression&gt;&lt;![CDATA[https://securepubads.g.doubleclick.net/pcs/view?xai=AKAOjstTmP8A14M7ViwVKrJkt42uaZfMcC2tg9k_ROS6UiPiBm-WyfQA-sKFRYCCEO2IDr5dEqFf02rw4T4heziZQBqBLWil942B92UTH9A9ad8fFaGAzdnXW4pVDndrn02W-GhRBgz3oLzJO_0uHfs0AHiIrb6i7Rwd8tHupqm5GHQnjzK9QI7ac8Fbml81XjyK2CJgU2GNGMwEHj2pr9tJd0Y3xVv-UwsB4yYDUX2tAOQBeQ&amp;sig=Cg0ArKJSzB9b9kD2MBq3EAE&amp;adurl=]]&gt;&lt;/Impression&gt;
-   &lt;Creatives&gt;
-    &lt;Creative id=&quot;57859154776&quot; sequence=&quot;1&quot;&gt;
-     &lt;Linear&gt;
-      &lt;Duration&gt;00:00:10&lt;/Duration&gt;
-      &lt;TrackingEvents&gt;
-       &lt;Tracking event=&quot;start&quot;&gt;&lt;![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BfibujemdWbCVB5eKMO7CooAN8NiP6wYAAAAQASCo3bsmOABY2MayxdcBYMmumY3spIAQugEKNzI4eDkwX3htbMgBBcACAuACAOoCJS8xMjQzMTkwOTYvZXh0ZXJuYWwvc2luZ2xlX2FkX3NhbXBsZXP4AvfRHoADAZAD4AOYA6wCqAMB4AQB0gUGEKj2ucwCkAYBoAYj2AcB4AcL0ggHCIBhEAEYAQ&amp;sigh=ITRaiISh3zc&amp;label=part2viewed&amp;ad_mt=[AD_MT]]]&gt;&lt;/Tracking&gt;
-       &lt;Tracking event=&quot;firstQuartile&quot;&gt;&lt;![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BfibujemdWbCVB5eKMO7CooAN8NiP6wYAAAAQASCo3bsmOABY2MayxdcBYMmumY3spIAQugEKNzI4eDkwX3htbMgBBcACAuACAOoCJS8xMjQzMTkwOTYvZXh0ZXJuYWwvc2luZ2xlX2FkX3NhbXBsZXP4AvfRHoADAZAD4AOYA6wCqAMB4AQB0gUGEKj2ucwCkAYBoAYj2AcB4AcL0ggHCIBhEAEYAQ&amp;sigh=ITRaiISh3zc&amp;label=videoplaytime25&amp;ad_mt=[AD_MT]]]&gt;&lt;/Tracking&gt;
-       &lt;Tracking event=&quot;midpoint&quot;&gt;&lt;![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BfibujemdWbCVB5eKMO7CooAN8NiP6wYAAAAQASCo3bsmOABY2MayxdcBYMmumY3spIAQugEKNzI4eDkwX3htbMgBBcACAuACAOoCJS8xMjQzMTkwOTYvZXh0ZXJuYWwvc2luZ2xlX2FkX3NhbXBsZXP4AvfRHoADAZAD4AOYA6wCqAMB4AQB0gUGEKj2ucwCkAYBoAYj2AcB4AcL0ggHCIBhEAEYAQ&amp;sigh=ITRaiISh3zc&amp;label=videoplaytime50&amp;ad_mt=[AD_MT]]]&gt;&lt;/Tracking&gt;
-       &lt;/Tracking&gt;
-     ...</code></pre>
+<pre class="line-numbers"><code class="language-xml">&lt;vmap:VMAP xmlns:bc=&quot;bc&quot; xmlns:vmap=&quot;http://www.iab.net/vmap-1.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; version=&quot;1.0&quot;&gt;
+  &lt;vmap:Extensions&gt;
+    &lt;bc:Brightcove ttl=&quot;1800&quot; contenturi=&quot;https://ssaiplayback.us-east-1.qa.boltdns.net/playback/once/v1/hls/v5/clear/accoutn_debug/debug/debug/7592e9c3-214f-4c68-a576-1e2494b7be06/debug.m3u8&quot; contentlength=&quot;10.0000&quot; payloadlength=&quot;70.0000&quot; contenttype=&quot;application/x-mpegURL&quot;&gt;&lt;/bc:Brightcove&gt;
+    &lt;bc:BrightcoveDebug sessionID=&quot;7592e9c3-214f-4c68-a576-1e2494b7be06&quot;&gt;&lt;/bc:BrightcoveDebug&gt;
+  &lt;/vmap:Extensions&gt;
+  &lt;vmap:AdBreak breakType=&quot;linear&quot; breakId=&quot;PreRoll_0_0&quot; timeOffset=&quot;start&quot;&gt;
+    &lt;vmap:AdSource allowMultipleAds=&quot;true&quot; followRedirects=&quot;true&quot; id=&quot;0&quot;&gt;
+      &lt;vmap:VASTData&gt;
+        &lt;VAST xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&gt;
+          &lt;Ad id=&quot;nike-01-30s&quot;&gt;
+            &lt;InLine&gt;
+              &lt;AdSystem&gt;BIAS&lt;/AdSystem&gt;
+              &lt;AdTitle&gt;nike-01-30s&lt;/AdTitle&gt;
+              &lt;Creatives&gt;
+                &lt;Creative&gt;
+                  &lt;Linear&gt;
+                    &lt;CreativeExtensions&gt;
+                      &lt;CreativeExtension&gt;
+                        &lt;BrightcoveForeignKey&gt;nike-01-30s&lt;/BrightcoveForeignKey&gt;
+                      &lt;/CreativeExtension&gt;
+                    &lt;/CreativeExtensions&gt;
+                    &lt;Duration&gt;00:00:30.0000&lt;/Duration&gt;
+                    &lt;TrackingEvents&gt;
+                      &lt;Tracking event=&quot;mute&quot;&gt;https://ads.brightcove.com/beacon?event=mute&amp;amp;type=vast&amp;amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;amp;ad_id=nike-01-30s&lt;/Tracking&gt;
+                      &lt;Tracking event=&quot;unmute&quot;&gt;https://ads.brightcove.com/beacon?event=unmute&amp;amp;type=vast&amp;amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;amp;ad_id=nike-01-30s&lt;/Tracking&gt;
+                      &lt;Tracking event=&quot;rewind&quot;&gt;https://ads.brightcove.com/beacon?event=rewind&amp;amp;type=vast&amp;amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;amp;ad_id=nike-01-30s&lt;/Tracking&gt;
+                      &lt;Tracking event=&quot;pause&quot;&gt;https://ads.brightcove.com/beacon?event=pause&amp;amp;type=vast&amp;amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;amp;ad_id=nike-01-30s&lt;/Tracking&gt;
+                      &lt;Tracking event=&quot;resume&quot;&gt;https://ads.brightcove.com/beacon?event=resume&amp;amp;type=vast&amp;amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;amp;ad_id=nike-01-30s&lt;/Tracking&gt;
+                      &lt;Tracking event=&quot;fullscreen&quot;&gt;https://ads.brightcove.com/beacon?event=fullscreen&amp;amp;type=vast&amp;amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;amp;ad_id=nike-01-30s&lt;/Tracking&gt;
+                      &lt;Tracking event=&quot;acceptInvitation&quot;&gt;https://ads.brightcove.com/beacon?event=acceptInvitation&amp;amp;type=vast&amp;amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;amp;ad_id=nike-01-30s&lt;/Tracking&gt;
+                    &lt;/TrackingEvents&gt;
+                    &lt;VideoClicks&gt;
+                      &lt;ClickThrough id=&quot;clickthrough&quot;&gt;https://www.brightcove.com/en/&lt;/ClickThrough&gt;
+                      &lt;ClickTracking id=&quot;43a0e4a5-4420-11e8-b306-99b1b6ae5164&quot;&gt;&lt;/ClickTracking&gt;
+                    &lt;/VideoClicks&gt;
+                  &lt;/Linear&gt;
+                &lt;/Creative&gt;
+              &lt;/Creatives&gt;
+            &lt;/InLine&gt;
+          &lt;/Ad&gt;
+        &lt;/VAST&gt;
+      &lt;/vmap:VASTData&gt;
+    &lt;/vmap:AdSource&gt;
+  &lt;/vmap:AdBreak&gt;
+  ...// additional ad breaks
+&lt;/vmap:VMAP&gt;
+</code></pre>
 
-         <br />
       </section>
 
       <section class="bcls-section">
-        <h2 id="Retrieving_beacon_trace_info">Retrieving beacon trace info</h2>
+        <h2 id="Tracing_without_an_ad_config_id">Tracing with a session id</h2>
         <p>
-          Retrieve beacon trace information, including headers, made against the ad server. This GET request is used with no authentication, but does require the X-Trace-Token in the header.
+          To retrieve ad-call trace information by supplying a session id, use a GET request similar to the following:
         </p>
 
         <table class="bcls-table">
@@ -407,68 +303,75 @@ content.vmap?bc_token=1234567abcdefg
             </tr>
             <tr>
               <th>URL</th>
-              <td>https://ssaiplayback.prod.boltdns.net/storage-api/v1/beacons/<span class="bcls-input">{account_id}</span>/<span class="bcls-input">{session_id}</span></td>
+              <td>https://ssai.api.brightcove.com/v1/accounts/<span class="bcls-input">{account_id}</span>/ssai_traces/<span class="bcls-input">{session_id}</span>/ad_calls</td>
             </tr>
             <tr>
               <th rowspan="2">Headers</th>
-              <td>X-Trace-Token : <span class="bcls-input">{xtrace_token}</span></td>
+              <td>Authorization: Bearer <span class="bcls-input">access_token</span> (see <a href="https://support.brightcove.com/node/17925">Getting Access Tokens</a>)</td>
             </tr>
             <tr>
               <td>Content-Type: application/json</td>
             </tr>
-            <!-- <tr>
-              <th>Sample Body</th>
-              <td>
-              <pre><code>{
-        &quot;name&quot;: &quot;VMAP Ad Server - updated&quot;
-        }</code></pre>
-                <p>
-                  Base 64 encoded payload of the ad server response that would include the VAST or ad server equivalent response body.
-                </p>
-              </td>
-            </tr> -->
           </tbody>
         </table>
-        <aside class="bcls-aside bcls-aside--information">Be sure to validate any server-side macros that they are correctly inserting values to that URL.</aside>
+        <!-- <aside class="bcls-aside bcls-aside--information">Be sure to validate any server-side macros that they are correctly inserting values to that URL.</aside> -->
         <h3>Response</h3>
-        <p>The response <code>body</code> consists of a base 64 encoded payload of the ad server response that would include the VAST or ad server equivalent response.</p>
-        <p>
-          You can use a tool like <a href="https://www.base64decode.org/">BASE64</a> to make the response body readable.
-        </p>
+        <p>The response <code>body</code> consists of the ad server response that would include the VAST or ad server equivalent response.</p>
         <p>
           Sample response:
         </p>
-<pre class="line-numbers"><code class="language-json">{
-  &quot;beacons&quot;: [
+  <pre class="line-numbers"><code class="language-json">{
+  &quot;ad_calls&quot;: [
     {
-      &quot;timestamp&quot;: &quot;2017-05-27T16:31:45.321117406Z&quot;,
+      &quot;timestamp&quot;: &quot;2018-04-19T22:23:19.242732189Z&quot;,
+      &quot;duration_ms&quot;: 1020.477211,
+      &quot;request&quot;: {
+        &quot;content_length&quot;: 0,
+        &quot;event&quot;: &quot;request&quot;,
+        &quot;headers&quot;: {
+          &quot;Referer&quot;: [
+            &quot;&quot;
+          ],
+          &quot;User-Agent&quot;: [
+            &quot;PostmanRuntime/7.1.1&quot;
+          ],
+          &quot;X-Device-User-Agent&quot;: [
+            &quot;PostmanRuntime/7.1.1&quot;
+          ],
+          &quot;X-Forwarded-For&quot;: [
+            &quot;63.150.45.170, 34.201.171.201&quot;
+          ]
+        },
+        &quot;method&quot;: &quot;GET&quot;,
+        &quot;url&quot;: &quot;https://ads.brightcove.com/ads?tech=dfpadrules&amp;dur=30&amp;pre=2&quot;
+      },
       &quot;response&quot;: {
-        &quot;content_length&quot;: 15,
+        &quot;content_length&quot;: 421,
         &quot;event&quot;: &quot;response&quot;,
         &quot;headers&quot;: {
-          &quot;Connection&quot;: [
-            &quot;keep-alive&quot;
-          ],
           &quot;Content-Length&quot;: [
-            &quot;15&quot;
+            &quot;421&quot;
           ],
           &quot;Content-Type&quot;: [
-            &quot;application/json&quot;
+            &quot;application/xml&quot;
           ],
           &quot;Date&quot;: [
-            &quot;Sat, 27 May 2017 16:31:45 GMT&quot;
+            &quot;Thu, 19 Apr 2018 22:23:19 GMT&quot;
           ],
           &quot;Via&quot;: [
-            &quot;1.1 ceece0dd01f2d2809fc1d3d58292f444.cloudfront.net (CloudFront)&quot;
+            &quot;1.1 0f3bddd6b971cf08b18fedb5c0a9f2f6.cloudfront.net (CloudFront)&quot;
+          ],
+          &quot;X-Amz-Apigw-Id&quot;: [
+            &quot;FnCBrHL8vHcFs1g=&quot;
           ],
           &quot;X-Amz-Cf-Id&quot;: [
-            &quot;XiIQ2FqVhNdjoxXe5_rnIbcUFnKikzdcN6fpvqjiQ-Fjem9fj5ibBQ==&quot;
+            &quot;eTyxWuLiomnzqOTF02tLEu_P7nhCOF4j_k0ot03ApzWG3FsmscwUtg==&quot;
           ],
           &quot;X-Amzn-Requestid&quot;: [
-            &quot;f93b6aa2-42f9-11e7-a21e-7f26e060f91f&quot;
+            &quot;436ae081-4420-11e8-bd7f-41361f814644&quot;
           ],
           &quot;X-Amzn-Trace-Id&quot;: [
-            &quot;sampled=0;root=1-5929a9f1-89395048460abb1811744922&quot;
+            &quot;sampled=0;root=1-5ad916d7-27fad540fa5ed98a891ac3fa&quot;
           ],
           &quot;X-Cache&quot;: [
             &quot;Miss from cloudfront&quot;
@@ -476,14 +379,23 @@ content.vmap?bc_token=1234567abcdefg
         },
         &quot;status_code&quot;: 200
       },
-      &quot;body&quot;: &quot;eyJzdGF0dXMiOiJvayJ9&quot;
-    }
-    ...
+        &quot;body&quot;: &quot;base64 encoded string from ad provider&quot;&quot;,
+        &quot;creatives&quot;: [
+          creative: {
+           &quot;event&quot;: &quot;resolve&quot;,
+           &quot;foreign_key&quot;: &quot;turbotax-01-30s&quot;,
+           &quot;state&quot;: &quot;active&quot;,
+            &quot;url&quot;: &quot;https://s3-us-west-2.amazonaws.com/js-qa/ads/mp4/30/va/turbotax-01-30s.mp4&quot;
+           }
+        ]
+        &quot;errors&quot;: null
+    },
+    ...// there are perhaps more ad calls
+  ]
+}
 </code></pre>
 
-           <br />
         </section>
-
 
 			</article>
 
