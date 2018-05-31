@@ -11,17 +11,20 @@
       height: 360px;
     }
   </style>
+  <link href="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.css" rel="stylesheet">
 </head>
 
 <body>
   <button onclick="addPlayer()">Add Player</button>
 
   <div id="placeHolder"></div>
+  <div id="placeHolder2"></div>
 
   <!-- custom script -->
   <script type="text/JavaScript">
     var myPlayer,
       playerHTML,
+      playerScript,
       //  Set the data for the player
       playerData = {
         'accountId': '1752604059001',
@@ -35,18 +38,18 @@
       // Inject the player code into the DOM
       document.getElementById('placeHolder').innerHTML = playerHTML;
       // Add and execute the player script tag
-      var s = document.createElement('script');
-      s.src = "//players.brightcove.net/" + playerData.accountId + "/" + playerData.playerId + "_default/index.min.js";
-      document.body.appendChild(s);
-      s.onload = callback;
+      playerScript = document.createElement('script');
+      playerScript.src = "//players.brightcove.net/" + playerData.accountId + "/" + playerData.playerId + "_default/index.min.js";
+      document.body.appendChild(playerScript);
+      playerScript.onload = callback;
     }
      //  Initialize the player and start the video
     function callback() {
       var ima = document.createElement('script');
       ima.src = '//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.js';
       document.body.appendChild(ima);
+      myPlayer = videojs('myPlayerID');
       ima.onload = function () {
-        myPlayer = videojs('myPlayerID');
         myPlayer.ima3({
           // debug to true to see console messages
           debug: true,
@@ -56,6 +59,21 @@
           serverUrl: 'https://solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vast.xml'
         });
       }
+      buildHTML();
+    }
+    function buildHTML() {
+      var htmlText,
+        codeDiv,
+        tempForText = '';
+      console.log('document.getElementById("placeHolder2")',document.getElementById("placeHolder2"));
+      codeDiv = document.getElementById("placeHolder2");
+      console.log('codeDiv',codeDiv);
+      htmlText = '<!doctype html> <html><head> <meta charset="UTF-8"> <title>Play a Preroll</title> <!-- Page styles --> <style> .video-js { width: 640px; height: 360px; } </style> <link href="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.css" rel="stylesheet"> </head><body>'
+      htmlText += playerHTML;
+      htmlText += playerScript;
+      
+
+      codeDiv.textContent = htmlText;
     }
   </script>
 </body>
