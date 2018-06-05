@@ -44,8 +44,7 @@
 		<div id="main" class="large-10 small-12 columns">
 			<h1>Video Cloud SSAI Ad Tag Validation</h1>
       <aside class="bcls-aside bcls-aside--warning">This is a INTERNAL document for review only. For the official Brightcove documentation site, go to <a href="https://support.brightcove.com/">support.brightcove.com</a></aside>
-      <p>In this topic, you will learn how to setup and validate SSAI ad tags, tracking all of the ad calls specified in the requests.
-      </p>
+      <p>In this topic, you will learn how to trace ad calls specified with Server-side Ad Insertion (SSAI).</p>
 
 
 	    <!-- BEGIN DRUPAL CONTENT -->
@@ -65,6 +64,31 @@
             </ul>
           </aside>
         </section>
+
+        <section class="bcls-section">
+          <h2 id="Overview">Overview</h2>
+          <p>
+            To help with debugging of server-side ads, Dynamic Delivery with SSAI provides API endpoints to track ad calls.
+          </p>
+          <!-- <aside class="bcls-aside bcls-aside--information">SSAI logging is session based and uses parameters for a particular session. It’s critical to test in an environment that best represents your needs to debug including, geography, page variables, playback device, etc.</aside> -->
+          <p>
+            To debug server-side ads with your video content stored in Video Cloud, follow these steps:
+          </p>
+          <ol>
+            <li>
+              <a href="#General_information">Review general information for the API path and authentication</a>
+            </li>
+            <li>
+              <a href="#Parameters">Review the API parameters</a>
+            </li>
+            <li>
+              <a href="#Tracing_without_an_ad_config_id">Retrieve detailed trace information without an ad config id</a>
+            </li>
+            <li>
+              <a href="#Tracing_with_a_session_id">Retrieve detailed trace information with a session id</a>
+            </li>
+          </ol>
+      </section>
 
         <section class="bcls-section">
           <h2 id="General_information">General information</h2>
@@ -109,7 +133,7 @@
       </section>
 
       <section class="bcls-section">
-          <h2 id="URL_parameters">Parameters</h2>
+          <h2 id="Parameters">Parameters</h2>
           <p>
             The following URL parameters can be used with your requests to the SSAI API:
           </p>
@@ -172,10 +196,27 @@
     <section class="bcls-section">
       <h2 id="Tracing_without_an_ad_config_id">Tracing without an ad config id</h2>
       <p>
-        To retrieve ad-call trace information without supplying an ad config id, use a POST request similar to the following:
+        To retrieve ad-call trace information without supplying an ad config id, follow these steps:
       </p>
-      <aside class="bcls-aside bcls-aside--information">For data definitions within the <code>videocloud_metadata</code> object, see the <a href="http://docs.brightcove.com/en/staging/ssai-api.html#Metadata_variables">Metadata variables</a> section of the Video Cloud SSAI Ad Config API document.</aside>
-
+      <h3>Gather information</h3>
+      <p>
+        Gather the following information for the <strong>body</strong> of your API request:
+      </p>
+      <ul>
+        <li>
+          Your account id
+        </li>
+        <li>
+          The <code>playback_config</code> section fields as defined in the <a href="//docs.brightcove.com/en/staging/ssai-api.html#Configuration_field_details">Configuration field details</a> section of the SSAI API document.
+        </li>
+        <li>
+          The <code>videocloud_metadata</code> section is needed only if you are using template variables that reference metadata fields. These are defined in the <a href="//docs.brightcove.com/en/staging/ssai-api.html#Ad_variables">Ad variables</a> section of the SSAI API document.
+        </li>
+      </ul>
+      <h3>Request</h3>
+      <p>
+        Create an SSAI ad trace for an account.
+      </p>
       <table class="bcls-table">
         <tbody class="bcls-table__body">
           <tr>
@@ -184,7 +225,7 @@
           </tr>
           <tr>
             <th>URL</th>
-            <td>https://ssai.api.brightcove.com/v1/accounts/<span class="bcls-input">{account_id}</span>/<span class="bcls-input">{ssai_debug_vmap}</span>/<span class="bcls-input">{debug.xml}</span> </td>
+            <td>https://ssai.api.brightcove.com/v1/accounts/<span class="bcls-input">{account_id}</span>/ssai_debug_vmap/debug.xml</td>
           </tr>
           <tr>
             <th rowspan="2">Headers</th>
@@ -194,9 +235,9 @@
             <td>Content-Type: application/json</td>
           </tr>
           <tr>
-      			<th>Sample Body</th>
-      			<td>
-      			<pre><code>{
+            <th>Sample Body</th>
+            <td>
+            <pre><code>{
   &quot;playback_config&quot;:{
     &quot;name&quot;: &quot;<span class="bcls-input">config_name</span>&quot;,
     &quot;vmap_response_namespace&quot;: &quot;<span class="bcls-input">config_namespace</span>&quot;,
@@ -234,11 +275,14 @@
     }
 }</code></pre>
 
-      			</td>
-      		</tr>
+            </td>
+          </tr>
         </tbody>
       </table>
+
+      <!-- <aside class="bcls-aside bcls-aside--information">For data definitions within the <code>videocloud_metadata</code> object, see the <a href="http://docs.brightcove.com/en/staging/ssai-api.html#Metadata_variables">Metadata variables</a> section of the Video Cloud SSAI Ad Config API document.</aside> -->
       <!-- <aside class="bcls-aside bcls-aside--information">Be sure to validate any server-side macros that they are correctly inserting values to that URL.</aside> -->
+
       <h3>Response</h3>
       <p>The response <code>body</code> consists of the ad server response that would include the VAST or ad server equivalent response.</p>
       <p>
@@ -295,7 +339,7 @@
       </section>
 
       <section class="bcls-section">
-        <h2 id="Tracing_without_an_ad_config_id">Tracing with a session id</h2>
+        <h2 id="Tracing_with_a_session_id">Tracing with a session id</h2>
         <p>
           To retrieve ad-call trace information by supplying a session id, use a GET request similar to the following:
         </p>

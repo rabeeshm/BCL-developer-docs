@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Load Player Dynamically</title>
+  <!-- Page styles -->
+  <style>
+    .video-js {
+      width: 640px;
+      height: 360px;
+    }
+    .bcls-code {
+      color: #111;
+      font-family: 'Source Code Pro',monospace;
+      padding: 1em;
+      width: 90%;
+      min-height: 5em;
+      background-color: #cfcfcf;
+      font-size: 1rem;
+    }
+  </style>
+  <link href="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <button onclick="addPlayer()">Add Player</button>
+  <div id="placeHolder"></div>
+  <br>
+  <textarea id="publishingCode" style="width:95%;height:30em;" class="bcls-code"></textarea>
+
+  <!-- custom script -->
+  <script type="text/JavaScript">
+    var myPlayer,
+      playerHTML,
+      playerScript,
+      publishingCode = document.getElementById('publishingCode'),
+      //  Set the data for the player
+      playerData = {
+        'accountId': '1752604059001',
+        'playerId': 'rJtrO8EKW',
+        'videoId': '5550679964001'
+      };
+     //  Build the player and place in HTML DOM
+    function addPlayer() {
+      // Dynamically build the player video element
+      playerHTML = '<video id=\"myPlayerID\" data-video-id=\"' + playerData.videoId + '\"  data-account=\"' + playerData.accountId + '\" data-player=\"' + playerData.playerId + '\" data-embed=\"default\" class=\"video-js\" controls></video>';
+      // Inject the player code into the DOM
+      document.getElementById('placeHolder').innerHTML = playerHTML;
+      // Add and execute the player script tag
+      playerScript = document.createElement('script');
+      playerScript.src = "//players.brightcove.net/" + playerData.accountId + "/" + playerData.playerId + "_default/index.min.js";
+      document.body.appendChild(playerScript);
+      playerScript.onload = callback;
+    }
+     //  Initialize the player and start the video
+    function callback() {
+      var ima = document.createElement('script');
+      ima.src = '//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.js';
+      document.body.appendChild(ima);
+      myPlayer = videojs('myPlayerID');
+      ima.onload = function () {
+        myPlayer.ima3({
+          // debug to true to see console messages
+          debug: true,
+          // set the requestMode to onload
+          requestMode: "onload",
+          // this is where your ad tag goes
+          serverUrl: 'https://solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vast.xml'
+        });
+      }
+      buildHTML();
+    }
+    function buildHTML() {
+      var htmlText,
+        prettyText;
+        // htmlText = '<!doctype html>\n<html>\n<head>\n\t<meta charset="UTF-8">\n\t<title>Play a Preroll</title>\n\t<!-- Page styles -->\n\t<style>\n\t\t.video-js {\n\t\t\twidth: 640px; height: 360px;\n\t\t}\n\t</style>\n\t<link href="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.css" rel="stylesheet">\n</head>\n<body>\n'
+        htmlText = '<!doctype html><html><head><meta charset="UTF-8"><title>Play a Preroll</title><!-- Page styles --><style>.video-js {width: 640px; height: 360px;}</style><link href="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.css" rel="stylesheet"></head><body>'
+      htmlText += playerHTML;
+      htmlText += playerScript.outerHTML;
+      htmlText += '<script src="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.js">\</script\>'
+      htmlText += '<script type="text/javascript">';
+      htmlText += '\n\t\t\tvar myPlayer = videojs.getPlayer("myPlayerID");\n\t\t\tmyPlayer.ready(function(){\n\t\t\t\tmyPlayer.ima3({ \n\t\t\t\t\tdebug: true,\n\t\t\t\t\trequestMode: "onload",\n\t\t\t\t\tserverUrl: "https://solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vast.xml"\n\t\t\t\t})\n\t\t\t}); \</script\> </body> </html>';
+      prettyText = formatCode(htmlText,false,false);
+      publishingCode.textContent = prettyText;
+    }
+
+    // Parameters:
+    // code 								- (string) code you wish to format
+    // stripWhiteSpaces			- (boolean) do you wish to remove multiple whitespaces coming after each other?
+    // stripEmptyLines 			- (boolean) do you wish to remove empty lines?
+    function formatCode(code, stripWhiteSpaces, stripEmptyLines) {
+        "use strict";
+        var whitespace          = ' '.repeat(1);             // Default indenting 4 whitespaces
+        var currentIndent       = 0;
+        var char                = null;
+        var nextChar            = null;
+
+
+        var result = '';
+        for(var pos=0; pos <= code.length; pos++) {
+            char            = code.substr(pos, 1);
+            nextChar        = code.substr(pos+1, 1);
+
+            // If opening tag, add newline character and indention
+            if(char === '<' && nextChar !== '/') {
+                result += '\n' + whitespace.repeat(currentIndent);
+                currentIndent++;
+            }
+            // if Closing tag, add newline and indention
+            else if(char === '<' && nextChar === '/') {
+                // If there're more closing tags than opening
+                if(--currentIndent < 0) currentIndent = 0;
+                result += '\n' + whitespace.repeat(currentIndent);
+            }
+
+            // remove multiple whitespaces
+            else if(stripWhiteSpaces === true && char === ' ' && nextChar === ' ') char = '';
+            // remove empty lines
+            else if(stripEmptyLines === true && char === '\n' ) {
+                //debugger;
+                if(code.substr(pos, code.substr(pos).indexOf("<")).trim() === '' ) char = '';
+            }
+
+            result += char;
+        }
+
+        return result;
+    }
+
+  </script>
+</body>
+
+</html>

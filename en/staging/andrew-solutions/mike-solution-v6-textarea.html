@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Load Player Dynamically</title>
+  <!-- Page styles -->
+  <style>
+    .video-js {
+      width: 640px;
+      height: 360px;
+    }
+  </style>
+  <link href="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <button onclick="addPlayer()">Add Player</button>
+
+  <div id="placeHolder"></div>
+  <div id="placeHolder2"></div>
+
+  <!-- custom script -->
+  <script type="text/JavaScript">
+    var myPlayer,
+      playerHTML,
+      playerScript,
+      //  Set the data for the player
+      playerData = {
+        'accountId': '1752604059001',
+        'playerId': 'rJtrO8EKW',
+        'videoId': '5550679964001'
+      };
+     //  Build the player and place in HTML DOM
+    function addPlayer() {
+      // Dynamically build the player video element
+      playerHTML = '<video id=\"myPlayerID\" data-video-id=\"' + playerData.videoId + '\"  data-account=\"' + playerData.accountId + '\" data-player=\"' + playerData.playerId + '\" data-embed=\"default\" class=\"video-js\" controls></video>';
+      // Inject the player code into the DOM
+      document.getElementById('placeHolder').innerHTML = playerHTML;
+      // Add and execute the player script tag
+      playerScript = document.createElement('script');
+      playerScript.src = "//players.brightcove.net/" + playerData.accountId + "/" + playerData.playerId + "_default/index.min.js";
+      document.body.appendChild(playerScript);
+      playerScript.onload = callback;
+    }
+     //  Initialize the player and start the video
+    function callback() {
+      var ima = document.createElement('script');
+      ima.src = '//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.js';
+      document.body.appendChild(ima);
+      myPlayer = videojs('myPlayerID');
+      ima.onload = function () {
+        myPlayer.ima3({
+          // debug to true to see console messages
+          debug: true,
+          // set the requestMode to onload
+          requestMode: "onload",
+          // this is where your ad tag goes
+          serverUrl: 'https://solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vast.xml'
+        });
+      }
+      buildHTML();
+    }
+    function buildHTML() {
+      var htmlText,
+        codeDiv,
+        tempElement;
+      codeDiv = document.getElementById("placeHolder2");
+      htmlText = '&lt;!doctype html&gt; &lt;html&gt;&lt;head&gt; &lt;meta charset=&quot;UTF-8&quot;&gt; &lt;title&gt;Play a Preroll&lt;/title&gt; &lt;!-- Page styles --&gt; &lt;style&gt; .video-js { width: 640px; height: 360px; } &lt;/style&gt; &lt;link href=&quot;//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.css&quot; rel=&quot;stylesheet&quot;&gt; &lt;/head&gt;&lt;body&gt;'
+      //htmlText += playerHTML;
+      // htmlText += playerScript.outerHTML;
+      // tempElement = document.createElement('script');
+      // tempElement.src = '//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.js';
+      // htmlText += tempElement.outerHTML;
+      // htmlText += '&lt;script type=&quot;text/javascript&quot;&gt;';
+      // htmlText += '&lt;/script&gt;';
+  </script>
+</body>
+
+</html>
