@@ -43,12 +43,12 @@ function postfix() {
     iMax = opblocks.length;
     for (i = 0; i < iMax; i++) {
       opblocks[i].classList.add('is-open');
+      window.getComputedStyle(opblocks[i]);
     }
     iMax = model_containers.length;
     for (i = 0; i < iMax; i++) {
       model_containers[i].classList.add('is-open');
+      window.getComputedStyle(model_containers[i];)
     }
-    // force style recalc
-    window.getComputedStyle(document.getElementsByClassName('wrapper')[0]);
   });
 }
