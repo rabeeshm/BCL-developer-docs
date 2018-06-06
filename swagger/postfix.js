@@ -39,7 +39,7 @@ function postfix() {
   description_div.appendChild(p);
   expand_all = document.getElementById('expand_all');
   expand_all.addEventListener('click', function () {
-    var str = '/docExpansion=full',
+    var str = '?docExpansion=full',
       prot = window.location.protocol,
       dom = window.location.domain,
       path = window.location.pathname;
