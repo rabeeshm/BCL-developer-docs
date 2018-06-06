@@ -1,7 +1,5 @@
-function postfix(description_div) {
+function postfix(description_div, opblocks, model_containers) {
   var topbar_wrapper = document.getElementsByClassName('topbar-wrapper')[0],
-    opblocks = document.getElementsByClassName('opblock'),
-    model_containers = document.getElementsByClassName('model-container'),
     btn = document.createElement('button'),
     txt = ' (click to make the entire doc searchable)',
     span = document.createElement(span),
