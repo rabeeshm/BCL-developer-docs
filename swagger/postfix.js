@@ -39,16 +39,10 @@ function postfix() {
   description_div.appendChild(p);
   expand_all = document.getElementById('expand_all');
   expand_all.addEventListener('click', function () {
-    var i, iMax;
-    iMax = opblocks.length;
-    for (i = 0; i < iMax; i++) {
-      opblocks[i].classList.add('is-open');
-      window.getComputedStyle(opblocks[i]);
-    }
-    iMax = model_containers.length;
-    for (i = 0; i < iMax; i++) {
-      model_containers[i].classList.add('is-open');
-      window.getComputedStyle(model_containers[i]);
-    }
+    var str = '/docExpansion=full',
+      prot = window.location.protocol,
+      dom = window.location.domain,
+      path = window.location.pathname;
+      window.location.href = prot + dom + path + str;
   });
 }
