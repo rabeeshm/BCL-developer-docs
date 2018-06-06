@@ -2,7 +2,6 @@ function postfix() {
   var topbar_wrapper = document.getElementsByClassName('topbar-wrapper')[0],
     opblocks = document.getElementsByClassName('opblock'),
     model_containers = document.getElementsByClassName('model-container'),
-    description_div = document.getElementsByClassName('description')[0],
     btn = document.createElement('button'),
     txt = ' (click to make the entire doc searchable)',
     span = document.createElement(span),
@@ -31,6 +30,7 @@ function postfix() {
   btn.setAttribute('class', 'btn try-out__btn');
   btn.textContent = 'Expand All Sections';
   span.textContent = txt;
+  // note that description_div is defined before postfix() is called
   description_div.appendChild(btn);
   description_div.appendChild(span);
   expand_all = document.getElementById('expand_all');
