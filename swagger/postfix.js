@@ -41,7 +41,7 @@ function postfix() {
   expand_all.addEventListener('click', function () {
     var str = '?docExpansion=full',
       prot = window.location.protocol,
-      dom = window.location.domain,
+      dom = window.location.hostname,
       path = window.location.pathname;
       window.location.href = prot + dom + path + str;
   });
