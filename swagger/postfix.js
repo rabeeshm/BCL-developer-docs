@@ -48,5 +48,7 @@ function postfix() {
     for (i = 0; i < iMax; i++) {
       model_containers[i].classList.add('is-open');
     }
+    // force style recalc
+    window.getComputedStyle();
   });
 }
