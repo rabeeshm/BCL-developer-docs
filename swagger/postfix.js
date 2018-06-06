@@ -48,7 +48,7 @@ function postfix() {
     iMax = model_containers.length;
     for (i = 0; i < iMax; i++) {
       model_containers[i].classList.add('is-open');
-      window.getComputedStyle(model_containers[i];)
+      window.getComputedStyle(model_containers[i]);
     }
   });
 }
