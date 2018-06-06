@@ -49,6 +49,6 @@ function postfix() {
       model_containers[i].classList.add('is-open');
     }
     // force style recalc
-    window.getComputedStyle();
+    window.getComputedStyle(document.getElementsByClassName('wrapper')[0]);
   });
 }
