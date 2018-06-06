@@ -9,6 +9,7 @@ function postfix(description_div) {
     img = document.createElement('img'),
     aDocs = document.createElement('a'),
     aHome = document.createElement('a'),
+    p = document.createElement('p'),
     frag = document.createDocumentFragment();
   // add custom header
   img.setAttribute('src', 'https://learning-services-media.brightcove.com/doc-assets/general/images/bc-logo-ondark-small.png');
@@ -30,9 +31,10 @@ function postfix(description_div) {
   btn.setAttribute('class', 'btn try-out__btn');
   btn.textContent = 'Expand All Sections';
   span.textContent = txt;
+  p.appendChild(btn);
+  p.appendChild(span);
   // note that description_div is defined before postfix() is called
-  description_div.appendChild(btn);
-  description_div.appendChild(span);
+  description_div.appendChild(p);
   expand_all = document.getElementById('expand_all');
   expand_all.addEventListener('click', function() {
     var i, iMax;
