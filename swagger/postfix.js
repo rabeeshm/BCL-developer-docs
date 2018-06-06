@@ -1,4 +1,4 @@
-function postfix() {
+function postfix(description_div) {
   var topbar_wrapper = document.getElementsByClassName('topbar-wrapper')[0],
     opblocks = document.getElementsByClassName('opblock'),
     model_containers = document.getElementsByClassName('model-container'),
