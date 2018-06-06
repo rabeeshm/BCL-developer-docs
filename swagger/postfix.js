@@ -1,8 +1,12 @@
-function postfix(description_div, opblocks, model_containers) {
+function postfix() {
   var topbar_wrapper = document.getElementsByClassName('topbar-wrapper')[0],
     btn = document.createElement('button'),
     txt = ' (click to make the entire doc searchable)',
     span = document.createElement(span),
+    description_div = document.getElementsByClassName('description')[0],
+    opblocks = document.getElementsByClassName('opblock'),
+    model_containers = document.getElementsByClassName('model-container'),
+
     expand_all,
     img = document.createElement('img'),
     aDocs = document.createElement('a'),
@@ -34,7 +38,7 @@ function postfix(description_div, opblocks, model_containers) {
   // note that description_div is defined before postfix() is called
   description_div.appendChild(p);
   expand_all = document.getElementById('expand_all');
-  expand_all.addEventListener('click', function() {
+  expand_all.addEventListener('click', function () {
     var i, iMax;
     iMax = opblocks.length;
     for (i = 0; i < iMax; i++) {
