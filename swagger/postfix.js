@@ -47,6 +47,6 @@ function postfix() {
       console.log('dom', dom);
       console.log('path', path);
       
-      window.location.href = prot + dom + path + str;
+      // window.location.href = prot + dom + path + str;
   });
 }
