@@ -43,6 +43,10 @@ function postfix() {
       prot = window.location.protocol,
       dom = window.location.hostname,
       path = window.location.pathname;
+      console.log('prot', prot);
+      console.log('dom', dom);
+      console.log('path', path);
+      
       window.location.href = prot + dom + path + str;
   });
 }
