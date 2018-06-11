@@ -1,50 +1,35 @@
 {
   "openapi": "3.0.0",
-  "info": 
-  {
+  "info": {
     "title": "Live API Reference",
     "description": "Reference for the Brightcove Live API, used to create and manage live streaming events.",
     "version": "1.0.0"
   },
-  "servers": 
-  [
-    {
-      "url": "https://api.bcovlive.io",
-      "variables": 
-      {}
-    }
-  ],
-  "paths": 
-  {
-    "/v1/jobs": 
-    {
-      "post": 
-      {
-        "tags": 
-        [
+  "servers": [{
+    "url": "https://api.bcovlive.io",
+    "variables": {}
+  }],
+  "paths": {
+    "/v1/jobs": {
+      "post": {
+        "tags": [
           "Live Jobs"
         ],
         "summary": "Create_a_Live_Job",
         "description": "Create a live stream ",
         "operationId": "CreateALiveJob",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/ContentType"
+        "parameters": [{
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "requestBody": 
-        {
+        "requestBody": {
           "description": "Create a live stream",
-          "content": 
-          {
-            "application/json": 
-            {
-              "schema": 
-              {
+          "content": {
+            "application/json": {
+              "schema": {
                 "description": "Create a live stream",
                 "$ref": "#/components/schemas/CreateALiveJobbody"
               }
@@ -52,55 +37,42 @@
           },
           "required": true
         },
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/CreateALiveJob200"
                 }
               }
             }
           },
-          "400": 
-          {
+          "400": {
             "description": "BAD_REQUEST: Invalid input value - see Live API Error Messages for more details"
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
           "IsMultiContentStreaming": false
         }
       },
-      "get": 
-      {
-        "tags": 
-        [
+      "get": {
+        "tags": [
           "Live Jobs"
         ],
         "summary": "List_Live_Jobs",
@@ -112,7 +84,7 @@
           "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           },
           {
             "name": "start_token",
@@ -120,8 +92,7 @@
             "description": "Next token from previous page; do not specify when fetching first page",
             "style": "form",
             "explode": true,
-            "schema": 
-            {
+            "schema": {
               "type": "string"
             }
           },
@@ -131,8 +102,7 @@
             "description": "Max number of jobs to return in one request (1-1000, default is 10)",
             "style": "form",
             "explode": true,
-            "schema": 
-            {
+            "schema": {
               "type": "integer",
               "minimum": 1,
               "maximum": 1000,
@@ -145,8 +115,7 @@
             "description": "Attribute to sort jobs by (`created_at` | `modified_at`, default is `created_at`)",
             "style": "form",
             "explode": true,
-            "schema": 
-            {
+            "schema": {
               "type": "string",
               "enum": ["created_at", "modified_at"],
               "default": "created_at"
@@ -158,69 +127,123 @@
             "description": "Sort direction (default is asc):`asc` - ascending; `desc` - descending",
             "style": "form",
             "explode": true,
-            "schema": 
-            {
+            "schema": {
               "type": "string",
               "enum": ["asc", "desc"],
               "default": "asc"
             }
-          }
-        ],
-        "requestBody": 
-        {
-          "description": "Create a live stream",
-          "content": 
+          },
           {
-            "application/json": 
-            {
-              "schema": 
-              {
-                "description": "Create a live stream",
-                "$ref": "#/components/schemas/CreateALiveJobbody"
-              }
+            "name": "user_id",
+            "in": "query",
+            "description": "Filter results by one or more user IDs",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "oneOf": [{
+                  "type": "string",
+                  "description": "User id"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "User id"
+                  }
+                }
+              ]
             }
           },
-          "required": true
-        },
-        "responses": 
-        {
-          "200": 
           {
-            "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
+            "name": "created_at",
+            "in": "query",
+            "description": "Filter results by Unix time of job creation (in milliseconds)",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "modified_at",
+            "in": "query",
+            "description": "Filter results by Unix time of job last modified (in milliseconds)",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "ad_insertion",
+            "in": "query",
+            "description": "Filter results by is SSAI enabled",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "static",
+            "in": "query",
+            "description": "Filter results by has static endpoint",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "Filter results by one or more job states",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "oneOf": [{
+                  "type": "string",
+                  "description": "User id"
+                },
                 {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "User id"
+                  }
+                }
+              ]
+            }
+          },
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/CreateALiveJob200"
                 }
               }
             }
           },
-          "400": 
-          {
+          "400": {
             "description": "BAD_REQUEST: Invalid input value - see Live API Error Messages for more details"
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -228,64 +251,49 @@
         }
       }
     },
-    "/v1/jobs/{job_id}": 
-    {
-      "get": 
-      {
-        "tags": 
-        [
+    "/v1/jobs/{job_id}": {
+      "get": {
+        "tags": [
           "Live Jobs"
         ],
         "summary": "Get_Live_Job_Details",
         "description": "Get Live Job Details ",
         "operationId": "GetLiveJobDetails",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/JobId"
+        "parameters": [{
+            "$ref": "#/components/parameters/JobId"
           },
           {
-          "$ref": "#/components/parameters/ContentType"
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/Job"
                 }
               }
             }
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -293,64 +301,49 @@
         }
       }
     },
-    "/v1/jobs/{job_id}/activate": 
-    {
-      "put": 
-      {
-        "tags": 
-        [
+    "/v1/jobs/{job_id}/activate": {
+      "put": {
+        "tags": [
           "Live Jobs"
         ],
         "summary": "Activate_SEP_Stream",
         "description": "Activate SEP (static entry point) Stream ",
         "operationId": "ActivateSepStream",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/JobId"
+        "parameters": [{
+            "$ref": "#/components/parameters/JobId"
           },
           {
-          "$ref": "#/components/parameters/ContentType"
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/ActivateSepStream200"
                 }
               }
             }
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -358,64 +351,49 @@
         }
       }
     },
-    "/v1/jobs/{job_id}/deactivate": 
-    {
-      "put": 
-      {
-        "tags": 
-        [
+    "/v1/jobs/{job_id}/deactivate": {
+      "put": {
+        "tags": [
           "Live Jobs"
         ],
         "summary": "Deactivate_SEP_Stream",
         "description": "Deactivate SEP (static entry point) Stream ",
         "operationId": "DeactivateSepStream",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/JobId"
+        "parameters": [{
+            "$ref": "#/components/parameters/JobId"
           },
           {
-          "$ref": "#/components/parameters/ContentType"
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/DeactivateSepStream200"
                 }
               }
             }
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -423,38 +401,29 @@
         }
       }
     },
-    "/v1/jobs/{job_id}/cuepoint": 
-    {
-      "post": 
-      {
-        "tags": 
-        [
+    "/v1/jobs/{job_id}/cuepoint": {
+      "post": {
+        "tags": [
           "Live Jobs"
         ],
         "summary": "Manual_Ad_Cue_Point_Insertion",
         "description": "Inserts a manual Cue-Out with a duration to the Live ingest point. ",
         "operationId": "ManualAdCuePointInsertion",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/JobId"
+        "parameters": [{
+            "$ref": "#/components/parameters/JobId"
           },
           {
-          "$ref": "#/components/parameters/ContentType"
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "requestBody": 
-        {
+        "requestBody": {
           "description": "Inserts a manual Cue-Out with a duration to the Live ingest point.",
-          "content": 
-          {
-            "application/json": 
-            {
-              "schema": 
-              {
+          "content": {
+            "application/json": {
+              "schema": {
                 "description": "Inserts a manual Cue-Out with a duration to the Live ingest point.",
                 "$ref": "#/components/schemas/ManualAdCuePointInsertionbody"
               }
@@ -462,45 +431,34 @@
           },
           "required": true
         },
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/ManualAdCuePointInsertion200"
                 }
               }
             }
           },
-          "400": 
-          {
+          "400": {
             "description": "BAD_REQUEST: Invalid input value - see Live API Error Messages for more details "
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details "
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details "
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: DB getItem, no results found - see Live API Error Messages for more details "
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -508,38 +466,29 @@
         }
       }
     },
-    "/v1/jobs/{job_id}/id3tag": 
-    {
-      "post": 
-      {
-        "tags": 
-        [
+    "/v1/jobs/{job_id}/id3tag": {
+      "post": {
+        "tags": [
           "Live Jobs"
         ],
         "summary": "Insert_ID3_timed_metadata",
         "description": "Inserts an ID3 timed metadata tag for an ongoing job. Note that: 1) If using timecode property, the job only stores the most recent request for insertion; 2) If using timecode property, the encoder must be sending SMPTE-formatted (HH:MM:SS:FF) timecode stored in the tc property via OnFI ",
         "operationId": "InsertId3TimedMetadata",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/JobId"
+        "parameters": [{
+            "$ref": "#/components/parameters/JobId"
           },
           {
-          "$ref": "#/components/parameters/ContentType"
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "requestBody": 
-        {
+        "requestBody": {
           "description": "Inserts an ID3 timed metadata tag for an ongoing job. Note that: 1) If using timecode property, the job only stores the most recent request for insertion; 2) If using timecode property, the encoder must be sending SMPTE-formatted (HH:MM:SS:FF) timecode stored in the tc property via OnFI",
-          "content": 
-          {
-            "application/json": 
-            {
-              "schema": 
-              {
+          "content": {
+            "application/json": {
+              "schema": {
                 "description": "Inserts an ID3 timed metadata tag for an ongoing job. Note that: 1) If using timecode property, the job only stores the most recent request for insertion; 2) If using timecode property, the encoder must be sending SMPTE-formatted (HH:MM:SS:FF) timecode stored in the tc property via OnFI",
                 "$ref": "#/components/schemas/InsertId3TimedMetadatabody"
               }
@@ -547,45 +496,34 @@
           },
           "required": true
         },
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/InsertId3TimedMetadata200"
                 }
               }
             }
           },
-          "400": 
-          {
+          "400": {
             "description": "BAD_REQUEST: Invalid input value - see Live API Error Messages for more details"
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -593,61 +531,46 @@
         }
       }
     },
-    "/v1/jobs/{job_id}/cancel": 
-    {
-      "put": 
-      {
-        "tags": 
-        [
+    "/v1/jobs/{job_id}/cancel": {
+      "put": {
+        "tags": [
           "Live Jobs"
         ],
         "summary": "Cancel_Live_Job",
         "description": "Cancel a live stream ",
         "operationId": "CancelLiveJob",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/JobId"
+        "parameters": [{
+            "$ref": "#/components/parameters/JobId"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/CancelLiveJob200"
                 }
               }
             }
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -655,35 +578,26 @@
         }
       }
     },
-    "/v1/vods": 
-    {
-      "post": 
-      {
-        "tags": 
-        [
+    "/v1/vods": {
+      "post": {
+        "tags": [
           "Clips"
         ],
         "summary": "Create_VOD_Clip",
         "description": "Create VOD clips from a Live Stream. ",
         "operationId": "CreateVodClip",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/ContentType"
+        "parameters": [{
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "requestBody": 
-        {
+        "requestBody": {
           "description": "Create VOD clips from a Live Stream.",
-          "content": 
-          {
-            "application/json": 
-            {
-              "schema": 
-              {
+          "content": {
+            "application/json": {
+              "schema": {
                 "description": "Create VOD clips from a Live Stream.",
                 "$ref": "#/components/schemas/CreateVodClipbody"
               }
@@ -691,45 +605,34 @@
           },
           "required": true
         },
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/VodJobs"
                 }
               }
             }
           },
-          "400": 
-          {
+          "400": {
             "description": "BAD_REQUEST: Invalid input value - see Live API Error Messages for more details"
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -737,35 +640,26 @@
         }
       }
     },
-    "/v1/ssai/applications": 
-    {
-      "post": 
-      {
-        "tags": 
-        [
+    "/v1/ssai/applications": {
+      "post": {
+        "tags": [
           "SSAI"
         ],
         "summary": "Create_Ad_Configuration",
         "description": "Create a configuration for server-side ad application. ",
         "operationId": "CreateAdConfiguration",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/ContentType"
+        "parameters": [{
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "requestBody": 
-        {
+        "requestBody": {
           "description": "Create a configuration for server-side ad application.",
-          "content": 
-          {
-            "application/json": 
-            {
-              "schema": 
-              {
+          "content": {
+            "application/json": {
+              "schema": {
                 "description": "Create a configuration for server-side ad application.",
                 "$ref": "#/components/schemas/CreateAdConfigurationbody"
               }
@@ -773,108 +667,82 @@
           },
           "required": true
         },
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/Application"
                 }
               }
             }
           },
-          "400": 
-          {
+          "400": {
             "description": "BAD_REQUEST: Invalid input value - see Live API Error Messages for more details"
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
           "IsMultiContentStreaming": false
         }
       },
-      "get": 
-      {
-        "tags": 
-        [
+      "get": {
+        "tags": [
           "SSAI"
         ],
         "summary": "Create_Ad_Configuration",
         "description": "Get ad applications for the current user.",
         "operationId": "GetuserAdConfigurations",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/ContentType"
+        "parameters": [{
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/Application"
                 }
               }
             }
           },
-          "400": 
-          {
+          "400": {
             "description": "BAD_REQUEST: Invalid input value - see Live API Error Messages for more details"
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -882,64 +750,49 @@
         }
       }
     },
-    "/v1/ssai/applications/account/{account_id}": 
-    {
-      "get": 
-      {
-        "tags": 
-        [
+    "/v1/ssai/applications/account/{account_id}": {
+      "get": {
+        "tags": [
           "SSAI"
         ],
         "summary": "Get_Account_Ad_Configurations",
         "description": "Get ad applications for an account. ",
         "operationId": "GetAccountAdConfigurations",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/LiveAccountId"
+        "parameters": [{
+            "$ref": "#/components/parameters/LiveAccountId"
           },
           {
-          "$ref": "#/components/parameters/ContentType"
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/Application"
                 }
               }
             }
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -947,118 +800,93 @@
         }
       }
     },
-    "/v1/ssai/applications/application/{application_id}": 
-    {
-      "get": 
-      {
-        "tags": 
-        [
+    "/v1/ssai/applications/application/{application_id}": {
+      "get": {
+        "tags": [
           "SSAI"
         ],
         "summary": "Get_Ad_Configuration",
         "description": "Get an ad application. ",
         "operationId": "GetAdConfiguration",
-        "parameters": 
-        [
-          {
+        "parameters": [{
             "name": "application_id",
             "in": "path",
             "description": "The ad application id",
             "required": true,
             "style": "simple",
             "explode": false,
-            "schema": 
-            {
+            "schema": {
               "type": "string"
             }
           },
           {
-          "$ref": "#/components/parameters/ContentType"
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/Application"
                 }
               }
             }
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
           "IsMultiContentStreaming": false
         }
       },
-      "put": 
-      {
-        "tags": 
-        [
+      "put": {
+        "tags": [
           "SSAI"
         ],
         "summary": "Update_Ad_Configuration",
         "description": "Update a configuration for server-side ad application. ",
         "operationId": "UpdateAdConfiguration",
-        "parameters": 
-        [
-          {
+        "parameters": [{
             "name": "application_id",
             "in": "path",
             "description": "The ad application id",
             "required": true,
             "style": "simple",
             "explode": false,
-            "schema": 
-            {
+            "schema": {
               "type": "string"
             }
           },
           {
-          "$ref": "#/components/parameters/ContentType"
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "requestBody": 
-        {
+        "requestBody": {
           "description": "Update a configuration for server-side ad application.",
-          "content": 
-          {
-            "application/json": 
-            {
-              "schema": 
-              {
+          "content": {
+            "application/json": {
+              "schema": {
                 "description": "Update a configuration for server-side ad application.",
                 "$ref": "#/components/schemas/UpdateAdConfigurationbody"
               }
@@ -1066,116 +894,90 @@
           },
           "required": true
         },
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/Application"
                 }
               }
             }
           },
-          "400": 
-          {
+          "400": {
             "description": "BAD_REQUEST: Invalid input value - see Live API Error Messages for more details"
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
           "IsMultiContentStreaming": false
         }
       },
-      "delete": 
-      {
-        "tags": 
-        [
+      "delete": {
+        "tags": [
           "SSAI"
         ],
         "summary": "Delete_Ad_Configuration",
         "description": "Delete an ad application. ",
         "operationId": "DeleteAdConfiguration",
-        "parameters": 
-        [
-          {
+        "parameters": [{
             "name": "application_id",
             "in": "path",
             "description": "The ad application id",
             "required": true,
             "style": "simple",
             "explode": false,
-            "schema": 
-            {
+            "schema": {
               "type": "string"
             }
           },
           {
-          "$ref": "#/components/parameters/ContentType"
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/DeleteAdConfiguration200"
                 }
               }
             }
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -1183,35 +985,26 @@
         }
       }
     },
-    "/v1/ssai/beaconsets": 
-    {
-      "post": 
-      {
-        "tags": 
-        [
+    "/v1/ssai/beaconsets": {
+      "post": {
+        "tags": [
           "SSAI"
         ],
         "summary": "Create_beacon_set",
         "description": "Beacons are data points on playback sent to ad servers to track whether and how much of ads were played. Creates a beacon set. ",
         "operationId": "CreateBeaconSet",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/ContentType"
+        "parameters": [{
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "requestBody": 
-        {
+        "requestBody": {
           "description": "Beacons are data points on playback sent to ad servers to track whether and how much of ads were played. Creates a beacon set.",
-          "content": 
-          {
-            "application/json": 
-            {
-              "schema": 
-              {
+          "content": {
+            "application/json": {
+              "schema": {
                 "description": "Beacons are data points on playback sent to ad servers to track whether and how much of ads were played. Creates a beacon set.",
                 "$ref": "#/components/schemas/CreateBeaconSetbody"
               }
@@ -1219,104 +1012,79 @@
           },
           "required": true
         },
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/BeaconSet"
                 }
               }
             }
           },
-          "400": 
-          {
+          "400": {
             "description": "BAD_REQUEST: Invalid input value - see Live API Error Messages for more details"
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
           "IsMultiContentStreaming": false
         }
       },
-      "get": 
-      {
-        "tags": 
-        [
+      "get": {
+        "tags": [
           "SSAI"
         ],
         "summary": "Get_beacon_sets_for_user",
         "description": "Get all beacon sets for the requesting user. ",
         "operationId": "GetBeaconSetsForUser",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/ContentType"
+        "parameters": [{
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/BeaconSet"
                 }
               }
             }
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -1324,38 +1092,29 @@
         }
       }
     },
-    "/v1/ssai/beaconsets/beaconset/beacon_set_id": 
-    {
-      "put": 
-      {
-        "tags": 
-        [
+    "/v1/ssai/beaconsets/beaconset/beacon_set_id": {
+      "put": {
+        "tags": [
           "SSAI"
         ],
         "summary": "Update_beacon_set",
         "description": "Updates a beacon set. ",
         "operationId": "UpdateBeaconSet",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/BeaconSetId"
+        "parameters": [{
+            "$ref": "#/components/parameters/BeaconSetId"
           },
           {
-          "$ref": "#/components/parameters/ContentType"
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "requestBody": 
-        {
+        "requestBody": {
           "description": "Updates a beacon set.",
-          "content": 
-          {
-            "application/json": 
-            {
-              "schema": 
-              {
+          "content": {
+            "application/json": {
+              "schema": {
                 "description": "Updates a beacon set.",
                 "$ref": "#/components/schemas/UpdateBeaconSetbody"
               }
@@ -1363,107 +1122,82 @@
           },
           "required": true
         },
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/BeaconSet"
                 }
               }
             }
           },
-          "400": 
-          {
+          "400": {
             "description": "BAD_REQUEST: Invalid input value - see Live API Error Messages for more details"
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
           "IsMultiContentStreaming": false
         }
       },
-      "delete": 
-      {
-        "tags": 
-        [
+      "delete": {
+        "tags": [
           "SSAI"
         ],
         "summary": "Delete_beacon_set",
         "description": "Deletes a beacon set. ",
         "operationId": "DeleteBeaconSet",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/BeaconSetId"
+        "parameters": [{
+            "$ref": "#/components/parameters/BeaconSetId"
           },
           {
-          "$ref": "#/components/parameters/ContentType"
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/DeleteBeaconSet200"
                 }
               }
             }
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -1471,64 +1205,49 @@
         }
       }
     },
-    "/v1/ssai/beaconsets/account/{account_id}": 
-    {
-      "get": 
-      {
-        "tags": 
-        [
+    "/v1/ssai/beaconsets/account/{account_id}": {
+      "get": {
+        "tags": [
           "SSAI"
         ],
         "summary": "Get_beacon_sets",
         "description": "Get all beacon sets for an account. ",
         "operationId": "GetBeaconSets",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/LiveAccountId"
+        "parameters": [{
+            "$ref": "#/components/parameters/LiveAccountId"
           },
           {
-          "$ref": "#/components/parameters/ContentType"
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/BeaconSet"
                 }
               }
             }
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -1536,35 +1255,26 @@
         }
       }
     },
-    "/v1/ssai/slates": 
-    {
-      "post": 
-      {
-        "tags": 
-        [
+    "/v1/ssai/slates": {
+      "post": {
+        "tags": [
           "SSAI"
         ],
         "summary": "Ingest_Slate_Media_Source_Asset",
         "description": "Ingest Slate Media Source Asset. ",
         "operationId": "IngestSlateMediaSourceAsset",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/ContentType"
+        "parameters": [{
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "requestBody": 
-        {
+        "requestBody": {
           "description": "Ingest Slate Media Source Asset.",
-          "content": 
-          {
-            "application/json": 
-            {
-              "schema": 
-              {
+          "content": {
+            "application/json": {
+              "schema": {
                 "description": "Ingest Slate Media Source Asset.",
                 "$ref": "#/components/schemas/IngestSlateMediaSourceAssetbody"
               }
@@ -1572,104 +1282,79 @@
           },
           "required": true
         },
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/IngestSlateMediaSourceAsset200"
                 }
               }
             }
           },
-          "400": 
-          {
+          "400": {
             "description": "BAD_REQUEST: Invalid input value - see Live API Error Messages for more details"
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
           "IsMultiContentStreaming": false
         }
       },
-      "get": 
-      {
-        "tags": 
-        [
+      "get": {
+        "tags": [
           "SSAI"
         ],
         "summary": "Get_User_Slate_Media_Source_Assets",
         "description": "Get Slate Media Source Assets for the current user. ",
         "operationId": "GetUserSlateMediaSourceAssets",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/ContentType"
+        "parameters": [{
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/GetSlateMediaSourceAssets200"
                 }
               }
             }
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -1677,64 +1362,49 @@
         }
       }
     },
-    "/v1/ssai/slates/slate{slate_msa_id}": 
-    {
-      "delete": 
-      {
-        "tags": 
-        [
+    "/v1/ssai/slates/slate{slate_msa_id}": {
+      "delete": {
+        "tags": [
           "SSAI"
         ],
         "summary": "Delete_Slate_Media_Source_Asset",
         "description": "Delete Slate Media Source Asset. ",
         "operationId": "DeleteSlateMediaSourceAsset",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/SlateMsaId"
+        "parameters": [{
+            "$ref": "#/components/parameters/SlateMsaId"
           },
           {
-          "$ref": "#/components/parameters/ContentType"
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/DeleteSlateMediaSourceAsset200"
                 }
               }
             }
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -1742,64 +1412,49 @@
         }
       }
     },
-    "/v1/ssai/slates/account/{account_id}": 
-    {
-      "get": 
-      {
-        "tags": 
-        [
+    "/v1/ssai/slates/account/{account_id}": {
+      "get": {
+        "tags": [
           "SSAI"
         ],
         "summary": "Get_slates_for_account",
         "description": "Get all beacon sets for an account. ",
         "operationId": "GetSlatesForAccount",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/LiveAccountId"
+        "parameters": [{
+            "$ref": "#/components/parameters/LiveAccountId"
           },
           {
-          "$ref": "#/components/parameters/ContentType"
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/GetSlateMediaSourceAssets200"
                 }
               }
             }
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -1807,94 +1462,71 @@
         }
       }
     },
-    "/v1/credentials": 
-    {
-      "get": 
-      {
-        "tags": 
-        [
+    "/v1/credentials": {
+      "get": {
+        "tags": [
           "Credentials"
         ],
         "summary": "List_Credentials",
         "description": "This endpoint can be used to get user credentials for a given user provided one has an API key. ",
         "operationId": "ListCredentials",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/ContentType"
+        "parameters": [{
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/ListCredentials200"
                 }
               }
             }
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
           "IsMultiContentStreaming": false
         }
       },
-      "post": 
-      {
-        "tags": 
-        [
+      "post": {
+        "tags": [
           "Credentials"
         ],
         "summary": "Create_Credential",
         "description": "Create a new credential. ",
         "operationId": "CreateCredential",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/ContentType"
+        "parameters": [{
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "requestBody": 
-        {
+        "requestBody": {
           "description": "Create a new credential.",
-          "content": 
-          {
-            "application/json": 
-            {
-              "schema": 
-              {
+          "content": {
+            "application/json": {
+              "schema": {
                 "description": "Create a new credential.",
                 "$ref": "#/components/schemas/CreateCredentialbody"
               }
@@ -1902,45 +1534,34 @@
           },
           "required": true
         },
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/CreateCredential200"
                 }
               }
             }
           },
-          "400": 
-          {
+          "400": {
             "description": "BAD_REQUEST: Invalid input value - see Live API Error Messages for more details"
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -1948,38 +1569,29 @@
         }
       }
     },
-    "/v1/credentials/{credential_id}": 
-    {
-      "put": 
-      {
-        "tags": 
-        [
+    "/v1/credentials/{credential_id}": {
+      "put": {
+        "tags": [
           "Credentials"
         ],
         "summary": "Update_Credential",
         "description": "Update a credential. ",
         "operationId": "UpdateCredential",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/CredentialId"
+        "parameters": [{
+            "$ref": "#/components/parameters/CredentialId"
           },
           {
-          "$ref": "#/components/parameters/ContentType"
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
-        }
+            "$ref": "#/components/parameters/XAPIKEY"
+          }
         ],
-        "requestBody": 
-        {
+        "requestBody": {
           "description": "Update a credential.",
-          "content": 
-          {
-            "application/json": 
-            {
-              "schema": 
-              {
+          "content": {
+            "application/json": {
+              "schema": {
                 "description": "Update a credential.",
                 "$ref": "#/components/schemas/UpdateCredentialbody"
               }
@@ -1987,96 +1599,74 @@
           },
           "required": true
         },
-        "responses": 
-        {
-          "200": 
-          {
+        "responses": {
+          "200": {
             "description": "200",
-            "content": 
-            {
-              "application/json": 
-              {
-                "schema": 
-                {
+            "content": {
+              "application/json": {
+                "schema": {
                   "description": "200",
                   "$ref": "#/components/schemas/UpdateCredential200"
                 }
               }
             }
           },
-          "400": 
-          {
+          "400": {
             "description": "BAD_REQUEST: Invalid input value - see Live API Error Messages for more details"
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
           "IsMultiContentStreaming": false
         }
       },
-      "delete": 
-      {
-        "tags": 
-        [
+      "delete": {
+        "tags": [
           "Credentials"
         ],
         "summary": "Delete_Credential",
         "description": "Delete a credential. ",
         "operationId": "DeleteCredential",
-        "parameters": 
-        [
-          {
-          "$ref": "#/components/parameters/CredentialId"
+        "parameters": [{
+            "$ref": "#/components/parameters/CredentialId"
           },
           {
-          "$ref": "#/components/parameters/ContentType"
+            "$ref": "#/components/parameters/ContentType"
           },
           {
-          "$ref": "#/components/parameters/XAPIKEY"
+            "$ref": "#/components/parameters/XAPIKEY"
           }
         ],
-        "responses": 
-        {
-          "204": 
-          {
+        "responses": {
+          "204": {
             "description": "NO_CONTENT: the credential was deleted"
           },
-          "401": 
-          {
+          "401": {
             "description": "UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details"
           },
-          "404": 
-          {
+          "404": {
             "description": "RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested - see Live API Error Messages for more details"
           },
-          "500": 
-          {
+          "500": {
             "description": "INTERNAL_SERVER_ERROR: see Live API Error Messages for more details"
           }
         },
         "deprecated": false,
-        "security": 
-        [],
-        "x-operation-settings": 
-        {
+        "security": [],
+        "x-operation-settings": {
           "CollectParameters": false,
           "AllowDynamicQueryParameters": false,
           "AllowDynamicFormParameters": false,
@@ -2085,15 +1675,11 @@
       }
     }
   },
-  "components": 
-  {
-    "schemas": 
-    {
-      "Path": 
-      {
+  "components": {
+    "schemas": {
+      "Path": {
         "title": "Path",
-        "required": 
-        [
+        "required": [
           "credential_id",
           "job_id",
           "application_id",
@@ -2102,72 +1688,57 @@
           "account_id"
         ],
         "type": "object",
-        "properties": 
-        {
-          "credential_id": 
-          {
+        "properties": {
+          "credential_id": {
             "type": "string",
             "description": "The credential id"
           },
-          "job_id": 
-          {
+          "job_id": {
             "type": "string",
             "description": "The job id."
           },
-          "application_id": 
-          {
+          "application_id": {
             "type": "string",
             "description": "The ad application id"
           },
-          "slate_msa_id": 
-          {
+          "slate_msa_id": {
             "type": "string",
             "description": "The id for the Slate media source asset"
           },
-          "beacon_set_id": 
-          {
+          "beacon_set_id": {
             "type": "string",
             "description": "The id for the beacon set"
           },
-          "account_id": 
-          {
+          "account_id": {
             "type": "string",
             "description": "The Live account id"
           }
         }
       },
-      "CreateVodClipbody": 
-      {
+      "CreateVodClipbody": {
         "title": "Create_VOD_ClipBody",
-        "required": 
-        [
+        "required": [
           "live_job_id",
           "outputs"
         ],
         "type": "object",
-        "properties": 
-        {
-          "live_job_id": 
-          {
+        "properties": {
+          "live_job_id": {
             "type": "string",
             "description": "The id of Live Stream job to create the VOD clip from."
           },
-          "outputs": 
-          {
+          "outputs": {
             "type": "array",
-            "items": 
-            {
+            "items": {
               "$ref": "#/components/schemas/CreateVodClipbody.outputs"
             },
             "description": "Array of VOD outputs"
           }
         }
       },
-      "CreateVodClipbody.outputs": 
-      {
+      "CreateVodClipbody.outputs": {
         "title": "Create_VOD_ClipBody.outputs",
-        "required": 
-        [
+        "required": [
           "label",
           "duration",
           "stream_start_time",
@@ -2181,178 +1752,141 @@
           "videocloud"
         ],
         "type": "object",
-        "properties": 
-        {
-          "label": 
-          {
+        "properties": {
+          "label": {
             "type": "string",
             "description": "Label for the output"
           },
-          "duration": 
-          {
+          "duration": {
             "type": "number",
             "description": "Duration of the clip in seconds"
           },
-          "stream_start_time": 
-          {
+          "stream_start_time": {
             "type": "number",
             "description": "Start time in seconds for the clip relative to the start time of the live stream"
           },
-          "stream_end_time": 
-          {
+          "stream_end_time": {
             "type": "number",
             "description": "End time in seconds for the clip relative to the start time of the live stream"
           },
-          "stream_start_timecode": 
-          {
+          "stream_start_timecode": {
             "type": "number",
             "description": "Start for the clip as an SMPTE timecode for the live stream"
           },
-          "stream_end_timecode": 
-          {
+          "stream_end_timecode": {
             "type": "number",
             "description": "End for the clip as an SMPTE timecode for the live stream"
           },
-          "start_time": 
-          {
+          "start_time": {
             "type": "number",
             "description": "Start time for the clip in Epoch (Unix) time (seconds)"
           },
-          "end_time": 
-          {
+          "end_time": {
             "type": "number",
             "description": "End time for the clip in Epoch (Unix) time (seconds)"
           },
-          "url": 
-          {
+          "url": {
             "type": "string",
             "description": "URL for the clip"
           },
-          "credentials": 
-          {
+          "credentials": {
             "type": "string",
             "description": "The name of the credentials configured in your account for this address - A credential label for a valid client id + client secret should have been created when your Live account was set up, the credential label sent to you. If you do not have it, please Contact Brightcove Support"
           },
-          "videocloud": 
-          {
+          "videocloud": {
             "description": "An object containing inputs for Video Cloud ingestion",
             "$ref": "#/components/schemas/CreateVodClipbody.outputs.videocloud"
           }
         }
       },
-      "CreateVodClipbody.outputs.videocloud": 
-      {
+      "CreateVodClipbody.outputs.videocloud": {
         "title": "Create_VOD_ClipBody.outputs.videocloud",
-        "required": 
-        [
+        "required": [
           "video",
           "ingest"
         ],
         "type": "object",
-        "properties": 
-        {
-          "video": 
-          {
+        "properties": {
+          "video": {
             "description": "An object containing inputs for Video Cloud video object creation - see the [CMS API Reference](https://brightcovelearning.github.io/Brightcove-API-References/cms-api/v1/doc/swagger.html#operations-Videos-CreateVideo)",
             "$ref": "#/components/schemas/CreateVodClipbody.outputs.videocloud.video"
           },
-          "ingest": 
-          {
+          "ingest": {
             "description": "An object containing inputs for Video Cloud video ingestion - see the [Dynamic Ingest Reference](https://brightcovelearning.github.io/Brightcove-API-References/dynamic-ingest-api/v1/doc/swagger.html#operations-Ingest-AccountsVideosIngestRequestsByAccountIdAndVideoIdPost) - do not include the master field, as that information will be provided by the Live API",
             "$ref": "#/components/schemas/CreateVodClipbody.outputs.videocloud.ingest"
           }
         }
       },
-      "CreateVodClipbody.outputs.videocloud.video": 
-      {
+      "CreateVodClipbody.outputs.videocloud.video": {
         "title": "Create_VOD_ClipBody.outputs.videocloud.video",
-        "required": 
-        [
+        "required": [
           "name"
         ],
         "type": "object",
-        "properties": 
-        {
-          "name": 
-          {
+        "properties": {
+          "name": {
             "type": "string",
             "description": "Title of the video clip"
           },
-          "economics": 
-          {
+          "economics": {
             "description": "whether the video supports ads",
             "$ref": "#/components/schemas/Economics"
           },
-          "tags": 
-          {
+          "tags": {
             "type": "object",
             "description": "Array of tags for the video - note that  tags are string that may not contain a comma"
           },
-          "reference_id": 
-          {
+          "reference_id": {
             "type": "string",
             "description": "Reference id for the clip - must be unique within the account"
           },
-          "description": 
-          {
+          "description": {
             "type": "string",
             "description": "Video short description"
           },
-          "state": 
-          {
+          "state": {
             "description": "Whether the video should be active or inactive",
             "example": "ACTIVE",
             "$ref": "#/components/schemas/State"
           },
-          "custom_fields": 
-          {
+          "custom_fields": {
             "type": "object",
             "description": "An object whose properties are `fieldname`:`value` pairs - be sure to the *internal* name of the field"
           },
-          "drm_disabled": 
-          {
+          "drm_disabled": {
             "type": "boolean",
             "description": "Use to disable DRM packaging for this video - applies only to DRM-enabled accounts"
           },
-          "long_description": 
-          {
+          "long_description": {
             "type": "string",
             "description": "A longer description of the video"
           },
-          "cue_points": 
-          {
+          "cue_points": {
             "type": "array",
-            "items": 
-            {
+            "items": {
               "$ref": "#/components/schemas/CreateVodClipbody.outputs.videocloud.video.cuePoint"
             },
             "description": "Array of cuepoint objects"
           },
-          "geo": 
-          {
+          "geo": {
             "description": "map of geo-filtering properties",
             "$ref": "#/components/schemas/CreateVodClipbody.outputs.videocloud.video.geo"
           },
-          "schedule": 
-          {
+          "schedule": {
             "description": "map of scheduling properties",
             "$ref": "#/components/schemas/CreateVodClipbody.outputs.videocloud.video.schedule"
           }
         }
       },
-      "Economics": 
-      {
+      "Economics": {
         "title": "Economics",
-        "enum": 
-        [
+        "enum": [
           "AD_SUPPORTED",
           "FREE"
         ],
         "type": "string",
         "example": "AD_SUPPORTED",
-        "x-enum-elements": 
-        [
-          {
+        "x-enum-elements": [{
             "name": "AD_SUPPORTED",
             "description": "Ad supported - this option can only be selected in the Brightcove account is ad-enabled"
           },
@@ -2362,19 +1896,15 @@
           }
         ]
       },
-      "State": 
-      {
+      "State": {
         "title": "State",
-        "enum": 
-        [
+        "enum": [
           "ACTIVE",
           "INACTIVE"
         ],
         "type": "string",
         "example": "ACTIVE",
-        "x-enum-elements": 
-        [
-          {
+        "x-enum-elements": [{
             "name": "ACTIVE",
             "description": "Video is available for playback"
           },
@@ -2384,58 +1914,46 @@
           }
         ]
       },
-      "CreateVodClipbody.outputs.videocloud.video.cuePoint": 
-      {
+      "CreateVodClipbody.outputs.videocloud.video.cuePoint": {
         "title": "Create_VOD_ClipBody.outputs.videocloud.video.cue_point",
-        "required": 
-        [
+        "required": [
           "time",
           "type"
         ],
         "type": "object",
-        "properties": 
-        {
-          "time": 
-          {
+        "properties": {
+          "time": {
             "type": "number",
             "description": "time of the cue point in seconds; example: 10.527"
           },
-          "type": 
-          {
+          "type": {
             "description": "cue point type",
             "example": "AD",
             "$ref": "#/components/schemas/Type"
           },
-          "force-stop": 
-          {
+          "force-stop": {
             "type": "boolean",
             "description": "whether video is force-stopped at the cue point"
           },
-          "metadata": 
-          {
+          "metadata": {
             "type": "string",
             "description": "optional metadata string (512 single-byte characters maximum)"
           },
-          "name": 
-          {
+          "name": {
             "type": "string",
             "description": "cue point name"
           }
         }
       },
-      "Type": 
-      {
+      "Type": {
         "title": "Type",
-        "enum": 
-        [
+        "enum": [
           "AD",
           "CODE"
         ],
         "type": "string",
         "example": "AD",
-        "x-enum-elements": 
-        [
-          {
+        "x-enum-elements": [{
             "name": "AD",
             "description": "A cue point to trigger an add request"
           },
@@ -2445,142 +1963,110 @@
           }
         ]
       },
-      "CreateVodClipbody.outputs.videocloud.video.geo": 
-      {
+      "CreateVodClipbody.outputs.videocloud.video.geo": {
         "title": "Create_VOD_ClipBody.outputs.videocloud.video.geo",
-        "required": 
-        [
+        "required": [
           "countries",
           "exclude_countries",
           "restricted"
         ],
         "type": "object",
-        "properties": 
-        {
-          "countries": 
-          {
+        "properties": {
+          "countries": {
             "type": "string",
             "description": "array of ISO 3166 list of 2-letter codes(https://www.iso.org/obp/ui/#home) (search for &quot;country codes&quot;)"
           },
-          "exclude_countries": 
-          {
+          "exclude_countries": {
             "type": "boolean",
             "description": "if true, country array is treated as a list of countries excluded from viewing"
           },
-          "restricted": 
-          {
+          "restricted": {
             "type": "boolean",
             "description": "whether geo-restriction is enabled for this video"
           }
         }
       },
-      "CreateVodClipbody.outputs.videocloud.video.schedule": 
-      {
+      "CreateVodClipbody.outputs.videocloud.video.schedule": {
         "title": "Create_VOD_ClipBody.outputs.videocloud.video.schedule",
-        "required": 
-        [
+        "required": [
           "ends_at",
           "starts_at"
         ],
         "type": "object",
-        "properties": 
-        {
-          "ends_at": 
-          {
+        "properties": {
+          "ends_at": {
             "type": "string",
             "description": "end date-time of availability in ISO-8601(http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15) format"
           },
-          "starts_at": 
-          {
+          "starts_at": {
             "type": "string",
             "description": "start date-time of availability in ISO-8601(http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15) format"
           }
         }
       },
-      "CreateVodClipbody.outputs.videocloud.ingest": 
-      {
+      "CreateVodClipbody.outputs.videocloud.ingest": {
         "title": "Create_VOD_ClipBody.outputs.videocloud.ingest",
         "type": "object",
-        "properties": 
-        {
-          "profile": 
-          {
+        "properties": {
+          "profile": {
             "type": "string",
             "description": "The ingest profile to use - we recommend that you do **not** include this field and use the account default profile instead"
           },
-          "capture-images": 
-          {
+          "capture-images": {
             "type": "boolean",
             "description": "Whether Video Cloud should capture poster and thumbnail images at the midpoint of the clip",
             "example": true
           },
-          "callbacks": 
-          {
+          "callbacks": {
             "type": "array",
             "description": "An array of URLs that nofications for the ingest job should be sent to",
-            "items": 
-            {
+            "items": {
               "type": "string"
             }
           }
         }
       },
-      "VodJobs": 
-      {
+      "VodJobs": {
         "title": "vod_jobs",
-        "required": 
-        [
+        "required": [
           "jvod_id",
           "label"
         ],
         "type": "object",
-        "properties": 
-        {
-          "jvod_id": 
-          {
+        "properties": {
+          "jvod_id": {
             "type": "string",
             "description": "The clip job id"
           },
-          "label": 
-          {
+          "label": {
             "type": "string",
             "description": "The clip label (from the input)"
           }
         }
       },
-      "CreateVodClip200": 
-      {
+      "CreateVodClip200": {
         "title": "Create_VOD_Clip200",
-        "required": 
-        [
+        "required": [
           "live_job_id"
         ],
         "type": "object",
-        "properties": 
-        {
-          "live_job_id": 
-          {
+        "properties": {
+          "live_job_id": {
             "type": "string",
             "description": "The clip label (from the input)"
           }
         },
-        "example": 
-        {
-          "vod_jobs": 
-          [
-            {
-              "jvod_id": "9582606c50d84be5ad4bc104f2aa3360",
-              "label": "last 60 secs of live job"
-            }
-          ],
+        "example": {
+          "vod_jobs": [{
+            "jvod_id": "9582606c50d84be5ad4bc104f2aa3360",
+            "label": "last 60 secs of live job"
+          }],
           "live_job_id": "88ba5d87b61a4ef3a6dddabd0c38d319"
         }
       },
-      "CreateCredentialbody": 
-      {
+      "CreateCredentialbody": {
         "title": "Create_CredentialBody",
-        "required": 
-        [
+        "required": [
           "user_id",
           "credential_default_for_type",
           "credential_label",
@@ -2589,29 +2075,23 @@
           "credential_public"
         ],
         "type": "object",
-        "properties": 
-        {
-          "user_id": 
-          {
+        "properties": {
+          "user_id": {
             "type": "string",
             "description": "GUID for which the credentials are being created."
           },
-          "credential_default_for_type": 
-          {
+          "credential_default_for_type": {
             "type": "boolean",
             "description": "Whether these are the default credentials for the request type"
           },
-          "credential_label": 
-          {
+          "credential_label": {
             "type": "string",
             "description": "Label for the credential"
           },
-          "credential_type": 
-          {
+          "credential_type": {
             "type": "string",
             "description": "The credential type",
-            "enum": 
-            [
+            "enum": [
               "ftp",
               "oauth",
               "s3",
@@ -2619,89 +2099,70 @@
               "zencoder"
             ]
           },
-          "credential_private": 
-          {
+          "credential_private": {
             "type": "string",
             "description": "Private key or password depending on the type"
           },
-          "credential_public": 
-          {
+          "credential_public": {
             "type": "string",
             "description": "Public key or password depending on the type"
           },
-          "oauth_settings": 
-          {
+          "oauth_settings": {
             "description": "OAuth settings for OAuth credentials needed to send notifications to a notification URL Required for oauth type credentials",
             "$ref": "#/components/schemas/CreateCredentialbody.oauthSettings"
           }
         }
       },
-      "CreateCredentialbody.oauthSettings": 
-      {
+      "CreateCredentialbody.oauthSettings": {
         "title": "Create_CredentialBody.oauth_settings",
-        "required": 
-        [
+        "required": [
           "url"
         ],
         "type": "object",
-        "properties": 
-        {
-          "url": 
-          {
+        "properties": {
+          "url": {
             "type": "string",
             "description": "OAuth access token URL for OAuth credentials needed to send notifications to a notification URL"
           }
         }
       },
-      "CreateCredential200": 
-      {
+      "CreateCredential200": {
         "title": "Create_Credential200",
-        "required": 
-        [
+        "required": [
           "credential_id",
           "user_id"
         ],
         "type": "object",
-        "properties": 
-        {
-          "credential_id": 
-          {
+        "properties": {
+          "credential_id": {
             "type": "string",
             "description": "The credential id"
           },
-          "user_id": 
-          {
+          "user_id": {
             "type": "string",
             "description": "The user id"
           }
         }
       },
-      "ListCredentials200": 
-      {
+      "ListCredentials200": {
         "title": "List_Credentials200",
-        "required": 
-        [
+        "required": [
           "Array"
         ],
         "type": "object",
-        "properties": 
-        {
-          "Array": 
-          {
+        "properties": {
+          "Array": {
             "type": "array",
-            "items": 
-            {
+            "items": {
               "$ref": "#/components/schemas/Credentials"
             },
             "description": "of credentials objects"
           }
         }
       },
-      "Credentials": 
-      {
+      "Credentials": {
         "title": "credentials",
-        "required": 
-        [
+        "required": [
           "credential_default_for_type",
           "user_id",
           "credential_private",
@@ -2711,29 +2172,23 @@
           "credential_public"
         ],
         "type": "object",
-        "properties": 
-        {
-          "credential_default_for_type": 
-          {
+        "properties": {
+          "credential_default_for_type": {
             "type": "boolean",
             "description": "The clip label (from the input)"
           },
-          "user_id": 
-          {
+          "user_id": {
             "type": "string",
             "description": "The user id"
           },
-          "credential_private": 
-          {
+          "credential_private": {
             "type": "string",
             "description": "The private key for the credential (not shown; represented by asterisks)"
           },
-          "type": 
-          {
+          "type": {
             "type": "string",
             "description": "The credential type",
-            "enum": 
-            [
+            "enum": [
               "ftp",
               "oauth",
               "s3",
@@ -2741,28 +2196,23 @@
               "zencoder"
             ]
           },
-          "label": 
-          {
+          "label": {
             "type": "string",
             "description": "The label used to reference the credential in requests"
           },
-          "credential_id": 
-          {
+          "credential_id": {
             "type": "string",
             "description": "The credential id"
           },
-          "credential_public": 
-          {
+          "credential_public": {
             "type": "string",
             "description": "The public key for the credential"
           }
         }
       },
-      "UpdateCredentialbody": 
-      {
+      "UpdateCredentialbody": {
         "title": "Update_CredentialBody",
-        "required": 
-        [
+        "required": [
           "user_id",
           "credential_default_for_type",
           "credential_label",
@@ -2771,29 +2221,23 @@
           "credential_public"
         ],
         "type": "object",
-        "properties": 
-        {
-          "user_id": 
-          {
+        "properties": {
+          "user_id": {
             "type": "string",
             "description": "GUID for which the credentials are being created."
           },
-          "credential_default_for_type": 
-          {
+          "credential_default_for_type": {
             "type": "boolean",
             "description": "Whether these are the default credentials for the request type"
           },
-          "credential_label": 
-          {
+          "credential_label": {
             "type": "string",
             "description": "Label for the credential"
           },
-          "credential_type": 
-          {
+          "credential_type": {
             "type": "string",
             "description": "The credential type",
-            "enum": 
-            [
+            "enum": [
               "ftp",
               "oauth",
               "s3",
@@ -2801,116 +2245,91 @@
               "zencoder"
             ]
           },
-          "credential_private": 
-          {
+          "credential_private": {
             "type": "string",
             "description": "Private key or password depending on the type"
           },
-          "credential_public": 
-          {
+          "credential_public": {
             "type": "string",
             "description": "Public key or password depending on the type"
           },
-          "oauth_settings": 
-          {
+          "oauth_settings": {
             "description": "OAuth settings for OAuth credentials needed to send notifications to a notification URL Required for oauth type credentials",
             "$ref": "#/components/schemas/UpdateCredentialbody.oauthSettings"
           }
         }
       },
-      "UpdateCredentialbody.oauthSettings": 
-      {
+      "UpdateCredentialbody.oauthSettings": {
         "title": "Update_CredentialBody.oauth_settings",
-        "required": 
-        [
+        "required": [
           "url"
         ],
         "type": "object",
-        "properties": 
-        {
-          "url": 
-          {
+        "properties": {
+          "url": {
             "type": "string",
             "description": "OAuth access token URL for OAuth credentials needed to send notifications to a notification URL"
           }
         }
       },
-      "UpdateCredential200": 
-      {
+      "UpdateCredential200": {
         "title": "Update_Credential200",
-        "required": 
-        [
+        "required": [
           "credential_id",
           "user_id"
         ],
         "type": "object",
-        "properties": 
-        {
-          "credential_id": 
-          {
+        "properties": {
+          "credential_id": {
             "type": "string",
             "description": "The credential id"
           },
-          "user_id": 
-          {
+          "user_id": {
             "type": "string",
             "description": "The user id"
           }
         }
       },
-      "ActivateSepStream200": 
-      {
+      "ActivateSepStream200": {
         "title": "Activate_SEP_Stream200",
-        "required": 
-        [
+        "required": [
           "id"
         ],
         "type": "object",
-        "properties": 
-        {
-          "id": 
-          {
+        "properties": {
+          "id": {
             "type": "string",
             "description": "The job id for the stream that was activated"
           }
         }
       },
-      "CancelLiveJob200": 
-      {
+      "CancelLiveJob200": {
         "title": "Cancel_Live_Job200",
         "type": "object",
-        "properties": 
-        {
-          "id": 
-          {
+        "properties": {
+          "id": {
             "type": "string",
             "description": "The job id for the stream that was stopped"
           }
         }
       },
-      "CreateALiveJobbody": 
-      {
+      "CreateALiveJobbody": {
         "title": "Create_a_Live_JobBody",
-        "required": 
-        [
+        "required": [
           "live_stream",
           "region",
           "outputs"
         ],
         "type": "object",
-        "properties": 
-        {
-          "live_stream": 
-          {
+        "properties": {
+          "live_stream": {
             "type": "boolean",
             "description": "Indicates that the job is a live streaming job."
           },
-          "region": 
-          {
+          "region": {
             "type": "string",
             "description": "AWS region - you can also specify region as the alias for a list set up for the account by Brightcove Support. See [Supported AWS Regions] (https://support.brightcove.com/overview-brightcove-live-api#Support_aws_regions) for more details on the support in each region.",
-            "enum": 
-            [
+            "enum": [
               "us-west-2",
               "us-east-1",
               "ap-southeast-2",
@@ -2921,132 +2340,107 @@
               "sa-east-1"
             ]
           },
-          "rtmp_ip_whitelist": 
-          {
+          "rtmp_ip_whitelist": {
             "type": "array",
             "description": "Array of IP addresses white-listed for RTMP delivery",
-            "items": 
-            {
+            "items": {
               "type": "string"
             }
           },
-          "channel_type": 
-          {
+          "channel_type": {
             "type": "string",
             "description": "Indicates whether the job should be billed as `event` hours or a channel (`24x7`) - see [Channels and Event Hours](https://support.brightcove.com/overview-brightcove-live-api#Channels_and_hours).",
             "default": "event",
-            "enum": 
-            [
+            "enum": [
               "24x7",
               "event"
             ]
           },
-          "hls_endlist": 
-          {
+          "hls_endlist": {
             "type": "boolean",
             "description": "Whether an `EXT-X-ENDLIST` tag should be added to the stream playlist when you stop the stream or the `reconnect_time` window has been reached. The `EXT-X-ENDLIST` tag indicates that no more Media Segments will be added to the Media Playlist file and helps prevent the player from displaying error messages when the stream stops.",
             "default": true
           },
-          "outputs": 
-          {
+          "outputs": {
             "type": "array",
-            "items": 
-            {
+            "items": {
               "$ref": "#/components/schemas/CreateALiveJobbody.outputs"
             },
             "description": "Array of output specifications for live and VOD assets to be created from the live stream."
           },
-          "ad_insertion": 
-          {
+          "ad_insertion": {
             "type": "boolean",
             "description": "Setting this parameter to true will enable server side ad insertion (SSAI) on the job. Current support includes, DFP, Freewheel, or any VAST 2.0/3.0 ad tags.",
             "default": false
           },
-          "ad_audio_loudness_level": 
-          {
+          "ad_audio_loudness_level": {
             "type": "number",
             "description": "Adjust the loudness level of the audio. This is measured in LUFS and specified in dB. This is useful to set the output loudness level to conform to a standard (-23dB for EBU R.128) The recommended setting is -23.",
             "minimum": -60,
             "maximum": 60
           },
-          "beacon_set": 
-          {
+          "beacon_set": {
             "type": "string",
             "description": "ID for a beacon set (for SSAI only)."
           },
-          "reconnect_time": 
-          {
+          "reconnect_time": {
             "type": "integer",
             "description": "The time, in seconds, to wait for a stream to reconnect to the encoder. If the reconnect time passes without the stream reconnecting, the job will automatically finish.",
             "minimum": 1,
             "maximum": 7200,
             "default": 30
           },
-          "slate": 
-          {
+          "slate": {
             "type": "string",
             "description": "Id for a set of slate assets"
           },
-          "static": 
-          {
+          "static": {
             "type": "boolean",
             "description": "Whether this is a static entry point (SEP) job",
             "default": false
           },
-          "encryption": 
-          {
+          "encryption": {
             "description": "Encryption to apply to the stream.",
             "$ref": "#/components/schemas/CreateALiveJobbody.encryption"
           },
-          "event_length": 
-          {
+          "event_length": {
             "type": "integer",
             "description": "Used to preset and define an end time for the live event. At any point within the specified `event_length` you may reconnect to your stream. The `event_length` setting goes into effect as soon as streaming begins.",
             "default": 0,
             "minimum": 0,
             "maximum": 93600
           },
-          "live_dvr_sliding_window_duration": 
-          {
+          "live_dvr_sliding_window_duration": {
             "type": "integer",
             "description": "The time, in seconds, to keep in the live DVR manifest. If the stream duration is longer than the window duration, segment references will be removed first in first out. Default is 100 seconds. **Note: for SSAI jobs, the limit is `7200`.",
             "default": 100,
             "minimum": 0,
             "maximum": 86400
           },
-          "live_dvr_ads_window_duration": 
-          {
+          "live_dvr_ads_window_duration": {
             "type": "integer",
             "description": "The time, in seconds, to keep in the live DVR manifest. If the stream duration is longer than the window duration, segment references will be removed first in first out. Default is `100` seconds.",
             "default": 100,
             "minimum": 0,
             "maximum": 600
           },
-          "max_hls_protocol_version": 
-          {
+          "max_hls_protocol_version": {
             "type": "integer",
             "description": "Sets the maximum HLS protocol version to use. Special features will be used as available. Default is `3`.",
             "default": 3,
             "minimum": 1,
             "maximum": 5
           },
-          "notifications": 
-          {
+          "notifications": {
             "type": "array",
-            "items": 
-            {
-              "oneOf": 
-              [
-                {
+            "items": {
+              "oneOf": [{
                   "type": "object",
-                  "properties": 
-                  {
-                    "event": 
-                    {
+                  "properties": {
+                    "event": {
                       "type": "string",
                       "description": "The type of event to send notifications for",
-                      "enum": 
-                      [
+                      "enum": [
                         "state_changed",
                         "first_segment_uploaded",
                         "output_finished"
@@ -3061,172 +2455,136 @@
             },
             "description": "Array of notification destination objects or strings - notifications defined here are for job-level events.  A notification will be sent to the destination when selected event occurs. You can use a simple string with a url: &quot;http://log:pass@httpbin.org/post&quot;, or you can use an object. See [Events](https://support.brightcove.com/live-api-notifications#Events) for an explanation of the events reported in `state_changed` notifications."
           },
-          "add_cdns": 
-          {
+          "add_cdns": {
             "type": "array",
-            "items": 
-            {
+            "items": {
               "$ref": "#/components/schemas/CreateALiveJobbody.addCdns"
             },
             "description": "Array of additional CDN providers to be used for manifest generation. For each CDN provided, the manifest will be prepended accordingly"
           }
         }
       },
-      "CreateALiveJobbody.encryption": 
-      {
+      "CreateALiveJobbody.encryption": {
         "title": "Create_a_Live_JobBody.encryption",
-        "required": 
-        [
+        "required": [
           "method",
           "type"
         ],
         "type": "object",
-        "properties": 
-        {
-          "method": 
-          {
+        "properties": {
+          "method": {
             "type": "string",
             "description": "The encryption method to use.",
-            "enum": 
-            [
+            "enum": [
               "aes-128"
             ]
           },
-          "type": 
-          {
+          "type": {
             "type": "string",
             "description": "The encryption type, depending on whether an internal or external key server will be used.",
-            "enum": 
-            [
+            "enum": [
               "internal",
               "external"
             ]
           },
-          "key": 
-          {
+          "key": {
             "type": "string",
             "description": "The encryption key - either a `key`, `passphrase`, or `key_rotation` is required; if the type is `external`, `key` is required"
           },
-          "passphrase": 
-          {
+          "passphrase": {
             "type": "string",
             "description": "The encryption key - either a `key`, `passphrase`, or `key_rotation` is required"
           },
-          "key_rotation": 
-          {
+          "key_rotation": {
             "type": "boolean",
             "description": "Whether to use key rotation - either a `key`, `passphrase`, or `key_rotation` is required",
             "default": false
           },
-          "rotate_every": 
-          {
+          "rotate_every": {
             "type": "integer",
             "description": "Interval for key rotation in video segments",
             "default": 10
           },
-          "external_url": 
-          {
+          "external_url": {
             "type": "string",
             "description": "The URL for the external encryption key - this field is required if you specify type as external, and the external key must match the `key` value"
           }
         }
       },
-      "CreateALiveJobbody.addCdns": 
-      {
+      "CreateALiveJobbody.addCdns": {
         "title": "Create_a_Live_JobBody.add_cdns",
-        "required": 
-        [
+        "required": [
           "label",
           "prepend",
           "protocol",
           "vendor"
         ],
         "type": "object",
-        "properties": 
-        {
-          "label": 
-          {
+        "properties": {
+          "label": {
             "type": "string",
             "description": "A label to identify the CDN."
           },
-          "prepend": 
-          {
+          "prepend": {
             "type": "string",
             "description": "CDN hostname to be prepended to addresses"
           },
-          "protocol": 
-          {
+          "protocol": {
             "type": "string",
             "description": "Protocol to use for the stream delivery",
-            "enum": 
-            [
+            "enum": [
               "http",
               "https"
             ]
           },
-          "vendor": 
-          {
+          "vendor": {
             "type": "string",
             "description": "CDN vendor such as akamai"
           },
-          "token_auth": 
-          {
+          "token_auth": {
             "$ref": "#/components/schemas/CreateALiveJobbody.addCdns.tokenAuth"
           }
         }
       },
-      "CreateALiveJobbody.addCdns.tokenAuth": 
-      {
+      "CreateALiveJobbody.addCdns.tokenAuth": {
         "title": "Create_a_Live_JobBody.add_cdns.token_auth",
-        "required": 
-        [
+        "required": [
           "auth_type",
           "key",
           "token_name"
         ],
         "type": "object",
         "description": "Token authentication details",
-        "properties": 
-        {
-          "auth_type": 
-          {
+        "properties": {
+          "auth_type": {
             "type": "string",
             "description": "Token authentication type - currently, the only supported value is `Akamai2.0`"
           },
-          "key": 
-          {
+          "key": {
             "type": "string",
             "description": "Your Akamai token auth password"
           },
-          "token_name": 
-          {
+          "token_name": {
             "type": "string",
             "description": "Your Akamai token token name"
           },
-          "media": 
-          {
+          "media": {
             "$ref": "#/components/schemas/CreateALiveJobbody.addCdns.tokenAuth.media"
           }
         }
       },
-      "CreateALiveJobbody.addCdns.tokenAuth.media": 
-      {
+      "CreateALiveJobbody.addCdns.tokenAuth.media": {
         "title": "Create_a_Live_JobBody.add_cdns.token_auth.media",
         "type": "object",
         "description": "Object containing tokenization properites",
-        "properties": 
-        {
-          "start_time": 
-          {
-            "oneOf": 
-            [
-              {
+        "properties": {
+          "start_time": {
+            "oneOf": [{
                 "type": "integer"
               },
               {
                 "type": "string",
-                "enum": 
-                [
+                "enum": [
                   "now"
                 ]
               }
@@ -3235,25 +2593,21 @@
             "format": "int32",
             "default": "now"
           },
-          "end_time": 
-          {
+          "end_time": {
             "type": "integer",
             "description": "The time to end token auth, epoch time in seconds",
             "format": "int32"
           },
-          "ttl": 
-          {
+          "ttl": {
             "type": "integer",
             "description": "The time to live in seconds - either `end_time` or `ttl` is required",
             "format": "int32"
           }
         }
       },
-      "CreateALiveJobbody.outputs": 
-      {
+      "CreateALiveJobbody.outputs": {
         "title": "Create_a_Live_JobBody.outputs",
-        "required": 
-        [
+        "required": [
           "label",
           "live_stream",
           "keyframe_interval",
@@ -3262,160 +2616,128 @@
           "segment_seconds"
         ],
         "type": "object",
-        "properties": 
-        {
-          "label": 
-          {
+        "properties": {
+          "label": {
             "type": "string",
             "description": "Label for the live or VOD asset."
           },
-          "live_stream": 
-          {
+          "live_stream": {
             "type": "boolean",
             "description": "For jobs, setting live_stream to true indicates the output is a live rendition. If live_stream is false, or is not set, the output will be treated as a VOD output."
           },
-          "keyframe_interval": 
-          {
+          "keyframe_interval": {
             "type": "integer",
             "description": "The maximum number of frames between each keyframe. If you set a low keyframe_interval it will increase the size / decrease the quality of your output file, but it will allow more precise scrubbing in most players. It’s recommended to have at least one keyframe per segment. If keyframe_interval is not provided, keyframes will follow the input GOP structure.",
             "minimum": 1,
             "maximum": 6000
           },
-          "video_bitrate": 
-          {
+          "video_bitrate": {
             "type": "integer",
             "description": "target video bitrate in kbps",
             "minimum": 64,
             "maximum": 10000
           },
-          "audio_bitrate": 
-          {
+          "audio_bitrate": {
             "type": "number",
             "description": "An output bitrate setting for the audio track, in Kbps",
             "minimum": 16,
             "maximum": 1024
           },
-          "segment_seconds": 
-          {
+          "segment_seconds": {
             "type": "number",
             "description": "Sets the maximum duration of each segment in a segmented output.",
             "minimum": 2,
             "maximum": 20
           },
-          "duration": 
-          {
+          "duration": {
             "type": "integer",
             "description": "Clipping API option 1. Duration (in seconds) to clip back from Live. Note: Clipping API only requires one of the three options for specifying duration or time.",
             "minimum": 0,
             "maximum": 172800
           },
-          "ad_audio_loudness_level": 
-          {
+          "ad_audio_loudness_level": {
             "type": "number",
             "description": "Adjust the loudness level of the audio. This is measured in LUFS and specified in dB. This is useful to set the output loudness level to conform to a standard (-23dB for EBU R.128) The recommended setting is -23.",
             "minimum": -60,
             "maximum": 60
           },
-          "stream_start_time": 
-          {
+          "stream_start_time": {
             "type": "integer",
             "description": "Clipping API option 2. An offset, in seconds, from the start of the live stream to mark the beginning of the clip. Note: Clipping API only requires one of the three options for specifying duration or time.",
             "minimum": 0,
             "maximum": 2147483647
           },
-          "stream_end_time": 
-          {
+          "stream_end_time": {
             "type": "integer",
             "description": "Clipping API option 2. An offset, in seconds, from the start of the live stream to mark the end of the clip. Note: Clipping API only requires one of the three options for specifying duration or time."
           },
-          "start_time": 
-          {
+          "start_time": {
             "type": "integer",
             "description": "Clipping API option 3. Universal epoch time, in seconds, to mark the beginning of the clip. Note: Clipping API only requires one of the three options for specifying duration or time."
           },
-          "end_time": 
-          {
+          "end_time": {
             "type": "integer",
             "description": "Clipping API option 3. Universal epoch time, in seconds, to mark the end of the clip. Note: Clipping API only requires one of the three options for specifying duration or time."
           },
-          "copy_video": 
-          {
+          "copy_video": {
             "type": "boolean",
             "description": "Specifying copy_video will take the video track from the input video file and transmux it into the resulting output file."
           },
-          "copy_audio": 
-          {
+          "copy_audio": {
             "type": "boolean",
             "description": "Specifying copy_audio will take the audio track from the input video file and transmux it into the resulting output file."
           },
-          "skip_video": 
-          {
+          "skip_video": {
             "type": "boolean",
             "description": "Specifying skip_video removes the video track."
           },
-          "skip_audio": 
-          {
+          "skip_audio": {
             "type": "boolean",
             "description": "Specifying skip_audio removes the audio track."
           },
-          "width": 
-          {
+          "width": {
             "type": "integer",
             "description": "Video frame width. If no width is supplied, we will use 640 pixels.",
             "default": 640
           },
-          "height": 
-          {
+          "height": {
             "type": "integer",
             "description": "Video frame height. If no height is supplied, we will use 480 pixels.",
             "default": 480
           },
-          "video_codec": 
-          {
+          "video_codec": {
             "type": "string",
             "description": "The output video codec. Note: Only `h264` is supported.",
-            "enum": 
-            [
+            "enum": [
               "h264"
             ]
           },
-          "h264_profile": 
-          {
+          "h264_profile": {
             "type": "string",
             "description": "H.264 has three commonly-used profiles: Baseline (lowest), Main, and High. Lower levels are easier to decode, but higher levels offer better compression. For the best compression quality, choose High. For playback on low-CPU machines or many mobile devices, choose `baseline`.",
-            "enum": 
-            [
+            "enum": [
               "baseline",
               "main",
               "high"
             ]
           },
-          "audio_codec": 
-          {
+          "audio_codec": {
             "type": "string",
             "description": "The output audio codec to use. Note: Only `aac` is supported.",
-            "enum": 
-            [
+            "enum": [
               "aac"
             ]
           },
-          "notifications": 
-          {
+          "notifications": {
             "type": "array",
-            "items": 
-            {
-              "oneOf": 
-              [
-                {
+            "items": {
+              "oneOf": [{
                   "type": "object",
-                  "properties": 
-                  {
-                    "event": 
-                    {
+                  "properties": {
+                    "event": {
                       "type": "string",
                       "description": "The type of event to send notifications for",
-                      "enum": 
-                      [
+                      "enum": [
                         "state_changed",
                         "first_segment_uploaded",
                         "output_finished"
@@ -3430,101 +2752,80 @@
             },
             "description": "Array of notification destination objects or strings - notifications defined here are for job-level events.  A notification will be sent to the destination when selected event occurs. You can use a simple string with a url: &quot;http://log:pass@httpbin.org/post&quot;, or you can use an object. See [Events](https://support.brightcove.com/live-api-notifications#Events) for an explanation of the events reported in `state_changed` notifications."
           },
-          "rendition_label": 
-          {
+          "rendition_label": {
             "type": "string",
             "description": "Indicates what rendition to use to create a VOD output (from the live job) or which renditions to use. By default, the system uses any transmuxed rendition or the highest resolution output if there is no transmuxed output."
           },
-          "type": 
-          {
+          "type": {
             "type": "string",
             "description": "The only type supported is a playlist. This is used for generating multiple master playlists with different renditions in the HLS manifest with the defined stream labels.",
-            "enum": 
-            [
+            "enum": [
               "playlist"
             ]
           },
-          "streams": 
-          {
+          "streams": {
             "type": "object",
             "description": "When creating a playlist, the streams field is used to define which output renditions (by label) should be included in the manifest. Example format [{&quot;source&quot;: &quot;1080p&quot;}, {&quot;source&quot;: &quot;720p&quot;}]."
           },
-          "url": 
-          {
+          "url": {
             "type": "string",
             "description": "For VOD, URL is mandatory and sets the destination of the final asset destination. For access restricted origins, the credentials a can be passed along with the URL or stored within the Brightcove system. For Live, this is reserved for future use."
           },
-          "credentials": 
-          {
+          "credentials": {
             "type": "string",
             "description": "The name for credentials with private and public keys can be stored with Brightcove to avoid passing plain text on API requests. This is required if the S3 or FTP origins are restricted. If credentials are not provided, it will be assumed that the origin restrictions are set to public or credentials are passed along with the URL."
           },
-          "videocloud": 
-          {
+          "videocloud": {
             "description": "Video Cloud customer have the option to push their clips directly through Dynamic Ingest. Options &quot;{&quot;video&quot;: {&quot;name&quot;}, &quot;ingest&quot;: { }&quot;. The video object will be sent to the CMS API and can include (description, tags, etc.). Note: the account_id and reference_id will be added automatically. If overriding the reference_id, ensure that the id does not already exist or the job will fail. For more information see: CMS-API-CreateVideo. The ingest object will be sent to the Dynamic Ingest API and can include (master, profile, poster, callbacks, etc). Note: the account_id and video_id are added automatically. For more information see: DI-API-IngestVideo.",
             "$ref": "#/components/schemas/CreateVodClipbody.outputs.videocloud"
           }
         }
       },
-      "CreateALiveJobbody.notifications": 
-      {
+      "CreateALiveJobbody.notifications": {
         "title": "Create_a_Live_JobBody.notifications",
-        "required": 
-        [
+        "required": [
           "url"
         ],
         "type": "object",
-        "properties": 
-        {
-          "url": 
-          {
+        "properties": {
+          "url": {
             "type": "string",
             "description": "Destination for the notification."
           },
-          "event": 
-          {
+          "event": {
             "type": "string",
             "description": "Event to send the notification for."
           },
-          "credentials": 
-          {
+          "credentials": {
             "type": "string",
             "description": "Credentials The name of the credentials configured in your account for this address"
           }
         }
       },
-      "CreateALiveJobbody.outputs.notifications": 
-      {
+      "CreateALiveJobbody.outputs.notifications": {
         "title": "Create_a_Live_JobBody.outputs.notifications",
-        "required": 
-        [
+        "required": [
           "url"
         ],
         "type": "object",
-        "properties": 
-        {
-          "url": 
-          {
+        "properties": {
+          "url": {
             "type": "string",
             "description": "Destination for the notification."
           },
-          "event": 
-          {
+          "event": {
             "type": "string",
             "description": "Event to send the notification for."
           },
-          "credentials": 
-          {
+          "credentials": {
             "type": "string",
             "description": "Credentials The name of the credentials configured in your account for this address"
           }
         }
       },
-      "CreateALiveJob200": 
-      {
+      "CreateALiveJob200": {
         "title": "Create_a_Live_Job200",
-        "required": 
-        [
+        "required": [
           "id",
           "stream_url",
           "stream_name",
@@ -3541,207 +2842,164 @@
           "add_cdns"
         ],
         "type": "object",
-        "properties": 
-        {
-          "id": 
-          {
+        "properties": {
+          "id": {
             "type": "string",
             "description": "Id for the stream."
           },
-          "stream_url": 
-          {
+          "stream_url": {
             "type": "string",
             "description": "The stream URL to add to your encoder configuration."
           },
-          "stream_name": 
-          {
+          "stream_name": {
             "type": "string",
             "description": "The stream name to add to your encoder configuration."
           },
-          "outputs": 
-          {
+          "outputs": {
             "type": "array",
-            "items": 
-            {
+            "items": {
               "$ref": "#/components/schemas/Outputs"
             },
             "description": "Details on each output rendition of the Live job."
           },
-          "live_stream": 
-          {
+          "live_stream": {
             "type": "boolean",
             "description": "Indicates that the job is a live streaming job."
           },
-          "ad_insertion": 
-          {
+          "ad_insertion": {
             "type": "boolean",
             "description": "Setting this parameter to true will enable server side ad insertion (SSAI) on the job. Current support includes, DFP, Freewheel, or any VAST 2.0/3.0 ad tags."
           },
-          "region": 
-          {
+          "region": {
             "type": "string",
             "description": "You can specify an Amazon AWS region to use for encoding a job and we will process the job on servers in the region specified. It’s recommended to use the region closest to your encoder."
           },
-          "reconnect_time": 
-          {
+          "reconnect_time": {
             "type": "number",
             "description": "The time, in seconds, to wait for a stream to reconnect to the encoder. Default is set to 30 seconds."
           },
-          "event_length": 
-          {
+          "event_length": {
             "type": "number",
             "description": "Used to preset and define an end time for the live event. At any point within the specified event_length you may reconnect to your stream. The event_length setting goes into effect as soon as streaming begins."
           },
-          "max_hls_protocol_version": 
-          {
+          "max_hls_protocol_version": {
             "type": "number",
             "description": "Sets the maximum HLS protocol version to use. Special features will be used as available. Default is 3."
           },
-          "slate": 
-          {
+          "slate": {
             "type": "string",
             "description": "id for slate of assets to be included"
           },
-          "sep_state": 
-          {
+          "sep_state": {
             "type": "string",
             "description": "The current state of the job&#39;s SEP (static entry point) - possible values: &#39;waiting&#39; &#39;pending_activation&#39;, &#39;activation_in_progress&#39;, &#39;ready&#39;, &#39;pending_deactivation&#39;, &#39;deactivation_in_progress&#39;, &#39;cancelled&#39;, &#39;finished&#39;"
           },
-          "notifications": 
-          {
+          "notifications": {
             "type": "array",
-            "items": 
-            {
+            "items": {
               "type": "string"
             },
             "description": "Array of notification destination objects or strings.  A notification will be sent to the destination when selected event occurs. You can use a simple string with a url: &quot;http://log:pass@httpbin.org/post&quot;, or you can use an object."
           },
-          "add_cdns": 
-          {
+          "add_cdns": {
             "type": "array",
-            "items": 
-            {
+            "items": {
               "$ref": "#/components/schemas/AddCdns"
             },
             "description": "Array of additional CDN providers to be used for manifest generation. For each CDN provided, the manifest will be prepended accordingly"
           }
         }
       },
-      "Outputs": 
-      {
+      "Outputs": {
         "title": "outputs",
-        "required": 
-        [
+        "required": [
           "id",
           "playback_url",
           "playback_url_dvr",
           "playback_url_vod"
         ],
         "type": "object",
-        "properties": 
-        {
-          "id": 
-          {
+        "properties": {
+          "id": {
             "type": "string",
             "description": "The unique id for the rendition."
           },
-          "playback_url": 
-          {
+          "playback_url": {
             "type": "string",
             "description": "Media HLS manifest for the specified rendition (non-SSAI)."
           },
-          "playback_url_dvr": 
-          {
+          "playback_url_dvr": {
             "type": "string",
             "description": "Media HLS manifest for the specified rendition (with DVR capability)."
           },
-          "playback_url_vod": 
-          {
+          "playback_url_vod": {
             "type": "string",
             "description": "Media HLS manifest for the VOD version of the stream if one was specified in the job settings - note that the VOD will not be available until the live event has finished and the creation of the VOD is complete."
           }
         }
       },
-      "AddCdns": 
-      {
+      "AddCdns": {
         "title": "add_cdns",
-        "required": 
-        [
+        "required": [
           "label",
           "prepend",
           "protocol"
         ],
         "type": "object",
-        "properties": 
-        {
-          "label": 
-          {
+        "properties": {
+          "label": {
             "type": "string",
             "description": "A label to identify the CDN."
           },
-          "prepend": 
-          {
+          "prepend": {
             "type": "string",
             "description": "Typically, a domain or path to prepend to addresses"
           },
-          "protocol": 
-          {
+          "protocol": {
             "type": "string",
             "description": "Protocol to use in sending the stream to the CDN."
           }
         }
       },
-      "Notifications": 
-      {
+      "Notifications": {
         "title": "notifications",
-        "required": 
-        [
+        "required": [
           "url",
           "credentials",
           "event"
         ],
         "type": "object",
-        "properties": 
-        {
-          "url": 
-          {
+        "properties": {
+          "url": {
             "type": "string",
             "description": "Destination for the notification."
           },
-          "credentials": 
-          {
+          "credentials": {
             "type": "string",
             "description": "Credentials for the destination, if required."
           },
-          "event": 
-          {
+          "event": {
             "type": "string",
             "description": "Event type to send notifications for.  It’s recommended to set events on the job and not individual rendition outputs since renditions will finish simultaneously."
           }
         }
       },
-      "DeactivateSepStream200": 
-      {
+      "DeactivateSepStream200": {
         "title": "Deactivate_SEP_Stream200",
-        "required": 
-        [
+        "required": [
           "id"
         ],
         "type": "object",
-        "properties": 
-        {
-          "id": 
-          {
+        "properties": {
+          "id": {
             "type": "string",
             "description": "The job id for the stream that was Deactivated"
           }
         }
       },
-      "Job": 
-      {
+      "Job": {
         "title": "job",
-        "required": 
-        [
+        "required": [
           "region",
           "reconnect_time",
           "event_length",
@@ -3753,363 +3011,289 @@
           "output_media_files"
         ],
         "type": "object",
-        "properties": 
-        {
-          "region": 
-          {
+        "properties": {
+          "region": {
             "type": "string",
             "description": "The Amazon AWS region to use for encoding the job",
             "example": "us-west-2"
           },
-          "reconnect_time": 
-          {
+          "reconnect_time": {
             "type": "number",
             "description": "The time, in seconds, that the system will wait for a stream to reconnect to the encoder",
             "example": 1800
           },
-          "event_length": 
-          {
+          "event_length": {
             "type": "number",
             "description": "Used to preset and define an end time for the live event. At any point within the specified event_length you may reconnect to your stream. The event_length setting goes into effect as soon as streaming begins."
           },
-          "live_stream": 
-          {
+          "live_stream": {
             "type": "boolean",
             "description": "Indicates whether this is a live stream or VOD"
           },
-          "ad_insertion": 
-          {
+          "ad_insertion": {
             "type": "boolean",
             "description": "Indicates whether SSAI is enabled"
           },
-          "input_media_file": 
-          {
+          "input_media_file": {
             "description": "Object containing properties for the input media file",
             "$ref": "#/components/schemas/Job.inputMediaFile"
           },
-          "slate": 
-          {
+          "slate": {
             "type": "string",
             "description": "id for a slate of assets included"
           },
-          "stream": 
-          {
+          "stream": {
             "description": "Object containing properties for the live stream",
             "$ref": "#/components/schemas/Job.stream"
           },
-          "output_media_files": 
-          {
+          "output_media_files": {
             "type": "array",
-            "items": 
-            {
+            "items": {
               "$ref": "#/components/schemas/Job.outputMediaFiles"
             },
             "description": "Array of objects containing properties for the output media files"
           },
-          "created_at": 
-          {
+          "created_at": {
             "type": "string",
             "description": "ISO 8601 date-time string representing when the job was created"
           },
-          "finished_at": 
-          {
+          "finished_at": {
             "type": "string",
             "description": "ISO 8601 date-time string representing when the live stream was stopped"
           },
-          "id": 
-          {
+          "id": {
             "type": "string",
             "description": "The live job id"
           },
-          "state": 
-          {
+          "state": {
             "type": "string",
             "description": "The current state of the job - possible values for Live jobs are standby, waiting, processing, disconnected. finishing, finished, cancelling, cancelled, failed; possible values for VOD jobs are waiting_finish_live, waiting, processing, creating_asset, cancelling, cancelled, finished, failed"
           },
-          "submitted_at": 
-          {
+          "submitted_at": {
             "type": "string",
             "description": "ISO 8601 date-time string representing when the job was submitted"
           },
-          "updated_at": 
-          {
+          "updated_at": {
             "type": "string",
             "description": "ISO 8601 date-time string representing when the job was last modified"
           },
-          "playback_url": 
-          {
+          "playback_url": {
             "type": "string",
             "description": "Playback URL for the live stream"
           },
-          "playback_url_dvr": 
-          {
+          "playback_url_dvr": {
             "type": "string",
             "description": "Playback URL for the live DVR"
           }
         }
       },
-      "Job.inputMediaFile": 
-      {
+      "Job.inputMediaFile": {
         "title": "job.input_media_file",
         "type": "object",
-        "properties": 
-        {
-          "audio_bitrate_in_kbps": 
-          {
+        "properties": {
+          "audio_bitrate_in_kbps": {
             "type": "number",
             "description": "Audio bitrate of the input media file"
           },
-          "audio_codec": 
-          {
+          "audio_codec": {
             "type": "string",
             "description": "Audio codec of the input media file"
           },
-          "audio_sample_rate": 
-          {
+          "audio_sample_rate": {
             "type": "number",
             "description": "Audio sample rate of the input media file"
           },
-          "audio_tracks": 
-          {
+          "audio_tracks": {
             "type": "number",
             "description": "The number of audio tracks"
           },
-          "channels": 
-          {
+          "channels": {
             "type": "number",
             "description": "The number of audio channels"
           },
-          "created_at": 
-          {
+          "created_at": {
             "type": "string",
             "description": "ISO 8601 date-time string representing when the input file was created"
           },
-          "duration_in_ms": 
-          {
+          "duration_in_ms": {
             "type": "number",
             "description": "duration_in_ms."
           },
-          "error_class": 
-          {
+          "error_class": {
             "type": "string",
             "description": "Type of error thrown"
           },
-          "error_message": 
-          {
+          "error_message": {
             "type": "string",
             "description": "Error message thrown"
           },
-          "file_size_bytes": 
-          {
+          "file_size_bytes": {
             "type": "number",
             "description": "File size"
           },
-          "finished_at": 
-          {
+          "finished_at": {
             "type": "string",
             "description": "ISO 8601 date-time string representing when the input file was finished"
           },
-          "format": 
-          {
+          "format": {
             "type": "string",
             "description": "Format of the input file"
           },
-          "frame_rate": 
-          {
+          "frame_rate": {
             "type": "number",
             "description": "Frame rate of the input file"
           },
-          "height": 
-          {
+          "height": {
             "type": "number",
             "description": "Frame height of the input file"
           },
-          "id": 
-          {
+          "id": {
             "type": "string",
             "description": "System id of the input file"
           },
-          "md5_checksum": 
-          {
+          "md5_checksum": {
             "type": "string",
             "description": "Checksum for the input file"
           },
-          "state": 
-          {
+          "state": {
             "type": "string",
             "description": "Current state of input file processing"
           },
-          "updated_at": 
-          {
+          "updated_at": {
             "type": "string",
             "description": "ISO 8601 date-time string representing when the input file was last modified"
           },
-          "video_bitrate_in_kbps": 
-          {
+          "video_bitrate_in_kbps": {
             "type": "number",
             "description": "Video bitrate of the input media file"
           },
-          "video_codec": 
-          {
+          "video_codec": {
             "type": "string",
             "description": "Video codec of the input media file"
           },
-          "width": 
-          {
+          "width": {
             "type": "number",
             "description": "Frame width of the input media file"
           },
-          "total_bitrate_in_kbps": 
-          {
+          "total_bitrate_in_kbps": {
             "type": "number",
             "description": "Total bitrate of the input media file"
           },
-          "url": 
-          {
+          "url": {
             "type": "string",
             "description": "URL for the input media file"
           }
         }
       },
-      "Job.stream": 
-      {
+      "Job.stream": {
         "title": "job.stream",
         "type": "object",
-        "properties": 
-        {
-          "created_at": 
-          {
+        "properties": {
+          "created_at": {
             "type": "string",
             "description": "ISO 8601 date-time string representing when the stream was created"
           },
-          "duration": 
-          {
+          "duration": {
             "type": "number",
             "description": "ISO Duration of the stream in seconds"
           },
-          "finished_at": 
-          {
+          "finished_at": {
             "type": "string",
             "description": "ISO 8601 date-time string representing when the stream was finished"
           },
-          "height": 
-          {
+          "height": {
             "type": "number",
             "description": "Frame height of the stream"
           },
-          "id": 
-          {
+          "id": {
             "type": "string",
             "description": "System id of the stream"
           },
-          "name": 
-          {
+          "name": {
             "type": "string",
             "description": "Name of the stream"
           },
-          "protocol": 
-          {
+          "protocol": {
             "type": "string",
             "description": "Protocol of the stream"
           },
-          "updated_at": 
-          {
+          "updated_at": {
             "type": "string",
             "description": "ISO 8601 date-time string representing when the stream was last modified"
           },
-          "video_bitrate_in_kbps": 
-          {
+          "video_bitrate_in_kbps": {
             "type": "number",
             "description": "Video bitrate of the input media file"
           },
-          "video_codec": 
-          {
+          "video_codec": {
             "type": "string",
             "description": "Video codec of the input media file"
           },
-          "width": 
-          {
+          "width": {
             "type": "number",
             "description": "Frame width of the stream"
           },
-          "total_bitrate_in_kbps": 
-          {
+          "total_bitrate_in_kbps": {
             "type": "number",
             "description": "Total bitrate of the stream"
           },
-          "region": 
-          {
+          "region": {
             "type": "string",
             "description": "AWS region list specified for the account"
           },
-          "url": 
-          {
+          "url": {
             "type": "string",
             "description": "URL for the stream"
           },
-          "location": 
-          {
+          "location": {
             "description": "Object representing the location of the stream",
             "$ref": "#/components/schemas/Job.stream.location"
           },
-          "destination": 
-          {
+          "destination": {
             "description": "Object representing the destination of the stream",
             "$ref": "#/components/schemas/Job.stream.destination"
           }
         }
       },
-      "Job.stream.location": 
-      {
+      "Job.stream.location": {
         "title": "job.stream.location",
         "type": "object",
-        "properties": 
-        {
-          "latitude": 
-          {
+        "properties": {
+          "latitude": {
             "type": "string",
             "description": "Latitude of the location source"
           },
-          "longitude": 
-          {
+          "longitude": {
             "type": "string",
             "description": "Longitude of the location source"
           },
-          "location": 
-          {
+          "location": {
             "type": "string",
             "description": "Longitude of the location source"
           }
         }
       },
-      "Job.stream.destination": 
-      {
+      "Job.stream.destination": {
         "title": "job.stream.destination",
         "type": "object",
-        "properties": 
-        {
-          "latitude": 
-          {
+        "properties": {
+          "latitude": {
             "type": "string",
             "description": "Latitude of the location source"
           },
-          "longitude": 
-          {
+          "longitude": {
             "type": "string",
             "description": "Longitude of the location source"
           },
-          "location": 
-          {
+          "location": {
             "type": "string",
             "description": "Longitude of the location source"
           }
         }
       },
-      "Job.outputMediaFiles": 
-      {
+      "Job.outputMediaFiles": {
         "title": "job.output_media_files",
-        "required": 
-        [
+        "required": [
           "audio_bitrate_in_kbps",
           "audio_codec",
           "audio_sample_rate",
@@ -4132,494 +3316,392 @@
           "dvr_filename"
         ],
         "type": "object",
-        "properties": 
-        {
-          "audio_bitrate_in_kbps": 
-          {
+        "properties": {
+          "audio_bitrate_in_kbps": {
             "type": "number",
             "description": "Audio bitrate of the output media file"
           },
-          "audio_codec": 
-          {
+          "audio_codec": {
             "type": "string",
             "description": "Audio codec of the output media file"
           },
-          "audio_sample_rate": 
-          {
+          "audio_sample_rate": {
             "type": "number",
             "description": "Audio sample rate of the output media file"
           },
-          "audio_tracks": 
-          {
+          "audio_tracks": {
             "type": "number",
             "description": "The number of audio tracks"
           },
-          "channels": 
-          {
+          "channels": {
             "type": "number",
             "description": "The number of audio channels"
           },
-          "duration_in_ms": 
-          {
+          "duration_in_ms": {
             "type": "number",
             "description": "ISO 8601 date-time string representing when the output file was created"
           },
-          "file_size_bytes": 
-          {
+          "file_size_bytes": {
             "type": "number",
             "description": "File size"
           },
-          "format": 
-          {
+          "format": {
             "type": "string",
             "description": "Format of the output file"
           },
-          "frame_rate": 
-          {
+          "frame_rate": {
             "type": "number",
             "description": "Frame rate of the output file"
           },
-          "height": 
-          {
+          "height": {
             "type": "number",
             "description": "Frame height of the output file"
           },
-          "video_bitrate_in_kbps": 
-          {
+          "video_bitrate_in_kbps": {
             "type": "number",
             "description": "Video bitrate of the output media file"
           },
-          "video_codec": 
-          {
+          "video_codec": {
             "type": "string",
             "description": "Video codec of the output media file"
           },
-          "width": 
-          {
+          "width": {
             "type": "number",
             "description": "Frame width of the output media file"
           },
-          "total_bitrate_in_kbps": 
-          {
+          "total_bitrate_in_kbps": {
             "type": "number",
             "description": "Total bitrate of the output media file"
           },
-          "keyframe_interval": 
-          {
+          "keyframe_interval": {
             "type": "integer",
             "description": "Keyframe interval for the output media file",
             "format": "int32"
           },
-          "keyframe_interval_follow_source": 
-          {
+          "keyframe_interval_follow_source": {
             "type": "boolean",
             "description": "Whether keyframe rate for the output matches the source"
           },
-          "live_stream": 
-          {
+          "live_stream": {
             "type": "boolean",
             "description": "Whether the output is a live stream"
           },
-          "type": 
-          {
+          "type": {
             "type": "string",
             "description": "Will be playlist for playlist output"
           },
-          "filename": 
-          {
+          "filename": {
             "type": "string",
             "description": "File name for the playlist manifest"
           },
-          "dvr_filename": 
-          {
+          "dvr_filename": {
             "type": "string",
             "description": "File name for the DVR playlist manifest"
           },
-          "created_at": 
-          {
+          "created_at": {
             "type": "string",
             "description": "ISO 8601 date-time string representing when the output file was created"
           },
-          "error_class": 
-          {
+          "error_class": {
             "type": "string",
             "description": "Type of error thrown"
           },
-          "error_message": 
-          {
+          "error_message": {
             "type": "string",
             "description": "Error message thrown"
           },
-          "finished_at": 
-          {
+          "finished_at": {
             "type": "string",
             "description": "ISO 8601 date-time string representing when the output file was finished"
           },
-          "id": 
-          {
+          "id": {
             "type": "string",
             "description": "System id of the output file"
           },
-          "md5_checksum": 
-          {
+          "md5_checksum": {
             "type": "string",
             "description": "Checksum for the output file"
           },
-          "state": 
-          {
+          "state": {
             "type": "string",
             "description": "Current state of output file processing"
           },
-          "updated_at": 
-          {
+          "updated_at": {
             "type": "string",
             "description": "ISO 8601 date-time string representing when the output file was last modified"
           },
-          "playback_url": 
-          {
+          "playback_url": {
             "type": "string",
             "description": "URL for the output file"
           },
-          "playback_url_dvr": 
-          {
+          "playback_url_dvr": {
             "type": "string",
             "description": "Live DVR url for live stream output"
           },
-          "playback_url_vod": 
-          {
+          "playback_url_vod": {
             "type": "string",
             "description": "URL for VOD output"
           },
-          "playlist_type": 
-          {
+          "playlist_type": {
             "type": "string",
             "description": "Playlist type for playlist output"
           }
         }
       },
-      "InsertId3TimedMetadatabody": 
-      {
+      "InsertId3TimedMetadatabody": {
         "title": "Insert_ID3_timed_metadataBody",
-        "required": 
-        [
+        "required": [
           "id3_tag"
         ],
         "type": "object",
-        "properties": 
-        {
-          "id3_tag": 
-          {
+        "properties": {
+          "id3_tag": {
             "description": "An object containing variables for the ID3 timed metadata",
             "$ref": "#/components/schemas/InsertId3TimedMetadatabody.id3Tag"
           }
         }
       },
-      "InsertId3TimedMetadatabody.id3Tag": 
-      {
+      "InsertId3TimedMetadatabody.id3Tag": {
         "title": "Insert_ID3_timed_metadataBody.id3_tag",
-        "required": 
-        [
+        "required": [
           "name",
           "value"
         ],
         "type": "object",
-        "properties": 
-        {
-          "name": 
-          {
+        "properties": {
+          "name": {
             "type": "string",
             "description": "A name for the tag"
           },
-          "value": 
-          {
+          "value": {
             "type": "string",
             "description": "A value for the tag (maximum string data size 256KB)"
           },
-          "timecode": 
-          {
+          "timecode": {
             "type": "string",
             "description": "Time to insert - by default, insertion is immediate - Note: 1) If you use the timecode property, the job only only stores the most recent request for insertion; 2) If you use the timecode property, the encoder must be sending SMPTE-formatted (HH:MM:SS:FF) timecode stored in the tc property via OnFI; 3) Software encoders such as Wirecast and OBS do not support the sending timecode via OnFI packets in the RTMP stream; 4) Elemental hardware encoders do support the sending timecode via OnFI packets in the RTMP stream"
           }
         }
       },
-      "InsertId3TimedMetadata200": 
-      {
+      "InsertId3TimedMetadata200": {
         "title": "Insert_ID3_timed_metadata200",
-        "required": 
-        [
+        "required": [
           "id",
           "id3_tag"
         ],
         "type": "object",
-        "properties": 
-        {
-          "id": 
-          {
+        "properties": {
+          "id": {
             "type": "string",
             "description": "The job id"
           },
-          "id3_tag": 
-          {
+          "id3_tag": {
             "description": "The ID3 tag details",
             "$ref": "#/components/schemas/Id3Tag"
           }
         }
       },
-      "Id3Tag": 
-      {
+      "Id3Tag": {
         "title": "id3_tag",
-        "required": 
-        [
+        "required": [
           "tag_name",
           "tag_value"
         ],
         "type": "object",
-        "properties": 
-        {
-          "tag_name": 
-          {
+        "properties": {
+          "tag_name": {
             "type": "string",
             "description": "The ID3 tag name"
           },
-          "tag_value": 
-          {
+          "tag_value": {
             "type": "string",
             "description": "The ID3 tag value"
           }
         }
       },
-      "ManualAdCuePointInsertionbody": 
-      {
+      "ManualAdCuePointInsertionbody": {
         "title": "Manual_Ad_Cue_Point_InsertionBody",
-        "required": 
-        [
+        "required": [
           "duration",
           "timecode"
         ],
         "type": "object",
-        "properties": 
-        {
-          "duration": 
-          {
+        "properties": {
+          "duration": {
             "type": "number",
             "description": "An integer value to indicate the length of the ad break in seconds"
           },
-          "timecode": 
-          {
+          "timecode": {
             "type": "string",
             "description": "When to insert the cuepoint in HH:MM:SS:FF from the stream start (FF = frames); if omitted, the cuepoint will be inserted immediately"
           },
-          "ad_server_data": 
-          {
+          "ad_server_data": {
             "type": "object",
             "description": "a set of any variables (key/value pairs) that should be passed to the adServer"
           }
         }
       },
-      "ManualAdCuePointInsertion200": 
-      {
+      "ManualAdCuePointInsertion200": {
         "title": "Manual_Ad_Cue_Point_Insertion200",
-        "required": 
-        [
+        "required": [
           "id",
           "cue_point"
         ],
         "type": "object",
-        "properties": 
-        {
-          "id": 
-          {
+        "properties": {
+          "id": {
             "type": "string",
             "description": "The id of the live stream job"
           },
-          "cue_point": 
-          {
+          "cue_point": {
             "description": "The cuepoint data",
             "$ref": "#/components/schemas/CuePoint"
           }
         }
       },
-      "CuePoint": 
-      {
+      "CuePoint": {
         "title": "cue_point",
-        "required": 
-        [
+        "required": [
           "id",
           "duration",
           "accuracy",
           "inserted_at"
         ],
         "type": "object",
-        "properties": 
-        {
-          "id": 
-          {
+        "properties": {
+          "id": {
             "type": "string",
             "description": "The cuepoint id"
           },
-          "duration": 
-          {
+          "duration": {
             "type": "number",
             "description": "The cuepoint duration in seconds"
           },
-          "accuracy": 
-          {
+          "accuracy": {
             "type": "string",
             "description": "The cuepoint insertion accuracy - may be segment or frame"
           },
-          "inserted_at": 
-          {
+          "inserted_at": {
             "type": "string",
             "description": "Time when the cue point was inserted in the stream"
           }
         }
       },
-      "CreateAdConfigurationbody": 
-      {
+      "CreateAdConfigurationbody": {
         "title": "Create_Ad_ConfigurationBody",
-        "required": 
-        [
+        "required": [
           "application_ad_configuration",
           "ad_configuration_url_format",
           "application_description"
         ],
         "type": "object",
-        "properties": 
-        {
-          "application_ad_configuration": 
-          {
+        "properties": {
+          "application_ad_configuration": {
             "description": "The ad configuration object",
             "$ref": "#/components/schemas/CreateAdConfigurationbody.applicationAdConfiguration"
           },
-          "ad_configuration_url_format": 
-          {
+          "ad_configuration_url_format": {
             "type": "string",
             "description": "Format for the ad tag - see SSAI Using the Brightcove Live API for the available ad configuration variables."
           },
-          "application_description": 
-          {
+          "application_description": {
             "type": "string",
             "description": "Human readable description of the ad application."
           },
-          "account_id": 
-          {
+          "account_id": {
             "type": "string",
             "description": "Your Live account id (if you leave this blank, the request will still work)"
           }
         }
       },
-      "CreateAdConfigurationbody.applicationAdConfiguration": 
-      {
+      "CreateAdConfigurationbody.applicationAdConfiguration": {
         "title": "Create_Ad_ConfigurationBody.application_ad_configuration",
-        "required": 
-        [
+        "required": [
           "ad_configuration_description",
           "ad_configuration_expected_response_type",
           "ad_configuration_strategy",
           "ad_configuration_transforms"
         ],
         "type": "object",
-        "properties": 
-        {
-          "ad_configuration_description": 
-          {
+        "properties": {
+          "ad_configuration_description": {
             "type": "string",
             "description": "Human readable description of the configuration."
           },
-          "ad_configuration_expected_response_type": 
-          {
+          "ad_configuration_expected_response_type": {
             "type": "string",
             "description": "The expected response type based on your ad server"
           },
-          "ad_configuration_strategy": 
-          {
+          "ad_configuration_strategy": {
             "type": "string",
             "description": "Specifies whether ad breaks should include single or muliple ads"
           },
-          "ad_configuration_transforms": 
-          {
+          "ad_configuration_transforms": {
             "type": "array",
-            "items": 
-            {
+            "items": {
               "$ref": "#/components/schemas/CreateAdConfigurationbody.applicationAdConfiguration.adConfigurationTransforms"
             },
             "description": "Array of ad configuration transforms."
           },
-          "ad_configuration_headers": 
-          {
+          "ad_configuration_headers": {
             "type": "object",
             "description": "An optional JSON object that can contain zero or more key-value-pairs, for which both key and value must be strings.  All of the standard URL substitutions are valid for headers."
           },
-          "ad_configuration_headers_for_impressions": 
-          {
+          "ad_configuration_headers_for_impressions": {
             "type": "boolean",
             "description": "If true, this configuration will send headers on all ad requests and impressions; if false, headers will not be sent on impressions (quartiles/impressions that we fire for tracking from an ad response)."
           }
         }
       },
-      "CreateAdConfigurationbody.applicationAdConfiguration.adConfigurationTransforms": 
-      {
+      "CreateAdConfigurationbody.applicationAdConfiguration.adConfigurationTransforms": {
         "title": "Create_Ad_ConfigurationBody.application_ad_configuration.ad_configuration_transforms",
-        "required": 
-        [
+        "required": [
           "xpath",
           "xslt"
         ],
         "type": "object",
-        "properties": 
-        {
-          "xpath": 
-          {
+        "properties": {
+          "xpath": {
             "type": "string",
             "description": "xpath for the transform."
           },
-          "xslt": 
-          {
+          "xslt": {
             "type": "string",
             "description": "xslt stylesheet for the transform."
           }
         }
       },
-      "Application": 
-      {
+      "Application": {
         "title": "application",
-        "required": 
-        [
+        "required": [
           "account_id",
           "description",
           "application_ad_configuration",
           "application_id"
         ],
         "type": "object",
-        "properties": 
-        {
-          "account_id": 
-          {
+        "properties": {
+          "account_id": {
             "type": "string",
             "description": "The account id"
           },
-          "description": 
-          {
+          "description": {
             "type": "string",
             "description": "The ad application description"
           },
-          "application_ad_configuration": 
-          {
+          "application_ad_configuration": {
             "description": "The ad configuration object for the application",
             "$ref": "#/components/schemas/Application.applicationAdConfiguration"
           },
-          "application_id": 
-          {
+          "application_id": {
             "type": "string",
             "description": "The ad application id"
           }
         }
       },
-      "Application.applicationAdConfiguration": 
-      {
+      "Application.applicationAdConfiguration": {
         "title": "application.application_ad_configuration",
-        "required": 
-        [
+        "required": [
           "ad_configuration_description",
           "response_type",
           "headers",
@@ -4629,407 +3711,318 @@
           "ad_configuration_variables"
         ],
         "type": "object",
-        "properties": 
-        {
-          "ad_configuration_description": 
-          {
+        "properties": {
+          "ad_configuration_description": {
             "type": "string",
             "description": "The ad configuration description"
           },
-          "response_type": 
-          {
+          "response_type": {
             "type": "string",
             "description": "The ad configuration response type (Dfp, Vast, or SmartXML)"
           },
-          "headers": 
-          {
+          "headers": {
             "type": "object",
             "description": "The ad configuration headers"
           },
-          "ad_configuration_strategy": 
-          {
+          "ad_configuration_strategy": {
             "type": "string",
             "description": "The ad configuration strategy (SingleAdResponse, or MultipleAdResponse)"
           },
-          "ad_configuration_transforms": 
-          {
+          "ad_configuration_transforms": {
             "type": "array",
-            "items": 
-            {
+            "items": {
               "$ref": "#/components/schemas/Application.applicationAdConfiguration.adConfigurationTransforms"
             },
             "description": "The ad configuration transforms"
           },
-          "ad_configuration_url_format": 
-          {
+          "ad_configuration_url_format": {
             "type": "string",
             "description": "The URL template for the ad server"
           },
-          "ad_configuration_variables": 
-          {
+          "ad_configuration_variables": {
             "type": "object",
             "description": "Key/value pairs for the ad server URL template"
           }
         }
       },
-      "Application.applicationAdConfiguration.adConfigurationTransforms": 
-      {
+      "Application.applicationAdConfiguration.adConfigurationTransforms": {
         "title": "application.application_ad_configuration.ad_configuration_transforms",
-        "required": 
-        [
+        "required": [
           "xpath",
           "xslt"
         ],
         "type": "object",
-        "properties": 
-        {
-          "xpath": 
-          {
+        "properties": {
+          "xpath": {
             "type": "string",
             "description": "The ad configuration transform xpath"
           },
-          "xslt": 
-          {
+          "xslt": {
             "type": "string",
             "description": "The ad configuration transform xslt"
           }
         }
       },
-      "ApplicationAdConfiguration": 
-      {
+      "ApplicationAdConfiguration": {
         "title": "application_ad_configuration",
-        "required": 
-        [
+        "required": [
           "ad_configuration_headers_for_impressions"
         ],
         "type": "object",
-        "properties": 
-        {
-          "ad_configuration_headers_for_impressions": 
-          {
+        "properties": {
+          "ad_configuration_headers_for_impressions": {
             "type": "boolean",
             "description": "If true, this configuration will send headers on all ad requests and impressions; if false, headers will not be sent on impressions (quartiles/impressions that we fire for tracking from an ad response)."
           }
         }
       },
-      "CreateAdConfiguration200": 
-      {
+      "CreateAdConfiguration200": {
         "title": "Create_Ad_Configuration200",
-        "required": 
-        [
+        "required": [
           "inserted"
         ],
         "type": "object",
-        "properties": 
-        {
-          "inserted": 
-          {
+        "properties": {
+          "inserted": {
             "type": "boolean",
             "description": "Whether the ad application was successfully inserted"
           }
         }
       },
-      "CreateBeaconSetbody": 
-      {
+      "CreateBeaconSetbody": {
         "title": "Create_beacon_setBody",
-        "required": 
-        [
+        "required": [
           "beacon_urls"
         ],
         "type": "object",
-        "properties": 
-        {
-          "beacon_urls": 
-          {
+        "properties": {
+          "beacon_urls": {
             "type": "array",
-            "items": 
-            {
+            "items": {
               "$ref": "#/components/schemas/CreateBeaconSetbody.beaconUrls"
             },
             "description": "Array of beacon URLs"
           },
-          "account_id": 
-          {
+          "account_id": {
             "type": "string",
             "description": "Account id"
           }
         }
       },
-      "CreateBeaconSetbody.beaconUrls": 
-      {
+      "CreateBeaconSetbody.beaconUrls": {
         "title": "Create_beacon_setBody.beacon_urls",
-        "required": 
-        [
+        "required": [
           "beacon_url",
           "beacon_type"
         ],
         "type": "object",
-        "properties": 
-        {
-          "beacon_url": 
-          {
+        "properties": {
+          "beacon_url": {
             "type": "string",
             "description": "URL format for the beacon - see ( https://support.brightcove.com/node/17763#Beacons) for the valid beacon variables"
           },
-          "beacon_type": 
-          {
+          "beacon_type": {
             "type": "string",
             "description": "the beacon type - see ( https://support.brightcove.com/node/17763#Beacons) for the valid beacon types"
           }
         }
       },
-      "BeaconSet": 
-      {
+      "BeaconSet": {
         "title": "beacon_set",
-        "required": 
-        [
+        "required": [
           "beacon_urls"
         ],
         "type": "object",
-        "properties": 
-        {
-          "beacon_urls": 
-          {
+        "properties": {
+          "beacon_urls": {
             "type": "array",
-            "items": 
-            {
+            "items": {
               "$ref": "#/components/schemas/BeaconSet.beaconUrls"
             },
             "description": "Array of beacon URLs"
           }
         }
       },
-      "BeaconSet.beaconUrls": 
-      {
+      "BeaconSet.beaconUrls": {
         "title": "beacon_set.beacon_urls",
-        "required": 
-        [
+        "required": [
           "beacon_url",
           "beacon_type"
         ],
         "type": "object",
-        "properties": 
-        {
-          "beacon_url": 
-          {
+        "properties": {
+          "beacon_url": {
             "type": "string",
             "description": "Beacon URL"
           },
-          "beacon_type": 
-          {
+          "beacon_type": {
             "type": "string",
             "description": "Beacon type"
           }
         }
       },
-      "BeaconSets": 
-      {
+      "BeaconSets": {
         "title": "beacon_sets",
-        "required": 
-        [
+        "required": [
           "beacon_set_id",
           "account_id"
         ],
         "type": "object",
-        "properties": 
-        {
-          "beacon_set_id": 
-          {
+        "properties": {
+          "beacon_set_id": {
             "type": "string",
             "description": "Id for the beacon set"
           },
-          "account_id": 
-          {
+          "account_id": {
             "type": "string",
             "description": "Id for the account"
           }
         }
       },
-      "CreateBeaconSet200": 
-      {
+      "CreateBeaconSet200": {
         "title": "Create_beacon_set200",
-        "required": 
-        [
+        "required": [
           "inserted"
         ],
         "type": "object",
-        "properties": 
-        {
-          "inserted": 
-          {
+        "properties": {
+          "inserted": {
             "type": "boolean",
             "description": "Whether the beacon set was added successfully"
           }
         }
       },
-      "DeleteAdConfiguration200": 
-      {
+      "DeleteAdConfiguration200": {
         "title": "Delete_Ad_Configuration200",
-        "required": 
-        [
+        "required": [
           "application_id",
           "deleted"
         ],
         "type": "object",
-        "properties": 
-        {
-          "application_id": 
-          {
+        "properties": {
+          "application_id": {
             "type": "string",
             "description": "The ad application id"
           },
-          "deleted": 
-          {
+          "deleted": {
             "type": "boolean",
             "description": "Confirmation of deletion"
           }
         }
       },
-      "GetAdConfiguration200": 
-      {
+      "GetAdConfiguration200": {
         "title": "Get_Ad_Configuration200",
-        "required": 
-        [
+        "required": [
           "inserted"
         ],
         "type": "object",
-        "properties": 
-        {
-          "inserted": 
-          {
+        "properties": {
+          "inserted": {
             "type": "boolean",
             "description": "Whether the ad application was successfully inserted"
           }
         }
       },
-      "UpdateAdConfigurationbody": 
-      {
+      "UpdateAdConfigurationbody": {
         "title": "Update_Ad_ConfigurationBody",
-        "required": 
-        [
+        "required": [
           "application_ad_configuration",
           "ad_configuration_url_format",
           "application_description"
         ],
         "type": "object",
-        "properties": 
-        {
-          "application_ad_configuration": 
-          {
+        "properties": {
+          "application_ad_configuration": {
             "description": "The ad configuration object",
             "$ref": "#/components/schemas/UpdateAdConfigurationbody.applicationAdConfiguration"
           },
-          "ad_configuration_url_format": 
-          {
+          "ad_configuration_url_format": {
             "type": "string",
             "description": "Format for the ad tag - see SSAI Using the Brightcove Live API for the available ad configuration variables."
           },
-          "application_description": 
-          {
+          "application_description": {
             "type": "string",
             "description": "Human readable description of the ad application."
           },
-          "account_id": 
-          {
+          "account_id": {
             "type": "string",
             "description": "Your Live account id (if you leave this blank, the request will still work)"
           }
         }
       },
-      "UpdateAdConfigurationbody.applicationAdConfiguration": 
-      {
+      "UpdateAdConfigurationbody.applicationAdConfiguration": {
         "title": "Update_Ad_ConfigurationBody.application_ad_configuration",
-        "required": 
-        [
+        "required": [
           "ad_configuration_description",
           "ad_configuration_expected_response_type",
           "ad_configuration_strategy",
           "ad_configuration_transforms"
         ],
         "type": "object",
-        "properties": 
-        {
-          "ad_configuration_description": 
-          {
+        "properties": {
+          "ad_configuration_description": {
             "type": "string",
             "description": "Human readable description of the configuration."
           },
-          "ad_configuration_expected_response_type": 
-          {
+          "ad_configuration_expected_response_type": {
             "type": "string",
             "description": "The expected response type based on your ad server"
           },
-          "ad_configuration_strategy": 
-          {
+          "ad_configuration_strategy": {
             "type": "string",
             "description": "Specifies whether ad breaks should include single or muliple ads"
           },
-          "ad_configuration_transforms": 
-          {
+          "ad_configuration_transforms": {
             "type": "array",
-            "items": 
-            {
+            "items": {
               "$ref": "#/components/schemas/UpdateAdConfigurationbody.applicationAdConfiguration.adConfigurationTransforms"
             },
             "description": "Array of ad configuration transforms."
           },
-          "ad_configuration_headers": 
-          {
+          "ad_configuration_headers": {
             "type": "object",
             "description": "An optional JSON object that can contain zero or more key-value-pairs, for which both key and value must be strings.  All of the standard URL substitutions are valid for headers."
           },
-          "ad_configuration_headers_for_impressions": 
-          {
+          "ad_configuration_headers_for_impressions": {
             "type": "boolean",
             "description": "If true, this configuration will send headers on all ad requests and impressions; if false, headers will not be sent on impressions (quartiles/impressions that we fire for tracking from an ad response)."
           }
         }
       },
-      "UpdateAdConfigurationbody.applicationAdConfiguration.adConfigurationTransforms": 
-      {
+      "UpdateAdConfigurationbody.applicationAdConfiguration.adConfigurationTransforms": {
         "title": "Update_Ad_ConfigurationBody.application_ad_configuration.ad_configuration_transforms",
-        "required": 
-        [
+        "required": [
           "xpath",
           "xslt"
         ],
         "type": "object",
-        "properties": 
-        {
-          "xpath": 
-          {
+        "properties": {
+          "xpath": {
             "type": "string",
             "description": "xpath for the transform."
           },
-          "xslt": 
-          {
+          "xslt": {
             "type": "string",
             "description": "xslt stylesheet for the transform."
           }
         }
       },
-      "UpdateAdConfiguration200": 
-      {
+      "UpdateAdConfiguration200": {
         "title": "Update_Ad_Configuration200",
-        "required": 
-        [
+        "required": [
           "inserted"
         ],
         "type": "object",
-        "properties": 
-        {
-          "inserted": 
-          {
+        "properties": {
+          "inserted": {
             "type": "boolean",
             "description": "Whether the ad application was successfully inserted"
           }
         }
       },
-      "DeleteSlateMediaSourceAsset200": 
-      {
+      "DeleteSlateMediaSourceAsset200": {
         "title": "Delete_Slate_Media_Source_Asset200",
-        "required": 
-        [
+        "required": [
           "media_source_asset_id",
           "account_id",
           "media_source_asset_default",
@@ -5038,151 +4031,118 @@
           "media_source_asset_status"
         ],
         "type": "object",
-        "properties": 
-        {
-          "media_source_asset_id": 
-          {
+        "properties": {
+          "media_source_asset_id": {
             "type": "string",
             "description": "Id for the slate asset"
           },
-          "account_id": 
-          {
+          "account_id": {
             "type": "string",
             "description": "Id for the account"
           },
-          "media_source_asset_default": 
-          {
+          "media_source_asset_default": {
             "type": "boolean",
             "description": "Whether this is the default media source asset"
           },
-          "media_source_asset_type": 
-          {
+          "media_source_asset_type": {
             "type": "string",
             "description": "The media asset type"
           },
-          "media_source_asset_url": 
-          {
+          "media_source_asset_url": {
             "type": "string",
             "description": "URL for the media asset to be ingested"
           },
-          "media_source_asset_status": 
-          {
+          "media_source_asset_status": {
             "type": "string",
             "description": "Current status of the ingestion of the media asset"
           }
         }
       },
-      "DeleteBeaconSet200": 
-      {
+      "DeleteBeaconSet200": {
         "title": "Delete_beacon_set200",
-        "required": 
-        [
+        "required": [
           "beacon_set_id",
           "deleted"
         ],
         "type": "object",
-        "properties": 
-        {
-          "beacon_set_id": 
-          {
+        "properties": {
+          "beacon_set_id": {
             "type": "string",
             "description": "The beacon set id"
           },
-          "deleted": 
-          {
+          "deleted": {
             "type": "boolean",
             "description": "Whether the beacon set was deleted successfully"
           }
         }
       },
-      "UpdateBeaconSetbody": 
-      {
+      "UpdateBeaconSetbody": {
         "title": "Update_beacon_setBody",
-        "required": 
-        [
+        "required": [
           "beacon_urls"
         ],
         "type": "object",
-        "properties": 
-        {
-          "beacon_urls": 
-          {
+        "properties": {
+          "beacon_urls": {
             "type": "array",
-            "items": 
-            {
+            "items": {
               "$ref": "#/components/schemas/UpdateBeaconSetbody.beaconUrls"
             },
             "description": "Array of beacon URLs"
           },
-          "account_id": 
-          {
+          "account_id": {
             "type": "string",
             "description": "URL for the slate to ingest"
           }
         }
       },
-      "UpdateBeaconSetbody.beaconUrls": 
-      {
+      "UpdateBeaconSetbody.beaconUrls": {
         "title": "Update_beacon_setBody.beacon_urls",
-        "required": 
-        [
+        "required": [
           "beacon_url",
           "beacon_type"
         ],
         "type": "object",
-        "properties": 
-        {
-          "beacon_url": 
-          {
+        "properties": {
+          "beacon_url": {
             "type": "string",
             "description": "URL format for the beacon - see ( https://support.brightcove.com/node/17763#Beacons) for the valid beacon variables"
           },
-          "beacon_type": 
-          {
+          "beacon_type": {
             "type": "string",
             "description": "the beacon type - see ( https://support.brightcove.com/node/17763#Beacons) for the valid beacon types"
           }
         }
       },
-      "UpdateBeaconSet200": 
-      {
+      "UpdateBeaconSet200": {
         "title": "Update_beacon_set200",
-        "required": 
-        [
+        "required": [
           "inserted"
         ],
         "type": "object",
-        "properties": 
-        {
-          "inserted": 
-          {
+        "properties": {
+          "inserted": {
             "type": "boolean",
             "description": "Whether the beacon set was added successfully"
           }
         }
       },
-      "GetAccountAdConfigurations200": 
-      {
+      "GetAccountAdConfigurations200": {
         "title": "Get_Account_Ad_Configurations200",
-        "required": 
-        [
+        "required": [
           "inserted"
         ],
         "type": "object",
-        "properties": 
-        {
-          "inserted": 
-          {
+        "properties": {
+          "inserted": {
             "type": "boolean",
             "description": "Whether the ad application was successfully inserted"
           }
         }
       },
-      "GetSlateMediaSourceAssets200": 
-      {
+      "GetSlateMediaSourceAssets200": {
         "title": "Get_Slate_Media_Source_Assets200",
-        "required": 
-        [
+        "required": [
           "media_source_asset_id",
           "account_id",
           "media_source_asset_description",
@@ -5192,112 +4152,88 @@
           "media_source_asset_status"
         ],
         "type": "object",
-        "properties": 
-        {
-          "media_source_asset_id": 
-          {
+        "properties": {
+          "media_source_asset_id": {
             "type": "string",
             "description": "Id for the slate asset"
           },
-          "account_id": 
-          {
+          "account_id": {
             "type": "string",
             "description": "Id for the account"
           },
-          "media_source_asset_description": 
-          {
+          "media_source_asset_description": {
             "type": "string",
             "description": "User identifiable description for the slate"
           },
-          "media_source_asset_default": 
-          {
+          "media_source_asset_default": {
             "type": "boolean",
             "description": "Whether this is the default media source asset"
           },
-          "media_source_asset_type": 
-          {
+          "media_source_asset_type": {
             "type": "string",
             "description": "The media asset type"
           },
-          "media_source_asset_url": 
-          {
+          "media_source_asset_url": {
             "type": "string",
             "description": "URL for the media asset to be ingested"
           },
-          "media_source_asset_status": 
-          {
+          "media_source_asset_status": {
             "type": "string",
             "description": "Current status of the ingestion of the media asset"
           }
         }
       },
-      "GetBeaconSets200": 
-      {
+      "GetBeaconSets200": {
         "title": "Get_beacon_sets200",
-        "required": 
-        [
+        "required": [
           "inserted"
         ],
         "type": "object",
-        "properties": 
-        {
-          "inserted": 
-          {
+        "properties": {
+          "inserted": {
             "type": "boolean",
             "description": "Whether the beacon set was added successfully"
           }
         }
       },
-      "GetBeaconSetsForUser200": 
-      {
+      "GetBeaconSetsForUser200": {
         "title": "Get_beacon_sets_for_user200",
-        "required": 
-        [
+        "required": [
           "inserted"
         ],
         "type": "object",
-        "properties": 
-        {
-          "inserted": 
-          {
+        "properties": {
+          "inserted": {
             "type": "boolean",
             "description": "Whether the beacon set was added successfully"
           }
         }
       },
-      "IngestSlateMediaSourceAssetbody": 
-      {
+      "IngestSlateMediaSourceAssetbody": {
         "title": "Ingest_Slate_Media_Source_AssetBody",
-        "required": 
-        [
+        "required": [
           "source_url",
           "account_id"
         ],
         "type": "object",
-        "properties": 
-        {
-          "source_url": 
-          {
+        "properties": {
+          "source_url": {
             "type": "string",
             "description": "URL for the slate to ingest"
           },
-          "account_id": 
-          {
+          "account_id": {
             "type": "string",
             "description": "The Live account id (if left blank, the request will still work)"
           },
-          "source_description": 
-          {
+          "source_description": {
             "type": "string",
             "description": "User identifiable description for the slate"
           }
         }
       },
-      "IngestSlateMediaSourceAsset200": 
-      {
+      "IngestSlateMediaSourceAsset200": {
         "title": "Ingest_Slate_Media_Source_Asset200",
-        "required": 
-        [
+        "required": [
           "media_source_asset_id",
           "account_id",
           "media_source_asset_description",
@@ -5307,152 +4243,127 @@
           "media_source_asset_status"
         ],
         "type": "object",
-        "properties": 
-        {
-          "media_source_asset_id": 
-          {
+        "properties": {
+          "media_source_asset_id": {
             "type": "string",
             "description": "Id for the slate asset"
           },
-          "account_id": 
-          {
+          "account_id": {
             "type": "string",
             "description": "Id for the account"
           },
-          "media_source_asset_description": 
-          {
+          "media_source_asset_description": {
             "type": "string",
             "description": "User identifiable description for the slate"
           },
-          "media_source_asset_default": 
-          {
+          "media_source_asset_default": {
             "type": "boolean",
             "description": "Whether this is the default media source asset"
           },
-          "media_source_asset_type": 
-          {
+          "media_source_asset_type": {
             "type": "string",
             "description": "The media asset type"
           },
-          "media_source_asset_url": 
-          {
+          "media_source_asset_url": {
             "type": "string",
             "description": "URL for the media asset to be ingested"
           },
-          "media_source_asset_status": 
-          {
+          "media_source_asset_status": {
             "type": "string",
             "description": "Current status of the ingestion of the media asset"
           }
         }
       }
     },
-    "parameters": 
-    {
-      "VideoCloudAccountId":
-      {
+    "parameters": {
+      "VideoCloudAccountId": {
         "name": "account_id",
         "in": "path",
         "description": "Video Cloud account ID.",
         "required": true,
         "style": "simple",
         "explode": false,
-        "schema": 
-        {
+        "schema": {
           "type": "string"
         }
       },
-      "ContentType": 
-      {
+      "ContentType": {
         "name": "Content-Type",
         "in": "header",
         "description": "Content-Type: application/json",
         "required": true,
         "style": "simple",
         "explode": false,
-        "schema": 
-        {
+        "schema": {
           "type": "string",
           "default": "application/json"
         },
         "example": "application/json"
       },
-      "XAPIKEY":
-      {
+      "XAPIKEY": {
         "name": "X-API-KEY",
         "in": "header",
         "description": "X-API-KEY: {APIKey}",
         "required": true,
         "style": "simple",
         "explode": false,
-        "schema": 
-        {
+        "schema": {
           "type": "string"
         },
         "example": "6aaXAZSSzRatgbVo7P12v7g13ovsuemr3y0C"
       },
-      "LiveAccountId": 
-      {
+      "LiveAccountId": {
         "name": "account_id",
         "in": "path",
         "description": "Live account ID",
         "required": true,
         "style": "simple",
         "explode": false,
-        "schema": 
-        {
+        "schema": {
           "type": "string"
         }
       },
-      "JobId": 
-      {
+      "JobId": {
         "name": "job_id",
         "in": "path",
         "description": "Live job ID",
         "required": true,
         "style": "simple",
         "explode": false,
-        "schema": 
-        {
+        "schema": {
           "type": "string"
         }
       },
-      "CredentialId": 
-      {
+      "CredentialId": {
         "name": "credential_id",
         "in": "path",
         "description": "A credential ID",
         "required": true,
         "style": "simple",
         "explode": false,
-        "schema": 
-        {
+        "schema": {
           "type": "string"
         }
       },
-      "SlateMsaId":
-      {
+      "SlateMsaId": {
         "name": "slate_msa_id",
         "in": "path",
         "description": "A slate media asset ID",
         "required": true,
         "style": "simple",
         "explode": false,
-        "schema": 
-        {
+        "schema": {
           "type": "string"
         }
       },
-      "BeaconSetId":
-      {
+      "BeaconSetId": {
         "name": "beacon_set_id",
         "in": "path",
         "description": "A slate media asset ID",
         "required": true,
         "style": "simple",
         "explode": false,
-        "schema": 
-        {
+        "schema": {
           "type": "string"
         }
       }
