@@ -1046,18 +1046,6 @@
             }
           }
         ],
-        "requestBody": {
-          "description": "Create VOD clips from a Live Stream.",
-          "content": {
-            "application/json": {
-              "schema": {
-                "description": "Create VOD clips from a Live Stream.",
-                "$ref": "#/components/schemas/CreateVodClipbody2"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "200": {
             "description": "200",
@@ -1065,7 +1053,7 @@
               "application/json": {
                 "schema": {
                   "description": "200",
-                  "$ref": "#/components/schemas/VodJobs"
+                  "$ref": "#/components/schemas/ListVodJobs"
                 }
               }
             }
@@ -3516,6 +3504,31 @@
         "title": "List_Live_Jobs200",
         "required": [
           "start_token",
+          "jobs"
+        ],
+        "type": "object",
+        "properties": {
+          "next_token": {
+            "type": "string",
+            "description": "Use as start_token to fetch next page.  Not include if no more matching jobs."
+          },
+          "start_token": {
+            "type": "string",
+            "description": "Returns start_token from current request (not included on first page)."
+          },
+          "jobs": {
+            "type": "array",
+            "description": "The filtered list of jobs.  List may be empty if no matching jobs or for last page.",
+            "items": {
+              "$ref": "#/components/schemas/Job"
+            }
+          }
+        }
+      },
+      "ListVODJobs200": {
+        "title": "List_Live_Jobs200",
+        "required": [
+          "start_token",
           "vod_jobs"
         ],
         "type": "object",
@@ -3532,8 +3545,94 @@
             "type": "array",
             "description": "The filtered list of jobs.  List may be empty if no matching jobs or for last page.",
             "items": {
-              "$ref": "#/components/schemas/Job"
+              "$ref": "#/components/schemas/VodJobs2"
             }
+          }
+        }
+      },
+      "VodJobs2": {
+        "title": "vod_jobs2",
+        "required": [
+          "jvod_id",
+          "label"
+        ],
+        "type": "object",
+        "properties": {
+          "jvod_id": {
+            "type": "string",
+            "description": "The clip job id"
+          },
+          "label": {
+            "type": "string",
+            "description": "The clip label (from the input)"
+          },
+          "job_id": {
+            "type": "string",
+            "description": "The parent job id"
+          },
+          "jvod_state": {
+            "type": "string",
+            "description": "Current vod job processing state",
+            "enum": [
+              "error",
+              "waiting",
+              "waiting_finish_live",
+              "processing",
+              "cancelling",
+              "cancelled",
+              "finished",
+              "failed",
+              "creating_asset"
+            ]
+          },
+          "jvod_type": {
+            "type": "string",
+            "description": "VOD job type",
+            "enum": [
+              "s3",
+              "ftp",
+              "instant",
+              "error"
+            ]
+          },
+          "jvod_url": {
+            "type": "string",
+            "description": "VOD job destination (e.g. s3://somebucket or ftp://someserver)"
+          },
+          "jvod_created_at": {
+            "type": "integer",
+            "description": "Time vod job was created (UNIX time in milliseconds)"
+          },
+          "jvod_last_state_change_at": {
+            "type": "integer",
+            "description": "Time vod job was last modified (UNIX time in milliseconds)"
+          },
+          "jvod_finished_at": {
+            "type": "integer",
+            "description": "Time vod job completed processing
+ (UNIX time in milliseconds)"
+          },
+          "jvod_duration_s": {
+            "type": "integer",
+            "description": "Length of VOD clip requested (seconds)"
+          },
+          "jvod_reported_duration_s": {
+            "type": "integer",
+            "description": "Length of VOD clip as generated (seconds)"
+          },
+          "jvod_region": {
+            "type": "string",
+            "description": "Region VOD job is processed in",
+            "enum":[
+              "us-west-2",
+              "us-east-1",
+              "ap-southeast-2",
+              "ap-northeast-1",
+              "ap-southeast-1",
+              "eu-central-1",
+              "eu-west-1",
+              "sa-east-1"
+            ]
           }
         }
       },
@@ -3642,6 +3741,16 @@
           "region": {
             "type": "string",
             "description": "The Amazon AWS region to use for encoding the job",
+            "enum":[
+              "us-west-2",
+              "us-east-1",
+              "ap-southeast-2",
+              "ap-northeast-1",
+              "ap-southeast-1",
+              "eu-central-1",
+              "eu-west-1",
+              "sa-east-1"
+            ],
             "example": "us-west-2"
           },
           "reconnect_time": {
