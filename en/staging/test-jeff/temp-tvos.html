@@ -839,26 +839,34 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate          
   	</li>
   </ol>
 
-  <!-- <h4>The rest</h4>
+  <h4>The rest</h4>
 
   <ol class="bcls-tasklist">
-  	<li>
-  	<p>Create a function to handle when the playback session advances.</p>
+    <li>
+      <p>Create functions to listen for the playback controller delegate methods, and functions for focus overrides.</p>
+      <pre class="line-numbers" data-start="79"><code class="language-swift">// MARK: Playback controller delegate methods
 
-  	<pre class="line-numbers" data-start="63">
-  <code class="language-swift">func playbackController(_ controller: BCOVPlaybackController!, playbackSession session: BCOVPlaybackSession!, didReceive lifecycleEvent: BCOVPlaybackSessionLifecycleEvent!) {
-  		NSLog("Event: %@", lifecycleEvent.eventType);
-  		self.avpvc.player = session.player;
-  }</code></pre>
-  	</li>
-  	<li>
-  	<p><strong>Optional</strong>: Log lifecycle events.</p>
+  func playbackController(_ controller: BCOVPlaybackController!, didAdvanceTo session: BCOVPlaybackSession!) {
+      NSLog(&quot;ViewController Debug - Advanced to new session.&quot;)
+  }
 
-  	<pre class="line-numbers" data-start="55">
-  <code class="language-swift">func playbackController(_ controller: BCOVPlaybackController!, playbackSession session: BCOVPlaybackSession!, didReceive lifecycleEvent: BCOVPlaybackSessionLifecycleEvent!) {
-  		NSLog("Event: %@", lifecycleEvent.eventType);
+  func playbackController(_ controller: BCOVPlaybackController!, playbackSession session: BCOVPlaybackSession!, didReceive lifecycleEvent: BCOVPlaybackSessionLifecycleEvent!) {
+      NSLog(&quot;Event: %@&quot;, lifecycleEvent.eventType)
+  }
+
+  // MARK: UIFocusEnvironment overrides
+
+  // Focus Environment override for tvOS 9
+  override var preferredFocusedView: UIView? {
+      return playerView
+  }
+
+  // Focus Environment override for tvOS 10+
+  override var preferredFocusEnvironments: [UIFocusEnvironment] {
+      return (playerView != nil ? [ playerView! ] : [])
   }</code></pre>
-  </ol> -->
+    </li>
+  </ol>
 
   <h4 id="viewControllerPerform">View the code</h4>
 
@@ -940,6 +948,28 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate {
         let source:BCOVSource = BCOVSource(url: url as URL?, deliveryMethod: kBCOVSourceDeliveryHLS, properties: nil)
         let video = BCOVVideo.init(source: source, cuePoints: BCOVCuePointCollection.init(array: []), properties: [NSObject:AnyObject]())
         return video!
+    }
+
+    // MARK: Playback controller delegate methods
+
+    func playbackController(_ controller: BCOVPlaybackController!, didAdvanceTo session: BCOVPlaybackSession!) {
+        NSLog(&quot;ViewController Debug - Advanced to new session.&quot;)
+    }
+
+    func playbackController(_ controller: BCOVPlaybackController!, playbackSession session: BCOVPlaybackSession!, didReceive lifecycleEvent: BCOVPlaybackSessionLifecycleEvent!) {
+        NSLog(&quot;Event: %@&quot;, lifecycleEvent.eventType)
+    }
+
+    // MARK: UIFocusEnvironment overrides
+
+    // Focus Environment override for tvOS 9
+    override var preferredFocusedView: UIView? {
+        return playerView
+    }
+
+    // Focus Environment override for tvOS 10+
+    override var preferredFocusEnvironments: [UIFocusEnvironment] {
+        return (playerView != nil ? [ playerView! ] : [])
     }
 
     override func didReceiveMemoryWarning() {
