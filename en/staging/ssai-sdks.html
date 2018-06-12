@@ -791,6 +791,145 @@ class ViewController: UIViewController, BCOVPlaybackControllerDelegate {
 
 }</code></pre>
 </div>
+
+<h3 id="tvOS_ViewController_using_Swift" class="bcls-expander-head">tvOS ViewController using Swift + FairPlay</h3>
+<div class="bcls-expander-content">
+  <p>
+    Your <strong>ViewController.swift</strong> file should look similar to this:
+  </p>
+  <pre class="line-numbers"><code class="language-swift">//
+//  ViewController.swift
+//  AppleTV = tvOS + Swift + SSAI + VOD + FairPlay
+//
+//  Copyright &copy; 2018 Brightcove. All rights reserved.
+//
+
+// This sample app shows how to set up and use the TV Player UI on tvOS.
+
+import BrightcovePlayerSDK
+import BrightcoveOUX
+
+let kViewControllerAccountID = &quot;3636334164001&quot;
+let kViewControllerPlaybackServicePolicyKey = &quot;BCpkADawqM04pilWqSIDfTmwPNiBscekcQB9wQ3IiTUZ4baBIx6LyLTrACuS0KJPOlpeEui10NOSgQ8zPTk8iSRPkQXSCGBrEqJD_4vJtX31zRvnk-4Wq8svz8j6abVYnqTijMliCf_1lIoa&quot;
+let kViewControllerVideoID = &quot;5456212487001&quot;
+let kAdConfigId = &quot;46065f14-eef7-403a-8f82-6f2b77137a66&quot;
+
+class ViewController: UIViewController, BCOVPlaybackControllerDelegate
+{
+  @IBOutlet var videoContainerView: UIView!
+
+  var playerView: BCOVTVPlayerView?
+  var fairPlayAuthProxy: BCOVFPSBrightcoveAuthProxy?
+  var playbackController:BCOVPlaybackController?
+
+  let playbackService = BCOVPlaybackService(accountId: kViewControllerAccountID, policyKey: kViewControllerPlaybackServicePolicyKey)
+
+  required init?(coder aDecoder: NSCoder)
+  {
+    super.init(coder: aDecoder)
+  }
+
+  override func viewDidLoad()
+  {
+    super.viewDidLoad()
+
+    let sdkManager = BCOVPlayerSDKManager.sharedManager()
+    self.fairPlayAuthProxy = BCOVFPSBrightcoveAuthProxy(publisherId: nil,
+                                                        applicationId: nil)
+
+    // Create chain of session providers
+    let basicSessionProvider = sdkManager?.createBasicSessionProvider(with:nil)
+
+    let fairplaySessionProvider = sdkManager?.createFairPlaySessionProvider(withApplicationCertificate:nil,
+                                            authorizationProxy:self.fairPlayAuthProxy!,
+                                            upstreamSessionProvider:basicSessionProvider)
+
+    let ouxSessionProvider = sdkManager?.createOUXSessionProvider(withUpstreamSessionProvider: fairplaySessionProvider)
+
+    // Create the playback controller
+
+    let playbackController = sdkManager?.createPlaybackController(with:ouxSessionProvider, viewStrategy:nil)
+
+    playbackController?.isAutoAdvance = false
+    playbackController?.isAutoPlay = true
+    playbackController?.delegate = self
+
+    if playbackController?.view != nil {
+      playbackController?.view.frame = self.videoContainerView.bounds
+      playbackController?.view.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+      self.videoContainerView.addSubview((playbackController!.view)!)
+    }
+
+    self.playbackController = playbackController
+
+    createTVPlayerView()
+
+    // Link the playback controller to the Player View
+    playerView?.playbackController = playbackController
+
+    requestContentFromPlaybackService()
+  }
+
+  func createTVPlayerView() {
+
+    // Make sure storyboard bindings are set up
+    self.loadViewIfNeeded()
+    if (videoContainerView == nil)
+    {
+      print(&quot;videoContainerView not bound to storyboard&quot;)
+      return
+    }
+
+    // Set ourself as the presenting view controller
+    // so that tab bar panels can present other view controllers
+    let options = BCOVTVPlayerViewOptions()
+    options.presentingViewController = self
+
+    // Create and add to the video container view
+    playerView = BCOVTVPlayerView(options: options)
+    if (playerView != nil) {
+      playerView!.frame = self.videoContainerView.bounds
+      self.videoContainerView.addSubview(playerView!)
+    }
+  }
+
+  func requestContentFromPlaybackService() {
+    let queryParameters = [&quot;ad_config_id&quot;: kAdConfigId]
+
+    playbackService?.findVideo(withVideoID: kViewControllerVideoID, parameters: queryParameters) { (video: BCOVVideo?, jsonResponse: [AnyHashable: Any]?, error: Error?) -&gt; Void in
+
+      if let v = video {
+        //  since &quot;isAutoPlay&quot; is true, setVideos will begin playing the content
+        self.playbackController?.setVideos([v] as NSArray)
+      } else {
+        print(&quot;ViewController Debug - Error retrieving video: \(error?.localizedDescription ?? &quot;unknown error&quot;)&quot;)
+      }
+    }
+  }
+
+  // MARK: Playback controller delegate methods
+
+  func playbackController(_ controller: BCOVPlaybackController!, didAdvanceTo session: BCOVPlaybackSession!) {
+    NSLog(&quot;ViewController Debug - Advanced to new session.&quot;)
+  }
+
+  func playbackController(_ controller: BCOVPlaybackController!, playbackSession session: BCOVPlaybackSession!, didReceive lifecycleEvent: BCOVPlaybackSessionLifecycleEvent!) {
+    NSLog(&quot;Event: %@&quot;, lifecycleEvent.eventType)
+  }
+
+  // MARK: UIFocusEnvironment overrides
+
+  // Focus Environment override for tvOS 9
+  override var preferredFocusedView: UIView? {
+    return playerView
+  }
+
+  // Focus Environment override for tvOS 10+
+  override var preferredFocusEnvironments: [UIFocusEnvironment] {
+    return (playerView != nil ? [ playerView! ] : [])
+  }
+}</code></pre>
+</div>
 <br />
 
           <aside class="bcls-aside bcls-aside--tip">
