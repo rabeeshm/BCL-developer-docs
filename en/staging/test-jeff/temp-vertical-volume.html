@@ -142,17 +142,12 @@
 <table class="bcls-table">
   <thead class="bcls-table__head">
     <tr>
-      <th>API Classes</th>
 			<th>API Methods</th>
 		</tr>
   </thead>
   <tbody class="bcls-table__body">
     <tr>
-      <td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/ControlBar.html">ControlBar</a></td>
-			<td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/ControlBar.html#addChild">controlBar.addChild()</a></td>
-		</tr>
-    <tr><td><a href="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/current-release/PlaybackRateMenuButton.html">PlaybackRateMenuButton</a></td>
-			<td></td>
+			<td><a href="/node/18051">bc() method</a></td>
 		</tr>
   </tbody>
 </table>
@@ -168,14 +163,43 @@
 
 <h3>Player configuration</h3>
 
-<p>No special configuration is required for the Brightcove Player you create for this sample.</p>
+<p>Because we want to modify the controlbar before the player is created, we will delay instantiation of the Brightcove Player by removing some of the attributes from the <code>&lt;video&gt;</code> tag. For more information about this, see the <a href="/node/18051">Delaying Player Instantiation</a> document.</p>
+<p>
+  Modify your player embed code as follows:
+</p>
+<ol class="bcls-tasklist">
+	<li>Add the <code>id</code> attribute to the <code>video</code> tag in the player embed code</li>
+  <li>Remove the following attributes from the <code>video</code> tag:
+    <ul>
+      <li>
+        <code>data-account</code>
+      </li>
+      <li>
+        <code>data-player</code>
+      </li>
+      <li>
+        <code>data-video-id</code>
+      </li>
+    </ul>
+  </li>
+</ol>
+<p>
+  Your player embed code should now look similar to this:
+</p>
+<pre><code class="language-html">&lt;video id=&quot;myPlayerID&quot;
+  data-embed=&quot;default&quot;
+  data-application-id
+  class=&quot;video-js&quot;
+  width=&quot;640&quot; height=&quot;360&quot;
+  controls&gt;&lt;/video&gt;
+&lt;script src=&quot;//players.brightcove.net/1752604059001/default_default/index.min.js&quot;&gt;&lt;/script&gt;</code></pre>
 
-<h3>Other HTML</h3>
+<!-- <h3>Other HTML</h3>
 
 <p>Remember to add the <code>id</code> attribute to the <code>video</code> tag in the player embed code.</p>
 
 <pre><code class="language-html">&lt;video <span class="bcls-highlight">id="myPlayerID"</span>
-...</code></pre>
+...</code></pre> -->
 
 </section>
 
@@ -186,93 +210,57 @@
 <p>The basic logic behind this application is:</p>
 
 <ul>
-	<li>Define the middleware functions</li>
-  <li>Register the middleware with the player</li>
-  <li>Define the playback rate options</li>
-  <li>Initialize the playback rate button</li>
+	<li>Define the player options</li>
+  <li>Add the player attributes</li>
+  <li>Create the player</li>
 </ul>
 
 
 <!-- UPDATE task 1 -->
 
-<h3>Define the middleware functions</h3>
+<h3>Define the player options</h3>
 
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Define the middleware functions +++</code></pre>
+<code class="language-javascript">// +++ Define the player options +++</code></pre>
 
 <p>
-  Create the following middleware functions:
+  Define the <code>volumePanel</code> so that it is vertical and not inline with the controlbar.
 </p>
-<ol class="bcls-tasklist__restart">
-    <li>Create a supporting middleware function that will re-calculate the playback start and end times based on the selected playback rate.</li>
-    <li>
-      <p>
-        Create a middleware function that will update the start time, duration and even current time when seeking.
-      </p>
-      <p>The basic syntax for creating a middleware function is as follows:</p>
-      <pre class="line-numbers">
-      <code class="language-javascript">const playbackrateAdjuster = function(player) {
-        return {
-        ...
-      };</code></pre>
 
-      <p>Note that the <code>player</code> object is passed to the function.</p>
-      <p>
-        This middleware function does the following:
-      </p>
-      <ol>
-        <li>
-          <strong>Listen for the ratechange event</strong>: When the playback rate is changed, then trigger the <code>durationchange</code> and <code>timeupdate</code> events.
-        </li>
-        <br />
-        <li>
-            <strong>Implement the setSource() method</strong>: This is a required method for every middleware function. By using the syntax shown means the middleware will always be selected, irregardless of the video type:
-          <pre><code class="language-javascript">setSource(srcObj, next) {
-  next(null, srcObj);
-},</code></pre>
-        </li>
-        <br />
-        <li>
-          <strong>Override methods using current playback rate</strong>: Override the methods for <code>duration</code>, <code>currentTime</code>, <code>buffered</code>, <code>seekable</code> and <code>played</code> with values calculated using the current playback rate.
-        </li>
-      </ol>
-    </li>
-</ol>
+<!-- UPDATE task 2 -->
 
-<!-- UPDATE task 5 -->
-
-<h3>Register the middleware with the player</h3>
+<h3>Add the player attributes</h3>
 
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Register the middleware with the player +++</code></pre>
+<code class="language-javascript">// +++ Add the player attributes +++</code></pre>
 
-<p>Register the middleware function with the player using the <code>use()</code> method.</p>
+<p>Add the following player attributes with your values to the <code>&lt;video&gt;</code> tag.</p>
+<ul>
+  <li>
+    <code>data-account</code>
+  </li>
+  <li>
+    <code>data-player</code>
+  </li>
+  <li>
+    <code>data-video-id</code>
+  </li>
+</ul>
 
-<!-- UPDATE task 6 -->
+<!-- UPDATE task 3 -->
 
-<h3>Define the playback rate options</h3>
+<h3>Create the player</h3>
 
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// +++ Define the playback rate options +++</code></pre>
+<code class="language-javascript">// +++ Create the player +++</code></pre>
 
-<p>Define the playback rates that you want displayed in the playback rate menu button.</p>
-
-<!-- UPDATE task 7 -->
-
-<h3>Initialize the playback rate button</h3>
-
-<p>Find the code which is labeled:</p>
-
-<pre>
-<code class="language-javascript">// +++ Initialize the playback rate button +++</code></pre>
-
-<p>Add the playback rate menu button to the player control bar, and initialize it with the values specified in the options object.</p>
+<p>Instantiate the player by passing the controlbar options into the <a href="/node/18051">bc() method</a>.</p>
 
 </section>
 
@@ -284,7 +272,7 @@
 <p>There are no additional styles for this sample.</p>
 </section>
 
-<section class="bcls-section">
+<!-- <section class="bcls-section">
 <h2 id="Using_the_middleware_function">Using the middleware function</h2>
 
 <p>Once the middleware function has been written you want to use it. Two ways were mentioned earlier, and will be detailed now.</p>
@@ -337,6 +325,36 @@
 </p>
 </aside>
 
+</section> -->
+
+<section class="bcls-section">
+<h2 id="Plugin_code">Plugin code</h2>
+
+<p>Normally when converting the JavaScript into a Brightcove Player plugin nominal changes are needed. One required change is to replace the standard use of the <code>ready()</code> method with the code that defines a plugin.</p>
+
+<p>Here is the very commonly used start to JavaScript code that will work with the player:</p>
+
+<pre class="line-numbers">
+<code class="language-javascript">videojs('myPlayerID').ready(function(){
+  var myPlayer = this;
+  ...
+});</code></pre>
+
+<p>You will change the first line to use the standard syntax to start a Brightcove Player plugin:</p>
+
+<pre class="line-numbers">
+<code class="language-javascript">videojs.registerPlugin('pluginName', function(options) {
+  var myPlayer = this;
+  ...
+});</code></pre>
+<!-- UPDATE path to plugin's JavaScript -->
+<p>As mentioned earlier, you can see the plugin's JavaScript code in this document's corresponding GitHub repo: <a href="https://github.com/BrightcoveLearning/18175-most-watched-videos-playlist/blob/master/plugin/most-watched-playlist.js">popular-videos.js</a>.</p>
+
+<h3>Using the plugin with a player</h3>
+
+<p>Once you have the plugin's CSS and JavaScript files stored in an Internet accessible location, you can use the plugin with a player. In Studio's <strong>PLAYERS</strong> module you can choose a player, then in the <strong>PLUGINS</strong> section add the URLs to the CSS and JavaScript files, and also add the <strong>Name</strong> and <strong>Options</strong>, if options are needed.</p>
+
+<aside class="bcls-aside bcls-aside--tip">For more information on using Studio to assign plugins to players see the <a href="//support.brightcove.com/node/14053">Configuring Player Plugins</a> document.</aside>
 </section>
 
 </article>
