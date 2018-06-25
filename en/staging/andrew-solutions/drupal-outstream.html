@@ -81,42 +81,44 @@
   }
 </style>
 <link href="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.css" rel="stylesheet" />
-<p>Enter values for the three form fields below to see a pre-roll ad appear before your video. (If you choose not to input your data, demo data will be supplied.)</p>
+<p>Enter values for the three form fields below to see an example of an outstream ad, that is the ad will insert itself between the paragraphs of text, then when the ad finishes it will remove itself . (If you choose not to input your data, demo data will be supplied.)</p>
 <p>Below the player, the code for the player implementation is shown so you can copy and use.</p>
-<div id="inputFields" class="input-fields">
+  <div id="inputFields" class="input-fields">
     <h3>Account Information</h3>
-    <div id="accountInfo">
-      <table class="bcls-table">
-        <tbody class="bcls-table__body">
-          <tr>
-            <td>Video Cloud Account ID:</td>
-            <td>
-              <input id="accountID" type="text" size="60" value="1507807800001" />
-            </td>
-          </tr>
-          <tr>
-            <td>Video ID:</td>
-            <td>
-              <input id="videoID" type="text" size="60" value="5622718636001" />
-            </td>
-          </tr>
-          <tr>
-            <td>Ad Server URL:</td>
-            <td>
-              <input id="adServerURL" type="text" size="60" value="https://solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vast.xml" />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <div id="accountInfo">
+        <table class="bcls-table">
+          <tbody class="bcls-table__body">
+            <tr>
+              <td>Video Cloud Account ID:</td>
+              <td>
+                <input id="accountID" type="text" size="60" value="3723496277001" />
+              </td>
+            </tr>
+            <tr>
+              <td>Ad Server URL:</td>
+              <td>
+                <input id="adServerURL" type="text" size="60" value="https://solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vast.xml" />
+              </td>
+            </tr>
+            <tr>
+              <td>Animation Duration:</td>
+              <td>
+                <input id="animationDuration" type="text" size="60" value="500" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
   </div>
 <p>
   <button id="buildPlayer" class="bcls-button" onclick="addPlayer()">Build the Player</button>
 </p>
 
   <h3>Player</h3>
-  <div class="bcls-fieldset">
-    <div id="placeHolder" style="width: 640px;height: 360px;background-color: #cfcfcf;">&nbsp;</div>
+  <div class="bcls-fieldset" style="background-color: #cfcfcf;">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nunc mi ipsum faucibus vitae aliquet nec. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nunc mi ipsum faucibus vitae aliquet nec.</p>
+      <div id="placeHolder"></div>
+      <p>Habitasse platea dictumst vestibulum rhoncus est pellentesque elit ullamcorper. Varius vel pharetra vel turpis nunc eget lorem dolor. Habitasse platea dictumst vestibulum rhoncus est pellentesque elit ullamcorper. Varius vel pharetra vel turpis nunc eget lorem dolor.</p>
   </div>
 
 <h3>Publishing Code</h3>
@@ -126,64 +128,73 @@
   </div>
 <!-- custom script -->
 <script type="text/JavaScript">
-  var myPlayer,
-    playerHTML,
-    playerScript,
-    publishingCode = document.getElementById('publishingCode'),
-    accountID = document.getElementById('accountID'),
-    videoID = document.getElementById('videoID'),
-    adServerURL = document.getElementById('adServerURL'),
-    options = {};
-  //  Build the player and place in HTML DOM
-  function addPlayer() {
-    options.accountID = accountID.value;
-    options.videoID = videoID.value;
-    options.adServerURL = adServerURL.value;
-    console.log('options', options);
-    // Dynamically build the player video element
-    playerHTML = '<video id=\"myPlayerID\" data-video-id=\"' + options.videoID + '\"  data-account=\"' + options.accountID + '\" data-player=\"default\" data-embed=\"default\" class=\"video-js\" controls></video>';
-    // Inject the player code into the DOM
-    document.getElementById('placeHolder').innerHTML = playerHTML;
-    // Add and execute the player script tag
-    playerScript = document.createElement('script');
-    playerScript.src = "//players.brightcove.net/" + options.accountID + "/default_default/index.min.js";
-    document.body.appendChild(playerScript);
-    playerScript.onload = callback;
-  }
-  //  Initialize the player and start the video
-  function callback() {
-    var ima = document.createElement('script');
-    ima.src = '//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.js';
-    document.body.appendChild(ima);
-    myPlayer = videojs('myPlayerID');
-    ima.onload = function () {
-      myPlayer.ima3({
-        // debug to true to see console messages
-        debug: true,
-        // set the requestMode to onload
-        requestMode: "onload",
-        // this is where your ad tag goes
-        serverUrl: options.adServerURL
-      });
-    }
-    buildHTML();
-  }
 
-  function buildHTML() {
-    var htmlText,
-      prettyText;
-    htmlText = '<!doctype html><html><head><meta charset="UTF-8"><title>Play a Preroll</title><!-- Page styles --><style>.video-js {width: 640px; height: 360px;}</style><link href="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.css" rel="stylesheet"></head><body>'
-    htmlText += playerHTML;
-    htmlText += playerScript.outerHTML;
-    htmlText += '<script src="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.js">\</script\>'
-    htmlText += '<script type="text/javascript">';
-    // htmlText += '\n\t\t\tvar myPlayer = videojs.getPlayer("myPlayerID");\n\t\t\tmyPlayer.ready(function(){\n\t\t\t\tmyPlayer.ima3({ \n\t\t\t\t\tdebug: true,\n\t\t\t\t\trequestMode: "onload",\n\t\t\t\t\tserverUrl: "' + options.adServerURL + '"\n\t\t\t\t})\n\t\t\t}); \</script\> </body> </html>';
-    htmlText += 'var myPlayer = videojs.getPlayer("myPlayerID");myPlayer.ready(function(){myPlayer.ima3({ debug: true,requestMode: "onload",serverUrl: "' + options.adServerURL + '"})}); \</script\> </body> </html>';
-    console.log('htmlText', htmlText);
+    var myPlayer,
+      playerHTML,
+      playerScript,
+      adonlyScript,
+      publishingCode = document.getElementById('publishingCode'),
+      adPlayerDiv = document.getElementById('placeHolder');
+      accountID = document.getElementById('accountID'),
+      animationDuration = document.getElementById('animationDuration'),
+      adServerURL = document.getElementById('adServerURL'),
+      options = {};
+
+    function addPlayer() {
+      options.accountID = accountID.value;
+      options.animationDuration = animationDuration.value;
+      options.adServerURL = adServerURL.value;
+      playerScript = document.createElement('script');
+      playerScript.src = "//players.brightcove.net/" + options.accountID + "/default_default/index.min.js";
+      document.head.appendChild(playerScript);
+      playerScript.onload = loadIMA;
+    }
+
+    function loadIMA() {
+      ima = document.createElement('script');
+      ima.src = '//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.js';
+      document.head.appendChild(ima);
+      ima.onload = loadAdonly;
+    }
+
+    function loadAdonly() {
+      adOnlyScript = document.createElement('script');
+      adOnlyScript.src = "//players.brightcove.net/3723496277001/files/adonly.js";
+      document.head.appendChild(adOnlyScript);
+      adOnlyScript.onload = playAd;
+    }
+
+    function playAd(){
+      bcPlayerTools.expandAndInjectAdOnlyPlayer({
+        div: adPlayerDiv,
+        adTag: options.adServerURL,
+        height: 360,
+        animationDuration: options.animationDuration
+      });
+      buildHTML();
+    }
+    function buildHTML(){
+      var htmlText,
+        prettyText;
+      htmlText = '<!doctype html> <html> <head> <meta charset="UTF-8"> <title>Untitled Document</title> </head> <body> <div style="width:600px"> <h1>Lorem Ipsum</h1> <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nunc mi ipsum faucibus vitae aliquet nec. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nunc mi ipsum faucibus vitae aliquet nec.</p> <div id="adPlayerDiv"></div> <p>Habitasse platea dictumst vestibulum rhoncus est pellentesque elit ullamcorper. Varius vel pharetra vel turpis nunc eget lorem dolor. Habitasse platea dictumst vestibulum rhoncus est pellentesque elit ullamcorper. Varius vel pharetra vel turpis nunc eget lorem dolor.</p> </div>';
+      htmlText += playerScript.outerHTML;
+      htmlText += '<link href="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.css" rel="stylesheet" /\>';
+      htmlText += '<script src="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.js">\</script\>';
+      htmlText += '<script src="//players.brightcove.net/3723496277001/files/adonly.js">\</script\>';
+      htmlText += '<script type="text/javascript">';
+      htmlText += 'bcPlayerTools.expandAndInjectAdOnlyPlayer({ div: adPlayerDiv, adTag: ' + options.adServerURL + ', height: 360, animationDuration: '+ options.animationDuration + ' });  \</script\> </body> </html> ';
+      console.log('htmlText: ', htmlText);
     prettyText = formatCode(htmlText, false, false);
     prettyText = prettyText.substring(1);
     publishingCode.textContent = prettyText;
+      
+    }
+
+  function copyCode() {
+    publishingCode.select();
+    document.execCommand('copy');
   }
+
   // Parameters:
   // code 								- (string) code you wish to format
   // stripWhiteSpaces			- (boolean) do you wish to remove multiple whitespaces coming after each other?
@@ -221,10 +232,7 @@
     return result;
   }
 
-  function copyCode() {
-    publishingCode.select();
-    document.execCommand('copy');
-  }
+
 </script>
 
 
