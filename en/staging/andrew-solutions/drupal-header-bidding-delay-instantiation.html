@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>Advertising with the SSAI Plugin</title>
+
 </head>
 
 <body>
+  <script async src="//acdn.adnxs.com/prebid/not-for-prod/1/prebid.js"></script>
       <h1>Doc Title</h1>
 <p>Enter values for the two form fields below to see header bidding in action using your player and video. (If you choose not to input your data, demo data is supplied.) The sample uses the AppNexus header bidding functionality.</p>
 <p>Below the player, the code for the player implementation is shown so you can copy and use.</p>
@@ -39,8 +41,6 @@
     color: #64AAB2;
     border: 1px #64AAB2 solid;
     border-radius: .5em;
-    /* width: 640px;
-           height: 480px; */
   }
   code {
     color: #E4B842;
@@ -93,28 +93,30 @@
     accountID = document.getElementById('accountID'),
     videoID = document.getElementById('videoID'),
     configOptions = {};
+
+
+    var pbjs = pbjs || {};
+    pbjs.que = pbjs.que || [];
+    iosDevice = !! navigator.platform.match(/iPhone|iPod|iPad/);
+
+
+
   //  Build the player and place in HTML DOM
   function addPlayer() {
     configOptions.accountID = accountID.value;
     configOptions.videoID = videoID.value;
     console.log('configOptions', configOptions);
-    // Dynamically build the player video element
-    playerHTML = '<video id=\"myPlayerID\" data-video-id=\"' + configOptions.videoID + '\"  data-account=\"' + configOptions.accountID + '\" data-player=\"default\" data-embed=\"default\" class=\"video-js\" controls></video>';
+    // Dynamically build the player video element, but only partially so it does not instantiate
+    playerHTML = '<video id=\"myPlayerID\" data-embed=\"default\" class=\"video-js\" controls></video>';
+
     // Inject the player code into the DOM
     document.getElementById('placeHolder').innerHTML = playerHTML;
     // Add and execute the player script tag
     playerScript = document.createElement('script');
     playerScript.src = "//players.brightcove.net/" + configOptions.accountID + "/default_default/index.min.js";
     document.body.appendChild(playerScript);
-    playerScript.onload = loadPrebid;
+    playerScript.onload = loadIMA;
   }
-
-    function loadPrebid() {
-      ima = document.createElement('script');
-      ima.src = '//acdn.adnxs.com/prebid/not-for-prod/1/prebid.js';
-      document.head.appendChild(ima);
-      ima.onload = loadIMA;
-    }
 
     function loadIMA() {
       ima = document.createElement('script');
@@ -124,12 +126,24 @@
     }
 
   function headerBidding() {
-    console.log('**********in header bidding');
+    // Instantiate player and immediately after call ima3 method
+    myPlayerID.setAttribute('data-account', 1507807800001);
+    myPlayerID.setAttribute('data-player', 'default');
+    myPlayerID.setAttribute('data-video-id', 5622718636001);
+    myPlayer = bc(document.getElementById("myPlayerID"));
+
+    console.log('**********calling IMA3 plugin next');
+    myPlayer.ima3({
+      serverUrl: getServerUrl,
+      debug: true,
+      timeout: 5000,
+      ima3SdkSettings: {
+        "disableCustomPlaybackForIOS10Plus": true
+      }
+    });
+
     //FROM HEADER BIDDING CODE
-    var pbjs = pbjs || {};
-    pbjs.que = pbjs.que || [];
-    iosDevice = !! navigator.platform.match(/iPhone|iPod|iPad/);
-    var getServerUrl = function (callback) {
+    function getServerUrl(callback) {
       var videoAdUnit = {
         code: 'video1',
         mediaTypes: {
@@ -175,20 +189,11 @@
         });
       });
     };
-    console.log('**********calling IMA3 plugin next');
-    bc("myPlayerID").ima3({
-      serverUrl: getServerUrl,
-      debug: true,
-      timeout: 5000,
-      ima3SdkSettings: {
-        "disableCustomPlaybackForIOS10Plus": true
-      }
-    });
-    videojs("myPlayerID").ready(function () {
-          console.log('**********in player ready');
-      var myPlayer = this;
+
+    myPlayer.ready(function () {
+      console.log('**********in player ready');
       myPlayer.on("ima3error", function () {
-        console.log("There was an ima3 error.");
+      console.log("There was an ima3 error.");
       });
     });
   }
