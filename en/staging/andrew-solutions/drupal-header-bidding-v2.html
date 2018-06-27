@@ -1,52 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Begin Drupal Taxonomy Data -->
-  <meta name="products" content="Video Cloud, Brightcove Player">
-  <meta name="role" content="Device SDK Developer">
-  <meta name="task" content="Develop with the Native SDKs">
-  <meta name="topic" content="Troubleshooting/Error Handling">
-  <meta name="sdk" content="iOS,tvOS,Android">
-  <meta name="keywords" content="device,SDK,FAQ">
-  <!-- End Drupal Taxonomy Data -->
-
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
-  <meta name="robots" content="noindex">
-  <!-- change title to match the h1 heading -->
+  <meta charset="UTF-8">
   <title>Advertising with the SSAI Plugin</title>
-
-  <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
-  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
-  <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700" rel="stylesheet" type="text/css">
-  <script src="//use.edgefonts.net/source-code-pro.js"></script>
-  <link rel="stylesheet" href="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.css">
-  <link rel="stylesheet" href="//docs.brightcove.com/en/styles/template-less/css/bcls-doc.css">
-  <link rel="stylesheet" href="/en/styles/foundation-fixes.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
-
 </head>
 
 <body>
-  <!-- header navbar -->
-  <div id="navWrapper" class="fixed"></div>
-  <!-- breadcrumbs -->
-  <nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
-  <!-- search -->
-  <div id="searchModal" class="reveal-modal" data-reveal></div>
-  <!-- content -->
-  <div class="row">
-    <div class="sidebar large-2 columns show-for-large-up">
-      <div id="sidenav" class="side-nav"></div>
-    </div>
-    <div id="main" class="large-10 small-12 columns">
       <h1>Doc Title</h1>
 <p>Enter values for the two form fields below to see header bidding in action using your player and video. (If you choose not to input your data, demo data is supplied.) The sample uses the AppNexus header bidding functionality.</p>
 <p>Below the player, the code for the player implementation is shown so you can copy and use.</p>
       <!-- BEGIN DRUPAL CONTENT -->
 
-<script async src="//acdn.adnxs.com/prebid/not-for-prod/1/prebid.js"></script>
+
 
 <style type="text/css">
   .video-js {
@@ -141,8 +106,15 @@
     playerScript = document.createElement('script');
     playerScript.src = "//players.brightcove.net/" + configOptions.accountID + "/default_default/index.min.js";
     document.body.appendChild(playerScript);
-    playerScript.onload = loadIMA;
+    playerScript.onload = loadPrebid;
   }
+
+    function loadPrebid() {
+      ima = document.createElement('script');
+      ima.src = '//acdn.adnxs.com/prebid/not-for-prod/1/prebid.js';
+      document.head.appendChild(ima);
+      ima.onload = loadIMA;
+    }
 
     function loadIMA() {
       ima = document.createElement('script');
@@ -158,7 +130,6 @@
     pbjs.que = pbjs.que || [];
     iosDevice = !! navigator.platform.match(/iPhone|iPod|iPad/);
     var getServerUrl = function (callback) {
-      console.log('**********in getServerUrl');
       var videoAdUnit = {
         code: 'video1',
         mediaTypes: {
@@ -220,87 +191,8 @@
         console.log("There was an ima3 error.");
       });
     });
-    //buildHTML();
   }
-
-  function buildHTML() {
-    var htmlText,
-      prettyText;
-    htmlText = '<!doctype html><html><head><meta charset="UTF-8"><title>Play a Preroll</title><!-- Page styles --><style>.video-js {width: 640px; height: 360px;}</style><link href="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.css" rel="stylesheet"></head><body>'
-    htmlText += playerHTML;
-    htmlText += playerScript.outerHTML;
-    htmlText += '<script src="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.js">\</script\>'
-    htmlText += '<script type="text/javascript">';
-
-    htmlText += 'var myPlayer = videojs.getPlayer("myPlayerID");myPlayer.ready(function(){myPlayer.ima3({ debug: true,requestMode: "onload",serverUrl: "' + configOptions.adServerURL + '"})}); \</script\> </body> </html>';
-    console.log('htmlText', htmlText);
-    prettyText = formatCode(htmlText, false, false);
-    prettyText = prettyText.substring(1);
-    publishingCode.textContent = prettyText;
-  }
-  // Parameters:
-  // code 								- (string) code you wish to format
-  // stripWhiteSpaces			- (boolean) do you wish to remove multiple whitespaces coming after each other?
-  // stripEmptyLines 			- (boolean) do you wish to remove empty lines?
-  function formatCode(code, stripWhiteSpaces, stripEmptyLines) {
-    "use strict";
-    var whitespace = ' '.repeat(1); // Default indenting 4 whitespaces
-    var currentIndent = 0;
-    var char = null;
-    var nextChar = null;
-    var result = '';
-    for (var pos = 0; pos <= code.length; pos++) {
-      char = code.substr(pos, 1);
-      nextChar = code.substr(pos + 1, 1);
-      // If opening tag, add newline character and indention
-      if (char === '<' && nextChar !== '/') {
-        result += '\n' + whitespace.repeat(currentIndent);
-        currentIndent++;
-      }
-      // if Closing tag, add newline and indention
-      else if (char === '<' && nextChar === '/') {
-        // If there're more closing tags than opening
-        if (--currentIndent < 0) currentIndent = 0;
-        result += '\n' + whitespace.repeat(currentIndent);
-      }
-      // remove multiple whitespaces
-      else if (stripWhiteSpaces === true && char === ' ' && nextChar === ' ') char = '';
-      // remove empty lines
-      else if (stripEmptyLines === true && char === '\n') {
-        //debugger;
-        if (code.substr(pos, code.substr(pos).indexOf("<")).trim() === '') char = '';
-      }
-      result += char;
-    }
-    return result;
-  }
-
-  function copyCode() {
-    publishingCode.select();
-    document.execCommand('copy');
-  }
-
 </script>
-
-
-      <!-- END DRUPAL CONTENT -->
-    </div>
-  </div>
-
-  <!-- bcl scripts -->
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
-  <script src="/en/scripts/docs-nav-data.min.js"></script>
-  <script src="/en/scripts/bcls-doc-site-v3.js"></script>
-  <script src="//learning-services-media.brightcove.com/doc-assets/js/bcls-utils.js"></script>
-  <script src="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.js"></script>
-  <script>
-    $(document).foundation();
-  </script>
-  <!-- Any scripts specific to page samples should go here -->
 </body>
 
 </html>
