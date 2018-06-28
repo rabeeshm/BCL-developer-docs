@@ -6,7 +6,10 @@ function postfix() {
     description_div = document.getElementsByClassName('description')[0],
     opblocks = document.getElementsByClassName('opblock'),
     model_containers = document.getElementsByClassName('model-container'),
-
+    rootURLdiv = document.createElement('div'),
+    rootURLpre = document.createElement('pre'),
+    rootURL = document.querySelector('div.servers select option').value,
+    rootURLpre.textContent = rootURL,
     expand_all,
     img = document.createElement('img'),
     aDocs = document.createElement('a'),
@@ -35,8 +38,10 @@ function postfix() {
   span.textContent = txt;
   p.appendChild(btn);
   p.appendChild(span);
+  rootURLdiv.appendChild(rootURLpre);
   // note that description_div is defined before postfix() is called
   description_div.appendChild(p);
+  description_div.appendChild(rootURLdiv);
   expand_all = document.getElementById('expand_all');
   expand_all.addEventListener('click', function () {
     var str = '?docExpansion=full',
@@ -47,7 +52,7 @@ function postfix() {
       console.log('dom', dom);
       console.log('path', path);
     console.log('href', prot + '//' + dom + path + str);
-      
+
       window.location.href = prot + '//' + dom + path + str;
   });
 }
