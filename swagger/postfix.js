@@ -9,7 +9,7 @@ function postfix() {
     rootURLdiv = document.createElement('div'),
     rootURLpre = document.createElement('pre'),
     rootURL = document.querySelector('div.servers select option').value,
-    rootURLpre.textContent = rootURL,
+
     expand_all,
     img = document.createElement('img'),
     aDocs = document.createElement('a'),
@@ -38,6 +38,7 @@ function postfix() {
   span.textContent = txt;
   p.appendChild(btn);
   p.appendChild(span);
+  rootURLpre.textContent = rootURL,
   rootURLdiv.appendChild(rootURLpre);
   // note that description_div is defined before postfix() is called
   description_div.appendChild(p);
