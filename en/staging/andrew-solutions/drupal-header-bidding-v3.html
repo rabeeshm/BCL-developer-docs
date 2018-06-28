@@ -221,56 +221,45 @@
         }
 
         function buildHTML() {
-          var htmlText,
+          var htmlText1,
+            htmlText2,
+            jsText,
             prettyText;
           htmlText = '<!DOCTYPE html> <html> <head> <meta charset="UTF-8"> <script async src="//acdn.adnxs.com/prebid/not-for-prod/1/prebid.js">\</script\> <link href="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.css" rel="stylesheet"> <title>Prebid Video -- Brightcove Player</title> </head> <body> <h1>Prebid Video -- Brightcove Player</h1>';
-          displayPlayerHTML = '<video id="myPlayerID" data-account="' + configOptions.accountID + '" data-player="defalut" data-video-id="' + configOptions.videoID + '" data-embed="default" data-application-id class="video-js" playsinline controls width="640" height="480"></video>';
-          htmlText += displayPlayerHTML;
-          htmlText += playerScript.outerHTML;
-          htmlText += '<script src="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.js">\</script\>';
-          htmlText += '<script type="text/javascript">';
-          htmlText += ' var pbjs = pbjs || {}; pbjs.que = pbjs.que || []; iosDevice = !! navigator.platform.match(/iPhone|iPod|iPad/); function getServerUrl(callback) { var videoAdUnit = { code: "video1", mediaTypes: { video: { playerSize: [640, 480], context: "instream" } }, bids: [{ bidder: "appnexus", params: { placementId: iosDevice ? 13239390 : 13232361, video: { skipppable: true, playback_method: ["auto_play_sound_off"] } } }] }; pbjs.que.push(function () { pbjs.addAdUnits(videoAdUnit); pbjs.setConfig({ debug: true, cache: { url: "https://prebid.adnxs.com/pbc/v1/cache" } }); pbjs.requestBids({ bidsBackHandler: function (bids) { var videoUrl = pbjs.adServers.dfp.buildVideoUrl({ adUnit: videoAdUnit, params: { iu: "/19968336/prebid_cache_video_adunit", cust_params: { section: "blog", anotherKey: "anotherValue" }, output: "vast" } }); callback(videoUrl); } }); }); }; bc("myPlayerID").ima3({ serverUrl: getServerUrl, debug: true, timeout: 5000, ima3SdkSettings: { "disableCustomPlaybackForIOS10Plus": true } }); var myPlayer = videojs.getPlayer("myPlayerID"); myPlayer.ready(function() { myPlayer.on("ima3error", function () { console.log("There was an ima3 error."); }); }); \</script\> </body> </html>';
+          displayPlayerHTML = '<video id="myPlayerID" data-account="' + configOptions.accountID + '" data-player="default" data-video-id="' + configOptions.videoID + '" data-embed="default" data-application-id class="video-js" playsinline controls width="640" height="480"></video>';
+          htmlText1 += displayPlayerHTML;
+          htmlText1 += playerScript.outerHTML;
+          htmlText1 += '<script src="//players.brightcove.net/videojs-ima3/3/videojs.ima3.min.js">\</script\>';
+          htmlText1 += '<script type="text/javascript">';
+          getFormattedHTML(htmlText1,'html')
+          jsText = ' var pbjs = pbjs || {}; pbjs.que = pbjs.que || []; iosDevice = !! navigator.platform.match(/iPhone|iPod|iPad/); function getServerUrl(callback) { var videoAdUnit = { code: "video1", mediaTypes: { video: { playerSize: [640, 480], context: "instream" } }, bids: [{ bidder: "appnexus", params: { placementId: iosDevice ? 13239390 : 13232361, video: { skipppable: true, playback_method: ["auto_play_sound_off"] } } }] }; pbjs.que.push(function () { pbjs.addAdUnits(videoAdUnit); pbjs.setConfig({ debug: true, cache: { url: "https://prebid.adnxs.com/pbc/v1/cache" } }); pbjs.requestBids({ bidsBackHandler: function (bids) { var videoUrl = pbjs.adServers.dfp.buildVideoUrl({ adUnit: videoAdUnit, params: { iu: "/19968336/prebid_cache_video_adunit", cust_params: { section: "blog", anotherKey: "anotherValue" }, output: "vast" } }); callback(videoUrl); } }); }); }; bc("myPlayerID").ima3({ serverUrl: getServerUrl, debug: true, timeout: 5000, ima3SdkSettings: { "disableCustomPlaybackForIOS10Plus": true } }); var myPlayer = videojs.getPlayer("myPlayerID"); myPlayer.ready(function() { myPlayer.on("ima3error", function () { console.log("There was an ima3 error."); }); });';
+          htmlText2 =  '\</script\> </body> </html>';
           console.log('^^^^^^^^^^^^htmlText',htmlText);
-          prettyText = formatCode(htmlText, false, false);
-          prettyText = prettyText.substring(1);
-          publishingCode.textContent = prettyText;
         }
-         // Parameters:
-         // code 								- (string) code you wish to format
-         // stripWhiteSpaces			- (boolean) do you wish to remove multiple whitespaces coming after each other?
-         // stripEmptyLines 			- (boolean) do you wish to remove empty lines?
-        function formatCode(code, stripWhiteSpaces, stripEmptyLines) {
-          "use strict";
-          var whitespace = ' '.repeat(1); // Default indenting 4 whitespaces
-          var currentIndent = 0;
-          var char = null;
-          var nextChar = null;
-          var result = '';
-          for (var pos = 0; pos <= code.length; pos++) {
-            char = code.substr(pos, 1);
-            nextChar = code.substr(pos + 1, 1);
-            // If opening tag, add newline character and indention
-            if (char === '<' && nextChar !== '/') {
-              result += '\n' + whitespace.repeat(currentIndent);
-              currentIndent++;
-            }
-            // if Closing tag, add newline and indention
-            else if (char === '<' && nextChar === '/') {
-              // If there're more closing tags than opening
-              if (--currentIndent < 0) currentIndent = 0;
-              result += '\n' + whitespace.repeat(currentIndent);
-            }
-            // remove multiple whitespaces
-            else if (stripWhiteSpaces === true && char === ' ' && nextChar === ' ') char = '';
-            // remove empty lines
-            else if (stripEmptyLines === true && char === '\n') {
-              //debugger;
-              if (code.substr(pos, code.substr(pos).indexOf("<")).trim() === '') char = '';
-            }
-            result += char;
-          }
-          return result;
-        }
+
+
+
+
+function getFormattedHTML(theText,jsOrHTML){
+  var xhr = new XMLHttpRequest();
+  xhr.withCredentials = false;
+
+  xhr.addEventListener("readystatechange", function () {
+    if (this.readyState === 4) {
+      console.log('@@@@@@@@@@@@@@this.responseText',this.responseText);
+    }
+  });
+
+  xhr.open("POST", "https://www.10bestdesign.com/dirtymarkup/api/html");
+  xhr.setRequestHeader("content-type", "application/x-www-form-urlencoded");
+  xhr.setRequestHeader("cache-control", "no-cache");
+  xhr.setRequestHeader("postman-token", "6fa4f83d-9f0c-5b28-c45f-1803670ffcb1");
+
+  xhr.send(data);
+}
+
+
+
 
         function copyCode() {
           publishingCode.select();
