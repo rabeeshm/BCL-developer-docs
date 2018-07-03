@@ -15,6 +15,9 @@ function postfix() {
     aDocs = document.createElement('a'),
     aHome = document.createElement('a'),
     p = document.createElement('p'),
+    swaggerContainer = document.getElementsByClassName('swagger-container')[0],
+    swaggerUI = document.getElementsByClassName('swagger-ui')[1],
+    sideNav = document.createElement('div')
     frag = document.createDocumentFragment();
   // add custom header
   img.setAttribute('src', 'https://learning-services-media.brightcove.com/doc-assets/general/images/bc-logo-ondark-small.png');
@@ -31,6 +34,9 @@ function postfix() {
   frag.appendChild(aHome);
   frag.appendChild(aDocs);
   topbar_wrapper.appendChild(frag);
+  swaggerContainer.setAttribute('style', 'position:relative');
+  swaggerUI.setAttribute('style', 'display:inline-block;')
+  sideNav
   // add expand all button
   btn.setAttribute('id', 'expand_all');
   btn.setAttribute('class', 'btn try-out__btn');
