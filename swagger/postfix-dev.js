@@ -4,7 +4,7 @@ function postfix() {
     txt = ' (click to make the entire doc searchable)',
     span = document.createElement(span),
     description_div = document.getElementsByClassName('description')[0],
-    opblocks = document.getElementsByClassName('opblock'),
+    opBlockSections = document.getElementsByClassName('opblock'),
     model_containers = document.getElementsByClassName('model-container'),
     rootURLdiv = document.createElement('div'),
     rootURLpre = document.createElement('pre'),
@@ -18,19 +18,23 @@ function postfix() {
     swaggerContainer = document.getElementsByClassName('swagger-container')[0],
     swaggerUI = document.getElementsByClassName('swagger-ui')[1],
     sideNav = document.createElement('div'),
-    opBlocks = document.getElementsByClassName('opblock-tag-section'),
+    opBlockSections = document.getElementsByClassName('opblock-tag-section'),
     opBlockLinks = document.querySelector('a.nostyle'),
     frag = document.createDocumentFragment(),
     navFrag = document.createDocumentFragment(),
     i,
-    iMax;
+    iMax,
+    j,
+    jMax;
 
   // add side nav
   swaggerContainer.setAttribute('style', 'position:relative');
   sideNav.setAttribute('style', 'position:fixed;top:64px;width:300px;height:100%;overflow-y:scroll;margin-right:10px;border-right:1px #ccc solid;');
-  iMax = opBlocks.length;
+  iMax = opBlockSections.length;
   for (i = 0; i < iMax; i++) {
-    
+    var h5 = document.createElement('h5'),
+      opBlocks = opBlockSections[i].querySelector('opblock'),
+      opBlockLink = opBlockSections[i].querySelector('a.nostyle');
   }
 
 
