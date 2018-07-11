@@ -21,6 +21,10 @@ function postfix() {
     opBlocks = document.getElementsByClassName('opblock-tag-section'),
     opBlockLinks = document.querySelector('a.nostyle'),
     frag = document.createDocumentFragment();
+
+  // add side nav
+swaggerContainer.setAttribute('style', 'position:relative')
+
   // add custom header
   img.setAttribute('src', 'https://learning-services-media.brightcove.com/doc-assets/general/images/bc-logo-ondark-small.png');
   img.setAttribute('alt', 'Brightcove');
