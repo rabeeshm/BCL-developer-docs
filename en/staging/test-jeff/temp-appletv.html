@@ -184,9 +184,10 @@
           Jump back to the current live moment to watch content in real-time
         </li>
       </ul>
-      <h3>Live streams</h3>
+
+      <h3>Implementing playback</h3>
       <p>
-        To play a live stream from your Apple TV app, do the following:
+        To play a live or live DVR stream from your Apple TV app, do the following:
       </p>
       <ol class="bcls-tasklist__restart">
         <li>
@@ -194,23 +195,84 @@
         </li>
         <li>
           <p>
-            In the <code>createTVPlayerView()</code> function, set the <code>playerType</code> to <code>live</code>.
+            In the <code>createTVPlayerView()</code> function, set the <code>playerType</code> to either <code>live</code> or <code>liveDVR</code>.
           </p>
            <pre class="line-numbers"><code class="language-swift">playerView = BCOVTVPlayerView(options: options)
 if (playerView != nil) {
     playerView!.frame = self.videoContainerView.bounds
-    <span class="bcls-highlight">playerView!.playerType = BCOVTVPlayerType.live;</span>
+    <span class="bcls-highlight">playerView!.playerType = BCOVTVPlayerType.liveDVR;</span>
     self.videoContainerView.addSubview(playerView!)
 }</code></pre>
         </li>
         <li>
-          In the <code>viewDidLoad()</code> function, commment out the calls to the <code>createSampleTabBarItemView()</code> and <code>requestContentFromPlaybackService()</code> functions.
+          Locate the  <code>viewDidLoad()</code> function.
         </li>
         <li>
-
+          The call to the <code>createSampleTabBarItemView()</code> function is optional and shows you how to create a custom view in the tab bar. For this example, we will comment the call to this function.
         </li>
+        <li>
+          Comment the call to the <code>requestContentFromPlaybackService()</code> function.
+        </li>
+        <li>
+          <p>
+            In the <code>viewDidLoad()</code> function, before the closing bracket, add code to do the following:
+          </p>
+          <ul>
+            <li>
+              Define the URL string for your live or live DVR stream.
+            </li>
+            <li>
+              Create a <code>BCOVVideo</code> object using your live or live DVR stream URL from the previous step.
+            </li>
+            <li>
+              Call the <code>setVideos()</code> function to add your live stream to the the <code>playbackController</code>'s playback queue, which is set to automatically start playing.
+            </li>
+            <pre class="line-numbers"><code class="language-swift">override func viewDidLoad()
+{
+    super.viewDidLoad()
+    // Do any additional setup after loading the view, typically from a nib.
 
+    createTVPlayerView()
+
+//        createSampleTabBarItemView()
+
+    // Create and configure the playback controller
+    playbackController.delegate = self
+    playbackController.isAutoAdvance = true
+    playbackController.isAutoPlay = true
+
+    // Link the playback controller to the Player View
+    playerView?.playbackController = playbackController
+
+//        requestContentFromPlaybackService()
+
+    // live stream
+    <span class="bcls-highlight">let url = URL(string: &quot;<span class="bcls-input">your live stream url</span>&quot;)
+
+    let video: BCOVVideo = BCOVVideo(hlsSourceURL:url )
+    self.playbackController.setVideos([video] as NSArray)</span>
+}</code></pre>
+          </ul>
+        </li>
       </ol>
+      <h4>Live stream controls</h4>
+      <p>
+        The progress bar provided by the Native SDK for tvOS will look like this:
+      </p>
+      <figure class="bcls-figure"><img class="bcls-image--no-border" alt="Live stream" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/tvos/playback-controls/live-stream.png" />
+        <figcaption class="bcls-caption--image">Live stream
+        </figcaption>
+      </figure>
+
+      <h4>Live DVR controls</h4>
+      <p>
+        While watching the live stream in real-time, the progress bar will be completely filled. Seeking to a previous time in the stream will look similar to this:
+      </p>
+      <figure class="bcls-figure"><img class="bcls-image--no-border" alt="Live stream" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/tvos/playback-controls/live-dvr.png" />
+        <figcaption class="bcls-caption--image">Live DVR stream
+        </figcaption>
+      </figure>
+
     </section>
   </article>
 
