@@ -20,11 +20,14 @@ function postfix() {
     sideNav = document.createElement('div'),
     opBlocks = document.getElementsByClassName('opblock-tag-section'),
     opBlockLinks = document.querySelector('a.nostyle'),
-    frag = document.createDocumentFragment();
+    frag = document.createDocumentFragment(),
+    navFrag = document.createDocumentFragment();
 
   // add side nav
   swaggerContainer.setAttribute('style', 'position:relative');
   sideNav.setAttribute('style', 'position:fixed;top:64px;width:300px;height:100%;overflow-y:scroll;margin-right:10px;border-right:1px #ccc solid;');
+
+
 
   // add custom header
   img.setAttribute('src', 'https://learning-services-media.brightcove.com/doc-assets/general/images/bc-logo-ondark-small.png');
