@@ -19,7 +19,7 @@ function postfix() {
     swaggerUI = document.getElementsByClassName('swagger-ui')[1],
     sideNav = document.createElement('div'),
     opBlocks = document.getElementsByClassName('opblock-tag-section'),
-    opBlockLinks = document.querySelector('a.nostyle')
+    opBlockLinks = document.querySelector('a.nostyle'),
     frag = document.createDocumentFragment();
   // add custom header
   img.setAttribute('src', 'https://learning-services-media.brightcove.com/doc-assets/general/images/bc-logo-ondark-small.png');
