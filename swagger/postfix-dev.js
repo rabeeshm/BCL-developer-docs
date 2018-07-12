@@ -29,8 +29,9 @@ function postfix() {
 
   // add side nav
   swaggerContainer.setAttribute('style', 'position:relative');
-  sideNav.setAttribute('style', 'position:fixed;top:64px;width:300px;height:100%;overflow-y:scroll;margin-right:iem;border-right:1px #ccc solid;');
-  swaggerUI.setAttribute('style', 'position:fixed;left:300px;top:64px;overflow-y:scroll;margin-left:1em;');
+  // sideNav.setAttribute('style', 'position:fixed;top:64px;width:300px;height:100%;overflow-y:scroll;margin-right:iem;border-right:1px #ccc solid;');
+  sideNav.setAttribute('style', 'display:inline-block')
+  // swaggerUI.setAttribute('style', 'position:fixed;left:300px;top:64px;overflow-y:scroll;margin-left:1em;');
   iMax = opBlockSections.length;
   for (i = 0; i < iMax; i++) {
     var h5 = document.createElement('h5'),
@@ -60,7 +61,7 @@ function postfix() {
       sideNav.appendChild(ul);
   }
 swaggerUI.insertAdjacentElement('beforebegin', sideNav);
-swaggerUI.setAttribute('style', 'position:fixed;left:300px;top:64px;overflow-y:scroll;margin-left:1em;');
+// swaggerUI.setAttribute('style', 'position:fixed;left:300px;top:64px;overflow-y:scroll;margin-left:1em;');
 
 
   // add custom header
