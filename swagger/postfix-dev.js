@@ -36,10 +36,11 @@ function postfix() {
     var h5 = document.createElement('h5'),
       ul = document.createElement('ul'),
       sectionA = document.createElement('a'),
+      opBlockSection = opBlockSections[i],
       opBlocks = opBlockSections[i].querySelector('opblock'),
-      opBlockSectionLink = opBlockSections[i].querySelector('a.nostyle'),
-      opBlockSectionHash = opBlockSectionLink[0].getAttribute('href'),
-      opBlockTitle = opBlockSectionLink[0].querySelector('span')[0].textContent;
+      opBlockSectionLink = opBlockSection.querySelector('a.nostyle'),
+      opBlockSectionHash = opBlockSectionLink.getAttribute('href'),
+      opBlockTitle = opBlockSectionLink.querySelector('span').textContent;
       ul.setAttribute('style', 'list-style-type:none;');
       sectionA.setAttribute('href', opBlockSectionHash),
       sectionA.textContent = opBlockTitle;
