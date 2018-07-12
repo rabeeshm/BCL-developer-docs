@@ -34,7 +34,8 @@ function postfix() {
   for (i = 0; i < iMax; i++) {
     var h5 = document.createElement('h5'),
       opBlocks = opBlockSections[i].querySelector('opblock'),
-      opBlockLink = opBlockSections[i].querySelector('a.nostyle');
+      opBlockLink = opBlockSections[i].querySelector('a.nostyle'),
+      opBlockHash = opBlockLink.getAttribute('href');
   }
 
 
