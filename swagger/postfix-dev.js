@@ -21,7 +21,6 @@ function postfix() {
     opBlockSections = document.getElementsByClassName('opblock-tag-section'),
     opBlockLinks = document.querySelector('a.nostyle'),
     frag = document.createDocumentFragment(),
-    navFrag = document.createDocumentFragment(),
     i,
     iMax,
     j,
@@ -39,6 +38,8 @@ function postfix() {
       opBlockLink = opBlockSections[i].querySelector('a.nostyle'),
       opBlockHash = opBlockLink[0].getAttribute('href'),
       opBlockTitle = opBlockLink.querySelector('span')[0].textContent;
+      h5.textContent = opBlockTitle;
+      jMax = opBlocks.length
   }
 
 
