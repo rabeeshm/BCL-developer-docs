@@ -33,6 +33,7 @@ function postfix() {
   iMax = opBlockSections.length;
   for (i = 0; i < iMax; i++) {
     var h5 = document.createElement('h5'),
+      ul = document.createElement('ul'),
       opBlocks = opBlockSections[i].querySelector('opblock'),
       opBlockLink = opBlockSections[i].querySelector('a.nostyle'),
       opBlockHash = opBlockLink[0].getAttribute('href'),
