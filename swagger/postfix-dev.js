@@ -75,7 +75,6 @@ swaggerUI.insertAdjacentElement('beforebegin', sideNav);
   aHome.setAttribute('class', 'topbar-a');
   aHome.textContent = 'API References Index';
   topbar_wrapper.innerHTML = '';
-  topbar_wrapper.setAttribute('style', 'position:fixed;top:0;left:0;')
   frag.appendChild(img);
   frag.appendChild(aHome);
   frag.appendChild(aDocs);
