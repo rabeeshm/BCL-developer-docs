@@ -21,6 +21,7 @@ function postfix() {
     opBlockSections = document.getElementsByClassName('opblock-tag-section'),
     opBlockSectionLinks = document.querySelector('a.nostyle'),
     frag = document.createDocumentFragment(),
+    navFrag = document.createDocumentFragment(),
     i,
     iMax,
     j,
@@ -34,19 +35,30 @@ function postfix() {
   for (i = 0; i < iMax; i++) {
     var h5 = document.createElement('h5'),
       ul = document.createElement('ul'),
+      sectionA = document.createElement('a'),
       opBlocks = opBlockSections[i].querySelector('opblock'),
       opBlockSectionLink = opBlockSections[i].querySelector('a.nostyle'),
-      opBlockHash = opBlockSectionLink[0].getAttribute('href'),
+      opBlockSectionHash = opBlockSectionLink[0].getAttribute('href'),
       opBlockTitle = opBlockSectionLink[0].querySelector('span')[0].textContent;
       ul.setAttribute('style', 'list-style-type:none;');
-      h5.textContent = opBlockTitle;
+      sectionA.setAttribute('href', opBlockSectionHash),
+      sectionA.textContent = opBlockTitle;
+      h5.appendChild(sectionA);
       jMax = opBlocks.length;
       for (j = 0; j < jMax; j++) {
         var li = document.createElement('li'),
           a = document.createElement('a'),
-      }
-  }
+          opBlock = opBlocks[i];
 
+          a.setAttribute('href', opBlock.querySelector('a.nostyle'))[0].getAttribute('href');
+          a.textContent = opBlock.querySelector('.opblock-summary-description')[0].textContent;
+          ul.appendChild(li);
+          li.appendChild(a);
+      }
+      navFrag.appendChild(h5);
+      navFrag.appendChild(ul);
+  }
+swaggerUI.insertAdjacentElement('beforebegin', navFrag);
 
   // add custom header
   img.setAttribute('src', 'https://learning-services-media.brightcove.com/doc-assets/general/images/bc-logo-ondark-small.png');
