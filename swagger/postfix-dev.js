@@ -37,7 +37,7 @@ function postfix() {
       ul = document.createElement('ul'),
       sectionA = document.createElement('a'),
       opBlockSection = opBlockSections[i],
-      opBlocks = opBlockSections[i].querySelector('opblock'),
+      opBlocks = opBlockSection.querySelectorAll('opblock'),
       opBlockSectionLink = opBlockSection.querySelector('a.nostyle'),
       opBlockSectionHash = opBlockSectionLink.getAttribute('href'),
       opBlockTitle = opBlockSectionLink.querySelector('span').textContent;
@@ -51,8 +51,8 @@ function postfix() {
           a = document.createElement('a'),
           opBlock = opBlocks[i];
 
-          a.setAttribute('href', opBlock.querySelector('a.nostyle'))[0].getAttribute('href');
-          a.textContent = opBlock.querySelector('.opblock-summary-description')[0].textContent;
+          a.setAttribute('href', opBlock.querySelector('a.nostyle')).getAttribute('href');
+          a.textContent = opBlock.querySelector('.opblock-summary-description').textContent;
           ul.appendChild(li);
           li.appendChild(a);
       }
