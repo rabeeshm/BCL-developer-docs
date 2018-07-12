@@ -19,7 +19,7 @@ function postfix() {
     swaggerUI = document.getElementsByClassName('swagger-ui')[1],
     sideNav = document.createElement('div'),
     opBlockSections = document.getElementsByClassName('opblock-tag-section'),
-    opBlockLinks = document.querySelector('a.nostyle'),
+    opBlockSectionLinks = document.querySelector('a.nostyle'),
     frag = document.createDocumentFragment(),
     i,
     iMax,
@@ -28,20 +28,22 @@ function postfix() {
 
   // add side nav
   swaggerContainer.setAttribute('style', 'position:relative');
-  sideNav.setAttribute('style', 'position:fixed;top:64px;width:300px;height:100%;overflow-y:scroll;margin-right:10px;border-right:1px #ccc solid;');
-  swaggerUI.setAttribute('style', 'position:fixed;left:300px;top:64px;overflow-y:scroll;')
+  sideNav.setAttribute('style', 'position:fixed;top:64px;width:300px;height:100%;overflow-y:scroll;margin-right:iem;border-right:1px #ccc solid;');
+  swaggerUI.setAttribute('style', 'position:fixed;left:300px;top:64px;overflow-y:scroll;margin-left:1em;')
   iMax = opBlockSections.length;
   for (i = 0; i < iMax; i++) {
     var h5 = document.createElement('h5'),
       ul = document.createElement('ul'),
       opBlocks = opBlockSections[i].querySelector('opblock'),
-      opBlockLink = opBlockSections[i].querySelector('a.nostyle'),
-      opBlockHash = opBlockLink[0].getAttribute('href'),
-      opBlockTitle = opBlockLink.querySelector('span')[0].textContent;
+      opBlockSectionLink = opBlockSections[i].querySelector('a.nostyle'),
+      opBlockHash = opBlockSectionLink[0].getAttribute('href'),
+      opBlockTitle = opBlockSectionLink[0].querySelector('span')[0].textContent;
+      ul.setAttribute('style', 'list-style-type:none;');
       h5.textContent = opBlockTitle;
       jMax = opBlocks.length;
       for (j = 0; j < jMax; j++) {
-        
+        var li = document.createElement('li'),
+          a = document.createElement('a'),
       }
   }
 
