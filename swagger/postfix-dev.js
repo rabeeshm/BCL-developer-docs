@@ -56,10 +56,10 @@ function postfix() {
           ul.appendChild(li);
           li.appendChild(a);
       }
-      navFrag.appendChild(h5);
-      navFrag.appendChild(ul);
+      sideNav.appendChild(h5);
+      sideNav.appendChild(ul);
   }
-swaggerUI.insertAdjacentElement('beforebegin', navFrag);
+swaggerUI.insertAdjacentElement('beforebegin', sideNav);
 
   // add custom header
   img.setAttribute('src', 'https://learning-services-media.brightcove.com/doc-assets/general/images/bc-logo-ondark-small.png');
