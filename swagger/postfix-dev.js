@@ -30,6 +30,7 @@ function postfix() {
   // add side nav
   swaggerContainer.setAttribute('style', 'position:relative');
   sideNav.setAttribute('style', 'position:fixed;top:64px;width:300px;height:100%;overflow-y:scroll;margin-right:10px;border-right:1px #ccc solid;');
+  swaggerUI.setAttribute('style', 'position:fixed;left:300px;top:64px;overflow-y:scroll;')
   iMax = opBlockSections.length;
   for (i = 0; i < iMax; i++) {
     var h5 = document.createElement('h5'),
@@ -52,6 +53,7 @@ function postfix() {
   aHome.setAttribute('class', 'topbar-a');
   aHome.textContent = 'API References Index';
   topbar_wrapper.innerHTML = '';
+  topbar_wrapper.setAttribute('style', 'position:fixed;top:0;left:0;')
   frag.appendChild(img);
   frag.appendChild(aHome);
   frag.appendChild(aDocs);
