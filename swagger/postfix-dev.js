@@ -30,7 +30,7 @@ function postfix() {
   // add side nav
   swaggerContainer.setAttribute('style', 'position:relative');
   sideNav.setAttribute('style', 'position:fixed;top:64px;width:300px;height:100%;overflow-y:scroll;margin-right:iem;border-right:1px #ccc solid;');
-  swaggerUI.setAttribute('style', 'position:fixed;left:300px;top:64px;overflow-y:scroll;margin-left:1em;')
+  swaggerUI.setAttribute('style', 'position:fixed;left:300px;top:64px;overflow-y:scroll;margin-left:1em;');
   iMax = opBlockSections.length;
   for (i = 0; i < iMax; i++) {
     var h5 = document.createElement('h5'),
@@ -49,7 +49,7 @@ function postfix() {
       for (j = 0; j < jMax; j++) {
         var li = document.createElement('li'),
           a = document.createElement('a'),
-          opBlock = opBlocks[i];
+          opBlock = opBlocks[j];
 
           a.setAttribute('href', opBlock.querySelector('a.nostyle')).getAttribute('href');
           a.textContent = opBlock.querySelector('.opblock-summary-description').textContent;
@@ -60,6 +60,8 @@ function postfix() {
       sideNav.appendChild(ul);
   }
 swaggerUI.insertAdjacentElement('beforebegin', sideNav);
+swaggerUI.setAttribute('style', 'position:fixed;left:300px;top:64px;overflow-y:scroll;margin-left:1em;');
+
 
   // add custom header
   img.setAttribute('src', 'https://learning-services-media.brightcove.com/doc-assets/general/images/bc-logo-ondark-small.png');
