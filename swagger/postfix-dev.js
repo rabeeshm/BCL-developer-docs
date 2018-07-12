@@ -39,7 +39,10 @@ function postfix() {
       opBlockHash = opBlockLink[0].getAttribute('href'),
       opBlockTitle = opBlockLink.querySelector('span')[0].textContent;
       h5.textContent = opBlockTitle;
-      jMax = opBlocks.length
+      jMax = opBlocks.length;
+      for (j = 0; j < jMax; j++) {
+        
+      }
   }
 
 
