@@ -12,8 +12,8 @@
  * @apiHeader {String} Authorization Authorization: Bearer access_token (see [Getting Access Tokens](https://support.brightcove.com/getting-access-tokens))
  * @apiHeader {String} Accept-Encoding Accept-Encoding: gzip (optional)
  *
- * @apiParam {String} account_id a Video Cloud account ID
- * @apiParam {String} video_id a Video Cloud video ID
+ * @apiParam (Path Parameters) {String} account_id a Video Cloud account ID
+ * @apiParam (Path Parameters) {String} video_id a Video Cloud video ID
  *
  * @apiParamExample {String} Video Dimension Report Example:
  *     https://analytics.api.brightcove.com/v1/alltime/accounts/20318290001/videos/2660272749001
