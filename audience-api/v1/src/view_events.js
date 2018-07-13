@@ -11,7 +11,7 @@
  * @apiHeader {String} Content-Type Content-Type: application/json
  * @apiHeader {String} Authorization Authorization: Bearer access_token (see [Getting Access Tokens](https://support.brightcove.com/getting-access-tokens))
  *
- * @apiParam {Number} account_id a Video Cloud account ID
+ * @apiParam (Path Parameters) {String} account_id a Video Cloud account ID
  * @apiParam (URL Parameters) {Number{1..100}} [limit=25] number of items to return
  * @apiParam (URL Parameters) {Number} [offset=0] number of videos to skip in the response
  * @apiParam (URL Parameters) {String="video_id","video_name","tracking_id","external_id","player_id","page_url","watched","time_watched","created_at","updated_at","is_synced","utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"} [sort="created_at"] field to sort results by
