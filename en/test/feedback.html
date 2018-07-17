@@ -17,27 +17,37 @@
         <iframe id="CSAT" src="https//learning-services-media.brightcove.com/doc-assets/general/surveylink.html" style="padding-bottom:20px;border:none"></iframe>
       </div>
         <script>
-        var cookiesArray = document.cookie.split(";"),
-          feedbackParams = {},
-          i,
-          tmpArray = [],
-          surveyWin = document.getElementById('CSAT').contentWindow;
-        for (i = 0; i < cookiesArray.length; i++) {
+        var BCLS = ( function (window, document) {
+          var cookiesArray = document.cookie.split(";"),
+            var iframe = document.createElement('iframe'),
+            feedbackParams = {},
+            i,
+            tmpArray = [];
+
+          iframe.setAttribute('id', 'CSAT');
+          iframe.setAttribute('src', 'https//learning-services-media.brightcove.com/doc-assets/general/surveylink.html');
+          iframe.setAttribute('style', 'padding-bottom:20px;border:none');
+          iframe.onLoad = function() {
+            var surveyWin = document.getElementById('CSAT').contentWindow;
+            // send message to surveyForm window
+            surveyWin.postMessage('feedbackParams', feedbackParams);
+          }
+          document.body.appendChild(iframe);
+          for (i = 0; i < cookiesArray.length; i++) {
             tmpArray = cookiesArray[i].split("=");
             if (tmpArray[0].indexOf('BC_EMAIL') > -1) {
               feedbackParams.BC_EMAIL = tmpArray[1];
             } else if (tmpArray[0].indexOf('BC_ACCOUNT') > -1) {
               feedbackParams.BC_ACCOUNT = tmpArray[1];
             }
-        }
-        if (!feedbackParams.hasOwnProperty('BC_EMAIL')) {
-          feedbackParams.BC_EMAIL = 'unknown';
-        }
-        if (!feedbackParams.hasOwnProperty('BC_ACCOUNT')) {
-          feedbackParams.BC_ACCOUNT = 'unknown';
-        }
-
-        surveyWin.postMessage('feedbackParams', feedbackParams);
+          }
+          if (!feedbackParams.hasOwnProperty('BC_EMAIL')) {
+            feedbackParams.BC_EMAIL = 'unknown';
+          }
+          if (!feedbackParams.hasOwnProperty('BC_ACCOUNT')) {
+            feedbackParams.BC_ACCOUNT = 'unknown';
+          }
+        })(window, document);
         </script>
 
     </body>
