@@ -34,7 +34,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Brightcove Player API Documentation</a></h1>
         
-            <span class="version">v7.0.5</span>
+            <span class="version">v7.1.0</span>
         
     </div>
     <div class="search-container" id="search-container">
@@ -208,6 +208,12 @@ function setSourceHelper(src = {}, middleware = [], next, player, acc = [], last
   } else if (mwFactory) {
     const mw = getOrCreateFactory(player, mwFactory);
 
+    // if setSource isn't present, implicitly select this middleware
+    if (!mw.setSource) {
+      acc.push(mw);
+      return setSourceHelper(src, mwrest, next, player, acc, lastRun);
+    }
+
     mw.setSource(assign({}, src), function(err, _src) {
 
       // something happened, try the next middleware on the current level
@@ -228,6 +234,7 @@ function setSourceHelper(src = {}, middleware = [], next, player, acc = [], last
           acc,
           lastRun);
     });
+
   } else if (mwrest.length) {
     setSourceHelper(src, mwrest, next, player, acc, lastRun);
   } else if (lastRun) {
@@ -247,7 +254,7 @@ function setSourceHelper(src = {}, middleware = [], next, player, acc = [], last
 
 <footer>
     <img class="logo" src="https://brightcovelearning.github.io/Brightcove-API-References/brightcove-player/doc-header-image/bc-logo.png" style="width: 50px; height: 46px">
-    <div class="footer-text"><span class='copyright'>©2017 <a href='https://brightcove.com' target='_blank'>Brightcove, Inc</a>.</div>
+    <div class="footer-text"><span class='copyright'>©2018 <a href='https://brightcove.com' target='_blank'>Brightcove, Inc</a>.</div>
 </footer>
 <script>prettyPrint();</script>
 <script src="scripts/jquery.min.js"></script>
