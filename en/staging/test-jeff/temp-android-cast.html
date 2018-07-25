@@ -227,7 +227,7 @@ GoogleCastComponent googleCastComponent = new GoogleCastComponent(eventEmitter, 
         </section>
 
         <section class="bcls-section">
-          <h2 id="The_Mini_Controller">Listening for Cast connection</h2>
+          <h2 id="Listening_for_Cast_connection">Listening for Cast connection</h2>
           <p>
             If you want your app to react when the Cast connection starts or ends, you can add the <code class="notranslate">GoogleCastEventType.CAST_CONNECTION_STARTED</code> or <code class="notranslate">GoogleCastEventType.CAST_CONNECTION_ENDED</code> event listeners as shown here:
           </p>
@@ -339,7 +339,7 @@ eventEmitter.on(GoogleCastEventType.CAST_CONNECTION_ENDED, new EventListener() {
           <p>To change the controller layout that appears in your Brightcove Video View when a Cast session has started, follow these steps.</p>
           <ol class="bcls-tasklist__restart">
             <li>
-              <a href="#Extend_the_BrightcoveCastMediaManage">Extend the BrightcoveCastMediaManager</a>
+              <a href="#Extend_the_BrightcoveCastMediaManager">Extend the BrightcoveCastMediaManager</a>
             </li>
             <li>
               <a href="#Set_the_MediaControllerConfig">Set the MediaControllerConfig</a>
@@ -348,9 +348,165 @@ eventEmitter.on(GoogleCastEventType.CAST_CONNECTION_ENDED, new EventListener() {
               <a href="#Overwrite_the_control_bar_setup">Overwrite the control bar setup</a>
             </li>
           </ol>
+
           <h3 id="Extend_the_BrightcoveCastMediaManager">Extend the BrightcoveCastMediaManager</h3>
+          <p>
+            To change the default behavior of the <code class="notranslate"><code class="notranslate"></code></code>, create a subclass and overwrite some key methods:
+          </p>
+          <ul>
+            <li>
+              <pre><code class="notranslate language-java">public void updateBrightcoveMediaController(boolean isRemote)</code></pre>
+              <p>
+                This method is called by the <code class="notranslate">GoogleCastComponent</code> when the session changes; that is, when the session has started or has ended. When the session has started, the <code class="notranslate">isRemote</code> parameter will be <code class="notranslate">true</code> and the <code class="notranslate">setupRemoteController</code> method is called. Otherwise, the <code class="notranslate">isRemote</code> will be <code class="notranslate">false</code> and the <code class="notranslate">resetToLocalController</code> is called.
+              </p>
+            </li>
+            <li>
+              <pre><code class="notranslate language-java">protected void setupRemoteController()</code></pre>
+              <p>
+                This method emits the event <code class="notranslate">EventType.SET_MEDIA_CONTROLLER_CONFIG</code> with the <code class="notranslate">MediaControllerConfig</code> object. We will talk more about <code class="notranslate">MediaControllerConfig</code> later in this section. This method also listens to the <code class="notranslate">BrightcoveMediaController.CONTROL_BAR_CREATED</code> event and reacts by calling the <code class="notranslate">setupBrightcoveControlBar</code> method.
+              </p>
+            </li>
+            <li>
+              <pre><code class="notranslate language-java">protected void resetToLocalController()</code></pre>
+              <p>
+                This method is responsible for resetting the <code class="notranslate">BrightcoveMediaController</code> to the original controller layout by emitting the <code class="notranslate">EventType.RESTORE_DEFAULT_MEDIA_CONTROLLER</code>.
+              </p>
+            </li>
+            <li>
+              <pre><code class="notranslate language-java">protected void setupBrightcoveControlBar(BrightcoveControlBar controlBar)</code></pre>
+              <p>
+                Once the <code class="notranslate">BrightcoveMediaController</code> has been recreated with the layout provided in the <code class="notranslate">MediaControllerConfig</code>, you will get access to the <code class="notranslate">BrightcoveControlBar</code> view. From here, you can access your UI views, like Buttons, where you can add <code class="notranslate">OnClickListener</code>'s to them.
+              </p>
+            </li>
+          </ul>
+
+          <h3 id="Set_the_MediaControllerConfig">Set the MediaControllerConfig</h3>
+          <p>
+            The <code class="notranslate">MediaControllerConfig</code> is a configuration class that you can use to change the default control layout of the <code class="notranslate">BrightcoveMediaController</code> class. In this class, you can set the layout and the <code class="notranslate">OnTouchListener</code>. Once created and configured, you can emit this object as shown below:
+          </p>
+          <pre class="line-numbers"><code class="notranslate language-java">Map&lt;String, Object&gt; properties = new HashMap&lt;&gt;();
+properties.put(Event.MEDIA_CONTROLLER_CONFIG, myMediaControllerConfig);
+eventEmitter.emit(EventType.SET_MEDIA_CONTROLLER_CONFIG,properties);</code></pre>
+          <p>
+            The default <code class="notranslate">MediaControllerConfig</code> object sets the <code class="notranslate">R.layout.cast_media_controller</code> as the layout with a single <strong>Play</strong> button. When clicked, it will open a dialog with two options:
+          </p>
+          <ul>
+            <li>
+              <strong>Play Now</strong> - When selected, the <code class="notranslate">loadMediaInfo()</code> method is called and the video will load and play in Chromecast.
+            </li>
+            <li>
+              <strong>Add to Queue</strong> - When selected, the <code class="notranslate">addMediaInfo()</code> method is called and the video is added to the end of the queue.
+            </li>
+          </ul>
+          <aside class="bcls-aside bcls-aside--information">If you want to keep the same UI but want to load additional information in the video being cast, you can overwrite the <code class="notranslate">loadMediaInfo()</code> and <code class="notranslate">addMediaInfo()</code> methods, and customize the information you add to the <code class="notranslate">MediaInfo</code> object.</aside>
+
+          <h3 id="Overwrite_the_control_bar_setup">Overwrite the control bar setup</h3>
+          <p>
+            When your media controller layout is set by emitting the <code class="notranslate">MediaControllerConfig</code>, the <code class="notranslate">BrightcoveControlBar</code> view will be created and the <code class="notranslate">BrightcoveCastMediaManager.setupBrightcoveControlBar()</code> method will be called. It’s here where you can get your UI components by Id and add the appropriate listeners.
+          </p>
+          <pre class="line-numbers"><code class="notranslate language-java">@Override
+protected void setupBrightcoveControlBar(BrightcoveControlBar controlBar) {
+   Button playButton = controlBar.findViewById(R.id.cast_play);
+   if (playButton != null) {
+       playButton.setOnClickListener(new View.OnClickListener() {...});
+   }
+}</code></pre>
+        </section>
+
+        <section class="bcls-section">
+          <h2 id="Cast_plugin_dependencies">Cast plugin dependencies</h2>
+          <p>
+            The Cast plugin depends on the ExoPlayer Cast Extension:
+          </p>
+          <pre><code class="notranslate language-java">compile 'com.google.android.exoplayer:extension-cast:2.7.0'</code></pre>
+          <p>
+            The  extension have several dependencies which are listed in the table below:
+          </p>
+          <table class="bcls-table">
+            <thead class="bcls-table__head">
+                <tr>
+                    <th>Name</th>
+                    <th>Full notation and current version</th>
+                </tr>
+            </thead>
+            <tbody class="bcls-table__body">
+                <tr>
+                    <td><a href="https://developer.android.com/reference/android/support/v7/media/MediaRouter">Mediarouter v7</a></td>
+                    <td><code class="notranslate">com.android.support:mediarouter-v7:27.0.0</code></td>
+                </tr>
+                <tr>
+                    <td><a href="https://developer.android.com/topic/libraries/support-library/packages#v7">Appcompat v7</a></td>
+                    <td><code class="notranslate">com.android.support:appcompat-v7:27.0.0</code></td>
+                </tr>
+                <tr>
+                    <td><a href="https://developer.android.com/topic/libraries/support-library/packages#v4">Support v4</a></td>
+                    <td><code class="notranslate">com.android.support:support-v4:27.0.0</code></td>
+                </tr>
+                <tr>
+                    <td><a href="https://developers.google.com/android/reference/com/google/android/gms/cast/package-summary">Cast Framework</a></td>
+                    <td><code class="notranslate">com.google.android.gms:play-services-cast-framework:11.4.2</code></td>
+                </tr>
+                <tr>
+                    <td><a href="https://github.com/google/ExoPlayer/tree/release-v2/library/core">ExoPlayer Core</a></td>
+                    <td><code class="notranslate">com.google.android.exoplayer:exoplayer-core:2.7.0</code></td>
+                </tr>
+                <tr>
+                    <td><a href="https://github.com/google/ExoPlayer/tree/release-v2/library/ui">ExoPlayer UI</a></td>
+                    <td><code class="notranslate">com.google.android.exoplayer:exoplayer-ui:2.7.0</code></td>
+                </tr>
+            </tbody>
+        </table>
+        </section>
+
+        <section class="bcls-section">
+          <h2 id="Supported_Video_Cloud_Features">Supported Video Cloud Features</h2>
+          <p>With the current Brightcove Native SDK for Android release, certain Video Cloud features have limited support, or are not supported when using the Cast plugin with the Google sample receiver app:</p>
+          <ul>
+            <li>
+              Captions - Only in-manifest captions with Dynamic Delivery are supported when using the Cast plugin with the Google sample receiver app.
+            </li>
+            <li>
+              Widevine Modular DRM is not supported when using the Cast plugin with the Google sample receiver app.
+            </li>
+            <li>
+              Multiple Audio Tracks are not supported when using the Cast plugin with the Google sample receiver app.
+            </li>
+            <li>
+              Client-side and Server-side Advertising is not supported when using the Cast plugin with the Google sample receiver app.
+            </li>
+            <li>
+              Live and Live DVR streams are not supported when using the Cast plugin with the Google sample receiver app.
+            </li>
+            <li>
+              Casting Offline Videos is not currently supported. When you download a video, the Source url is changed to point to a local file. If you then try casting that Video, the plugin will pick the local source but the Chromecast device will not be able to request the video.
+            </li>
+          </ul>
+
+          <h3 id="Handling_currently_unsupported_features">Handling currently unsupported features</h3>
+          <p>
+            The Cast plugin is responsible for gathering MediaInfo data, such as video url, title, description, and poster image, and casting it to your connected Chromecast device. Note that successful playback of the Video and display of the metadata ultimately depends on the Application Receiver.
+          </p>
+          <p>
+            It is the developer's responsibility to evaluate the Application Receiver for what it supports, and its limitations. Therefore, the developer should implement UI elements that inform the user what can or can’t be cast. For example, if the Application Receiver does not support Videos with DRM or Ads, your Android app must handle these scenarios.
+          </p>
+        </section>
+
+        <section class="bcls-section">
+          <h2 id="Known_Issues">Known Issues</h2>
+          <h4>The volume control in the Cast dialog may not decrease all the way to zero on the sending device.</h4>
+          <p>
+            Testing has shown that when using either the volume control in the Cast dialog, or the volume buttons on the sending device, that the displayed volume level may jump back up slightly to show a non-zero value on the sender. However, the receiver will display a non-zero value. This is a behavior with the the Google Cast dialog, and not within the Brightcove Android SDK.
+          </p>
+          <h4>The Casting connection may not be created if the sender’s Google Play Services version is not up to date.</h4>
+          <p>
+            Testing has shown that when the sender’s Google Play Services, in particular the Cast Services framework, are out of date, that creating a Cast connection may be unsuccessful. This is remedied by updating the sender’s Google Play Services through the Google Play Store.
+          </p>
 
         </section>
+
+
+
+
 
 
 
