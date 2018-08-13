@@ -56,18 +56,12 @@
 <article class="bcls-article">
 
   <section class="bcls-section">
-    <h2 id="Using_JavaScript_Promises">Using JavaScript Promises</h2>
-    <p>In this topic, you will learn how to use JavaScript Promises, which are returned by some Brightcove Player methods.</p>
-  </section>
-
-  <section class="bcls-section">
     <h2 id="section-name2">Simple Promise</h2>
     <p>Although it is NOT the purpose of this document to teach you how to write a JavaScript Promise, to understand how to use them it is instructive to see how a simple Promise is coded.</p>
-    <p>In the following a Promise is created that returns a string that states whether a task was completed or not.The key point is that either the <code>Promise.resolve()</code> or <code>Promise.reject()</code> is called. In this case a simple string is passed, but this could be an object.</p>
+    <p>In the following a Promise is created that returns a string that states whether a task was completed or not.The key point is that either the <code>Promise.resolve()</code> or <code>Promise.reject()</code> is called. In this case a simple string is passed by both methods, but this could be an object.</p>
     <aside class="bcls-aside bcls-aside--information">Note: Although NOT demonstrated in this simple example, the Promise object represents the <strong>eventual completion</strong> (or failure) of an <strong>asynchronous operation</strong>, and its resulting value. In this way a Promise is similar in concept to a callback function.</aside>
 <pre class="line-numbers">
-<code class="language-javascript">
-let promiseToFinishTask = new Promise(function(resolve, reject) {
+<code class="language-javascript">let promiseToFinishTask = new Promise(function(resolve, reject) {
 
   //Business logic to set taskComplete boolean
   let taskComplete = true;
@@ -77,38 +71,40 @@ let promiseToFinishTask = new Promise(function(resolve, reject) {
   } else {
     reject('Not quite done');
   }
-});
-</code></pre>
-<p>Next you want to see how to deal with the returned Promise information, which is what you will do with some Brightcove Player API method calls. The basic handling of a Promise follows:</p>
+});</code></pre>
+<p>No you see how to deal with the returned Promise information, which is what you will do with some Brightcove Player API method calls. The basic handling of a Promise follows:</p>
 <pre class="line-numbers">
-<code class="language-javascript">
-  promiseName.then(
-    // Function call for promise resolved
-  ).catch(
-    // Function call for promise rejected
-  )
-</code></pre>
-<p>Hanlding the simple example above would appear as shown here:</p>
+<code class="language-javascript">promiseName.then(
+  // Function call for promise resolved
+).catch(
+  // Function call for promise rejected
+)</code></pre>
+<p>Handling the simple example above would appear as shown here:</p>
 <pre class="line-numbers">
-<code class="language-javascript">
-promiseToFinishTask.then(function(fromResolve) {
+<code class="language-javascript">promiseToFinishTask.then(function(fromResolve) {
   console.log(fromResolve);
 }).catch(function(fromReject) {
   console.log(fromReject);
-});
-</code></pre>
-<p>And either of the strings <strong>Yea, I am done</strong> or <strong>Not quite done</strong> would appear based on the business logic that set the <code>taskComplete</code> variable's value.</p>
-
+});</code></pre>
+    <p>If the Promise is resolved the <code>then</code> code is executed, and if the Promise rejected the <code>catch</code> code is executed. For the example, one of the strings <strong>Yea, I am done</strong> or <strong>Not quite done</strong> would appear based on the business logic that set the <code>taskComplete</code> variable's value.</p>
   </section>
 
   <section class="bcls-section">
-    <h2 id="section-name3">section-title</h2>
-    <p></p>
-  </section>
-
-  <section class="bcls-section">
-    <h2 id="section-name4">section-title</h2>
-    <p></p>
+    <h2 id="section-name3">Brightcove example</h2>
+    <p>The Brightcove Player's <code>play()</code> method returns a Promise that can be used to check if the player could autoplay the video currently in the player. The code that deals with the Promise is highlighted:</p>
+<pre class="line-numbers">
+<code class="language-javascript">var myPlayer = videojs.getPlayer('myPlayerID');
+myPlayer.on('loadedmetadata',function() {
+  var promise = myPlayer.play();
+  if (promise !== undefined) {
+    <span class="bcls-highlight">promise.then(function() {
+      // Autoplay started!
+    }).catch(function(error) {
+      // Autoplay was prevented.
+    });</span>
+  }
+});</code></pre>
+    <p>Based on this you can then code behaviors if the video autoplayed or not.</p>
   </section>
 
 </article>
