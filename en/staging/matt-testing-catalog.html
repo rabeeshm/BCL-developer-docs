@@ -192,6 +192,108 @@
         &lt;/script&gt;</code></pre>
       </section>
 
+
+
+
+
+
+      <section class="bcls-section">
+      <h2 id="get_method">get() method</h2>
+
+      <p>The <code>get(params, [callback])  ⇒ Promise | XMLHttpRequest</code> method permits searching the catalog using <a href="/node/18005">CMS/Playback API: Videos Search</a> syntax. Under the hood, this method uses the Playback API.</p>
+
+      <h3>Parameters</h3>
+
+      <p>Any of the follow options are recognized:</p>
+
+      <ul>
+      	<li><code>query</code> (string or object): Can be a string representing <code>query.q</code> or an object.</li>
+      	<li><code>query.q</code> (string): The query string with which to search for videos.</li>
+      	<li><code>policyKey</code> (string): A search-enabled policy key for the account.</li>
+      	<li><code>query.limit</code> (number): <strong>Default: 20</strong> Number of videos to return, can be between 1 and 100.</li>
+      	<li><code>query.offset</code> (number): <strong>Default: 0</strong> Number of videos to skip from the start, must be &gt;= to 0.</li>
+      	<li><code>query.sort</code> (string): A string the specifies the field on which to sort.</li>
+      	<li><code>callback</code> (function): A function that will be called when the request completes, whether it's successful or not. It is invoked with two arguments:
+      	<ul>
+      		<li>The first argument will contain an error object, if an an error occurs. This object contains details of the error. If no error occurs, this object is <strong>null</strong>.</li>
+      		<li>If no error occurs, the second argument is the requested video object(s). If an error occurs, this value contains the empty string.</li>
+      	</ul>
+      	</li>
+      	<li><code>adConfigId</code> (string): A numeric value for an ad configuration that will be passed along to the Playback API. This value will be called <code>ad_config_id</code> when the actual call is made.</li>
+      </ul>
+
+      <h3>Returned value</h3>
+
+      <p>The catalog call itself returns an object of type <strong>XMLHttpRequest</strong>. The exact structure of the returned data will vary depending what was searched for.</p>
+
+      <h3>Example</h3>
+
+      <p>The following example does the following:</p>
+
+      <ol>
+      	<li>Builds a query object that will be passed as an argument with the function. The required, search-enabled policy key is passed. The search will query for videos with the string <strong>desert</strong> in the video's <strong>name</strong>.</li>
+      	<li>Performs the search using the <code>getSearch()</code> method. Note that the callback function will use the parameters named <code>errorObj</code> and <code>videosReturned</code>.</li>
+      	<li>Use the <code>playlist()</code> method to assign the returned videos to the Brightcove Player.</li>
+      </ol>
+
+      <pre class="line-numbers">
+      <code class="language-javascript">&lt;style type="text/css"&gt;
+          .video-js {
+            height: 360px;
+            width: 640px;
+            float: left;
+          }
+          .vjs-playlist {
+            width: 280px;
+            height: 350px;
+          }
+      &lt;/style&gt;
+
+      ...
+
+      &lt;video id="myPlayerID"
+        data-account="1752604059001"
+        data-player="Sk5m8XYoG"
+        data-embed="default"
+        data-application-id
+        class="video-js"
+        controls&gt;&lt;/video&gt;
+
+      &lt;div class="vjs-playlist"&gt;&lt;/div&gt;
+
+      &lt;script src="//players.brightcove.net/1752604059001/Sk5m8XYoG_default/index.min.js"&gt;&lt;/script&gt;
+
+      &lt;script type="text/javascript"&gt;
+        videojs('myPlayerID').ready(function(){
+          var myPlayer = this,
+            queryObject = {};
+          <span class="bcls-highlight">queryObject.policyKey = 'BCpkADawqM...fj0vsWCv8-nlTX';
+          queryObject.q = 'name:desert';</span>
+          console.log('queryObject',queryObject);
+          <span class="bcls-highlight">myPlayer.catalog.getSearch(queryObject,function(errorObj,videosReturned){
+            console.log('videosReturned',videosReturned);
+            myPlayer.playlist(videosReturned);
+          });</span>
+        });
+      &lt;/script&gt;</code></pre>
+
+      <p>The following screenshot shows the two <code>console.log()</code> results in the code above. The <code>queryObject</code> shows the required parameters for the search, and the <code>videosReturned</code> array shows the three videos returned by the search.</p>
+
+      <figure class="bcls-figure"><img class="bcls-image" alt="Objects in console from getSearch method call" src="//learning-services-media.brightcove.com/doc-assets/player-development/references/player-catalog/getsearch-console.png" /></figure>
+
+      <h3>Obtaining a policy key</h3>
+
+      <p>In the example above, you see a <code>policyKey</code> value is needed. This policy key must be <strong>search-enabled</strong>. For information on creating a policy key and then search-enabling it see the <a href="/node/18003#Search_videos">Overview: Policy API - Search Videos</a> section.</p>
+      </section>
+
+
+
+
+
+
+
+
+
       <section class="bcls-section">
       <h2 id="getSearch_method">getSearch() method</h2>
 
