@@ -319,7 +319,7 @@ videojs("myPlayerID").ready(function() {
 
 <p>The method returns a <strong>Promise</strong> or an object of type <strong>XMLHttpRequest</strong>. The exact structure of the returned data will vary depending for what is searched.</p>
 
-<h3>Example</h3>
+<h3>Callback example</h3>
 
 <p>The following example does the following:</p>
 
@@ -330,53 +330,44 @@ videojs("myPlayerID").ready(function() {
 </ol>
 
 <pre class="line-numbers">
-<code class="language-javascript">&lt;style type="text/css"&gt;
-    .video-js {
-      height: 360px;
-      width: 640px;
-      float: left;
-    }
-    .vjs-playlist {
-      width: 280px;
-      height: 350px;
-    }
-&lt;/style&gt;
-
-...
-
-&lt;video id="myPlayerID"
-  data-account="1752604059001"
-  data-player="Sk5m8XYoG"
-  data-embed="default"
-  data-application-id
-  class="video-js"
-  controls&gt;&lt;/video&gt;
-
-&lt;div class="vjs-playlist"&gt;&lt;/div&gt;
-
-&lt;script src="//players.brightcove.net/1752604059001/Sk5m8XYoG_default/index.min.js"&gt;&lt;/script&gt;
-
-&lt;script type="text/javascript"&gt;
+<code class="language-javascript">&lt;script type=&quot;text/javascript&quot;&gt;
   videojs('myPlayerID').ready(function(){
     var myPlayer = this,
-      queryObject = {};
-    <span class="bcls-highlight">queryObject.policyKey = 'BCpkADawqM...fj0vsWCv8-nlTX';
-    queryObject.q = 'name:desert';</span>
-    console.log('queryObject',queryObject);
-    <span class="bcls-highlight">myPlayer.catalog.getSearch(queryObject,function(errorObj,videosReturned){
+      catalogParams = {};
+    catalogParams.type = 'search';
+    catalogParams.policyKey = 'BCpkADawqM3dv_...Cv8-nlTX';
+    catalogParams.q = 'name:Desert';
+    console.log('catalogParams',catalogParams);
+    myPlayer.catalog.get(catalogParams,function(errorObj,videosReturned){
       console.log('videosReturned',videosReturned);
       myPlayer.playlist(videosReturned);
-    });</span>
+    });
   });
 &lt;/script&gt;</code></pre>
 
-<p>The following screenshot shows the two <code>console.log()</code> results in the code above. The <code>queryObject</code> shows the required parameters for the search, and the <code>videosReturned</code> array shows the three videos returned by the search.</p>
+<p>The following screenshot shows the two <code>console.log()</code> results in the code above. The <code>catalogParams</code> shows the parameters for the search, and the <code>videosReturned</code> array shows the three videos returned by the search.</p>
 
-<figure class="bcls-figure"><img class="bcls-image" alt="Objects in console from getSearch method call" src="//learning-services-media.brightcove.com/doc-assets/player-development/references/player-catalog/getsearch-console.png" /></figure>
+<figure class="bcls-figure"><img class="bcls-image" alt="Objects in console from get method call" src="//learning-services-media.brightcove.com/doc-assets/player-development/references/player-catalog/get-search-callback.png" /></figure>
 
-<h3>Obtaining a policy key</h3>
-
-<p>In the example above, you see a <code>policyKey</code> value is needed. This policy key must be <strong>search-enabled</strong>. For information on creating a search enabled policy key see the <a href="/node/18003#Search_videos">Overview: Policy API - Search Videos</a> section.</p>
+<h3>Promise example</h3>
+<p>In this code the same search is done using <code>get()</code> method as shown just above, but the result is handled as a Promise.</p>
+<pre class="line-numbers">
+<code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
+  videojs('myPlayerID').ready(function(){
+    var myPlayer = this,
+      catalogParams = {};
+    catalogParams.type = 'search';
+    catalogParams.policyKey = 'BCpkADawqM3dv_...Cv8-nlTX';
+    catalogParams.q = 'name:Desert';
+    myPlayer.catalog.get(catalogParams).then(function(videosReturned){
+      console.log('videosReturned',videosReturned);
+      myPlayer.playlist(videosReturned);
+    }).catch(function(errorObj){
+      console.log('errorObj',errorObj);
+    })
+  });
+&lt;/script&gt;</code></pre>
+  <p>For more information on Promises, see <a href="/node/18652">Using JavaScript Promises</a>.</p>
 </section>
 
 
