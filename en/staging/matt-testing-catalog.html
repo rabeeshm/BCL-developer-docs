@@ -183,7 +183,7 @@ https://players.api.brightcove.com/v2/accounts/$ACCOUNT_ID/players/$PLAYER_ID/co
 
 <figure class="bcls-figure"><img class="bcls-image" alt="request object" src="//learning-services-media.brightcove.com/doc-assets/player-development/references/player-catalog/request-object.png" /></figure>
 
-<h3>Example</h3>
+<h3>Example: Video ID as string</h3>
 
 <p>The following example shows a use of the <code>getVideo()</code> method:</p>
 
@@ -198,9 +198,25 @@ https://players.api.brightcove.com/v2/accounts/$ACCOUNT_ID/players/$PLAYER_ID/co
 
 
 &lt;script type="text/javascript"&gt;
-videojs("myPlayerID").ready(function() {
-  var myPlayer = this;
-  <span class="bcls-highlight">myPlayer.catalog.getVideo('2114345471001', function(error, video){</span>
+  videojs.getPlayer('myPlayerID').ready(function() {
+    var myPlayer = this;
+    <span class="bcls-highlight">myPlayer.catalog.getVideo('2114345471001', function(error, video){</span>
+    //deal with error
+    myPlayer.catalog.load(video);
+  });
+});
+&lt;/script&gt;</code></pre>
+
+<h3>Example: Using catalogParams</h3>
+<p>The equivalent of the code just above, but using the CatalogParams object appears as follows:</p>
+<pre class="line-numbers">
+<code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
+  videojs.getPlayer('myPlayerID').ready(function() {
+    var myPlayer = this,
+      catalogParams = {};
+    catalogParams.type = 'video';
+    catalogParams.id = '2114345471001';
+    myPlayer.catalog.getVideo(catalogParams, function(error, video){
     //deal with error
     myPlayer.catalog.load(video);
   });
@@ -248,8 +264,8 @@ videojs("myPlayerID").ready(function() {
 &lt;script type="text/javascript"&gt;
   var myPlayer;
 
-  videojs('myPlayerID').ready(function(){
-    myPlayer = this;
+  videojs.getPlayer('myPlayerID').ready(function() {
+    var myPlayer = this;
     <span class="bcls-highlight">myPlayer.catalog.getPlaylist('1754200320001', function(error, playlist){</span>
       //deal with error
       myPlayer.catalog.load(playlist);
@@ -284,7 +300,7 @@ videojs("myPlayerID").ready(function() {
 
 
 &lt;script type="text/javascript"&gt;
-  videojs("myPlayerID").ready(function() {
+  videojs.getPlayer('myPlayerID').ready(function() {
     var myPlayer = this;
     myPlayer.catalog.getVideo('2114345471001', function(error, video) {
       //deal with error
@@ -328,7 +344,7 @@ videojs("myPlayerID").ready(function() {
 
 <pre class="line-numbers">
 <code class="language-javascript">&lt;script type=&quot;text/javascript&quot;&gt;
-  videojs('myPlayerID').ready(function(){
+  videojs.getPlayer('myPlayerID').ready(function() {
     var myPlayer = this,
       catalogParams = {};
     catalogParams.type = 'search';
@@ -350,7 +366,7 @@ videojs("myPlayerID").ready(function() {
 <p>In this code the same search is done using <code>get()</code> method as shown just above, but the result is handled as a Promise.</p>
 <pre class="line-numbers">
 <code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
-  videojs('myPlayerID').ready(function(){
+  videojs.getPlayer('myPlayerID').ready(function() {
     var myPlayer = this,
       catalogParams = {};
     catalogParams.type = 'search';
@@ -403,7 +419,7 @@ videojs("myPlayerID").ready(function() {
 
 <pre class="line-numbers">
 <code class="language-javascript">&lt;script type=&quot;text/javascript&quot;&gt;
-  videojs('myPlayerID').ready(function(){
+  videojs.getPlayer('myPlayerID').ready(function() {
     var myPlayer = this,
       catalogParams = {};
     catalogParams.type = 'search';
@@ -426,7 +442,7 @@ videojs("myPlayerID").ready(function() {
 <section class="bcls-section">
 <h2 id="getSequence_method">getSequence() method</h2>
 
-<p>The <code>getSequence(sequences, callback, adConfigId)</code> method permits passing multiple catalog operations and retrieves all video objects from those multiple catalog operations. You can have three types of operations, those being:</p>
+<p>The <code>getSequence(sequences, callback, [adConfigId]) ⇒ Array.&lt;XMLHttpRequest&gt;</code> method permits passing multiple catalog operations and retrieves all video objects from those multiple catalog operations. You can have three types of operations, those being:</p>
 
 <ol>
 	<li>search</li>
@@ -446,65 +462,37 @@ videojs("myPlayerID").ready(function() {
 
 <h3>Parameters</h3>
 
-<p>Any of the follow options are recognized:</p>
-
 <ul>
-	<li><code>sequences</code> (object or array of objects): An object or an array of objects representing the sequence of catalog operations that are to be performed.</li>
-	<li><code>sequences[].type</code> (string): The type of operation to be performed. This can be <code>search</code>, <code>playlist</code> or <code>video</code>.</li>
-	<li><code>sequences[].id</code> (string or object): The identifier/options for the operation. For <code>playlist</code> and <code>video</code>, this will be the media's ID. For searches, this can be a string representing <code>q</code> or an object with all of the options from the search function.</li>
-	<li><code>policyKey</code> (string): A search-enabled policy key for the account.</li>
-	<li><code>callback</code> (function): A function that will be called when the request completes, whether it's successful or not. It is invoked with two arguments:
+  <li><strong>sequences</strong>: An object of type <a href="#Catalog_parameters_object">Catalog parameters</a> OR an array of objects representing a sequence of catalog operations.</li>
+	<li><strong>callback</strong>: A function that will be called when the request completes, whether it's successful or not. It is invoked with two arguments:
 	<ul>
 		<li>The first argument will contain an error object, if an an error occurs. This object contains details of the error. If no error occurs, this object is <strong>null</strong>.</li>
-		<li>If no error occurs, the second argument is the requested video object(s). If an error occurs, this value contains the empty string.</li>
+		<li>If no error occurs, the second argument is the requested video object. If an error occurs, this value contains the empty string.</li>
 	</ul>
 	</li>
-	<li><code>adConfigId</code> (string): A numeric value for an ad configuration that will be passed along to the playback API. This value will be called <code>ad_config_id</code> when the actual call is made.</li>
+  <li><strong>[adConfigId]</strong>: An ad configuration ID that will be passed along with each request.</li>
+
 </ul>
 
 <p>Note that if a specific video is returned in more than one of the operations, it will be in the result multiple times.</p>
 
 <h3>Returned value</h3>
 
-<p>The catalog call itself returns an object of type <strong>XMLHttpRequest</strong>. The exact structure of the returned data will vary depending what was searched for.</p>
+<p>The catalog call itself returns an array of <strong>XMLHttpRequest</strong> objects. The exact structure of the returned data will vary depending what was searched for.</p>
 
 <h3>Example</h3>
 
 <p>The following example uses a sequence of three catalog operations. The first is a search for the 10 oldest videos in the catalog, the second an individual video is added, and lastly a playlist's videos are added to the result.</p>
 
 <pre class="line-numbers">
-<code class="language-javascript">&lt;style type="text/css"&gt;
-    .video-js {
-      height: 360px;
-      width: 640px;
-      float: left;
-    }
-    .vjs-playlist {
-      width: 280px;
-      height: 350px;
-    }
-&lt;/style&gt;
-...
-&lt;video id="myPlayerID"
-  data-account="1752604059001"
-  data-player="Sk5m8XYoG"
-  data-embed="default"
-  data-application-id
-  class="video-js"
-  controls&gt;&lt;/video&gt;
-
-&lt;div class="vjs-playlist"&gt;&lt;/div&gt;
-
-&lt;script src="//players.brightcove.net/1752604059001/Sk5m8XYoG_default/index.min.js"&gt;&lt;/script&gt;
-
-&lt;script type="text/javascript"&gt;
-  videojs('myPlayerID').ready(function(){
+<code class="language-javascript">&lt;script&gt;
+  videojs.getPlayer('myPlayerID').ready(function() {
     var myPlayer = this,
       // Declare object for catalog search
-      queryObject = {};
-      // Declare mySequences array which will hold
-      // three different types of catalog operations
-      mySequences = [];
+      catalogParams = {};
+    // Declare mySequences array which will hold
+    // three different types of catalog operations
+    mySequences = [];
 
     // Declare 3 objects for different catalog operations
     mySequences[0]={};
@@ -513,26 +501,30 @@ videojs("myPlayerID").ready(function() {
 
     // Define the object for catalog search
     // Search will retrieve 10 oldest videos in catalog
-    queryObject.policyKey = 'BCpkADawqM3dv_...df3s-rSSaDpwCVfj0vsWCv8-nlTX';
-    queryObject.q = 'type:*';
-    queryObject.sort = 'created_at';
-    queryObject.limit = 10;
-    <span class="bcls-highlight">mySequences[0].type = 'search';
-    mySequences[0].id=queryObject;</span>
+    catalogParams.policyKey = 'BCpkADawqM3dv_RjQyLQPx8i9GgLSGU2K_L_uIFTCZAvfvUd25ExGIbIMkFttfuqWQijLVMC6eGG42530ej9nTtHUHo2l5xOL48_pQFqkUFozgp2Azfvdf3s-rSSaDpwCVfj0vsWCv8-nlTX';
+    catalogParams.q = 'type:*';
+    catalogParams.sort = 'created_at';
+    catalogParams.limit = 10;
+    catalogParams.type = 'search';
+    mySequences[0] = catalogParams;
 
     // Create a video retrieval catalog operation
-    <span class="bcls-highlight">mySequences[1].type = 'video';
-    mySequences[1].id = '5755775186001';</span>
+    catalogParams = {};
+    catalogParams.type = 'video';
+    catalogParams.id = '5755775186001';
+    mySequences[1] = catalogParams;
 
     // Create a playlist retrieval catalog operation
-    <span class="bcls-highlight">mySequences[2].type = 'playlist';
-    mySequences[2].id = '5531423971001';</span>
+    catalogParams = {};
+    catalogParams.type = 'playlist';
+    catalogParams.id = '5531423971001';
+    mySequences[2] = catalogParams;
 
     // Display mySequences array
     console.log('mySequences',mySequences);
 
     // Perform sequence of catalog operations
-    <span class="bcls-highlight">myPlayer.catalog.getSequence(mySequences,function(errorObj,videosReturned)</span>{
+    myPlayer.catalog.getSequence(mySequences,function(errorObj,videosReturned){
       // Display video objects returned
       console.log('videosReturned',videosReturned);
       // Assign video objects as a playlist
@@ -541,27 +533,22 @@ videojs("myPlayerID").ready(function() {
   });
 &lt;/script&gt;</code></pre>
 
-<p>The following screenshots show the structure of the <code>myStructure</code> array, followed by the array of video objects returned:</p>
+<p>The following screenshot shows the structure of the <code>mySequences</code> array, followed by the array of video objects returned:</p>
 
 <figure class="bcls-figure"><img class="bcls-image" alt="The myStructures data structure" src="//learning-services-media.brightcove.com/doc-assets/player-development/references/player-catalog/getSequences-mySequences.png" /></figure>
 
-<figure class="bcls-figure"><img class="bcls-image" alt="Returned video objects" src="//learning-services-media.brightcove.com/doc-assets/player-development/references/player-catalog/getSequence-videosReturned.png" /></figure>
-
-<h3>Obtaining a policy key</h3>
-
-<p>In the example above, you see a <code>policyKey</code> value is needed. This policy key must be <strong>search-enabled</strong>. For information on creating a policy key and then search-enabling it see the <a href="/node/18003#Search_videos">Overview: Policy API - Search Videos</a> section.</p>
 </section>
 
 <section class="bcls-section">
 <h2 id="getLazySequence_method">getLazySequence() method</h2>
 
-<p>The <code>getLazySequence(sequences, callback, adConfigId)</code> method behaves the same as the <a href="#getSequence_method">getSequence() method</a>, except that lazy loading of videos is employed. This means that when the videos for a sequence operation are retrieved, the next sequence operation's videos won't be retrieved until the last video from the previous operation is reached. A special case exists if a sequence returns only a single video, in which case the next sequence operation is performed and more videos are retrieved.</p>
+<p>The <code>getLazySequence(sequences, callback, [adConfigId]) ⇒ XMLHttpRequest</code> method behaves the same as the <a href="#getSequence_method">getSequence() method</a>, except that lazy loading of videos is employed. This means that when the videos for a sequence operation are retrieved, the next sequence operation's videos won't be retrieved until the last video from the previous operation is reached. A special case exists if a sequence returns only a single video, in which case the next sequence operation is performed and more videos are retrieved.</p>
 </section>
 
 <section class="bcls-section">
 <h2 id="autoFindAndLoadMedia_method">autoFindAndLoadMedia() method</h2>
 
-<p>The <code>autoFindAndLoadMedia(options)</code> method looks for the last-defined video or playlist ID, requests it from the API, and loads it into the player. This method defines the default behavior for the Brightcove Player.</p>
+<p>The <code>autoFindAndLoadMedia([opts]) ⇒ Object | undefined</code> method looks for the last-defined video or playlist ID, requests it from the API, and loads it into the player. This method defines the default behavior for the Brightcove Player.</p>
 
 <h3>Parameters</h3>
 
@@ -573,9 +560,10 @@ videojs("myPlayerID").ready(function() {
 		<li><code>embedHasPoster</code> (boolean): Whether or not the original embed had a poster.</li>
 		<li><code>embedHasSources</code> (boolean): Whether or not the original embed had sources.</li>
 		<li><code>embedHasTracks</code> (boolean): Whether or not the original embed had tracks.</li>
+    <li><code>playlistId</code> (string): A playlist ID provided in the player configuration.</li>
+    <li><code>search</code> (string | Object): A search string/object that was provided in the player config or embed. See <code>get()</code> method for more info on the supported parameters.</li>
+    <li><code>sequence</code> (Object | Array.Object): A search string/object that was provided in the player config or embed. See <code>get()</code> method for more info on the supported parameters.</li>
 		<li><code>videoId</code> (string): A video ID provided in the player configuration.</li>
-		<li><code>playlistId</code> (string): A playlist ID provided in the player configuration.</li>
-		<li><code>playlistVideoId</code> (string): A video ID, which will be the first video in a playlist to be loaded if it's present in the playlist. You would use this in conjunction with the <code>playlistId</code> option.</li>
 	</ul>
 	</li>
 </ul>
