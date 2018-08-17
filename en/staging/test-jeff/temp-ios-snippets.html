@@ -65,7 +65,7 @@
 
     <h5 class="bcls-question">Captions</h5>
     <ul class="bcls-answer">
-      <li><a href="#Customizing_the_Closed_Captions_button">Customizing the Closed Captions button</a></li>
+      <li><a href="#Customizing_the_closed_captions_button">Customizing the closed captions button</a></li>
     </ul>
 
         <!--
@@ -132,10 +132,10 @@
   	<p>Learn about AirPlay in <a href="">Apple's developer documentation for AirPlay</a>.</p>
   	</li>
   	<li>
-  	<p>Use the playback controller’s <code>allowsExternalPlayback </code> property to set the AVPlayer’s <code>allowsExternalPlayback </code> property:</p>
+  	<p>Use the playback controller’s <code class="notranslate">allowsExternalPlayback </code> property to set the AVPlayer’s <code class="notranslate">allowsExternalPlayback </code> property:</p>
 
   	<pre>
-  <code class="language-swift"><a href="https://docs.brightcove.com/ios-sdk/Protocols/BCOVPlaybackController.html#//api/name/allowsExternalPlayback">_playbackController.allowsExternalPlayback = YES;</a></code></pre>
+  <code class="notranslate language-swift"><a href="https://docs.brightcove.com/ios-sdk/Protocols/BCOVPlaybackController.html#//api/name/allowsExternalPlayback">_playbackController.allowsExternalPlayback = YES;</a></code></pre>
   	</li>
   	<li>
   	<p>Set up an AirPlay router control and handle its selection. For details, see <a href="https://developer.apple.com/library/content/documentation/AudioVideo/Conceptual/AirPlayGuide/Introduction/Introduction.html">Apple's AirPlay Overview</a> document.</p>
@@ -144,22 +144,36 @@
   </section>
 
   <section class="bcls-section">
-  <h2 id="Customizing_the_Closed_Captions_button">Customizing the Closed Captions button</h2>
+  <h2 id="Customizing_the_closed_captions_button">Customizing the closed captions button</h2>
 
-  <p>If you are using custom controls, you can follow these steps:</p>
+  <p>The <a href="https://docs.brightcove.com/ios-sdk/index.html#PlayerUI">BCOVPlayerUI sample code</a> shows you how to customize the Brightcove player when using the Native SDK for iOS. For more details, see the <a href="https://docs.brightcove.com/ios-sdk/index.html#PlayerUI">Customizing PlayerUI controls</a> section of the Native SDK reference document.</p>
+
+  <p>
+    To customize the closed captions button using the PlayerUI, follow these steps:
+  </p>
 
   <ol class="bcls-tasklist__restart">
   	<li>
-  	<p>Learn about AirPlay in <a href="">Apple's developer documentation for AirPlay</a>.</p>
+  	<p>Start with the <a href="https://github.com/BrightcoveOS/ios-player-samples/tree/master/Player/VideoCloudBasicPlayer">Basic Video Playback App</a>.</p>
   	</li>
+    <li>
+      <p>Replace your values for the Policy Key, Account Id and Video Id. Select a video from your account that has text tracks.</p>
+    </li>
   	<li>
-  	<p>Use the playback controller’s <code>allowsExternalPlayback </code> property to set the AVPlayer’s <code>allowsExternalPlayback </code> property:</p>
+  	<p>Set up the player view with a standard VOD layout:</p>
 
-  	<pre>
-  <code class="language-swift"><a href="https://docs.brightcove.com/ios-sdk/Protocols/BCOVPlaybackController.html#//api/name/allowsExternalPlayback">_playbackController.allowsExternalPlayback = YES;</a></code></pre>
+<pre class="line-numbers"><code class="notranslate language-objectivec">// Set up our player view. Create with a standard VOD layout.
+BCOVPUIPlayerView *playerView = [[BCOVPUIPlayerView alloc] initWithPlaybackController:self.playbackController options:nil controlsView:
+[BCOVPUIBasicControlView basicControlViewWithVODLayout] ];</code></pre>
   	</li>
-  	<li>
-  	<p>Set up an AirPlay router control and handle its selection. For details, see <a href="https://developer.apple.com/library/content/documentation/AudioVideo/Conceptual/AirPlayGuide/Introduction/Introduction.html">Apple's AirPlay Overview</a> document.</p>
+    <li>
+  	<p>The <code class="notranslate">closedCaptionButton</code> is declared as a <code class="notranslate">BCOVPUIButton</code>, which is a subclass of <code class="notranslate">UIButton</code> and adds three additional methods for customization. Whenever you customize BCOVPlayerUI controls, you should use the Native Player APIs wherever they are available. Your customized code should look similar to this:</p>
+
+<pre class="line-numbers"><code class="notranslate language-objectivec">// Customize the CC button.
+  BCOVPUIButton *ccButton = playerView.controlsView.closedCaptionButton;
+  ccButton.titleLabel.font = [UIFont systemFontOfSize:14.];
+  ccButton.primaryTitle = @&quot;CC&quot;;
+  [ccButton showPrimaryTitle:YES];</code></pre>
   	</li>
   </ol>
   </section>
@@ -172,7 +186,7 @@
   <p>To display FairPlay-protected videos, set the AVPlayer properties exposed through the Brightcove Playback Controller to allow FairPlay video to play on an external display. The video plays in full screen mode. Here is an example of setting these properties:</p>
 
   <pre>
-  <code class="language-swift"><a href="https://docs.brightcove.com/ios-sdk/Protocols/BCOVPlaybackController.html#//api/name/usesExternalPlaybackWhileExternalScreenIsActive">playbackController.allowsExternalPlayback = YES;
+  <code class="notranslate language-swift"><a href="https://docs.brightcove.com/ios-sdk/Protocols/BCOVPlaybackController.html#//api/name/usesExternalPlaybackWhileExternalScreenIsActive">playbackController.allowsExternalPlayback = YES;
   playbackController.usesExternalPlaybackWhileExternalScreenIsActive = YES;</a></code></pre>
   </section>
 
@@ -189,7 +203,7 @@
   	<p>Here is one way you could use Google Analytics to track video playback using Google's Firebase SDK:</p>
 
   	<pre class="line-numbers" data-start="1">
-  <code class="language-swift">// This snippet shows one way to track video playback
+  <code class="notranslate language-swift">// This snippet shows one way to track video playback
   // using the Firebase SDK from Google Analytics with
   // the lifecycle event playback controller delegate method.
   - (void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller playbackSession:(id&lt;BCOVPlaybackSession&gt;)session didReceiveLifecycleEvent:(BCOVPlaybackSessionLifecycleEvent *)lifecycleEvent
@@ -240,14 +254,14 @@
   <section class="bcls-section">
   <h2 id="Limiting_the_bitrate">Limiting the bitrate</h2>
 
-  <p>You can't control which source (rendition) in the HLS manifest gets selected by the <code>AVPlayer </code>, but you can put a bitrate cap on playback. This prevents the player from using sources (renditions) with a bitrate over the specified bitrate.</p>
+  <p>You can't control which source (rendition) in the HLS manifest gets selected by the <code class="notranslate">AVPlayer </code>, but you can put a bitrate cap on playback. This prevents the player from using sources (renditions) with a bitrate over the specified bitrate.</p>
 
-  <p>Set the <code>preferredPeakBitRate </code> to the desired limit, in bits per second, of the network bandwidth consumption for the given <code>AVPlayerItem </code>.</p>
+  <p>Set the <code class="notranslate">preferredPeakBitRate </code> to the desired limit, in bits per second, of the network bandwidth consumption for the given <code class="notranslate">AVPlayerItem </code>.</p>
 
   <p>Use one of the following declarations:</p>
 
   <pre class="line-numbers">
-  <code class="language-swift">// Swift
+  <code class="notranslate language-swift">// Swift
   var preferredPeakBitRate: Double
   // Obj-C
   @property(nonatomic) double preferredPeakBitRate</code></pre>
@@ -261,18 +275,18 @@
   <p>This code assumes that you have set the delegate of the playbackController to the object with this method:</p>
 
   <pre class="line-numbers">
-  <code class="language-swift">- (void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller playbackSession:(id&lt;BCOVPlaybackSession&gt;)session didReceiveLifecycleEvent:(BCOVPlaybackSessionLifecycleEvent *)lifecycleEvent
-  {
-    if ([kBCOVPlaybackSessionLifecycleEventEnd isEqualToString:lifecycleEvent.eventType])
-      {
-        [controller seekToTime:kCMTimeZero completionHandler:^(BOOL finished) {
-        if (finished)
-          {
-            [controller play];
-          }
-      }];
-    }
-  }</code></pre>
+<code class="notranslate language-swift">- (void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller playbackSession:(id&lt;BCOVPlaybackSession&gt;)session didReceiveLifecycleEvent:(BCOVPlaybackSessionLifecycleEvent *)lifecycleEvent
+{
+  if ([kBCOVPlaybackSessionLifecycleEventEnd isEqualToString:lifecycleEvent.eventType])
+    {
+      [controller seekToTime:kCMTimeZero completionHandler:^(BOOL finished) {
+      if (finished)
+        {
+          [controller play];
+        }
+    }];
+  }
+}</code></pre>
   </section>
 
   <section class="bcls-section">
@@ -283,12 +297,12 @@
   <p>If these values are not important to you or interfere with your own progress tracking, they can be easily ignored with a conditional statement like this:</p>
 
   <pre class="line-numbers">
-  <code class="language-swift"><a href="https://docs.brightcove.com/ios-sdk/Protocols/BCOVPlaybackControllerBasicDelegate.html#//api/name/playbackController:playbackSession:didProgressTo:">- (void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller playbackSession:(id&lt;BCOVPlaybackSession&gt;)session didProgressTo:(NSTimeInterval)progress
-  {
-    if (progress &lt; 0.0 || progress &gt;= INFINITY)
-      return;
-      // Your code here
-  }</a></code></pre>
+<code class="notranslate language-swift"><a href="https://docs.brightcove.com/ios-sdk/Protocols/BCOVPlaybackControllerBasicDelegate.html#//api/name/playbackController:playbackSession:didProgressTo:">- (void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller playbackSession:(id&lt;BCOVPlaybackSession&gt;)session didProgressTo:(NSTimeInterval)progress
+{
+  if (progress &lt; 0.0 || progress &gt;= INFINITY)
+    return;
+    // Your code here
+}</a></code></pre>
   </section>
 
   <section class="bcls-section">
@@ -299,25 +313,24 @@
   <p>Here are the observed events that are fired through the end of a pre-roll ad, when the quartile offsets are absent:</p>
 
   <pre class="line-numbers">
-  <code class="language-html">impression
-  companionCreativeView
-  creativeView
-  complete</code></pre>
+<code class="notranslate language-html">impression
+companionCreativeView
+creativeView
+complete</code></pre>
 
   <p>Here are the observed events when valid offset values are used:</p>
 
   <pre class="line-numbers">
-  <code class="language-html">companionCreativeView
-  impression
-  creativeView
-  start
-  firstQuartile
-  midpoint
-  thirdQuartile
-  complete
-  </code></pre>
+<code class="notranslate language-html">companionCreativeView
+impression
+creativeView
+start
+firstQuartile
+midpoint
+thirdQuartile
+complete</code></pre>
 
-  <p>OnceUX maintains an array of events to be fired during playback of ads, and that array is ordered by the event offsets. An event which does not possess a valid offset cannot be added to the array which means it cannot be fired during ad playback. The <code>complete </code> event is a special case which is handled without using the ordered event array.</p>
+  <p>OnceUX maintains an array of events to be fired during playback of ads, and that array is ordered by the event offsets. An event which does not possess a valid offset cannot be added to the array which means it cannot be fired during ad playback. The <code class="notranslate">complete </code> event is a special case which is handled without using the ordered event array.</p>
   </section>
 
   <section class="bcls-section">
@@ -328,23 +341,22 @@
   <p>To page through a set of videos in a playlist, use the following request URL parameters:</p>
 
   <ul>
-  	<li><code><a href="/node/17906#playlistRequests">limit</a> </code> - defines the number of videos to return from the Playback API</li>
-  	<li><code><a href="/node/17906#playlistRequests">offset</a> </code> - sets the number of videos to skip in a playlist from the Playback API</li>
+  	<li><code class="notranslate"><a href="/node/17906#playlistRequests">limit</a> </code> - defines the number of videos to return from the Playback API</li>
+  	<li><code class="notranslate"><a href="/node/17906#playlistRequests">offset</a> </code> - sets the number of videos to skip in a playlist from the Playback API</li>
   </ul>
 
   <p>This example returns 6 videos starting with the 10th video in the playlist:</p>
 
   <pre class="line-numbers">
-  <code class="language-objectivec">NSDictionary *params =
-  @{
-    @"limit": @6,
-    @"offset": @9
-  };
-  [playbackService findPlaylistWithReferenceID:playlistRefID
-  parameters:params
-  completion:^(BCOVPlaylist *playlist, NSDictionary *jsonResponse, NSError *error)
-  { ...
-  </code></pre>
+<code class="notranslate language-objectivec">NSDictionary *params =
+@{
+  @"limit": @6,
+  @"offset": @9
+};
+[playbackService findPlaylistWithReferenceID:playlistRefID
+parameters:params
+completion:^(BCOVPlaylist *playlist, NSDictionary *jsonResponse, NSError *error)
+{ ...</code></pre>
   </section>
 
   <section class="bcls-section">
@@ -355,78 +367,77 @@
   <p>You can also add cue points to your video programmatically. The code below adds quarterly interval cue points to the video returned from the Playback API:</p>
 
   <pre class="line-numbers">
-  <code class="language-swift"><a href="https://docs.brightcove.com/ios-sdk//Protocols/BCOVVideo.html#//api/name/update:">// programmatically add cue points to a video
-  - (void)requestContentFromPlaybackService
+<code class="notranslate language-swift"><a href="https://docs.brightcove.com/ios-sdk//Protocols/BCOVVideo.html#//api/name/update:">// programmatically add cue points to a video
+- (void)requestContentFromPlaybackService
+{
+  [self.service findVideoWithVideoID:kViewControllerVideoID parameters:nil completion:^(BCOVVideo *video, NSDictionary *jsonResponse, NSError *error) {
+  if (video)
   {
-    [self.service findVideoWithVideoID:kViewControllerVideoID parameters:nil completion:^(BCOVVideo *video, NSDictionary *jsonResponse, NSError *error) {
-    if (video)
+    <span class="bcls-highlight">// Get the video duration from the properties dictionary
+    NSNumber *durationNumber = video.properties[@"duration"]; // milliseconds
+    float duration = durationNumber.floatValue / 1000.0; // convert to seconds
+    video = [video update:^(id&lt;BCOVMutableVideo&gt; mutableVideo)
     {
-      <span class="bcls-highlight">// Get the video duration from the properties dictionary
-      NSNumber *durationNumber = video.properties[@"duration"]; // milliseconds
-      float duration = durationNumber.floatValue / 1000.0; // convert to seconds
-      video = [video update:^(id&lt;BCOVMutableVideo&gt; mutableVideo)
-      {
-      // Add quarterly interval cue points of your own type
-      BCOVCuePoint *cp1 = [[BCOVCuePoint alloc] initWithType:@"<span class="bcls-input">your cue point type</span>" position:CMTimeMake(duration * 250, 1000)];
-      BCOVCuePoint *cp2 = [[BCOVCuePoint alloc] initWithType:@"<span class="bcls-input">your cue point type</span>" position:CMTimeMake(duration * 500, 1000)];
-      BCOVCuePoint *cp3 = [[BCOVCuePoint alloc] initWithType:@"<span class="bcls-input">your cue point type</span>" position:CMTimeMake(duration * 750, 1000)];
-      BCOVCuePoint *cp4 = [[BCOVCuePoint alloc] initWithType:@"<span class="bcls-input">your cue point type</span>" position:CMTimeMake(duration * 1000, 1000)];
-      // Create new cue point collection using existing cue points and new cue points
-      NSMutableArray *newCuePoints = [[NSMutableArray alloc] initWithArray:mutableVideo.cuePoints.array];
-      [newCuePoints addObject:cp1];
-      [newCuePoints addObject:cp2];
-      [newCuePoints addObject:cp3];
-      [newCuePoints addObject:cp4];
-      mutableVideo.cuePoints = [[BCOVCuePointCollection alloc] initWithArray:newCuePoints];
-      }];</span>
-      [self.playbackController setVideos:@[ video ]];
-    }
-    else
-    {
-      NSLog(@"ViewController Debug - Error retrieving video: `%@`", error);
-    }
-    }];
-  }</a>
-  </code></pre>
+    // Add quarterly interval cue points of your own type
+    BCOVCuePoint *cp1 = [[BCOVCuePoint alloc] initWithType:@"<span class="bcls-input">your cue point type</span>" position:CMTimeMake(duration * 250, 1000)];
+    BCOVCuePoint *cp2 = [[BCOVCuePoint alloc] initWithType:@"<span class="bcls-input">your cue point type</span>" position:CMTimeMake(duration * 500, 1000)];
+    BCOVCuePoint *cp3 = [[BCOVCuePoint alloc] initWithType:@"<span class="bcls-input">your cue point type</span>" position:CMTimeMake(duration * 750, 1000)];
+    BCOVCuePoint *cp4 = [[BCOVCuePoint alloc] initWithType:@"<span class="bcls-input">your cue point type</span>" position:CMTimeMake(duration * 1000, 1000)];
+    // Create new cue point collection using existing cue points and new cue points
+    NSMutableArray *newCuePoints = [[NSMutableArray alloc] initWithArray:mutableVideo.cuePoints.array];
+    [newCuePoints addObject:cp1];
+    [newCuePoints addObject:cp2];
+    [newCuePoints addObject:cp3];
+    [newCuePoints addObject:cp4];
+    mutableVideo.cuePoints = [[BCOVCuePointCollection alloc] initWithArray:newCuePoints];
+    }];</span>
+    [self.playbackController setVideos:@[ video ]];
+  }
+  else
+  {
+    NSLog(@"ViewController Debug - Error retrieving video: `%@`", error);
+  }
+  }];
+}</a></code></pre>
 
-  <p>Note that the value of <code>your cue point type </code> can be any string value that you want, as long as you are not using any of the <a href="https://support.brightcove.com/node/18227#Integrations">iOS plugins</a>. For details, see the <a href="https://docs.brightcove.com/ios-sdk/Protocols/BCOVCuePoint.html#//api/name/type">BCOVCuePoint Protocol Reference</a> document.</p>
+  <p>Note that the value of <code class="notranslate">your cue point type </code> can be any string value that you want, as long as you are not using any of the <a href="https://support.brightcove.com/node/18227#Integrations">iOS plugins</a>. For details, see the <a href="https://docs.brightcove.com/ios-sdk/Protocols/BCOVCuePoint.html#//api/name/type">BCOVCuePoint Protocol Reference</a> document.</p>
 
   <p>If you are using cue points with the IMA plugin, learn more about it in the <a href="https://github.com/brightcove/brightcove-player-sdk-ios-ima#vast-and-vmapserver-side-ad-rules">VAST and VMAP/Server Side Ad Rules</a> section of the IMA Plugin for the Native SDK for iOS notes. The <a href="https://github.com/brightcove/brightcove-player-sdk-ios-ima/blob/06bb6f8dff6075340737017a966ad19b20bf6adb/ios/BrightcoveIMA.framework/Headers/BCOVIMAComponent.h#L39-L42">IMA sample app</a> shows you the value required for IMA ad cue points.</p>
 
   <p>The code below listens for your cue points and displays a message:</p>
 
   <pre class="line-numbers">
-  <code class="language-swift"><a href="https://docs.brightcove.com/ios-sdk/Protocols/BCOVCuePoint.html">// listen for cue points and display them
-  -(void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller playbackSession:(id&lt;BCOVPlaybackSession&gt;)session didPassCuePoints:(NSDictionary *)cuePointInfo {
-    BCOVCuePointCollection *cpc = cuePointInfo[@"kBCOVPlaybackSessionEventKeyCuePoints"];
-    for (BCOVCuePoint *cp in cpc) {
-      if ([cp.type isEqualToString:@"<span class="bcls-input">your cue point type</span>"])
-      {
-      NSLog(@"Found your cue point at %f", CMTimeGetSeconds(cp.position));
-      }
+<code class="notranslate language-swift"><a href="https://docs.brightcove.com/ios-sdk/Protocols/BCOVCuePoint.html">// listen for cue points and display them
+-(void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller playbackSession:(id&lt;BCOVPlaybackSession&gt;)session didPassCuePoints:(NSDictionary *)cuePointInfo {
+  BCOVCuePointCollection *cpc = cuePointInfo[@"kBCOVPlaybackSessionEventKeyCuePoints"];
+  for (BCOVCuePoint *cp in cpc) {
+    if ([cp.type isEqualToString:@"<span class="bcls-input">your cue point type</span>"])
+    {
+    NSLog(@"Found your cue point at %f", CMTimeGetSeconds(cp.position));
     }
-  }</a></code></pre>
+  }
+}</a></code></pre>
   </section>
   <!-- <section class="bcls-section" id="Setting_the_buffer_size">
         <h2>Setting the buffer size</h2>
         <p>You may consider increasing the buffer length to eliminate buffering in the player if the delivery of the next segment is delayed from the CDN. But, you may not be able to do anything better manually that HLS already does.</p>
-        <p>The <code>AVPlayer</code> contains the <code>AVPlayerItem</code>, essentially the video being played, that contains the <code>loadedTimeRanges</code> property. This tells you how much is buffered.</p>
+        <p>The <code class="notranslate">AVPlayer</code> contains the <code class="notranslate">AVPlayerItem</code>, essentially the video being played, that contains the <code class="notranslate">loadedTimeRanges</code> property. This tells you how much is buffered.</p>
         <p>HLS is designed to play right away and drop quality if it can't keep up. This way, it does not need to preload a buffer. If it can't keep up, it will load as much of the video as it can at the best quality to prevent interruption.</p>
         </section> -->
 
   <section class="bcls-section">
   <h2 id="Setting_the_playback_rate">Setting the playback rate</h2>
 
-  <p>To control the playback rate, you can set the <code>rate </code> property on the <code>AVPlayer </code> class exposed on the session. For a <code>BCOVPlaybackSession </code>, you could do something like this:</p>
+  <p>To control the playback rate, you can set the <code class="notranslate">rate </code> property on the <code class="notranslate">AVPlayer </code> class exposed on the session. For a <code class="notranslate">BCOVPlaybackSession </code>, you could do something like this:</p>
 
   <pre>
-  <code class="language-swift"><a href="https://docs.brightcove.com/ios-sdk/Protocols/BCOVPlaybackSession.html">session.player.rate = 2;</a></code></pre>
+<code class="notranslate language-swift"><a href="https://docs.brightcove.com/ios-sdk/Protocols/BCOVPlaybackSession.html">session.player.rate = 2;</a></code></pre>
 
   <p>Note the following:</p>
 
   <ul>
-  	<li>For iOS6, a stream can only play at 2X if <code>session.player.currentItem.canPlayFastForward </code> returns <strong>YES</strong>.</li>
-  	<li>For iOS7, you can play up to 2X always, but it won't go higher unless <code>session.player.currentItem.canPlayFastForward </code> returns <strong>Yes</strong>.</li>
+  	<li>For iOS6, a stream can only play at 2X if <code class="notranslate">session.player.currentItem.canPlayFastForward </code> returns <strong>YES</strong>.</li>
+  	<li>For iOS7, you can play up to 2X always, but it won't go higher unless <code class="notranslate">session.player.currentItem.canPlayFastForward </code> returns <strong>Yes</strong>.</li>
   </ul>
 
   <aside class="bcls-aside bcls-aside--information">
@@ -442,18 +453,17 @@
   <section class="bcls-section">
   <h2 id="Setting_VR_Goggles_mode_for_360_videos">Setting VR Goggles mode for 360° videos</h2>
 
-  <p>When playing a 360° video, users can select the Video 360 button on the control bar to switch to VR Goggles mode. You may also want to do this programmatically, before playback starts. You can do this by updating the <code>BCOVPlaybackController </code> protocol's <code>viewProjection </code> property as follows:</p>
+  <p>When playing a 360° video, users can select the Video 360 button on the control bar to switch to VR Goggles mode. You may also want to do this programmatically, before playback starts. You can do this by updating the <code class="notranslate">BCOVPlaybackController </code> protocol's <code class="notranslate">viewProjection </code> property as follows:</p>
 
   <pre class="line-numbers">
-  <code class="language-objectivec"><a href="https://docs.brightcove.com/ios-sdk/Protocols/BCOVPlaybackController.html">- (void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller didAdvanceToPlaybackSession:(id&lt;BCOVPlaybackSession&gt;)session
-  {
-    BCOVVideo360ViewProjection *viewProjection = [self.playbackController.viewProjection copy];
-    [viewProjection setProjectionStyle:BCOVVideo360ProjectionStyleVRGoggles];
-    [self.playbackController setViewProjection:viewProjection];
-  }</a>
-  </code></pre>
+<code class="notranslate language-objectivec"><a href="https://docs.brightcove.com/ios-sdk/Protocols/BCOVPlaybackController.html">- (void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller didAdvanceToPlaybackSession:(id&lt;BCOVPlaybackSession&gt;)session
+{
+  BCOVVideo360ViewProjection *viewProjection = [self.playbackController.viewProjection copy];
+  [viewProjection setProjectionStyle:BCOVVideo360ProjectionStyleVRGoggles];
+  [self.playbackController setViewProjection:viewProjection];
+}</a></code></pre>
 
-  <aside class="bcls-aside bcls-aside--information">Note that you need to set the controller's projection style in the <code>didAdvanceToPlaybackSession </code> delegate method.</aside>
+  <aside class="bcls-aside bcls-aside--information">Note that you need to set the controller's projection style in the <code class="notranslate">didAdvanceToPlaybackSession </code> delegate method.</aside>
   </section>
 
   <section class="bcls-section">
@@ -471,11 +481,11 @@
   <p>This example shows how to customize the accessibility values for the play button:</p>
 
   <pre class="line-numbers">
-  <code class="language-objectivec"><a href="https://docs.brightcove.com/ios-sdk/Classes/BCOVPUIPlayerView.html#//api/name/controlsView">// After creating the BCOVPUIPlayerView, store it in a playerView property
-  // Then set the accessibilityLabel and accessibilityHint properties
-  self.playerView.controlsView.playbackButton.accessibilityLabel = @"Playback Button";
-  self.playerView.controlsView.playbackButton.accessibilityHint = @"Play or pause the video";</a>
-  </code></pre>
+<code class="notranslate language-objectivec"><a href="https://docs.brightcove.com/ios-sdk/Classes/BCOVPUIPlayerView.html#//api/name/controlsView">// After creating the BCOVPUIPlayerView, store it in a playerView property
+// Then set the accessibilityLabel and accessibilityHint properties
+self.playerView.controlsView.playbackButton.accessibilityLabel = @"Playback Button";
+self.playerView.controlsView.playbackButton.accessibilityHint = @"Play or pause the video";</a>
+</code></pre>
 
   <aside class="bcls-aside bcls-aside--information">If you are using your own playback controls, then you have to add VoiceOver support yourself.</aside>
   </section>
@@ -485,16 +495,15 @@
 
   <p>When playing a video in portrait mode, you may notice a black border on top and below the player. The player view is the size of the screen, but the video only takes up a small part of the center of the player view. The visible portions around the video is the background of the player layer.</p>
 
-  <p>This is normal <code>AVPlayer </code> behavior. It shrinks your video to fit inside the player layer, and the rest is the player layer background.</p>
+  <p>This is normal <code class="notranslate">AVPlayer </code> behavior. It shrinks your video to fit inside the player layer, and the rest is the player layer background.</p>
 
   <p>You can change the player layer background with the following code:</p>
 
   <pre class="line-numbers">
-  <code class="language-objectivec">(void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller didAdvanceToPlaybackSession:(id&lt;BCOVPlaybackSession&gt;)session
-  {
-    session.playerLayer.backgroundColor = UIColor.whiteColor.CGColor;
-  }
-  </code></pre>
+<code class="notranslate language-objectivec">(void)playbackController:(id&lt;BCOVPlaybackController&gt;)controller didAdvanceToPlaybackSession:(id&lt;BCOVPlaybackSession&gt;)session
+{
+  session.playerLayer.backgroundColor = UIColor.whiteColor.CGColor;
+}</code></pre>
 
   <p>Setting the background color to white should look like this:</p>
 
