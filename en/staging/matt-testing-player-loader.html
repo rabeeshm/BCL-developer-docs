@@ -64,6 +64,7 @@
   <h2 id="Player_loader_overview">Player loader overview</h2>
   <p>The Brightcove Player Loader library provides more technical customers the ability to adopt modern build tooling. For users of Brightcove Player would don't want to copy and paste either the in-page embed or iframe player implementations, this module is bundled into their web application a provides a way to use Brightcove Players without needing to write a lot of integration code to download their players and embed them.  This tool solves the problem wing a Brightcove library that can download any published Brightcove Player and embed it in the DOM.</p>
   <p>This library supports common evergreen browsers, Chrome, Firefox, Edge, Safari and IE11. Earlier versions of IE or NOT supported.</p>
+  <p>This document essentially provides example uses of the Brightcove Player Loader. For complete details see the library's <a href="https://github.com/brightcove/player-loader#">brightcove / player-loader</a> GitHub repo.</p>
 </section>
 
 <section class="bcls-section">
@@ -75,40 +76,14 @@
 
 <section class="bcls-section">
   <h2 id="Including_the_library">Including the library</h2>
-  <p>You have numerous ways to include the library for your use. They are detailed here.</p>
-  <h3>&lt;script&gt; Tag</h3>
-  <p>This is the simplest case. Get the script in whatever way you prefer and include it:</p>
-  <pre class="line-numbers">
-<code class="language-html notranslate">&lt;script src=&quot;//path/to/@brightcove/brightcove-player-loader.min.js&quot;&gt;&lt;/script&gt;
-&lt;script&gt;
-  brightcovePlayerLoader( ... );
-&lt;/script&gt;</code></pre>
-  <h3>ES6 Modules (e.g. Rollup, Webpack)</h3>
-  <p>This is the most modern use-case.</p>
-  <pre class="line-numbers">
-<code class="language-javascript notranslate">import brightcovePlayerLoader from '@brightcove/player-loader';
-
-brightcovePlayerLoader( ... );</code></pre>
-  <h3>CommonJS (e.g. Browserify)</h3>
-  <p>When using with CommonJS or Browserify, install <code class="notranslate">@brightcove/player-loader</code> via npm and require the library as you would any other module:</p>
-  <pre class="line-numbers">
-<code class="language-javascript notranslate">var brightcovePlayerLoader = require('@brightcove/player-loader');
-
-brightcovePlayerLoader( ... );</code></pre>
-  <h3>AMD (e.g. RequireJS)</h3>
-  <p>When using with RequireJS (or another AMD library), get the script in whatever way you prefer and require the library as you normally would:</p>
-  <pre class="line-numbers">
-<code class="language-javascript notranslate">require(['@brightcove/player-loader'], function(brightcovePlayerLoader) {
-  brightcovePlayerLoader( ... );
-});</code></pre>
-  <p>NOTE: Use either <code class="notranslate">dist/brightcove-player-loader.js</code> or <code class="notranslate">dist/brightcove-player-loader.min.js</code>. In either case, the global variable <code class="notranslate">brightcovePlayerLoader</code> will be created.</p>
-
+  <p>For different methods of including the library for your use please see the <a href="https://github.com/brightcove/player-loader#inclusion">GitHub repo</a> for the libary.</p>
 </section>
 
 <section class="bcls-section">
   <h2 id="Implementation_using_a_Promise">Implementation using a Promise</h2>
+  <aside class="bcls-aside bcls-aside--tip">In this sample, and those that follow, parameters from the library are used. A table with complete listing of parameters is in the <a href="#Available_parameters">Available parameters</a> section below.</aside>
   <p>You can use a <a href="/node/18652">JavaScript Promise</a> with the library. Promises are not required for this library to work, but they are recommended. By default, this library will look for a global Promise. However, you can explicitly provide a Promise implementation via the <code class="notranslate">Promise</code> parameter, detailed later in this document.</p>
-  <p>The following shows an implementation of the library using a Promise:</p>
+  <p>The following shows an implementation of the library using a Promise. A key concept is that you obtain a reference to the player by using <code>var myPlayer = success.ref;</code> in the <code>then</code> section of handling the promise:</p>
   <pre class="line-numbers">
 <code class="language-html notranslate">&lt;!doctype html&gt;
 &lt;html&gt;
@@ -158,8 +133,61 @@ brightcovePlayerLoader( ... );</code></pre>
 
 <section class="bcls-section">
   <h2 id="Implementation_using_callbacks">Implementation using callbacks</h2>
+  <p>You can also implement the player loader using callbacks via the <code>onSuccess</code> and <code>onFailure</code> callback functions.</p>
+  <p>The following shows an implementation of the library using callbacks. A key concept is that you obtain a reference to the player by using <code>var myPlayer = success.ref;</code> in the <code>onSuccess</code> callback function:</p>
+  <pre class="line-numbers">
+<code class="language-html notranslate">&lt;!doctype html&gt;
+&lt;html&gt;
+
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;title&gt;Untitled Document&lt;/title&gt;
+  &lt;style&gt;
+    .video-js {
+      height: 344px;
+      width: 610px;
+    }
+  &lt;/style&gt;
+
+&lt;/head&gt;
+
+&lt;body&gt;
+  &lt;script src=&quot;brightcove-player-loader.min.js&quot;&gt;&lt;/script&gt;
+
+  &lt;div id=&quot;theDiv&quot;&gt;
+  &lt;/div&gt;
+
+  &lt;script&gt;
+  <span class="bcls-highlight">brightcovePlayerLoader({
+    refNode: theDiv,
+    accountId: '1752604059001',
+    playerId: 'wHBRh9M3o',
+    videoId: '4607357817001',
+    onSuccess: function(success) {
+      var myPlayer = success.ref;
+      console.log('success', success);
+      myPlayer.on('loadedmetadata',function(){
+        myPlayer.muted(true);
+        myPlayer.play();
+      });
+    },
+    onFailure(error) {
+      console.log('error', error);
+    }
+  });</span>
+  &lt;/script&gt;
+
+&lt;/body&gt;
+
+&lt;/html&gt;</code></pre>
+</section>
+
+<section class="bcls-section">
+  <h2 id="Using_a_search_parameter">Using a search parameter</h2>
+  <aside class="bcls-aside bcls-aside--tip">For information on building complex searches see the <a href="/node/18108#getSearch_method">getSearch()</a> section of the <strong>Player Catalog</strong> document.</aside>
   <p></p>
 </section>
+
 
 <section class="bcls-section">
   <h2 id="Available_parameters">Available parameters</h2>
@@ -244,12 +272,12 @@ brightcovePlayerLoader( ... );</code></pre>
       </tr>
       <tr>
         <td><code class="notranslate">onFailure</code></td>
-        <td>Funtion(Error)</td>
+        <td>Function(Error)</td>
         <td>A callback function which allows handling of failures when <code>Promise</code> is not available or not desired. Passing this function will prevent a <code>Promise</code> from being returned. It gets a single <code>Error</code> object as an argument. The return value of this function is ignored.</td>
       </tr>
       <tr>
         <td><code class="notranslate">onSuccess</code></td>
-        <td>Funtion(Object)</td>
+        <td>Function(Object)</td>
         <td>A callback function which allows handling of successes when <code>Promise</code> is not available or not desired. Passing this function will prevent a <code>Promise</code> from being returned. It gets a single <code>Success</code> object as an argument. The return value of this function is ignored.</td>
       </tr>
       <tr>
@@ -305,10 +333,6 @@ brightcovePlayerLoader( ... );</code></pre>
   </table>
 </section>
 
-<section class="bcls-section">
-  <h2 id="Using_a_search_method">Using a search method</h2>
-  <p></p>
-</section>
 
 <section class="bcls-section">
   <h2 id="section-name7">section-title</h2>
