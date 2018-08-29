@@ -294,11 +294,55 @@ var preferredPeakBitRate: Double
   <section class="bcls-section">
   <h2 id="Managing_videos_in_a_playlist">Managing videos in a playlist</h2>
 
-  <p>One way to manage a playlist of videos is to store the video objects in a table. When the user selects a video from the table, the table row will contain the video object. For a complete code example, see the <a href="https://github.com/BrightcoveOS/ios-player-samples/tree/master/Offline">Offline Player</a> sample.</p>
+  <p>One way to manage a playlist of videos is to store the video objects in a table. When the user selects a video from the table, the table row will contain the video object.</p>
   <p>
     Here's an overview of how it works:
   </p>
   <ol class="bcls-tasklist__restart">
+    <li>
+      <p>
+        Retrieve a playlist from your account.
+      </p>
+      <pre class="line-numbers"><code class="notranslate language-objectivec">- (void)retrievePlaylist
+{
+    [self.refreshControl beginRefreshing];
+
+    // Retrieve a playlist through the BCOVPlaybackService
+    BCOVPlaybackServiceRequestFactory *playbackServiceRequestFactory = [[BCOVPlaybackServiceRequestFactory alloc]         initWithAccountId:kDynamicDeliveryAccountID
+                                      policyKey:kDynamicDeliveryPolicyKey];
+    BCOVPlaybackService *playbackService = [[BCOVPlaybackService alloc] initWithRequestFactory:playbackServiceRequestFactory];
+
+    [playbackService findPlaylistWithReferenceID:kDynamicDeliveryPlaylistRefID
+                                      parameters:nil
+                                      completion:^(BCOVPlaylist *playlist, NSDictionary *jsonResponse, NSError *error)
+     {
+         [self.refreshControl endRefreshing];
+
+         NSLog(@&quot;JSON Response:\n%@&quot;, jsonResponse);
+
+         if (playlist)
+         {
+             self.currentVideos = playlist.videos.mutableCopy;
+             self.currentPlaylistTitle = playlist.properties[@&quot;name&quot;];
+             self.currentPlaylistDescription = playlist.properties[@&quot;description&quot;];
+
+             NSLog(@&quot;Retrieved playlist containing %d videos&quot;, (int)self.currentVideos.count);
+
+             [self usePlaylist:self.currentVideos];
+         }
+         else
+         {
+             NSLog(@&quot;No playlist for ID %@ was found.&quot;, kDynamicDeliveryPlaylistRefID);
+         }
+
+     }];
+}</code></pre>
+    </li>
+    <li>
+      <p>
+        Re-initialize the containers that store information related to the videos in the current playlist.
+      </p>
+    </li>
     <li>
       <p>
         When the table view is selected, the row's index is used to create a new <code>videoDictionary</code>. Next, ask the dictionary for the video. If the video is not null, then load the video in the <code>playbackController</code>.
@@ -316,6 +360,10 @@ var preferredPeakBitRate: Double
 }</code></pre>
     </li>
   </ol>
+  <p>
+    To work with playlists, you can store the playlist in another object such as a table. Based on user interaction, you can navigate the the object's indices and select the appropriate video. 
+  </p>
+  <aside class="bcls-aside bcls-aside--tip">For a complete code example, see the <a href="https://github.com/BrightcoveOS/ios-player-samples/tree/master/Offline">Offline Player</a> sample.</aside>
 
 
   </section>
