@@ -12,12 +12,22 @@ info:
 servers:
   - url: 'https://analytics.api.brightcove.com/v1'
     variables: {}
+    tags:
+      - name: Engagement Report
+        description: 'Detailed engagement reports by account, video or player. Detailed engagement is available only for the most recent 32 days.'
+      - name: Analytics Report
+        description: >-
+          Full analytics reports with many options for filtering, date ranges, formats, and more.
+      - name: SSAI
+        description: Operations for managing server-side ad insertion with live streams.
+      - name: Credentials
+        description: Operations for creating and managing credentials for secure destinations.
 paths:
   '/engagement/accounts/{account_id}':
     get:
       tags:
-        - Engagement
-      summary: Get_Account_Engagement
+        - Engagement Report
+      summary: Get Account Engagement
       description: >-
         Get a summary report of engagement for the account. Note:  Engagement
         reports are only available for periods within the past 32 days. Requests
@@ -76,8 +86,8 @@ paths:
   '/engagement/accounts/{account_id}/players/{player_id}':
     get:
       tags:
-        - Engagement
-      summary: Get_Player_Engagement
+        - Engagement Report
+      summary: Get Player Engagement
       description: >-
         Get a summary report of engagement for a player. Note:  Engagement
         reports are only available for periods within the past 32 days. Requests
@@ -137,8 +147,8 @@ paths:
   '/engagement/accounts/{account_id}/videos/{video_id}':
     get:
       tags:
-        - Engagement
-      summary: Get_Video_Engagement
+        - Engagement Report
+      summary: Get Video Engagement
       description: >-
         Get a summary report of engagement for a video. Note:  Engagement
         reports are only available for periods within the past 32 days. Requests
@@ -198,7 +208,7 @@ paths:
   /data:
     get:
       tags:
-        - Report
+        - Analytics Report
       summary: Get_Analytics_Report
       description: >-
         Get an analytics report on one or more dimensions. Note that the fields
@@ -267,7 +277,7 @@ paths:
     get:
       tags:
         - Report
-      summary: Get_Available_Date_Range
+      summary: Get Available Date Range
       description: >-
         Get the date range for which reconciled data is available for any
         Analytics API report. All parameters are allowed, but only account,
@@ -277,143 +287,20 @@ paths:
         is to use from=alltime
       operationId: GetAvailableDateRange
       parameters:
-        - name: accounts
-          in: query
-          description: 'One or more account ids, separated by commas'
-          required: true
-          style: form
-          explode: true
-          schema:
-            type: string
-        - name: dimensions
-          in: query
-          description: >-
-            One or more dimensions to report on; see [Multiple
-            Dimensions](https://support.brightcove.com/overview-analytics-api-v1#metrics)
-            for which combined dimensions are supported
-          required: true
-          style: form
-          explode: true
-          schema:
-            $ref: '#/components/schemas/Dimensions'
-        - name: Content-Type
-          in: header
-          description: 'Content-Type: application/json'
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-        - name: Authorization
-          in: header
-          description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-        - name: Accept-Encoding
-          in: header
-          description: 'Accept-Encoding: gzip (optional)'
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-        - name: limit
-          in: query
-          description: Number of items to return
-          style: form
-          explode: true
-          schema:
-            type: integer
-            format: int32
-            default: 10
-            example: 10
-        - name: offset
-          in: query
-          description: Number of items to skip
-          style: form
-          explode: true
-          schema:
-            type: integer
-            format: int32
-            default: 0
-            example: 0
-        - name: sort
-          in: query
-          description: Field to sort results by (prefix with `-` for descending order)
-          style: form
-          explode: true
-          schema:
-            type: string
-            default: video_view
-            example: video_view
-        - name: fields
-          in: query
-          description: Fields to return
-          style: form
-          explode: true
-          schema:
-            type: string
-            default: '`video_view` + others (varies by dimension)'
-            example: '`video_view` + others (varies by dimension)'
-        - name: where
-          in: query
-          description: >-
-            one or more 'dimension==value' pairs to filter the results; see
-            [Where
-            Filters](https://support.brightcove.com/overview-analytics-api-v1#filterValues)
-            for details
-          style: form
-          explode: true
-          schema:
-            $ref: '#/components/schemas/Where'
-        - name: from
-          in: query
-          description: >-
-            Start time for the period covered by the report — `alltime` or epoch
-            time in milliseconds or a date in the format `yyyy-mm-dd` (such as
-            `2013-09-26`)
-          style: form
-          explode: true
-          schema:
-            type: string
-            default: (30 days before now)
-            example: (30 days before now)
-        - name: to
-          in: query
-          description: >-
-            End time for the period covered by the report — `now` or epoch time
-            in milliseconds or a date in the format `yyyy-mm-dd` (such as
-            `2013-09-26`)
-          style: form
-          explode: true
-          schema:
-            type: string
-            default: now
-            example: now
-        - name: format
-          in: query
-          description: format to return the results in
-          style: form
-          explode: true
-          schema:
-            default: json
-            example: json
-            $ref: '#/components/schemas/Format'
-        - name: reconciled
-          in: query
-          description: >-
-            if true, only reconciled data is returned; if false, only realtime
-            data is returned; if not present, both reconciled and realtime data
-            are returned
-          style: form
-          explode: true
-          schema:
-            type: boolean
-            default: true
-            example: true
+        - $ref: '#/components/parameters/accounts'
+        - $ref: '#/components/parameters/dimensions'
+        - $ref: '#/components/parameters/Content-Type'
+        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/Accept-Encoding'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/where'
+        - $ref: '#/components/parameters/from'
+        - $ref: '#/components/parameters/to'
+        - $ref: '#/components/parameters/format'
+        - $ref: '#/components/parameters/reconciled'
       responses:
         '200':
           description: '200'
