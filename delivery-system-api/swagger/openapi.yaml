@@ -1,468 +1,472 @@
-swagger: '2.0'
+openapi: 3.0.0
 info:
-  version: 1.0.0
   title: Delivery System API Reference
   description: >-
-    Reference for the Delivery System API, used to manage and deploy a group of
-    files, called a repository. These files are managed through REST APIs and
-    through git. These files are delivered, on every <code>git push</code>, to
-    players.brightcove.com. To test API requests, you can use our <a
-    href="https://support.brightcove.com/node/17910" target="_blank">API Testing
-    Tools</a>
+    Reference for the Delivery System API, used to manage and deploy a group of files, called a repository. These files are managed through REST APIs and through git. These files are delivered, on every <code>git push</code>, to players.brightcove.com. To test API requests, you can use our <a href="https://support.brightcove.com/node/17910" target="_blank">API Testing Tools</a>
 
      **Base URL**: https://repos.api.brightcove.com/v1
-host: repos.api.brightcove.com
-basePath: /v1
-schemes:
-  - https
-consumes:
-  - application/json
-produces:
-  - application/json
+  version: '1.0.0'
+servers:
+- url: https://repos.api.brightcove.com/v1
+  variables: {}
 paths:
-  '/accounts/{accountId}/repos/{repoName}/files/{filename}':
+  /accounts/{accountId}/repos/{repoName}/files/{filename}:
     put:
-      description: >-
-        This will add or update a file. The wanted file name is at the end of
-        the endpoint. The form contents can be a file name, including relative
-        path, or any string. If the file has a .json extension, it will be
-        checked for valid JSON format.
-      summary: Add or Update File
       tags:
-        - Files
+      - Files
+      summary: AccountsReposFilesFilenameByAccountIdAndRepoNamePut
+      description: This will add or update a file. The wanted file name is at the end of the endpoint. The form contents can be a file name, including relative path, or any string. If the file has a .json extension, it will be checked for valid JSON format.
       operationId: AccountsReposFilesFilenameByAccountIdAndRepoNamePut
-      produces:
-        - application/json
       parameters:
-        - name: accountId
-          in: path
-          required: true
+      - name: accountId
+        in: path
+        description: Video Cloud account ID.
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: Video Cloud account ID.
-        - name: repoName
-          in: path
-          required: true
+      - name: repoName
+        in: path
+        description: The name of the repo for which to list details.
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: The name of the repo for which to list details.
-        - name: filename
-          in: path
-          required: true
+      - name: filename
+        in: path
+        description: The name of the file in the repo, it can be different than the name of locally read file.
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: >-
-            The name of the file in the repo, it can be different than the name
-            of locally read file.
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
       responses:
-        '200':
-          description: '200'
-          schema:
-            $ref: '#/definitions/AddUpdateFile200'
-          examples: {}
-        '401':
-          description: >-
-            UNAUTHORIZED: Authentication failed; check to make sure your client
-            credentials were correct for the access token
-          schema: {}
-        '404':
-          description: >-
-            RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you
-            requested
-          schema: {}
+        200:
+          description: 200
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddUpdateFile200'
+        401:
+          description: 'UNAUTHORIZED: Authentication failed; check to make sure your client credentials were correct for the access token'
+        404:
+          description: 'RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested'
       security: []
-      x-unitTests: []
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
     delete:
+      tags:
+      - Files
+      summary: AccountsReposFilesFilenameByAccountIdAndRepoNameDelete
       description: 'Deletes a file in a repo. '
-      summary: Delete_File
-      tags:
-        - Files
       operationId: AccountsReposFilesFilenameByAccountIdAndRepoNameDelete
-      produces:
-        - application/json
       parameters:
-        - name: accountId
-          in: path
-          required: true
+      - name: accountId
+        in: path
+        description: Video Cloud account ID.
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: Video Cloud account ID.
-        - name: repoName
-          in: path
-          required: true
+      - name: repoName
+        in: path
+        description: The name of the repo for which to list details.
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: The name of the repo for which to list details.
-        - name: filename
-          in: path
-          required: true
+      - name: filename
+        in: path
+        description: The name of the file in the repo to delete.
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: The name of the file in the repo to delete.
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
       responses:
-        '200':
-          description: ''
-        '401':
-          description: >-
-            UNAUTHORIZED: Authentication failed; check to make sure your client
-            credentials were correct for the access token
-          schema: {}
-        '404':
-          description: >-
-            RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you
-            requested
-          schema: {}
-      security: []
-      x-unitTests: []
-      x-operation-settings:
-        CollectParameters: false
-        AllowDynamicQueryParameters: false
-        AllowDynamicFormParameters: false
-        IsMultiContentStreaming: false
-  '/accounts/{accountId}/repos/{repoName}/files':
-    get:
-      description: 'Lists all the files in a repo. '
-      summary: List_Files
-      tags:
-        - Files
-      operationId: AccountsReposFilesByAccountIdAndRepoNameGet
-      produces:
-        - application/json
-      parameters:
-        - name: accountId
-          in: path
-          required: true
-          type: string
-          description: Video Cloud account ID.
-        - name: repoName
-          in: path
-          required: true
-          type: string
-          description: The name of the repo for which to list details.
-        - name: Authorization
-          in: header
-          required: true
-          type: string
-          description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
-      responses:
-        '200':
-          description: ''
-        '401':
-          description: >-
-            UNAUTHORIZED: Authentication failed; check to make sure your client
-            credentials were correct for the access token
-          schema: {}
-        '404':
-          description: >-
-            RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you
-            requested
-          schema: {}
-      security: []
-      x-unitTests: []
-      x-operation-settings:
-        CollectParameters: false
-        AllowDynamicQueryParameters: false
-        AllowDynamicFormParameters: false
-        IsMultiContentStreaming: false
-  '/accounts/{accountId}/repos/{repoName}':
-    get:
-      description: 'This will retrieve the details for a Repositories. '
-      summary: Get_Repository
-      tags:
-        - Repositories
-      operationId: AccountsReposByAccountIdAndRepoNameGet
-      produces:
-        - application/json
-      parameters:
-        - name: accountId
-          in: path
-          required: true
-          type: string
-          description: Video Cloud account ID.
-        - name: repoName
-          in: path
-          required: true
-          type: string
-          description: The name of the repo for which to list details.
-        - name: Content-Type
-          in: header
-          required: true
-          type: string
-          description: 'Content-Type: application/json'
-        - name: Authorization
-          in: header
-          required: true
-          type: string
-          description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
-      responses:
-        '200':
+        200:
           description: '200'
-          schema:
-            $ref: '#/definitions/GetRepository200'
-          examples: {}
-        '401':
-          description: >-
-            UNAUTHORIZED: Authentication failed; check to make sure your client
-            credentials were correct for the access token
-          schema: {}
-        '404':
-          description: >-
-            RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you
-            requested
-          schema: {}
+        401:
+          description: 'UNAUTHORIZED: Authentication failed; check to make sure your client credentials were correct for the access token'
+        404:
+          description: 'RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested'
       security: []
-      x-unitTests: []
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /accounts/{accountId}/repos/{repoName}/files:
+    get:
+      tags:
+      - Files
+      summary: AccountsReposFilesByAccountIdAndRepoNameGet
+      description: 'Lists all the files in a repo. '
+      operationId: AccountsReposFilesByAccountIdAndRepoNameGet
+      parameters:
+      - name: accountId
+        in: path
+        description: Video Cloud account ID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: repoName
+        in: path
+        description: The name of the repo for which to list details.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: '200'
+        401:
+          description: 'UNAUTHORIZED: Authentication failed; check to make sure your client credentials were correct for the access token'
+        404:
+          description: 'RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested'
+      security: []
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /accounts/{accountId}/repos/{repoName}:
+    get:
+      tags:
+      - Repositories
+      summary: AccountsReposByAccountIdAndRepoNameGet
+      description: 'This will retrieve the details for a Repositories. '
+      operationId: AccountsReposByAccountIdAndRepoNameGet
+      parameters:
+      - name: accountId
+        in: path
+        description: Video Cloud account ID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: repoName
+        in: path
+        description: The name of the repo for which to list details.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Content-Type
+        in: header
+        description: 'Content-Type: application/json'
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: 200
+          content:
+            application/json:
+              schema:
+                description: 200
+                $ref: '#/components/schemas/GetRepository200'
+        401:
+          description: 'UNAUTHORIZED: Authentication failed; check to make sure your client credentials were correct for the access token'
+        404:
+          description: 'RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested'
+      security: []
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
     put:
-      description: >-
-        This will create a Repositories, if it does not exist. A response of 200
-        means the repository already existed. A response of 201 means repository
-        was successfully created.
-      summary: Create_Repository
       tags:
-        - Repositories
+      - Repositories
+      summary: AccountsReposByAccountIdAndRepoNamePut
+      description: This will create a Repositories, if it does not exist. A response of 200 means the repository already existed. A response of 201 means repository was successfully created.
       operationId: AccountsReposByAccountIdAndRepoNamePut
-      produces:
-        - application/json
       parameters:
-        - name: accountId
-          in: path
-          required: true
+      - name: accountId
+        in: path
+        description: Video Cloud account ID.
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: Video Cloud account ID.
-        - name: repoName
-          in: path
-          required: true
+      - name: repoName
+        in: path
+        description: The name of the repo for which to list details.
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: The name of the repo for which to list details.
-        - name: Content-Type
-          in: header
-          required: true
+      - name: Content-Type
+        in: header
+        description: 'Content-Type: application/json'
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: 'Content-Type: application/json'
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
       responses:
-        '200':
-          description: '200'
-          schema:
-            $ref: '#/definitions/CreateRepository200'
-          examples: {}
-        '401':
-          description: >-
-            UNAUTHORIZED: Authentication failed; check to make sure your client
-            credentials were correct for the access token
-          schema: {}
-        '404':
-          description: >-
-            RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you
-            requested
-          schema: {}
+        200:
+          description: 200
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateRepository200'
+        401:
+          description: 'UNAUTHORIZED: Authentication failed; check to make sure your client credentials were correct for the access token'
+        404:
+          description: 'RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested'
       security: []
-      x-unitTests: []
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
     delete:
+      tags:
+      - Repositories
+      summary: AccountsReposByAccountIdAndRepoNameDelete
       description: 'This will delete a Repositories. '
-      summary: Delete_Repository
-      tags:
-        - Repositories
       operationId: AccountsReposByAccountIdAndRepoNameDelete
-      produces:
-        - application/json
       parameters:
-        - name: accountId
-          in: path
-          required: true
+      - name: accountId
+        in: path
+        description: Video Cloud account ID.
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: Video Cloud account ID.
-        - name: repoName
-          in: path
-          required: true
+      - name: repoName
+        in: path
+        description: The name of the repo for which to list details.
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: The name of the repo for which to list details.
-        - name: Content-Type
-          in: header
-          required: true
+      - name: Content-Type
+        in: header
+        description: 'Content-Type: application/json'
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: 'Content-Type: application/json'
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
       responses:
-        '200':
-          description: '200'
-          schema:
-            $ref: '#/definitions/DeleteRepository200'
-          examples: {}
-        '401':
-          description: >-
-            UNAUTHORIZED: Authentication failed; check to make sure your client
-            credentials were correct for the access token
-          schema: {}
-        '404':
-          description: >-
-            RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you
-            requested
-          schema: {}
+        200:
+          description: 200
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteRepository200'
+        401:
+          description: 'UNAUTHORIZED: Authentication failed; check to make sure your client credentials were correct for the access token'
+        404:
+          description: 'RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested'
       security: []
-      x-unitTests: []
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
-  '/accounts/{accountId}/repos':
+  /accounts/{accountId}/repos:
     get:
-      description: 'This will list the details for all repositories in an account. '
-      summary: Get_All_Repositories
       tags:
-        - Repositories
+      - Repositories
+      summary: AccountsReposByAccountIdGet
+      description: 'This will list the details for all repositories in an account. '
       operationId: AccountsReposByAccountIdGet
-      produces:
-        - application/json
       parameters:
-        - name: accountId
-          in: path
-          required: true
+      - name: accountId
+        in: path
+        description: Video Cloud account ID.
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: Video Cloud account ID.
-        - name: Content-Type
-          in: header
-          required: true
+      - name: Content-Type
+        in: header
+        description: 'Content-Type: application/json'
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: 'Content-Type: application/json'
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-          description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
       responses:
-        '200':
-          description: '200'
-          schema:
-            $ref: '#/definitions/GetAllRepositories200'
-          examples: {}
-        '401':
-          description: >-
-            UNAUTHORIZED: Authentication failed; check to make sure your client
-            credentials were correct for the access token
-          schema: {}
-        '404':
-          description: >-
-            RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you
-            requested
-          schema: {}
+        200:
+          description: 200
+          content:
+            application/json:
+              schema:
+                description: 200
+                $ref: '#/components/schemas/GetAllRepositories200'
+        401:
+          description: 'UNAUTHORIZED: Authentication failed; check to make sure your client credentials were correct for the access token'
+        404:
+          description: 'RESOURCE_NOT_FOUND: The api couldn&#39;t find the resource you requested'
       security: []
-      x-unitTests: []
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
-definitions:
-  AddUpdateFile200:
-    title: Add_Update_File200
-    type: object
-    properties:
-      name:
-        description: Destination filename
-        type: string
-      public_url:
-        description: URL to use for referencing the file (contrasted to the repo URL)
-        type: string
-    required:
+components:
+  schemas:
+    AddUpdateFile200:
+      title: Add_Update_File200
+      required:
       - name
       - public_url
-  CreateRepository200:
-    title: Create_Repository200
-    type: object
-    properties:
-      name:
-        description: repo name
-        type: string
-      public_url:
-        description: URL for the public player
-        type: string
-      repo_url:
-        description: URL for the repository
-        type: string
-    required:
-      - name
-      - public_url
-      - repo_url
-  DeleteRepository200:
-    title: Delete_Repository200
-    type: object
-    properties:
-      name:
-        description: repo name
-        type: string
-    required:
-      - name
-  GetRepository200:
-    title: Get_Repository200
-    type: object
-    properties:
-      name:
-        description: repo name
-        type: string
-      public_url:
-        description: URL for the public player
-        type: string
-      repo_url:
-        description: URL for the repository
-        type: string
-    required:
-      - name
-      - public_url
-      - repo_url
-  GetAllRepositories200:
-    title: Get_All_Repositories200
-    type: object
-    properties:
-      items:
-        description: array of items
-        type: array
-        items:
+      type: object
+      properties:
+        name:
           type: string
-    required:
-      - items
-  Items:
-    title: items
-    type: object
-    properties:
-      name:
-        description: repo name
-        type: string
-      public_url:
-        description: URL for the public player
-        type: string
-      repo_url:
-        description: URL for the repository
-        type: string
-    required:
+          description: Destination filename
+        public_url:
+          type: string
+          description: URL to use for referencing the file (contrasted to the repo URL)
+    CreateRepository200:
+      title: Create_Repository200
+      required:
       - name
       - public_url
       - repo_url
+      type: object
+      properties:
+        name:
+          type: string
+          description: repo name
+        public_url:
+          type: string
+          description: URL for the public player
+        repo_url:
+          type: string
+          description: URL for the repository
+    DeleteRepository200:
+      title: Delete_Repository200
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          description: repo name
+    GetRepository200:
+      title: Get_Repository200
+      required:
+      - name
+      - public_url
+      - repo_url
+      type: object
+      properties:
+        name:
+          type: string
+          description: repo name
+        public_url:
+          type: string
+          description: URL for the public player
+        repo_url:
+          type: string
+          description: URL for the repository
+    GetAllRepositories200:
+      title: Get_All_Repositories200
+      required:
+      - items
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: string
+          description: array of items
+    Items:
+      title: items
+      required:
+      - name
+      - public_url
+      - repo_url
+      type: object
+      properties:
+        name:
+          type: string
+          description: repo name
+        public_url:
+          type: string
+          description: URL for the public player
+        repo_url:
+          type: string
+          description: URL for the repository
