@@ -1,4 +1,7 @@
 openapi: 3.0.0
+x-bc-implicit-head: true
+x-bc-implicit-options: true
+x-bc-upstream: 'http://backend_server'
 info:
   title: Brightcove Ingest Profiles API Reference
   description: >-
@@ -8,6 +11,7 @@ info:
 
      **Base URL**: https://ingestion.api.brightcove.com/v1
   version: 1.0.0
+  x-bc-access: public
 servers:
   - url: 'https://ingestion.api.brightcove.com/v1'
     variables: {}
@@ -24,6 +28,9 @@ paths:
       summary: Get Default Profile
       description: 'Get the default ingest profile for the account. '
       operationId: GetDefaultProfile
+      security:
+        - BC_OAuth2:
+          - video-cloud/ingest-profiles/account/read
       parameters:
         - $ref: '#/components/parameters/account_id'
         - $ref: '#/components/parameters/ContentType'
@@ -40,7 +47,6 @@ paths:
         '404':
           description: 'NOT_FOUND: The api could not find the resource you requested '
       deprecated: false
-      security: []
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
@@ -52,6 +58,9 @@ paths:
       summary: Update Default Profile
       description: 'Updates the default ingest profile for the account. '
       operationId: UpdateDefaultProfile
+      security:
+        - BC_OAuth2:
+          - video-cloud/ingest-profiles/account/write
       parameters:
         - $ref: '#/components/parameters/account_id'
         - $ref: '#/components/parameters/ContentType'
@@ -81,7 +90,6 @@ paths:
             CONFLICT: Account configuration already exists for 57838016001;
             please delete the configuration first, or update it instead.
       deprecated: false
-      security: []
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
@@ -93,6 +101,9 @@ paths:
       summary: Set Default Profile
       description: 'Sets an ingest profile as the default for the account. '
       operationId: SetDefaultProfile
+      security:
+        - BC_OAuth2:
+          - video-cloud/ingest-profiles/account/write
       parameters:
         - $ref: '#/components/parameters/account_id'
         - $ref: '#/components/parameters/ContentType'
@@ -122,7 +133,6 @@ paths:
             CONFLICT: Account configuration already exists for 57838016001;
             please delete the configuration first, or update it instead.
       deprecated: false
-      security: []
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
@@ -135,6 +145,9 @@ paths:
       summary: Get All Ingest Profiles
       description: 'Get an array of all the profiles valid for the account '
       operationId: GetAllIngestProfiles
+      security:
+        - BC_OAuth2:
+          - video-cloud/ingest-profiles/profile/read
       parameters:
         - $ref: '#/components/parameters/account_id'
         - $ref: '#/components/parameters/ContentType'
@@ -157,7 +170,6 @@ paths:
             PROFILE_ERROR: profile rendition count exceeds configured rendition
             limit
       deprecated: false
-      security: []
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
@@ -171,6 +183,9 @@ paths:
         Create a custom ingest profile for the account. Note that you can also
         do this through Video Cloud Studio
       operationId: CreateIngestProfile
+      security:
+        - BC_OAuth2:
+          - video-cloud/ingest-profiles/profile/write
       parameters:
         - $ref: '#/components/parameters/account_id'
         - $ref: '#/components/parameters/ContentType'
@@ -208,7 +223,6 @@ paths:
             UNPROCESSABLE_ENTITY: required field missing &mdash; message varies
             according to the issue
       deprecated: false
-      security: []
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
@@ -258,6 +272,9 @@ paths:
         Update a custom ingest profile for the account. Note that you can also
         do this through Video Cloud Studio
       operationId: UpdateIngestProfile
+      security:
+        - BC_OAuth2:
+          - video-cloud/ingest-profiles/profile/write
       parameters:
         - $ref: '#/components/parameters/account_id'
         - $ref: '#/components/parameters/profile_id'
@@ -296,7 +313,6 @@ paths:
             UNPROCESSABLE_ENTITY: required field missing &mdash; message varies
             according to the issue
       deprecated: false
-      security: []
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
@@ -310,6 +326,9 @@ paths:
         Delete a custom ingest profile for the account. Note that you can also
         do this through Video Cloud Studio
       operationId: DeleteIngestProfile
+      security:
+        - BC_OAuth2:
+          - video-cloud/ingest-profiles/profile/write
       parameters:
         - $ref: '#/components/parameters/account_id'
         - $ref: '#/components/parameters/profile_id'
@@ -335,7 +354,6 @@ paths:
             UNPROCESSABLE_ENTITY: required field missing &mdash; message varies
             according to the issue
       deprecated: false
-      security: []
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
@@ -1054,3 +1072,16 @@ components:
         	},
         	"id": "6198c17bbbdc42a4bb60a41f"
         }
+  securitySchemes:
+    BC_OAuth2:
+      type: oauth2
+      description: >-
+        Brightcove OAuth API. See the [support documentation](https://support.brightcove.com/oauth-api) or [Getting Access Tokens](https://support.brightcove.com/oauth-api-sample-get-access-token) to learn more
+      flows:
+        clientCredentials:
+          tokenUrl: 'https://oauth.brightcove.com/v4/access_token'
+          scopes:
+            video-cloud/ingest-profiles/profile/read: Read profiles
+            video-cloud/ingest-profiles/profile/write: Write profiles
+            video-cloud/ingest-profiles/account/read: Read account settings
+            video-cloud/ingest-profiles/account/write: Write account settings
