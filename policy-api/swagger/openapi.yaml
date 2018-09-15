@@ -1,4 +1,7 @@
 openapi: 3.0.0
+x-bc-implicit-head: true
+x-bc-implicit-options: true
+x-bc-upstream: 'http://backend_server'
 info:
   title: Policy API Reference
   description: >-
@@ -12,6 +15,7 @@ info:
 
      **Base URL**: https://policy.api.brightcove.com/v1
   version: 1.0.0
+  x-bc-access: public
 servers:
   - url: 'https://policy.api.brightcove.com/v1'
     variables: {}
@@ -26,6 +30,9 @@ paths:
       summary: Create a Policy Key
       description: 'Create a new policy key to access the Playback API '
       operationId: CreateAPolicyKey
+      security:
+        - BC_OAuth2:
+          - video-cloud/player/all
       parameters:
         - name: account_id
           in: path
@@ -81,7 +88,6 @@ paths:
             UNKNOWN: Issue in Brightcove system; try again later.
             TIMEOUT: Server likely too busy; try again later.
       deprecated: false
-      security: []
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
@@ -94,6 +100,9 @@ paths:
       summary: Get Policy
       description: 'Get a policy key associated with a policy key string '
       operationId: GetPolicy
+      security:
+        - BC_OAuth2:
+          - video-cloud/player/read
       parameters:
         - name: account_id
           in: path
@@ -149,7 +158,6 @@ paths:
             UNKNOWN: Issue in Brightcove system; try again later.
             TIMEOUT: Server likely too busy; try again later.
       deprecated: false
-      security: []
       x-operation-settings:
         CollectParameters: false
         AllowDynamicQueryParameters: false
@@ -303,3 +311,14 @@ components:
         key-data:
           description: Map of key data prescribing the policy
           $ref: '#/components/schemas/KeyData'
+  securitySchemes:
+    BC_OAuth2:
+      type: oauth2
+      description: >-
+        Brightcove OAuth API. See the [support documentation](https://support.brightcove.com/oauth-api) or [Getting Access Tokens](https://support.brightcove.com/oauth-api-sample-get-access-token) to learn more
+      flows:
+        clientCredentials:
+          tokenUrl: 'https://oauth.brightcove.com/v4/access_token'
+          scopes:
+            video-cloud/player/read: Read player data
+            video-cloud/player/all: Read/write player data
