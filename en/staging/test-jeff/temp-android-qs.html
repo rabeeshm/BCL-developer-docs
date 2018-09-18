@@ -300,10 +300,7 @@ dependencies {
       	<li>
       	<p>Return to the <code class="notranslate">MainActivity.java</code> file. For the <code class="notranslate">MainActivity</code> class, extend the <code class="notranslate">BrightcovePlayer</code> class. This provides default lifecycle management for your app.</p>
 
-	<pre class="line-numbers video-cloud-only" data-start="13">
-<code class="notranslate language-java">public class MainActivity extends BrightcovePlayer {</code></pre>
-
-	<pre class="line-numbers player-only" data-start="8">
+	<pre class="line-numbers" data-start="13">
 <code class="notranslate language-java">public class MainActivity extends BrightcovePlayer {</code></pre>
       	</li>
       	<li>
@@ -315,52 +312,59 @@ dependencies {
       		</li>
       	</ul>
 
-	<pre class="line-numbers video-cloud-only" data-start="13">
+	<pre class="line-numbers" data-start="13">
 <code class="notranslate language-java">public class MainActivity extends BrightcovePlayer {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
-      setContentView(R.layout.activity_main);
-  <span class="bcls-highlight">    brightcoveVideoView = (BrightcoveExoPlayerVideoView) findViewById(R.id.brightcove_video_view);</span></code></pre>
-
-	<pre class="line-numbers player-only" data-start="8">
-<code class="notranslate language-java">public class MainActivity extends BrightcovePlayer {
-
-    @Override
-      protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    <span class="bcls-highlight">    setContentView(R.layout.activity_main);
-        brightcoveVideoView = (BrightcoveExoPlayerVideoView) findViewById(R.id.brightcove_video_view);</span></code></pre>
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+<span class="bcls-highlight">    brightcoveVideoView = (BrightcoveExoPlayerVideoView) findViewById(R.id.brightcove_video_view);</span></code></pre>
       	</li>
       	<li class="player-only">
       	<p>Next, you need to send your Brightcove Player Account ID to Brightcove using the analytics <code class="notranslate">setAccount()</code> method.</p>
 
 	<pre class="line-numbers" data-start="16">
 <code class="notranslate language-java">Analytics analytics = brightcoveVideoView.getAnalytics();
-    analytics.setAccount("123456789");</code></pre>
+analytics.setAccount(&quot;<span class="bcls-input">your account Id</span>&quot;);</code></pre>
       	</li>
       	<li class="video-cloud-only">
       	<p><strong>Optional:</strong> If you override the <code class="notranslate">BrightcoveExoPlayerVideoView</code> class or do not use the Brightcove player and catalog, you need to send your Video Cloud Publisher ID to Video Cloud Analytics. You can do this by using the analytics <code class="notranslate">setAccount()</code> method. This allows you to view data for this app in Video Cloud Analytics.</p>
 
 	<pre class="line-numbers" data-start="20">
 <code class="notranslate language-java">Analytics analytics = brightcoveVideoView.getAnalytics();
-analytics.setAccount("123456789");</code></pre>
+analytics.setAccount(&quot;<span class="bcls-input">your account Id</span>&quot;);</code></pre>
 
       	<aside class="bcls-aside bcls-aside--tip video-cloud-only">For details about sending data to Video Cloud Analytics, see the <a href="/node/18214">Using Brightcove Analytics</a> guide.</aside>
       	</li>
-      	<li>
-      	<p>Now, add the following lines of code to add a video to the view and play it.</p>
-
-	<pre class="line-numbers video-cloud-only" data-start="22">
-<code class="notranslate language-java">brightcoveVideoView.add(Video.createVideo("http://learning-services-media.brightcove.com/videos/mp4/Wildlife_Tiger.mp4", DeliveryType.MP4));
+        <li>
+          <p>
+            Create a video object from your video hosted on a remote server. Set the <code>DeliveryType</code> to match the type of video you have.
+          </p>
+  <pre class="line-numbers" data-start="22">
+<code class="notranslate language-java">Video video = Video.createVideo(&quot;https://learning-services-media.brightcove.com/videos/hls/greatblueheron/greatblueheron.m3u8&quot;,
+  DeliveryType.HLS);</code></pre>
+        </li>
+        <li>
+          <p>
+            Load a remote image to be used as the poster image before video playback starts.
+          </p>
+  <pre class="line-numbers" data-start="22">
+<code class="notranslate language-java">try {
+  java.net.URI myposterImage = new java.net.URI(&quot;https://solutions.brightcove.com/bcls/assets/images/Great-Blue-Heron.png&quot;);
+  video.getProperties().put(Video.Fields.STILL_IMAGE_URI, myposterImage);
+} catch (URISyntaxException e) {
+  e.printStackTrace();
+}</code></pre>
+        </li>
+        <li>
+          <p>
+            Add the video to the view and start video playback.
+          </p>
+  <pre class="line-numbers" data-start="22">
+<code class="notranslate language-java">brightcoveVideoView.add(video);
 brightcoveVideoView.start();</code></pre>
-
-	<pre class="line-numbers player-only" data-start="19">
-<code class="notranslate language-java">brightcoveVideoView.add(Video.createVideo("http://learning-services-media.brightcove.com/videos/mp4/Wildlife_Tiger.mp4", DeliveryType.MP4));
-    brightcoveVideoView.start();</code></pre>
-      	</li>
-      	<li class="player-only">
+        </li>
+      	<li>
       	<p>Check to be sure your <code class="notranslate">onCreate()</code> method appears as follows:</p>
 
 	<pre class="line-numbers" data-start="10">
@@ -370,10 +374,24 @@ brightcoveVideoView.start();</code></pre>
     setContentView(R.layout.activity_main);
     brightcoveVideoView = (BrightcoveExoPlayerVideoView) findViewById(R.id.brightcove_video_view);
 
+    // Optional: For Brightcove Player customers to register their apps
     Analytics analytics = brightcoveVideoView.getAnalytics();
-    analytics.setAccount("123456789");
+    analytics.setAccount(&quot;<span class="bcls-input">your account Id</span>&quot;);
 
-    brightcoveVideoView.add(Video.createVideo("http://learning-services-media.brightcove.com/videos/mp4/Wildlife_Tiger.mp4", DeliveryType.MP4));
+    // Define a video from a remote server
+    Video video = Video.createVideo(&quot;https://learning-services-media.brightcove.com/videos/hls/greatblueheron/greatblueheron.m3u8&quot;, DeliveryType.HLS);
+
+    // Load a remote poster image
+    try {
+        java.net.URI myposterImage = new java.net.URI(&quot;https://solutions.brightcove.com/bcls/assets/images/Great-Blue-Heron.png&quot;);
+        video.getProperties().put(Video.Fields.STILL_IMAGE_URI, myposterImage);
+    } catch (URISyntaxException e) {
+        e.printStackTrace();
+    }
+
+    // Add video to the view
+    brightcoveVideoView.add(video);
+    // Start video playback
     brightcoveVideoView.start();
   }</code></pre>
       	</li>
