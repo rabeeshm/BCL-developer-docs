@@ -50,129 +50,17 @@ paths:
   parameters:
     ContentType:
       name: Content-Type
-      in: path
-      description: ID of the account to query video statuses for
+      in: header
+      description: 'Content-Type: application/json'
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ZencoderApiKey:
+      name: Zencoder-Api-Key
+      in: header
+      description: Your API key
       required: true
       schema:
         type: string
-    VideoId:
-      name: video_id
-      in: path
-      description: ID of the video to query video statuses for
-      required: true
-      schema:
-        type: string
-    Platform:
-      name: platform
-      in: query
-      description: >
-        Limit the list of videos to a single social platform.  Valid values
-        for this property are
-
-        - YOUTUBE
-
-        - FACEBOOK
-
-        - TWITTER
-
-        Note that this may conflict with `destination_id`, below.
-      required: false
-      schema:
-        type: string
-    DestinationId:
-      name: destination_id
-      in: query
-      description: >
-        Limit the list of videos to a single Social destination, by it's ID.
-        Note that this may conflict with `platform`, above. (e.g.,
-        Specifying `platform=YOUTUBE` and passing the ID of a Twitter
-        destination will result in no statuses.)  Generally if you are
-        passing a `destination_id` you probably don't want to be passing a
-        `platform` as well, as destinations imply a platform.
-      required: false
-      schema:
-        type: string
-        format: uuid
-    Status:
-      name: status
-      in: query
-      description: >
-        Limit the list of videos to those with a specific status.  Valid
-        values for this property are
-
-        - DELETED
-
-        - ERROR
-
-        - HIDDEN
-
-        - PROCESSING
-
-        - PUBLISHED
-
-        - SCHEDULED
-
-        - SYNCED
-
-        - ABANDONED
-      schema:
-        type: string
-    Before:
-      name: before
-      in: query
-      description: >-
-        Limit the list of videos to those whose last status change occurred
-        before the specified date time.  Can accept either a full timestamp, or just a datestamp.  If passed just a datestamp, assumes 00:00:00 for the time, and the filter will be exclusive of the date specified.
-      required: false
-      schema:
-        type: string
-        format: date-time
-    Since:
-      name: since
-      in: query
-      description: >-
-        Limit the list of videos to those whose last status change occurred
-        since the specified date time.  Can accept either a full timestamp, or just a datestamp.  If passed just a datestamp, assumes 00:00:00 for the time, and the filter will be inclusive of the date specified.
-      required: false
-      schema:
-        type: string
-        format: date-time
-    PageKey:
-      name: page_key
-      in: query
-      description: >-
-        Fetch the next page of data.  If the previous call to this endpoint
-        returned a `page_key`, a subsequent call can be made with the same
-        parameters and including the `page_key` to retrieve the next page.
-      required: false
-      schema:
-        type: string
-    PageSize:
-      name: page_size
-      in: query
-      description: >-
-        The number of entries to fetch in the next page of data.  Must be a number between 1 and 100, inclusive.  Defaults to 20.
-      required: false
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-        maximum: 100
-    PrettyPrint:
-      name: pretty_print
-      in: query
-      description: >-
-        Whether or not to pretty-print the JSON response.  Defaults to false.
-      required: false
-      schema:
-        type: boolean
-  securitySchemes:
-    BC_OAuth2:
-      type: oauth2
-      description: >-
-        Brightcove OAuth API. See the [support documentation](https://support.brightcove.com/oauth-api) or [Getting Access Tokens](https://support.brightcove.com/oauth-api-sample-get-access-token) to learn more
-      flows:
-        clientCredentials:
-          tokenUrl: 'https://oauth.brightcove.com/v4/access_token'
-          scopes:
-            video-cloud/social/status/read: Read social sharing status and history
