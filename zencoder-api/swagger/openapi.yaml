@@ -622,12 +622,23 @@ components:
             Only use this setting if you understand its implications, as it can decrease video quality. This should typically only be used for streaming (or for device playback).
           maximum: 100000
         one_pass:
-          type: integer
+          type: boolean
           description: >-
-            The size of the buffer fed to the decoder when using a bitrate_cap, expressed in kbps. The buffer_size divided by bitrate_cap represents the size of the buffer in seconds; so if you set bitrate_cap to 1000 and buffer_size to 1000, the buffer is effectively 1.0 second. If bitrate_cap is 500 and buffer_size is 1000, the buffer is 2.0 seconds.
+            By default, we will use two-pass encoding whenever encoding to a target video_bitrate, and one_pass encoding when performing constant quality encoding (which doesn't benefit from a second pass). This option will force one_pass encoding when targeting a specific video_bitrate.
 
-            Only use this setting if you understand its implications, as it can decrease video quality. This should typically only be used for streaming (or for device playback).
-          maximum: 100000
+            We highly recommend not forcing one_pass encoding. The first pass in two-pass encoding is faster than the second pass, so going from two-pass encoding to one_pass encoding only results in a 25% encoding speedup, not 50% faster encoding. And two-pass encoding looks significantly better than one_pass encoding.
+          default: false
+        audio_constant_bitrate:
+          type: boolean
+          description: >-
+            Enable constant bitrate (CBR) mode for audio, when possible. audio_sample_rate may be adjusted for compatibility.
+
+audio_bitrate setting must also be specified when using this option.
+
+Compatible with AAC and MP3 audio codecs. Not compatible when used with the VP6 video_codec.) For MP3 audio, only certain bitrates are compatible with this option: 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320.
+
+Note: The AAC codec does not define a fixed CBR mode, so there are still small variations in bitrate over short time periods. Most software will still report these encodes as VBR.
+          default: false
         drm:
           $ref: '#/components/schemas/DRM'
         headers:
