@@ -737,6 +737,23 @@ components:
             Zencoder supports setting a limited subset of these headers: `Cache-Control`, `Content-Disposition`, `Content-Encoding`, `Content-Type`, `Expires`, `x-amz-acl`, `x-amz-storage-class`, `x-amz-server-side-encryption`, `x-amz-meta-*`, `x-goog-acl` and `x-goog-meta-*`.
         skip:
           $ref: '#/components/schemas/Skip'
+        streaming_delivery_format:
+          type: string
+          description: >-
+            Sets the format/protocol for an output that will be delivered using a specific streaming configuration, including necessary manifests, directory structures, or other packaging.
+
+            For 'dash' outputs, this will also change the default segment_seconds to 2, enforce fixed keyframe intervals, include an MPD manifest, and create a directory structure with initialization and segment files.
+          example: dash
+        streaming_delivery_profile:
+          type: string
+          description: |-
+            Sets the profile of the streaming delivery format, ensuring options are selected for compatibility with the profile. Valid options depend on the selected streaming_delivery_format.
+
+            For 'dash' outputs, the currently supported profiles are:
+
+            `live` - Will set the DASH profile to "urn:mpeg:dash:profile:isoff-live:2011" and use a single SegmentTemplate for each AdaptationSet. For DRM, it will use an 8-byte IV, and for PlayReady will use version 1.1, including a PSSH atom in the media.
+            `hbbtv_1.5` - Will set the DASH profile to "urn:hbbtv:dash:profile:isoff-live:2012" and include required attributes for audio and video representations. For DRM, it will use a 16-byte IV, and for PlayReady will use version 1.0, excluding PSSH atoms.
+            `on_demand` - Will set the DASH profile to "urn:mpeg:dash:profile:isoff-on-demand:2011" and encode media as single fragmented files for each stream rather than segmenting them. Otherwise the same as live profile.
     MasterDisplay:
       title: Master Display
       description: Hash of HDR10 output settings
