@@ -40,7 +40,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Job'
+              $ref: '#/components/schemas/CreateJobFields'
         required: true
       responses:
         '200':
@@ -132,8 +132,102 @@ components:
         minimum: 1
         maximum: 50
   schemas:
-    Job:
-      title: Job
+    CreateJobFields:
+      title: Create Job Request Body Fields
+      type: object
+      description: |-
+        Hash of Zencoder job properties
+      required:
+        - input
+      properties:
+        dynamic_profile_options:
+          $ref: '#/components/schemas/DynamicProfileOptions'
+        generate_dynamic_profile:
+          type: boolean
+          description: |-
+            'With CAE the number of outputs and parameters of such outputs may change dynamically for each input file. To specify limits on the number of outputs to be generated as well as other profile constraints, CAE job request must also include dynamic_profile_options object. The outputs reserved for CAE use should not include resolution, bitrate, or codec-related parameters. Instead, they should include labels dynamic_profile_rendition. The number of outputs reserved for CAE use must match the number specified as max_renditions in dynamic_profile_options.'
+        input:
+          type: string
+          description: |-
+            'A valid URL to a media file (HTTP/HTTPS, FTP/FTPS, SFTP, Azure, GCS, CF or S3), with or without authentication'
+        region:
+          type: string
+          description: |-
+            'The AWS region or Google Compute Engine instance (beta) where Zencoder should process the job'
+          enum:
+            - us
+            - europe
+            - asia
+            - sa
+            - australia
+            - us-virginia
+            - us-oregon
+            - us-n-california
+            - eu-dublin
+            - asia-singapore
+            - asia-tokyo
+            - sa-saopaulo
+            - australia-sydney
+          default: us
+        test:
+          type: boolean
+          description: |-
+            'Enable test mode ("Integration Mode") for a job'
+          default: false
+        private:
+          type: boolean
+          description: 'Enable privacy mode for a job'
+          default: false
+        pass_through:
+          type: string
+          description: Optional information to store alongside this job
+        mock:
+          type: boolean
+          description: Send a mocked job request
+          default: false
+        grouping:
+          type: string
+          description: A report grouping for this job
+        aspera_transfer_policy:
+          type: string
+          description: |-
+            How to allocate available bandwidth for Aspera file transfers
+          enum:
+            - fair
+            - low
+          default: fair
+        transfer_minimum_rate:
+          type: integer
+          description: A targeted rate in Kbps for data transfer minimums
+          default: 1800
+        transfer_maximum_rate:
+          type: integer
+          description: A targeted rate in Kbps for data transfer maximums
+          default: 250000
+        expected_md5_checksum:
+          type: string
+          description: The expected MD5 checksum of the input file. If the file's checksum does not match the provided checksum the job will fail.
+        credentials:
+          type: string
+          description: References saved credentials by a nickname
+        notifications:
+          description: |-
+            Array of notification destination objects or strings - notifications defined here are for job-level events.  A notification will be sent to the destination when selected event occurs. You can use a simple string with a url: &quot;http://log:pass@httpbin.org/post&quot;, or you can use an object.  <br> Retry strategy: In the event of a failed request to send a notification, the default retry strategy is to retry 50 times with an exponential delay between attempts: <br>
+            `max_retry_times = 50` <br> `delay_delta_s = 5` <br>
+            `next_retry = now_s + retry_count * delay_delta_s`
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/Notification'
+              - type: string
+                description: A URL or email address to send notifications to
+          type: array
+        outputs:
+          type: array
+          description: Array of output specifications
+          items:
+            $ref: '#/components/schemas/Output'
+    JobResponseFields:
+      title: Create Job Request Body Fields
       type: object
       description: |-
         Hash of Zencoder job properties
