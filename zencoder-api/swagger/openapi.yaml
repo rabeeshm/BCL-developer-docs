@@ -217,6 +217,40 @@ paths:
                     AllowDynamicQueryParameters: false
                     AllowDynamicFormParameters: false
                     IsMultiContentStreaming: false
+  '/inputs/{input_id}':
+    get:
+      tags:
+        - Inputs
+      summary: Get Input Details
+      description: |-
+        Get job input Details. Job details are available for two months after the job is submitted.
+      operationId: getJob
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/ContentType'
+        - $ref: '#/components/parameters/ZencoderApiKey'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/InputId'
+      responses:
+        '200':
+          description: Job properties.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobResponseFields'
+        '403':
+          description: Forbidden
+        '422':
+          description: Invalid query parameters
+        '500':
+          description: Server error
+      deprecated: false
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
 components:
   parameters:
     ContentType:
@@ -260,6 +294,16 @@ components:
       in: path
       description: >-
         The Zencoder job id
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    InputId:
+      name: input_id
+      in: path
+      description: >-
+        A Zencoder job input id
       required: true
       style: simple
       explode: false
@@ -2481,29 +2525,7 @@ components:
           type: number
           description: The percentage complete
         input:
-          type: object
-          description: Progress for processing the input file
-          properties:
-            id:
-              type: integer
-              description: The input id
-            state:
-              type: string
-              description: |-
-                The state of input processing
-                - pending (not yet submitted to Zencoder)
-                - submitting (currently submitting to Zencoder)
-                - finished (Zencoder finished processing the file)
-                - failed (Zencoder was unable to process the file)
-            progress:
-              type: number
-              description: Input processing percentage completed
-            current_event:
-              type: string
-              description: The current activity
-            current_event_progress:
-              type: number
-              description: The current activity percentage completed
+          $ref: '#/components/schemas/InputProgressResponse'
         output:
           type: object
           description: Progress for processing an output file
@@ -2530,3 +2552,55 @@ components:
             current_event_progress:
               type: number
               description: The current activity percentage completed
+    InputProgressResponse:
+      title: Job Input Progress Response
+      description: |-
+        Progress in the processing of a job input file
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The input id
+        state:
+          type: string
+          description: |-
+            The state of input processing
+            - pending (not yet submitted to Zencoder)
+            - submitting (currently submitting to Zencoder)
+            - finished (Zencoder finished processing the file)
+            - failed (Zencoder was unable to process the file)
+        progress:
+          type: number
+          description: Input processing percentage completed
+        current_event:
+          type: string
+          description: The current activity
+        current_event_progress:
+          type: number
+          description: The current activity percentage completed
+    InputProgressResponse:
+      title: Job Input Progress Response
+      description: |-
+        Progress in the processing of a job input file
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The input id
+        state:
+          type: string
+          description: |-
+            The state of input processing
+            - pending (not yet submitted to Zencoder)
+            - submitting (currently submitting to Zencoder)
+            - finished (Zencoder finished processing the file)
+            - failed (Zencoder was unable to process the file)
+        progress:
+          type: number
+          description: Input processing percentage completed
+        current_event:
+          type: string
+          description: The current activity
+        current_event_progress:
+          type: number
+          description: The current activity percentage completed
