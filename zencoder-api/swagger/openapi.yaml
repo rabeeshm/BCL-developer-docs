@@ -198,25 +198,23 @@ paths:
         'If you wish to cancel a job that has not yet finished processing you may send a request (using any HTTP method) to https://app.zencoder.com/api/v2/jobs/1234/cancel. If cancellation succeeds you will receive a 204 No Content response. Only jobs that are in the `waiting` or `processing` state may be cancelled. If you attempt to cancel a job in any other state you will receive a 409 Conflict response.'
         operationId: cancelJob
         security: []
-        parameters:
-          - $ref: '#/components/parameters/ContentType'
-          - $ref: '#/components/parameters/ZencoderApiKey'
-          - $ref: '#/components/parameters/Page'
-          - $ref: '#/components/parameters/PerPage'
-          - $ref: '#/components/parameters/JobId'
-          responses:
-            '204':
-              description: No content.
-              '409':
-                description: Conflict
-                '500':
-                  description: Server error
-                  deprecated: false
-                  x-operation-settings:
-                    CollectParameters: false
-                    AllowDynamicQueryParameters: false
-                    AllowDynamicFormParameters: false
-                    IsMultiContentStreaming: false
+      parameters:
+        - $ref: '#/components/parameters/ContentType'
+        - $ref: '#/components/parameters/ZencoderApiKey'
+        - $ref: '#/components/parameters/JobId'
+      responses:
+        '204':
+          description: No content.
+        '409':
+          description: Conflict
+        '500':
+          description: Server error
+      deprecated: false
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
   '/inputs/{input_id}':
     get:
       tags:
@@ -224,7 +222,7 @@ paths:
       summary: Get Input Details
       description: |-
         Get job input Details. Job details are available for two months after the job is submitted.
-      operationId: getJob
+      operationId: getInputDetails
       security: []
       parameters:
         - $ref: '#/components/parameters/ContentType'
@@ -234,11 +232,150 @@ paths:
         - $ref: '#/components/parameters/InputId'
       responses:
         '200':
-          description: Job properties.
+          description: Input properties.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JobResponseFields'
+                $ref: '#/components/schemas/InputMediaFile'
+        '403':
+          description: Forbidden
+        '422':
+          description: Invalid query parameters
+        '500':
+          description: Server error
+      deprecated: false
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  '/inputs/{input_id}/progress':
+    get:
+      tags:
+        - Inputs
+      summary: Get Input Progress
+      description: |-
+        Get the progress of processing for the input file. The current_event_progress number is the percent complete of the current event – so if the event is Downloading, and current_event_progress is 99.3421, then the file is almost finished downloading, but hasn't started Inspecting yet.
+
+        The progress number is the overall percentage of completion for the input. The progress number is the percent complete of the current event – so if the event is Downloading, and progress is 99.3421, then the file is almost finished downloading, but hasn't started Inspecting yet.
+
+        Valid states include:
+        - `waiting`
+        - `pending`
+        - `assigning`
+        - `processing`
+        - `finished`
+        - `failed`
+        - `cancelled`
+
+        Events include:
+        - `downloading`
+        - `inspecting`
+
+        If you're getting a 404 to an input progress request, make sure that you're using the input ID, not the job or output ID, and make sure your API key is correct. A 404 means that we didn't find an input file with the specified ID for the account linked to the provided API key.
+      operationId: getInputProgress
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/ContentType'
+        - $ref: '#/components/parameters/ZencoderApiKey'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/InputId'
+      responses:
+        '200':
+          description: Input processing progress.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InputProgressResponse'
+        '403':
+          description: Forbidden
+        '422':
+          description: Invalid query parameters
+        '500':
+          description: Server error
+      deprecated: false
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  '/outputs/{output_id}':
+    get:
+      tags:
+        - Outputs
+      summary: Get Output Details
+      description: |-
+        Get details for a job output. Job details are available for two months after the job is submitted.
+      operationId: getOutputDetails
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/ContentType'
+        - $ref: '#/components/parameters/ZencoderApiKey'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/OutputId'
+      responses:
+        '200':
+          description: Output properties.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutputMediaFile'
+        '403':
+          description: Forbidden
+        '422':
+          description: Invalid query parameters
+        '500':
+          description: Server error
+      deprecated: false
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  '/outputs/{output_id}/progress':
+    get:
+      tags:
+        - Outputs
+      summary: Get Output Progress
+      description: |-
+        Get the progress of processing for an output file. The current_event_progress number is the percent complete of the current event – so if the event is Transcoding, and current_event_progress is 99.3421, then the file is almost finished transcoding, but hasn't started uploading yet.
+
+        The progress number is the overall percentage of completion for the output. The progress number is the percent complete of the current event – so if the event is Transcoding, and progress is 99.3421, then the file is almost finished transcoding, but hasn't started Uploading yet.
+
+        Valid states include:
+        - `waiting`
+        - `queued`
+        - `assigning`
+        - `processing`
+        - `finished`
+        - `failed`
+        - `cancelled`
+        - `no input`
+        - `skipped`
+
+        Events include:
+        - `downloading`
+        - `transcoding`
+        - `uploading`
+
+        If you're getting a 404 to an output progress request, make sure that you're using the output ID, not the job or output ID, and make sure your API key is correct. A 404 means that we didn't find an output file with the specified ID for the account linked to the provided API key.
+      operationId: getOutputProgress
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/ContentType'
+        - $ref: '#/components/parameters/ZencoderApiKey'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/OutputId'
+      responses:
+        '200':
+          description: Output processing progress.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutputProgressResponse'
         '403':
           description: Forbidden
         '422':
@@ -304,6 +441,16 @@ components:
       in: path
       description: >-
         A Zencoder job input id
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    OutputId:
+      name: output_id
+      in: path
+      description: >-
+        A Zencoder job output id
       required: true
       style: simple
       explode: false
