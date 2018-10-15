@@ -465,6 +465,7 @@ paths:
       security: []
       parameters:
         - $ref: '#/components/parameters/ContentType'
+        - $ref: '#/components/parameters/ZencoderApiKey'
       responses:
         '204':
           description: No Content
@@ -489,6 +490,7 @@ paths:
       security: []
       parameters:
         - $ref: '#/components/parameters/ContentType'
+        - $ref: '#/components/parameters/ZencoderApiKey'
       responses:
         '204':
           description: No Content
@@ -508,14 +510,22 @@ paths:
         - Reports
       summary: Get Usage Report
       description: |-
-        'This report returns a breakdown of video on demand (videos not using live-streaming) minute usage by day and grouping. It will contain two top-level keys: total and statistics. total will contain the sum of all statistics returned in the report. statistics will contain an entry for each day and grouping. If you don't use the report grouping feature of the API the report will contain only one entry per day. These statistics are collected about once per hour, but there is only one record per day (per grouping). By default this report excludes the current day from the response because it's only partially complete. It's important to note that our service operates in the UTC time zone (including billing periods). All dates and times reported will be in UTC.'
-      operationId: turnOffIntegration
+        'This report returns a breakdown of video on demand minute usage by day and grouping. It will contain two top-level keys: total and statistics. total will contain the sum of all statistics returned in the report. statistics will contain an entry for each day and grouping. If you do not use the report grouping feature of the API the report will contain only one entry per day. These statistics are collected about once per hour, but there is only one record per day (per grouping). By default this report excludes the current day from the response because it is only partially complete. It is important to note that our service operates in the UTC time zone (including billing periods). All dates and times reported will be in UTC.'
+      operationId: getUsageReport
       security: []
       parameters:
         - $ref: '#/components/parameters/ContentType'
+        - $ref: '#/components/parameters/ZencoderApiKey'
+        - $ref: '#/components/parameters/From'
+        - $ref: '#/components/parameters/To'
+        - $ref: '#/components/parameters/Grouping'
       responses:
-        '204':
-          description: No Content
+        '200':
+          description: Get account details response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUsageReportResponse'
         '403':
           description: Forbidden
         '500':
@@ -564,6 +574,24 @@ components:
         type: integer
         minimum: 1
         maximum: 50
+    From:
+      name: from
+      in: query
+      description: >-
+        Start date in the format YYYY-MM-DD (default: 30 days ago)
+      style: form
+      explode: true
+      schema:
+        type: string
+    To:
+      name: to
+      in: query
+      description: >-
+        End date in the format YYYY-MM-DD (default: today)
+      style: form
+      explode: true
+      schema:
+        type: string
     JobId:
       name: job_id
       in: path
