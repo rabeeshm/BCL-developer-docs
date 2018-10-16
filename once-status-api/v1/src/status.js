@@ -209,7 +209,7 @@
 // Get status by foreign key and catalog
 
 /**
- * @api {get} /statuses Status by Foreign Key/Catalog
+ * @api {get} /statuses{?foreign_key=myForeignKey&catalog=myCatalog} Status by Foreign Key/Catalog
  * @apiName Status by Foreign Key/Catalog
  * @apiGroup Status
  * @apiVersion 1.0.0
