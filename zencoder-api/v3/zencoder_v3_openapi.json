@@ -1,0 +1,753 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Zencoder APIv3",
+    "description": "Updated API with Advanced Features",
+    "version": "0.0.1",
+    "contact": {
+      "name": "Slack - #team-zencoder",
+      "url": "https://brightcove.slack.com/messages/C679W79MX/"
+    }
+  },
+  "security": [
+    {
+      "header_api_key": []
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://app.zencoder.com/api/v3",
+      "description": "Production APIv3 Server"
+    },
+    {
+      "url": "https://staging.zencoder.com/api/v3",
+      "description": "Staging Test Server"
+    },
+    {
+      "url": "https://qa.zencoder.com/api/v3",
+      "description": "QA Test Server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "jobs"
+    },
+    {
+      "name": "outputs"
+    }
+  ],
+  "paths": {
+    "/jobs": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Returns a list of jobs for the current account.",
+        "description": "List recently-created jobs for the current account, along with basic state/status info.  Paginated by job_id continuation tokens (\"after\" ???).",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "count",
+            "description": "How many jobs to include in the response (1..50)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 30
+            }
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "description": "Include the first 'count' jobs older than this job ID.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON object including a jobs array and a link to the next set of jobs, if applicable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "next_link": {
+                      "type": "string",
+                      "description": "Link to next set of jobs.",
+                      "example": "https://app.zencoder.com/api/v3/jobs?after=1234567890"
+                    },
+                    "jobs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/job_index_info"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401_unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/429_rate_limited"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Create an encoding job",
+        "description": "Create an encoding job for a set of inputs and outputs.",
+        "requestBody": {
+          "description": "JSON job-create document.  See [JSON SCHEMA DOCUMENT] for a schema definition.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "example": {
+                  "inputs": [],
+                  "outputs": []
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "JSON job info structure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/job_progress"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401_unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/422_unprocessable"
+          }
+        }
+      }
+    },
+    "/jobs/{job_id}": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Returns detailed info for the specified job",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/path_job_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "JSON job details structure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/job_details"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{job_id}/cancel": {
+      "put": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Cancels the specified job.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/path_job_id"
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204_no_content"
+          },
+          "401": {
+            "$ref": "#/components/responses/401_unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/409_conflict"
+          }
+        }
+      }
+    },
+    "/jobs/{job_id}/retry": {
+      "put": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Retries the specified job.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/path_job_id"
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204_no_content"
+          },
+          "401": {
+            "$ref": "#/components/responses/401_unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/409_conflict"
+          }
+        }
+      }
+    },
+    "/jobs/{job_id}/outputs/{output_id}": {
+      "get": {
+        "tags": [
+          "outputs"
+        ],
+        "summary": "Returns detailed info for the specified output",
+        "description": "Both the job_id and output_id must be present, and the output_id must reference an output of the specified job, or else a 404 Not Found will be returned.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/path_job_id"
+          },
+          {
+            "$ref": "#/components/parameters/path_output_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "JSON output details structure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/output_details"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401_unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/404_not_found"
+          }
+        }
+      }
+    },
+    "/jobs/{job_id}/progress": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Returns progress details for the specified job",
+        "description": "The recommended way to get notified when a job is complete is to use Notifications.  Another option, however, is to poll periodically for the progress of the job, then take further action when the state changes to a final state (such as finished/failed).\n\nThe progress API call allows for retrieving just the progress/state information of a job, with a high rate limit.  This could also be used to display/update progress of a job on a downstream website / UI.\n\nNOTE: Progress information will only be available for 10 days after a job has completed; after that this will return a 404 Not Found error.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/path_job_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "JSON job progress structure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/job_progress"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{job_id}/outputs/{output_id}/progress": {
+      "get": {
+        "tags": [
+          "outputs"
+        ],
+        "summary": "Returns progress details for the specified output",
+        "description": "This call may or may not be implemented, depending if it's more efficient to just use a job-progress API call.  Both the job_id and output_id must be present, and the output_id must reference an output of the specified job, or else a 404 Not Found will be returned.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/path_job_id"
+          },
+          {
+            "$ref": "#/components/parameters/path_output_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "JSON output progress structure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/output_progress"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "header_api_key": {
+        "description": "Standard API calls specify the API key in the Zencoder-Api-Key header.",
+        "type": "apiKey",
+        "name": "zencoder-api-key",
+        "in": "header"
+      },
+      "query_api_key": {
+        "description": "Some JsonP progress calls may include the API key in an api_key query string parameter.  (???)",
+        "type": "apiKey",
+        "name": "api_key",
+        "in": "query"
+      }
+    },
+    "responses": {
+      "204_no_content": {
+        "description": "Action succeeded."
+      },
+      "409_conflict": {
+        "description": "Action could not be taken on the specified item."
+      },
+      "429_rate_limited": {
+        "description": "Rate Limit Encountered - Please wait and try again later."
+      },
+      "401_unauthorized": {
+        "description": "Unauthorized - API Key invalid, not specified, or a read-only key was used for an action that requires a full-access key."
+      },
+      "403_forbidden": {
+        "description": "Action is not allowed on the specified item."
+      },
+      "404_not_found": {
+        "description": "Not Found"
+      },
+      "422_unprocessable": {
+        "description": "Request data could not be successfully parsed.  See error message for validation errors."
+      }
+    },
+    "parameters": {
+      "path_job_id": {
+        "in": "path",
+        "name": "job_id",
+        "schema": {
+          "type": "string"
+        },
+        "description": "String numeric job ID",
+        "required": true
+      },
+      "path_output_id": {
+        "in": "path",
+        "name": "output_id",
+        "schema": {
+          "type": "string"
+        },
+        "description": "String numeric output ID",
+        "required": true
+      }
+    },
+    "schemas": {
+      "job_index_info": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1374039625294675967"
+          },
+          "state": {
+            "$ref": "#/components/schemas/possible_states"
+          },
+          "test": {
+            "type": "boolean",
+            "example": false
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finished_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "billing_data": {
+            "type": "string",
+            "description": "TBD - Billing method is not yet defined."
+          },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/input_index_info"
+            }
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/output_index_info"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "state",
+          "submitted_at",
+          "created_at"
+        ]
+      },
+      "input_index_info": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1374039625294675968"
+          },
+          "label": {
+            "type": "string",
+            "example": "input-video"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "input"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "example": "s3+us-east-1://zencodertesting/test.mov"
+          },
+          "state": {
+            "$ref": "#/components/schemas/possible_states"
+          },
+          "billing_data": {
+            "type": "string",
+            "description": "TBD - Billing method is not yet defined."
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "state"
+        ]
+      },
+      "output_index_info": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1374039625294675969"
+          },
+          "label": {
+            "type": "string",
+            "example": "encoded-output"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "output"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "example": "https://s3.amazonaws.com/output-bucket/output.mp4"
+          },
+          "state": {
+            "$ref": "#/components/schemas/possible_states"
+          },
+          "billing_data": {
+            "type": "string",
+            "description": "TBD - Billing method is not yet defined."
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "state"
+        ]
+      },
+      "job_progress": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1374039625294675967"
+          },
+          "state": {
+            "$ref": "#/components/schemas/possible_states"
+          },
+          "test": {
+            "type": "boolean",
+            "example": false
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finished_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/input_progress"
+            }
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/output_progress"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "state",
+          "submitted_at",
+          "created_at"
+        ]
+      },
+      "input_progress": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1374039625294675968"
+          },
+          "label": {
+            "type": "string",
+            "example": "input-video"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "input"
+            ]
+          },
+          "state": {
+            "$ref": "#/components/schemas/possible_states"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "state"
+        ]
+      },
+      "output_progress": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1374039625294675969"
+          },
+          "label": {
+            "type": "string",
+            "example": "encoded-output"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "output"
+            ]
+          },
+          "state": {
+            "$ref": "#/components/schemas/possible_states"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "state"
+        ]
+      },
+      "job_details": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1374039625294675967"
+          },
+          "state": {
+            "$ref": "#/components/schemas/possible_states"
+          },
+          "test": {
+            "type": "boolean",
+            "example": false
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finished_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/input_info"
+            }
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/output_info"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "state",
+          "submitted_at",
+          "created_at"
+        ]
+      },
+      "input_info": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1374039625294675968"
+          },
+          "label": {
+            "type": "string",
+            "example": "input-video"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "input"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "example": "s3+us-east-1://zencodertesting/test.mov"
+          },
+          "state": {
+            "$ref": "#/components/schemas/possible_states"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "state"
+        ]
+      },
+      "output_info": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1374039625294675969"
+          },
+          "label": {
+            "type": "string",
+            "example": "encoded-output"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "output"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "example": "https://s3.amazonaws.com/output-bucket/output.mp4"
+          },
+          "state": {
+            "$ref": "#/components/schemas/possible_states"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "state"
+        ]
+      },
+      "output_details": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1374039625294675969"
+          },
+          "label": {
+            "type": "string",
+            "example": "encoded-output"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "output"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "example": "https://s3.amazonaws.com/output-bucket/output.mp4"
+          },
+          "state": {
+            "$ref": "#/components/schemas/possible_states"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/file_metadata"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "state"
+        ]
+      },
+      "file_metadata": {
+        "properties": {
+          "format": {
+            "type": "string",
+            "example": "mpeg4"
+          },
+          "duration": {
+            "description": "Media duration in milliseconds",
+            "type": "integer",
+            "format": "int64",
+            "example": 30000
+          },
+          "file_size": {
+            "description": "File size in bytes",
+            "type": "integer",
+            "format": "int64",
+            "example": 1048576
+          }
+        }
+      },
+      "possible_states": {
+        "type": "string",
+        "example": "finished",
+        "enum": [
+          "pending",
+          "waiting",
+          "processing",
+          "finished",
+          "failed",
+          "cancelled"
+        ]
+      }
+    }
+  }
+}
