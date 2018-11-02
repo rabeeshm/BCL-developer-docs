@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" />
+    <meta name="robots" content="noindex">
+  	<!-- change title to match the h1 heading -->
+  	<title>iOS: Resizing the View</title>
+
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css" />
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700" rel="stylesheet" type="text/css">
+    <script src="//use.edgefonts.net/source-code-pro.js"></script>
+    <link rel="stylesheet" href="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.css">
+    <link rel="stylesheet" href="//docs.brightcove.com/en/styles/template-less/css/bcls-doc.css">
+    <link rel="stylesheet" href="/en/styles/foundation-fixes.css">
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js"></script>
+
+</head>
+
+<body>
+	<!-- header navbar -->
+	<div id="navWrapper" class="fixed"></div>
+	<!-- breadcrumbs -->
+	<nav id="breadCrumbWrapper" class="breadcrumbs show-for-medium-up"></nav>
+	<!-- search -->
+	<div id="searchModal" class="reveal-modal" data-reveal></div>
+	<!-- content -->
+	<div class="row">
+		<div class="sidebar large-2 columns show-for-large-up">
+			<div id="sidenav" class="side-nav"></div>
+		</div>
+		<div id="main" class="large-10 small-12 columns">
+			<h1>iOS: Resizing the View</h1>
+      <aside class="bcls-aside bcls-aside--warning">This is a temporary STAGING document for review only. For the official Brightcove documentation site, go to <a href="https://support.brightcove.com/">support.brightcove.com</a></aside>
+      <p>In this topic, you will learn how to resize the video view.</p>
+
+
+	    <!-- BEGIN DRUPAL CONTENT -->
+
+
+<article class="bcls-article">
+<section class="bcls-section" id="top">&nbsp;</section>
+
+<section class="bcls-section" id="Overview">
+<h2>Overview</h2>
+
+<p>One reason to assume control over the resizing animation of the <code>AVPlayerLayer</code> would be to implement a full screen button.</p>
+
+<p>To do this, Brightcove recommends creating your own <code>UIView</code> and capturing the <code>AVPlayerLayer</code> that is created for each <code>BCOVPlaybackSession</code>. With this approach, you will not use <code>BCOVPlaybackController.view</code> at all.</p>
+
+<p>The Native SDK for iOS adds the <code>AVPlayerLayer</code> to the <code>BCOVPlaybackController.view</code> every time a new playback session is sent to the playback controller. This is done for each video because each video's session has a unique <code>playerLayer</code> object.</p>
+
+<p>Each time the <code>AVPlayerLayer</code> is added to the <code>BCOVPlaybackController.view</code>, the Native SDK disables its animation by setting the bounds and position entries in the <code>AVPlayerLayer.actions</code> dictionary to <code>NSNull</code>. If you try to mutate the actions dictionary directly, you will have to update it every time it advances to a new playback session.</p>
+</section>
+
+<section class="bcls-section" id="Example">
+<h2>Example</h2>
+
+<p>Here is an example of what you might do:</p>
+
+<ol class="bcls-tasklist">
+  <li>
+    Start with the <a href="https://github.com/BrightcoveOS/ios-player-samples/tree/master/Player/VideoCloudBasicPlayer">Video Cloud Basic Player</a> sample.
+  </li>
+  <li>
+    Open the <strong>ViewController.m</strong> file.
+  </li>
+  <li>
+    In the <code>viewDidLoad</code> method, comment any references to the <code>playbackController.view</code> as follows:
+  </li>
+	<li> 
+
+	<pre class="line-numbers">
+<code class="language-swift">// self.playbackController.view.frame = self.videoContainer.bounds;
+// self.playbackController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+// [self.videoContainer addSubview:self.playbackController.view];</code></pre>
+	</li>
+	<li>Then, in the <code>didAdvanceToPlaybackSession</code> method, add the <code>AVPlayerLayer</code> to the layer of your view.</li>
+</ol>
+
+<p>If you really need to use <code>BCOVPlaybackController.view</code>, you can remove the bounds and position entries from the <code>AVPlayerLayer.actions</code> dictionary, but you’ll have to assume responsibility for setting up the <code>CALayer</code> animations to look good in your code.</p>
+</section>
+</article>
+
+
+<!-- END DRUPAL CONTENT -->
+</div>
+</div>
+<!-- bcl scripts -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+<script src="/en/scripts/docs-nav-data.min.js"></script>
+<script src="/en/scripts/bcls-doc-site-v3.js"></script>
+<script src="//learning-services-media.brightcove.com/doc-assets/js/bcls-utils.js"></script>
+<script src="//learning-services-media.brightcove.com/doc-assets/js/prism/prism.js"></script>
+<script>
+$(document).foundation();
+</script>
+<!-- Any scripts specific to page samples should go here -->
+</body>
+
+</html>
