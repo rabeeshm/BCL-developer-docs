@@ -347,22 +347,47 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	</ul>
 
 	<pre class="line-numbers" data-start="11">
-<code class="notranslate language-swift">let kViewControllerPlaybackServicePolicyKey = "<span class="bcls-input">your policy key</span>"
-let kViewControllerAccountID = "<span class="bcls-input">your account id</span>"
-let kViewControllerVideoID = "<span class="bcls-input">your video id</span>"</code></pre>
+<code class="notranslate language-swift">fileprivate struct playbackConfig {
+    static let policyKey = &quot;<span class="bcls-input">your policy key</span>&quot;
+    static let accountID = &quot;<span class="bcls-input">your account id</span>&quot;
+    static let videoID = &quot;<span class="bcls-input">your video id</span>&quot;
+}</code></pre>
 	</li>
 </ol>
 
-<h4>Set the playback controller delegate</h4>
-
-<p>This allows your app to listen and respond to video playback events.</p>
+<h4>Create a view variable</h4>
 
 <ol class="bcls-tasklist">
 	<li>
-	<p>Update the View Controller class to include the Brightcove playback controller delegate.</p>
+	<p>In the <code class="notranslate">ViewController</code> class, add a variable for the view.</p>
 
 	<pre class="line-numbers" data-start="15">
-<code class="notranslate language-swift">class ViewController: UIViewController, BCOVPlaybackControllerDelegate {</code></pre>
+<code class="notranslate language-swift">class ViewController: UIViewController {
+  @IBOutlet weak var videoContainerView: UIView!</code></pre>
+	</li>
+</ol>
+
+<h4>Create an init function</h4>
+
+<ol class="bcls-tasklist">
+	<li>Create an <code class="notranslate">init</code>function as follows:
+
+	<ul>
+		<li>Line 26: Calls the super class implementation of the init() function.</li>
+		<li>
+		<p>Line 28: <strong>Optional:</strong> Sends your Video Cloud Account ID to analytics. This is only needed if you override the <code class="notranslate">BCOVVideo</code> class or do not use the Brightcove Playback service or catalog.</p>
+
+		<aside class="bcls-aside bcls-aside--tip">For details about sending data to Video Cloud Analytics, see the <a href="/node/18214">Using Brightcove Analytics</a> guide.</aside>
+		</li>
+	</ul>
+
+	<pre class="line-numbers" data-start="24">
+<code class="notranslate language-swift">required init?(coder aDecoder: NSCoder)
+  {
+    super.init(coder: aDecoder)
+
+    playbackController.analytics.account = kViewControllerAccountID;
+  }</code></pre>
 	</li>
 </ol>
 
@@ -391,30 +416,6 @@ let kViewControllerVideoID = "<span class="bcls-input">your video id</span>"</co
     let playbackService = BCOVPlaybackService(accountId: kViewControllerAccountID, policyKey: kViewControllerPlaybackServicePolicyKey)
 
     let playbackController: BCOVPlaybackController = BCOVPlayerSDKManager.shared().createPlaybackController()</code></pre>
-	</li>
-</ol>
-
-<h4>Create an init function</h4>
-
-<ol class="bcls-tasklist">
-	<li>Create an <code class="notranslate">init</code>function as follows:
-
-	<ul>
-		<li>Line 26: Calls the super class implementation of the init() function.</li>
-		<li>
-		<p>Line 28: <strong>Optional:</strong> Sends your Video Cloud Account ID to analytics. This is only needed if you override the <code class="notranslate">BCOVVideo</code> class or do not use the Brightcove Playback service or catalog.</p>
-
-		<aside class="bcls-aside bcls-aside--tip">For details about sending data to Video Cloud Analytics, see the <a href="/node/18214">Using Brightcove Analytics</a> guide.</aside>
-		</li>
-	</ul>
-
-	<pre class="line-numbers" data-start="24">
-<code class="notranslate language-swift">required init?(coder aDecoder: NSCoder)
-  {
-    super.init(coder: aDecoder)
-
-    playbackController.analytics.account = kViewControllerAccountID;
-  }</code></pre>
 	</li>
 </ol>
 
@@ -516,6 +517,19 @@ let kViewControllerVideoID = "<span class="bcls-input">your video id</span>"</co
     }
   }
 }}</code></pre>
+	</li>
+</ol>
+
+<h4>Set the playback controller delegate</h4>
+
+<p>This allows your app to listen and respond to video playback events.</p>
+
+<ol class="bcls-tasklist">
+	<li>
+	<p>Update the View Controller class to include the Brightcove playback controller delegate.</p>
+
+	<pre class="line-numbers" data-start="15">
+<code class="notranslate language-swift">class ViewController: UIViewController, BCOVPlaybackControllerDelegate {</code></pre>
 	</li>
 </ol>
 
