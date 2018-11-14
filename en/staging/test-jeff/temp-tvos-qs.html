@@ -42,6 +42,7 @@
 
 
 
+
 <article class="bcls-article">
 <section class="bcls-section">
 <h2 id="Overview">Overview</h2>
@@ -78,6 +79,7 @@
 	<li>Run the <code class="notranslate">pod install</code> command.</li>
 	<li>Open and run the newly created workspace.</li>
 </ol>
+<p>For details, see the <a href="/node/18566">Running Sample Apps for the Native SDK for iOS/tvOS</a> document.</p>
 
 <h3>Build the app by following the steps in this guide</h3>
 
@@ -103,7 +105,7 @@
 	<li>
 	<p>Start the creation of a new tvOS project in Xcode. Select <strong>Create a new Xcode project</strong>.</p>
 
-	<figure class="bcls-figure"><img class="bcls-image--no-border" alt="Create project" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/tvos/getting-started/quick-start-swift/quick-start-welcome.png" />
+	<figure class="bcls-figure"><img class="bcls-image--no-border" alt="Create project" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/ios/getting-started/quick-start/quick-start-welcome.png" />
 	<figcaption class="bcls-caption--image">Create project</figcaption>
 	</figure>
 	</li>
@@ -168,7 +170,11 @@
 		<li>Line 67: Defines the GitHub source.</li>
 		<li>Line 69: Sets Pods to use frameworks instead of static libraries.</li>
 		<li>Line 71: Defines the tvOS platform version.</li>
-		<li>Lines 73-75: Install the current version of the Brightcove player SDK.</li>
+		<li>
+      <p>
+        Lines 73-75: Install the current version of the Brightcove player SDK.
+      </p>
+    </li>
 	</ul>
 
 	<pre class="line-numbers" data-start="1">
@@ -193,7 +199,7 @@ end</code></pre>
 	<li>
 	<p>Open a Terminal session and navigate to your <strong>Simple-Video-Playback</strong> Xcode project folder.</p>
 
-	<figure class="bcls-figure"><img class="bcls-image--no-border" alt="Terminal session" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/tvos/getting-started/quick-start-swift/quick-start-terminal.png" />
+	<figure class="bcls-figure"><img class="bcls-image--no-border" alt="Terminal session" src="//learning-services-media.brightcove.com/doc-assets/device-sdks/ios/getting-started/quick-start/quick-start-terminal.png" />
 	<figcaption class="bcls-caption--image">Terminal session</figcaption>
 	</figure>
 	</li>
@@ -220,11 +226,11 @@ end</code></pre>
 
 <h3 id="appdelegate">Set the audio behavior for the app</h3>
 
-<p>The audio session handles audio behavior at the app level. Learn more about the <a href="https://developer.apple.com/library/ios/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/Introduction/Introduction.html">AVAudioSession</a> class.</p>
+<p>The audio session handles audio behavior at the app level. Learn more about the <a href="https://developer.apple.com/documentation/avfoundation/avaudiosession">AVAudioSession</a> class.</p>
 
-<p>You can choose from several audio session categories and settings to customize your app's audio behavior. <a href="https://developer.apple.com/library/ios/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/AudioSessionBasics/AudioSessionBasics.html#//apple_ref/doc/uid/TP40007875-CH3-SW1">Choose the best audio session category</a> for your app.</p>
+<aside class="bcls-aside bcls-aside--tip">You can choose from several audio session categories and settings to customize your app's audio behavior. <a href="https://developer.apple.com/documentation/avfoundation/avaudiosession/audio_session_categories">Choose the best audio session category</a> for your app.</aside>
 
-<p>For this sample, we will use <code class="notranslate">AVAudioSessionCategoryPlayback</code>. This plays audio even when the screen is locked and with the Ring/Silent switch set to silent. To keep it simple, we will put the code for this in the App Delegate.</p>
+<p>For this sample, we will use the <a href="https://developer.apple.com/documentation/avfoundation/avaudiosession/category/1616509-playback">playback</a> category. This plays audio even when the screen is locked and with the Ring/Silent switch set to silent. Since we are playing video, we will use the <a href="https://developer.apple.com/documentation/avfoundation/avaudiosession/mode/1616623-movieplayback">moviePlayback</a> mode. To keep it simple, we will put this code in the App Delegate.</p>
 
 <ol class="bcls-tasklist">
 	<li>
@@ -254,7 +260,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 <span class="bcls-highlight">        var categoryError :NSError?;
         var success: Bool;
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback, options: .duckOthers)
             success = true;
         } catch let error as NSError {
             categoryError = error;
@@ -331,17 +337,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	<ul>
 		<li>
 		<p>Line 11: Defines your Brightcove Playback API Policy Key. This example plays a video returned from the <a href="/node/17906">Brightcove Playback API</a>, which is the latest and recommended API to retrieve content from your Video Cloud library. If you are not familiar with Policy Keys, see the <a href="/node/18003">Policy API Overview</a>.</p>
-
-		<aside class="bcls-aside bcls-aside--information">Because the Native SDKs do not send an origin header, you cannot use a domain-restricted Policy Key. If you try this, you will get a <code class="notranslate">403 Forbidden</code> response when you attempt to fetch content from your Video Cloud library.</aside>
 		</li>
 		<li>Line 12: Defines your Video Cloud Account ID</li>
-		<li>Line 13: Defines your Video Cloud Video ID</li>
+		<li>
+      <p>
+        Line 13: Defines your Video Cloud Video ID
+      </p>
+    </li>
 	</ul>
 
 	<pre class="line-numbers" data-start="11">
-<code class="notranslate language-swift">let kViewControllerPlaybackServicePolicyKey = "BCpkADawqM1W-vUOMe6RSA3pA6Vw-VWUNn5rL0lzQabvrI63-VjS93gVUugDlmBpHIxP16X8TSe5LSKM415UHeMBmxl7pqcwVY_AZ4yKFwIpZPvXE34TpXEYYcmulxJQAOvHbv2dpfq-S_cm"
-let kViewControllerAccountID = "3636334163001"
-let kViewControllerVideoID = "3666678807001"</code></pre>
+<code class="notranslate language-swift">let kViewControllerPlaybackServicePolicyKey = "<span class="bcls-input">your policy key</span>"
+let kViewControllerAccountID = "<span class="bcls-input">your account id</span>"
+let kViewControllerVideoID = "<span class="bcls-input">your video id</span>"</code></pre>
 	</li>
 </ol>
 
@@ -1062,6 +1070,7 @@ Temporary exceptions can be configured via your app's Info.plist file.</code></p
 </div>
 </section>
 </article>
+
 
 
 <!-- END DRUPAL CONTENT -->
