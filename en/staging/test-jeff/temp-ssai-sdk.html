@@ -487,65 +487,68 @@ import BrightcovePlayerSDK
 import BrightcoveOUX
 
 // ** Customize these values with your own account information **
-let kAccountId = "<span class="bcls-input">your account id</span>";
-let kPolicyKey = "<span class="bcls-input">your policy key</span>";
-let kVideoId = "<span class="bcls-input">your video id</span>";
-let kAdConfigId = "<span class="bcls-input">your ad configuration id</span>";
+struct Constants {
+  static let kAccountId = &quot;<span class="bcls-input">your account id</span>&quot;
+  static let kPolicyKey = &quot;<span class="bcls-input">your policy key</span>&quot;
+  static let kVideoId = &quot;<span class="bcls-input">your video id</span>&quot;
+  static let kAdConfigId = &quot;<span class="bcls-input">your ad configuration id</span>&quot;
+}
 
 class ViewController: UIViewController {
-    @IBOutlet weak var videoContainerView: UIView!
-    @IBOutlet weak var companionSlotContainerView: UIView!
+  @IBOutlet weak var videoContainerView: UIView!
+  @IBOutlet weak var companionSlotContainerView: UIView!
 
-    var controller: BCOVPlaybackController?
-    var playerView: BCOVPUIPlayerView?
+  let playbackService = BCOVPlaybackService(accountId: Constants.kAccountId, policyKey: Constants.kPolicyKey)
+  var controller: BCOVPlaybackController?
+  var playerView: BCOVPUIPlayerView?
 
     override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+      super.viewDidLoad()
+      // Do any additional setup after loading the view, typically from a nib.
 
-        // Create a companion slot.
-        let companionSlot = BCOVOUXCompanionSlot(view: companionSlotContainerView, width: 500, height: 61)
+      // Create a companion slot.
+      let companionSlot = BCOVOUXCompanionSlot(view: companionSlotContainerView, width: 500, height: 61)
 
-        // In order to display an ad progress banner on the top of the view, we create this display container.  This object is also responsible for populating the companion slots.
-        let adComponentDisplayContainer = BCOVOUXAdComponentDisplayContainer(companionSlots: [companionSlot])
+      // In order to display an ad progress banner on the top of the view, we create this display container.  This object is also responsible for populating the companion slots.
+      let adComponentDisplayContainer = BCOVOUXAdComponentDisplayContainer(companionSlots: [companionSlot])
 
-        controller = BCOVPlayerSDKManager.shared().createOUXPlaybackController(viewStrategy: nil)
+      controller = BCOVPlayerSDKManager.shared().createOUXPlaybackController(viewStrategy: nil)
 
-        // In order for the ad display container to receive ad information, we add it as a session consumer.
-        controller?.add(adComponentDisplayContainer)
-        controller?.delegate = self
-        controller?.isAutoPlay = true
+      // In order for the ad display container to receive ad information, we add it as a session consumer.
+      controller?.add(adComponentDisplayContainer)
+      controller?.delegate = self
+      controller?.isAutoPlay = true
 
-        let controlView = BCOVPUIBasicControlView.withVODLayout()
+      let controlView = BCOVPUIBasicControlView.withVODLayout()
 
-        // Set playback controller later.
-        playerView = BCOVPUIPlayerView(playbackController: nil, options: nil, controlsView: controlView)
-        if let playerView = playerView {
-            playerView.translatesAutoresizingMaskIntoConstraints = false
-            videoContainerView.addSubview(playerView)
-            NSLayoutConstraint.activate([
-                playerView.topAnchor.constraint(equalTo: videoContainerView.topAnchor),
-                playerView.rightAnchor.constraint(equalTo: videoContainerView.rightAnchor),
-                playerView.leftAnchor.constraint(equalTo: videoContainerView.leftAnchor),
-                playerView.bottomAnchor.constraint(equalTo: videoContainerView.bottomAnchor)
-            ])
-            playerView.playbackController = controller
-        }
+      // Set playback controller later.
+      playerView = BCOVPUIPlayerView(playbackController: nil, options: nil, controlsView: controlView)
+      if let playerView = playerView {
+        playerView.translatesAutoresizingMaskIntoConstraints = false
+        videoContainerView.addSubview(playerView)
+        NSLayoutConstraint.activate([
+          playerView.topAnchor.constraint(equalTo: videoContainerView.topAnchor),
+          playerView.rightAnchor.constraint(equalTo: videoContainerView.rightAnchor),
+          playerView.leftAnchor.constraint(equalTo: videoContainerView.leftAnchor),
+          playerView.bottomAnchor.constraint(equalTo: videoContainerView.bottomAnchor)
+        ])
+        playerView.playbackController = controller
+      }
 
-        requestContentFromPlaybackService()
+      requestContentFromPlaybackService()
     }
 
     func requestContentFromPlaybackService() {
-        let queryParameters = ["ad_config_id": kAdConfigId]
+      let queryParameters = [&quot;ad_config_id&quot;: Constants.kAdConfigId]
 
-        playbackService?.findVideo(withVideoID: kVideoId, parameters: queryParameters) { (video: BCOVVideo?, jsonResponse: [AnyHashable: Any]?, error: Error?) -&gt; Void in
+      playbackService?.findVideo(withVideoID: Constants.kVideoId, parameters: queryParameters) { (video: BCOVVideo?, jsonResponse: [AnyHashable: Any]?, error: Error?) -&gt; Void in
 
-            if let v = video {
-                self.playbackController.setVideos([v] as NSArray)
-            } else {
-                print("ViewController Debug - Error retrieving video: \(error?.localizedDescription ?? "unknown error")")
-            }
+        if let v = video {
+          self.controller?.setVideos([v] as NSArray)
+        } else {
+          print(&quot;ViewController Debug - Error retrieving video: \(error?.localizedDescription ?? &quot;unknown error&quot;)&quot;)
         }
+      }
     }
 
     // MARK: - BCOVPlaybackControllerDelegate
@@ -573,7 +576,7 @@ class ViewController: UIViewController {
 
     func playbackController(_ controller: BCOVPlaybackController!, playbackSession session: BCOVPlaybackSession!, didExitAd ad: BCOVAd!) {
         print(&quot;ViewController Debug - Exiting ad&quot;)
-    }  
+    }
 }</code></pre>
 </div>
 &nbsp;
@@ -678,10 +681,12 @@ import BrightcovePlayerSDK
 import BrightcoveOUX
 
 // ** Customize these values with your own account information **
-let kAccountId = "<span class="bcls-input">your account id</span>";
-let kPolicyKey = "<span class="bcls-input">your policy key</span>";
-let kVideoId = "<span class="bcls-input">your video id</span>";
-let kAdConfigId = "<span class="bcls-input">your ad configuration id</span>";
+struct VideoConfig {
+  static let kAccountId = &quot;<span class="bcls-input">your account id</span>&quot;
+  static let kPolicyKey = &quot;<span class="bcls-input">your policy key</span>&quot;;
+  static let kVideoId = &quot;<span class="bcls-input">your video id</span>&quot;
+  static let kAdConfigId = &quot;<span class="bcls-input">your ad configuration id</span>&quot;
+}
 
 class ViewController: UIViewController, BCOVPlaybackControllerDelegate {
     @IBOutlet weak var videoContainerView: UIView!
