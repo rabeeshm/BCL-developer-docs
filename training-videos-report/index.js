@@ -17,13 +17,8 @@ var BCLS = (function(window, document) {
     summaryCsvStr,
     customFields = [],
     // elements
-    account_id_element = document.getElementById('account_id'),
-    client_id_element = document.getElementById('client_id'),
-    client_secret_element = document.getElementById('client_secret'),
-    tag = document.getElementById('tag'),
-    videoCount = document.getElementById('videoCount'),
     makeReport = document.getElementById('makeReport'),
-    content,
+    data_table_body = document,
     csvData = document.getElementById('csvData'),
     apiRequest = document.getElementById('apiRequest');
 
