@@ -92,6 +92,7 @@
       callNumber = 0,
       videosCompleted = 0,
       videosArray = [],
+      videosForReport = [],
       summaryData = {},
       csvStr,
       summaryCsvStr,
@@ -104,20 +105,8 @@
       videoCount = document.getElementById('videoCount'),
       makeReport = document.getElementById('makeReport'),
       content,
-      logger = document.getElementById('logger'),
-      logText = document.getElementById('logText'),
       csvData = document.getElementById('csvData'),
-      apiRequest = document.getElementById('apiRequest'),
-      allButtons = document.getElementsByName('button'),
-      pLogGettingVideos = document.createElement('p'),
-      pLogGettingRenditions = document.createElement('p'),
-      pLogFinish = document.createElement('p'),
-      spanIntro2 = document.createElement('span'),
-      spanOf2 = document.createElement('span'),
-      spanRenditionsTotal = document.createElement('span'),
-      spanRenditionsCount = document.createElement('span'),
-      spanRenditionsTotalEl,
-      spanRenditionsCountEl;
+      apiRequest = document.getElementById('apiRequest');
 
     /**
      * tests for all the ways a variable might be undefined or not have a value
@@ -346,16 +335,12 @@
               totalVideos = (totalVideos < video_count) ? totalVideos : video_count;
             }
             totalCalls = Math.ceil(totalVideos / limit);
-            logText.textContent = totalVideos + ' videos found; getting account custom fields';
             createRequest('getVideos');
           });
           break;
         case 'getVideos':
           var offset = (limit * callNumber);
           endPoint = account_id + '/videos?sort=created_at&limit=' + limit + '&offset=' + offset;
-          if (isDefined(tag.value)) {
-            endPoint += '&q=%2Btags:' + tag.value;
-          }
           options.url = baseURL + endPoint;
           options.requestType = 'GET';
           apiRequest.textContent = options.url;
@@ -366,83 +351,7 @@
             if (callNumber < totalCalls) {
               createRequest('getVideos');
             } else {
-              callNumber = 0;
-              spanRenditionsCountEl.textContent = callNumber + 1;
-              spanRenditionsTotalEl.textContent = totalVideos;
-              createRequest('getDigitalMaster');
-            }
-          });
-          break;
-        case 'getDigitalMaster':
-          videosArray[callNumber].totalSize = 0;
-          endPoint = account_id + '/videos/' + videosArray[callNumber].id + '/digital_master';
-          options.url = baseURL + endPoint;
-          options.requestType = 'GET';
-          apiRequest.textContent = options.url;
-          makeRequest(options, function(response) {
-            if (isDefined(response)){
-              responseDecoded = JSON.parse(response);
-              if (isDefined(responseDecoded) && !isDefined(responseDecoded.length)) {
-                videosArray[callNumber].totalSize += responseDecoded.size;
-                createRequest('getVideoRenditions');
-              } else {
-                createRequest('getVideoRenditions');
-              }
-            } else {
-              createRequest('getVideoRenditions');
-            }
-          })
-          break;
-        case 'getVideoRenditions':
-          var i,
-            iMax = videosArray.length;
-          videosArray[callNumber].hlsRenditions = [];
-          videosArray[callNumber].mp4Renditions = [];
-          videosArray[callNumber].flvRenditions = [];
-          videosArray[callNumber].otherRenditions = [];
-          endPoint = account_id + '/videos/' + videosArray[callNumber].id + '/assets/renditions';
-          options.url = baseURL + endPoint;
-          options.requestType = 'GET';
-          apiRequest.textContent = options.url;
-          spanRenditionsCountEl.textContent = callNumber + 1;
-          makeRequest(options, function(response) {
-              var renditions = JSON.parse(response);
-              if (renditions.length > 0) {
-                processRenditions(renditions, function(hlsRenditions, mp4Renditions, flvRenditions, otherRenditions, totalSize) {
-                  if (hlsRenditions.length > 0) {
-                    sortArray(hlsRenditions, 'encoding_rate');
-                  }
-
-                  videosArray[callNumber].hlsRenditions = hlsRenditions;
-                  if (mp4Renditions.length > 0) {
-                    sortArray(mp4Renditions, 'encoding_rate');
-                  }
-                  videosArray[callNumber].mp4Renditions = mp4Renditions;
-                  if (flvRenditions.length > 0) {
-                    sortArray(flvRenditions, 'encoding_rate');
-                  }
-                  videosArray[callNumber].flvRenditions = flvRenditions;
-                  // if (otherRenditions.length > 0) {
-                  //     sortArray(otherRenditions, 'encoding_rate');
-                  // }
-                  // videosArray[callNumber].otherRenditions = otherRenditions;
-                  videosArray[callNumber].totalSize += totalSize;
-              });
-            } else {
-                videosArray[callNumber].hlsRenditions = [];
-                videosArray[callNumber].mp4Renditions = [];
-                videosArray[callNumber].flvRenditions = [];
-              }
-            videosCompleted++;
-            logText.textContent = totalVideos + ' videos found; videos retrieved: ' + videosCompleted;
-            callNumber++;
-            if (callNumber < totalVideos) {
-              createRequest('getDigitalMaster');
-            } else {
-              // create csv headings
-              startCSVStrings();
-              // write the report
-              writeReport();
+              processVideos();
             }
           });
           break;
