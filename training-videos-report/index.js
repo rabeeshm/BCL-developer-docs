@@ -141,6 +141,7 @@ var BCLS = (function(window, document) {
     data_table_body.appendChild(frag);
     log_message.textContent = 'Finished! See the reports below.'
   }
+}
 
   /**
    * sets up the data for the API request
