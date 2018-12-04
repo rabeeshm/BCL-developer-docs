@@ -253,8 +253,16 @@ var BCLS = (function(window, document) {
 
     // in case of re-run, cleal the results
     csvData.textContent = '';
+    while (data_table_body.firstChild) {
+        data_table_body.removeChild(data_table_body.firstChild);
+    }
+
+
     // get the inputs
     account_id = '20318290001'
+
+    // start CSV string
+    startCSVStrings();
     // get video count
     createRequest('getCount');
   }
