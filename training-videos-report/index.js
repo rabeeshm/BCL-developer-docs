@@ -204,7 +204,7 @@ var BCLS = (function(window, document) {
       }
     switch (id) {
       case 'getCount':
-        endPoint = account_id + '/counts/videos?sort=created_at';
+        endPoint = account_id + '/counts/videos?sort=created_at&q=state:ACTIVE';
         options.url = baseURL + endPoint;
         options.requestType = 'GET';
         apiRequest.textContent = options.url;
@@ -219,7 +219,7 @@ var BCLS = (function(window, document) {
         break;
       case 'getVideos':
         var offset = (limit * callNumber);
-        endPoint = account_id + '/videos?sort=created_at&limit=' + limit + '&offset=' + offset;
+        endPoint = account_id + '/videos?sort=created_at&q=state:ACTIVE&limit=' + limit + '&offset=' + offset;
         options.url = baseURL + endPoint;
         options.requestType = 'GET';
         apiRequest.textContent = options.url;
