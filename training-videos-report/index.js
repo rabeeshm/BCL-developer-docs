@@ -20,7 +20,8 @@ var BCLS = (function(window, document) {
     makeReport = document.getElementById('makeReport'),
     data_table_body = document.getElementById('data_table_body'),
     csvData = document.getElementById('csvData'),
-    apiRequest = document.getElementById('apiRequest');
+    apiRequest = document.getElementById('apiRequest'),
+    log_message = document.getElementById('log_message');
 
   /**
    * tests for all the ways a variable might be undefined or not have a value
@@ -121,7 +122,24 @@ var BCLS = (function(window, document) {
         csvStr += '"' + video.id + '","' + video.name + '","' + video.duration + '","' + video.captions_url + '",
       csvData.textContent += csvStr;
       // add table row
+      tr = document.createElement('tr');
+      td = document.createElement('td');
+      td.textContent = video.id;
+      tr.appendChild(td);
+      td = document.createElement('td');
+      td.textContent = video.name;
+      tr.appendChild(td);
+      td = document.createElement('td');
+      td.textContent = video.duration;
+      tr.appendChild(td);
+      td = document.createElement('td');
+      td.textContent = video.captions_url;
+      tr.appendChild(td);
+      frag.appendChild(tr);
     }
+    csvData.textContent = csvStr;
+    data_table_body.appendChild(frag);
+    log_message.textContent = 'Finished! See the reports below.'
   }
 
   /**
@@ -161,6 +179,7 @@ var BCLS = (function(window, document) {
         options.url = baseURL + endPoint;
         options.requestType = 'GET';
         apiRequest.textContent = options.url;
+        log_message.textContent += '.';
         makeRequest(options, function(response) {
           parsedData = JSON.parse(response);
           videosArray = videosArray.concat(parsedData);
