@@ -157,8 +157,6 @@ var BCLS = (function(window, document) {
         options.client_id = client_id;
         options.client_secret = client_secret;
       }
-    // disable buttons to prevent a new request before current one finishes
-    disableButtons();
     switch (id) {
       case 'getCount':
         endPoint = account_id + '/counts/videos?sort=created_at';
@@ -259,7 +257,6 @@ var BCLS = (function(window, document) {
     account_id = '20318290001'
     // get video count
     createRequest('getCount');
-
   }
 
 
