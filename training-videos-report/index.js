@@ -119,7 +119,7 @@ var BCLS = (function(window, document) {
           video.description = video.description.replace(/(?:\r\n|\r|\n)/g, ' ');
         }
         // add csv row
-        csvStr += '"' + video.id + '","' + video.name + '","' + video.duration + '","' + video.captions_url + '",
+        csvStr += '"' + video.id + '","' + video.name + '","' + video.duration + '","' + video.captions_url + '",\r\n';
       csvData.textContent += csvStr;
       // add table row
       tr = document.createElement('tr');
