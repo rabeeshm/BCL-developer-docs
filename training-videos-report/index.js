@@ -1,7 +1,5 @@
 var BCLS = (function(window, document) {
   var account_id,
-    client_id,
-    client_secret,
     // api stuff
     proxyURL = 'https://solutions.brightcove.com/bcls/bcls-proxy/bcls-proxy-v2.php',
     baseURL = 'https://cms.api.brightcove.com/v1/accounts/',
@@ -9,13 +7,10 @@ var BCLS = (function(window, document) {
     totalVideos = 0,
     totalCalls = 0,
     callNumber = 0,
-    videosCompleted = 0,
     videosArray = [],
     videosForReport = [],
     summaryData = {},
     csvStr,
-    summaryCsvStr,
-    customFields = [],
     // elements
     makeReport = document.getElementById('makeReport'),
     data_table_body = document.getElementById('data_table_body'),
