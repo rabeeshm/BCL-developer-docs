@@ -50,23 +50,26 @@ var BCLS = (function(window, document) {
 
 
   /**
-   * determines whether specified item is in an array
+   * find index of an object in array of objects
+   * based on some property value
    *
-   * @param {array} array to check
-   * @param {string} item to check for
-   * @return {boolean} true if item is in the array, else false
-   */
-  function arrayContains(arr, item) {
-    var i,
-      iMax = arr.length;
-    for (i = 0; i < iMax; i++) {
-      if (arr[i] === item) {
-        return true;
+   * @param {array} targetArray array to search
+   * @param {string} objProperty object property to search
+   * @param {string} value of the property to search for
+   * @return {integer} index of first instance if found, otherwise returns -1
+  */
+  function findObjectInArray(targetArray, objProperty, value) {
+      var i, totalItems = targetArray.length, objFound = false;
+      for (i = 0; i < totalItems; i++) {
+          if (targetArray[i][objProperty] === value) {
+              objFound = true;
+              return i;
+          }
       }
-    }
-    return false;
+      if (objFound === false) {
+          return -1;
+      }
   }
-
   function startCSVStrings() {
     var i = 0,
       iMax;
@@ -76,6 +79,7 @@ var BCLS = (function(window, document) {
   function processVideos() {
     var video,
       obj,
+      idx,
       i,
       iMax;
     iMax = videosArray.length;
@@ -84,8 +88,16 @@ var BCLS = (function(window, document) {
       video = videosArray[i];
       obj.id = video.id;
       obj.name = video.name;
-      obj.
+      obj.duration = video.duration;
+      if (video.text_tracks.length > 0) {
+        idx = findObjectInArray(video.text_tracks, 'srclang', 'en');
+        obj.captions_url = video.text_tracks[idx].src;
+      } else {
+        obj.captions_url = 'None';
+      }
+      videosForReport.push(obj);
     }
+    return;
   }
 
   function writeReport() {
@@ -158,6 +170,7 @@ var BCLS = (function(window, document) {
             createRequest('getVideos');
           } else {
             processVideos();
+            writeReport();
           }
         });
         break;
