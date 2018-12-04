@@ -74,7 +74,18 @@ var BCLS = (function(window, document) {
   }
 
   function processVideos() {
-    
+    var video,
+      obj,
+      i,
+      iMax;
+    iMax = videosArray.length;
+    for (i = 0; i < iMax; i++) {
+      obj = {};
+      video = videosArray[i];
+      obj.id = video.id;
+      obj.name = video.name;
+      obj.
+    }
   }
 
   function writeReport() {
