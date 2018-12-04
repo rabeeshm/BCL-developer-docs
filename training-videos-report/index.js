@@ -49,6 +49,49 @@ var BCLS = (function(window, document) {
       return true;
   }
 
+  /**
+ * utility to extract h/m/s from seconds
+ * @param {number} ms - milliseconds to convert to hh:mm:ss
+ * @returns {object} object with members h (hours), m (minutes), s (seconds)
+ */
+    function secondsToTime(ms) {
+        var secs = ms / 1000,
+            hours = Math.floor(secs / (60 * 60)),
+            divisor_for_minutes = secs % (60 * 60),
+            minutes = Math.floor(divisor_for_minutes / 60),
+            divisor_for_seconds = divisor_for_minutes % 60,
+            seconds = Math.ceil(divisor_for_seconds),
+            obj = {};
+
+        if (hours < 10) {
+            hours = "0" + hours.toString();
+        } else {
+            hours = hours.toString();
+        }
+
+        if (minutes < 10) {
+            minutes = "0" + minutes.toString();
+        } else {
+            minutes = minutes.toString();
+        }
+
+        if (seconds < 10) {
+            seconds = "0" + seconds.toString();
+        } else {
+            seconds = seconds.toString();
+        }
+
+        obj = {
+            'h': hours,
+            'm': minutes,
+            's': seconds
+        };
+
+        return obj;
+    }
+
+
+
 
   /**
    * find index of an object in array of objects
@@ -82,6 +125,7 @@ var BCLS = (function(window, document) {
       obj,
       idx,
       i,
+      durationFormatted,
       iMax;
     iMax = videosArray.length;
     for (i = 0; i < iMax; i++) {
@@ -89,7 +133,8 @@ var BCLS = (function(window, document) {
       video = videosArray[i];
       obj.id = video.id;
       obj.name = video.name;
-      obj.duration = video.duration;
+      durationFormatted = secondsToTime(video.duration);
+      obj.duration = durationFormatted.m + ':' + durationFormatted.s;
       if (video.text_tracks.length > 0) {
         idx = findObjectInArray(video.text_tracks, 'srclang', 'en');
         obj.captions_url = video.text_tracks[idx].src;
