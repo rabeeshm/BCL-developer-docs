@@ -18,7 +18,7 @@ var BCLS = (function(window, document) {
     customFields = [],
     // elements
     makeReport = document.getElementById('makeReport'),
-    data_table_body = document,
+    data_table_body = document.getElementById('data_table_body'),
     csvData = document.getElementById('csvData'),
     apiRequest = document.getElementById('apiRequest');
 
@@ -48,84 +48,6 @@ var BCLS = (function(window, document) {
       return true;
   }
 
-  /**
-   * get selected value for single select element
-   * @param {htmlElement} e the select element
-   */
-  function getSelectedValue(e) {
-    return e.options[e.selectedIndex].value;
-  }
-
-  /**
-   * disables all buttons so user can't submit new request until current one finishes
-   */
-  function disableButtons() {
-    var i,
-      iMax = allButtons.length;
-    for (i = 0; i < iMax; i++) {
-      allButtons[i].setAttribute('disabled', 'disabled');
-    }
-  }
-
-  /**
-   * re-enables all buttons
-   */
-  function enableButtons() {
-    var i,
-      iMax = allButtons.length;
-    for (i = 0; i < iMax; i++) {
-      allButtons[i].removeAttribute('disabled');
-    }
-  }
-
-  /**
-   * sort an array of objects based on an object property
-   * @param {array} targetArray - array to be sorted
-   * @param {string|number} objProperty - object property to sort on
-   * @return sorted array
-   */
-  function sortArray(targetArray, objProperty) {
-    targetArray.sort(function(a, b) {
-      var propA = a[objProperty],
-        propB = b[objProperty];
-      // sort ascending; reverse propA and propB to sort descending
-      if (propA < propB) {
-        return -1;
-      } else if (propA > propB) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
-    return targetArray;
-  }
-
-  function processRenditions(renditions, callback) {
-    var i,
-      iMax = renditions.length,
-      hlsRenditions = [],
-      mp4Renditions = [],
-      flvRenditions = [],
-      otherRenditions = [],
-      totalSize = 0;
-    // separate renditions by type
-    for (i = 0; i < iMax; i += 1) {
-      if (renditions[i].hasOwnProperty('size')) {
-        totalSize += renditions[i].size;
-      }
-      if (renditions[i].video_container === 'M2TS') {
-        hlsRenditions.push(renditions[i]);
-      } else if (renditions[i].video_container === 'MP4') {
-        mp4Renditions.push(renditions[i]);
-      } else if (renditions[i].video_container === 'FLV') {
-        flvRenditions.push(renditions[i]);
-      } else {
-        otherRenditions.push(renditions[i]);
-      }
-    }
-    // sort renditions by encoding rate
-    callback(hlsRenditions, mp4Renditions, flvRenditions, otherRenditions, totalSize);
-  }
 
   /**
    * determines whether specified item is in an array
@@ -145,20 +67,14 @@ var BCLS = (function(window, document) {
     return false;
   }
 
-  function processCustomFields(fields) {
-    var field;
-    for (field in fields) {
-      if (!arrayContains(customFields, field)) {
-        customFields.push(field);
-      }
-    }
-  }
-
-
   function startCSVStrings() {
     var i = 0,
       iMax;
     csvStr = '"ID","Name","Reference ID","Description","Date Added","Date Last Modified","Filename","Resolution","Duration(sec)","HLS Renditions (bitrate range KBPS)","MP4 Renditions (bitrate range KBPS)","FLV Renditions (bitrate range KBPS)","Total Rendition Size (MB)",\r\n';
+  }
+
+  function processVideos() {
+    
   }
 
   function writeReport() {
@@ -166,16 +82,7 @@ var BCLS = (function(window, document) {
       iMax,
       j,
       jMax,
-      video,
-      hlsLowRate,
-      hlsHighRate,
-      mp4LowRate,
-      mp4HighRate,
-      flvLowRate,
-      flvHighRate,
-      resWidth,
-      resHeight,
-      rendition = {};
+      video;
     if (videosArray.length > 0) {
       iMax = videosArray.length;
       for (i = 0; i < iMax; i += 1) {
@@ -184,25 +91,6 @@ var BCLS = (function(window, document) {
         if (video.description) {
           video.description = video.description.replace(/(?:\r\n|\r|\n)/g, ' ');
         }
-        // generate the video detail row
-        hlsLowRate = (video.hlsRenditions.length > 0) ? video.hlsRenditions[0].encoding_rate / 1000 : 0;
-        hlsHighRate = (video.hlsRenditions.length > 0) ? video.hlsRenditions[video.hlsRenditions.length - 1].encoding_rate / 1000 : 0;
-        mp4LowRate = (video.mp4Renditions.length > 0) ? video.mp4Renditions[0].encoding_rate / 1000 : 0;
-        mp4HighRate = (video.mp4Renditions.length > 0) ? video.mp4Renditions[video.mp4Renditions.length - 1].encoding_rate / 1000 : 0;
-        flvLowRate = (video.flvRenditions.length > 0) ? video.flvRenditions[0].encoding_rate / 1000 : 0;
-        flvHighRate = (video.flvRenditions.length > 0) ? video.flvRenditions[video.flvRenditions.length - 1].encoding_rate / 1000 : 0;
-        if (video.flvRenditions.length > 0) {
-          rendition = video.flvRenditions[video.flvRenditions.length - 1];
-        } else if (video.mp4Renditions.length > 0) {
-          rendition = video.mp4Renditions[video.mp4Renditions.length - 1];
-        } else if (video.hlsRenditions.length > 0) {
-          rendition = video.hlsRenditions[video.hlsRenditions.length - 1];
-        } else {
-          rendition.frame_width = "unknown";
-          rendition.frame_height = "unknown";
-        }
-        resWidth = rendition.frame_width;
-        resHeight = rendition.frame_height;
         // add csv row
         csvStr += '"' + video.id + '","' + video.name + '","' + video.reference_id + '","' + video.description + '","' + video.created_at + '","' + video.updated_at + '","' + video.original_filename + '","' + resWidth + 'x' + resHeight + '","' + video.duration / 1000 + '","' + video.hlsRenditions.length + ' (' + hlsLowRate + '-' + hlsHighRate + ')","' + video.mp4Renditions.length + ' (' + mp4LowRate + '-' + mp4HighRate + ')","' + video.flvRenditions.length + ' (' + flvLowRate + '-' + flvHighRate + ')",' + '"' + (video.totalSize / 1000000) + '",\r\n';
       }
@@ -233,9 +121,6 @@ var BCLS = (function(window, document) {
     switch (id) {
       case 'getCount':
         endPoint = account_id + '/counts/videos?sort=created_at';
-        if (isDefined(tag.value)) {
-          endPoint += '&q=%2Btags:' + tag.value;
-        }
         options.url = baseURL + endPoint;
         options.requestType = 'GET';
         apiRequest.textContent = options.url;
@@ -243,11 +128,7 @@ var BCLS = (function(window, document) {
           parsedData = JSON.parse(response);
           // set total videos
           video_count = parsedData.count;
-          if (totalVideos === "All") {
-            totalVideos = video_count;
-          } else {
-            totalVideos = (totalVideos < video_count) ? totalVideos : video_count;
-          }
+          totalVideos = video_count;
           totalCalls = Math.ceil(totalVideos / limit);
           createRequest('getVideos');
         });
@@ -328,42 +209,19 @@ var BCLS = (function(window, document) {
     csvData.addEventListener('click', function() {
       this.select();
     });
-    // set up the log elements
-    content = document.createTextNode('Getting renditions for video ');
-    spanIntro2.appendChild(content);
-    content = document.createTextNode(' of ');
-    spanOf2.appendChild(content);
-    spanRenditionsCount.setAttribute('id', 'spanRenditionsCount');
-    spanRenditionsTotal.setAttribute('id', 'spanRenditionsTotal');
-    pLogGettingRenditions.appendChild(spanIntro2);
-    pLogGettingRenditions.appendChild(spanRenditionsCount);
-    pLogGettingRenditions.appendChild(spanOf2);
-    pLogGettingRenditions.appendChild(spanRenditionsTotal);
-    logger.appendChild(pLogGettingRenditions);
-    spanRenditionsCountEl = document.getElementById('spanRenditionsCount');
-    spanRenditionsTotalEl = document.getElementById('spanRenditionsTotal');
-    logger.appendChild(pLogFinish);
 
+    // button event handlers
+    makeReport.addEventListener('click', function() {
+      // in case of re-run, cleal the results
+      csvData.textContent = '';
+      // get the inputs
+      account_id = '20318290001'
+      // get video count
+      createRequest('getCount');
+
+    });
   }
 
-  // button event handlers
-  makeReport.addEventListener('click', function() {
-    // in case of re-run, cleal the results
-    csvData.textContent = '';
-    // get the inputs
-    client_id = client_id_element.value;
-    client_secret = client_secret_element.value;
-    account_id = account_id_element.value
-    totalVideos = getSelectedValue(videoCount);
-    // only use entered account id if client id and secret are entered also
-    if (!isDefined(client_id) || !isDefined(client_secret) || !isDefined(account_id)) {
-      logger.appendChild(document.createTextNode('To use your own account, you must specify an account id, and client id, and a client secret - since at least one of these is missing, a sample account will be used'));
-        account_id = '1752604059001';
-    }
-    // get video count
-    createRequest('getCount');
-
-  });
 
   init();
 })(window, document);
