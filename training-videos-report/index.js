@@ -226,11 +226,11 @@ var BCLS = (function(window, document) {
                           // return the response
                           callback(response);
                       } else {
-                          logger.appendChild(document.createTextNode('There was a problem with the request. Request returned ' + httpRequest.status));
+                        console.log('request fail');
                       }
                   }
               } catch (e) {
-                  logger.appendChild(document.createTextNode('Caught Exception: ' + e));
+                  console.log('exception');
               }
           };
       /**
@@ -253,16 +253,13 @@ var BCLS = (function(window, document) {
       this.select();
     });
 
-    // button event handlers
-    makeReport.addEventListener('click', function() {
-      // in case of re-run, cleal the results
-      csvData.textContent = '';
-      // get the inputs
-      account_id = '20318290001'
-      // get video count
-      createRequest('getCount');
+    // in case of re-run, cleal the results
+    csvData.textContent = '';
+    // get the inputs
+    account_id = '20318290001'
+    // get video count
+    createRequest('getCount');
 
-    });
   }
 
 
