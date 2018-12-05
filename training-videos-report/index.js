@@ -193,10 +193,6 @@ var BCLS = (function(window, document) {
       options = {};
       options.proxyURL = proxyURL;
       options.account_id = account_id;
-      if (isDefined(client_id) && isDefined(client_secret)) {
-        options.client_id = client_id;
-        options.client_secret = client_secret;
-      }
     switch (id) {
       case 'getCount':
         endPoint = account_id + '/counts/videos?sort=created_at&q=state:ACTIVE';
@@ -240,8 +236,6 @@ var BCLS = (function(window, document) {
    * @param  {String} options.url the full API request URL
    * @param  {String="GET","POST","PATCH","PUT","DELETE"} requestData [options.requestType="GET"] HTTP type for the request
    * @param  {String} options.proxyURL proxyURL to send the request to
-   * @param  {String} options.client_id client id for the account (default is in the proxy)
-   * @param  {String} options.client_secret client secret for the account (default is in the proxy)
    * @param  {JSON} [options.requestBody] Data to be sent in the request body in the form of a JSON string
    * @param  {Function} [callback] callback function that will process the response
    */
