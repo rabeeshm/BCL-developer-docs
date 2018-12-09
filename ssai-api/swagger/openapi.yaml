@@ -4,55 +4,41 @@ x-bc-implicit-options: true
 x-bc-upstream: 'http://backend_server'
 info:
   description: |-
-    API for Brightcove Social
+    API for Brightcove SSAI
 
-    **Notes:**
-    - The Social API is currently in beta. if you are interested in participating in the beta, contact your account manager.
-    - While the Social API is in beta, permissions for it are <strong>not</strong> available in the Studio Admin section for Managing API Credentials. Instead, you will have to use the OAuth API to create your credentials. However, Brightcove Learning Services, has created a [simple online tool](https://support.brightcove.com/oauth-api-sample-create-client-credentials) for doing this.
+    This API is used for managing operations related to Server-Side Ad Insertion (SSAI)
 
-    **Base URL:** https://social.api.brightcove.com/v1
+    **Base URL:** https://ssai.api.brightcove.com/v1
   version: 0.1.0
-  title: Brightcove Social API
+  title: Brightcove SSAI API
   x-bc-access: public
 servers:
-  - url: 'https://social.api.brightcove.com/v1'
+  - url: 'https://ssai.api.brightcove.com/v1'
     variables: {}
 tags:
-  - name: Status
-    description: Operations for getting the status of all or a specific video.
-  - name: History
-    description: Operations for getting the history of all or a specific video.
+  - name: Ad Configurations
+    description: Operations for managing ad configurations.
 paths:
-  '/accounts/{account_id}/videos/status':
+  '/accounts/{account_id}/ssai_configs':
     get:
       tags:
-        - Status
-      summary: List the current status for every video on the account
+        - Ad Configurations
+      summary: List the ad configurations for the account
       description: |-
-        Gets the current status of every video Social has ever attempted to distribute to a social platform.  Note that this endpoint has pagination.
-
-        **Note: The Social API is currently in beta. if you are interested in participating in the beta, contact your account manager.**
-      operationId: getAccountVideosStatus
+        List the ad configurations defined for an account.
+      operationId: getAdConfigurations
       security:
         - BC_OAuth2:
-          - video-cloud/social/status/read
+          - video-cloud/social/video/read
       parameters:
         - $ref: '#/components/parameters/AccountId'
-        - $ref: '#/components/parameters/Platform'
-        - $ref: '#/components/parameters/DestinationId'
-        - $ref: '#/components/parameters/Status'
-        - $ref: '#/components/parameters/Before'
-        - $ref: '#/components/parameters/Since'
-        - $ref: '#/components/parameters/PageKey'
-        - $ref: '#/components/parameters/PageSize'
-        - $ref: '#/components/parameters/PrettyPrint'
       responses:
         '200':
           description: A list of videos.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/VideoList'
+                $ref: '#/components/schemas/AdConfigList'
         '403':
           description: Forbidden
         '422':
@@ -253,109 +239,76 @@ components:
           enum:
             - SUCCESS
             - ERROR
-    VideoList:
-      type: object
-      properties:
-        total_hits:
-          type: integer
-        page_key:
-          type: string
-        videos:
-          type: array
-          items:
-            $ref: '#/components/schemas/Video'
+    AdConfigList:
+      type: array
+      description: >-
+        Array of ad configuration objects
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+            description: Name of the ad configuration
+          vmap_response_namespace:
+            type: string
+            description: >-
+              Adjusts the VMAP output to use the legacy Unicorn Once namespace format or to use the new Brightcove namespace format.
+            enum:
+              - bc
+              - ua
+            default: bc
+          account_id:
+            type: string
+            description: The Video Cloud account id
+          created_timestamp:
+            type: string
+            description: Date-time when the ad configuration was created
+          updated_timestamp:
+            type: string
+            description: Date-time when the ad configuration was last updated
+          ad_config:
+            $ref: '#/components/schemas/AdConfig'
       example: >-
-        '{
-          "total_hits": 117,
-          "page_key": "1506960062695:5382545592001_-T6xvfm_ebE",
-          "videos": [
-            {
-              "id": "5667310879001",
-              "account_id": "1486906377",
-              "destination_id": "c1243033-fbfd-4f1d-80e4-00ed027db9ec",
-              "remote_id": "hWESxu2PZFU",
-              "remote_url": "https://www.youtube.com/watch?v=hWESxu2PZFU",
-              "status": "PUBLISHED",
-              "timestamp": "Jan 26, 2018 6:59:16 PM",
-              "published_at": "Jan 26, 2018 6:59:16 PM",
-              "distribution_method": "MANUAL",
-              "action": "YOUTUBE_UPLOAD",
-              "result": "SUCCESS"
-            },
-            {
-              "id": "5263118111001",
-              "account_id": "1486906377",
-              "destination_id": "9b67c5f2-5fed-4b61-8383-7bb6e4456b8e",
-              "remote_id": "1434615919981329",
-              "remote_url": "https://www.facebook.com/1434615919981329",
-              "status": "SYNCED",
-              "timestamp": "Jan 24, 2018 3:35:24 PM",
-              "published_at": "Jan 24, 2018 3:35:24 PM",
-              "distribution_method": "SYNC",
-              "autosync_id": "4d09778b-0043-4be6-8dd7-011863607f0c",
-              "action": "FACEBOOK_UPDATE",
-              "result": "SUCCESS"
-            },
-            {
-              "id": "5363058704001",
-              "account_id": "1486906377",
-              "destination_id": "9b67c5f2-5fed-4b61-8383-7bb6e4456b8e",
-              "status": "ERROR",
-              "timestamp": "Dec 8, 2017 6:44:49 PM",
-              "published_at": "Dec 8, 2017 6:44:49 PM",
-              "distribution_method": "MANUAL",
-              "errors": [
-                {
-                  "error_code": "UPLOAD_FAILURE",
-                  "message": "Upload error: Received Facebook error response of type OAuthException: (#100) sponsor_id requires publishing profile/page to be verified or branding partner. (code 100, subcode null)"
-                }
-              ],
-              "action": "FACEBOOK_UPLOAD",
-              "result": "ERROR"
-            },
-            {
-              "id": "5630023626001",
-              "account_id": "1486906377",
-              "destination_id": "69cac3e2-4e71-489f-86f4-c00ae7e9e235",
-              "remote_id": "GcFEO8hEiw8",
-              "remote_url": "https://www.youtube.com/watch?v=GcFEO8hEiw8",
-              "status": "PUBLISHED",
-              "timestamp": "Oct 31, 2017 3:49:02 PM",
-              "published_at": "Oct 31, 2017 3:49:02 PM",
-              "distribution_method": "MANUAL",
-              "action": "YOUTUBE_UPLOAD",
-              "result": "SUCCESS"
-            },
-            {
-              "id": "5382545592001",
-              "account_id": "1486906377",
-              "destination_id": "7d6a1691-317e-4142-a59c-a2bbc28bf08d",
-              "remote_id": "8z9uAFW24Zs",
-              "remote_url": "https://www.youtube.com/watch?v=8z9uAFW24Zs",
-              "status": "ABANDONED",
-              "timestamp": "Oct 2, 2017 5:07:48 PM",
-              "published_at": "Oct 2, 2017 5:07:48 PM",
-              "distribution_method": "SYNC",
-              "autosync_id": "83440ca9-ca3b-43d4-b75f-a606efe03433",
-              "action": "YOUTUBE_UPDATE_UNSYNC",
-              "result": "SUCCESS"
-            },
-            {
-              "id": "5382545592001",
-              "account_id": "1486906377",
-              "destination_id": "7d6a1691-317e-4142-a59c-a2bbc28bf08d",
-              "remote_id": "-T6xvfm_ebE",
-              "remote_url": "https://www.youtube.com/watch?v=-T6xvfm_ebE",
-              "status": "DELETED",
-              "timestamp": "Oct 2, 2017 4:01:02 PM",
-              "published_at": "Oct 2, 2017 4:01:02 PM",
-              "distribution_method": "SYNC",
-              "autosync_id": "83440ca9-ca3b-43d4-b75f-a606efe03433",
-              "action": "YOUTUBE_DELETE",
-              "result": "SUCCESS"
+        '[
+          {
+            "name": "VMAP Ad Server",
+            "vmap_response_namespace": "bc",
+            "config_id": "2ecc6beb-d6a4-4deb-a78e-37ac27e0f883",
+            "account_id": "57838016001",
+            "created_timestamp": "2017-07-24T19:28:34.976878586Z",
+            "updated_timestamp": "2017-07-24T19:28:34.976878586Z",
+            "ad_config": {
+              "expected_ad_response": "dfp_ad_rules",
+              "disable_server_beacons": false,
+              "template_url": {
+                  "template": "http://solutions.brightcove.com/bcls/ads/simple-ad-rules?ip={{ system.ip_address }}&vid={{ metadata.video_id }}&ppid={{ system.unique_user_id }}&p_vmap={{ url.p_vmap }}"
+              }
             }
-          ]
-        }'
+          }
+        ]'
+    AdConfig:
+      type: object
+      description: Ad config part of an ad configuration object
+      properties:
+        expected_ad_response:
+          type: string
+          description: |-
+            Which tech to use to parse the response.
+
+            When the `expected_ad_response` is set to `vast_3_0`, SSAI makes one VAST call for each ad cue point defined in Video Cloud. For VMAP and ad rules, SSAI makes requests based on the defined ad breaks in the initial ad response.
+          enum:
+            - dfp_ad_rules
+            - dfp_vmap
+            - smart_xml
+            - vast_3_0
+        disable_server_beacons:
+          type: boolean
+          description: |-
+            Flags whether to disable the server side firing of ad impressions/beacons
+
+            When set to `true`, SSAI will not fire any beacons server-side and will include all beacons in the VMAP output
+
+            When set to `false`, SSAI will fire the beacons it is able to server-side and include any it is not able to in the VMAP output
   parameters:
     AccountId:
       name: account_id
