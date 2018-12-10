@@ -12,7 +12,7 @@ curl --request POST \
 			"template": "http://solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vmap.xml"
 		},
 		"defaults": {
-			"origin": "bc",
+			"session_id": "{{system.uuid}}"
 		}
   },
 	"beacon_templates": [
