@@ -2344,8 +2344,10 @@ components:
             The name of the credentials configured in your Live account for this destination. Not required if using the default Video Cloud account associated with your Live account.
           type: string
         notifications:
-          description: >-
-            'Array of notification destination objects or strings - notifications defined here are for job-level events.  A notification will be sent to the destination when selected event occurs. You can use a simple string with a url: &quot;http://log:pass@httpbin.org/post&quot;, or you can use an object. See [Events](https://support.brightcove.com/live-api-notifications#Events) for an explanation of the events reported in `state_changed` notifications. <br> Retry strategy: In the event of a failed request to send a notification, the default retry strategy is to retry 50 times with an exponential delay between attempts: <br> `max_retry_times = 50` <br> `delay_delta_s = 5` <br> `next_retry = now_s + retry_count * delay_delta_s`'
+          description: |-
+            'Array of notification destination objects or strings - notifications defined here are for job-level events.  A notification will be sent to the destination when selected event occurs. You can use a simple string with a url: &quot;http://log:pass@httpbin.org/post&quot;, or you can use an object. See [Events](https://support.brightcove.com/live-api-notifications#Events) for an explanation of the events reported in `state_changed` notifications. <br> Retry strategy: In the event of a failed request to send a notification, the default retry strategy is to retry 50 times with an exponential delay between attempts: <br> `max_retry_times = 50` <br> `delay_delta_s = 5` <br> `next_retry = now_s + retry_count * delay_delta_s`
+
+            **Note:** notifications are *not* supported for instant mode VODs.'
           items:
             oneOf:
               - $ref: '#/components/schemas/Notification'
@@ -2353,8 +2355,10 @@ components:
                 description: A URL to send notifications to
           type: array
         duration:
-          description: >-
+          description: |-
             Duration of the clip in seconds. The <code>duration</code> must be used alone to define a clip that will be made of the final <code>{duration}</code> seconds of the stream. <code>duration</code>
+
+            **Note:** the duration parameter is not available for instant mode VODs.
           maximum: 172800
           minimum: 0
           type: integer
@@ -2388,6 +2392,16 @@ components:
         label:
           description: Label for the output
           type: string
+        mode:
+          type: string
+          description: >-
+            Expedite clip publishing by leveraging existing live renditions and segment boundaries
+          enum:
+            - instant
+        playlist_label:
+          type: string
+          description: >-
+            Only applicable for `instant` mode VODs. Indicates which playlist to use to create a VOD output (from the live job). Only necessary if custom playlists were defined at live job creation.
         url:
           description: >-
             `url` is mandatory (**unless** the destination is `videocloud`, in which case you dod **not** include the `url`) and sets the destination of the final asset destination. For access restricted origins, the credentials a can be passed along with the URL or stored within the Brightcove system. For Live, this is reserved for future use.
