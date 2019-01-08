@@ -70,7 +70,67 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AdConfigList'
+                $ref: '#/components/schemas/AdConfiguration'
+        '403':
+          description: Forbidden
+        '422':
+          description: Invalid query parameters
+        '500':
+          description: Server error
+  '/accounts/{account_id}/ssai_configs/{ad_config_id}':
+    get:
+      tags:
+        - Ad Configurations
+      summary: List the ad configurations for the account
+      description: |-
+        List the ad configurations defined for an account.
+      operationId: getAdConfigurations
+      security:
+        - BC_OAuth2:
+          - video-cloud/social/video/read
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+        - $ref: '#/components/parameters/ConfigId'
+      responses:
+        '200':
+          description: A list of videos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdConfiguration'
+        '403':
+          description: Forbidden
+        '422':
+          description: Invalid query parameters
+        '500':
+          description: Server error
+    put:
+      tags:
+        - Ad Configurations
+      summary: Update an ad configuration
+      description: |-
+        Update an ad configuration
+      operationId: updateAdConfigurations
+      security:
+        - BC_OAuth2:
+          - video-cloud/social/video/read
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+        - $ref: '#/components/parameters/ConfigId'
+      requestBody:
+        description: Create a new ad configuration
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdConfiguration"
+        required: true
+      responses:
+        '200':
+          description: A list of videos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdConfiguration'
         '403':
           description: Forbidden
         '422':
@@ -108,6 +168,7 @@ components:
         config_id:
           type: string
           description: System id for this configuration
+          readOnly: true
         description:
           type: string
           description: Description of the ad configuration
@@ -297,6 +358,13 @@ components:
       name: video_id
       in: path
       description: ID of the video to query video statuses for
+      required: true
+      schema:
+        type: string
+    ConfigId:
+      name: config_id
+      in: path
+      description: ID of the ad configuration
       required: true
       schema:
         type: string
