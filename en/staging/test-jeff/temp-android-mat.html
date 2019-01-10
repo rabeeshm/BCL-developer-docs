@@ -103,10 +103,58 @@ catalog = new OfflineCatalog(this, eventEmitter, ACCOUNT_ID, POLICY_KEY);
     </li>
   </ul>
   </li>
+  <li>
+    <p>
+      Retrieve lists of data from the bundle. Here are examples for retrieving the different lists:
+    </p>
+    <pre>
+<code class="notranslate language-java">ArrayList&lt;MediaFormat&gt; video = bundle.getParcelableArrayList(MediaDownloadable.VIDEO_RENDITIONS);
+
+ArrayList&lt;MediaFormat&gt; audio = bundle.getParcelableArrayList(MediaDownloadable.AUDIO_LANGUAGES);
+
+ArrayList&lt;String&gt; roles = bundle.getStringArrayList(MediaDownloadable.AUDIO_LANGUAGE_ROLES);
+
+ArrayList&lt;MediaFormat&gt; captions = bundle.getParcelableArrayList(MediaDownloadable.CAPTIONS);</code></pre>
+  </li>
+  <li>
+    <p>
+      Create a new <code>Bundle</code> (<code>filteredBundle</code>) to select the audio tracks and closed captions that you want to include in the download.
+    </p>
+    <pre>
+<code class="notranslate language-java">Bundle filteredBundle = new Bundle();</code></pre>
+    <aside class="bcls-aside bcls-aside--information">If you reuse the bundle created earlier, you may download all audio tracks and closed captions.</aside>
+  </li>
+  <li>
+    <p>
+      Filter the tracks that you want from the list that you created earlier, and add it to the new <code>filteredBundle</code>.
+    </p>
+    <pre>
+<code class="notranslate language-java">ArrayList&lt;MediaFormat&gt; captions = bundle.getParcelableArrayList(MediaDownloadable.CAPTIONS);
+if (captions != null &amp;&amp; captions.size() &gt; 0) {
+   ArrayList&lt;MediaFormat&gt; newCaptions = new ArrayList&lt;&gt;();
+   newCaptions.add(captions.get(0));
+
+filteredBundle.putParcelableArrayList(MediaDownloadable.CAPTIONS, newCaptions);
+}</code></pre>
+  </li>
+  <li>
+    <p>
+      Set the <code>filteredBundle</code> to the <code>MediaDownloadable</code> object.
+    </p>
+    <pre>
+<code class="notranslate language-java">mediaDownloadable.setConfigurationBundle(filteredBundle);</code></pre>
+  </li>
+  <li>
+    <p>
+      Download the video.
+    </p>
+    <pre>
+<code class="notranslate language-java">offlineCatalog.downloadVideo(video);</code></pre>
+<p>
+  Internally, the <code>OfflineCatalog</code> will use the cached <code>MediaDownloadable</code> provided by the <code>MediaDownloadable.MediaFormatListener</code> callback.
+</p>
+  </li>
 </ol>
-
-
-
 
 </section>
 
@@ -114,7 +162,9 @@ catalog = new OfflineCatalog(this, eventEmitter, ACCOUNT_ID, POLICY_KEY);
 <section class="bcls-section">
 <h2 id="Code_sample">Code sample</h2>
 
-<p>There are several constants that were deprecated in the <a href="https://developer.android.com/reference/android/net/ConnectivityManager">ConnectivityManager</a> class. Some of these constants are currently used by the Brightcove SDK, specifically by the Offline Playback and the Offline Analytics features. Here is the list:</p>
+<p>
+  For a complete example of downloading additional audio tracks and captions files, see the <a href="https://github.com/BrightcoveOS/android-player-samples/tree/master/brightcove-exoplayer/OfflinePlaybackSampleApp/src/main/java/com/brightcove/player/samples/offlineplayback">Offline Playback sample app</a>.
+</p>
 
 </section>
 
