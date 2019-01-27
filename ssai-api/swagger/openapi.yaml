@@ -20,6 +20,8 @@ servers:
 tags:
   - name: Ad Configurations
     description: Operations for managing ad configurations.
+  - name: Ad Call Tracking
+    description: Operations for tracking ad calls - used primarily for debugging.
 paths:
   '/accounts/{account_id}/ssai_configs':
     get:
@@ -133,6 +135,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AdConfiguration'
+        '403':
+          description: Forbidden
+        '422':
+          description: Invalid query parameters
+        '500':
+          description: Server error
+  '/accounts/{account_id}/ssai_debug_vmap/debug.xml':
+    post:
+      tags:
+        - Ad Call Tracking
+      summary: Create an SSAI ad trace for an account
+      description: |-
+        Create an SSAI ad trace for an account.
+      operationId: createAdTrace
+      security:
+        - BC_OAuth2:
+          - video-cloud/social/video/all
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+      requestBody:
+        description: SSAI ad trace configuration
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdTraceConfiguration"
+        required: true
+      responses:
+        '200':
+          description: An ad response. The content varies according to the `expected_ad_response`
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AdResponse'
         '403':
           description: Forbidden
         '422':
@@ -294,6 +329,57 @@ components:
               type: string
               description: >-
                 Ad tag template. Available variables described in [this document](https://support.brightcove.com/video-cloud-ssai-ad-config-api#Ad_variables).
+    AdResponse:
+      title: Ad Response
+      description: >-
+        An ad response. The content varies depending on the kind of response expected. The example shown is a VAST response
+      example:
+        '<vmap:VMAP xmlns:bc="bc" xmlns:vmap="http://www.iab.net/vmap-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
+        <vmap:Extensions>
+        <bc:Brightcove ttl="1800" contenturi="https://ssaiplayback.us-east-1.qa.boltdns.net/playback/once/v1/hls/v5/clear/accoutn_debug/debug/debug/7592e9c3-214f-4c68-a576-1e2494b7be06/debug.m3u8" contentlength="10.0000" payloadlength="70.0000" contenttype="application/x-mpegURL"></bc:Brightcove>
+        <bc:BrightcoveDebug sessionID="7592e9c3-214f-4c68-a576-1e2494b7be06"></bc:BrightcoveDebug>
+        </vmap:Extensions>
+        <vmap:AdBreak breakType="linear" breakId="PreRoll_0_0" timeOffset="start">
+        <vmap:AdSource allowMultipleAds="true" followRedirects="true" id="0">
+        <vmap:VASTData>
+          <VAST xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <Ad id="test-01-30s">
+              <InLine>
+                <AdSystem>BIAS</AdSystem>
+                <AdTitle>test-01-30s</AdTitle>
+                <Creatives>
+                  <Creative>
+                    <Linear>
+                      <CreativeExtensions>
+                        <CreativeExtension>
+                          <BrightcoveForeignKey>test-01-30s</BrightcoveForeignKey>
+                        </CreativeExtension>
+                      </CreativeExtensions>
+                      <Duration>00:00:30.0000</Duration>
+                      <TrackingEvents>
+                        <Tracking event="mute">https://solutions.brightcove.com/beacon?event=mute&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
+                        <Tracking event="unmute">https://solutions.brightcove.com/beacon?event=unmute&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
+                        <Tracking event="rewind">https://solutions.brightcove.com/beacon?event=rewind&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
+                        <Tracking event="pause">https://solutions.brightcove.com/beacon?event=pause&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
+                        <Tracking event="resume">https://solutions.brightcove.com/beacon?event=resume&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
+                        <Tracking event="fullscreen">https://solutions.brightcove.com/beacon?event=fullscreen&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
+                        <Tracking event="acceptInvitation">https://solutions.brightcove.com/beacon?event=acceptInvitation&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
+                      </TrackingEvents>
+                      <VideoClicks>
+                        <ClickThrough id="clickthrough">https://www.brightcove.com/en/</ClickThrough>
+                        <ClickTracking id="43a0e4a5-4420-11e8-b306-99b1b6ae5164"></ClickTracking>
+                      </VideoClicks>
+                    </Linear>
+                  </Creative>
+                </Creatives>
+              </InLine>
+            </Ad>
+          </VAST>
+        </vmap:VASTData>
+        </vmap:AdSource>
+        </vmap:AdBreak>
+        ...// additional ad breaks
+        </vmap:VMAP>'
     BeaconTemplate:
       title: Beacon Template
       description: >-
@@ -358,6 +444,139 @@ components:
             Example: ["v4","v5"] to deliver for v4 & v5 but not for v3
           example:
             ["v4","v5"]
+    AdTraceConfiguration:
+      type: object
+      description: |-
+        Configuration for the ad trace.
+      properties:
+        playback_config:
+          $ref: "#/components/schemas/PlaybackConfig"
+        title_metadata:
+          type: object
+          description: >-
+            Metadata for the video
+          properties:
+            duration:
+              type: string
+              description: >-
+                The video duration
+              example: 39s
+        videocloud_metadata:
+          $ref: "#/components/schemas/VideoCloudMetadata"
+      example: >-
+        {
+          "playback_config":{
+            "name": "config_name",
+            "vmap_response_namespace": "config_namespace",
+            "account_id": "account_id",
+            "ad_config": {
+              "enable_ads": true,
+              "expected_ad_response": "dfp_ad_rules",
+              "disable_server_beacons": false,
+              "round_up_cue_points": false,
+              "template_url": {
+              "template": "template_url"
+              }
+            },
+            "extend_beacon_guard_ttl": false
+          },
+          "title_metadata":{
+          "duration": "10s"
+          },
+          "videocloud_metadata": {
+            "name": "ad_name",
+            "tags": [ "tag1:tag1_value", "tag2:tag2_value" ],
+            "ad_keys":"a=1&b=2",
+            "cue_points": [{
+              "name":"Pre-roll",
+              "type":"AD",
+              "time":0,
+              "metadata":"type:pre-roll,a=b",
+              },
+              {
+              "name":"Mid-roll",
+              "type":"AD",
+              "time":10,
+              "metadata":"type=mid-roll,x=y",
+            }]
+          }
+        }
+    PlaybackConfig:
+      type: object
+      description: >-
+        Playback configuration for ads
+      properties:
+        name:
+          type: string
+          description: >-
+            Name of the playback configuration
+        vmap_response_namespace:
+          type: string
+          description: >-
+            Adjusts the VMAP output to use the legacy Unicorn Once namespace format or to use the new Brightcove namespace format.
+            enum:
+              - bc
+              - uo
+              default: bc
+        account_id:
+          type: string
+          description: >-
+            The Video Cloud account id
+        ad_config:
+          $ref: '#/components/schemas/AdConfig'
+        extend_beacon_guard_ttl:
+          type: boolean
+          description: >-
+            Sets the length of the Beacon Guard TTL (Time to live) to the length of the Content’s Session TTL. Otherwise, the default is 1 minute.
+          default: false
+    VideoCloudMetadata:
+      type: object
+      description: >-
+        Video Cloud metadata referenced by ad template variables
+      properties:
+        name:
+          type: string
+          description: the ad name
+        tags:
+          type: array
+          description: >-
+            Array of `tag:value` pairs
+          items:
+            type: string
+            example: >-
+              '["subject:sports", "category:tennis"]'
+        ad_keys:
+          type: strings
+          description: >-
+            String of key-value pairs separated by ampersands
+          example: >-
+            'category=sports&subcategory=tennis'
+        cue_points:
+          type: array
+          description: >-
+            Array of video cuepoint objects
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: >-
+                  Name of the cuepoint
+              type:
+                type: string
+                description: >-
+                  Type of the cuepoint
+                enum:
+                  - AD
+                  - CODE
+              time:
+                type: integer
+                description: >-
+                  Time of the cuepoint in the video (seconds)
+              metadata:
+                type: string
+                description: >-
+                  String of metadata assigned to the cuepoint when it was created
   parameters:
     AccountId:
       name: account_id
