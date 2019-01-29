@@ -147,7 +147,7 @@ paths:
         - Ad Call Tracking
       summary: Create an SSAI ad trace for an account
       description: |-
-        Create an SSAI ad trace for an account.
+        Create an SSAI ad trace for an account. Use this request if you do **not** have an ad config id.
       operationId: createAdTrace
       security:
         - BC_OAuth2:
@@ -170,8 +170,31 @@ paths:
                 $ref: '#/components/schemas/AdResponse'
         '403':
           description: Forbidden
-        '422':
-          description: Invalid query parameters
+        '500':
+          description: Server error
+  '/accounts/{account_id}/ssai_traces/{session_id}/ad_calls':
+    get:
+      tags:
+        - Ad Call Tracking
+      summary: Get ad calls for a session
+      description: |-
+        'Get ad calls for a session. The `session_id` comes from the VMAP response: `<bc:BrightcoveDebug sessionID="your session id"></bc:BrightcoveDebug>`'
+      operationId: getAdCalls
+      security:
+        - BC_OAuth2:
+          - video-cloud/social/video/read
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Array of ad calls for a session.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdCalls'
+        '403':
+          description: Forbidden
         '500':
           description: Server error
 components:
@@ -188,6 +211,8 @@ components:
         platform_error:
           type: string
           description: JSON representation of the error object returned from the social platform, if any.
+    AdCalls:
+      title: Ad Calls
     AdConfigList:
       title: List Ad Configurations Response
       type: array
@@ -600,6 +625,13 @@ components:
       name: config_id
       in: path
       description: ID of the ad configuration
+      required: true
+      schema:
+        type: string
+    SessionId:
+      name: session_id
+      in: path
+      description: Session id from the VMAP response
       required: true
       schema:
         type: string
