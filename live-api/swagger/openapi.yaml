@@ -14,6 +14,9 @@ tags:
   - name: Live Jobs
     description: >-
        Operations for creating live jobs, listing live jobs, getting job details, and canceling live jobs. There are also operations for activating and deactivating SEP jobs, and for inserting cuepoints or ID3 timed metadata.
+  - name: RTMP Outputs
+    description: >-
+       Operations for creating and managing RTMP outputs
   - name: Clips
     description: >-
       Operations for creating and managing VOD clips
@@ -413,6 +416,115 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StopLiveJob'
+        '401':
+          description: >-
+            UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details
+        '404':
+          description: >-
+            RESOURCE_NOT_FOUND: The api could not find the resource you requested - see Live API Error Messages for more details
+        '500':
+          description: >-
+            INTERNAL_SERVER_ERROR: see Live API Error Messages for more details
+      deprecated: false
+      security: []
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  '/jobs/{job_id}/rtmpouts':
+    get:
+      tags:
+        - RTMP Outputs
+      summary: List RTMP Outputs
+      description: >-
+        Get a list of RTMP outputs. See [Live API: RTMP Outputs](https://support.brightcove.com/live-api-rtmp-outputs) for more information on RTMP outputs.
+      operationId: GetRTMPOutputs
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+        - $ref: '#/components/parameters/XAPIKEY'
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListRTMPOutputs'
+        '401':
+          description: >-
+            UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details
+        '404':
+          description: >-
+            RESOURCE_NOT_FOUND: The api could not find the resource you requested - see Live API Error Messages for more details
+        '500':
+          description: >-
+            INTERNAL_SERVER_ERROR: see Live API Error Messages for more details
+      deprecated: false
+      security: []
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+    post:
+      tags:
+        - RTMP Outputs
+      summary: Create RTMP Output
+      description: >-
+        Create an RTMP output. See [Live API: RTMP Outputs](https://support.brightcove.com/live-api-rtmp-outputs) for more information on RTMP outputs.
+      operationId: CreateRTMPOutput
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+        - $ref: '#/components/parameters/XAPIKEY'
+      requestBody:
+        description: Create an RTMP output request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRTMPOutputRequestBody'
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateRTMPOutputResponse'
+        '401':
+          description: >-
+            UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details
+        '404':
+          description: >-
+            RESOURCE_NOT_FOUND: The api could not find the resource you requested - see Live API Error Messages for more details
+        '500':
+          description: >-
+            INTERNAL_SERVER_ERROR: see Live API Error Messages for more details
+      deprecated: false
+      security: []
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  '/jobs/{job_id}/rtmpouts/{rtmp_out_id}/stop':
+    put:
+      tags:
+        - RTMP Outputs
+      summary: Stop RTMP Output
+      description: >-
+        Stop an RTMP output. See [Live API: RTMP Outputs](https://support.brightcove.com/live-api-rtmp-outputs) for more information on RTMP outputs.
+      operationId: StopRTMPOutput
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+        - $ref: '#/components/parameters/XAPIKEY'
+        - $ref: '#/components/parameters/rtmpOutId'
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StopRTMPOutputResponse'
         '401':
           description: >-
             UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details
@@ -2741,6 +2853,66 @@ components:
           ],
           "live_job_id": "3ae7fa89943f4a96aa273fbbf175d527"
         }
+    CreateRTMPOutputRequestBody:
+      title: Create RTMP Output Request Body
+      description: Request body for requests to create an RTMP output
+      type: object
+      properties:
+        url:
+          type: string
+          description: URL for the RTMP output
+          example: 'rtmp://host:port/application/streamName'
+        output_label:
+          type: string
+          description: >-
+            The label of the job output to use as the source for the RTMP output. Omit this parameter to simply forward the RTMP input instead.
+      required:
+        - url
+    CreateRTMPOutputResponse:
+      title: Create RTMP output success response
+      description: Create RTMP output success response
+      type: object
+      properties:
+        connection_info:
+          type: object
+          description: Information on the connection URL
+          properties:
+            host:
+              type: string
+              description: Host URL
+            port:
+              type: integer
+              description: The port number
+            application:
+              type: string
+              description: The application name in the path
+            streamName:
+              type: string
+              description: The stream name in the path
+        duration_history:
+          type: array
+          description: Array of durations for connections
+          items:
+            type: integer
+            description: A connection duration in seconds
+        rtmp_out_id:
+          type: string
+          description: System id for the RTMP output
+        stream_start:
+          type: integer
+          description: Time of the stream start in Epoch time (milliseconds)
+      example: >-
+        '{
+          "connection_info": {
+            "host": "live-api-s.facebook.com",
+            "port": 80,
+            "application": "rtmp",
+            "streamName": "foo-bar"
+          },
+          "duration_history": [],
+          "rtmp_out_id": "foo",
+          "stream_start": 1542731746032
+        }'
     Credentials:
       properties:
         credential_default_for_type:
@@ -3085,6 +3257,31 @@ components:
             - sa-east-1
           example: us-west-2
           type: string
+        randomize_chunk_url:
+          type: boolean
+          description: >-
+            If true, HLS segments will be scrambled to prevent your stream from being stolen and reused
+          default: true
+        rtmp_outputs:
+          type: array
+          description: >-
+            '[RTMP outputs](https://support.brightcove.com/live-api-rtmp-outputs) for the job'
+          items:
+            $ref: '#/components/schemas/RTMPout'
+          example: >-
+            '[
+              {
+                "rtmp_out_id": "asdfg-lkjh",
+                "stream_start": 1538746255247,
+                "connection_info": {
+                  "host": "a.rtmp.youtube.com",
+                  "port": 1935,
+                  "application": "live2",
+                  "streamName": "myStream",
+                  "sessionStatus": "Active"
+                }
+              }
+            ]'
         slate:
           description: id for a slate of assets included
           type: string
@@ -3921,6 +4118,74 @@ components:
             }
           ]
         }'
+    ListRTMPOutputs:
+      title: List RMTP Outputs
+      description: >-
+        Response to GET request for RTMP outputs - array of RTMP outputs objects
+      type: array
+      items:
+        $ref: '#/components/schemas/RTMPout'
+      example: >-
+        '[
+          {
+            "rtmp_out_id": "asdfg-lkjh",
+            "stream_start": 1538746255247,
+            "connection_info": {
+              "host": "a.rtmp.youtube.com",
+              "port": 1935,
+              "application": "live2",
+              "streamName": "myStream",
+              "sessionStatus": "Active"
+            }
+          }
+        ]'
+    RTMPout:
+      title: RTMP Output
+      type: object
+      description: RTMP output object
+      properties:
+        rtmp_out_id:
+          type: string
+          description: system id for the RTMP output
+        stream_start:
+          type: integer
+          description: Start time of the output in Epoch time (milliseconds)
+        state:
+          type: string
+          description: Current state of the RTMP output stream
+          enum:
+            - connected
+            - disconnected
+            - error
+            - starting
+        duration_history:
+          type: array
+          description: Array of durations for connections
+          items:
+            type: integer
+            description: A connection duration in seconds
+        connection_info:
+          type: object
+          description: Details of the connection information
+          properties:
+            host:
+              type: string
+              description: Host URL
+            port:
+              type: integer
+              description: The port number
+            application:
+              type: string
+              description: The application name in the path
+            streamName:
+              type: string
+              description: The stream name in the path
+            sessionStatus:
+              type: string
+              description: The current session status
+              enum:
+                - Active
+                - Inactive
     ListVodJobs:
       properties:
         next_token:
@@ -4190,6 +4455,7 @@ components:
             - state_changed
             - first_segment_uploaded
             - output_finished
+            - rtmp_output_state_changed
         url:
           description: Destination for the notification.
           type: string
@@ -4225,6 +4491,18 @@ components:
         - playback_url_vod
       title: outputs
       type: object
+    StopRTMPOutputResponse:
+      title: Stop RTMP output response
+      description: Success response for stopping and RTMP output
+      type: object
+      properties:
+        message:
+          type: string
+          description: Success message
+          example:
+            '{
+              "message": "RTMP out asdfg-lkjh deleted successfully"
+            }'
     UpdateAdConfigurationbody:
       properties:
         account_id:
@@ -4539,6 +4817,15 @@ components:
       name: jvod_id
       in: path
       description: VOD job ID
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    rtmpOutId:
+      name: rtmp_out_id
+      in: path
+      description: RTMP output ID
       required: true
       style: simple
       explode: false

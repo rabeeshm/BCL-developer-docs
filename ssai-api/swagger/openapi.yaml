@@ -147,7 +147,7 @@ paths:
         - Ad Call Tracking
       summary: Create an SSAI ad trace for an account
       description: |-
-        Create an SSAI ad trace for an account.
+        Create an SSAI ad trace for an account. Use this request if you do **not** have an ad config id.
       operationId: createAdTrace
       security:
         - BC_OAuth2:
@@ -163,15 +163,38 @@ paths:
         required: true
       responses:
         '200':
-          description: An ad response. The content varies according to the `expected_ad_response`
+          description: An ad response. The content varies according to the `expected_ad_response`. For examples, see [Video Cloud SSAI Ad Tag Validation](https://support.brightcove.com/video-cloud-ssai-ad-tag-validation#Tracing_without_an_ad_config_id)
           content:
             application/xml:
               schema:
                 $ref: '#/components/schemas/AdResponse'
         '403':
           description: Forbidden
-        '422':
-          description: Invalid query parameters
+        '500':
+          description: Server error
+  '/accounts/{account_id}/ssai_traces/{session_id}/ad_calls':
+    get:
+      tags:
+        - Ad Call Tracking
+      summary: Get ad calls for a session
+      description: |-
+        'Get ad calls for a session. The `session_id` comes from the VMAP response: `<bc:BrightcoveDebug sessionID="your session id"></bc:BrightcoveDebug>`'
+      operationId: getAdCalls
+      security:
+        - BC_OAuth2:
+          - video-cloud/social/video/read
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Array of ad calls for a session.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdCalls'
+        '403':
+          description: Forbidden
         '500':
           description: Server error
 components:
@@ -188,13 +211,162 @@ components:
         platform_error:
           type: string
           description: JSON representation of the error object returned from the social platform, if any.
+    AdCalls:
+      title: Ad Calls
+      type: object
+      description: |-
+        List of ad calls for a video viewing session.
+      properties:
+        ad_calls:
+          type: array
+          description: >-
+            List of ad call objects for the session
+          items:
+        $ref: '#/components/schemas/AdCall'
+      example: >-
+        {
+          "ad_calls": [
+            {
+              "timestamp": "2019-01-29T16:25:57.775607279Z",
+              "duration_ms": 2772.666305,
+              "request": {
+                "content_length": 0,
+                "event": "request",
+                "headers": {
+                  "Referer": [
+                    ""
+                  ],
+                  "User-Agent": [
+                    "insomnia/6.3.2"
+                  ],
+                  "X-Device-User-Agent": [
+                    "insomnia/6.3.2"
+                  ],
+                  "X-Forwarded-For": [
+                    "108.26.214.36, 3.89.139.168"
+                  ]
+                },
+                "method": "GET",
+                "url": "https://solutions.brightcove.com/bcls/brightcove-player/vmap/simple-vmap.xml"
+              },
+              "response": {
+                "content_length": -1,
+                "event": "response",
+                "headers": {
+                  "Accept-Ranges": [
+                    "bytes"
+                  ],
+                  "Access-Control-Allow-Credentials": [
+                    "true"
+                  ],
+                  "Access-Control-Allow-Headers": [
+                    "X-Requested-With"
+                  ],
+                  "Access-Control-Allow-Origin": [
+                    "*"
+                  ],
+                  "Content-Type": [
+                    "application/xml"
+                  ],
+                  "Date": [
+                    "Tue, 29 Jan 2019 16:25:57 GMT"
+                  ],
+                  "Etag": [
+                    "\"13d6-57baaddddeea0-gzip\""
+                  ],
+                  "Last-Modified": [
+                    "Tue, 27 Nov 2018 19:58:00 GMT"
+                  ],
+                  "Server": [
+                    "Apache/2.4.7 (Ubuntu)"
+                  ],
+                  "Vary": [
+                    "Accept-Encoding"
+                  ]
+                },
+                "status_code": 200
+              },
+              "body": "PHZtYXA6Vk1BUCB4bWxuczp2bWFwPSJodHRwOi8vd3d3LmlhYi5uZXQvdmlkZW9zdWl0ZS92bWFwIiB2ZXJzaW9uPSIxLjAiPgoKICA8dm1hcDpBZEJyZWFrIHRpbWVPZmZzZXQ9InN0YXJ0IiBicmVha1R5cGU9ImxpbmVhciIgYnJlYWtJZD0icHJlcm9sbCI+CiAgICA8dm1hcDpBZFNvdXJjZSBpZD0icHJlcm9sbC1hZCIgYWxsb3dNdWx0aXBsZUFkcz0iZmFsc2UiIGZvbGxvd1JlZGlyZWN0cz0idHJ1ZSI+CiAgICAgIDx2bWFwOlZBU1RBZERhdGE+CiAgICAgICAgPFZBU1QgdmVyc2lvbj0iMy4wIj4KICAgICAgICAgIDxBZCBpZD0iMSI+CiAgICAgICAgICAgIDxJbkxpbmU+CiAgICAgICAgICAgICAgPEFkU3lzdGVtIHZlcnNpb249IjEuMCI+VGVzdCBBZCBTZXJ2ZXI8L0FkU3lzdGVtPgogICAgICAgICAgICAgIDxBZFRpdGxlPgogICAgICAgICAgICAgICAgPCFbQ0RBVEFbUG9ydGFsc11dPgogICAgICAgICAgICAgIDwvQWRUaXRsZT4KICAgICAgICAgICAgICA8RGVzY3JpcHRpb24+CiAgICAgICAgICAgICAgICA8IVtDREFUQVtEZW1vIGFkIG51bWJlciA2XV0+CiAgICAgICAgICAgICAgPC9EZXNjcmlwdGlvbj4KICAgICAgICAgICAgICA8RXJyb3I+CiAgICAgICAgICAgICAgICA8IVtDREFUQVtdXT4KICAgICAgICAgICAgICA8L0Vycm9yPgogICAgICAgICAgICAgIDxDcmVhdGl2ZXM+CiAgICAgICAgICAgICAgICA8Q3JlYXRpdmU+CiAgICAgICAgICAgICAgICAgIDxMaW5lYXI+CiAgICAgICAgICAgICAgICAgICAgPER1cmF0aW9uPjAwOjAwOjg8L0R1cmF0aW9uPgogICAgICAgICAgICAgICAgICAgIDxUcmFja2luZ0V2ZW50cy8+CiAgICAgICAgICAgICAgICAgICAgPEFkUGFyYW1ldGVycz4KICAgICAgICAgICAgICAgICAgICAgIDwhW0NEQVRBWzx4bWw+PC94bWw+XV0+CiAgICAgICAgICAgICAgICAgICAgPC9BZFBhcmFtZXRlcnM+CiAgICAgICAgICAgICAgICAgICAgPFZpZGVvQ2xpY2tzLz4KICAgICAgICAgICAgICAgICAgICA8TWVkaWFGaWxlcz4KICAgICAgICAgICAgICAgICAgICAgIDxNZWRpYUZpbGUgdHlwZT0idmlkZW8vbXA0IiB3aWR0aD0iMTI4MCIgaGVpZ2h0PSI3MjAiIGRlbGl2ZXJ5PSJwcm9ncmVzc2l2ZSIgaWQ9IjIiIGJpdHJhdGU9IjQzMTYiIG1pbkJpdHJhdGU9IjMyMCIgbWF4Qml0cmF0ZT0iMzIwIiBzY2FsYWJsZT0idHJ1ZSIgbWFpbnRhaW5Bc3BlY3RSYXRpbz0idHJ1ZSI+CiAgICAgICAgICAgICAgICAgICAgICAgIDwhW0NEQVRBW2h0dHBzOi8vc29sdXRpb25zLmJyaWdodGNvdmUuY29tL2JjbHMvYWRzL2JjLWFkcy9iY2xzLWFkLTYtNXNlY29uZHMubXA0XV0+CiAgICAgICAgICAgICAgICAgICAgICA8L01lZGlhRmlsZT4KICAgICAgICAgICAgICAgICAgICA8L01lZGlhRmlsZXM+CiAgICAgICAgICAgICAgICAgIDwvTGluZWFyPgogICAgICAgICAgICAgICAgPC9DcmVhdGl2ZT4KICAgICAgICAgICAgICA8L0NyZWF0aXZlcz4KICAgICAgICAgICAgICA8RXh0ZW5zaW9ucz4KICAgICAgICAgICAgICAgIDxFeHRlbnNpb24+CiAgICAgICAgICAgICAgICAgIDx4bWw+ZGF0YTwveG1sPgogICAgICAgICAgICAgICAgPC9FeHRlbnNpb24+CiAgICAgICAgICAgICAgPC9FeHRlbnNpb25zPgogICAgICAgICAgICA8L0luTGluZT4KICAgICAgICAgIDwvQWQ+CiAgICAgICAgPC9WQVNUPgogICAgICA8L3ZtYXA6VkFTVEFkRGF0YT4KICAgIDwvdm1hcDpBZFNvdXJjZT4KICA8L3ZtYXA6QWRCcmVhaz4KCiAgPHZtYXA6QWRCcmVhayB0aW1lT2Zmc2V0PSIwMDowMDowNSIgYnJlYWtUeXBlPSJsaW5lYXIiIGJyZWFrSWQ9Im1pZHJvbGwiPgogICAgPHZtYXA6QWRTb3VyY2UgaWQ9Im1pZHJvbGwtYWQiIGFsbG93TXVsdGlwbGVBZHM9ImZhbHNlIiBmb2xsb3dSZWRpcmVjdHM9InRydWUiPgogICAgICA8dm1hcDpWQVNUQWREYXRhPgogICAgICAgIDxWQVNUIHZlcnNpb249IjMuMCI+CiAgICAgICAgICA8QWQgaWQ9IjIiPgogICAgICAgICAgICA8SW5MaW5lPgogICAgICAgICAgICAgIDxBZFN5c3RlbSB2ZXJzaW9uPSIxLjAiPlRlc3QgQWQgU2VydmVyPC9BZFN5c3RlbT4KICAgICAgICAgICAgICA8QWRUaXRsZT4KICAgICAgICAgICAgICAgIDwhW0NEQVRBW01hcmtldGluZ11dPgogICAgICAgICAgICAgIDwvQWRUaXRsZT4KICAgICAgICAgICAgICA8RGVzY3JpcHRpb24+CiAgICAgICAgICAgICAgICA8IVtDREFUQVtEZW1vIGFkIG51bWJlciA0XV0+CiAgICAgICAgICAgICAgPC9EZXNjcmlwdGlvbj4KICAgICAgICAgICAgICA8RXJyb3I+CiAgICAgICAgICAgICAgICA8IVtDREFUQVtdXT4KICAgICAgICAgICAgICA8L0Vycm9yPgogICAgICAgICAgICAgIDxDcmVhdGl2ZXM+CiAgICAgICAgICAgICAgICA8Q3JlYXRpdmU+CiAgICAgICAgICAgICAgICAgIDxMaW5lYXIgc2tpcG9mZnNldD0iMDA6MDA6MDUiPgogICAgICAgICAgICAgICAgICAgIDxEdXJhdGlvbj4wMDowMDoxMjwvRHVyYXRpb24+CiAgICAgICAgICAgICAgICAgICAgPFRyYWNraW5nRXZlbnRzLz4KICAgICAgICAgICAgICAgICAgICA8QWRQYXJhbWV0ZXJzPgogICAgICAgICAgICAgICAgICAgICAgPCFbQ0RBVEFbPHhtbD48L3htbD5dXT4KICAgICAgICAgICAgICAgICAgICA8L0FkUGFyYW1ldGVycz4KICAgICAgICAgICAgICAgICAgICA8VmlkZW9DbGlja3MvPgogICAgICAgICAgICAgICAgICAgIDxNZWRpYUZpbGVzPgogICAgICAgICAgICAgICAgICAgICAgPE1lZGlhRmlsZSB0eXBlPSJ2aWRlby9tcDQiIHdpZHRoPSIxMjgwIiBoZWlnaHQ9IjcyMCIgZGVsaXZlcnk9InByb2dyZXNzaXZlIiBpZD0iMyIgYml0cmF0ZT0iMzAyNiIgbWluQml0cmF0ZT0iMzIwIiBtYXhCaXRyYXRlPSIzMjAiIHNjYWxhYmxlPSJ0cnVlIiBtYWludGFpbkFzcGVjdFJhdGlvPSJ0cnVlIj4KICAgICAgICAgICAgICAgICAgICAgICAgPCFbQ0RBVEFbaHR0cHM6Ly9zb2x1dGlvbnMuYnJpZ2h0Y292ZS5jb20vYmNscy9hZHMvYmMtYWRzL2JjbHMtYWQtNC0xMnNlY29uZHMubXA0XV0+CiAgICAgICAgICAgICAgICAgICAgICA8L01lZGlhRmlsZT4KICAgICAgICAgICAgICAgICAgICA8L01lZGlhRmlsZXM+CiAgICAgICAgICAgICAgICAgIDwvTGluZWFyPgogICAgICAgICAgICAgICAgPC9DcmVhdGl2ZT4KICAgICAgICAgICAgICA8L0NyZWF0aXZlcz4KICAgICAgICAgICAgICA8RXh0ZW5zaW9ucz4KICAgICAgICAgICAgICAgIDxFeHRlbnNpb24+CiAgICAgICAgICAgICAgICAgIDx4bWw+ZGF0YTwveG1sPgogICAgICAgICAgICAgICAgPC9FeHRlbnNpb24+CiAgICAgICAgICAgICAgPC9FeHRlbnNpb25zPgogICAgICAgICAgICA8L0luTGluZT4KICAgICAgICAgIDwvQWQ+CiAgICAgICAgPC9WQVNUPgogICAgICA8L3ZtYXA6VkFTVEFkRGF0YT4KICAgIDwvdm1hcDpBZFNvdXJjZT4KICA8L3ZtYXA6QWRCcmVhaz4KCiAgPHZtYXA6QWRCcmVhayB0aW1lT2Zmc2V0PSJlbmQiIGJyZWFrVHlwZT0ibGluZWFyIiBicmVha0lkPSJwb3N0cm9sbCI+CiAgICA8dm1hcDpBZFNvdXJjZSBpZD0icG9zdHJvbGwtYWQiIGFsbG93TXVsdGlwbGVBZHM9ImZhbHNlIiBmb2xsb3dSZWRpcmVjdHM9InRydWUiPgogICAgICA8dm1hcDpWQVNUQWREYXRhPgogICAgICAgIDxWQVNUIHZlcnNpb249IjMuMCI+CiAgICAgICAgICA8QWQgaWQ9IjMiPgogICAgICAgICAgICA8SW5MaW5lPgogICAgICAgICAgICAgIDxBZFN5c3RlbSB2ZXJzaW9uPSIxLjAiPlRlc3QgQWQgU2VydmVyPC9BZFN5c3RlbT4KICAgICAgICAgICAgICA8QWRUaXRsZT4KICAgICAgICAgICAgICAgIDwhW0NEQVRBW0JyYW5kXV0+CiAgICAgICAgICAgICAgPC9BZFRpdGxlPgogICAgICAgICAgICAgIDxEZXNjcmlwdGlvbj4KICAgICAgICAgICAgICAgIDwhW0NEQVRBW0RlbW8gYWQgbnVtYmVyIDFdXT4KICAgICAgICAgICAgICA8L0Rlc2NyaXB0aW9uPgogICAgICAgICAgICAgIDxFcnJvcj4KICAgICAgICAgICAgICAgIDwhW0NEQVRBW11dPgogICAgICAgICAgICAgIDwvRXJyb3I+CiAgICAgICAgICAgICAgPENyZWF0aXZlcz4KICAgICAgICAgICAgICAgIDxDcmVhdGl2ZT4KICAgICAgICAgICAgICAgICAgPExpbmVhcj4KICAgICAgICAgICAgICAgICAgICA8RHVyYXRpb24+MDA6MDA6MDg8L0R1cmF0aW9uPgogICAgICAgICAgICAgICAgICAgIDxUcmFja2luZ0V2ZW50cy8+CiAgICAgICAgICAgICAgICAgICAgPEFkUGFyYW1ldGVycz4KICAgICAgICAgICAgICAgICAgICAgIDwhW0NEQVRBWzx4bWw+PC94bWw+XV0+CiAgICAgICAgICAgICAgICAgICAgPC9BZFBhcmFtZXRlcnM+CiAgICAgICAgICAgICAgICAgICAgPFZpZGVvQ2xpY2tzLz4KICAgICAgICAgICAgICAgICAgICA8TWVkaWFGaWxlcz4KICAgICAgICAgICAgICAgICAgICAgIDxNZWRpYUZpbGUgdHlwZT0idmlkZW8vbXA0IiB3aWR0aD0iMTI4MCIgaGVpZ2h0PSI3MjAiIGRlbGl2ZXJ5PSJwcm9ncmVzc2l2ZSIgaWQ9IjQiIGJpdHJhdGU9IjIxMTUiIG1pbkJpdHJhdGU9IjMyMCIgbWF4Qml0cmF0ZT0iMzIwIiBzY2FsYWJsZT0idHJ1ZSIgbWFpbnRhaW5Bc3BlY3RSYXRpbz0idHJ1ZSI+CiAgICAgICAgICAgICAgICAgICAgICAgIDwhW0NEQVRBW2h0dHBzOi8vc29sdXRpb25zLmJyaWdodGNvdmUuY29tL2JjbHMvYWRzL2JjLWFkcy9iY2xzLWFkLTEtOHNlY29uZHMubXA0XV0+CiAgICAgICAgICAgICAgICAgICAgICA8L01lZGlhRmlsZT4KICAgICAgICAgICAgICAgICAgICA8L01lZGlhRmlsZXM+CiAgICAgICAgICAgICAgICAgIDwvTGluZWFyPgogICAgICAgICAgICAgICAgPC9DcmVhdGl2ZT4KICAgICAgICAgICAgICA8L0NyZWF0aXZlcz4KICAgICAgICAgICAgICA8RXh0ZW5zaW9ucz4KICAgICAgICAgICAgICAgIDxFeHRlbnNpb24+CiAgICAgICAgICAgICAgICAgIDx4bWw+ZGF0YTwveG1sPgogICAgICAgICAgICAgICAgPC9FeHRlbnNpb24+CiAgICAgICAgICAgICAgPC9FeHRlbnNpb25zPgogICAgICAgICAgICA8L0luTGluZT4KICAgICAgICAgIDwvQWQ+CiAgICAgICAgPC9WQVNUPgogICAgICA8L3ZtYXA6VkFTVEFkRGF0YT4KICAgIDwvdm1hcDpBZFNvdXJjZT4KICA8L3ZtYXA6QWRCcmVhaz4KCjwvdm1hcDpWTUFQPgo=",
+              "creatives": null,
+              "errors": null
+            }
+          ]
+        }
+    AdCall:
+      title: Ad Call
+      type: object
+      description: |-
+        The request and response for an ad request
+      properties:
+        timestamp:
+          type: string
+          description: UTC timestamp for the ad call
+        duration_ms:
+          type: number
+          description: Duration of the ad call in milliseconds
+        request:
+          type: object
+          desciption: Details of the ad request
+          properties:
+            content_length:
+              type: integer
+              description: >-
+                The amount of video played back before the request (in seconds)
+            event:
+              type: string
+              description: >-
+                The player event associated with the ad call, normally `request`
+            headers:
+              type: array
+              description: >-
+                Array of header name-value pairs sent with the request
+              items:
+                type: object
+                description: >-
+                  A header object. The name will be the header name, and the value an array of string values for the header
+            method:
+              type: string
+              description: >-
+                The HTTP request type, normally `GET`
+            url:
+              type: string
+              description: >-
+                URL for the ad request
+        response:
+          type: object
+          desciption: Details of the ad response
+          properties:
+            content_length:
+              type: integer
+              description: >-
+                The amount of video played back before the response (in seconds)
+            event:
+              type: string
+              description: >-
+                The player event associated with the ad response, normally `response`
+            headers:
+              type: array
+              description: >-
+                Array of header name-value pairs returned with the response
+              items:
+                type: object
+                description: >-
+                  A header object. The name will be the header name, and the value an array of string values for the header
+            status_code:
+              type: integer
+              description: >-
+                The HTTP status code - `200` = "success"
+            body:
+              type: string
+              description: >-
+                The Base64-encoded body of the reponse. You can use a tool like [BASE64](https://www.base64decode.org/) to see the full response - the content will vary according to the expected ad response.
     AdConfigList:
       title: List Ad Configurations Response
       type: array
       description: >-
         Array of ad configuration objects
       items:
-        $ref: "#/components/schemas/AdConfiguration"
+        $ref: '#/components/schemas/AdConfiguration'
     AdConfiguration:
       title: "Ad Configuration Response"
       type: object
@@ -331,55 +503,59 @@ components:
                 Ad tag template. Available variables described in [this document](https://support.brightcove.com/video-cloud-ssai-ad-config-api#Ad_variables).
     AdResponse:
       title: Ad Response
+      type: object
       description: >-
-        An ad response. The content varies depending on the kind of response expected. The example shown is a VAST response
-      example:
-        '<vmap:VMAP xmlns:bc="bc" xmlns:vmap="http://www.iab.net/vmap-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
-        <vmap:Extensions>
-        <bc:Brightcove ttl="1800" contenturi="https://ssaiplayback.us-east-1.qa.boltdns.net/playback/once/v1/hls/v5/clear/accoutn_debug/debug/debug/7592e9c3-214f-4c68-a576-1e2494b7be06/debug.m3u8" contentlength="10.0000" payloadlength="70.0000" contenttype="application/x-mpegURL"></bc:Brightcove>
-        <bc:BrightcoveDebug sessionID="7592e9c3-214f-4c68-a576-1e2494b7be06"></bc:BrightcoveDebug>
-        </vmap:Extensions>
-        <vmap:AdBreak breakType="linear" breakId="PreRoll_0_0" timeOffset="start">
-        <vmap:AdSource allowMultipleAds="true" followRedirects="true" id="0">
-        <vmap:VASTData>
-          <VAST xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <Ad id="test-01-30s">
-              <InLine>
-                <AdSystem>BIAS</AdSystem>
-                <AdTitle>test-01-30s</AdTitle>
-                <Creatives>
-                  <Creative>
-                    <Linear>
-                      <CreativeExtensions>
-                        <CreativeExtension>
-                          <BrightcoveForeignKey>test-01-30s</BrightcoveForeignKey>
-                        </CreativeExtension>
-                      </CreativeExtensions>
-                      <Duration>00:00:30.0000</Duration>
-                      <TrackingEvents>
-                        <Tracking event="mute">https://solutions.brightcove.com/beacon?event=mute&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
-                        <Tracking event="unmute">https://solutions.brightcove.com/beacon?event=unmute&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
-                        <Tracking event="rewind">https://solutions.brightcove.com/beacon?event=rewind&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
-                        <Tracking event="pause">https://solutions.brightcove.com/beacon?event=pause&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
-                        <Tracking event="resume">https://solutions.brightcove.com/beacon?event=resume&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
-                        <Tracking event="fullscreen">https://solutions.brightcove.com/beacon?event=fullscreen&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
-                        <Tracking event="acceptInvitation">https://solutions.brightcove.com/beacon?event=acceptInvitation&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
-                      </TrackingEvents>
-                      <VideoClicks>
-                        <ClickThrough id="clickthrough">https://www.brightcove.com/en/</ClickThrough>
-                        <ClickTracking id="43a0e4a5-4420-11e8-b306-99b1b6ae5164"></ClickTracking>
-                      </VideoClicks>
-                    </Linear>
-                  </Creative>
-                </Creatives>
-              </InLine>
-            </Ad>
-          </VAST>
-        </vmap:VASTData>
-        </vmap:AdSource>
-        </vmap:AdBreak>
-        ...// additional ad breaks
-        </vmap:VMAP>'
+        An ad response. The content varies depending on the kind of response expected. For examples, see [Video Cloud SSAI Ad Tag Validation](https://support.brightcove.com/video-cloud-ssai-ad-tag-validation#Tracing_without_an_ad_config_id)
+      examples:
+        xml:
+          summary: VMAP/VAST example
+          value: |-
+            '<vmap:VMAP xmlns:bc="bc" xmlns:vmap="http://www.iab.net/vmap-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
+            <vmap:Extensions>
+            <bc:Brightcove ttl="1800" contenturi="https://ssaiplayback.us-east-1.qa.boltdns.net/playback/once/v1/hls/v5/clear/accoutn_debug/debug/debug/7592e9c3-214f-4c68-a576-1e2494b7be06/debug.m3u8" contentlength="10.0000" payloadlength="70.0000" contenttype="application/x-mpegURL"></bc:Brightcove>
+            <bc:BrightcoveDebug sessionID="7592e9c3-214f-4c68-a576-1e2494b7be06"></bc:BrightcoveDebug>
+            </vmap:Extensions>
+            <vmap:AdBreak breakType="linear" breakId="PreRoll_0_0" timeOffset="start">
+            <vmap:AdSource allowMultipleAds="true" followRedirects="true" id="0">
+            <vmap:VASTData>
+              <VAST xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <Ad id="test-01-30s">
+                  <InLine>
+                    <AdSystem>BIAS</AdSystem>
+                    <AdTitle>test-01-30s</AdTitle>
+                    <Creatives>
+                      <Creative>
+                        <Linear>
+                          <CreativeExtensions>
+                            <CreativeExtension>
+                              <BrightcoveForeignKey>test-01-30s</BrightcoveForeignKey>
+                            </CreativeExtension>
+                          </CreativeExtensions>
+                          <Duration>00:00:30.0000</Duration>
+                          <TrackingEvents>
+                            <Tracking event="mute">https://solutions.brightcove.com/beacon?event=mute&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
+                            <Tracking event="unmute">https://solutions.brightcove.com/beacon?event=unmute&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
+                            <Tracking event="rewind">https://solutions.brightcove.com/beacon?event=rewind&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
+                            <Tracking event="pause">https://solutions.brightcove.com/beacon?event=pause&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
+                            <Tracking event="resume">https://solutions.brightcove.com/beacon?event=resume&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
+                            <Tracking event="fullscreen">https://solutions.brightcove.com/beacon?event=fullscreen&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
+                            <Tracking event="acceptInvitation">https://solutions.brightcove.com/beacon?event=acceptInvitation&amp;type=vast&amp;request_id=43a0e4a5-4420-11e8-b306-99b1b6ae5164&amp;parent_request_id=436ae081-4420-11e8-bd7f-41361f814644&amp;ad_id=test-01-30s</Tracking>
+                          </TrackingEvents>
+                          <VideoClicks>
+                            <ClickThrough id="clickthrough">https://www.brightcove.com/en/</ClickThrough>
+                            <ClickTracking id="43a0e4a5-4420-11e8-b306-99b1b6ae5164"></ClickTracking>
+                          </VideoClicks>
+                        </Linear>
+                      </Creative>
+                    </Creatives>
+                  </InLine>
+                </Ad>
+              </VAST>
+            </vmap:VASTData>
+            </vmap:AdSource>
+            </vmap:AdBreak>
+            ...// additional ad breaks
+            </vmap:VMAP>'
     BeaconTemplate:
       title: Beacon Template
       description: >-
@@ -596,6 +772,13 @@ components:
       name: config_id
       in: path
       description: ID of the ad configuration
+      required: true
+      schema:
+        type: string
+    SessionId:
+      name: session_id
+      in: path
+      description: Session id from the VMAP response
       required: true
       schema:
         type: string
