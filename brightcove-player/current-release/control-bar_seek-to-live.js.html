@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Module: log | Brightcove Player API Documentation</title>
+    <title>Source: control-bar/seek-to-live.js | Brightcove Player API Documentation</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -49,124 +51,110 @@
 
 
 
-
-<section>
-
-<header>
     
-        <h2>log</h2>
-        
-            
-        
-    
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file seek-to-live.js
+ */
+import Button from '../button';
+import Component from '../component';
+import * as Dom from '../utils/dom.js';
 
-<article>
-    
-        <div class="container-overview">
-        
-            
-                <div class="description"><p>log.js</p></div>
-            
+/**
+ * Displays the live indicator when duration is Infinity.
+ *
+ * @extends Component
+ */
+class SeekToLive extends Button {
 
-            
-                
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   */
+  constructor(player, options) {
+    super(player, options);
 
-<dt>
-    
-</dt>
-<dd>
+    this.updateLiveEdgeStatus();
 
-    
+    if (this.player_.liveTracker) {
+      this.on(this.player_.liveTracker, 'liveedgechange', this.updateLiveEdgeStatus);
+    }
+  }
 
-    
+  /**
+   * Create the `Component`'s DOM element
+   *
+   * @return {Element}
+   *         The element that was created.
+   */
+  createEl() {
+    const el = super.createEl('button', {
+      className: 'vjs-seek-to-live-control vjs-control'
+    });
 
-    
+    this.textEl_ = Dom.createEl('span', {
+      className: 'vjs-seek-to-live-text',
+      innerHTML: this.localize('LIVE')
+    }, {
+      'aria-hidden': 'true'
+    });
 
-    
+    el.appendChild(this.textEl_);
+    return el;
+  }
 
-    
+  /**
+   * Update the state of this button if we are at the live edge
+   * or not
+   */
+  updateLiveEdgeStatus(e) {
+    // default to live edge
+    if (!this.player_.liveTracker || this.player_.liveTracker.atLiveEdge()) {
+      this.setAttribute('aria-disabled', true);
+      this.addClass('vjs-at-live-edge');
+      this.controlText('Seek to live, currently playing live');
+    } else {
+      this.setAttribute('aria-disabled', false);
+      this.removeClass('vjs-at-live-edge');
+      this.controlText('Seek to live, currently behind live');
+    }
+  }
 
-    
+  /**
+   * On click bring us as near to the live point as possible.
+   * This requires that we wait for the next `live-seekable-change`
+   * event which will happen every segment length seconds.
+   */
+  handleClick() {
+    this.player_.liveTracker.seekToLiveEdge();
+  }
 
-    
+  /**
+   * Dispose of the element and stop tracking
+   */
+  dispose() {
+    if (this.player_.liveTracker) {
+      this.off(this.player_.liveTracker, 'liveedgechange', this.updateLiveEdgeStatus);
+    }
+    this.textEl_ = null;
 
-    
+    super.dispose();
+  }
+}
 
-    
+SeekToLive.prototype.controlText_ = 'Seek to live, currently playing live';
 
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-        
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+Component.registerComponent('SeekToLive', SeekToLive);
+export default SeekToLive;
+</code></pre>
+        </article>
+    </section>
 
 
 
@@ -183,7 +171,7 @@
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'module:log_sub'.replace(/"/g, '_');
+        var id = '_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 
