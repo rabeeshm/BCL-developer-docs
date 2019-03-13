@@ -57,7 +57,11 @@
 
         <section class="bcls-section">
           <h2 id="Introduction">Introduction</h2>
-          <p>The plugin explained in this document adds SEO metadata for your Brightcove Players. </p>
+          <p>The plugin detailed in this document adds SEO metadata for the video in your Brightcove Player. An example result that Google would see for a video is shown here:</p>
+            <figure class="bcls-figure">
+                <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/plugins/schema/structured-data-video-result.png" alt="structured data video result">
+            </figure>
+            <p>You can learn more about validating your structured data later in the document in the <a href="#Googles_Structured_Data_Testing_Tool">Google's Structured Data Testing Tool</a> section.</p>
         </section>
 
         <section class="bcls-section">
@@ -78,37 +82,117 @@
             <li>For the <strong>Plugin Name</strong> enter <strong>schema</strong>.</li>
           	<li>For the <strong>JavaScript</strong> URL, enter:
           	<pre>
-          <code class="language-json">https://unpkg.com/videojs-schema/dist/videojs-schema.min.js</code></pre>
+<code class="language-json">https://unpkg.com/videojs-schema/dist/videojs-schema.min.js</code></pre>
           	</li>
           	<li>No <strong>CSS</strong> URL is needed.</li>
           	  <!-- ** choose one of the following two steps, delete the other ** -->
-          	<li>You do not have to enter any options for this plugin.</li>
+          	<li>You do not have to enter any options for this plugin in this specific implementation.</li>
             <li>Click <strong>Save</strong>.</li>
           	<li>To publish the player, click <strong>Publish & Embed > Publish Changes</strong>.</li>
             <li>To close the open dialog, click <strong>Close</strong>.</li>
           </ol>
+          <h3>Installing using code</h3>
+          <p>If you wish to install the plugin for single player using code, use the following code as a guide:</p>
+          <pre class="line-numbers">
+<code class="language-html">&lt;video id=&quot;myPlayerID&quot;
+  data-video-id=&quot;5796745147001&quot;
+  data-account=&quot;1507807800001&quot;
+  data-player=&quot;default&quot;
+  data-embed=&quot;default&quot;
+  data-application-id
+  class=&quot;video-js&quot;
+  controls
+  width=&quot;640&quot;
+  height=&quot;360&quot;&gt;&lt;/video&gt;
+&lt;script src=&quot;//players.brightcove.net/1507807800001/default_default/index.min.js&quot;&gt;&lt;/script&gt;
+
+<span class="bcls-highlight">&lt;script src=&quot;https://unpkg.com/videojs-schema/dist/videojs-schema.min.js&quot;&gt;&lt;/script&gt;</span>
+
+&lt;script&gt;
+  videojs.getPlayer('myPlayerID').ready(function() {
+    var myPlayer = this;
+    <span class="bcls-highlight">myPlayer.schema();</span>
+  });
+&lt;/script&gt;</code></pre>
         </section>
 
         <section class="bcls-section">
-          <h2 id="section-name3">section-title</h2>
-          <p></p>
+          <h2 id="Googles_Structured_Data_Testing_Tool">Google's Structured Data Testing Tool</h2>
+          <p>Once the plugin in installed, and you publish a video in a Brightcove Player you can test to be sure the structured data is correct. Google provide a <a href="https://search.google.com/structured-data/testing-tool">Structured Data Testing Tool</a>. On that page you are prompted to enter the URL for the page containing your player:</p>
+            <figure class="bcls-figure">
+                <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/plugins/schema/structured-data-ui.png" alt="structured data ui">
+            </figure>
+          <p>After you enter the URL to your page and click <strong>RUN TEST</strong>, any errors in your data will be displayed.</p>
+            <figure class="bcls-figure">
+                <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/plugins/schema/structured-data-error.png" alt="structured data error">
+            </figure>
+          <aside class="bcls-aside bcls-aside--tip language-editable">Even though the property description says <strong>description</strong>, that field actually displays the video's <strong>Short Description</strong>.</aside>
         </section>
 
         <section class="bcls-section">
-          <h2 id="section-name4">section-title</h2>
-          <p></p>
+          <h2 id="Schema_used">Schema used</h2>
+          <p>This plugin is used to inject metadata from a Video Cloud video in to the page as Schema.org structured data. It uses the JSON-LD format supported by Google for video SEO:</p>
+          <pre class="line-numbers">
+<code class="language-html">&lt;script type=&quot;application/ld+json&quot;&gt;
+  {
+    &quot;@context&quot;:&quot;http://schema.org/&quot;,
+    &quot;@type&quot;:&quot;VideoObject&quot;,
+    &quot;name&quot;:&quot;Big Buck Bunny&quot;,
+    &quot;description&quot;:&quot;(c) copyright 2008, Blender Foundation / www.bigbuckbunny.org&quot;,
+    &quot;thumbnailUrl&quot;:&quot;https://cf-images.eu-west-1.prod.boltdns.net/v1/static/906043040001/f7d56300-ffca-460d-8ff6-fef835c12b36/e284fdba-d15a-422f-bebc-6a355e3d4dd3/1280x720/match/image.jpg&quot;,
+    &quot;uploadDate&quot;:&quot;2016-10-20&quot;,
+    &quot;@id&quot;:&quot;http://players.brightcove.net/906043040001/5WnZb7ptr_default/index.html?videoId=ref:bunnyfull&quot;,
+    &quot;duration&quot;:&quot;PT10M35S&quot;,
+    &quot;embedUrl&quot;:&quot;http://players.brightcove.net/906043040001/5WnZb7ptr_default/index.html?videoId=1401169490001&quot;
+  }
+&lt;/script&gt;</code></pre>
+
+
+
         </section>
 
+
+        <section class="bcls-section">
+          <h2 id="Plugin_options">Plugin options</h2>
+          <p>The following are options you can use with this plugin:</p>
+        <ul>
+          <li><code>schemaId</code>:           <p>The value to use as <code>@id</code> in the metadata. This must be a unique URI which represents the video, but not necessarily a "real" URL. This is arbitrary and might be values like:</p>
+                      <ul>
+                        <li><strong>https://mydomain.com/videos/{id}</strong></li>
+                        <li><strong>https://videos.mydomain.com#{id}</strong></li>
+                        <li><strong>https://mydomain.com/article-about-video-{id}#the-video</strong></li>
+                      </ul>
+                    <p>The following are accepted as macros:</p>
+                    <ul>
+                      <li><code>{id}</code></li>
+                      <li><code>{referenceId}</code></li>
+                      <li><code>{playerId}</code></li>
+                      <li><code>{embedId}</code></li>
+                      <li><code>{accountId}</code></li>
+                    </ul>
+                    <p>The default URI will be:</p>
+          <pre class="line-numbers">
+<code class="language-html">https://players.brightcove.net/{accountId}/{playerId}_{embedId}/index.html?videoId={id}</code></pre></li>
+          <li><code>keywords</code>: If true, include tags as keywords; default is false</li>
+          <li><code>excludeTags</code>:  Array of tags to not include as keywords, e.g. <strong>["youtubesync"]</strong></li>
+          <li><code>baseObject</code>: An <strong>option</strong> object of properties onto which to build the video specific metadata;  For example this could be used to include a publisher object:
+            <pre class="line-numbers">
+<code class="language-json">"baseObject": {
+  "publisher": {
+    "@type": "Organization",
+    "name": "Publisher name",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://example.com/logo.jpg",
+      "width": 600,
+      "height": 60
+    }
+  }
+}</code></pre></li>
+        </ul>
+        </section>
       </article>
       <!-- end drupal content -->
-
-      <div class="bcls-section" id="BCLreferences">
-        <h2>Related Topics</h2>
-        <ul>
-          <li><a href="../guides/1x-5x-skins.html">Skins and Player Versions</a>
-          </li>
-        </ul>
-      </div>
 
     </div>
   </div>
