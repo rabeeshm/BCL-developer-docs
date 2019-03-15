@@ -145,6 +145,13 @@
 				<td>Select one of the license options. For your private plugins, you can select <strong>Unlicensed</strong>.</td>
 				<td>Unlicensed</td>
 			</tr>
+      <tr>
+				<td>Basic or Advanced Plugin</td>
+				<td>The basic, function-based plugin is a plain JavaScript function. If you've written a Video.js plugin in the past, then you should be familiar with the basic plugin concept. <br/></br/>
+          The advanced, class-based plugin was introduced with Video.js 6. This plugin type starts with a JavaScript class, which is a constructor function. <br/></br/>
+        For details, see the <a href="https://github.com/videojs/Video.js/blob/master/docs/guides/plugins.md">Video.js Plugins</a> readme documentation.</td>
+				<td>Basic plugin (function-based)</td>
+			</tr>
 			<tr>
 				<td>CSS tooling</td>
 				<td>Select yes, if you want to include CSS styling. This will generate a CSS file.</td>
@@ -171,13 +178,13 @@
             Include a Linting tool called videojs standard. This process checks your code for some common errors.
         </td>
         <td>
-          No
+          Yes
         </td>
         </tr>
 			<tr>
 				<td>Before Git push</td>
-				<td>This gives you the option to prevent pushing to a git repository if the selected checks fail. This is a good way to prevent pushing code that is not up to standards.</td>
-				<td>Check code quality</td>
+				<td>This gives you the option to prevent pushing to a git repository if the selected checks fail. Checking code quality is a good way to prevent pushing code that is not up to standards.</td>
+				<td>No</td>
 			</tr>
 		</tbody>
 	</table>
@@ -210,34 +217,53 @@
 	<p>In an editor, open the top folder where you put your plugin project. Open the <strong>src</strong> folder. Here you will find the following:</p>
 
 	<ul>
-		<li>A <strong>js</strong> folder with an <strong>plugin.js</strong> file. This file contains the code for your plugin.</li>
-		<li>A <strong>css</strong> folder with an <strong>plugin.scss</strong> file, if you selected <strong>Yes</strong> to the styling option.</li>
+		<li>A <strong>plugin.js</strong> file. This file contains the code for your plugin.</li>
+		<li>A <strong>plugin.css</strong> file, if you selected <strong>Yes</strong> to the CSS tooling option.</li>
 	</ul>
 	</li>
 	<li>
-	<p>If you did not select <strong>Yes</strong> to the styling option, you can skip this step. Open the <strong>src &gt; css &gt; plugin.scss</strong> file.</p>
+	<p>(If you did not select <strong>Yes</strong> to the CSS tooling option, you can skip this step.) Open the <strong>src &gt; plugin.css</strong> file.</p>
 
-	<aside class="bcls-aside bcls-aside--tip">You will make your coding changes in this SASS file, but a CSS file will be created for distribution. If you are not familiar with SASS, don't worry. Since CSS is a subset of SASS, you can also use CSS in this file.</aside>
+	<!-- <aside class="bcls-aside bcls-aside--tip">You will make your coding changes in this SASS file, but a CSS file will be created for distribution. If you are not familiar with SASS, don't worry. Since CSS is a subset of SASS, you can also use CSS in this file.</aside> -->
 
 	<p>Your code should look similar to the following:</p>
 
-	<ul>
+	<!-- <ul>
 		<li>Lines 6-8: add the <code>vjs-demo</code> class to the player.</li>
-	</ul>
+	</ul> -->
 
 	<pre class="line-numbers">
-<code class="language-javascript">// Sass for videojs-demo
-
-.video-js {
-
-  // This class is added to the video.js element by the plugin by default.
-  &amp;.vjs-demo {
-    display: block;
+<code class="language-javascript">/* Note: all vars must be defined here, there are no "local" vars */
+  :root {
+    --main-color: red;
+    --base-font-size: 9;
+    --font-size: 7;
   }
-}</code></pre>
+
+  .video-js {
+
+    &amp;.vjs-demo {
+      /* This class is added to the video.js element by the plugin by default. */
+      display: block;
+
+      &amp; .remove-me, &amp; .remove-me-too, &amp;.finally-remove-me {
+        /* examples of postcss syntax, you probably want to remove this */
+
+        color: var(--main-color);
+
+        /**
+         * Note that you have to use calc and multiply by a value with a unit
+         * prepending the unit like `var(--base-font-size)px` or
+         * `calc(10 * var(--base-font-size)em` will NOT work!
+         */
+        font-size: calc(var(--font-size) * 8 * var(--base-font-size) * 1px);
+
+      }
+    }
+  }</code></pre>
 	</li>
 	<li>
-	<p>Open the <strong>src &gt; js &gt; plugin.js</strong> file.</p>
+	<p>Open the <strong>src &gt; plugin.js</strong> file.</p>
 
 	<aside class="bcls-aside bcls-aside--tip">The generator uses ES6, which is the latest JavaScript version. Learn more about the new features in <a href="http://es6-features.org/#Constants">ECMAScript 6</a>. The generator translates your ES6 code into ES5 code so that your distribution code will run on a majority of browsers.</aside>
 
@@ -340,7 +366,7 @@ export default demo;</code></pre>
 	</figure>
 	</li>
 	<li>
-	<p>Now, let's try adding code to the plugin to automatically start playing the video when the player loads. Return to the <strong>src &gt; js &gt; plugin.js</strong> file in your editor.</p>
+	<p>Now, let's try adding code to the plugin to automatically start playing the video when the player loads. Return to the <strong>src &gt; plugin.js</strong> file in your editor.</p>
 	</li>
 	<li>
 	<p>In the <code>onPlayerReady()</code> method, add code to start playback of the video.</p>
@@ -373,7 +399,7 @@ export default demo;</code></pre>
 <p>In this section, you will add code to the JavaScript source file to add a paragraph element with custom text to the player.</p>
 
 <ol class="bcls-tasklist">
-	<li>In your editor, return to the <strong>src &gt; js &gt; plugin.js</strong> file.</li>
+	<li>In your editor, return to the <strong>src &gt; plugin.js</strong> file.</li>
 	<li>
 	<p>In the <code>onPlayerReady()</code> function, add code to add a <code>&lt;p&gt;</code> element with custom text to the player.</p>
 
@@ -407,19 +433,18 @@ export default demo;</code></pre>
 <p>In this section, you will add code to the CSS source file to display text over the player.</p>
 
 <ol class="bcls-tasklist">
-	<li>In your editor, return to the <strong>src &gt; css &gt; plugin.scss</strong> file.</li>
+	<li>In your editor, return to the <strong>src &gt; plugin.css</strong> file.</li>
 	<li>
 	<p>Add the <code>.vjs-text</code> selector with styles to display the custom text in the player.</p>
 
 	<pre class="line-numbers">
-<code class="language-css">// Sass for videojs-demo
-
-.video-js {
-
-  // This class is added to the video.js element by the plugin by default.
-  &amp;.vjs-demo {
-    display: block;
+<code class="language-css">/* Note: all vars must be defined here, there are no "local" vars */
+  :root {
+    --main-color: red;
+    --base-font-size: 9;
+    --font-size: 7;
   }
+
 <span class="bcls-highlight">  .vjs-text {
     background-color: #333333;
     color: white;
@@ -428,8 +453,7 @@ export default demo;</code></pre>
     text-align: center;
     width: 100%;
     margin-top: 10%;
-  }</span>
-}</code></pre>
+  }</span></code></pre>
 	</li>
 	<li>Save the file. Remember that your changes will be automatically updated in the testing browser.</li>
 	<li>
