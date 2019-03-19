@@ -164,12 +164,12 @@
 			<td><a href="https://docs.brightcove.com/brightcove-player/current-release/Player.html#event:loadedmetadata">loadedmetadata</a></td>
 		</tr>
 		<tr>
-			<td><a href="https://docs.brightcove.com/brightcove-player/current-release/Menu.html#children">player.controlBar.subsCapsButton.menu.children()</a></td>
+			<td><a href="https://docs.brightcove.com/brightcove-player/current-release/SubsCapsButton.html">player.controlBar.subsCapsButton.menu.children()</a></td>
 			<td></td>
 		</tr>
 	</tbody>
 </table>
-<!-- <aside class="bcls-aside bcls-aside--tip">This code sample uses one of the Brightcove REST APIs. To understand working with this API it is vital you read and understand the <a href="/node/18132">Learning Guide: Using the REST APIs</a> document.</aside> --></section>
+</section>
 <!-- UPDATE player and HTML configuration -->
 
 <section class="bcls-section">
@@ -193,9 +193,12 @@
 <p>The basic logic behind this application is:</p>
 
 <ul>
-	<li>Retrieve the captions menu options.</li>
-	<li>Loop over the options, looking for a specific language code.</li>
-	<li>When the language code is found, update the menu option using the corresponding emoji flag in front of the label.</li>
+	<li>Retrieve the menu options for the captions/subtitles button</li>
+  <li>
+    Get the browser language
+  </li>
+	<li>Loop over the captions</li>
+	<li>Set the default caption language</li>
 </ul>
 <!-- UPDATE task 1 -->
 
@@ -204,27 +207,60 @@
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// ### Retrieve the menu options ###</code></pre>
+<code class="language-javascript">// +++ Retrieve the menu options +++</code></pre>
 
-<p>Use the <code>myPlayer.controlBar.subsCapsButton.menu.children()</code> method to retrieve all the options that are displayed in the captions menu. An example of one of the options which contains a language from which to choose appears as follows:</p>
+<p>Use the <code>myPlayer.controlBar.subsCapsButton.menu.children()</code> method to retrieve all the options that are displayed in the captions menu. An example of one of the captions is shown here:</p>
 
-<figure class="bcls-figure"><img class="bcls-image" alt="console menu option object" src="//learning-services-media.brightcove.com/doc-assets/player-development/samples/add-flag-country-label/console-menu-option-object.png" /></figure>
+<figure class="bcls-figure"><img class="bcls-image" alt="console menu option object" src="//learning-services-media.brightcove.com/doc-assets/player-development/samples/auto-language/captions-options.png" /></figure>
 
 <p>Notice that the object contains both the country label and country code (language). In the JavaScript code, we are searching for the <code>item.track.language</code> since it is possible that the <code>item.track.label</code> could be translated by the browser.</p>
-<p>
-  The first two items returned are created automatically and will not have a language defined. These are for the <code>captions settings</code> and <code>captions off</code> items that appear when you select the <strong>cc</strong> button. Then, you will see an item for each text track associated with the video.
-</p>
+
 <!-- UPDATE task 2 -->
 
-<h3>Add flag to each menu option</h3>
+<h3>Get the browser language</h3>
 
 <p>Find the code which is labeled:</p>
 
 <pre>
-<code class="language-javascript">// ### Add flag to each menu option ###</code></pre>
+<code class="language-javascript">// +++ Get the browser language +++</code></pre>
 
-<p>First step is to setup a <code>for-each</code> loop to step over all the menu items. Once the proper menu item is found, the <code>innerHTML</code> is altered, adding the corresponding flag to the country label. In this case, the emoji for the country flag is used. These emojis can be found in numerous places, including <a href="https://emojiterra.com/">EmojiTerra</a>. You can copy the actual emoji, as is done in the supplied code, or if you prefer use the emoji code, for instance <strong>&amp;#127465;&amp;#127466;</strong> for the German flag.</p>
+<p>Use <code>navigator.language</code> to determine the language being used in the browser. Check for <code>navigator.userLanguage</code> with IE browsers earlier than 10.</p>
+
+<!-- UPDATE task 3 -->
+
+<h3>Loop over the captions</h3>
+
+<p>Find the code which is labeled:</p>
+
+<pre>
+<code class="language-javascript">// +++ Loop over the captions +++</code></pre>
+
+<p>
+  Loop over the available captions tracks.
+</p>
+<p>
+  The first two items returned are created automatically and will not have a language defined. These are for the <code>captions settings</code> and <code>captions off</code> items that appear when you select the <strong>cc</strong> button.
+</p>
+
+<!-- UPDATE task 4 -->
+
+<h3>Set the default caption language</h3>
+
+<p>Find the code which is labeled:</p>
+
+<pre>
+<code class="language-javascript">// +++ Set the default caption language +++</code></pre>
+
+<p>
+  When the caption language is equal to the browser language, then set it as the default, by setting the <code>item.track.mode</code> to a value of <code>"showing"</code>.
+</p>
+<p>
+  Turn the other caption tracks off by setting the <code>item.track.mode</code> to a value of <code>"disabled"</code>.
+</p>
+
 </section>
+
+
 <!-- UPDATE CSS description -->
 
 <section class="bcls-section">
