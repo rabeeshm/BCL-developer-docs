@@ -79,6 +79,13 @@
 
 <p>The publisher will generate a public-private key pair and provide the public key to Brightcove. The private key is used by the publisher to sign tokens, and is not shared with Brightcove.</p>
 
+<h3>Generate</h3>
+<p>
+  There are many ways to generate the public-private key pair. Here are some examples:
+</p>
+<h4>
+  Example bash script:
+</h4>
 <p>
   Example script to generate the key pair:
 </p>
@@ -104,8 +111,91 @@ rm &quot;$CURVE_PEM&quot;
 echo &quot;Public key saved in $PUBLIC_TXT&quot;
 </code></pre>
 
+<h4 id="Example_Go_implementation" class="bcls-expander-head">Example Go implementation</h4>
+<div class="bcls-expander-content">
 <p>
-  An example of a decoded token using <a href="https://jwt.io/">https://JWT.io</a> specifying the full set of claims is shown here:
+  Example Go implementation to generate the key pair:
+</p>
+<pre class="line-numbers"><code class="language-http">package main
+
+import (
+	&quot;crypto/ecdsa&quot;
+	&quot;crypto/elliptic&quot;
+	&quot;crypto/rand&quot;
+	&quot;crypto/x509&quot;
+	&quot;encoding/base64&quot;
+	&quot;encoding/pem&quot;
+	&quot;flag&quot;
+	&quot;fmt&quot;
+	&quot;io/ioutil&quot;
+	&quot;os&quot;
+	&quot;path&quot;
+	&quot;strconv&quot;
+	&quot;time&quot;
+)
+
+func main() {
+	var out string
+
+	flag.StringVar(&amp;out, &quot;output-dir&quot;, &quot;&quot;, &quot;Output directory to write files into&quot;)
+	flag.Parse()
+
+	if out == &quot;&quot; {
+		out = &quot;ec-key_&quot; + strconv.FormatInt(time.Now().Unix(), 10)
+	}
+
+	if err := os.MkdirAll(out, os.ModePerm); err != nil {
+		panic(err.Error())
+	}
+
+	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	privBytes, err := x509.MarshalECPrivateKey(priv)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	pubBytes, err := x509.MarshalPKIXPublicKey(priv.Public())
+	if err != nil {
+		panic(err.Error())
+	}
+
+	privOut, err := os.OpenFile(path.Join(out, &quot;private.pem&quot;), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	if err := pem.Encode(privOut, &amp;pem.Block{Type: &quot;EC PRIVATE KEY&quot;, Bytes: privBytes}); err != nil {
+		panic(err.Error())
+	}
+
+	pubOut, err := os.OpenFile(path.Join(out, &quot;public.pem&quot;), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	if err := pem.Encode(pubOut, &amp;pem.Block{Type: &quot;PUBLIC KEY&quot;, Bytes: pubBytes}); err != nil {
+		panic(err.Error())
+	}
+
+	var pubEnc = base64.StdEncoding.EncodeToString(pubBytes)
+
+	var pubEncOut = path.Join(out, &quot;public_key.txt&quot;)
+	if err := ioutil.WriteFile(pubEncOut, []byte(pubEnc+&quot;\n&quot;), 0600); err != nil {
+		panic(err.Error())
+	}
+
+	fmt.Println(&quot;Public key saved in &quot; + pubEncOut)
+}
+</code></pre>
+</div>
+
+<h3>Results</h3>
+<p>
+  Here is an example of a decoded token using <a href="https://jwt.io/">https://JWT.io</a> specifying the full set of claims:
 </p>
 <p>
   HEADER:
@@ -253,6 +343,127 @@ echo &quot;Public key saved in $PUBLIC_TXT&quot;
 <p>
   Libraries are commonly available to generate JWT tokens. For details, see the <a href="https://jwt.io/">JSON Web Tokens</a> site.
 </p>
+<p>
+
+</p>
+<h4 id="Example_Go_implementation" class="bcls-expander-head">Example Go implementation</h4>
+<div class="bcls-expander-content">
+<p>
+  Here is an example of a reference Go implementation (as a cli tool) for generating tokens without the use of any 3rd party library:
+</p>
+<pre class="line-numbers"><code class="language-bash">package main
+
+import (
+	&quot;crypto/ecdsa&quot;
+	&quot;crypto/rand&quot;
+	&quot;crypto/sha256&quot;
+	&quot;crypto/x509&quot;
+	&quot;encoding/base64&quot;
+	&quot;encoding/json&quot;
+	&quot;encoding/pem&quot;
+	&quot;flag&quot;
+	&quot;fmt&quot;
+	&quot;io/ioutil&quot;
+	&quot;os&quot;
+	&quot;time&quot;
+)
+
+// Header is the base64UrlEncoded string of a JWT header for the ES256 algorithm
+const Header = &quot;eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9&quot;
+
+// Claims represents constraints that should be applied to the use of the token
+type Claims struct {
+	Iat   float64 `json:&quot;iat,omitempty&quot;`   // Issued At
+	Exp   float64 `json:&quot;exp,omitempty&quot;`   // Expires At
+	Accid string  `json:&quot;accid,omitempty&quot;` // Account ID
+	Conid string  `json:&quot;conid,omitempty&quot;` // Content ID
+	Maxu  float64 `json:&quot;maxu,omitempty&quot;`  // Max Uses
+	Maxip float64 `json:&quot;maxip,omitempty&quot;` // Max IPs
+	Ua    string  `json:&quot;ua,omitempty&quot;`    // User Agent
+}
+
+func main() {
+	var key string
+
+	c := Claims{Iat: float64(time.Now().Unix())}
+
+	flag.StringVar(&amp;key, &quot;key&quot;, &quot;&quot;, &quot;Path to private.pem key file&quot;)
+	flag.StringVar(&amp;c.Accid, &quot;account-id&quot;, &quot;&quot;, &quot;Account ID&quot;)
+	flag.StringVar(&amp;c.Conid, &quot;content-id&quot;, &quot;&quot;, &quot;Content ID (eg, video_id or live_job_id)&quot;)
+	flag.Float64Var(&amp;c.Exp, &quot;expires-at&quot;, float64(time.Now().AddDate(0, 0, 1).Unix()), &quot;Epoch timestamp (in seconds) for when the token should stop working&quot;)
+	flag.Float64Var(&amp;c.Maxu, &quot;max-uses&quot;, 0, &quot;Maximum number of times the token is valid for&quot;)
+	flag.Float64Var(&amp;c.Maxip, &quot;max-ips&quot;, 0, &quot;Maximum number of unique IP addresses the token is valid for&quot;)
+	flag.StringVar(&amp;c.Ua, &quot;user-agent&quot;, &quot;&quot;, &quot;User Agent that the token is valid for&quot;)
+	flag.Parse()
+
+	if key == &quot;&quot; {
+		fmt.Printf(&quot;missing required flag: -key\n\n&quot;)
+		flag.Usage()
+		os.Exit(1)
+	}
+
+	if c.Accid == &quot;&quot; {
+		fmt.Printf(&quot;missing required flag: -account-id\n\n&quot;)
+		flag.Usage()
+		os.Exit(2)
+	}
+
+	bs, err := json.Marshal(c)
+	if err != nil {
+		fmt.Println(&quot;failed to marshal token to json&quot;, err)
+		os.Exit(3)
+	}
+
+	kbs, err := ioutil.ReadFile(key)
+	if err != nil {
+		fmt.Println(&quot;failed to read private key&quot;, err)
+		os.Exit(4)
+	}
+
+	block, _ := pem.Decode(kbs)
+	if block == nil || block.Type != &quot;EC PRIVATE KEY&quot; {
+		fmt.Println(&quot;failed to decode PEM block containing ec private key&quot;)
+		os.Exit(5)
+	}
+
+	pkey, err := x509.ParseECPrivateKey(block.Bytes)
+	if err != nil {
+		fmt.Println(&quot;failed to parse ec private key&quot;, err)
+		os.Exit(6)
+	}
+
+	message := Header + &quot;.&quot; + base64.RawURLEncoding.EncodeToString(bs)
+	hash := sha256.Sum256([]byte(message))
+
+	r, s, err := ecdsa.Sign(rand.Reader, pkey, hash[:])
+	if err != nil {
+		fmt.Println(&quot;failed to sign token&quot;, err)
+		os.Exit(7)
+	}
+
+	curveBits := pkey.Curve.Params().BitSize
+
+	keyBytes := curveBits / 8
+	if curveBits%8 &gt; 0 {
+		keyBytes++
+	}
+
+	rBytes := r.Bytes()
+	rBytesPadded := make([]byte, keyBytes)
+	copy(rBytesPadded[keyBytes-len(rBytes):], rBytes)
+
+	sBytes := s.Bytes()
+	sBytesPadded := make([]byte, keyBytes)
+	copy(sBytesPadded[keyBytes-len(sBytes):], sBytes)
+
+	out := append(rBytesPadded, sBytesPadded...)
+
+	sig := base64.RawURLEncoding.EncodeToString(out)
+
+	fmt.Println(message + &quot;.&quot; + sig)
+}
+</code></pre>
+</div>
 
 </section>
 
