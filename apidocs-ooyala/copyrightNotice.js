@@ -8,7 +8,7 @@ function copyFunction()
     footerString += currentYear;
     footerString += " Ooyala, Inc. &bull;</a>";
     footerString += "<a href=\"https://www.brightcove.com/en/legal/privacy\" target=\"_blank\"> Website Privacy Policy &bull;</a>";
-    footerString += "<a href=\"http://ooyala.com/websitetos\" target=\"_blank\"> Terms of Service &bull;</a>";
+    footerString += "<a href=\"https://www.brightcove.com/en/terms-and-conditions\" target=\"_blank\"> Terms of Service &bull;</a>";
     footerString += " All Rights Reserved ";
     footerString += "<a href=\"http://support.ooyala.com/developers/documentation/concepts/about.html\" target=\"_blank\">";
     footerString += "&bull; Ooyala Support - Developer Documentation</a>";
