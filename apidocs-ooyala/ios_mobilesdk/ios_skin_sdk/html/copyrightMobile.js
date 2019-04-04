@@ -444,7 +444,7 @@ function copyMobileFunction() {
     var date = new Date();
     var currentYear = date.getFullYear();
     copyNotice.setAttribute('style', 'font-size: 14px; cursor: pointer; text-align:center;');
-    var footerString = "<a href=\"http://ooyala.com\" target=\"_blank\">&copy; ";
+    var footerString = "<a href=\"https://brightcove.com\" target=\"_blank\">&copy; ";
     footerString += currentYear;
     footerString += " Ooyala, Inc. &bull;</a>";
     footerString += "<a href=\"https://www.brightcove.com/en/legal/privacy\" target=\"_blank\"> Website Privacy Policy &bull;</a>";
