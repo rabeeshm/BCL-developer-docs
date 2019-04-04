@@ -2264,6 +2264,6 @@ var smoothScroll = function(hash, offset) {
         active_position = active_option.offset();
       $aside.scrollTop(active_position.top - pos_aside.top)
     }
-    $(".content-footer .cta").attr("href", "mailto:doc-feedback@ooyala.com?Subject=Feedback%20%7C%20Welcome&body=I%20have%20a%20comment%20for%20the%20page%20%0A%0A%20" + encodeURI(window.location.href) + "%20%0A%0A%0A%3Cyour%20comment%20here%3E")
+    $(".content-footer .cta").attr("href", "mailto:docs@brightcove.com?Subject=Feedback%20%7C%20Welcome&body=I%20have%20a%20comment%20for%20the%20page%20%0A%0A%20" + encodeURI(window.location.href) + "%20%0A%0A%0A%3Cyour%20comment%20here%3E")
   })
 }(jQuery);
