@@ -72,7 +72,7 @@
 <p>
   With an SSAI asset URL, call the following method:
 </p>
-<pre class="line-numbers"><code class="language-java">SSAIComponent.processVideo(String url)</code></pre>
+<pre><code class="language-java">SSAIComponent.processVideo(String url)</code></pre>
 <p>
   Here is an example:
 </p>
@@ -93,15 +93,15 @@ ssaiComponent.processVideo(ssaiUrl);
     </li>
     <li>
       Use the adConfig's <code>id</code> property as a URL parameter (<code>ad_config_id</code>) added to the Catalog method call:
-      <pre class="line-numbers"><code class="language-java">findVideoById</code></pre>
+      <pre><code class="language-java">findVideoById</code></pre>
       <p>
         or
       </p>
-      <pre class="line-numbers"><code class="language-java">findVideoByReferenceId  </code></pre>
+      <pre><code class="language-java">findVideoByReferenceId  </code></pre>
     </li>
     <li>
       Having retrieved the Video object with the findVideo method, call the following method in the SSAI plugin:
-      <pre class="line-numbers"><code class="language-java">SSAIComponent.processVideo(Video ssaiVideo)</code></pre>
+      <pre><code class="language-java">SSAIComponent.processVideo(Video ssaiVideo)</code></pre>
     </li>
 </ol>
 <p>
@@ -125,12 +125,15 @@ catalog.findVideoByID(myVideoId, httpRequestConfig, new VideoListener() {
     }
 });
 </code></pre>
+</section>
 
+<section class="bcls-section">
 <h2 id="Companion_Ads">Companion Ads</h2>
+
 <p>
   If your ads have Companions, you can easily display them in your app by providing a <code>ViewGroup</code> to hold the Companion image, by calling:
 </p>
-<pre class="line-numbers"><code class="language-java">SSAIComponent.addCompanionContainer(ViewGroup companionContainer)
+<pre><code class="language-java">SSAIComponent.addCompanionContainer(ViewGroup companionContainer)
 </code></pre>
 <p>
   Here is an example. First, Add the FrameLayout to your activity or fragment layout:
@@ -150,7 +153,7 @@ catalog.findVideoByID(myVideoId, httpRequestConfig, new VideoListener() {
 &lt;/RelativeLayout&gt;
 </code></pre>
 <p>
-   Then, use that FrameLayout to pass it to the plugin:
+   Then, use that <code>FrameLayout</code> to pass it to the plugin:
 </p>
 <pre class="line-numbers"><code class="language-java">ViewGroup viewGroup = findViewById(R.id.ad_frame);
 plugin.addCompanionContainer(viewGroup);
@@ -158,8 +161,11 @@ plugin.addCompanionContainer(viewGroup);
 // process your Video
 plugin.processVideo(video);
 </code></pre>
+</section>
 
+<section class="bcls-section">
 <h2 id="Error_handling">Error handling</h2>
+
 <p>
   All errors will be surface to the developer using the <code>EventType.ERROR</code> event, as shown here:
 </p>
@@ -172,20 +178,106 @@ plugin.processVideo(video);
     }
 });
 </code></pre>
-
-
-
-
-
 </section>
 
 <section class="bcls-section">
-<h2 id="Questions">Questions</h2>
+<h2 id="Migrating_from_the_OnceUx_Plugin">Migrating from the OnceUx Plugin</h2>
 
-<p>We understand that this is a technical topic and are happy to answer any questions concerning the transition. Please reach out to us through the <a href="https://groups.google.com/forum/#%21forum/brightcove-native-player-sdks">SDK Developer Forums</a> for technical questions, or to your account manager for concerns.</p>
 <p>
-  Looking for developer docs? Check out the <a href="/node/18367">Brightcove Native Player SDK</a> documents.
+  If you are already using the OnceUx plugin to play your SSAI videos in your app, you only need to follow a few steps to migrate to the new SSAI plugin.
 </p>
+<ol class="bcls-tasklist__restart">
+    <li>
+      In your app’s <strong>build.gradle</strong> file, replace
+      <pre><code class="language-java">implementation 'com.brightcove.player:android-onceux-plugin:6.5.1'
+</code></pre>
+<p>
+  with the following: (use the latest plugin version)
+</p>
+<pre><code class="language-java">implementation 'com.brightcove.player:android-ssai-plugin:6.7.0'
+</code></pre>
+    </li>
+    <li>
+      Replace the <code>OnceUxComponent</code> class with the <code>SSAIComponent</code> class.
+    </li>
+    <li>
+      Replace <code>OnceUxEventType.NO_AD_DATA_URL</code> with <code>EventType.ERROR</code>.
+    </li>
+    <li>
+      If your code uses any of the constants that were found in <code>OnceUxEventType</code> class, replace these with <code>SSAIEventType</code> and <code>SSAIEvent</code> constants, according to their function:
+      <ul>
+        <li>
+          The constants used to listen for an event are now found in the <code>SSAIEventType</code> class. For example:
+          <pre><code class="language-java">SSAIEventtType.AD_DATA_READY</code></pre>
+        </li>
+        <li>
+          The constants used as keys for Event properties are now found in the SSAIEvent class. For example:
+          <pre><code class="language-java">SSAIEvent.SSAI_AD</code></pre>
+        </li>
+      </ul>
+    </li>
+    <li>
+      The SSAI and OnceUx plugins share an internal library responsible for parsing the VMAP object. If your app directly uses objects from this library (<code>package com.brightcove.iab</code>), there are changes in the new version that you might find useful.
+    </li>
+    <li>
+      For more information, please see Appendix A.
+    </li>
+</ol>
+<!-- <p>
+  For more information on the differences between the Event sent in the OnceUx plugin and the SSAI plugin, please check the appendices B and C.
+</p> -->
+</section>
+
+<section class="bcls-section">
+<h2 id="Appendix_A">Appendix A</h2>
+
+<p>Changes in the internal IAB Android library 1.5.0:</p>
+<ul>
+  <li>
+    Added the following methods to return timed values in microseconds:
+    <ul>
+      <li>
+        <code>com.brightcove.iab.ssai.BrightcoveSSAI.getContentLengthUs():long</code>
+      </li>
+      <li>
+        <code>com.brightcove.iab.ssai.BrightcoveSSAI.getPayloadLengthUs():long</code>
+      </li>
+      <li>
+        <code>com.brightcove.iab.vmap.AdBreak.getTimeOffsetUs():long</code>
+      </li>
+      <li>
+        <code>com.brightcove.iab.vmap.AdBreak.getDurationUs():long</code>
+      </li>
+      <li>
+        <code>com.brightcove.iab.vast.Linear.getDurationUs():long</code>
+      </li>
+      <li>
+        <code>com.brightcove.iab.vast.Linear.getSkipOffsetUs():long</code>
+      </li>
+      <li>
+        <code>com.brightcove.iab.vast.NonLinear.getMinSuggestedDurationUs():long</code>
+      </li>
+      <li>
+        <code>com.brightcove.iab.vast.Icon.getDurationUs():long</code>
+      </li>
+      <li>
+        <code>com.brightcove.iab.vast.Icon.getOffsetUs():long</code>
+      </li>
+      <li>
+        <code>com.brightcove.iab.vast.Tracking.getOffsetUs():long</code>
+      </li>
+    </ul>
+  </li>
+  <li>
+    Added <code>AdBreak.POST_ROLL_TIME_OFFSET_US</code> to specify the value of a post-roll AdBreak when using <code>AdBreak.getTimeOffsetUs()</code>.
+  </li>
+  <li>
+    Added the <code>BrightcoveSSAI</code> property getters following the camelcase naming convention.
+  </li>
+  <li>
+    Deprecated the <code>BrightcoveSSAI</code> property getters not following the camelcase naming convention.
+  </li>
+</ul>
 
 </section>
 
