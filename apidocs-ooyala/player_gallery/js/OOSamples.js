@@ -670,7 +670,7 @@ $(document).on("click","#enableDebug",function(){
 
 $(document).on("click","#aboutBtn",function(){
     showFloatingMenu("aboutBtn","<div class='floatingContent'>"+
-            "<p>© 2015 Ooyala, Inc. • Website Privacy Policy • Terms of Service • All Rights Reserved</p>"+
+            "<p>© 2015 Brightcove, Inc. • Website Privacy Policy • Terms of Service • All Rights Reserved</p>"+
             "</div>","280px","70px");
 });
 
