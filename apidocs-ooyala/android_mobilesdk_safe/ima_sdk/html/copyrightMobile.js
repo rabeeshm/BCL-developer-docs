@@ -450,7 +450,7 @@ function copyMobileFunction() {
     footerString += "<a href=\"https://www.brightcove.com/en/legal/privacy\" target=\"_blank\"> Website Privacy Policy &bull;</a>";
     footerString += "<a href=\"https://www.brightcove.com/en/terms-and-conditions\" target=\"_blank\"> Terms of Service &bull;</a>";
     footerString += " All Rights Reserved ";
-    footerString += "<a href=\"https://help-ooyala.brightcove.com/developers/documentation/concepts/about.html\" target=\"_blank\">";
+    footerString += "<a href=\"https://help-ooyala.brightcove.com/video-platform/concepts/about.html\" target=\"_blank\">";
     footerString += "&bull; Ooyala Support - Developer Documentation</a>";
     copyNotice.innerHTML = footerString;
     copyNotice.style.display = 'block';
