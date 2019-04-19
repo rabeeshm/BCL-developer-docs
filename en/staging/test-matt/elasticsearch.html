@@ -151,32 +151,63 @@ Video#2: has the title “Using a lighter to make a campfire”</code></pre>
           <pre>
 <code class="language-html">Video#2 - “Using a lighter to make a campfire”
 Video#1 - “Don’t look into the light”</code></pre>
-
-
-
-
-
-
           <p>There are two problems with this:</p>
-<ul>
-  <li>Relevance: The order is incorrect. “Don’t look into the light” (Video#2) should appear before “Using a lighter to make a campfire” (Video#1)</li>
-  <li>Accuracy: “Using a lighter to make a campfire” shouldn’t even appear in the result set as the word “light” doesn’t appear in the video title at all.</li>
-</ul>
+          <ul>
+            <li><strong>Relevance</strong>: The order is incorrect. “Don’t look into the light” (Video#2) should appear before “Using a lighter to make a campfire” (Video#1)</li>
+            <li><strong>Accuracy</strong>: “Using a lighter to make a campfire” shouldn’t even appear in the result set as the word “light” doesn’t appear in the video title at all.</li>
+          </ul>
 
-          With Elasticsearch, this will return only video one:
-
-
-          Video#1 - “Don’t look into the light”
-
-
-          This is an improvement because:
-          * Relevance: The order is correct.
-          * Accuracy: Only Video one is returned as it’s the only video with the word “light” in the title.
-
+          <p>With Elasticsearch, this will return only video one:</p>
+          <pre>
+<code class="language-html">Video#1 - “Don’t look into the light”</code></pre>
+          <p>This is an improvement because:</p>
+          <ul>
+            <li>Relevance: The order is correct.</li>
+            <li>Accuracy: Only Video one is returned as it’s the only video with the word “light” in the title.</li>
+          </ul>
 
           <h3>Example 2</h3>
-          <p></p>
-        </section>
+          <p>As described in our CMS API documentation for stemming, stemming is supported, but not partial word searches. So let’s say we have 5 videos with the following names:</p>
+          <pre>
+<code class="language-html">Video#1 - "Parking Ban Announced"
+Video#2 - "Parking to be Banned"
+Video#3 - "City Banning Parking"
+Video#4 - "Bank Holiday"
+Video#5 - "Bandit Captured"</code></pre>
+
+          <p>The user wishes to return all videos that must have the word “ban” in the name field. Using the CMS API, the query would look like:</p>
+          <pre>
+<code class="language-html">q=%2Bname%3Aban or q=+name:ban</code></pre>
+
+          <p>The expectation is that “Ban”, “Banning” and “Banned” would produce search results as “Ban” is a stem of all three.</p>
+          <p>However, with the current search system, this will return all five videos in this order:</p>
+          <pre>
+<code class="language-html">Video#2 - "Parking to be Banned"
+Video#3 - "City Banning Parking"
+Video#1 - "Parking Ban Announced"
+Video#4 - "Bank Holiday"
+Video#5 - "Bandit Captured"</code></pre>
+
+          <p>Again, there are two problems with this:</p>
+          <ul>
+            <li>Relevance: The order is incorrect. "Parking Ban Announced" should be the first video returned as it has the word “Ban” in it.</li>
+            <li>Accuracy: "Bank Holiday" and "Bandit Captured" should not be returned at all as “Ban” is not part of the word “Bank” or “Bandit”.</li>
+          </ul>
+
+
+          <p>With Elasticsearch, the results look like:</p>
+          <pre>
+<code class="language-html">Video#1 - "Parking Ban Announced"
+Video#2 - "Parking to be Banned"
+Video#3 - "City Banning Parking"</code></pre>
+
+          <p>This is an improvement because:</p>
+          <ul>
+            <li>Relevance: The order is correct.</li>
+            <li>Accuracy: Only Videos with the stems of the word “Ban” (“Ban”, “Banning” and “Banned”) are returned.
+        </li>
+        </ul>
+      </section>
 
       </article>
       <!-- end drupal content -->
