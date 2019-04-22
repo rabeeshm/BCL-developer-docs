@@ -627,6 +627,25 @@ func main() {
 <p>
   Use the Audit API to generate a daily access report with session details by following these steps:
 </p>
+<aside class="bcls-aside bcls-aside--information">
+  <p>
+    Notes:
+  </p>
+  <ul>
+    <li>
+      <p>
+        All Authorization access logs for Brightcove are in the UTC timezone. Remember to take timezones into account when requests do not show up in your report.
+      </p>
+    </li>
+    <li>
+      <p>
+        Brightcove recommends running Audit API query reports 6 hours after midnight for processing from all regions to complete for all authorization data from the previous day.
+Audit API calls for a given account and a given day are cached on API side. If you run a report before the suggested midnight+6 hours, you may find that your report is incorrect or incomplete.
+      </p>
+    </li>
+  </ul>
+</aside>
+
 <ol class="bcls-tasklist__restart">
   <li>
     <p>
@@ -681,7 +700,7 @@ func main() {
     		</tr>
         <tr>
           <th>URL</th>
-    			<td>https://playback-auth.api.brightcove.com/v1/audit/accounts/<span class="bcls-input">your account id</span>/query/{date}</td>
+    			<td>https://playback-auth.api.brightcove.com/v1/audit/accounts/<span class="bcls-input">{account_Id}</span>/query/<span class="bcls-input">{date}</span></td>
     		</tr>
         <tr>
           <th rowspan="2">Headers</th>
@@ -709,7 +728,7 @@ func main() {
         <tr>
           <td><code>execution_id</code></td>
 			    <td>String</td>
-			    <td>A unique ID representing the report query parameters. A combination of <code>accountId</code> and date generates a new <code>execution_id</code>. This id is passed to the other endpoints below.</td>
+			    <td>A unique ID representing the report query parameters. A combination of <code>account_Id</code> and date generates a new <code>execution_id</code>. This id is passed to the other endpoints below.</td>
 		    </tr>
       </tbody>
     </table>
@@ -719,13 +738,76 @@ func main() {
     <p>
       Check the status of your report
     </p>
-    <pre><code class="language-http">GET /v1/audit/accounts/{accountId}/execution/{execution_id}/status</code></pre>
+
+    <h5>Request</h5>
+    <table class="bcls-table">
+      <tbody class="bcls-table__body">
+        <tr>
+          <th>Method</th>
+    			<td>GET</td>
+    		</tr>
+        <tr>
+          <th>URL</th>
+    			<td>https://playback-auth.api.brightcove.com/v1/audit/accounts/<span class="bcls-input">{account_Id}</span>/execution/<span class="bcls-input">{execution_id}</span>/status</td>
+    		</tr>
+        <tr>
+          <th rowspan="2">Headers</th>
+    			<td>Authorization: Bearer <span class="bcls-input">your access token</span></td>
+    		</tr>
+        <tr>
+          <td>Content-Type: application/json</td>
+    		</tr>
+      </tbody>
+    </table>
+
+    <!-- <h5>Response</h5>
+    <p>
+      The API response includes the following:
+    </p>
+    <table class="bcls-table">
+      <thead class="bcls-table__head">
+        <tr>
+          <th>Field</th>
+			    <th>Type</th>
+			    <th>Description</th>
+	    	</tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td><code>execution_id</code></td>
+			    <td>String</td>
+			    <td>A unique ID representing the report query parameters. A combination of <code>accountId</code> and date generates a new <code>execution_id</code>. This id is passed to the other endpoints below.</td>
+		    </tr>
+      </tbody>
+    </table> -->
+
   </li>
   <li>
     <p>
       Fetch your report
     </p>
-    <pre><code class="language-http">GET /v1/audit/accounts/{accountId}/execution/{execution_id}/report</code></pre>
+    <h5>Request</h5>
+    <table class="bcls-table">
+      <tbody class="bcls-table__body">
+        <tr>
+          <th>Method</th>
+    			<td>GET</td>
+    		</tr>
+        <tr>
+          <th>URL</th>
+    			<td>https://playback-auth.api.brightcove.com/v1/audit/accounts/<span class="bcls-input">{account_Id}</span>/execution/<span class="bcls-input">{execution_id}</span>/report</td>
+    		</tr>
+        <tr>
+          <th rowspan="2">Headers</th>
+    			<td>Authorization: Bearer <span class="bcls-input">your access token</span></td>
+    		</tr>
+        <tr>
+          <td>Content-Type: application/json</td>
+    		</tr>
+      </tbody>
+    </table>
+
+    <h5>Response</h5>
     <p>
       The results are returned as an S3 URL that you can download.  Signed S3 URLs are valid for 15 minutes.
     </p>
