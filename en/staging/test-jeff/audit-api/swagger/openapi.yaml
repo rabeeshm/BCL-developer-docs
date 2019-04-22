@@ -1,0 +1,415 @@
+openapi: 3.0.0
+x-bc-implicit-head: true
+x-bc-implicit-options: true
+x-bc-upstream: 'http://backend_server'
+info:
+  title: Key API Reference
+  description: >-
+    Reference for the Brightcove Key API, used to manage your public keys when using Brightcove's [Playback Authorization Service](https://docs.brightcove.com/en/staging/pas/overview-playback-authorization-service.html). This API allows you to register, list and delete public keys.
+
+     **Base URL**: https://playback-auth.api.brightcove.com
+  version: 1.0.0
+  x-bc-access: public
+servers:
+  - url: 'https://playback-auth.api.brightcove.com/v1/'
+    variables: {}
+tags:
+  - name: Key
+    description: Operations for registering, listing and deleting public keys with Brightcove's Playback Authorization Service.
+paths:
+  '/accounts/{account_id}/keys':
+    post:
+      tags:
+        - Key
+      summary: Register a Public Key
+      description: |-
+        Register a Public Key with Brightcove's Playback Authorization Service
+      operationId: RegisterKey
+      security:
+        - BC_OAuth2:
+          - video-cloud/playback-auth/key/write
+      parameters:
+        - name: account_id
+          in: path
+          description: Video Cloud account ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: Content-Type
+          in: header
+          description: 'Content-Type: application/json'
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: Register a Public Key with Brightcove's Playback Authorization Service
+        content:
+          application/json:
+            schema:
+              description: Register a public key
+              $ref: '#/components/schemas/CreateAKeybody'
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateKeyResponse'
+        '400':
+          description: >-
+            NOT_AVAILABLE: The resource you are requesting is temporarily unavailable
+        '401':
+          description: >-
+            UNAUTHORIZED: Authentication failed; check to make sure your policy
+            key is correct
+        '404':
+          description: >-
+            RESOURCE_NOT_FOUND: The api could not find the resource you requested
+        '500':
+          description: |-
+            UNKNOWN: Issue in Brightcove system; try again later.
+            TIMEOUT: Server likely too busy; try again later.
+      deprecated: false
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+    get:
+      tags:
+        - Key
+      summary: List Public Keys
+      description: 'Get a list of public keys associated with a specified account'
+      operationId: GetKeys
+      security:
+        - BC_OAuth2:
+          - video-cloud/playback-auth/key/read
+      parameters:
+        - name: account_id
+          in: path
+          description: Video Cloud account ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: Content-Type
+          in: header
+          description: 'Content-Type: application/json'
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPolicy200'
+        '400':
+          description: >-
+            NOT_AVAILABLE: The resource you are requesting is temporarily unavailable
+        '401':
+          description: >-
+            UNAUTHORIZED: Authentication failed; check to make sure your policy
+            key is correct
+        '404':
+          description: >-
+            RESOURCE_NOT_FOUND: The api could not find the resource you requested
+        '500':
+          description: |-
+            UNKNOWN: Issue in Brightcove system; try again later.
+            TIMEOUT: Server likely too busy; try again later.
+      deprecated: false
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  '/accounts/{account_id}/keys/{key_id}':
+    get:
+      tags:
+        - Key
+      summary: Get One Public Key
+      description: 'Get one public key associated with a specified account'
+      operationId: GetOneKey
+      security:
+        - BC_OAuth2:
+          - video-cloud/playback-auth/key/read
+      parameters:
+        - name: account_id
+          in: path
+          description: Video Cloud account ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: key_id
+          in: path
+          description: Your public key value
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: Content-Type
+          in: header
+          description: 'Content-Type: application/json'
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPolicy200'
+        '400':
+          description: >-
+            NOT_AVAILABLE: The resource you are requesting is temporarily unavailable
+        '401':
+          description: >-
+            UNAUTHORIZED: Authentication failed; check to make sure your policy
+            key is correct
+        '404':
+          description: >-
+            RESOURCE_NOT_FOUND: The api could not find the resource you requested
+        '500':
+          description: |-
+            UNKNOWN: Issue in Brightcove system; try again later.
+            TIMEOUT: Server likely too busy; try again later.
+      deprecated: false
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+    delete:
+      tags:
+        - Key
+      summary: Delete One Public Key
+      description: 'Delete one public key associated with a specified account'
+      operationId: DeleteKey
+      security:
+        - BC_OAuth2:
+          - video-cloud/playback-auth/key/write
+      parameters:
+        - name: account_id
+          in: path
+          description: Video Cloud account ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: key_id
+          in: path
+          description: Your public key value
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: Content-Type
+          in: header
+          description: 'Content-Type: application/json'
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPolicy200'
+        '400':
+          description: >-
+            NOT_AVAILABLE: The resource you are requesting is temporarily unavailable
+        '401':
+          description: >-
+            UNAUTHORIZED: Authentication failed; check to make sure your policy
+            key is correct
+        '404':
+          description: >-
+            RESOURCE_NOT_FOUND: The api could not find the resource you requested
+        '500':
+          description: |-
+            UNKNOWN: Issue in Brightcove system; try again later.
+            TIMEOUT: Server likely too busy; try again later.
+      deprecated: false
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+components:
+  schemas:
+    CreateAKeybody:
+      title: Create_a_Key_Body
+      required:
+        - key-data
+      type: object
+      properties:
+        key-data:
+          description: Data for the public key
+          $ref: '#/components/schemas/CreateAKeybody.key-data'
+    CreateAKeybody.key-data:
+      title: Create_a_Key_Body.key-data
+      required:
+        - account-id
+      type: object
+      properties:
+        account-id:
+          type: string
+          description: Video Cloud account id
+        value:
+          type: string
+          description: >-
+            The publisher will generate a public-private key pair and provide the public key to Brightcove
+    CreateKeyResponse:
+      title:  Create Key Response
+      required:
+        - key_string
+        - key-data
+      type: object
+      properties:
+        key_string:
+          type: string
+          description: The policy key string
+        key-data:
+          description: Map of key data prescribing the policy
+          $ref: '#/components/schemas/KeyData'
+      example: >-
+        {
+          "key-string": "BCpkADawqM1IftwCYR6HsNBjvIoCgGZdeSz6f1zJYW4mGg7YFiCIejFI1np9eYIsweJ_RynK7mXlB1vYCN8BCRbgp9MrXPRzGlLiShLBd5HGnRjYsLsb6p02eDpFKuNu_jwKLzlvdRjJR5fQPpCxUFlpPL_55HXWZtwfWeyolAuxK7q2V2Nc6p1J-cu",
+          "key-data": {
+            "account-id": "2728142649001",
+            "apis": [
+              "search"
+            ],
+            "allowed-domains": [
+              "https://54.210.55.162"
+            ]
+          }
+        }
+    KeyData:
+      title: key-data
+      required:
+        - account-id
+        - apis
+        - allowed-domains
+        - require-ad-config
+        - geo
+      type: object
+      properties:
+        account-id:
+          type: string
+          description: The Video Cloud account id
+        apis:
+          type: array
+          items:
+            type: string
+          description: Array of apis permitted for the key
+        allowed-domains:
+          type: array
+          items:
+            type: string
+          description: Array of domains allowed to use this key
+        require-ad-config:
+          type: boolean
+          description: >-
+            Whether Playback API requests require an ad-config-id URL parameter
+            for server-side ad insertion
+        geo:
+          description: Map of geo-filtering properties
+          $ref: '#/components/schemas/KeyData.geo'
+    KeyData.geo:
+      title: key-data.geo
+      required:
+        - countries
+        - exclude_countries
+      type: object
+      properties:
+        countries:
+          type: array
+          items:
+            type: string
+          description: >-
+            Array of ISO 3166 list of 2- or 4-letter codes in lower-case (search
+            for &quot;country codes&quot;)
+        exclude_countries:
+          type: boolean
+          description: >-
+            If true, country array is treated as a list of countries excluded
+            from viewing. If false, the country array is a list of countries
+            included for viewing.
+    GetPolicy200:
+      title: Get_Policy200
+      required:
+        - key_string
+        - key-data
+      type: object
+      properties:
+        key_string:
+          type: string
+          description: The policy key string
+        key-data:
+          description: Map of key data prescribing the policy
+          $ref: '#/components/schemas/KeyData'
+  securitySchemes:
+    BC_OAuth2:
+      type: oauth2
+      description: >-
+        Brightcove OAuth API. See the [support documentation](https://support.brightcove.com/oauth-api) or [Getting Access Tokens](https://support.brightcove.com/oauth-api-sample-get-access-token) to learn more
+      flows:
+        clientCredentials:
+          tokenUrl: 'https://oauth.brightcove.com/v4/access_token'
+          scopes:
+            video-cloud/playback-auth/key/read: Read key data
+            video-cloud/playback-auth/key/write: Write key data
