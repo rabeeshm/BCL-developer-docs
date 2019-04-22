@@ -581,7 +581,7 @@ func main() {
 <section class="bcls-section">
 <h2 id="Audit_an_account">Audit an account</h2>
 
-<p>The Audit API allows you to generate a daily access report for your account's Playback Authorization Service usage. You can also get more details along with the authorization response for each session.</p>
+<p>The Audit API allows you to generate a daily access report for your account's Playback Authorization Service usage. This report includes details along with the authorization response for each session.</p>
 
 <h3>Audit API</h3>
 <p>
@@ -598,9 +598,9 @@ func main() {
 
 <h4>Account path</h4>
 <p>
-  In all cases, requests will be made for a specific Video Cloud Account. So, you will always add the term accounts followed by your account id to the base URL:
+  In all cases, requests will be made for a specific Video Cloud account. So, you will always add the term accounts followed by your account id to the base URL:
 </p>
-<pre><code class="language-http">https://playback-auth.api.brightcove.com/v1/audit/accounts/{accountId}
+<pre><code class="language-http">https://playback-auth.api.brightcove.com/v1/audit/accounts/{account_Id}
 </code></pre>
 
 <h4>Authorization</h4>
@@ -625,17 +625,95 @@ func main() {
 
 <h4>Generate reports</h4>
 <p>
-  Use the Audit API to generate a daily access report by following these steps:
+  Use the Audit API to generate a daily access report with session details by following these steps:
 </p>
 <ol class="bcls-tasklist__restart">
   <li>
     <p>
-      Execute a daily report query
+      Request a daily report
     </p>
-    <pre><code class="language-http">POST /v1/audit/accounts/{accountId}/query/{date}</code></pre>
+
+    <h5>Parameters</h5>
+    <table class="bcls-table">
+      <thead class="bcls-table__head">
+        <tr>
+          <th>Field</th>
+			    <th>Type</th>
+			    <th>Description</th>
+	    	</tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td><code>account_Id</code></td>
+			    <td>String</td>
+			    <td>Your Video Cloud account Id</td>
+		    </tr>
+        <tr>
+          <td><code>date</code></td>
+			    <td>String</td>
+			    <td>
+            Validations:
+            <ul>
+              <li>
+                Format YYYY-MM-DD
+              </li>
+              <li>
+                Date cannot be today (UTC time)
+              </li>
+              <li>
+                Date cannot be > 1 month old
+              </li>
+              <li>
+                Brightcove does not hold on to the authorization service usage reports after 30 days to follow GDPR compliance
+              </li>
+            </ul>
+          </td>
+		    </tr>
+      </tbody>
+    </table>
+
+    <h5>Request</h5>
+    <table class="bcls-table">
+      <tbody class="bcls-table__body">
+        <tr>
+          <th>Method</th>
+    			<td>POST</td>
+    		</tr>
+        <tr>
+          <th>URL</th>
+    			<td>https://playback-auth.api.brightcove.com/v1/audit/accounts/<span class="bcls-input">your account id</span>/query/{date}</td>
+    		</tr>
+        <tr>
+          <th rowspan="2">Headers</th>
+    			<td>Authorization: Bearer <span class="bcls-input">your access token</span></td>
+    		</tr>
+        <tr>
+          <td>Content-Type: application/json</td>
+    		</tr>
+      </tbody>
+    </table>
+
+    <h5>Response</h5>
     <p>
-      The date should have the form YYYY-MM-DD. This request returns an <code>execution_id</code>, which can be passed to the other endpoints below.
+      The API response includes the following:
     </p>
+    <table class="bcls-table">
+      <thead class="bcls-table__head">
+        <tr>
+          <th>Field</th>
+			    <th>Type</th>
+			    <th>Description</th>
+	    	</tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td><code>execution_id</code></td>
+			    <td>String</td>
+			    <td>A unique ID representing the report query parameters. A combination of <code>accountId</code> and date generates a new <code>execution_id</code>. This id is passed to the other endpoints below.</td>
+		    </tr>
+      </tbody>
+    </table>
+
   </li>
   <li>
     <p>
@@ -645,7 +723,7 @@ func main() {
   </li>
   <li>
     <p>
-      Use the <code>execution_id</code> to fetch a detailed report.
+      Fetch your report
     </p>
     <pre><code class="language-http">GET /v1/audit/accounts/{accountId}/execution/{execution_id}/report</code></pre>
     <p>
