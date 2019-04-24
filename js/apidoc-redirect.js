@@ -1,6 +1,6 @@
 var BCLSredirect = ( function (window, document) {
   var href = window.location.href,
-    newHref = href.replace('apidoc.html', index.html),
+    newHref = href.replace('apidoc.html', 'index.html'),
     ts;
 
     function redirect() {
