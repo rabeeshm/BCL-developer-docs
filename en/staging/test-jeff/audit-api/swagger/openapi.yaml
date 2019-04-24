@@ -3,31 +3,31 @@ x-bc-implicit-head: true
 x-bc-implicit-options: true
 x-bc-upstream: 'http://backend_server'
 info:
-  title: Key API Reference
+  title: Audit API Reference
   description: >-
-    Reference for the Brightcove Key API, used to manage your public keys when using Brightcove's [Playback Authorization Service](https://docs.brightcove.com/en/staging/pas/overview-playback-authorization-service.html). This API allows you to register, list and delete public keys.
+    Reference for the Brightcove Audit API. This API allows you to generate a daily access report for your account's Playback Authorization Service usage with session details.
 
      **Base URL**: https://playback-auth.api.brightcove.com
   version: 1.0.0
   x-bc-access: public
 servers:
-  - url: 'https://playback-auth.api.brightcove.com/v1/'
+  - url: 'https://playback-auth.api.brightcove.com/v1/audit'
     variables: {}
 tags:
-  - name: Key
-    description: Operations for registering, listing and deleting public keys with Brightcove's Playback Authorization Service.
+  - name: Audit
+    description: Operations for requesting, checking the status and getting the daily usage report URL for Brightcove's Playback Authorization Service.
 paths:
-  '/accounts/{account_id}/keys':
+  '/accounts/{account_id}/query/{date}':
     post:
       tags:
-        - Key
-      summary: Register a Public Key
+        - Audit
+      summary: Request a daily usage report
       description: |-
-        Register a Public Key with Brightcove's Playback Authorization Service
-      operationId: RegisterKey
+        Request a daily usage report for Brightcove's Playback Authorization Service
+      operationId: RequestReport
       security:
         - BC_OAuth2:
-          - video-cloud/playback-auth/key/write
+          - video-cloud/playback-auth/audit
       parameters:
         - name: account_id
           in: path
@@ -37,6 +37,21 @@ paths:
           explode: false
           schema:
             type: string
+        - name: date
+          in: path
+          description: |-
+            Date for requested usage report
+            Validations:
+              Format YYYY-MM-DD
+              Date cannot be today (UTC time)
+              Date cannot be > 1 month old
+              Brightcove does not hold on to the authorization service usage reports after 30 days to follow GDPR compliance
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: date
         - name: Content-Type
           in: header
           description: 'Content-Type: application/json'
@@ -88,6 +103,7 @@ paths:
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
+  '/accounts/{account_id}/query':
     get:
       tags:
         - Key
