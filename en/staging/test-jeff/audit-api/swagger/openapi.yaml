@@ -219,7 +219,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetPolicy200'
+                $ref: '#/components/schemas/FetchResponse'
         '400':
           description: >-
             NOT_AVAILABLE: The resource you are requesting is temporarily unavailable
@@ -275,6 +275,27 @@ components:
         {
           "status": "completed"
         }
+    FetchResponse:
+      title:  Fetch Response
+      required:
+        - signedURL
+        - expirationTime
+      type: string
+      description: The results are returned as an S3 URL that you can download
+      properties:
+        signedURL:
+          type: string
+          description:
+            The results are returned as an S3 URL that you can download
+        expirationTime:
+          type: integer
+          description:
+            Epoch Timestamp, Signed S3 URLs are valid for 15 minutes
+      example: >-
+        {
+          "signedURL": "http://signed-url",
+          "expirationTime": 1569219842
+        }
     Status200:
       title:  Status Response 200
       required:
@@ -319,122 +340,6 @@ components:
           "status": "failed",
           "message": "Internal Server Error"
         }
-
-
-
-
-    CreateAKeybody:
-      title: Create_a_Key_Body
-      required:
-        - key-data
-      type: object
-      properties:
-        key-data:
-          description: Data for the public key
-          $ref: '#/components/schemas/CreateAKeybody.key-data'
-    CreateAKeybody.key-data:
-      title: Create_a_Key_Body.key-data
-      required:
-        - account-id
-      type: object
-      properties:
-        account-id:
-          type: string
-          description: Video Cloud account id
-        value:
-          type: string
-          description: >-
-            The publisher will generate a public-private key pair and provide the public key to Brightcove
-    CreateAKeyResponse:
-      title:  Request Response
-      required:
-        - key_string
-        - key-data
-      type: object
-      properties:
-        key_string:
-          type: string
-          description: The policy key string
-        key-data:
-          description: Map of key data prescribing the policy
-          $ref: '#/components/schemas/KeyData'
-      example: >-
-        {
-          "key-string": "BCpkADawqM1IftwCYR6HsNBjvIoCgGZdeSz6f1zJYW4mGg7YFiCIejFI1np9eYIsweJ_RynK7mXlB1vYCN8BCRbgp9MrXPRzGlLiShLBd5HGnRjYsLsb6p02eDpFKuNu_jwKLzlvdRjJR5fQPpCxUFlpPL_55HXWZtwfWeyolAuxK7q2V2Nc6p1J-cu",
-          "key-data": {
-            "account-id": "2728142649001",
-            "apis": [
-              "search"
-            ],
-            "allowed-domains": [
-              "https://54.210.55.162"
-            ]
-          }
-        }
-    KeyData:
-      title: key-data
-      required:
-        - account-id
-        - apis
-        - allowed-domains
-        - require-ad-config
-        - geo
-      type: object
-      properties:
-        account-id:
-          type: string
-          description: The Video Cloud account id
-        apis:
-          type: array
-          items:
-            type: string
-          description: Array of apis permitted for the key
-        allowed-domains:
-          type: array
-          items:
-            type: string
-          description: Array of domains allowed to use this key
-        require-ad-config:
-          type: boolean
-          description: >-
-            Whether Playback API requests require an ad-config-id URL parameter
-            for server-side ad insertion
-        geo:
-          description: Map of geo-filtering properties
-          $ref: '#/components/schemas/KeyData.geo'
-    KeyData.geo:
-      title: key-data.geo
-      required:
-        - countries
-        - exclude_countries
-      type: object
-      properties:
-        countries:
-          type: array
-          items:
-            type: string
-          description: >-
-            Array of ISO 3166 list of 2- or 4-letter codes in lower-case (search
-            for &quot;country codes&quot;)
-        exclude_countries:
-          type: boolean
-          description: >-
-            If true, country array is treated as a list of countries excluded
-            from viewing. If false, the country array is a list of countries
-            included for viewing.
-    GetPolicy200:
-      title: Get_Policy200
-      required:
-        - key_string
-        - key-data
-      type: object
-      properties:
-        key_string:
-          type: string
-          description: The policy key string
-        key-data:
-          description: Map of key data prescribing the policy
-          $ref: '#/components/schemas/KeyData'
   securitySchemes:
     BC_OAuth2:
       type: oauth2
