@@ -17,7 +17,7 @@ tags:
   - name: Audit
     description: Operations for requesting, checking the status and getting the daily usage report URL for Brightcove's Playback Authorization Service.
 paths:
-  '/accounts/{account_id}/query/{date}':
+  '/accounts/{accountID}/query/{date}':
     post:
       tags:
         - Audit
@@ -29,7 +29,7 @@ paths:
         - BC_OAuth2:
           - video-cloud/playback-auth/audit
       parameters:
-        - name: account_id
+        - name: accountID
           in: path
           description: Video Cloud account ID
           required: true
@@ -42,10 +42,10 @@ paths:
           description: |-
             Date for requested usage report
             Validations:
-              Format YYYY-MM-DD
-              Date cannot be today (UTC time)
-              Date cannot be > 1 month old
-              Brightcove does not hold on to the authorization service usage reports after 30 days to follow GDPR compliance
+              - Format YYYY-MM-DD
+              - Date cannot be today (UTC time)
+              - Date cannot be < 30 days in the past
+              - Brightcove does not hold on to the authorization service usage reports after 30 days to follow GDPR compliance
           required: true
           style: simple
           explode: false
@@ -68,21 +68,13 @@ paths:
           explode: false
           schema:
             type: string
-      requestBody:
-        description: Register a Public Key with Brightcove's Playback Authorization Service
-        content:
-          application/json:
-            schema:
-              description: Register a public key
-              $ref: '#/components/schemas/CreateAKeybody'
-        required: true
       responses:
         '200':
           description: '200'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateKeyResponse'
+                $ref: '#/components/schemas/RequestResponse'
         '400':
           description: >-
             NOT_AVAILABLE: The resource you are requesting is temporarily unavailable
@@ -103,20 +95,28 @@ paths:
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
-  '/accounts/{account_id}/query':
+  '/accounts/{accountID}/execution/{executionID}/status':
     get:
       tags:
-        - Key
-      summary: List Public Keys
-      description: 'Get a list of public keys associated with a specified account'
-      operationId: GetKeys
+        - Check status
+      summary: Check usage report status
+      description: 'Check the status of your usage report request'
+      operationId: CheckStatus
       security:
         - BC_OAuth2:
-          - video-cloud/playback-auth/key/read
+          - video-cloud/playback-auth/audit
       parameters:
-        - name: account_id
+        - name: accountID
           in: path
           description: Video Cloud account ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: executionID
+          in: path
+          description: A unique ID associated with a usage report for a specified accountID and date
           required: true
           style: simple
           explode: false
@@ -306,6 +306,24 @@ paths:
         IsMultiContentStreaming: false
 components:
   schemas:
+    RequestResponse:
+      title:  Request Response
+      required:
+        - executionID
+      type: string
+      description: A unique ID associated with a usage report for a specified accountID and date
+      properties:
+        executionID:
+          type: string
+          description: A unique ID associated with a usage report for a specified accountID and date
+      example: >-
+        {
+          "executionID": "abcdef-asfdag-dvsbcd"
+        }
+
+
+
+
     CreateAKeybody:
       title: Create_a_Key_Body
       required:
@@ -328,8 +346,8 @@ components:
           type: string
           description: >-
             The publisher will generate a public-private key pair and provide the public key to Brightcove
-    CreateKeyResponse:
-      title:  Create Key Response
+    CreateAKeyResponse:
+      title:  Request Response
       required:
         - key_string
         - key-data
