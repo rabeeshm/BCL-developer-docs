@@ -98,10 +98,85 @@ paths:
   '/accounts/{accountID}/execution/{executionID}/status':
     get:
       tags:
-        - Check status
+        - Audit
       summary: Check usage report status
       description: 'Check the status of your usage report request'
       operationId: CheckStatus
+      security:
+        - BC_OAuth2:
+          - video-cloud/playback-auth/audit
+      parameters:
+        - name: accountID
+          in: path
+          description: Video Cloud account ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: executionID
+          in: path
+          description: A unique ID associated with a usage report for a specified accountID and date
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: Content-Type
+          in: header
+          description: 'Content-Type: application/json'
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status200'
+        '400':
+          description: '400'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status400'
+        '401':
+          description: >-
+            UNAUTHORIZED: Authentication failed; check to make sure your policy
+            key is correct
+        '404':
+          description: >-
+            RESOURCE_NOT_FOUND: The api could not find the resource you requested
+        '500':
+          description: '500'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status500'
+      deprecated: false
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  '/accounts/{accountID}/execution/{executionID}/report':
+    get:
+      tags:
+        - Audit
+      summary: Fetch usage report
+      description: 'Fetch your daily usage report'
+      operationId: FetchReport
       security:
         - BC_OAuth2:
           - video-cloud/playback-auth/audit
@@ -165,145 +240,6 @@ paths:
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
-  '/accounts/{account_id}/keys/{key_id}':
-    get:
-      tags:
-        - Key
-      summary: Get One Public Key
-      description: 'Get one public key associated with a specified account'
-      operationId: GetOneKey
-      security:
-        - BC_OAuth2:
-          - video-cloud/playback-auth/key/read
-      parameters:
-        - name: account_id
-          in: path
-          description: Video Cloud account ID
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-        - name: key_id
-          in: path
-          description: Your public key value
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-        - name: Content-Type
-          in: header
-          description: 'Content-Type: application/json'
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-        - name: Authorization
-          in: header
-          description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-      responses:
-        '200':
-          description: '200'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPolicy200'
-        '400':
-          description: >-
-            NOT_AVAILABLE: The resource you are requesting is temporarily unavailable
-        '401':
-          description: >-
-            UNAUTHORIZED: Authentication failed; check to make sure your policy
-            key is correct
-        '404':
-          description: >-
-            RESOURCE_NOT_FOUND: The api could not find the resource you requested
-        '500':
-          description: |-
-            UNKNOWN: Issue in Brightcove system; try again later.
-            TIMEOUT: Server likely too busy; try again later.
-      deprecated: false
-      x-operation-settings:
-        CollectParameters: false
-        AllowDynamicQueryParameters: false
-        AllowDynamicFormParameters: false
-        IsMultiContentStreaming: false
-    delete:
-      tags:
-        - Key
-      summary: Delete One Public Key
-      description: 'Delete one public key associated with a specified account'
-      operationId: DeleteKey
-      security:
-        - BC_OAuth2:
-          - video-cloud/playback-auth/key/write
-      parameters:
-        - name: account_id
-          in: path
-          description: Video Cloud account ID
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-        - name: key_id
-          in: path
-          description: Your public key value
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-        - name: Content-Type
-          in: header
-          description: 'Content-Type: application/json'
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-        - name: Authorization
-          in: header
-          description: 'Authorization: Bearer access_token (see Getting Access Tokens)'
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-      responses:
-        '200':
-          description: '200'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPolicy200'
-        '400':
-          description: >-
-            NOT_AVAILABLE: The resource you are requesting is temporarily unavailable
-        '401':
-          description: >-
-            UNAUTHORIZED: Authentication failed; check to make sure your policy
-            key is correct
-        '404':
-          description: >-
-            RESOURCE_NOT_FOUND: The api could not find the resource you requested
-        '500':
-          description: |-
-            UNKNOWN: Issue in Brightcove system; try again later.
-            TIMEOUT: Server likely too busy; try again later.
-      deprecated: false
-      x-operation-settings:
-        CollectParameters: false
-        AllowDynamicQueryParameters: false
-        AllowDynamicFormParameters: false
-        IsMultiContentStreaming: false
 components:
   schemas:
     RequestResponse:
@@ -319,6 +255,69 @@ components:
       example: >-
         {
           "executionID": "abcdef-asfdag-dvsbcd"
+        }
+    StatusResponse:
+      title:  Status Response
+      required:
+        - status
+      type: string
+      description: The status returned from a report query
+      properties:
+        status:
+          type: string
+          description: |-
+            The status returned from a report query.
+            Values:
+            - "completed"
+            - "processing"
+            - "failed"
+      example: >-
+        {
+          "status": "completed"
+        }
+    Status200:
+      title:  Status Response 200
+      required:
+        - status
+      type: string
+      description: The status returned from a report query
+      properties:
+        status:
+          type: string
+          description: The status returned from a report query.
+      example: >-
+        {
+          "status": "completed"
+        }
+    Status400:
+      title:  Status Response 400
+      required:
+        - status
+      type: string
+      description: The status returned from a report query
+      properties:
+        status:
+          type: string
+          description: The status returned from a report query.
+      example: >-
+        {
+          "status": "failed",
+          "message": "Error executing status for executionID"
+        }
+    Status500:
+      title:  Status Response 500
+      required:
+        - status
+      type: string
+      description: The status returned from a report query
+      properties:
+        status:
+          type: string
+          description: The status returned from a report query.
+      example: >-
+        {
+          "status": "failed",
+          "message": "Internal Server Error"
         }
 
 
