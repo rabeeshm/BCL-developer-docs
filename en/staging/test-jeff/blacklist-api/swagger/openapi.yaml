@@ -24,10 +24,10 @@ paths:
       summary: Add a token to the blacklist
       description: |-
         Add a token to the blacklist to invalidate for license requests when using Brightcove's Playback Authorization Service
-      operationId: RequestReport
+      operationId: BlacklistToken
       security:
         - BC_OAuth2:
-          - video-cloud/playback-auth/audit
+          - video-cloud/playback-auth/blacklist
       parameters:
         - name: accountID
           in: path
@@ -39,7 +39,7 @@ paths:
             type: string
         - name: token
           in: path
-          description: The entire encoded JWT string is included in the path.
+          description: The entire encoded JWT token string is included in the path.
           required: true
           style: simple
           explode: false
@@ -62,12 +62,9 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: '200'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RequestResponse'
+        '204':
+          description: >-
+            NOT_AVAILABLE: The token is blacklisted
         '400':
           description: >-
             NOT_AVAILABLE: The resource you are requesting is temporarily unavailable
@@ -88,28 +85,20 @@ paths:
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
-  '/accounts/{accountID}/execution/{executionID}/status':
+  '/accounts/{accountID}/blacklist':
     get:
       tags:
-        - Audit
-      summary: Check usage report status
-      description: 'Check the status of your usage report request'
-      operationId: CheckStatus
+        - Blacklist
+      summary: Get the current blacklist
+      description: 'Get the access tokens that are on the blacklist'
+      operationId: GetBlacklist
       security:
         - BC_OAuth2:
-          - video-cloud/playback-auth/audit
+          - video-cloud/playback-auth/blacklist
       parameters:
         - name: accountID
           in: path
           description: Video Cloud account ID
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-        - name: executionID
-          in: path
-          description: A unique ID associated with a usage report for a specified accountID and date
           required: true
           style: simple
           explode: false
@@ -137,13 +126,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Status200'
+                $ref: '#/components/schemas/BlacklistResponse'
         '400':
-          description: '400'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Status400'
+          description: >-
+            NOT_AVAILABLE: The resource you are requesting is temporarily unavailable
         '401':
           description: >-
             UNAUTHORIZED: Authentication failed; check to make sure your policy
@@ -152,11 +138,9 @@ paths:
           description: >-
             RESOURCE_NOT_FOUND: The api could not find the resource you requested
         '500':
-          description: '500'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Status500'
+          description: |-
+            UNKNOWN: Issue in Brightcove system; try again later.
+            TIMEOUT: Server likely too busy; try again later.
       deprecated: false
       x-operation-settings:
         CollectParameters: false
@@ -235,8 +219,8 @@ paths:
         IsMultiContentStreaming: false
 components:
   schemas:
-    RequestResponse:
-      title:  Request Response
+    BlacklistResponse:
+      title:  Blacklist Response
       required:
         - executionID
       type: string
@@ -327,4 +311,4 @@ components:
         clientCredentials:
           tokenUrl: 'https://oauth.brightcove.com/v4/access_token'
           scopes:
-            video-cloud/playback-auth/audit: Request, check status and fetch daily usage report
+            video-cloud/playback-auth/audit: Manage the blacklisting of access tokens
