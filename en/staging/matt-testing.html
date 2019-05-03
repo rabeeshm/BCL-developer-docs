@@ -989,9 +989,75 @@ https://players.api.brightcove.com/v2/accounts/$ACCOUNT_ID/players/$PLAYER_ID/co
 <figure class="bcls-figure">
     <img class="bcls-image" src="//learning-services-media.brightcove.com/doc-assets/player-development/references/player-catalog/geo-error.png" alt="geo error">
 </figure>
+<p>The following code catches the catalog error, then checks to see if it is a geo-filtering issue. If it is, then an appropriate message is displayed in the HTML page, just below the player, as shown in the screenshot.</p>
+<pre class="line-numbers"><code class="language-html">&lt;video-js id=&quot;myPlayerID&quot;
+  data-video-id=&quot;4040394419001&quot;
+  data-account=&quot;1486906377&quot;
+  data-player=&quot;XJhO7JGxY&quot;
+  data-embed=&quot;default&quot;
+  data-application-id
+  class=&quot;video-js&quot;
+  controls
+  width=&quot;640&quot;
+  height=&quot;360&quot;&gt;&lt;/video-js&gt;
+&lt;script src=&quot;//players.brightcove.net/1486906377/XJhO7JGxY_default/index.min.js&quot;&gt;&lt;/script&gt;
+&lt;br&gt;
+&lt;div id=&quot;textTarget&quot;&gt;&lt;/div&gt;
+
+&lt;script type=&quot;text/javascript&quot;&gt;
+  videojs.getPlayer('myPlayerID').one('bc-catalog-error', function() {
+    var myPlayer = this,
+      specificError;
+    if (myPlayer.catalog.error !== undefined) {
+      specificError = myPlayer.catalog.error.data[0];
+      console.log('myPlayer.catalog.error', myPlayer.catalog.error);
+      if (specificError !== undefined &amp; specificError.error_subcode == 'CLIENT_GEO') {
+        document.getElementById('textTarget').innerHTML = '&lt;strong&gt;The video you are trying to watch cannot be viewed from your current country or location.&lt;/strong&gt;';
+      };
+    };
+  });
+
+  videojs.getPlayer('myPlayerID').ready(function() {
+    var myPlayer = this;
+    console.log('in ready');
+  });
+&lt;/script&gt;</code></pre>
 
 <h3 id="Handle_IP_restriction_error">Handle IP restriction error</h3>
-<p></p>
+<p>The following code is analogous to what was just shown above for geo-filtering, except for IP restrictions:</p>
+<pre class="line-numbers">
+<code class="language-html">&lt;video-js id=&quot;myPlayerID&quot;
+  data-video-id=&quot;5981021521001&quot;
+  data-account=&quot;5977711152001&quot;
+  data-player=&quot;iYNDnCGt9&quot;
+  data-embed=&quot;default&quot;
+  data-application-id
+  class=&quot;video-js&quot;
+  controls
+  width=&quot;640&quot;
+  height=&quot;360&quot;&gt;&lt;/video-js&gt;
+&lt;script src=&quot;//players.brightcove.net/5977711152001/iYNDnCGt9_default/index.min.js&quot;&gt;&lt;/script&gt;
+&lt;br&gt;
+&lt;div id=&quot;textTarget&quot;&gt;&lt;/div&gt;
+
+&lt;script type=&quot;text/javascript&quot;&gt;
+  videojs.getPlayer('myPlayerID').one('bc-catalog-error', function() {
+    var myPlayer = this,
+      specificError;
+    if (myPlayer.catalog.error !== undefined) {
+      specificError = myPlayer.catalog.error.data[0];
+      console.log('myPlayer.catalog.error', myPlayer.catalog.error);
+      if (specificError !== undefined &amp; specificError.error_subcode == 'CLIENT_IP') {
+        document.getElementById('textTarget').innerHTML = '&lt;strong&gt;The video you are trying to watch cannot be viewed from your current IP address.&lt;/strong&gt;';
+      };
+    };
+  });
+
+  videojs.getPlayer('myPlayerID').ready(function() {
+    var myPlayer = this;
+    console.log('in ready');
+  });
+&lt;/script&gt;</code></pre>
 </section>
 
 <section class="bcls-section">
