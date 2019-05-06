@@ -82,13 +82,12 @@
 
 <p>The publisher will generate a public-private key pair and provide the public key to Brightcove. The private key is used by the publisher to sign tokens, and is not shared with Brightcove.</p>
 
-<h3>Generate</h3>
 <p>
   There are many ways to generate the public-private key pair. Here are some examples:
 </p>
-<h4>
+<h3>
   Example bash script:
-</h4>
+</h3>
 <p>
   Example script to generate the key pair:
 </p>
@@ -119,7 +118,7 @@ echo &quot;Public key saved in $PUBLIC_TXT&quot;
 <pre><code class="language-bash">bash keygen.sh
 </code></pre>
 
-<h4 id="Example_using_Go" class="bcls-expander-head">Example using Go</h4>
+<h3 id="Example_using_Go" class="bcls-expander-head">Example using Go</h3>
 <div class="bcls-expander-content">
 <p>
   Example using the Go programming language to generate the key pair:
@@ -202,7 +201,7 @@ func main() {
 </code></pre>
 </div>
 
-<h4 id="Example_using_node_js" class="bcls-expander-head">Example using node.js</h4>
+<h3 id="Example_using_node_js" class="bcls-expander-head">Example using node.js</h3>
 <div class="bcls-expander-content">
 <p>
   Example using node.js to generate the key pair:
@@ -240,32 +239,6 @@ crypto.generateKeyPair(
 
 </div>
 
-<h3>Results</h3>
-<p>
-  Here is an example of a decoded token using <a href="https://jwt.io/">https://JWT.io</a> specifying the full set of claims:
-</p>
-<p>
-  HEADER:
-</p>
-<pre class="line-numbers"><code class="language-json">{
-  &quot;alg&quot;: &quot;ES256&quot;,
-  &quot;type&quot;: &quot;JWT&quot;
-}
-</code></pre>
-
-<p>
-  PAYLOAD:
-</p>
-<pre class="line-numbers"><code class="language-json">{
-  &quot;accid&quot;: &quot;1100863500123&quot;,
-  &quot;conid&quot;: &quot;51141412620123&quot;,
-  &quot;exp&quot;: 1554200832,
-  &quot;iat&quot;: 1554199032,
-  &quot;maxip&quot;: 10,
-  &quot;maxu&quot;: 10,
-  &quot;ua&quot;: &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36&quot;
-}
-</code></pre>
 </section>
 
 <section class="bcls-section">
@@ -304,10 +277,10 @@ crypto.generateKeyPair(
 </p>
 <ul>
   <li>
-    video-cloud/playback-auth/key/read
+    <code>video-cloud/playback-auth/key/read</code>
   </li>
   <li>
-    video-cloud/playback-auth/key/write
+    <code>video-cloud/playback-auth/key/write</code>
   </li>
 </ul>
 
@@ -346,41 +319,77 @@ crypto.generateKeyPair(
 <h2 id="Generate_JWT_token">Generate JWT token</h2>
 
 <p>Publishers create a <a href="https://jwt.io/introduction/">JSON Web Token</a> (JWT). The token is signed with the <a href="https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm">Elliptic Curve Digital Signature Algorithm</a> (ECDSA) using the P-256 curve and the SHA-256 hash algorithm (identified in the JWT spec as "<a href="https://ldapwiki.com/wiki/ES256">ES256</a>"). No other JWT algorithms will be supported.</p>
+
+<h3>Claims</h3>
 <p>
   A subset of the standard <a href="https://auth0.com/docs/tokens/jwt-claims">JSON Web Token claims</a> will be used, along with some private claims defined by Brightcove:
 </p>
+<table class="bcls-table">
+  <thead class="bcls-table__head">
+    <tr>
+      <th>Field</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody class="bcls-table__body">
+    <tr>
+      <td><code>accid</code></td>
+      <td>String</td>
+      <td>Yes</td>
+      <td>The account id that owns the content being played</td>
+    </tr>
+    <tr>
+      <td><code>conid</code></td>
+      <td>String</td>
+      <td></td>
+      <td>If present, this token will only authorize license fetching for a specific Video Cloud video id</td>
+    </tr>
+    <tr>
+      <td><code>exp</code></td>
+      <td>Integer</td>
+      <td>Yes</td>
+      <td>Time this token will no longer be valid, in seconds since the Epoch. Must be no more than 30 days from <code>iat</code></td>
+    </tr>
+    <tr>
+      <td><code>iat</code></td>
+      <td>Integer</td>
+      <td>Yes</td>
+      <td>Time this token was issued, in seconds since the Epoch</td>
+    </tr>
+    <tr>
+      <td><code>maxip</code></td>
+      <td>Integer</td>
+      <td></td>
+      <td>If present, this token will only be able to be used by this many different IP addresses</td>
+    </tr>
+    <tr>
+      <td><code>maxu</code></td>
+      <td>Integer</td>
+      <td></td>
+      <td>
+          If present, this token will only be valid for this many license requests
+        <br><br>
+        <ul>
+          <li>
+            For HLSe, players will make multiple requests when playing a video, typically one per rendition. The <code>maxu</code> must be set high enough to account for these additional requests.
+          </li>
+          <li>
+            For DRM, one licence request is made per playback
+          </li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><code>ua</code></td>
+      <td>String</td>
+      <td></td>
+      <td>If present, this token will only be valid for requests from this User-Agent</td>
+    </tr>
+  </tbody>
+</table>
 
-<ul>
-  <li>
-    <code>accid</code> - REQUIRED string, must correspond to the account id that owns the content being played
-  </li>
-  <li>
-    <code>exp</code> - REQUIRED int, time this token will no longer be valid, in seconds since the Epoch. Must be no more than 30 days from <code>iat</code>.
-  </li>
-  <li>
-    <code>iat</code> - REQUIRED int, time this token was issued, in seconds since the Epoch
-  </li>
-  <li>
-    <code>conid</code> - OPTIONAL string, if present, this token will only authorize license fetching for a specific Video Cloud video id
-  </li>
-  <li>
-    <code>maxu</code>  - OPTIONAL int, integer, if present, this token will only be valid for this many license requests
-    <ul>
-      <li>
-        For HLSe, players will make multiple requests when playing a video, typically one per rendition. The <code>maxu</code> must be set high enough to account for these additional requests.
-      </li>
-      <li>
-        For DRM, one licence request is made per playback
-      </li>
-    </ul>
-  </li>
-  <li>
-    <code>maxip</code> - OPTIONAL int, integer, if present, this token will only be able to be used by this many different IP addresses
-  </li>
-  <li>
-    <code>ua</code> - OPTIONAL string, a User-Agent string, if present, this token will only be valid for requests from this User-Agent
-  </li>
-</ul>
 
 <p>
   Libraries are commonly available to generate JWT tokens. For details, see the <a href="https://jwt.io/">JSON Web Tokens</a> site.
@@ -388,7 +397,7 @@ crypto.generateKeyPair(
 <p>
 
 </p>
-<h4 id="Example_using_Go_token" class="bcls-expander-head">Example using Go</h4>
+<h3 id="Example_using_Go_token" class="bcls-expander-head">Example using Go</h3>
 <div class="bcls-expander-content">
 <p>
   Here is an example of a reference Go implementation (as a cli tool) for generating tokens without the use of any 3rd party library:
@@ -508,6 +517,33 @@ func main() {
 </code></pre>
 </div>
 
+<h3>Results</h3>
+<p>
+  Here is an example of a decoded token using <a href="https://jwt.io/">https://JWT.io</a> specifying the full set of claims:
+</p>
+<p>
+  HEADER:
+</p>
+<pre class="line-numbers"><code class="language-json">{
+  &quot;alg&quot;: &quot;ES256&quot;,
+  &quot;type&quot;: &quot;JWT&quot;
+}
+</code></pre>
+
+<p>
+  PAYLOAD:
+</p>
+<pre class="line-numbers"><code class="language-json">{
+  &quot;accid&quot;: &quot;1100863500123&quot;,
+  &quot;conid&quot;: &quot;51141412620123&quot;,
+  &quot;exp&quot;: 1554200832,
+  &quot;iat&quot;: 1554199032,
+  &quot;maxip&quot;: 10,
+  &quot;maxu&quot;: 10,
+  &quot;ua&quot;: &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36&quot;
+}
+</code></pre>
+
 </section>
 
 <section class="bcls-section">
@@ -568,7 +604,7 @@ func main() {
 </p>
 <ul>
   <li>
-    video-cloud/playback-auth/blacklist
+    <code>video-cloud/playback-auth/blacklist</code>
   </li>
 </ul>
 
@@ -664,7 +700,7 @@ func main() {
 </p>
 <ul>
   <li>
-    video-cloud/playback-auth/audit
+    <code>video-cloud/playback-auth/audit</code>
   </li>
 </ul>
 
