@@ -310,6 +310,51 @@ paths:
         AllowDynamicQueryParameters: false
         AllowDynamicFormParameters: false
         IsMultiContentStreaming: false
+  '/jobs/{job_id}/cuepointdata':
+    post:
+      tags:
+        - Live Jobs
+      summary: Add or update Ad Metadata
+      description: >-
+        Allows  content metadata to be pushed and constantly updated out-of-band from a customer live stream..
+      operationId: AddAdMatadata
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+        - $ref: '#/components/parameters/ContentType'
+        - $ref: '#/components/parameters/XAPIKEY'
+      requestBody:
+        description: Contains a set of key/value pairs for ad requests.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddAdMatadatabody'
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManualAdCuePointInsertionResponse'
+        '400':
+          description: >-
+            BAD_REQUEST: Invalid input value - see Live API Error Messages for more details
+        '401':
+          description: >-
+            UNAUTHORIZED: Unauthorized - see Live API Error Messages for more details
+        '404':
+          description: >-
+            RESOURCE_NOT_FOUND: The api could not find the resource you requested - see Live API Error Messages for more details
+        '500':
+          description: >-
+            INTERNAL_SERVER_ERROR: DB getItem, no results found - see Live API Error Messages for more details
+      deprecated: false
+      security: []
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
   '/jobs/{job_id}/id3tag':
     post:
       tags:
@@ -1494,6 +1539,24 @@ components:
         playback_token:
           type: string
           example: 'live.TCaG-5GnlxmTFA8twsstmHqgET9npvC3nVtokT5nte...'
+    AddAdMatadatabody:
+      title: Add Ad Metadata Request body
+      description: ->
+        A set of key/value pairs for ad requests.
+      type: object
+      properties:
+        ad_server_data:
+          type: object
+          description: >-
+            Object containing a collection of keys and values. Values may be strings, numbers, or boolean.
+          example: >-
+            {
+              "ad_server_data": {
+              	"one":"won",
+              	"two":2,
+              	"three":false
+              }
+            }
     Application:
       properties:
         account_id:
