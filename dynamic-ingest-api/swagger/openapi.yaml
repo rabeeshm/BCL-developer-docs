@@ -240,8 +240,7 @@ components:
           type: string
           description: >-
             this is the URL you will include in your Dynamic Ingest POST request for the Master url or url for the image/text_tracks assets
-      example: >-
-        {
+      example: {
         	"bucket": "ingestion-upload-production",
         	"object_key": "57838016001/67909129001/c7e6f28b-9057-4616-a7aa-66a0eb836236/greatblueheron.mp4",
         	"access_key_id": "ASIA25ESRNNEXKNDUXGJ",
@@ -261,6 +260,7 @@ components:
           description: >-
             ingest profile to use for transcoding; if absent, account default
             profile will be used
+        example: multi-platform-standard-static
         priority:
           type: string
           description: |-
@@ -286,7 +286,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/IngestMediaAssetbody.audioTracks'
-          description: array of audio track objects **dynamic Delivery only**
+          description: array of audio track objects **Dynamic Delivery only**
         poster:
           $ref: '#/components/schemas/IngestMediaAssetbody.poster'
         thumbnail:
@@ -302,9 +302,23 @@ components:
           items:
             type: string
           description: array of URLs that notifications should be sent to
+          example: [
+              "http://solutions.brightcove.com/bcls/di-api/di-callbacks.php"
+            ]
     IngestMediaAssetbody.master:
-      title: Ingest Media Asse Body.master
+      title: Ingest Media Asset Body.master
       type: object
+      description: >-
+        Spefication of master for media asset(s) to be ingested
+      example: {
+          "url": "http://learning-services-media.brightcove.com/videos/mp4/greatblueheron.mp4",
+          "audio_tracks": [
+            {
+              "language": "en",
+              "variant": "main"
+            }
+          ]
+        }
       properties:
         url:
           type: string
@@ -312,18 +326,24 @@ components:
             URL for the video source; required except for re-transcoding where a
             digital master has been archived, or you are adding images or text
             tracks to an existing video
+          example: https://learning-services-media.brightcove.com/audio/celtic_lullaby.m4a
         use_archived_master:
           type: boolean
           description: >-
-            For retranscode requests, will use the archived master if set to
-            true; if set to false, you must also include the url for the source
-            video
+            For retranscode requests, will use the archived master if set to true; if set to false, you must also include the url for the source video
+          default: false
         audio_tracks:
           type: array
           description: >-
             Language code for the **muxed in** audio from the subtags in
             (http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry)
-            (default can be set for the account by contacting Brightcove Support) **dynamic Delivery only**
+            (default can be set for the account by contacting Brightcove Support) **Dynamic Delivery only**
+          example: [
+              {
+                "language": "en",
+                "variant": "main"
+              }
+            ]
           items:
             type: object
             properties:
@@ -332,11 +352,11 @@ components:
                 description: >-
                   Language code for the muxed in audio from the subtags in
                   (http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry)
-                  (default can be set for the account by contacting Brightcove Support) **dynamic Delivery only**
+                  (default can be set for the account by contacting Brightcove Support) **Dynamic Delivery only**
                 variant:
                   type: string
                   description: >-
-                    the type of audio track for the muxed in audio - generally `main` **dynamic Delivery only**
+                    the type of audio track for the muxed in audio - generally `main` **Dynamic Delivery only**
                   enum:
                     - main
                     - alternate
@@ -374,6 +394,15 @@ components:
         default:
           type: boolean
           description: sets the default language for captions/subtitles
+      example: [
+          {
+            "url": "https://learning-services-media.brightcove.com.s3.amazonaws.com/captions/bc_smart.vtt",
+            "srclang": "en",
+            "kind": "captions",
+            "label": "EN",
+            "default": true
+          }
+        ]
     IngestMediaAssetbody.audioTracks:
       title: Ingest Media Asset Body.audio_tracks
       type: object
@@ -387,7 +416,22 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/IngestMediaAssetbody.audioTracks.masters'
-          description: array of audio track objects **dynamic Delivery only**
+          description: array of audio track objects **Dynamic Delivery only**
+      example: {
+        "merge_with_existing": true,
+        "masters": [
+            {
+              "url": "http://learning-services-media.brightcove.com/audio/celtic_lullaby.m4a",
+              "language": "en",
+              "variant": "alternate"
+            },
+            {
+              "url": "http://learning-services-media.brightcove.com/audio/audio1.m4a",
+              "language": "en",
+              "variant": "commentary"
+            }
+          ]
+        }
     IngestMediaAssetbody.audioTracks.masters:
       title: Ingest Media Asset Body.audio_tracks.masters
       description: >-
@@ -396,19 +440,19 @@ components:
       properties:
         url:
           type: string
-          description: URL for the audio file **dynamic Delivery only**
+          description: URL for the audio file **Dynamic Delivery only**
         language:
           type: string
           description: >-
             Language code for the audio track from the subtags in
             http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
             (default can be set for the account by contacting Brightcove
-            Support) **dynamic Delivery only**
+            Support) **Dynamic Delivery only**
         variant:
           type: string
           description: >-
             the type of audio track (default can be set for the account by
-            contacting Brightcove Support) **dynamic Delivery only**
+            contacting Brightcove Support) **Dynamic Delivery only**
           enum:
             - main
             - alternate
@@ -430,6 +474,11 @@ components:
         width:
           type: number
           description: pixel width of the image
+      example: {
+          "url": "http://learning-services-media.brightcove.com/images/celtic-lullaby-large.png",
+          "width": 1400,
+          "height": 1400
+        }
     IngestMediaAssetbody.thumbnail:
       title: Ingest Media Asset Body.thumbnail
       required:
@@ -445,6 +494,11 @@ components:
         width:
           type: number
           description: pixel width of the image
+      example: {
+          "url": "http://learning-services-media.brightcove.com/images/celtic-lullaby-large.png",
+          "width": 160,
+          "height": 90
+        }
     IngestMediaAssetResponse:
       title: Ingest Media Asset Response
       required:
@@ -454,8 +508,7 @@ components:
         id:
           type: string
           description: job id for the request
-      example: >-
-        {
+      example: {
         	"id": "1242d634-0447-45c0-a79d-2199df409b4f"
         }
   securitySchemes:

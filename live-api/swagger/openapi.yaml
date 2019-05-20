@@ -1578,12 +1578,11 @@ components:
           type: object
           description: >-
             Object containing a collection of keys and values. Values may be strings, numbers, or boolean.
-          example: >-
-            {
+          example: {
               "ad_server_data": {
-              	"one":"won",
-              	"two":2,
-              	"three":false
+                "one":"won",
+                "two":2,
+                "three":false
               }
             }
     Application:
@@ -2064,8 +2063,7 @@ components:
         - outputs
       title: Create_Live_JobBody
       type: object
-      example: >-
-        {
+      example: {
             "live_dvr_sliding_window_duration": 1,
             "notifications": [
                 "http://solutions.brightcove.com/bcls/live/live-callbacks.php",
@@ -2570,8 +2568,7 @@ components:
         - outputs
       title: Create_VOD_ClipBody
       type: object
-      example: >-
-        {
+      example: {
           "live_job_id": "3ae7fa89943f4a96aa273fbbf175d527",
           "outputs": [{
             "label": "first 30 secs of live job",
@@ -2934,24 +2931,19 @@ components:
               jvod_id:
                 type: string
                 description: VOD job id
+                readOnly: true
+                example: 62989518f9294e19b2f7e184e8141d72
               label:
                 type: string
                 description: Label for the job set in the input field
-              live_job_id:
-                type: string
-                description: The id of the live job
+                example: first 30 secs of live job
+        live_job_id:
+          type: string
+          description: The id of the live job
+          readOnly: true
+          example: 3ae7fa89943f4a96aa273fbbf175d527
       title: Create VOD Job Response
       type: object
-      example: >-
-        {
-          "vod_jobs": [
-            {
-              "jvod_id": "62989518f9294e19b2f7e184e8141d72",
-              "label": "first 30 secs of live job"
-            }
-          ],
-          "live_job_id": "3ae7fa89943f4a96aa273fbbf175d527"
-        }
     CreateRTMPOutputRequestBody:
       title: Create RTMP Output Request Body
       description: Request body for requests to create an RTMP output
@@ -3000,8 +2992,7 @@ components:
         stream_start:
           type: integer
           description: Time of the stream start in Epoch time (milliseconds)
-      example: >-
-        '{
+      example: {
           "connection_info": {
             "host": "live-api-s.facebook.com",
             "port": 80,
@@ -3011,7 +3002,7 @@ components:
           "duration_history": [],
           "rtmp_out_id": "foo",
           "stream_start": 1542731746032
-        }'
+        }
     Credentials:
       properties:
         credential_default_for_type:
@@ -3269,8 +3260,7 @@ components:
         - id3_tag
       title: Insert_ID3_timed_metadataBody
       type: object
-      example: >-
-        {
+      example: {
           "id3_tag": {
             "name": "BCOV",
             "value": "my value",
@@ -3367,8 +3357,7 @@ components:
             '[RTMP outputs](https://support.brightcove.com/live-api-rtmp-outputs) for the job'
           items:
             $ref: '#/components/schemas/RTMPout'
-          example: >-
-            '[
+          example: [
               {
                 "rtmp_out_id": "asdfg-lkjh",
                 "stream_start": 1538746255247,
@@ -3380,7 +3369,7 @@ components:
                   "sessionStatus": "Active"
                 }
               }
-            ]'
+            ]
         slate:
           description: id for a slate of assets included
           type: string
@@ -3517,8 +3506,7 @@ components:
         - output_media_files
       title: job
       type: object
-      example: >-
-        {
+      example: {
           "job": {
             "created_at": "2018-09-05T12:19:29.826Z",
             "finished_at": null,
@@ -4064,8 +4052,7 @@ components:
         - jobs
       title: List_Live_Jobs200
       type: object
-      example: >-
-        '{
+      example: {
           "next_token": "eyJhY2NvdW50X2lkIjoiYTk1YWM1ODE1NTFiNDQ3OGIyNzkxMGU1Njc1ZGIxZjgiLCJqb2JfaWQiOiI5NTA2NGI0Mjc0ZTI0M2Y0ODE0ZGQ2OTcxYTNjMmRkNyIsImpvYl9jcmVhdGVkX2F0IjoxNTI2MjQzNDgyNzEzfQ==",
           "jobs":
           [
@@ -4216,7 +4203,7 @@ components:
               ]
             }
           ]
-        }'
+        }
     ListRTMPOutputs:
       title: List RMTP Outputs
       description: >-
@@ -4224,8 +4211,7 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/RTMPout'
-      example: >-
-        '[
+      example: [
           {
             "rtmp_out_id": "asdfg-lkjh",
             "stream_start": 1538746255247,
@@ -4235,9 +4221,16 @@ components:
               "application": "live2",
               "streamName": "myStream",
               "sessionStatus": "Active"
-            }
+            },
+            "duration_history": [
+              {
+                "stream_start": 1557933191000,
+                "stream_end": 1557936731000
+              }
+            ],
+            "waiting_for_start": false
           }
-        ]'
+        ]
     RTMPout:
       title: RTMP Output
       type: object
@@ -4261,8 +4254,18 @@ components:
           type: array
           description: Array of durations for connections
           items:
-            type: integer
-            description: A connection duration in seconds
+            type: object
+            description: >-
+              A connection start and stop
+            properties:
+              stream_start:
+                type: integer
+                description: >-
+                  The epoch time (in milliseconds) that a stream connected
+              stream_end:
+                type: integer
+                description: >-
+                  The epoch time (in milliseconds) that a stream disconnected
         connection_info:
           type: object
           description: Details of the connection information
@@ -4285,6 +4288,12 @@ components:
               enum:
                 - Active
                 - Inactive
+        waiting_for_start:
+          type: boolean
+          description: |-
+            For SEP jobs. If `true`, the SEP job was deactivated but the RTMP output was not stopped and the next time you activate the stream on the SEP job there will be an attempt to reconnect the RTMP output.
+
+            If `waiting_for_start` is `false`, it means the RTMP output was stopped.
     ListVodJobs:
       properties:
         next_token:
@@ -4309,8 +4318,7 @@ components:
         - vod_jobs
       title: List_Live_Jobs200
       type: object
-      example: >-
-        {
+      example: {
           "jvod_state": "processing",
           "jvod_progress": "Chunklist-download-error",
           "job_id": "3ae7fa89943f4a96aa273fbbf175d527",
@@ -4444,8 +4452,7 @@ components:
         - add_cdns
       title: Create_a_Live_Job
       type: object
-      example: >-
-        {
+      example: {
           "id": "493885dfd7c64e23ad253fcc42c120d8",
           "outputs": [
             {
@@ -4501,13 +4508,12 @@ components:
         - cue_point
       title: Manual_Ad_Cue_Point_Insertion_Response
       type: object
-      example: >-
-        {
+      example: {
           "cue_point": {
               "accuracy": "segment",
               "duration": 30,
               "id": "c1d242de729d4a76a605e018cc101601"
-          }
+          },
           "id": "3ae7fa89943f4a96aa273fbbf175d527"
         }
     ManualAdCuePointInsertionbody:
@@ -4528,8 +4534,7 @@ components:
               3. Software encoders such as Wirecast and OBS do not support the sending timecode via `OnFI` packets in the RTMP stream
               4. Elemental hardware encoders do support the sending timecode via `OnFI` packets in the RTMP stream'
           type: string
-          example: >-
-            {
+          example: {
               "duration": 30,
               "ad_server_data": {
                 "subject": "wildlife"
