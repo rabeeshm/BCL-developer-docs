@@ -39,7 +39,7 @@ paths:
             type: string
         - name: token
           in: path
-          description: The entire encoded JWT token string is included in the path.
+          description: The entire encoded JSON Web Token string is included in the path
           required: true
           style: simple
           explode: false
@@ -62,12 +62,9 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: '200'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BlacklistResponse'
+        '204':
+          description: >-
+            SUCCESS: The JSON Web Token has been added to the Blacklist
         '400':
           description: >-
             NOT_AVAILABLE: The resource you are requesting is temporarily unavailable
@@ -92,7 +89,7 @@ paths:
       tags:
         - Blacklist
       summary: Check blacklist
-      description: 'Check if an access token is on the blacklist'
+      description: 'Check if a JSON Web Token is on the blacklist'
       operationId: CheckBlacklist
       security:
         - BC_OAuth2:
@@ -108,7 +105,7 @@ paths:
             type: string
         - name: token
           in: path
-          description: The entire encoded JWT token string is included in the path.
+          description: The entire encoded JSON Web Token string is included in the path
           required: true
           style: simple
           explode: false
@@ -131,12 +128,9 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: '200'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CheckResponse'
+        '204':
+          description: >-
+            SUCCESS: The JSON Web Token is on the Blacklist
         '400':
           description: >-
             NOT_AVAILABLE: The resource you are requesting is temporarily unavailable
@@ -161,7 +155,7 @@ paths:
       tags:
         - Blacklist
       summary: Remove token from blacklist
-      description: 'Remove an access token from the blacklist'
+      description: 'Remove a JSON Web Token from the blacklist'
       operationId: RemoveTokenFromBlacklist
       security:
         - BC_OAuth2:
@@ -177,7 +171,7 @@ paths:
             type: string
         - name: token
           in: path
-          description: The entire encoded JWT token string is included in the path.
+          description: The entire encoded JSON Web Token string is included in the path
           required: true
           style: simple
           explode: false
@@ -200,12 +194,9 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: '200'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RemoveResponse'
+        '204':
+          description: >-
+            SUCCESS: The specified JSON Web Token has been removed from the Blacklist API
         '400':
           description: >-
             NOT_AVAILABLE: The resource you are requesting is temporarily unavailable
@@ -231,7 +222,7 @@ paths:
       tags:
         - Blacklist
       summary: Get the current blacklist
-      description: 'Get the access tokens that are on the blacklist'
+      description: 'Get the JSON Web Tokens that are on the blacklist'
       operationId: GetBlacklist
       security:
         - BC_OAuth2:
@@ -267,7 +258,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BlacklistResponse'
+                type: array
+                description: Array of JSON Web Tokens that are on the Blacklist
+                items:
+                  $ref: '#/components/schemas/BlacklistResponse'
         '400':
           description: >-
             NOT_AVAILABLE: The resource you are requesting is temporarily unavailable
@@ -293,45 +287,15 @@ components:
     BlacklistResponse:
       title:  Blacklist Response
       required:
-        - status
-      type: string
-      description: Status response
+        - token
+      type: object
       properties:
-        status:
+        token:
           type: string
-          description: Status response
-      example: >-
-        {
-          "status": "token has been blacklisted"
-        }
-    CheckResponse:
-      title:  Check blacklist Response
-      required:
-        - status
-      type: string
-      description: Status response
-      properties:
-        status:
-          type: string
-          description: Status response
-      example: >-
-        {
-          "status": "token is on the blacklist"
-        }
-    RemoveResponse:
-      title:  Remove from blacklist Response
-      required:
-        - status
-      type: string
-      description: Status response
-      properties:
-        status:
-          type: string
-          description: Status response
-      example: >-
-        {
-          "status": "token has been removed from the blacklist"
-        }
+          description: JSON Web Token
+      example: {
+          "token": "eyJ0eXAiOi1234567890.eyJpc3MiO1234567890ifQ.cJRWi1234567890GwQ"
+          }
   securitySchemes:
     BC_OAuth2:
       type: oauth2

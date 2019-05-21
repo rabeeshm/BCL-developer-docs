@@ -5,7 +5,7 @@ x-bc-upstream: 'http://backend_server'
 info:
   title: Audit API Reference
   description: >-
-    Reference for the Brightcove Audit API. This API allows you to generate a daily access report for your account's Playback Authorization Service usage with session details.
+    Reference for the Brightcove Audit API. This API allows you to generate a daily access report for your account's [Playback Authorization Service](https://docs.brightcove.com/en/staging/pas/overview-playback-authorization-service.html) usage with session details.
 
      **Base URL**: https://playback-auth.api.brightcove.com
   version: 1.0.0
@@ -191,7 +191,7 @@ paths:
             type: string
         - name: executionID
           in: path
-          description: A unique ID associated with a usage report for a specified accountID and date
+          description: A unique ID associated with a usage report for a specified account ID and date
           required: true
           style: simple
           explode: false
@@ -244,87 +244,69 @@ components:
   schemas:
     RequestResponse:
       title:  Request Response
-      required:
-        - executionID
-      type: string
-      description: A unique ID associated with a usage report for a specified accountID and date
+      type: object
       properties:
-        executionID:
+        execution_id:
           type: string
-          description: A unique ID associated with a usage report for a specified accountID and date
-      example: >-
-        {
-          "executionID": "abcdef-asfdag-dvsbcd"
-        }
+          description: >-
+            A unique ID associated with a usage report for a specified accountID and date
+      example: {
+          "execution_id": "b123456e-1234-4e91-b123-123456d1234"
+          }
     FetchResponse:
       title:  Fetch Response
-      required:
-        - signedURL
-        - expirationTime
-      type: string
+      type: object
       description: The results are returned as an S3 URL that you can download
       properties:
-        signedURL:
+        report_url:
           type: string
-          description:
-            The results are returned as an S3 URL that you can download
-        expirationTime:
+          description: The results are returned as an S3 URL that you can download
+        expiration_time:
           type: integer
-          description:
-            Epoch Timestamp, Signed S3 URLs are valid for 15 minutes
-      example: >-
-        {
-          "signedURL": "http://signed-url",
-          "expirationTime": 1569219842
-        }
+          description: Epoch Timestamp. Signed S3 URLs are valid for 15 minutes
+      example: {
+          "report_url": "https://site.com/audit-reports-storage/b123456.csv?X-Algorithm=1234567890",
+          "expiration_time": 1557324256
+          }
     Status200:
       title:  Status Response 200
-      required:
-        - status
-      type: string
+      type: object
       description: The status returned from a report query
       properties:
-        status:
+        state:
           type: string
           description: The status returned from a report query.
           enum:
-            - "completed"
+            - "SUCCEEDED"
             - "processing"
             - "failed"
-      example: >-
-        '{
-          "status": "completed"
-        }'
+      example: {
+          "state": "SUCCEEDED"
+          }
     Status400:
       title:  Status Response 400
-      required:
-        - status
-      type: string
+      type: object
       description: The status returned from a report query
       properties:
-        status:
+        state:
           type: string
           description: The status returned from a report query.
-      example: >-
-        {
+      example: {
           "status": "failed",
-          "message": "Error executing status for executionID"
-        }
+          "message": "Error executing status for execution_id"
+          }
     Status500:
       title:  Status Response 500
-      required:
-        - status
-      type: string
+      type: object
       description: The status returned from a report query
       properties:
-        status:
+        state:
           type: string
           description: The status returned from a report query.
-      example: >-
-        {
+      example: {
           "status": "failed",
           "message": "Internal Server Error"
-        }
+          }
   securitySchemes:
     BC_OAuth2:
       type: oauth2
